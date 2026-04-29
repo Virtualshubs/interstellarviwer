@@ -154,7 +154,7 @@ function animate() {
 }
 
 /* =========================
-   DETECTOR ROBUSTO
+   DETECTOR
 ========================= */
 
 function detectType(text) {
@@ -177,7 +177,26 @@ function detectType(text) {
 }
 
 /* =========================
-   TEMPERATURA → COLOR REAL
+   TEMPERATURA FÍSICA
+========================= */
+
+function spectralToTemp(s){
+
+  if(!s) return 5800;
+
+  if(s.startsWith("O")) return 30000;
+  if(s.startsWith("B")) return 15000;
+  if(s.startsWith("A")) return 9000;
+  if(s.startsWith("F")) return 7000;
+  if(s.startsWith("G")) return 5800;
+  if(s.startsWith("K")) return 4500;
+  if(s.startsWith("M")) return 3200;
+
+  return 5800;
+}
+
+/* =========================
+   BLACKBODY REALISTA
 ========================= */
 
 function tempToColor(temp) {
@@ -208,7 +227,7 @@ function clamp(x){
 }
 
 /* =========================
-   PARSER ESTRELLA
+   PARSER
 ========================= */
 
 function parseStar(text){
@@ -219,23 +238,11 @@ function parseStar(text){
     spectral: get(/Spectral type:\s*([A-Z0-9]+)/i),
     parallax: parseFloat(get(/Parallaxes?.*?:\s*([0-9.]+)/i)),
     V: parseFloat(get(/\bV\s+([0-9.]+)/)),
+    B: parseFloat(get(/\bB\s+([0-9.]+)/)),
+    J: parseFloat(get(/\bJ\s+([0-9.]+)/)),
+    K: parseFloat(get(/\bK\s+([0-9.]+)/)),
     binary: /\*\*|Double|Multiple/i.test(text)
   };
-}
-
-function spectralToTemp(s){
-
-  if(!s) return 5800;
-
-  if(s.startsWith("O")) return 30000;
-  if(s.startsWith("B")) return 15000;
-  if(s.startsWith("A")) return 9000;
-  if(s.startsWith("F")) return 7000;
-  if(s.startsWith("G")) return 5800;
-  if(s.startsWith("K")) return 4500;
-  if(s.startsWith("M")) return 3200;
-
-  return 5800;
 }
 
 /* =========================
@@ -291,25 +298,34 @@ function generateObject(){
 
     const s = parseStar(text);
 
-    const temp = spectralToTemp(s.spectral);
+    // 🌡️ temperatura base
+    let temp = spectralToTemp(s.spectral);
+
+    // 🌈 corrección fotométrica simple
+    if(s.B && s.V) {
+      const bv = s.B - s.V;
+      temp *= (1 - 0.05 * bv);
+    }
+
+    if(s.J && s.K) {
+      const jk = s.J - s.K;
+      temp *= (1 - 0.03 * jk);
+    }
+
     const color = tempToColor(temp);
 
     const size = s.V ? Math.max(0.5, 3 - s.V * 0.2) : 1.2;
 
-    // ⭐ ESTRELLA (SIN LIGHTING)
     const geo = new THREE.SphereGeometry(size, 32, 32);
 
-    const mat = new THREE.MeshBasicMaterial({
-      color: color
-    });
+    const mat = new THREE.MeshBasicMaterial({ color });
 
     currentObject = new THREE.Mesh(geo, mat);
     scene.add(currentObject);
 
-    // ✨ GLOW SEPARADO
     const glowGeo = new THREE.SphereGeometry(size * 1.4, 32, 32);
     const glowMat = new THREE.MeshBasicMaterial({
-      color: color,
+      color,
       transparent: true,
       opacity: 0.25
     });
@@ -320,17 +336,17 @@ function generateObject(){
     info.innerHTML =
       `⭐ STAR<br>
       Spectral: ${s.spectral}<br>
-      Temp: ${temp}K<br>
+      Temp: ${Math.round(temp)}K<br>
       Parallax: ${s.parallax}<br>
-      Binary: ${s.binary}`;
-  }
+      Binary: ${s.binary}<br>
+      ☀ ${(size).toFixed(2)}x Sol`;
 
-  else {
+  } else {
 
     currentObject = createGalaxy();
     scene.add(currentObject);
 
-    info.innerHTML = "🌌 GALAXY detected (spiral improved)";
+    info.innerHTML = "🌌 GALAXY detected (spiral model)";
   }
 
   camera.position.z = distance;
