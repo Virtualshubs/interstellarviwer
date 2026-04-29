@@ -68,6 +68,7 @@ canvas { display: block; }
 
 let scene, camera, renderer;
 let currentObject;
+let currentGlow;
 
 let distance = 6;
 let rotX = 0;
@@ -82,9 +83,14 @@ function init() {
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
 
-  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -137,13 +143,18 @@ function animate() {
     currentObject.rotation.x = rotX;
   }
 
+  if (currentGlow) {
+    currentGlow.rotation.y = rotY;
+    currentGlow.rotation.x = rotX;
+  }
+
   camera.position.z += (distance - camera.position.z) * 0.1;
 
   renderer.render(scene, camera);
 }
 
 /* =========================
-   DETECTOR ROBUSTO REAL
+   DETECTOR ROBUSTO
 ========================= */
 
 function detectType(text) {
@@ -151,28 +162,22 @@ function detectType(text) {
   let starScore = 0;
   let galaxyScore = 0;
 
-  // ⭐ ESTRELLA (evidencia fuerte física real)
   if (/Spectral type/i.test(text)) starScore += 5;
   if (/Parallaxes/i.test(text)) starScore += 5;
   if (/Proper motions/i.test(text)) starScore += 4;
-  if (/Fluxes/i.test(text)) starScore += 1;
 
-  // 🌌 GALAXIA (evidencia astrofísica real)
   if (/NGC|IC\b/i.test(text)) galaxyScore += 6;
   if (/Morphological type/i.test(text)) galaxyScore += 5;
-  if (/redshift|z\(emission\)|cz/i.test(text)) galaxyScore += 4;
-  if (/Sb|Sa|Sc|HII/i.test(text)) galaxyScore += 2;
+  if (/redshift|cz|HII/i.test(text)) galaxyScore += 4;
 
-  // ⚖ DECISIÓN FINAL
   if (starScore >= 8 && starScore > galaxyScore) return "star";
   if (galaxyScore >= 6 && galaxyScore > starScore) return "galaxy";
 
-  // fallback seguro (SIMBAD dominante = estrella)
   return "star";
 }
 
 /* =========================
-   TEMPERATURA → COLOR
+   TEMPERATURA → COLOR REAL
 ========================= */
 
 function tempToColor(temp) {
@@ -203,7 +208,7 @@ function clamp(x){
 }
 
 /* =========================
-   STAR PARSER
+   PARSER ESTRELLA
 ========================= */
 
 function parseStar(text){
@@ -241,20 +246,26 @@ function createGalaxy(){
 
   const g = new THREE.Group();
 
-  for(let i=0;i<2000;i++){
+  for(let i=0;i<2500;i++){
 
     const t = i * 0.15;
     const r = 0.005 * i;
 
-    const x = Math.cos(t) * r;
-    const z = Math.sin(t) * r;
+    const arm = (i % 2) * Math.PI;
+
+    const x = Math.cos(t + arm) * r;
+    const z = Math.sin(t + arm) * r;
 
     const m = new THREE.Mesh(
       new THREE.SphereGeometry(0.008),
-      new THREE.MeshBasicMaterial({color:0xffffff})
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
     );
 
-    m.position.set(x,(Math.random()-0.5)*0.2,z);
+    m.position.set(
+      x + (Math.random()-0.5)*0.02,
+      (Math.random()-0.5)*0.2,
+      z + (Math.random()-0.5)*0.02
+    );
 
     g.add(m);
   }
@@ -274,6 +285,7 @@ function generateObject(){
   const type = detectType(text);
 
   if(currentObject) scene.remove(currentObject);
+  if(currentGlow) scene.remove(currentGlow);
 
   if(type === "star"){
 
@@ -284,16 +296,26 @@ function generateObject(){
 
     const size = s.V ? Math.max(0.5, 3 - s.V * 0.2) : 1.2;
 
-    const geo = new THREE.SphereGeometry(size,32,32);
+    // ⭐ ESTRELLA (SIN LIGHTING)
+    const geo = new THREE.SphereGeometry(size, 32, 32);
 
-    const mat = new THREE.MeshStandardMaterial({
-      color,
-      emissive: color,
-      emissiveIntensity: 1.5
+    const mat = new THREE.MeshBasicMaterial({
+      color: color
     });
 
-    currentObject = new THREE.Mesh(geo,mat);
+    currentObject = new THREE.Mesh(geo, mat);
     scene.add(currentObject);
+
+    // ✨ GLOW SEPARADO
+    const glowGeo = new THREE.SphereGeometry(size * 1.4, 32, 32);
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.25
+    });
+
+    currentGlow = new THREE.Mesh(glowGeo, glowMat);
+    scene.add(currentGlow);
 
     info.innerHTML =
       `⭐ STAR<br>
@@ -308,7 +330,7 @@ function generateObject(){
     currentObject = createGalaxy();
     scene.add(currentObject);
 
-    info.innerHTML = "🌌 GALAXY detected (spiral model)";
+    info.innerHTML = "🌌 GALAXY detected (spiral improved)";
   }
 
   camera.position.z = distance;
