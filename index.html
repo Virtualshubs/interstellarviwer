@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Star Visualizer</title>
+<title>Star / Galaxy Visualizer</title>
 
 <style>
 body {
@@ -57,7 +57,7 @@ canvas { display: block; }
 <body>
 
 <div id="ui">
-  <textarea id="input" placeholder="Pega aquí datos SIMBAD / Gaia / galaxias..."></textarea>
+  <textarea id="input" placeholder="Pega datos SIMBAD / Gaia / NGC..."></textarea>
   <button onclick="generateObject()">Previsualizar objeto</button>
   <div id="info"></div>
 </div>
@@ -143,25 +143,36 @@ function animate() {
 }
 
 /* =========================
-   DETECTOR ROBUSTO (FIX REAL)
+   DETECTOR ROBUSTO REAL
 ========================= */
 
 function detectType(text) {
 
-  let star = 0;
-  let galaxy = 0;
+  let starScore = 0;
+  let galaxyScore = 0;
 
-  if (/Spectral type|Parallaxes|Proper motions|Fluxes/i.test(text)) star += 5;
-  if (/V\s+[0-9.]+|B\s+[0-9.]+/i.test(text)) star += 2;
+  // ⭐ ESTRELLA (evidencia fuerte física real)
+  if (/Spectral type/i.test(text)) starScore += 5;
+  if (/Parallaxes/i.test(text)) starScore += 5;
+  if (/Proper motions/i.test(text)) starScore += 4;
+  if (/Fluxes/i.test(text)) starScore += 1;
 
-  if (/NGC|IC\b/i.test(text)) galaxy += 5;
-  if (/Morphological|redshift|cz|HII|Sb|Sa|Sc/i.test(text)) galaxy += 3;
+  // 🌌 GALAXIA (evidencia astrofísica real)
+  if (/NGC|IC\b/i.test(text)) galaxyScore += 6;
+  if (/Morphological type/i.test(text)) galaxyScore += 5;
+  if (/redshift|z\(emission\)|cz/i.test(text)) galaxyScore += 4;
+  if (/Sb|Sa|Sc|HII/i.test(text)) galaxyScore += 2;
 
-  return star >= galaxy ? "star" : "galaxy";
+  // ⚖ DECISIÓN FINAL
+  if (starScore >= 8 && starScore > galaxyScore) return "star";
+  if (galaxyScore >= 6 && galaxyScore > starScore) return "galaxy";
+
+  // fallback seguro (SIMBAD dominante = estrella)
+  return "star";
 }
 
 /* =========================
-   TEMPERATURA → COLOR FÍSICO
+   TEMPERATURA → COLOR
 ========================= */
 
 function tempToColor(temp) {
@@ -192,7 +203,7 @@ function clamp(x){
 }
 
 /* =========================
-   PARSER
+   STAR PARSER
 ========================= */
 
 function parseStar(text){
@@ -288,15 +299,8 @@ function generateObject(){
       `⭐ STAR<br>
       Spectral: ${s.spectral}<br>
       Temp: ${temp}K<br>
+      Parallax: ${s.parallax}<br>
       Binary: ${s.binary}`;
-
-    if(s.binary){
-      const g2 = new THREE.SphereGeometry(size*0.6,32,32);
-      const m2 = new THREE.MeshStandardMaterial({color:0xffffff});
-      const s2 = new THREE.Mesh(g2,m2);
-      s2.position.x = size*2;
-      scene.add(s2);
-    }
   }
 
   else {
@@ -304,7 +308,7 @@ function generateObject(){
     currentObject = createGalaxy();
     scene.add(currentObject);
 
-    info.innerHTML = "🌌 GALAXY detected";
+    info.innerHTML = "🌌 GALAXY detected (spiral model)";
   }
 
   camera.position.z = distance;
