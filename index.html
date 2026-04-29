@@ -1,104 +1,23 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8" />
-<title>SIMBAD Star Lookup</title>
+<html>
+<body style="font-family: Arial; background:#0b0f1a; color:white; padding:20px">
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #0b1020;
-  color: white;
-  padding: 20px;
-}
+<h2>Star lookup</h2>
 
-input {
-  padding: 10px;
-  width: 280px;
-  border-radius: 6px;
-  border: none;
-}
+<input id="name" placeholder="HD 210842B" />
+<button onclick="getStar()">Buscar</button>
 
-button {
-  padding: 10px 15px;
-  margin-left: 10px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  background: #4a6cff;
-  color: white;
-}
-
-pre {
-  margin-top: 20px;
-  background: #111827;
-  padding: 15px;
-  border-radius: 8px;
-  white-space: pre-wrap;
-}
-</style>
-</head>
-
-<body>
-
-<h2>SIMBAD Star Query</h2>
-
-<input id="starInput" placeholder="Ej: HD 210842B" />
-<button onclick="searchStar()">Buscar</button>
-
-<pre id="output">Resultado aparecerá aquí...</pre>
+<pre id="out"></pre>
 
 <script>
-async function searchStar() {
-  const name = document.getElementById("starInput").value;
-  const output = document.getElementById("output");
+async function getStar() {
+  const name = document.getElementById("name").value;
 
-  output.textContent = "Consultando SIMBAD...";
+  const res = await fetch("http://localhost:3000/star?name=" + name);
+  const data = await res.json();
 
-  try {
-    const query = `
-      SELECT main_id, ra, dec, sp_type
-      FROM basic
-      WHERE main_id='${name}'
-    `;
-
-    const url =
-      "https://simbad.cds.unistra.fr/simbad/sim-tap/sync?query=" +
-      encodeURIComponent(query) +
-      "&format=json";
-
-    const res = await fetch(url);
-
-    if (!res.ok) {
-      throw new Error("Error HTTP: " + res.status);
-    }
-
-    const data = await res.json();
-
-    // SIMBAD devuelve estructura tipo: data.data
-    const row = data.data?.[0];
-
-    if (!row) {
-      output.textContent = "No se encontró la estrella en SIMBAD";
-      return;
-    }
-
-    const result = {
-      name: row[0],
-      ra: row[1],
-      dec: row[2],
-      spectral_type: row[3]
-    };
-
-    output.textContent =
-      "RESULTADO SIMBAD:\n\n" +
-      JSON.stringify(result, null, 2);
-
-  } catch (err) {
-    output.textContent =
-      "Error consultando SIMBAD:\n\n" + err.message +
-      "\n\n(Posible CORS o endpoint temporalmente bloqueado)";
-  }
+  document.getElementById("out").textContent =
+    JSON.stringify(data, null, 2);
 }
 </script>
 
