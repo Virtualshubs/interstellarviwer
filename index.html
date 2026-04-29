@@ -201,26 +201,44 @@ function spectralToTemp(s){
 /* =========================
    CORRECCIÓN FÍSICA REAL
 ========================= */
-
 function photometricTemperature(temp, B, V, J, K) {
 
-  if (B && V) {
+  // 🔒 seguridad
+  if (!temp || isNaN(temp)) temp = 5800;
+
+  // =========================
+  // B-V → ajuste suave (NO reemplazo)
+  // =========================
+  if (B !== null && V !== null && !isNaN(B) && !isNaN(V)) {
+
     const bv = B - V;
 
-    temp = 4600 * (
-      (1 / (0.92 * bv + 1.7)) +
-      (1 / (0.92 * bv + 0.62))
-    );
+    // ajuste máximo ±15%
+    const factorBV = 1 - Math.max(-0.15, Math.min(0.15, 0.03 * bv));
+
+    temp *= factorBV;
   }
 
-  if (J && K) {
+  // =========================
+  // J-K → ajuste IR (AGB / polvo)
+  // =========================
+  if (J !== null && K !== null && !isNaN(J) && !isNaN(K)) {
+
     const jk = J - K;
-    temp *= (1 - 0.06 * jk);
+
+    // ajuste máximo ±10%
+    const factorJK = 1 - Math.max(-0.10, Math.min(0.10, 0.02 * jk));
+
+    temp *= factorJK;
   }
+
+  // =========================
+  // CLAMP FÍSICO (CRÍTICO)
+  // =========================
+  temp = Math.max(2500, Math.min(40000, temp));
 
   return temp;
 }
-
 /* =========================
    BLACKBODY COLOR
 ========================= */
