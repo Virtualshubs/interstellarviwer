@@ -46,28 +46,29 @@ button {
 #info {
   margin-top: 10px;
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.85;
+  line-height: 1.4;
 }
 
-canvas {
-  display: block;
-}
+canvas { display: block; }
 </style>
 </head>
 
 <body>
 
 <div id="ui">
-  <textarea id="input" placeholder="Pega aquí datos SIMBAD / Gaia..."></textarea>
-  <button onclick="generateStar()">Previsualizar estrella</button>
+  <textarea id="input" placeholder="Pega aquí datos SIMBAD / Gaia / galaxias..."></textarea>
+  <button onclick="generateObject()">Previsualizar objeto</button>
   <div id="info"></div>
 </div>
 
-<!-- Three.js r134 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 
 <script>
-let scene, camera, renderer, starMesh, glowMesh;
+let scene, camera, renderer;
+let currentObject;
+
+const SUN_SCALE = 1;
 
 init();
 
@@ -75,16 +76,10 @@ function init() {
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 6;
 
-  camera.position.z = 5;
-
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -93,47 +88,67 @@ function init() {
 
 function animate() {
   requestAnimationFrame(animate);
-  if (starMesh) starMesh.rotation.y += 0.002;
+  if (currentObject) currentObject.rotation.y += 0.002;
   renderer.render(scene, camera);
 }
 
 /* =========================
-   PARSER GENÉRICO
+   DETECTOR DE OBJETO
+========================= */
+
+function detectType(text) {
+
+  if (/NGC|IC|Galaxy|Sb|Sa|Sc|HII/i.test(text)) return "galaxy";
+  if (/Double|Multiple|\*\*/i.test(text)) return "binary";
+  if (/Spectral type/i.test(text)) return "star";
+
+  return "star";
+}
+
+/* =========================
+   PARSER ESTRELLA
 ========================= */
 
 function parseStar(text) {
 
-  const get = (regex) => {
-    const match = text.match(regex);
-    return match ? match[1].trim() : null;
-  };
-
-  const spectral = get(/Spectral type:\s*([A-Z0-9]+)/i);
-  const parallax = parseFloat(get(/Parallaxes?.*?:\s*([0-9.]+)/i));
-  const B = parseFloat(get(/\bB\s+([0-9.]+)/));
-  const V = parseFloat(get(/\bV\s+([0-9.]+)/));
-  const G = parseFloat(get(/\bG\s+([0-9.]+)/));
-
-  const binary = /\*\*|Double|Multiple/i.test(text);
+  const get = (r) => (text.match(r)?.[1] || null);
 
   return {
-    spectral,
-    parallax,
-    B, V, G,
-    binary
+    spectral: get(/Spectral type:\s*([A-Z0-9]+)/i),
+    parallax: parseFloat(get(/Parallaxes?.*?:\s*([0-9.]+)/i)),
+    B: parseFloat(get(/\bB\s+([0-9.]+)/)),
+    V: parseFloat(get(/\bV\s+([0-9.]+)/)),
+    G: parseFloat(get(/\bG\s+([0-9.]+)/)),
+    binary: /\*\*|Double|Multiple/i.test(text)
   };
 }
 
 /* =========================
-   TRADUCCIÓN A FÍSICA VISUAL
+   EMISIVIDAD
 ========================= */
 
-function buildStarModel(s) {
+function getEmission(type) {
+  if (!type) return 1.2;
+
+  if (type.startsWith("O")) return 3.0;
+  if (type.startsWith("B")) return 2.5;
+  if (type.startsWith("A")) return 2.0;
+  if (type.startsWith("F")) return 1.5;
+  if (type.startsWith("G")) return 1.2;
+  if (type.startsWith("K")) return 0.8;
+  if (type.startsWith("M")) return 0.5;
+
+  return 1;
+}
+
+/* =========================
+   MODELO ESTRELLA
+========================= */
+
+function buildStar(s) {
 
   let color = 0xffffff;
-  let size = 1.2;
 
-  // COLOR por tipo espectral
   if (s.spectral?.startsWith("O")) color = 0x9bbcff;
   else if (s.spectral?.startsWith("B")) color = 0xaecbff;
   else if (s.spectral?.startsWith("A")) color = 0xcfe8ff;
@@ -142,67 +157,100 @@ function buildStarModel(s) {
   else if (s.spectral?.startsWith("K")) color = 0xffb36b;
   else if (s.spectral?.startsWith("M")) color = 0xff6b6b;
 
-  // tamaño por brillo (aprox con V)
-  if (s.V) {
-    size = Math.max(0.5, 3 - s.V * 0.2);
-  }
+  let size = s.V ? Math.max(0.5, 3 - s.V * 0.2) : 1.2;
 
-  return { color, size, binary: s.binary };
+  return {
+    color,
+    size,
+    emission: getEmission(s.spectral),
+    binary: s.binary
+  };
 }
 
 /* =========================
-   RENDER
+   GALAXIA SIMPLE (ESPIRAL)
 ========================= */
 
-function generateStar() {
+function createGalaxy() {
+
+  const group = new THREE.Group();
+
+  for (let i = 0; i < 1500; i++) {
+
+    const t = i * 0.12;
+    const r = 0.01 * i;
+
+    const x = Math.cos(t) * r;
+    const z = Math.sin(t) * r;
+
+    const star = new THREE.Mesh(
+      new THREE.SphereGeometry(0.01),
+      new THREE.MeshBasicMaterial({ color: 0xffffff })
+    );
+
+    star.position.set(x, (Math.random()-0.5)*0.2, z);
+    group.add(star);
+  }
+
+  return group;
+}
+
+/* =========================
+   RENDER PRINCIPAL
+========================= */
+
+function generateObject() {
 
   const text = document.getElementById("input").value;
   const info = document.getElementById("info");
 
-  const data = parseStar(text);
-  const star = buildStarModel(data);
+  const type = detectType(text);
 
-  info.innerHTML =
-    "Spectral: " + data.spectral + "<br>" +
-    "Parallax: " + data.parallax + "<br>" +
-    "Binary: " + data.binary;
+  if (currentObject) scene.remove(currentObject);
 
-  if (starMesh) {
-    scene.remove(starMesh);
-    scene.remove(glowMesh);
+  /* ================= STAR ================= */
+  if (type === "star") {
+
+    const s = parseStar(text);
+    const star = buildStar(s);
+
+    const geo = new THREE.SphereGeometry(star.size, 32, 32);
+
+    const mat = new THREE.MeshStandardMaterial({
+      color: star.color,
+      emissive: star.color,
+      emissiveIntensity: star.emission
+    });
+
+    currentObject = new THREE.Mesh(geo, mat);
+
+    info.innerHTML =
+      `⭐ STAR<br>
+      Spectral: ${s.spectral}<br>
+      Binary: ${s.binary}<br>
+      Emission: ${star.emission}<br>
+      ☀ ~ ${(star.size / SUN_SCALE).toFixed(2)}x Sol`;
+
+    if (s.binary) {
+      const geo2 = new THREE.SphereGeometry(star.size * 0.6, 32, 32);
+      const mat2 = new THREE.MeshStandardMaterial({ color: 0xffffff });
+      const star2 = new THREE.Mesh(geo2, mat2);
+      star2.position.x = 2;
+      scene.add(star2);
+    }
+
   }
 
-  const geometry = new THREE.SphereGeometry(star.size, 32, 32);
-  const material = new THREE.MeshBasicMaterial({
-    color: star.color
-  });
+  /* ================= GALAXY ================= */
+  else if (type === "galaxy") {
 
-  starMesh = new THREE.Mesh(geometry, material);
-  scene.add(starMesh);
+    currentObject = createGalaxy();
 
-  // Glow simple (segunda esfera)
-  const glowGeo = new THREE.SphereGeometry(star.size * 1.4, 32, 32);
-  const glowMat = new THREE.MeshBasicMaterial({
-    color: star.color,
-    transparent: true,
-    opacity: 0.15
-  });
-
-  glowMesh = new THREE.Mesh(glowGeo, glowMat);
-  scene.add(glowMesh);
-
-  // binaria
-  if (star.binary) {
-    const geo2 = new THREE.SphereGeometry(star.size * 0.6, 32, 32);
-    const mat2 = new THREE.MeshBasicMaterial({ color: 0xffffff });
-
-    const star2 = new THREE.Mesh(geo2, mat2);
-    star2.position.x = 2;
-
-    scene.add(star2);
+    info.innerHTML = `🌌 GALAXY detected (spiral render)`;
   }
 
-  camera.position.z = 5;
+  scene.add(currentObject);
+  camera.position.z = 6;
 }
 
 </script>
