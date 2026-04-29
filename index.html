@@ -67,7 +67,8 @@ canvas { display: block; }
 <script>
 
 let scene, camera, renderer;
-let currentObject, currentGlow;
+let currentObject;
+let currentGlow;
 
 let distance = 6;
 let rotX = 0;
@@ -82,9 +83,14 @@ function init() {
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
 
-  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -129,6 +135,7 @@ function addControls() {
 ========================= */
 
 function animate() {
+
   requestAnimationFrame(animate);
 
   if (currentObject) {
@@ -146,33 +153,34 @@ function animate() {
 }
 
 /* =========================
-   ⭐ DETECTOR REAL FIX
+   DETECTOR MEJORADO (FIX REAL)
 ========================= */
 
 function detectType(text) {
 
-  // 🔥 HARD LOCK: ESTRELLAS (catálogos)
-  if (/HD|BD|TYC|HIP|Gaia|V\*/i.test(text)) return "star";
+  // 🔥 HARD STAR LOCK
+  if (/(HD|BD|TYC|HIP|Gaia|V\*|SAO)/i.test(text)) return "star";
 
-  // 🔥 HARD LOCK: GALAXIAS
-  if (/NGC|IC\b|LEDA|PGC/i.test(text)) return "galaxy";
+  // 🔥 HARD GALAXY LOCK
+  if (/(NGC|IC\b|PGC|LEDA|CLU)/i.test(text)) return "galaxy";
 
-  // SCORE SYSTEM (fallback)
   let starScore = 0;
   let galaxyScore = 0;
 
   if (/Spectral type/i.test(text)) starScore += 5;
   if (/Parallaxes/i.test(text)) starScore += 5;
-  if (/Proper motions/i.test(text)) starScore += 4;
+  if (/Proper motions/i.test(text)) starScore += 3;
 
-  if (/Morphological type/i.test(text)) galaxyScore += 5;
+  if (/\bV\s+\d|\bB\s+\d|\bG\s+\d/i.test(text)) starScore += 2;
+
   if (/redshift|cz|z\(emission\)/i.test(text)) galaxyScore += 5;
+  if (/Morphological type/i.test(text)) galaxyScore += 4;
 
   return starScore >= galaxyScore ? "star" : "galaxy";
 }
 
 /* =========================
-   TEMPERATURA
+   TEMPERATURA BASE
 ========================= */
 
 function spectralToTemp(s){
@@ -191,7 +199,30 @@ function spectralToTemp(s){
 }
 
 /* =========================
-   BLACKBODY
+   CORRECCIÓN FÍSICA REAL
+========================= */
+
+function photometricTemperature(temp, B, V, J, K) {
+
+  if (B && V) {
+    const bv = B - V;
+
+    temp = 4600 * (
+      (1 / (0.92 * bv + 1.7)) +
+      (1 / (0.92 * bv + 0.62))
+    );
+  }
+
+  if (J && K) {
+    const jk = J - K;
+    temp *= (1 - 0.06 * jk);
+  }
+
+  return temp;
+}
+
+/* =========================
+   BLACKBODY COLOR
 ========================= */
 
 function tempToColor(temp) {
@@ -241,7 +272,7 @@ function parseStar(text){
 }
 
 /* =========================
-   GALAXY
+   GALAXIA
 ========================= */
 
 function createGalaxy(){
@@ -295,9 +326,7 @@ function generateObject(){
 
     let temp = spectralToTemp(s.spectral);
 
-    // photometry correction
-    if(s.B && s.V) temp *= (1 - 0.04 * (s.B - s.V));
-    if(s.J && s.K) temp *= (1 - 0.02 * (s.J - s.K));
+    temp = photometricTemperature(temp, s.B, s.V, s.J, s.K);
 
     const color = tempToColor(temp);
 
@@ -305,10 +334,17 @@ function generateObject(){
 
     const geo = new THREE.SphereGeometry(size,32,32);
 
-    const mat = new THREE.MeshBasicMaterial({color});
+    const mat = new THREE.MeshStandardMaterial({
+      color,
+      emissive: color,
+      emissiveIntensity: 1.2
+    });
 
     currentObject = new THREE.Mesh(geo,mat);
     scene.add(currentObject);
+
+    const light = new THREE.PointLight(color, 1.2, 50);
+    currentObject.add(light);
 
     currentGlow = new THREE.Mesh(
       new THREE.SphereGeometry(size*1.4,32,32),
@@ -327,7 +363,7 @@ function generateObject(){
       Temp: ${Math.round(temp)}K<br>
       Parallax: ${s.parallax}<br>
       Binary: ${s.binary}<br>
-      Size: ${(size).toFixed(2)}x Sun`;
+      Size: ${size.toFixed(2)}x Sun`;
 
   } else {
 
