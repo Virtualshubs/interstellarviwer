@@ -162,18 +162,36 @@ function detectType(text) {
   let starScore = 0;
   let galaxyScore = 0;
 
-  if (/Spectral type/i.test(text)) starScore += 5;
-  if (/Parallaxes/i.test(text)) starScore += 5;
+  // =========================
+  // ⭐ ANCLA ESTRELLAS (MUY FUERTE)
+  // =========================
+  if (/HD|BD|TYC|HIP|Gaia|V\*/i.test(text)) starScore += 6;
+
+  if (/Spectral type/i.test(text)) starScore += 6;
+  if (/Parallaxes/i.test(text)) starScore += 6;
   if (/Proper motions/i.test(text)) starScore += 4;
 
-  if (/NGC|IC\b/i.test(text)) galaxyScore += 6;
-  if (/Morphological type/i.test(text)) galaxyScore += 5;
-  if (/redshift|cz|HII/i.test(text)) galaxyScore += 4;
+  // magnitudes = estrella probable
+  if (/\bV\s+\d|\bB\s+\d|\bG\s+\d/i.test(text)) starScore += 2;
 
-  if (starScore >= 8 && starScore > galaxyScore) return "star";
-  if (galaxyScore >= 6 && galaxyScore > starScore) return "galaxy";
+  // variables estelares
+  if (/V\*|variable|Long-Period/i.test(text)) starScore += 2;
 
-  return "star";
+  // =========================
+  // 🌌 GALAXIAS (solo señales fuertes)
+  // =========================
+  if (/NGC|IC\b/i.test(text)) galaxyScore += 7;
+  if (/Morphological type/i.test(text)) galaxyScore += 6;
+  if (/redshift|cz|z\(emission\)/i.test(text)) galaxyScore += 5;
+
+  // HII SOLO si está acompañado de galaxy context
+  if (/HII/.test(text) && /Galaxy/i.test(text)) galaxyScore += 2;
+
+  // =========================
+  // DECISIÓN ROBUSTA
+  // =========================
+  if (starScore >= galaxyScore) return "star";
+  return "galaxy";
 }
 
 /* =========================
