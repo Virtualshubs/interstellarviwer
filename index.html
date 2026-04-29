@@ -107,25 +107,36 @@ function animate() {
 
 function detectType(text) {
 
-  const isStar =
-    /Spectral type|Parallaxes|Proper motions|Radial velocity|Fluxes|V\s+[0-9.]+/i.test(text);
+  let starScore = 0;
+  let galaxyScore = 0;
 
-  const isBinary =
-    /Double|Multiple|\*\*/i.test(text);
+  // =========================
+  // ⭐ EVIDENCIA ESTRELLA
+  // =========================
+  if (/Spectral type/i.test(text)) starScore += 3;
+  if (/Parallaxes/i.test(text)) starScore += 3;
+  if (/Proper motions/i.test(text)) starScore += 2;
+  if (/Radial velocity/i.test(text)) starScore += 1;
+  if (/Fluxes/i.test(text)) starScore += 1;
 
-  const isGalaxy =
-    /\bNGC\b|\bIC\b|\bGalaxy\b|\bSb\b|\bSa\b|\bSc\b/i.test(text);
+  // =========================
+  // 🌌 EVIDENCIA GALAXIA
+  // =========================
+  if (/NGC|IC\b/.test(text)) galaxyScore += 4;
+  if (/Galaxy/i.test(text)) galaxyScore += 3;
+  if (/redshift|z\(emission|cz/i.test(text)) galaxyScore += 3;
+  if (/Morphological type/i.test(text)) galaxyScore += 3;
+  if (/Sb|Sa|Sc\b/.test(text)) galaxyScore += 1;
+  if (/HII/i.test(text)) galaxyScore += 1;
 
-  const hasRedshift =
-    /redshift|z\(s|cz/i.test(text);
-
-  // ⭐ PRIORIDAD ESTRELLA (SIEMPRE GANA SI HAY DATOS FÍSICOS)
-  if (isStar) {
-    return isBinary ? "binary" : "star";
+  // =========================
+  // DECISIÓN FINAL
+  // =========================
+  if (starScore >= galaxyScore && starScore > 0) {
+    return "star";
   }
 
-  // 🌌 GALAXIA SOLO SI NO HAY DATOS ESTELARES
-  if (isGalaxy || hasRedshift) {
+  if (galaxyScore > starScore) {
     return "galaxy";
   }
 
