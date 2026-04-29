@@ -2,31 +2,27 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Gaia Star Demo</title>
+<title>SIMBAD Star Lookup</title>
 
 <style>
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background: #0b0f1a;
+  background: #0b1020;
   color: white;
-}
-
-.container {
   padding: 20px;
 }
 
 input {
   padding: 10px;
-  width: 300px;
-  border-radius: 8px;
+  width: 280px;
+  border-radius: 6px;
   border: none;
 }
 
 button {
   padding: 10px 15px;
   margin-left: 10px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
   background: #4a6cff;
@@ -34,100 +30,74 @@ button {
 }
 
 pre {
+  margin-top: 20px;
   background: #111827;
   padding: 15px;
-  margin-top: 20px;
-  border-radius: 10px;
-  overflow: auto;
-}
-
-#canvas {
-  margin-top: 20px;
-  width: 100%;
-  height: 500px;
-  background: black;
+  border-radius: 8px;
+  white-space: pre-wrap;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h2>Gaia Star Query Demo</h2>
+<h2>SIMBAD Star Query</h2>
 
-  <input id="starName" placeholder="Ej: HD 210842B" />
-  <button onclick="searchStar()">Buscar</button>
+<input id="starInput" placeholder="Ej: HD 210842B" />
+<button onclick="searchStar()">Buscar</button>
 
-  <pre id="output">Resultado aparecerá aquí...</pre>
-
-  <div id="canvas"></div>
-</div>
+<pre id="output">Resultado aparecerá aquí...</pre>
 
 <script>
 async function searchStar() {
-  const name = document.getElementById("starName").value;
+  const name = document.getElementById("starInput").value;
   const output = document.getElementById("output");
 
   output.textContent = "Consultando SIMBAD...";
 
   try {
-    // 1. SIMBAD (RA / DEC)
-    const simbadQuery = `
+    const query = `
       SELECT main_id, ra, dec, sp_type
       FROM basic
       WHERE main_id='${name}'
     `;
 
-    const simbadURL =
+    const url =
       "https://simbad.cds.unistra.fr/simbad/sim-tap/sync?query=" +
-      encodeURIComponent(simbadQuery) +
+      encodeURIComponent(query) +
       "&format=json";
 
-    const simbadRes = await fetch(simbadURL);
-    const simbadData = await simbadRes.json();
+    const res = await fetch(url);
 
-    const row = simbadData.data?.[0];
+    if (!res.ok) {
+      throw new Error("Error HTTP: " + res.status);
+    }
+
+    const data = await res.json();
+
+    // SIMBAD devuelve estructura tipo: data.data
+    const row = data.data?.[0];
 
     if (!row) {
-      output.textContent = "No encontrada en SIMBAD";
+      output.textContent = "No se encontró la estrella en SIMBAD";
       return;
     }
 
-    const ra = row[1];
-    const dec = row[2];
-    const spType = row[3];
+    const result = {
+      name: row[0],
+      ra: row[1],
+      dec: row[2],
+      spectral_type: row[3]
+    };
 
     output.textContent =
-      "SIMBAD OK\nRA: " + ra +
-      "\nDEC: " + dec +
-      "\nTYPE: " + spType +
-      "\n\nConsultando Gaia...";
-
-    // 2. GAIA QUERY (región)
-    const gaiaQuery = `
-      SELECT TOP 50 ra, dec, phot_g_mean_mag
-      FROM gaiadr3.gaia_source
-      WHERE CONTAINS(
-        POINT('ICRS', ra, dec),
-        CIRCLE('ICRS', ${ra}, ${dec}, 0.1)
-      )=1
-    `;
-
-    const gaiaURL =
-      "https://gea.esac.esa.int/tap-server/tap/sync?" +
-      "query=" + encodeURIComponent(gaiaQuery) +
-      "&format=json";
-
-    const gaiaRes = await fetch(gaiaURL);
-    const gaiaData = await gaiaRes.json();
-
-    output.textContent +=
-      "\n\nGAIA RESULTADOS:\n" +
-      JSON.stringify(gaiaData, null, 2);
+      "RESULTADO SIMBAD:\n\n" +
+      JSON.stringify(result, null, 2);
 
   } catch (err) {
-    console.error(err);
-    output.textContent = "Error en consulta (probable CORS o timeout)";
+    output.textContent =
+      "Error consultando SIMBAD:\n\n" + err.message +
+      "\n\n(Posible CORS o endpoint temporalmente bloqueado)";
   }
 }
 </script>
