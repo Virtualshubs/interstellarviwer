@@ -59,7 +59,7 @@ select, textarea{
     border-radius:8px;
 }
 
-/* GRID EDITOR */
+/* GRID */
 .grid-editor,
 .grid-play{
     display:grid;
@@ -67,7 +67,7 @@ select, textarea{
     margin-top:20px;
 }
 
-/* CASILLAS EDITOR */
+/* EDITOR */
 .cell-input{
     width:100%;
     min-height:70px;
@@ -77,15 +77,9 @@ select, textarea{
     color:white;
     border-radius:10px;
     padding:8px;
-    outline:none;
 }
 
-.cell-input:focus{
-    border-color:#a855f7;
-    box-shadow:0 0 10px #7c3aed;
-}
-
-/* CASILLAS JUEGO */
+/* JUEGO */
 .bingo-cell{
     min-height:95px;
     background: linear-gradient(145deg, #111827, #0b0b12);
@@ -103,48 +97,28 @@ select, textarea{
     overflow:hidden;
 }
 
-/* efecto hover tipo videojuego */
 .bingo-cell:hover{
     transform:scale(1.03);
     border-color:#a855f7;
-    box-shadow:0 0 12px rgba(168,85,247,0.4);
 }
 
-/* CASILLA MARCADA */
+/* MARCADA */
 .marked{
     background: linear-gradient(145deg, #16a34a, #22c55e);
     border-color:#22c55e;
-    box-shadow:0 0 20px rgba(34,197,94,0.6);
 }
 
-/* efecto “energía” */
-.marked::after{
-    content:"";
-    position:absolute;
-    width:200%;
-    height:200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.2), transparent 60%);
-    animation:pulse 1.2s infinite;
+/* 🔥 NUEVO: LINEA GANADORA */
+.win-line{
+    animation: winPulse 1s infinite alternate;
+    box-shadow:0 0 25px #a855f7, 0 0 50px #22c55e;
+    border-color:#22c55e !important;
+    transform:scale(1.05);
 }
 
-@keyframes pulse{
-    0%{ transform:scale(0.8); opacity:0.6; }
-    100%{ transform:scale(1.2); opacity:0; }
-}
-
-/* TOP BAR */
-.topbar{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-/* URL BOX */
-.url-box{
-    width:100%;
-    margin-top:15px;
-    background:#0f0f1a;
-    color:#a855f7;
-    border:1px solid #2e2e3e;
+@keyframes winPulse{
+    0%{ filter:brightness(1); }
+    100%{ filter:brightness(1.5); }
 }
 
 /* PROGRESS BAR */
@@ -157,8 +131,6 @@ select, textarea{
 .progress-top{
     display:flex;
     justify-content:space-between;
-    font-size:14px;
-    margin-bottom:6px;
 }
 
 .progress-bar-bg{
@@ -177,15 +149,29 @@ select, textarea{
     transition:0.25s;
 }
 
+.topbar{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.url-box{
+    width:100%;
+    margin-top:15px;
+    background:#0f0f1a;
+    color:#a855f7;
+    border:1px solid #2e2e3e;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
 <div id="editor">
 
-<h1>🎮 Borjabingo </h1>
+<h1>🎮 Borjabingo</h1>
 
 <div class="controls">
 <select id="gridSize">
@@ -195,23 +181,13 @@ select, textarea{
 <option value="9">9 x 9</option>
 </select>
 
-<button onclick="generateEditor()">
-Generar Cuadrícula
-</button>
-
-<button onclick="exportBingo()">
-Crear bingo
-</button>
+<button onclick="generateEditor()">Generar Cuadrícula</button>
+<button onclick="exportBingo()">Crear bingo</button>
 </div>
 
 <div id="editorGrid" class="grid-editor"></div>
 
-<textarea
-id="generatedUrl"
-class="url-box"
-rows="4"
-placeholder="Aquí aparecerá la URL..."
-></textarea>
+<textarea id="generatedUrl" class="url-box" rows="4"></textarea>
 
 </div>
 
@@ -222,15 +198,14 @@ placeholder="Aquí aparecerá la URL..."
 <button onclick="resetMarks()">Reiniciar</button>
 </div>
 
-<!-- PROGRESS BAR -->
 <div class="progress-wrap">
-    <div class="progress-top">
-        <span>Progreso</span>
-        <span id="progressText">0%</span>
-    </div>
-    <div class="progress-bar-bg">
-        <div id="progressBar" class="progress-bar-fill"></div>
-    </div>
+<div class="progress-top">
+<span>Progreso</span>
+<span id="progressText">0%</span>
+</div>
+<div class="progress-bar-bg">
+<div id="progressBar" class="progress-bar-fill"></div>
+</div>
 </div>
 
 <div id="playGrid" class="grid-play"></div>
@@ -242,116 +217,126 @@ placeholder="Aquí aparecerá la URL..."
 <script>
 
 function generateEditor(){
-
-    const size = parseInt(
-        document.getElementById('gridSize').value
-    );
-
-    const grid =
-        document.getElementById('editorGrid');
+    const size = +document.getElementById('gridSize').value;
+    const grid = document.getElementById('editorGrid');
 
     grid.innerHTML='';
-
-    grid.style.gridTemplateColumns =
-        `repeat(${size},1fr)`;
+    grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
 
     for(let i=0;i<size*size;i++){
-
-        const input =
-            document.createElement('textarea');
-
+        const input=document.createElement('textarea');
         input.className='cell-input';
-
-        input.placeholder=
-            `Casilla ${i+1}`;
-
+        input.placeholder=`Casilla ${i+1}`;
         grid.appendChild(input);
     }
 }
 
 function exportBingo(){
 
-    const size =
-        parseInt(
-        document.getElementById('gridSize').value
-    );
+    const size = +document.getElementById('gridSize').value;
 
-    const cells =
-        [...document.querySelectorAll('.cell-input')]
-        .map(el=>el.value.trim());
+    const cells=[...document.querySelectorAll('.cell-input')]
+        .map(e=>e.value.trim());
 
-    const data = {
-        size,
-        cells
-    };
+    const data={size,cells};
 
-    const encoded =
-        btoa(
-            encodeURIComponent(
-                JSON.stringify(data)
-            )
-        );
+    const encoded=btoa(encodeURIComponent(JSON.stringify(data)));
 
-    const url =
-        location.origin +
-        location.pathname +
-        '#' +
-        encoded;
+    const url=location.origin+location.pathname+'#'+encoded;
 
-    document.getElementById(
-        'generatedUrl'
-    ).value = url;
+    document.getElementById('generatedUrl').value=url;
 }
 
+/* =========================
+   PROGRESO
+========================= */
 function updateProgress(){
 
-    const cells =
-        document.querySelectorAll('.bingo-cell');
+    const cells=document.querySelectorAll('.bingo-cell');
+    const marked=document.querySelectorAll('.bingo-cell.marked');
 
-    const marked =
-        document.querySelectorAll('.bingo-cell.marked');
+    const percent=Math.round((marked.length/cells.length)*100);
 
-    const percent =
-        Math.round((marked.length / cells.length) * 100);
-
-    document.getElementById('progressBar').style.width =
-        percent + '%';
-
-    document.getElementById('progressText').textContent =
-        percent + '%';
+    document.getElementById('progressBar').style.width=percent+'%';
+    document.getElementById('progressText').textContent=percent+'%';
 }
 
+/* =========================
+   CHECK BINGO LINES
+========================= */
+function checkBingo(){
+
+    const cells=[...document.querySelectorAll('.bingo-cell')];
+    const size=Math.sqrt(cells.length);
+
+    const grid=[];
+
+    for(let i=0;i<size;i++){
+        grid.push(cells.slice(i*size,(i+1)*size));
+    }
+
+    let winLines=[];
+
+    // filas
+    for(let r=0;r<size;r++){
+        if(grid[r].every(c=>c.classList.contains('marked'))){
+            winLines.push(grid[r]);
+        }
+    }
+
+    // columnas
+    for(let c=0;c<size;c++){
+        let col=[];
+        for(let r=0;r<size;r++){
+            col.push(grid[r][c]);
+        }
+        if(col.every(c=>c.classList.contains('marked'))){
+            winLines.push(col);
+        }
+    }
+
+    // diagonal ↘
+    let d1=[];
+    for(let i=0;i<size;i++) d1.push(grid[i][i]);
+    if(d1.every(c=>c.classList.contains('marked'))) winLines.push(d1);
+
+    // diagonal ↙
+    let d2=[];
+    for(let i=0;i<size;i++) d2.push(grid[i][size-1-i]);
+    if(d2.every(c=>c.classList.contains('marked'))) winLines.push(d2);
+
+    cells.forEach(c=>c.classList.remove('win-line'));
+
+    winLines.forEach(line=>{
+        line.forEach(cell=>{
+            cell.classList.add('win-line');
+        });
+    });
+}
+
+/* =========================
+   LOAD PLAYER
+========================= */
 function loadPlayer(data){
 
-    document.getElementById('editor')
-        .classList.add('hidden');
+    document.getElementById('editor').classList.add('hidden');
+    document.getElementById('player').classList.remove('hidden');
 
-    document.getElementById('player')
-        .classList.remove('hidden');
+    const grid=document.getElementById('playGrid');
 
-    const grid =
-        document.getElementById('playGrid');
-
-    grid.style.gridTemplateColumns =
-        `repeat(${data.size},1fr)`;
+    grid.style.gridTemplateColumns=`repeat(${data.size},1fr)`;
 
     data.cells.forEach(text=>{
 
-        const cell =
-            document.createElement('div');
-
+        const cell=document.createElement('div');
         cell.className='bingo-cell';
+        cell.textContent=text||'—';
 
-        cell.textContent =
-            text || '—';
-
-        cell.addEventListener(
-            'click',
-            ()=>{
-                cell.classList.toggle('marked');
-                updateProgress();
-            }
-        );
+        cell.addEventListener('click',()=>{
+            cell.classList.toggle('marked');
+            updateProgress();
+            checkBingo();
+        });
 
         grid.appendChild(cell);
     });
@@ -359,51 +344,32 @@ function loadPlayer(data){
     updateProgress();
 }
 
+/* =========================
+   RESET
+========================= */
 function resetMarks(){
 
-    document
-    .querySelectorAll('.bingo-cell')
-    .forEach(cell=>{
-        cell.classList.remove('marked');
-    });
+    document.querySelectorAll('.bingo-cell')
+        .forEach(c=>c.classList.remove('marked','win-line'));
 
     updateProgress();
 }
 
+/* =========================
+   INIT
+========================= */
 window.addEventListener('load',()=>{
 
     if(location.hash){
-
-        try{
-
-            const encoded =
-                location.hash.substring(1);
-
-            const data =
-                JSON.parse(
-                    decodeURIComponent(
-                        atob(encoded)
-                    )
-                );
-
-            loadPlayer(data);
-
-        }catch(e){
-
-            console.error(e);
-
-            alert(
-                'Error al cargar el bingo'
-            );
-        }
-
+        const data=JSON.parse(
+            decodeURIComponent(atob(location.hash.substring(1)))
+        );
+        loadPlayer(data);
     }else{
-
         generateEditor();
-
     }
-
 });
+
 </script>
 
 </body>
