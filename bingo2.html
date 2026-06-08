@@ -86,8 +86,6 @@ select, textarea{
     cursor:pointer;
     transition:0.2s;
     user-select:none;
-    position:relative;
-    overflow:hidden;
 }
 
 .bingo-cell:hover{
@@ -95,63 +93,39 @@ select, textarea{
     border-color:#a855f7;
 }
 
+/* NORMAL */
 .marked{
     background: linear-gradient(145deg, #16a34a, #22c55e);
-    border-color:#22c55e;
 }
 
 /* 🟡 CASILLA DORADA */
 .gold{
-    background: linear-gradient(145deg, #ffcc00, #ff9900) !important;
-    border-color: gold !important;
-    box-shadow: 0 0 25px gold, 0 0 60px rgba(255,215,0,0.6);
-    color:black;
-    font-weight:bold;
+    background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+    border-color:#fbbf24 !important;
+    box-shadow:0 0 25px rgba(255,200,0,0.6);
 }
 
-/* línea estable */
+/* LÍNEA */
 .win-line{
     box-shadow:0 0 18px #22c55e;
     border-color:#22c55e !important;
 }
 
+/* ANIMACIÓN SOLO UNA VEZ */
 .win-animate{
     animation: winPulse 0.8s ease;
 }
 
 @keyframes winPulse{
-    0%{ transform:scale(1); filter:brightness(1); }
+    0%{ transform:scale(1); }
     50%{
         transform:scale(1.08);
         box-shadow:0 0 40px #22c55e, 0 0 70px #7c3aed;
-        filter:brightness(1.5);
     }
-    100%{ transform:scale(1.03); filter:brightness(1); }
+    100%{ transform:scale(1.03); }
 }
 
-/* 🟡 TOAST */
-.toast{
-    position:fixed;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%);
-    background:rgba(0,0,0,0.85);
-    border:1px solid gold;
-    color:gold;
-    padding:12px 16px;
-    border-radius:10px;
-    font-weight:bold;
-    z-index:99999;
-    animation:fade 2.5s ease;
-}
-
-@keyframes fade{
-    0%{opacity:0; transform:translateX(-50%) translateY(-10px);}
-    10%{opacity:1; transform:translateX(-50%) translateY(0);}
-    90%{opacity:1;}
-    100%{opacity:0;}
-}
-
+/* PROGRESS */
 .progress-wrap{
     width:100%;
     max-width:600px;
@@ -176,23 +150,7 @@ select, textarea{
     height:100%;
     width:0%;
     background:linear-gradient(90deg,#7c3aed,#22c55e);
-    transition:0.25s;
 }
-
-.topbar{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.url-box{
-    width:100%;
-    margin-top:15px;
-    background:#0f0f1a;
-    color:#a855f7;
-    border:1px solid #2e2e3e;
-}
-
-.hidden{ display:none; }
 
 /* WIDGET */
 #widgetBar{
@@ -204,9 +162,26 @@ select, textarea{
     background:#0f0f1a;
     border:1px solid #2e2e3e;
     border-radius:12px;
-    padding:10px 14px;
+    padding:10px;
     display:none;
     justify-content:space-between;
+}
+
+.hidden{display:none}
+
+/* 🔔 mensaje dorado */
+#goldToast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#fbbf24;
+    color:black;
+    padding:10px 20px;
+    border-radius:12px;
+    font-weight:bold;
+    display:none;
+    box-shadow:0 0 30px rgba(255,200,0,0.6);
 }
 
 </style>
@@ -215,48 +190,37 @@ select, textarea{
 <body>
 
 <div id="widgetBar">
-    <span>🎮 Borjabingo</span>
-    <button onclick="toggleWidget()">↔ Expandir</button>
+    🎮 Bingo <button onclick="toggleWidget()">↔</button>
 </div>
 
 <div class="container">
 
 <div id="editor">
+<h1>BORJABINGO</h1>
 
-<h1>🎮 Borjabingo</h1>
-
-<div class="controls">
 <select id="gridSize">
-<option value="4">4 x 4</option>
-<option value="5">5 x 5</option>
-<option value="6">6 x 6</option>
-<option value="9">9 x 9</option>
+<option value="4">4x4</option>
+<option value="5">5x5</option>
+<option value="6">6x6</option>
 </select>
 
-<button onclick="generateEditor()">Generar Cuadrícula</button>
-<button onclick="exportBingo()">Crear bingo</button>
-<button onclick="toggleWidget()">⤵ Minimizar</button>
-</div>
+<button onclick="generateEditor()">Generar</button>
+<button onclick="exportBingo()">Crear</button>
+<button onclick="toggleWidget()">Minimizar</button>
 
-<div id="editorGrid" class="grid-editor"></div>
-
-<textarea id="generatedUrl" class="url-box" rows="4"></textarea>
-
+<div id="editorGrid"></div>
+<textarea id="url"></textarea>
 </div>
 
 <div id="player" class="hidden">
 
 <div class="topbar">
-<h1>🎯 Bingo</h1>
-<button onclick="resetMarks()">Reiniciar</button>
-<button onclick="toggleWidget()">⤵ Minimizar</button>
+<h1>BINGO</h1>
+<button onclick="resetMarks()">Reset</button>
+<button onclick="toggleWidget()">Minimizar</button>
 </div>
 
 <div class="progress-wrap">
-<div class="progress-top">
-<span>Progreso</span>
-<span id="progressText">0%</span>
-</div>
 <div class="progress-bar-bg">
 <div id="progressBar" class="progress-bar-fill"></div>
 </div>
@@ -268,150 +232,162 @@ select, textarea{
 
 </div>
 
+<div id="goldToast">🟡 CASILLA DORADA ACTIVADA</div>
+
 <script>
 
 const activatedLines = new Set();
-let isMinimized = false;
+let isMinimized=false;
 
-/* 🟡 GOLD SYSTEM */
-let goldCooldown = false;
-
-/* TOAST */
-function showToast(){
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = '🟡 CASILLA DORADA ACTIVADA';
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),2500);
-}
-
-/* GOLD EVENT */
-function tryGoldEvent(){
-
-    if(goldCooldown) return;
-
-    if(Math.random() < 0.5){
-
-        goldCooldown = true;
-
-        const marked = [...document.querySelectorAll('.bingo-cell.marked')];
-        if(marked.length === 0) return;
-
-        const cell = marked[Math.floor(Math.random()*marked.length)];
-        cell.classList.add('gold');
-
-        showToast();
-
-        setTimeout(()=>{
-            goldCooldown = false;
-        }, 8000);
-    }
-}
-
-/* WIDGET */
+/* ================= WIDGET ================= */
 function toggleWidget(){
+    isMinimized=!isMinimized;
 
-    isMinimized = !isMinimized;
-
-    const editor = document.getElementById('editor');
-    const player = document.getElementById('player');
-    const bar = document.getElementById('widgetBar');
+    const editor=document.getElementById("editor");
+    const player=document.getElementById("player");
+    const bar=document.getElementById("widgetBar");
 
     if(isMinimized){
-        editor.style.display = 'none';
-        player.style.display = 'none';
-        bar.style.display = 'flex';
+        editor.style.display="none";
+        player.style.display="none";
+        bar.style.display="flex";
     }else{
-        bar.style.display = 'none';
-        if(document.querySelector('.bingo-cell')){
-            player.style.display = 'block';
+        bar.style.display="none";
+        if(document.querySelector(".bingo-cell")){
+            player.style.display="block";
         }else{
-            editor.style.display = 'block';
+            editor.style.display="block";
         }
     }
 }
 
-/* CORE */
+/* ================= EDITOR ================= */
 function generateEditor(){
-    const size = +document.getElementById('gridSize').value;
-    const grid = document.getElementById('editorGrid');
+    const size=+gridSize.value;
+    const grid=document.getElementById("editorGrid");
 
-    grid.innerHTML='';
+    grid.innerHTML="";
     grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
 
     for(let i=0;i<size*size;i++){
-        const input=document.createElement('textarea');
-        input.className='cell-input';
-        grid.appendChild(input);
+        const t=document.createElement("textarea");
+        t.className="cell-input";
+        t.placeholder="Casilla "+(i+1);
+        grid.appendChild(t);
     }
 }
 
 function exportBingo(){
-    const size = +document.getElementById('gridSize').value;
-    const cells=[...document.querySelectorAll('.cell-input')].map(e=>e.value.trim());
-
+    const size=+gridSize.value;
+    const cells=[...document.querySelectorAll(".cell-input")].map(e=>e.value);
     const data={size,cells};
-    const encoded=btoa(encodeURIComponent(JSON.stringify(data)));
 
-    const url=location.origin+location.pathname+'#'+encoded;
-    document.getElementById('generatedUrl').value=url;
+    const url=btoa(JSON.stringify(data));
+    document.getElementById("url").value=location.href+"#"+url;
 }
 
+/* ================= PROGRESS ================= */
 function updateProgress(){
-    const cells=document.querySelectorAll('.bingo-cell');
-    const marked=document.querySelectorAll('.bingo-cell.marked');
+    const all=document.querySelectorAll(".bingo-cell");
+    const marked=document.querySelectorAll(".marked");
 
-    const percent=Math.round((marked.length/cells.length)*100);
-
-    document.getElementById('progressBar').style.width=percent+'%';
-    document.getElementById('progressText').textContent=percent+'%';
+    const p=Math.round(marked.length/all.length*100);
+    document.getElementById("progressBar").style.width=p+"%";
 }
 
+/* ================= GOLD SYSTEM ================= */
+function maybeGold(cell){
+    if(Math.random()<0.5 && !cell.classList.contains("marked")){
+        cell.classList.add("gold");
+        showGoldToast();
+    }
+}
+
+function showGoldToast(){
+    const t=document.getElementById("goldToast");
+    t.style.display="block";
+    setTimeout(()=>t.style.display="none",2000);
+}
+
+/* ================= CHECK BINGO ================= */
+function checkBingo(){
+    const cells=[...document.querySelectorAll(".bingo-cell")];
+    const size=Math.sqrt(cells.length);
+
+    const grid=[];
+    for(let i=0;i<size;i++){
+        grid.push(cells.slice(i*size,(i+1)*size));
+    }
+
+    let winLines=[];
+
+    for(let r=0;r<size;r++){
+        if(grid[r].every(c=>c.classList.contains("marked")))
+            winLines.push(grid[r]);
+    }
+
+    for(let c=0;c<size;c++){
+        let col=[];
+        for(let r=0;r<size;r++) col.push(grid[r][c]);
+        if(col.every(c=>c.classList.contains("marked")))
+            winLines.push(col);
+    }
+
+    let d1=[],d2=[];
+    for(let i=0;i<size;i++){
+        d1.push(grid[i][i]);
+        d2.push(grid[i][size-1-i]);
+    }
+
+    if(d1.every(c=>c.classList.contains("marked"))) winLines.push(d1);
+    if(d2.every(c=>c.classList.contains("marked"))) winLines.push(d2);
+
+    winLines.forEach(line=>{
+        line.forEach(c=>{
+            c.classList.add("win-line","win-animate");
+            setTimeout(()=>c.classList.remove("win-animate"),800);
+        });
+    });
+}
+
+/* ================= LOAD ================= */
 function loadPlayer(data){
+    document.getElementById("editor").classList.add("hidden");
+    document.getElementById("player").classList.remove("hidden");
 
-    document.getElementById('editor').classList.add('hidden');
-    document.getElementById('player').classList.remove('hidden');
-
-    const grid=document.getElementById('playGrid');
+    const grid=document.getElementById("playGrid");
     grid.style.gridTemplateColumns=`repeat(${data.size},1fr)`;
 
-    data.cells.forEach(text=>{
+    data.cells.forEach(t=>{
+        const c=document.createElement("div");
+        c.className="bingo-cell";
+        c.textContent=t;
 
-        const cell=document.createElement('div');
-        cell.className='bingo-cell';
-        cell.textContent=text||'—';
-
-        cell.addEventListener('click',()=>{
-            cell.classList.toggle('marked');
+        c.onclick=()=>{
+            c.classList.toggle("marked");
+            maybeGold(c);
             updateProgress();
             checkBingo();
+        };
 
-            // 🟡 trigger gold event
-            tryGoldEvent();
-        });
-
-        grid.appendChild(cell);
+        grid.appendChild(c);
     });
-
-    updateProgress();
 }
 
+/* ================= RESET ================= */
 function resetMarks(){
     activatedLines.clear();
-    document.querySelectorAll('.bingo-cell')
-        .forEach(c=>c.classList.remove('marked','win-line','win-animate','gold'));
-    updateProgress();
+    document.querySelectorAll(".bingo-cell")
+        .forEach(c=>c.classList.remove("marked","gold","win-line","win-animate"));
 }
 
-window.addEventListener('load',()=>{
+window.onload=()=>{
     if(location.hash){
-        const data=JSON.parse(decodeURIComponent(atob(location.hash.substring(1))));
-        loadPlayer(data);
+        loadPlayer(JSON.parse(atob(location.hash.slice(1))));
     }else{
         generateEditor();
     }
-});
-
+};
 </script>
 
 </body>
