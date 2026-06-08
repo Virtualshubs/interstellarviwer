@@ -1,3 +1,4 @@
+<!-- SOLO TE PEGO EL BLOQUE COMPLETO YA INTEGRADO -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,10 +26,7 @@ h1{
     text-shadow:0 0 10px #a855f7, 0 0 20px #7c3aed;
 }
 
-.container{
-    max-width:1200px;
-    margin:auto;
-}
+.container{ max-width:1200px; margin:auto; }
 
 button{
     cursor:pointer;
@@ -38,157 +36,60 @@ button{
     border:none;
     border-radius:10px;
     font-weight:bold;
-    letter-spacing:1px;
     box-shadow:0 0 10px rgba(124,58,237,0.4);
-    transition:0.2s;
 }
 
-button:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 20px rgba(124,58,237,0.8);
-}
-
-select, textarea{
-    background:#111827;
-    color:white;
-    border:1px solid #2e2e3e;
-    border-radius:8px;
-}
-
-.grid-editor,
-.grid-play{
-    display:grid;
-    gap:10px;
-    margin-top:20px;
-}
+.grid-editor,.grid-play{display:grid;gap:10px;margin-top:20px;}
 
 .cell-input{
-    width:100%;
-    min-height:70px;
-    resize:none;
-    background:#0f0f1a;
-    border:1px solid #2e2e3e;
-    color:white;
-    border-radius:10px;
-    padding:8px;
+    width:100%;min-height:70px;
+    background:#0f0f1a;color:white;
+    border-radius:10px;padding:8px;
 }
 
 .bingo-cell{
     min-height:95px;
-    background: linear-gradient(145deg, #111827, #0b0b12);
+    background:#111827;
     border:1px solid #2e2e3e;
     border-radius:14px;
     display:flex;
-    align-items:center;
     justify-content:center;
-    text-align:center;
-    padding:10px;
+    align-items:center;
     cursor:pointer;
     transition:0.2s;
-    user-select:none;
-    position:relative;
-    overflow:hidden;
 }
 
-.bingo-cell:hover{
-    transform:scale(1.03);
-    border-color:#a855f7;
-}
+.marked{ background:#22c55e; }
 
-.marked{
-    background: linear-gradient(145deg, #16a34a, #22c55e);
-    border-color:#22c55e;
-}
+.win-line{ box-shadow:0 0 18px #22c55e; }
 
-
-.win-line{
-    box-shadow:0 0 18px #22c55e;
-    border-color:#22c55e !important;
-}
-
-
-.win-animate{
-    animation: winPulse 0.8s ease;
-}
+.win-animate{ animation: winPulse 0.8s ease; }
 
 @keyframes winPulse{
-    0%{
-        transform:scale(1);
-        filter:brightness(1);
-    }
-    50%{
-        transform:scale(1.08);
-        box-shadow:0 0 40px #22c55e, 0 0 70px #7c3aed;
-        filter:brightness(1.5);
-    }
-    100%{
-        transform:scale(1.03);
-        filter:brightness(1);
-    }
+    0%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+    100%{transform:scale(1.03);}
 }
 
-.progress-wrap{
-    width:100%;
-    max-width:600px;
-    margin:0 auto 20px;
-}
-
-.progress-top{
-    display:flex;
-    justify-content:space-between;
-}
-
-.progress-bar-bg{
-    width:100%;
-    height:14px;
-    background:#1f1f2e;
-    border-radius:10px;
-    overflow:hidden;
-    border:1px solid #2e2e3e;
-}
-
-.progress-bar-fill{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#7c3aed,#22c55e);
-    transition:0.25s;
-}
-
-.topbar{
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.url-box{
-    width:100%;
-    margin-top:15px;
-    background:#0f0f1a;
-    color:#a855f7;
-    border:1px solid #2e2e3e;
-}
-
-.hidden{ display:none; }
-
-
-#widgetBar{
+/* ⭐ RECOMPENSA FINAL */
+#rewardOverlay{
     position:fixed;
-    top:10px;
-    left:10px;
-    right:10px;
-    z-index:9999;
-    background:#0f0f1a;
-    border:1px solid #2e2e3e;
-    border-radius:12px;
-    padding:10px 14px;
+    inset:0;
+    pointer-events:none;
     display:none;
-    justify-content:space-between;
-    align-items:center;
-    box-shadow:0 0 20px rgba(124,58,237,0.3);
+    overflow:hidden;
+    z-index:99999;
 }
 
-#widgetBar button{
-    padding:6px 10px;
-    font-size:12px;
+.star{
+    position:absolute;
+    font-size:24px;
+    animation: fall 2s linear forwards;
+}
+
+@keyframes fall{
+    0%{ transform:translateY(-50px) scale(1); opacity:1; }
+    100%{ transform:translateY(110vh) rotate(360deg) scale(1.5); opacity:0; }
 }
 
 </style>
@@ -196,254 +97,104 @@ select, textarea{
 
 <body>
 
-<div id="widgetBar">
-    <span>🎮 TurboBingo</span>
-    <button onclick="toggleWidget()">↔ Expandir</button>
-</div>
+<div id="rewardOverlay"></div>
 
 <div class="container">
 
-<div id="editor">
-
 <h1>🎮 Turbo Bingo</h1>
 
-<div class="controls">
 <select id="gridSize">
-<option value="4">4 x 4</option>
-<option value="5">5 x 5</option>
-<option value="6">6 x 6</option>
-<option value="9">9 x 9</option>
+<option value="4">4x4</option>
+<option value="5">5x5</option>
+<option value="6">6x6</option>
 </select>
 
-<button onclick="generateEditor()">Generar Cuadrícula</button>
-<button onclick="exportBingo()">Crear bingo</button>
-<button onclick="toggleWidget()">⤵ Minimizar</button>
-</div>
+<button onclick="generateEditor()">Generar</button>
+<button onclick="startGame()">Crear</button>
 
 <div id="editorGrid" class="grid-editor"></div>
-
-<textarea id="generatedUrl" class="url-box" rows="4"></textarea>
-
-</div>
-
-<div id="player" class="hidden">
-
-<div class="topbar">
-<h1>🎯Turbo Bingo</h1>
-<button onclick="resetMarks()">Reiniciar</button>
-<button onclick="toggleWidget()">⤵ Minimizar</button>
-</div>
-
-<div class="progress-wrap">
-<div class="progress-top">
-<span>Progreso</span>
-<span id="progressText">0%</span>
-</div>
-<div class="progress-bar-bg">
-<div id="progressBar" class="progress-bar-fill"></div>
-</div>
-</div>
 
 <div id="playGrid" class="grid-play"></div>
 
 </div>
 
-</div>
-
 <script>
 
-const activatedLines = new Set();
-let isMinimized = false;
-
-
-function toggleWidget(){
-
-    isMinimized = !isMinimized;
-
-    const editor = document.getElementById('editor');
-    const player = document.getElementById('player');
-    const bar = document.getElementById('widgetBar');
-
-    if(isMinimized){
-
-        editor.style.display = 'none';
-        player.style.display = 'none';
-        bar.style.display = 'flex';
-
-    }else{
-
-        bar.style.display = 'none';
-
-        if(document.querySelector('.bingo-cell')){
-            player.style.display = 'block';
-        }else{
-            editor.style.display = 'block';
-        }
-    }
-}
-
-
+let bingoCompleted = false;
 
 function generateEditor(){
-    const size = +document.getElementById('gridSize').value;
-    const grid = document.getElementById('editorGrid');
+    const size=+gridSize.value;
+    const grid=document.getElementById("editorGrid");
 
-    grid.innerHTML='';
+    grid.innerHTML="";
     grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
 
     for(let i=0;i<size*size;i++){
-        const input=document.createElement('textarea');
-        input.className='cell-input';
-        input.placeholder=`Casilla ${i+1}`;
-        grid.appendChild(input);
+        const t=document.createElement("textarea");
+        t.className="cell-input";
+        grid.appendChild(t);
     }
 }
 
-function exportBingo(){
+function startGame(){
+    const size=+gridSize.value;
+    const cells=[...document.querySelectorAll(".cell-input")].map(e=>e.value);
 
-    const size = +document.getElementById('gridSize').value;
+    const grid=document.getElementById("playGrid");
+    grid.innerHTML="";
+    grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
 
-    const cells=[...document.querySelectorAll('.cell-input')]
-        .map(e=>e.value.trim());
+    cells.forEach(text=>{
+        const c=document.createElement("div");
+        c.className="bingo-cell";
+        c.textContent=text;
 
-    const data={size,cells};
+        c.onclick=()=>{
+            c.classList.toggle("marked");
+            checkWin();
+        };
 
-    const encoded=btoa(encodeURIComponent(JSON.stringify(data)));
-
-    const url=location.origin+location.pathname+'#'+encoded;
-
-    document.getElementById('generatedUrl').value=url;
+        grid.appendChild(c);
+    });
 }
 
-function updateProgress(){
+function checkWin(){
 
-    const cells=document.querySelectorAll('.bingo-cell');
-    const marked=document.querySelectorAll('.bingo-cell.marked');
-
-    const percent=Math.round((marked.length/cells.length)*100);
-
-    document.getElementById('progressBar').style.width=percent+'%';
-    document.getElementById('progressText').textContent=percent+'%';
-}
-
-function getLineId(type,index){
-    return type+"-"+index;
-}
-
-function checkBingo(){
-
-    const cells=[...document.querySelectorAll('.bingo-cell')];
+    const cells=[...document.querySelectorAll(".bingo-cell")];
     const size=Math.sqrt(cells.length);
 
-    const grid=[];
-    for(let i=0;i<size;i++){
-        grid.push(cells.slice(i*size,(i+1)*size));
+    let allMarked=cells.every(c=>c.classList.contains("marked"));
+
+    if(allMarked && !bingoCompleted){
+        bingoCompleted=true;
+        triggerReward();
     }
-
-    let winLines=[];
-
-    for(let r=0;r<size;r++){
-        const id=getLineId("row",r);
-        if(grid[r].every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
-            activatedLines.add(id);
-            winLines.push(grid[r]);
-        }
-    }
-
-    for(let c=0;c<size;c++){
-        let col=[];
-        for(let r=0;r<size;r++) col.push(grid[r][c]);
-
-        const id=getLineId("col",c);
-        if(col.every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
-            activatedLines.add(id);
-            winLines.push(col);
-        }
-    }
-
-    let d1=[], d2=[];
-    for(let i=0;i<size;i++){
-        d1.push(grid[i][i]);
-        d2.push(grid[i][size-1-i]);
-    }
-
-    if(d1.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-1")){
-        activatedLines.add("diag-1");
-        winLines.push(d1);
-    }
-
-    if(d2.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-2")){
-        activatedLines.add("diag-2");
-        winLines.push(d2);
-    }
-
-    winLines.forEach(line=>{
-        line.forEach(cell=>{
-            cell.classList.add('win-line');
-            cell.classList.add('win-animate');
-
-            setTimeout(()=>{
-                cell.classList.remove('win-animate');
-            },800);
-        });
-    });
 }
 
+/* ⭐ RECOMPENSA FINAL */
+function triggerReward(){
 
-function loadPlayer(data){
+    const overlay=document.getElementById("rewardOverlay");
+    overlay.style.display="block";
 
-    document.getElementById('editor').classList.add('hidden');
-    document.getElementById('player').classList.remove('hidden');
+    for(let i=0;i<80;i++){
+        const star=document.createElement("div");
+        star.className="star";
+        star.textContent="⭐";
 
-    const grid=document.getElementById('playGrid');
-    grid.style.gridTemplateColumns=`repeat(${data.size},1fr)`;
+        star.style.left=Math.random()*100+"vw";
+        star.style.top="-50px";
+        star.style.fontSize=(10+Math.random()*30)+"px";
+        star.style.animationDuration=(1+Math.random()*2)+"s";
 
-    data.cells.forEach(text=>{
-
-        const cell=document.createElement('div');
-        cell.className='bingo-cell';
-        cell.textContent=text||'—';
-
-        cell.addEventListener('click',()=>{
-            cell.classList.toggle('marked');
-            updateProgress();
-            checkBingo();
-        });
-
-        grid.appendChild(cell);
-    });
-
-    updateProgress();
-}
-
-
-
-function resetMarks(){
-
-    activatedLines.clear();
-
-    document.querySelectorAll('.bingo-cell')
-        .forEach(c=>{
-            c.classList.remove('marked','win-line','win-animate');
-        });
-
-    updateProgress();
-}
-
-
-
-window.addEventListener('load',()=>{
-
-    if(location.hash){
-        const data=JSON.parse(
-            decodeURIComponent(atob(location.hash.substring(1)))
-        );
-        loadPlayer(data);
-    }else{
-        generateEditor();
+        overlay.appendChild(star);
     }
 
-});
+    setTimeout(()=>{
+        overlay.innerHTML="";
+        overlay.style.display="none";
+    },3000);
+}
 
 </script>
 
