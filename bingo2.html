@@ -100,13 +100,13 @@ select, textarea{
     border-color:#22c55e;
 }
 
-/* 🔥 ESTADO LINEA (SUAVE, NO CONSTANTE) */
+/* línea marcada (estado estable) */
 .win-line{
     box-shadow:0 0 18px #22c55e;
     border-color:#22c55e !important;
 }
 
-/* 🔥 ANIMACIÓN SOLO EN EVENTO (NO LOOP) */
+/* animación solo evento */
 .win-animate{
     animation: winPulse 0.8s ease;
 }
@@ -167,6 +167,9 @@ select, textarea{
     border:1px solid #2e2e3e;
 }
 
+/* hidden helper */
+.hidden{ display:none; }
+
 </style>
 </head>
 
@@ -221,6 +224,9 @@ select, textarea{
 
 <script>
 
+/* 🔥 ESTADO GLOBAL: líneas activadas */
+const activatedLines = new Set();
+
 function generateEditor(){
     const size = +document.getElementById('gridSize').value;
     const grid = document.getElementById('editorGrid');
@@ -261,8 +267,13 @@ function updateProgress(){
     document.getElementById('progressText').textContent=percent+'%';
 }
 
+/* helper IDs */
+function getLineId(type,index){
+    return type + "-" + index;
+}
+
 /* =========================
-   BINGO CHECK (CONTROLADO)
+   CHECK BINGO (FIXED)
 ========================= */
 function checkBingo(){
 
@@ -270,7 +281,6 @@ function checkBingo(){
     const size=Math.sqrt(cells.length);
 
     const grid=[];
-
     for(let i=0;i<size;i++){
         grid.push(cells.slice(i*size,(i+1)*size));
     }
@@ -279,7 +289,10 @@ function checkBingo(){
 
     // filas
     for(let r=0;r<size;r++){
-        if(grid[r].every(c=>c.classList.contains('marked'))){
+        const id = getLineId("row", r);
+
+        if(grid[r].every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
+            activatedLines.add(id);
             winLines.push(grid[r]);
         }
     }
@@ -290,7 +303,11 @@ function checkBingo(){
         for(let r=0;r<size;r++){
             col.push(grid[r][c]);
         }
-        if(col.every(c=>c.classList.contains('marked'))){
+
+        const id = getLineId("col", c);
+
+        if(col.every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
+            activatedLines.add(id);
             winLines.push(col);
         }
     }
@@ -301,19 +318,21 @@ function checkBingo(){
         d1.push(grid[i][i]);
         d2.push(grid[i][size-1-i]);
     }
-    if(d1.every(c=>c.classList.contains('marked'))) winLines.push(d1);
-    if(d2.every(c=>c.classList.contains('marked'))) winLines.push(d2);
 
-    // limpiar
-    cells.forEach(c=>{
-        c.classList.remove('win-animate');
-    });
+    if(d1.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-1")){
+        activatedLines.add("diag-1");
+        winLines.push(d1);
+    }
 
-    // aplicar animación SOLO 1 vez
+    if(d2.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-2")){
+        activatedLines.add("diag-2");
+        winLines.push(d2);
+    }
+
+    // animación SOLO primera vez
     winLines.forEach(line=>{
         line.forEach(cell=>{
             cell.classList.add('win-line');
-
             cell.classList.add('win-animate');
 
             setTimeout(()=>{
@@ -351,6 +370,8 @@ function loadPlayer(data){
 }
 
 function resetMarks(){
+
+    activatedLines.clear();
 
     document.querySelectorAll('.bingo-cell')
         .forEach(c=>{
