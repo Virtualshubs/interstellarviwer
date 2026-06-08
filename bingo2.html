@@ -100,34 +100,58 @@ select, textarea{
     border-color:#22c55e;
 }
 
+/* 🟡 CASILLA DORADA */
+.gold{
+    background: linear-gradient(145deg, #ffcc00, #ff9900) !important;
+    border-color: gold !important;
+    box-shadow: 0 0 25px gold, 0 0 60px rgba(255,215,0,0.6);
+    color:black;
+    font-weight:bold;
+}
+
 /* línea estable */
 .win-line{
     box-shadow:0 0 18px #22c55e;
     border-color:#22c55e !important;
 }
 
-/* animación evento */
 .win-animate{
     animation: winPulse 0.8s ease;
 }
 
 @keyframes winPulse{
-    0%{
-        transform:scale(1);
-        filter:brightness(1);
-    }
+    0%{ transform:scale(1); filter:brightness(1); }
     50%{
         transform:scale(1.08);
         box-shadow:0 0 40px #22c55e, 0 0 70px #7c3aed;
         filter:brightness(1.5);
     }
-    100%{
-        transform:scale(1.03);
-        filter:brightness(1);
-    }
+    100%{ transform:scale(1.03); filter:brightness(1); }
 }
 
-/* PROGRESS */
+/* 🟡 TOAST */
+.toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    border:1px solid gold;
+    color:gold;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:bold;
+    z-index:99999;
+    animation:fade 2.5s ease;
+}
+
+@keyframes fade{
+    0%{opacity:0; transform:translateX(-50%) translateY(-10px);}
+    10%{opacity:1; transform:translateX(-50%) translateY(0);}
+    90%{opacity:1;}
+    100%{opacity:0;}
+}
+
 .progress-wrap{
     width:100%;
     max-width:600px;
@@ -170,10 +194,7 @@ select, textarea{
 
 .hidden{ display:none; }
 
-/* =========================
-   WIDGET MODE
-========================= */
-
+/* WIDGET */
 #widgetBar{
     position:fixed;
     top:10px;
@@ -186,13 +207,6 @@ select, textarea{
     padding:10px 14px;
     display:none;
     justify-content:space-between;
-    align-items:center;
-    box-shadow:0 0 20px rgba(124,58,237,0.3);
-}
-
-#widgetBar button{
-    padding:6px 10px;
-    font-size:12px;
 }
 
 </style>
@@ -200,7 +214,6 @@ select, textarea{
 
 <body>
 
-<!-- 🔥 WIDGET BAR -->
 <div id="widgetBar">
     <span>🎮 Borjabingo</span>
     <button onclick="toggleWidget()">↔ Expandir</button>
@@ -260,9 +273,42 @@ select, textarea{
 const activatedLines = new Set();
 let isMinimized = false;
 
-/* =========================
-   WIDGET TOGGLE
-========================= */
+/* 🟡 GOLD SYSTEM */
+let goldCooldown = false;
+
+/* TOAST */
+function showToast(){
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = '🟡 CASILLA DORADA ACTIVADA';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2500);
+}
+
+/* GOLD EVENT */
+function tryGoldEvent(){
+
+    if(goldCooldown) return;
+
+    if(Math.random() < 0.5){
+
+        goldCooldown = true;
+
+        const marked = [...document.querySelectorAll('.bingo-cell.marked')];
+        if(marked.length === 0) return;
+
+        const cell = marked[Math.floor(Math.random()*marked.length)];
+        cell.classList.add('gold');
+
+        showToast();
+
+        setTimeout(()=>{
+            goldCooldown = false;
+        }, 8000);
+    }
+}
+
+/* WIDGET */
 function toggleWidget(){
 
     isMinimized = !isMinimized;
@@ -272,15 +318,11 @@ function toggleWidget(){
     const bar = document.getElementById('widgetBar');
 
     if(isMinimized){
-
         editor.style.display = 'none';
         player.style.display = 'none';
         bar.style.display = 'flex';
-
     }else{
-
         bar.style.display = 'none';
-
         if(document.querySelector('.bingo-cell')){
             player.style.display = 'block';
         }else{
@@ -289,10 +331,7 @@ function toggleWidget(){
     }
 }
 
-/* =========================
-   CORE
-========================= */
-
+/* CORE */
 function generateEditor(){
     const size = +document.getElementById('gridSize').value;
     const grid = document.getElementById('editorGrid');
@@ -303,29 +342,22 @@ function generateEditor(){
     for(let i=0;i<size*size;i++){
         const input=document.createElement('textarea');
         input.className='cell-input';
-        input.placeholder=`Casilla ${i+1}`;
         grid.appendChild(input);
     }
 }
 
 function exportBingo(){
-
     const size = +document.getElementById('gridSize').value;
-
-    const cells=[...document.querySelectorAll('.cell-input')]
-        .map(e=>e.value.trim());
+    const cells=[...document.querySelectorAll('.cell-input')].map(e=>e.value.trim());
 
     const data={size,cells};
-
     const encoded=btoa(encodeURIComponent(JSON.stringify(data)));
 
     const url=location.origin+location.pathname+'#'+encoded;
-
     document.getElementById('generatedUrl').value=url;
 }
 
 function updateProgress(){
-
     const cells=document.querySelectorAll('.bingo-cell');
     const marked=document.querySelectorAll('.bingo-cell.marked');
 
@@ -334,76 +366,6 @@ function updateProgress(){
     document.getElementById('progressBar').style.width=percent+'%';
     document.getElementById('progressText').textContent=percent+'%';
 }
-
-function getLineId(type,index){
-    return type+"-"+index;
-}
-
-/* =========================
-   CHECK BINGO
-========================= */
-function checkBingo(){
-
-    const cells=[...document.querySelectorAll('.bingo-cell')];
-    const size=Math.sqrt(cells.length);
-
-    const grid=[];
-    for(let i=0;i<size;i++){
-        grid.push(cells.slice(i*size,(i+1)*size));
-    }
-
-    let winLines=[];
-
-    for(let r=0;r<size;r++){
-        const id=getLineId("row",r);
-        if(grid[r].every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
-            activatedLines.add(id);
-            winLines.push(grid[r]);
-        }
-    }
-
-    for(let c=0;c<size;c++){
-        let col=[];
-        for(let r=0;r<size;r++) col.push(grid[r][c]);
-
-        const id=getLineId("col",c);
-        if(col.every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
-            activatedLines.add(id);
-            winLines.push(col);
-        }
-    }
-
-    let d1=[], d2=[];
-    for(let i=0;i<size;i++){
-        d1.push(grid[i][i]);
-        d2.push(grid[i][size-1-i]);
-    }
-
-    if(d1.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-1")){
-        activatedLines.add("diag-1");
-        winLines.push(d1);
-    }
-
-    if(d2.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-2")){
-        activatedLines.add("diag-2");
-        winLines.push(d2);
-    }
-
-    winLines.forEach(line=>{
-        line.forEach(cell=>{
-            cell.classList.add('win-line');
-            cell.classList.add('win-animate');
-
-            setTimeout(()=>{
-                cell.classList.remove('win-animate');
-            },800);
-        });
-    });
-}
-
-/* =========================
-   LOAD
-========================= */
 
 function loadPlayer(data){
 
@@ -423,6 +385,9 @@ function loadPlayer(data){
             cell.classList.toggle('marked');
             updateProgress();
             checkBingo();
+
+            // 🟡 trigger gold event
+            tryGoldEvent();
         });
 
         grid.appendChild(cell);
@@ -431,37 +396,20 @@ function loadPlayer(data){
     updateProgress();
 }
 
-/* =========================
-   RESET
-========================= */
-
 function resetMarks(){
-
     activatedLines.clear();
-
     document.querySelectorAll('.bingo-cell')
-        .forEach(c=>{
-            c.classList.remove('marked','win-line','win-animate');
-        });
-
+        .forEach(c=>c.classList.remove('marked','win-line','win-animate','gold'));
     updateProgress();
 }
 
-/* =========================
-   INIT
-========================= */
-
 window.addEventListener('load',()=>{
-
     if(location.hash){
-        const data=JSON.parse(
-            decodeURIComponent(atob(location.hash.substring(1)))
-        );
+        const data=JSON.parse(decodeURIComponent(atob(location.hash.substring(1))));
         loadPlayer(data);
     }else{
         generateEditor();
     }
-
 });
 
 </script>
