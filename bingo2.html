@@ -100,13 +100,13 @@ select, textarea{
     border-color:#22c55e;
 }
 
-/* línea marcada (estado estable) */
+/* línea estable */
 .win-line{
     box-shadow:0 0 18px #22c55e;
     border-color:#22c55e !important;
 }
 
-/* animación solo evento */
+/* animación evento */
 .win-animate{
     animation: winPulse 0.8s ease;
 }
@@ -127,6 +127,7 @@ select, textarea{
     }
 }
 
+/* PROGRESS */
 .progress-wrap{
     width:100%;
     max-width:600px;
@@ -167,13 +168,43 @@ select, textarea{
     border:1px solid #2e2e3e;
 }
 
-/* hidden helper */
 .hidden{ display:none; }
+
+/* =========================
+   WIDGET MODE
+========================= */
+
+#widgetBar{
+    position:fixed;
+    top:10px;
+    left:10px;
+    right:10px;
+    z-index:9999;
+    background:#0f0f1a;
+    border:1px solid #2e2e3e;
+    border-radius:12px;
+    padding:10px 14px;
+    display:none;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 0 20px rgba(124,58,237,0.3);
+}
+
+#widgetBar button{
+    padding:6px 10px;
+    font-size:12px;
+}
 
 </style>
 </head>
 
 <body>
+
+<!-- 🔥 WIDGET BAR -->
+<div id="widgetBar">
+    <span>🎮 Borjabingo</span>
+    <button onclick="toggleWidget()">↔ Expandir</button>
+</div>
 
 <div class="container">
 
@@ -191,6 +222,7 @@ select, textarea{
 
 <button onclick="generateEditor()">Generar Cuadrícula</button>
 <button onclick="exportBingo()">Crear bingo</button>
+<button onclick="toggleWidget()">⤵ Minimizar</button>
 </div>
 
 <div id="editorGrid" class="grid-editor"></div>
@@ -204,6 +236,7 @@ select, textarea{
 <div class="topbar">
 <h1>🎯 Bingo</h1>
 <button onclick="resetMarks()">Reiniciar</button>
+<button onclick="toggleWidget()">⤵ Minimizar</button>
 </div>
 
 <div class="progress-wrap">
@@ -224,8 +257,41 @@ select, textarea{
 
 <script>
 
-/* 🔥 ESTADO GLOBAL: líneas activadas */
 const activatedLines = new Set();
+let isMinimized = false;
+
+/* =========================
+   WIDGET TOGGLE
+========================= */
+function toggleWidget(){
+
+    isMinimized = !isMinimized;
+
+    const editor = document.getElementById('editor');
+    const player = document.getElementById('player');
+    const bar = document.getElementById('widgetBar');
+
+    if(isMinimized){
+
+        editor.style.display = 'none';
+        player.style.display = 'none';
+        bar.style.display = 'flex';
+
+    }else{
+
+        bar.style.display = 'none';
+
+        if(document.querySelector('.bingo-cell')){
+            player.style.display = 'block';
+        }else{
+            editor.style.display = 'block';
+        }
+    }
+}
+
+/* =========================
+   CORE
+========================= */
 
 function generateEditor(){
     const size = +document.getElementById('gridSize').value;
@@ -243,6 +309,7 @@ function generateEditor(){
 }
 
 function exportBingo(){
+
     const size = +document.getElementById('gridSize').value;
 
     const cells=[...document.querySelectorAll('.cell-input')]
@@ -258,6 +325,7 @@ function exportBingo(){
 }
 
 function updateProgress(){
+
     const cells=document.querySelectorAll('.bingo-cell');
     const marked=document.querySelectorAll('.bingo-cell.marked');
 
@@ -267,13 +335,12 @@ function updateProgress(){
     document.getElementById('progressText').textContent=percent+'%';
 }
 
-/* helper IDs */
 function getLineId(type,index){
-    return type + "-" + index;
+    return type+"-"+index;
 }
 
 /* =========================
-   CHECK BINGO (FIXED)
+   CHECK BINGO
 ========================= */
 function checkBingo(){
 
@@ -287,32 +354,25 @@ function checkBingo(){
 
     let winLines=[];
 
-    // filas
     for(let r=0;r<size;r++){
-        const id = getLineId("row", r);
-
+        const id=getLineId("row",r);
         if(grid[r].every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
             activatedLines.add(id);
             winLines.push(grid[r]);
         }
     }
 
-    // columnas
     for(let c=0;c<size;c++){
         let col=[];
-        for(let r=0;r<size;r++){
-            col.push(grid[r][c]);
-        }
+        for(let r=0;r<size;r++) col.push(grid[r][c]);
 
-        const id = getLineId("col", c);
-
+        const id=getLineId("col",c);
         if(col.every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
             activatedLines.add(id);
             winLines.push(col);
         }
     }
 
-    // diagonales
     let d1=[], d2=[];
     for(let i=0;i<size;i++){
         d1.push(grid[i][i]);
@@ -329,7 +389,6 @@ function checkBingo(){
         winLines.push(d2);
     }
 
-    // animación SOLO primera vez
     winLines.forEach(line=>{
         line.forEach(cell=>{
             cell.classList.add('win-line');
@@ -342,13 +401,16 @@ function checkBingo(){
     });
 }
 
+/* =========================
+   LOAD
+========================= */
+
 function loadPlayer(data){
 
     document.getElementById('editor').classList.add('hidden');
     document.getElementById('player').classList.remove('hidden');
 
     const grid=document.getElementById('playGrid');
-
     grid.style.gridTemplateColumns=`repeat(${data.size},1fr)`;
 
     data.cells.forEach(text=>{
@@ -369,6 +431,10 @@ function loadPlayer(data){
     updateProgress();
 }
 
+/* =========================
+   RESET
+========================= */
+
 function resetMarks(){
 
     activatedLines.clear();
@@ -380,6 +446,10 @@ function resetMarks(){
 
     updateProgress();
 }
+
+/* =========================
+   INIT
+========================= */
 
 window.addEventListener('load',()=>{
 
