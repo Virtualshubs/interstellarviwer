@@ -7,7 +7,7 @@
 <title>Bingo Stream Creator</title>
 
 <style>
-    
+
 body{
     font-family: 'Arial', sans-serif;
     background: radial-gradient(circle at top, #1a1a2e, #0a0a0f);
@@ -16,7 +16,6 @@ body{
     padding:20px;
 }
 
-/* TITULO */
 h1{
     text-align:center;
     font-size:32px;
@@ -26,13 +25,11 @@ h1{
     text-shadow:0 0 10px #a855f7, 0 0 20px #7c3aed;
 }
 
-/* CONTENEDOR */
 .container{
     max-width:1200px;
     margin:auto;
 }
 
-/* BOTONES */
 button{
     cursor:pointer;
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
@@ -51,7 +48,6 @@ button:hover{
     box-shadow:0 0 20px rgba(124,58,237,0.8);
 }
 
-/* SELECT / INPUT */
 select, textarea{
     background:#111827;
     color:white;
@@ -59,7 +55,6 @@ select, textarea{
     border-radius:8px;
 }
 
-/* GRID */
 .grid-editor,
 .grid-play{
     display:grid;
@@ -67,7 +62,6 @@ select, textarea{
     margin-top:20px;
 }
 
-/* EDITOR */
 .cell-input{
     width:100%;
     min-height:70px;
@@ -79,7 +73,6 @@ select, textarea{
     padding:8px;
 }
 
-/* JUEGO */
 .bingo-cell{
     min-height:95px;
     background: linear-gradient(145deg, #111827, #0b0b12);
@@ -102,26 +95,38 @@ select, textarea{
     border-color:#a855f7;
 }
 
-/* MARCADA */
 .marked{
     background: linear-gradient(145deg, #16a34a, #22c55e);
     border-color:#22c55e;
 }
 
-/* 🔥 NUEVO: LINEA GANADORA */
+/* 🔥 ESTADO LINEA (SUAVE, NO CONSTANTE) */
 .win-line{
-    animation: winPulse 1s infinite alternate;
-    box-shadow:0 0 25px #a855f7, 0 0 50px #22c55e;
+    box-shadow:0 0 18px #22c55e;
     border-color:#22c55e !important;
-    transform:scale(1.05);
+}
+
+/* 🔥 ANIMACIÓN SOLO EN EVENTO (NO LOOP) */
+.win-animate{
+    animation: winPulse 0.8s ease;
 }
 
 @keyframes winPulse{
-    0%{ filter:brightness(1); }
-    100%{ filter:brightness(1.5); }
+    0%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+    50%{
+        transform:scale(1.08);
+        box-shadow:0 0 40px #22c55e, 0 0 70px #7c3aed;
+        filter:brightness(1.5);
+    }
+    100%{
+        transform:scale(1.03);
+        filter:brightness(1);
+    }
 }
 
-/* PROGRESS BAR */
 .progress-wrap{
     width:100%;
     max-width:600px;
@@ -232,7 +237,6 @@ function generateEditor(){
 }
 
 function exportBingo(){
-
     const size = +document.getElementById('gridSize').value;
 
     const cells=[...document.querySelectorAll('.cell-input')]
@@ -247,11 +251,7 @@ function exportBingo(){
     document.getElementById('generatedUrl').value=url;
 }
 
-/* =========================
-   PROGRESO
-========================= */
 function updateProgress(){
-
     const cells=document.querySelectorAll('.bingo-cell');
     const marked=document.querySelectorAll('.bingo-cell.marked');
 
@@ -262,7 +262,7 @@ function updateProgress(){
 }
 
 /* =========================
-   CHECK BINGO LINES
+   BINGO CHECK (CONTROLADO)
 ========================= */
 function checkBingo(){
 
@@ -295,28 +295,34 @@ function checkBingo(){
         }
     }
 
-    // diagonal ↘
-    let d1=[];
-    for(let i=0;i<size;i++) d1.push(grid[i][i]);
+    // diagonales
+    let d1=[], d2=[];
+    for(let i=0;i<size;i++){
+        d1.push(grid[i][i]);
+        d2.push(grid[i][size-1-i]);
+    }
     if(d1.every(c=>c.classList.contains('marked'))) winLines.push(d1);
-
-    // diagonal ↙
-    let d2=[];
-    for(let i=0;i<size;i++) d2.push(grid[i][size-1-i]);
     if(d2.every(c=>c.classList.contains('marked'))) winLines.push(d2);
 
-    cells.forEach(c=>c.classList.remove('win-line'));
+    // limpiar
+    cells.forEach(c=>{
+        c.classList.remove('win-animate');
+    });
 
+    // aplicar animación SOLO 1 vez
     winLines.forEach(line=>{
         line.forEach(cell=>{
             cell.classList.add('win-line');
+
+            cell.classList.add('win-animate');
+
+            setTimeout(()=>{
+                cell.classList.remove('win-animate');
+            },800);
         });
     });
 }
 
-/* =========================
-   LOAD PLAYER
-========================= */
 function loadPlayer(data){
 
     document.getElementById('editor').classList.add('hidden');
@@ -344,20 +350,16 @@ function loadPlayer(data){
     updateProgress();
 }
 
-/* =========================
-   RESET
-========================= */
 function resetMarks(){
 
     document.querySelectorAll('.bingo-cell')
-        .forEach(c=>c.classList.remove('marked','win-line'));
+        .forEach(c=>{
+            c.classList.remove('marked','win-line','win-animate');
+        });
 
     updateProgress();
 }
 
-/* =========================
-   INIT
-========================= */
 window.addEventListener('load',()=>{
 
     if(location.hash){
@@ -368,6 +370,7 @@ window.addEventListener('load',()=>{
     }else{
         generateEditor();
     }
+
 });
 
 </script>
