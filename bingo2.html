@@ -111,6 +111,60 @@ select, textarea{
     animation: winPulse 0.8s ease;
 }
 
+/* =========================
+   BINGO FINAL MESSAGE
+========================= */
+
+#bingoMessage{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:10000;
+    backdrop-filter:blur(6px);
+}
+
+.bingo-box{
+    background:#111827;
+    border:2px solid #22c55e;
+    border-radius:20px;
+    padding:40px;
+    text-align:center;
+    max-width:500px;
+    box-shadow:
+        0 0 40px rgba(34,197,94,.6),
+        0 0 80px rgba(124,58,237,.4);
+    animation:bingoAppear .5s ease;
+}
+
+.bingo-box h2{
+    margin-top:0;
+    font-size:36px;
+    color:#22c55e;
+    text-shadow:0 0 20px #22c55e;
+}
+
+.bingo-box p{
+    font-size:18px;
+    margin:20px 0;
+}
+
+@keyframes bingoAppear{
+
+    from{
+        transform:scale(.7);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+
+}
+    
 @keyframes winPulse{
     0%{
         transform:scale(1);
@@ -223,7 +277,21 @@ select, textarea{
 <div id="editorGrid" class="grid-editor"></div>
 
 <textarea id="generatedUrl" class="url-box" rows="4"></textarea>
+<div id="bingoMessage">
 
+    <div class="bingo-box">
+        <h2>🎉 BINGO COMPLETADO 🎉</h2>
+
+        <p>
+            ¡Has completado todas las casillas!
+        </p>
+
+        <button onclick="closeBingoMessage()">
+            Seguir jugando
+        </button>
+    </div>
+
+</div>
 </div>
 
 <div id="player" class="hidden">
@@ -254,6 +322,7 @@ select, textarea{
 
 const activatedLines = new Set();
 let isMinimized = false;
+let bingoCompleted = false;
 
 
 function toggleWidget(){
@@ -283,8 +352,51 @@ function toggleWidget(){
 }
 
 
+/* =========================
+   FINAL BINGO MESSAGE
+========================= */
+
+function showBingoMessage(){
+
+    if(bingoCompleted) return;
+
+    bingoCompleted = true;
+
+    const messages = [
+
+        "🎉 ¡BINGO COMPLETADO!",
+        "🔥 ¡Evento desbloqueado!",
+        "👑 ¡El chat reclama su premio!",
+        "⭐ ¡Victoria legendaria!",
+        "🎲 ¡Reto completado!",
+        "🚀 ¡Turbo Bingo conseguido!",
+        "🏆 ¡Tablero completado!"
+
+    ];
+
+    const title = document.querySelector('#bingoMessage h2');
+
+    if(title){
+
+        title.textContent =
+            messages[Math.floor(Math.random()*messages.length)];
+    }
+
+    document.getElementById("bingoMessage").style.display = "flex";
+}
+
+function closeBingoMessage(){
+
+    document.getElementById("bingoMessage").style.display = "none";
+}
+
+
+/* =========================
+   EDITOR
+========================= */
 
 function generateEditor(){
+
     const size = +document.getElementById('gridSize').value;
     const grid = document.getElementById('editorGrid');
 
@@ -292,9 +404,12 @@ function generateEditor(){
     grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
 
     for(let i=0;i<size*size;i++){
+
         const input=document.createElement('textarea');
+
         input.className='cell-input';
         input.placeholder=`Casilla ${i+1}`;
+
         grid.appendChild(input);
     }
 }
@@ -308,12 +423,21 @@ function exportBingo(){
 
     const data={size,cells};
 
-    const encoded=btoa(encodeURIComponent(JSON.stringify(data)));
+    const encoded=btoa(
+        encodeURIComponent(
+            JSON.stringify(data)
+        )
+    );
 
     const url=location.origin+location.pathname+'#'+encoded;
 
     document.getElementById('generatedUrl').value=url;
 }
+
+
+/* =========================
+   PROGRESS
+========================= */
 
 function updateProgress(){
 
@@ -324,11 +448,22 @@ function updateProgress(){
 
     document.getElementById('progressBar').style.width=percent+'%';
     document.getElementById('progressText').textContent=percent+'%';
+
+    if(percent === 100){
+
+        showBingoMessage();
+    }
 }
 
 function getLineId(type,index){
+
     return type+"-"+index;
 }
+
+
+/* =========================
+   CHECK BINGO
+========================= */
 
 function checkBingo(){
 
@@ -336,110 +471,190 @@ function checkBingo(){
     const size=Math.sqrt(cells.length);
 
     const grid=[];
+
     for(let i=0;i<size;i++){
-        grid.push(cells.slice(i*size,(i+1)*size));
+
+        grid.push(
+            cells.slice(i*size,(i+1)*size)
+        );
     }
 
     let winLines=[];
 
     for(let r=0;r<size;r++){
+
         const id=getLineId("row",r);
-        if(grid[r].every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
+
+        if(
+            grid[r].every(c=>c.classList.contains('marked'))
+            &&
+            !activatedLines.has(id)
+        ){
             activatedLines.add(id);
             winLines.push(grid[r]);
         }
     }
 
     for(let c=0;c<size;c++){
+
         let col=[];
-        for(let r=0;r<size;r++) col.push(grid[r][c]);
+
+        for(let r=0;r<size;r++){
+
+            col.push(grid[r][c]);
+        }
 
         const id=getLineId("col",c);
-        if(col.every(c=>c.classList.contains('marked')) && !activatedLines.has(id)){
+
+        if(
+            col.every(c=>c.classList.contains('marked'))
+            &&
+            !activatedLines.has(id)
+        ){
             activatedLines.add(id);
             winLines.push(col);
         }
     }
 
     let d1=[], d2=[];
+
     for(let i=0;i<size;i++){
+
         d1.push(grid[i][i]);
         d2.push(grid[i][size-1-i]);
     }
 
-    if(d1.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-1")){
+    if(
+        d1.every(c=>c.classList.contains('marked'))
+        &&
+        !activatedLines.has("diag-1")
+    ){
         activatedLines.add("diag-1");
         winLines.push(d1);
     }
 
-    if(d2.every(c=>c.classList.contains('marked')) && !activatedLines.has("diag-2")){
+    if(
+        d2.every(c=>c.classList.contains('marked'))
+        &&
+        !activatedLines.has("diag-2")
+    ){
         activatedLines.add("diag-2");
         winLines.push(d2);
     }
 
     winLines.forEach(line=>{
+
         line.forEach(cell=>{
+
             cell.classList.add('win-line');
             cell.classList.add('win-animate');
 
             setTimeout(()=>{
+
                 cell.classList.remove('win-animate');
+
             },800);
+
         });
+
     });
 }
 
 
+/* =========================
+   PLAYER
+========================= */
+
 function loadPlayer(data){
 
-    document.getElementById('editor').classList.add('hidden');
-    document.getElementById('player').classList.remove('hidden');
+    document.getElementById('editor')
+        .classList.add('hidden');
+
+    document.getElementById('player')
+        .classList.remove('hidden');
 
     const grid=document.getElementById('playGrid');
-    grid.style.gridTemplateColumns=`repeat(${data.size},1fr)`;
+
+    grid.style.gridTemplateColumns=
+        `repeat(${data.size},1fr)`;
 
     data.cells.forEach(text=>{
 
         const cell=document.createElement('div');
+
         cell.className='bingo-cell';
         cell.textContent=text||'—';
 
         cell.addEventListener('click',()=>{
+
             cell.classList.toggle('marked');
+
             updateProgress();
             checkBingo();
         });
 
         grid.appendChild(cell);
+
     });
 
     updateProgress();
 }
 
 
+/* =========================
+   RESET
+========================= */
 
 function resetMarks(){
 
     activatedLines.clear();
 
+    bingoCompleted = false;
+
+    const popup =
+        document.getElementById("bingoMessage");
+
+    if(popup){
+
+        popup.style.display = "none";
+    }
+
     document.querySelectorAll('.bingo-cell')
         .forEach(c=>{
-            c.classList.remove('marked','win-line','win-animate');
+
+            c.classList.remove(
+                'marked',
+                'win-line',
+                'win-animate'
+            );
+
         });
 
     updateProgress();
 }
 
 
+/* =========================
+   INIT
+========================= */
 
 window.addEventListener('load',()=>{
 
     if(location.hash){
+
         const data=JSON.parse(
-            decodeURIComponent(atob(location.hash.substring(1)))
+
+            decodeURIComponent(
+                atob(
+                    location.hash.substring(1)
+                )
+            )
         );
+
         loadPlayer(data);
+
     }else{
+
         generateEditor();
     }
 
