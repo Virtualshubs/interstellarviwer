@@ -318,10 +318,13 @@ pre {
   }
 }
 
-  #satPatch {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+#satPatch {
+  position: fixed;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
 
   width: 64px;
   height: 64px;
@@ -349,7 +352,6 @@ pre {
 
   z-index: 5;
 }
-
 
 #satPatch img {
   width: 80%;
