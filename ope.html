@@ -15,10 +15,6 @@ body {
 
 canvas { display: block; }
 
-/* ========================= */
-/* MAIN PANEL (MISSION CONTROL ORION STYLE) */
-/* ========================= */
-
 #ui {
   position: absolute;
   top: 12px;
@@ -42,7 +38,6 @@ canvas { display: block; }
     inset 0 0 25px rgba(255,255,255,0.02);
 }
 
-/* subtle HUD line accent */
 #ui::before {
   content: "";
   position: absolute;
@@ -60,7 +55,7 @@ canvas { display: block; }
   opacity: 0.6;
 }
 
-/* TITLE */
+
 #ui h3 {
   margin: 0 0 12px 0;
   font-weight: 600;
@@ -69,10 +64,6 @@ canvas { display: block; }
   color: #9CCBFF;
   text-transform: uppercase;
 }
-
-/* ========================= */
-/* CONTROLS (INSTRUMENT PANEL STYLE) */
-/* ========================= */
 
 button, select, input {
   width: 100%;
@@ -103,9 +94,6 @@ button:active {
   transform: scale(0.98);
 }
 
-/* ========================= */
-/* MAIN RESULT CARD (BEST PASS CORE) */
-/* ========================= */
 
 .highlight {
   margin-top: 14px;
@@ -126,10 +114,6 @@ button:active {
 
   box-shadow: inset 0 0 18px rgba(0,255,150,0.05);
 }
-
-/* ========================= */
-/* INSIGHT SYSTEM (SATELLITE MODULES) */
-/* ========================= */
 
 .insightBlock {
   margin-top: 10px;
@@ -178,9 +162,6 @@ button:active {
   border-left: 1px solid rgba(120, 180, 255, 0.25);
 }
 
-/* ========================= */
-/* RANKING CARDS (MISSION LIST) */
-/* ========================= */
 
 .rankCard {
   margin-top: 8px;
@@ -202,9 +183,7 @@ button:active {
   background: rgba(120, 180, 255, 0.05);
 }
 
-/* ========================= */
-/* OUTPUT LOG (TELEMETRY STREAM) */
-/* ========================= */
+
 
 pre {
   white-space: pre-wrap;
@@ -216,9 +195,7 @@ pre {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
 }
 
-/* ========================= */
-/* SCROLLBAR (OPTIONAL HUD TOUCH) */
-/* ========================= */
+
 
 #ui::-webkit-scrollbar {
   width: 6px;
@@ -340,6 +317,48 @@ pre {
     transform: translateY(0);
   }
 }
+
+  #satPatch {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 64px;
+  height: 64px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255,255,255,0.18),
+    rgba(120,180,255,0.08) 40%,
+    rgba(10,14,20,0.9) 100%
+  );
+
+  border: 1px solid rgba(120, 180, 255, 0.35);
+
+  box-shadow:
+    0 0 18px rgba(120,180,255,0.25),
+    inset 0 0 12px rgba(255,255,255,0.05);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  z-index: 5;
+}
+
+
+#satPatch img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+
+  filter: drop-shadow(0 0 6px rgba(120,180,255,0.4));
+}
+  
 </style>
 </head>
 
@@ -481,6 +500,7 @@ pre {
 </div>
 
   <div id="satInfoPanel"></div>
+  <div id="satPatch"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
@@ -573,24 +593,17 @@ function animate() {
 
   const now = new Date();
 
-  // =========================
-  // 🌍 ROTACIÓN TIERRA REAL
-  // =========================
+
   if (earth) {
     const gmst = satellite.gstime(now);
     earth.rotation.y = -gmst;
   }
 
-  // =========================
-  // 🛰 SATÉLITE
-  // =========================
+
   if (window.latestSatrec) {
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-  // =========================
-  // 🎥 ZOOM SMOOTH
-  // =========================
   zoom += (targetZoom - zoom) * 0.1;
 
   camera.position.set(0, 140, zoom);
@@ -599,9 +612,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// =========================
-// OBSERVER
-// =========================
+
 function getObserver() {
   return {
     latitude: window.lat || 40.4168,
@@ -646,12 +657,11 @@ function getClass(maxElev) {
   return "🔴 MUY BAJO";
 }
 
-// =========================
-// SAT INFO
-// =========================
+
 const SAT_INFO = {
   "25544": {
     name: "ISS",
+    patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Estación espacial",
     mission: "Microgravedad",
     instruments: [
@@ -668,6 +678,7 @@ const SAT_INFO = {
 
   "39634": {
     name: "Sentinel-1A",
+    patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Radar SAR",
     mission: "Copernicus (observación radar de la Tierra)",
     instruments: [
@@ -684,6 +695,7 @@ const SAT_INFO = {
 
   "42063": {
     name: "Sentinel-2B",
+    patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Óptico multispectral",
     mission: "Copernicus (observación óptica de la Tierra)",
     instruments: [
@@ -700,6 +712,7 @@ const SAT_INFO = {
 
   "25338": {
     name: "NOAA-15",
+    patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Meteorológico",
     mission: "Clima global y predicción meteorológica",
     instruments: [
@@ -749,6 +762,21 @@ function getContextInsight(satId, maxElev) {
 }
 
 
+
+  
+function renderSatPatch(catnr) {
+
+  const el = document.getElementById("satPatch");
+  const info = SAT_INFO[catnr];
+
+  if (!el || !info) return;
+
+  if (info.patch) {
+    el.innerHTML = `<img src="${info.patch}">`;
+  } else {
+    el.innerHTML = "🛰";
+  }
+}
 
   // =========================
 // infopanel
@@ -895,6 +923,8 @@ async function loadSatellite(catnr) {
   window.latestSatrec = satrec;
   window.currentCATNR = catnr;
 
+  renderSatPatch(catnr);
+
   run();
 }
 
@@ -964,6 +994,8 @@ Duración: ${p.duration.toFixed(1)} min
 Score: ${Math.round(p.score)}
 `).join("\n");
 }
+
+  
 
 </script>
 
