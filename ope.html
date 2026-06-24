@@ -241,7 +241,7 @@ pre {
 }
 
   .satPanelTitle {
-  font-size: 14px;
+  font-size: 19px;
   font-weight: 600;
 
   margin-bottom: 12px;
@@ -250,6 +250,45 @@ pre {
   text-transform: uppercase;
 
   color: #9CCBFF;
+}
+
+  #satHeader {
+  width: 100%;
+  height: 120px;
+
+  border-radius: 12px;
+  overflow: hidden;
+
+  margin-bottom: 12px;
+
+  position: relative;
+
+  border: 1px solid rgba(120, 180, 255, 0.25);
+
+  box-shadow: 0 0 20px rgba(120,180,255,0.15);
+}
+
+  #satHeader img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  filter: contrast(1.1) brightness(0.9);
+}
+
+  #satHeader::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.1),
+    rgba(0,0,0,0.7)
+  );
+
+  pointer-events: none;
 }
 
   .satBlock {
@@ -675,6 +714,7 @@ function getClass(maxElev) {
 const SAT_INFO = {
   "25544": {
     name: "ISS",
+      image: "https://3d.staratlas.es/ISS/emblem900x900.pngg",
     patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Estación espacial",
     mission: "Microgravedad",
@@ -692,6 +732,7 @@ const SAT_INFO = {
 
   "39634": {
     name: "Sentinel-1A",
+     image: "https://3d.staratlas.es/ISS/emblem900x900.pngg",
     patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
     type: "Radar SAR",
     mission: "Copernicus (observación radar de la Tierra)",
@@ -709,6 +750,7 @@ const SAT_INFO = {
 
   "42063": {
     name: "Sentinel-2B",
+     image: "https://3d.staratlas.es/ISS/emblem900x900.pngg",
     patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Óptico multispectral",
     mission: "Copernicus (observación óptica de la Tierra)",
@@ -726,6 +768,7 @@ const SAT_INFO = {
 
   "25338": {
     name: "NOAA-15",
+     image: "https://3d.staratlas.es/ISS/emblem900x900.pngg",
     patch: "https://3d.staratlas.es/NOAA_logo.svg.png",
     type: "Meteorológico",
     mission: "Clima global y predicción meteorológica",
@@ -796,32 +839,32 @@ function renderSatPatch(catnr) {
 // infopanel
 // =========================
 
-  function renderSatInfoPanel(catnr, maxElev) {
+ function renderSatInfoPanel(catnr, maxElev) {
 
   const panel = document.getElementById("satInfoPanel");
-  if (!panel) return;
-
   const info = SAT_INFO[catnr];
-  if (!info) return;
+  if (!panel || !info) return;
 
   const insights = getContextInsight(catnr, maxElev);
 
-  let html = `
-    <div class="satPanelTitle">🛰 ${info.name}</div>
-  `;
+  panel.innerHTML = `
+    
+    <div id="satHeader">
+      <img src="${info.image || ''}">
+    </div>
 
-  insights.forEach(block => {
-    html += `
+    <div class="satPanelTitle">🛰 ${info.name}</div>
+
+    ${insights.map(block => `
       <div class="satBlock">
         <div class="satBlockTitle">${block.title}</div>
         ${block.items.map(i => `
           <div class="satItem">• ${i}</div>
         `).join("")}
       </div>
-    `;
-  });
+    `).join("")}
 
-  panel.innerHTML = html;
+  `;
 }
 
 // =========================
