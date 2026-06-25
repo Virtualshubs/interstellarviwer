@@ -688,11 +688,14 @@ function getClass(maxElev) {
   return "🔴 MUY BAJO";
 }
 
-
 const SAT_INFO = {
+
+  // =========================
+  // 🧑‍🚀 ISS
+  // =========================
   "25544": {
     name: "ISS",
-      image: "https://3d.staratlas.es/ISS/1366_521.jpg",
+    image: "https://3d.staratlas.es/ISS/1366_521.jpg",
     patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Estación espacial",
     mission: "Microgravedad",
@@ -708,30 +711,53 @@ const SAT_INFO = {
     ]
   },
 
+  // =========================
+  // 🌍 COPERNICUS - SENTINEL 1
+  // =========================
+
   "39634": {
     name: "Sentinel-1A",
-     image: "https://3d.staratlas.es/ISS/emblem900x900.png",
+    image: "https://3d.staratlas.es/Sentinel-1.jpg",
     patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
     type: "Radar SAR",
-    mission: "Copernicus (observación radar de la Tierra)",
+    mission: "Copernicus - Observación radar de la Tierra",
     instruments: [
-      "Radar de apertura sintética (SAR)",
-      "Imagen de microondas banda C"
+      "Radar de apertura sintética (C-band SAR)"
     ],
     capabilities: [
       "Detección de inundaciones",
       "Deformación del terreno",
-      "Monitorización de desastres",
-      "Funciona de noche y con nubes"
+      "Monitoreo de hielo marino",
+      "Operación nocturna y con nubes"
     ]
   },
 
+  "39084": {
+    name: "Sentinel-1B",
+    image: "https://3d.staratlas.es/Sentinel-1.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
+    type: "Radar SAR",
+    mission: "Copernicus - Observación radar de la Tierra",
+    instruments: [
+      "Radar de apertura sintética (C-band SAR)"
+    ],
+    capabilities: [
+      "Refuerzo de Sentinel-1A",
+      "Mayor frecuencia de revisita",
+      "Monitoreo continuo global"
+    ]
+  },
+
+  // =========================
+  // 🌱 COPERNICUS - SENTINEL 2
+  // =========================
+
   "42063": {
     name: "Sentinel-2B",
-     image: "https://3d.staratlas.es/ISS/emblem900x900.png",
+    image: "https://3d.staratlas.es/Sentinel-2.jpg",
     patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Óptico multispectral",
-    mission: "Copernicus (observación óptica de la Tierra)",
+    mission: "Copernicus - Observación óptica de la Tierra",
     instruments: [
       "Cámara multiespectral",
       "13 bandas espectrales"
@@ -744,9 +770,75 @@ const SAT_INFO = {
     ]
   },
 
+  "29780": {
+    name: "Sentinel-2A",
+    image: "https://3d.staratlas.es/Sentinel-2.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
+    type: "Óptico multispectral",
+    mission: "Copernicus - Observación óptica de la Tierra",
+    instruments: [
+      "Cámara multiespectral",
+      "13 bandas espectrales"
+    ],
+    capabilities: [
+      "Mapeo de vegetación",
+      "Agricultura de precisión",
+      "Monitoreo urbano",
+      "Recursos hídricos"
+    ]
+  },
+
+  // =========================
+  // 🌊 COPERNICUS - OCEANOS
+  // =========================
+
+  "28654": {
+    name: "Sentinel-3A",
+    image: "https://3d.staratlas.es/Sentinel-3.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-3_patch.png",
+    type: "Oceanografía / Clima",
+    mission: "Copernicus - Océanos y clima global",
+    instruments: [
+      "Altímetro radar",
+      "Radiómetro óptico",
+      "Sensor térmico"
+    ],
+    capabilities: [
+      "Temperatura del océano",
+      "Nivel del mar",
+      "Color del océano",
+      "Clima global"
+    ]
+  },
+
+  // =========================
+  // 🌫️ COPERNICUS - ATMOSFERA
+  // =========================
+
+  "43618": {
+    name: "Sentinel-5P",
+    image: "https://3d.staratlas.es/Sentinel-5P.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-5P_patch.png",
+    type: "Monitoreo atmosférico",
+    mission: "Copernicus - Calidad del aire",
+    instruments: [
+      "Espectrómetro TROPOMI"
+    ],
+    capabilities: [
+      "CO2 y NO2 global",
+      "Calidad del aire",
+      "Contaminación urbana",
+      "Ozono atmosférico"
+    ]
+  },
+
+  // =========================
+  // 🌦️ NOAA (NO COPERNICUS PERO LO MANTENEMOS)
+  // =========================
+
   "25338": {
     name: "NOAA-15",
-     image: "https://3d.staratlas.es/NOAA_logo.svg.png",
+    image: "https://3d.staratlas.es/NOAA_logo.svg.png",
     patch: "https://3d.staratlas.es/NOAA_logo.svg.png",
     type: "Meteorológico",
     mission: "Clima global y predicción meteorológica",
@@ -764,15 +856,17 @@ const SAT_INFO = {
   }
 };
 
-// =========================
-// CONTEXT INTELLIGENCE
-// =========================
-function getContextInsight(satId, maxElev) {
+
+
+  function getContextInsight(satId, maxElev) {
 
   const info = SAT_INFO[satId];
 
   let insights = [];
 
+  // =========================
+  // BASE INFO
+  // =========================
   if (info) {
     insights.push({ title: "MISIÓN", items: [info.mission] });
     insights.push({ title: "TIPO", items: [info.type] });
@@ -780,22 +874,101 @@ function getContextInsight(satId, maxElev) {
     insights.push({ title: "CAPACIDADES", items: info.capabilities });
   }
 
+  // =========================
+  // 🌍 CITY / EARTH USE LAYER (COPERNICUS AWARE)
+  // =========================
   let cityUse = [];
 
-  if (satId === "39634") cityUse = ["Inundaciones", "Deformación del terreno", "Infraestructura"];
-  if (satId === "42063") cityUse = ["Agricultura", "Vegetación", "Uso del suelo"];
-  if (satId === "25338") cityUse = ["Clima", "Tormentas", "Nubosidad"];
-  if (satId === "25544") cityUse = ["Observación orbital", "Investigación"];
+  // =========================
+  // 🛰 SENTINEL-1 (RADAR)
+  // =========================
+  if (satId === "39634" || satId === "39084") {
+    cityUse = [
+      "Inundaciones",
+      "Deformación del terreno",
+      "Hielo marino",
+      "Infraestructura crítica"
+    ];
+  }
 
-  insights.push({ title: "USO", items: cityUse });
+  // =========================
+  // 🌱 SENTINEL-2 (ÓPTICO / AGRICULTURA)
+  // =========================
+  if (satId === "42063" || satId === "29780") {
+    cityUse = [
+      "Agricultura de precisión",
+      "Vegetación y salud de cultivos",
+      "Uso del suelo",
+      "Urbanismo",
+      "Recursos hídricos"
+    ];
+  }
 
-  if (maxElev > 70) insights.push({ title: "CALIDAD", items: ["MUY ALTA 🔥"] });
-  else if (maxElev > 45) insights.push({ title: "CALIDAD", items: ["MEDIA 🟡"] });
-  else insights.push({ title: "CALIDAD", items: ["BAJA 🟠"] });
+  // =========================
+  // 🌊 SENTINEL-3 (OCÉANOS / CLIMA)
+  // =========================
+  if (satId === "28654") {
+    cityUse = [
+      "Temperatura del océano",
+      "Nivel del mar",
+      "Color del agua",
+      "Clima global"
+    ];
+  }
+
+  // =========================
+  // 🌫 SENTINEL-5P (ATMÓSFERA)
+  // =========================
+  if (satId === "43618") {
+    cityUse = [
+      "Calidad del aire",
+      "Contaminación urbana",
+      "Ozono atmosférico",
+      "Emisiones industriales"
+    ];
+  }
+
+  // =========================
+  // 🧑‍🚀 ISS
+  // =========================
+  if (satId === "25544") {
+    cityUse = [
+      "Observación orbital",
+      "Investigación científica",
+      "Experimentos en microgravedad"
+    ];
+  }
+
+  // =========================
+  // 🌦 NOAA (METEO FALLBACK)
+  // =========================
+  if (satId === "25338") {
+    cityUse = [
+      "Predicción del tiempo",
+      "Tormentas",
+      "Nubosidad",
+      "Temperatura global"
+    ];
+  }
+
+  insights.push({
+    title: "USO",
+    items: cityUse
+  });
+
+  // =========================
+  // 📊 QUALITY SYSTEM
+  // =========================
+  if (maxElev > 70) {
+    insights.push({ title: "CALIDAD", items: ["MUY ALTA 🔥"] });
+  } else if (maxElev > 45) {
+    insights.push({ title: "CALIDAD", items: ["MEDIA 🟡"] });
+  } else {
+    insights.push({ title: "CALIDAD", items: ["BAJA 🟠"] });
+  }
 
   return insights;
 }
-
 
 
   
