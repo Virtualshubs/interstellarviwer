@@ -398,13 +398,30 @@ pre {
 <div id="ui">
   <h3>🛰 Orbital Pass Engine</h3>
 
-  <!-- SAT -->
-  <select id="satSelect" onchange="changeSatellite()">
-    <option value="25544">ISS</option>
-    <option value="39634">Sentinel-1A</option>
-    <option value="42063">Sentinel-2B</option>
-    <option value="25338">NOAA-15</option>
-  </select>
+<!-- SAT -->
+<select id="satSelect" onchange="changeSatellite()">
+
+  <!-- ISS -->
+  <option value="25544">ISS</option>
+
+  <!-- COPERNICUS - SENTINEL 1 -->
+  <option value="39634">Sentinel-1A</option>
+  <option value="39084">Sentinel-1B</option>
+
+  <!-- COPERNICUS - SENTINEL 2 -->
+  <option value="42063">Sentinel-2B</option>
+  <option value="29780">Sentinel-2A</option>
+
+  <!-- COPERNICUS - SENTINEL 3 -->
+  <option value="28654">Sentinel-3A</option>
+
+  <!-- COPERNICUS - SENTINEL 5P -->
+  <option value="43618">Sentinel-5P</option>
+
+  <!-- METEO / NOAA -->
+  <option value="25338">NOAA-15</option>
+
+</select>
 
   <!-- CITY -->
 <select id="citySelect" onchange="changeCity()">
@@ -717,7 +734,7 @@ const SAT_INFO = {
 
   "39634": {
     name: "Sentinel-1A",
-    image: "https://3d.staratlas.es/Sentinel-1.jpg",
+    image: "https://3d.staratlas.es/ISS/emblem900x900.png",
     patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
     type: "Radar SAR",
     mission: "Copernicus - Observación radar de la Tierra",
@@ -735,7 +752,7 @@ const SAT_INFO = {
   "39084": {
     name: "Sentinel-1B",
     image: "https://3d.staratlas.es/Sentinel-1.jpg",
-    patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
+    patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Radar SAR",
     mission: "Copernicus - Observación radar de la Tierra",
     instruments: [
@@ -754,7 +771,7 @@ const SAT_INFO = {
 
   "42063": {
     name: "Sentinel-2B",
-    image: "https://3d.staratlas.es/Sentinel-2.jpg",
+    image: "https://3d.staratlas.es/ISS/emblem900x900.png",
     patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Óptico multispectral",
     mission: "Copernicus - Observación óptica de la Tierra",
