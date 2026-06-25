@@ -1479,7 +1479,6 @@ function renderMissionNav() {
 
       <div class="missionMeta">
         <div class="missionLabel">${m.label}</div>
-        <div class="missionSub">${m.description}</div>
       </div>
 
     </div>
@@ -1497,6 +1496,10 @@ function renderMissionPanel() {
   if (!mission) return;
 
   panel.innerHTML = `
+    <button class="missionCloseBtn" onclick="closeMissionPanel()">
+      ✕
+    </button>
+
     <div class="missionTitle">
       🧭 ${mission.label}
     </div>
