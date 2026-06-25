@@ -441,7 +441,54 @@ pre {
   height: 100%;
   object-fit: cover;
 }
-  
+
+
+  #missionPanel{
+  position:fixed;
+
+  top:50%;
+  left:50%;
+
+  transform:translate(-50%,-50%);
+
+  width:420px;
+  min-height:180px;
+
+  padding:24px;
+
+  background:rgba(8,12,18,0.95);
+  backdrop-filter:blur(20px);
+
+  border:1px solid rgba(120,180,255,0.35);
+  border-radius:20px;
+
+  box-shadow:
+    0 0 40px rgba(120,180,255,0.25);
+
+  color:white;
+
+  z-index:9999;
+
+  overflow:hidden;
+}
+
+  .missionTitle{
+  font-size:24px;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+.missionDesc{
+  font-size:14px;
+  line-height:1.6;
+  opacity:0.85;
+  margin-bottom:16px;
+}
+
+.missionSatCount{
+  font-size:13px;
+  color:#7ec8ff;
+}
 </style>
 </head>
 
