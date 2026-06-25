@@ -389,11 +389,65 @@ pre {
 
   filter: drop-shadow(0 0 6px rgba(120,180,255,0.4));
 }
+
+
+#missionNav {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  gap: 10px;
+
+  padding: 10px 14px;
+
+  background: rgba(10,14,20,0.6);
+  border: 1px solid rgba(120,180,255,0.15);
+  backdrop-filter: blur(10px);
+
+  border-radius: 999px;
+
+  z-index: 20;
+}
+
+.missionSlot {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  border: 1px solid rgba(120,180,255,0.25);
+  background: rgba(255,255,255,0.03);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.missionSlot:hover {
+  transform: scale(1.1);
+  border-color: rgba(120,180,255,0.6);
+  box-shadow: 0 0 15px rgba(120,180,255,0.25);
+}
+
+.missionSlot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
   
 </style>
 </head>
 
 <body>
+
+  <div id="missionNav"></div>
 
 <div id="ui">
   <h3>🛰 Orbital Pass Engine</h3>
@@ -894,6 +948,36 @@ const SAT_INFO = {
 }
 };
 
+
+
+
+const MISSIONS = {
+  copernicus: {
+    label: "Copernicus",
+    satellites: ["39634","42063","29780","43618","28654"],
+    description: "Observación global de la Tierra (Europa)",
+    icon: "https://3d.staratlas.es/icons/copernicus.png"
+  },
+
+  meteorology: {
+    label: "Meteorología",
+    satellites: ["25338","38552"],
+    description: "Clima y predicción atmosférica",
+    icon: "https://3d.staratlas.es/icons/weather.png"
+  },
+
+  human: {
+    label: "Human Spaceflight",
+    satellites: ["25544"],
+    description: "Actividad humana en órbita",
+    icon: "https://3d.staratlas.es/icons/iss.png"
+  }
+};
+
+  
+
+  
+
 function getContextInsight(satId, maxElev) {
 
   const info = SAT_INFO[satId];
@@ -1274,8 +1358,39 @@ Score: ${Math.round(p.score)}
 `).join("\n");
 }
 
+
+
+
   
 
+  function renderMissionNav() {
+  const nav = document.getElementById("missionNav");
+
+  nav.innerHTML = Object.entries(MISSIONS).map(([id, m]) => `
+    <div class="missionSlot"
+         title="${m.label}"
+         onclick="selectMission('${id}')">
+      <img src="${m.icon}">
+    </div>
+  `).join("");
+}
+
+
+
+function selectMission(id) {
+  const mission = MISSIONS[id];
+
+  if (!mission) return;
+
+  // cambia satélite activo al primero del grupo
+  const firstSat = mission.satellites[0];
+
+  loadSatellite(firstSat);
+
+  // opcional: guardar contexto
+  window.currentMission = id;
+}
+  
 </script>
 
 </body>
