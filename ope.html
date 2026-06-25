@@ -531,6 +531,31 @@ pre {
   opacity: 0.85;
   letter-spacing: 0.3px;
 }
+  .missionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.impactCard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+
+.impactIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.impactLabel {
+  font-size: 12px;
+  color: white;
+}
 </style>
 </head>
 
@@ -538,13 +563,6 @@ pre {
 
   <div id="missionNav"></div>
   <div id="missionPanel">
-
-<div class="impactCard">
-  <img class="impactIcon" src="${IMPACT_ICONS[i.tag]}" />
-  <div class="impactLabel">${i.name}</div>
-</div>
-
-    
   </div>
 
 <div id="ui">
@@ -717,7 +735,9 @@ let earth;
 let zoom = 420;
 let targetZoom = 420;
   
-window.currentMission = null;
+window.currentMission = "copernicus";
+renderMissionNav();
+renderMissionPanel();
 window.latestSatrec = null;
 
 init();
@@ -1439,7 +1459,7 @@ async function run() {
   );
 
   renderMissionNav();
-  renderMissionPanel();
+
 
   // =========================
   // 🛰 CASO SIN PASOS
@@ -1518,7 +1538,7 @@ function renderMissionNav() {
 }
 
 
-  function renderMissionPanel() {
+function renderMissionPanel() {
   const panel = document.getElementById("missionPanel");
   const id = window.currentMission;
 
@@ -1539,18 +1559,28 @@ function renderMissionNav() {
     <div class="missionSatCount">
       🛰 ${mission.satellites.length} satélites
     </div>
+
+    <div class="missionGrid">
+      ${mission.impacts.map(i => `
+        <div class="impactCard">
+          <img class="impactIcon" src="${IMPACT_ICONS[i.tag]}" />
+          <div class="impactLabel">${i.name}</div>
+        </div>
+      `).join("")}
+    </div>
   `;
 }
-
 function selectMission(id) {
   const mission = MISSIONS[id];
   if (!mission) return;
 
   window.currentMission = id;
 
-  renderMissionPanel();
+  // primero actualizas UI
   renderMissionNav();
+  renderMissionPanel();
 
+  // luego cargas satélite
   const firstSat = mission.satellites[0];
   loadSatellite(firstSat);
 }
