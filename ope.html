@@ -537,17 +537,16 @@ pre {
 <body>
 
   <div id="missionNav"></div>
-
-  
   <div id="missionPanel">
-  </div>
 
 <div class="impactCard">
   <img class="impactIcon" src="${IMPACT_ICONS[i.tag]}" />
   <div class="impactLabel">${i.name}</div>
 </div>
 
-  
+    
+  </div>
+
 <div id="ui">
   <h3>🛰 Orbital Pass Engine</h3>
 
@@ -1518,7 +1517,8 @@ function renderMissionNav() {
   `).join("");
 }
 
-function renderMissionPanel() {
+
+  function renderMissionPanel() {
   const panel = document.getElementById("missionPanel");
   const id = window.currentMission;
 
@@ -1539,21 +1539,8 @@ function renderMissionPanel() {
     <div class="missionSatCount">
       🛰 ${mission.satellites.length} satélites
     </div>
-
-    <div class="missionImpactGrid">
-      ${mission.impacts?.map(i => `
-        <div class="impactCard">
-          <div class="impactIcon">
-            ${IMPACT_ICONS[i.tag] || "❓"}
-          </div>
-          <div class="impactLabel">
-            ${i.name}
-          </div>
-        </div>
-      `).join("") || ""}
-    </div>
   `;
-}}
+}
 
 function selectMission(id) {
   const mission = MISSIONS[id];
