@@ -421,6 +421,9 @@ pre {
   <!-- METEO / NOAA -->
   <option value="25338">NOAA-15</option>
 
+    <!-- 🌍 METEOROLOGÍA EUROPEA (EUMETSAT) -->
+  <option value="38552">Meteosat-10</option>
+
 </select>
 
   <!-- CITY -->
@@ -870,12 +873,28 @@ const SAT_INFO = {
       "Temperatura global",
       "Cobertura de nubes"
     ]
-  }
+  },
+  "38552": {
+  name: "Meteosat-10",
+  image: "https://3d.staratlas.es/Meteosat.jpg",
+  patch: "https://3d.staratlas.es/Meteosat_patch.png",
+  type: "Meteorológico geoestacionario",
+  mission: "EUMETSAT - Observación meteorológica Europa",
+  instruments: [
+    "Imager multiespectral",
+    "Sensores infrarrojos",
+    "Canales visibles y térmicos"
+  ],
+  capabilities: [
+    "Seguimiento de tormentas",
+    "Nubes en tiempo real",
+    "Temperatura atmosférica",
+    "Fenómenos extremos (huracanes, borrascas)"
+  ]
+}
 };
 
-
-
-  function getContextInsight(satId, maxElev) {
+function getContextInsight(satId, maxElev) {
 
   const info = SAT_INFO[satId];
 
@@ -892,7 +911,7 @@ const SAT_INFO = {
   }
 
   // =========================
-  // 🌍 CITY / EARTH USE LAYER (COPERNICUS AWARE)
+  // 🌍 CITY / EARTH USE LAYER
   // =========================
   let cityUse = [];
 
@@ -909,7 +928,7 @@ const SAT_INFO = {
   }
 
   // =========================
-  // 🌱 SENTINEL-2 (ÓPTICO / AGRICULTURA)
+  // 🌱 SENTINEL-2 (ÓPTICO)
   // =========================
   if (satId === "42063" || satId === "29780") {
     cityUse = [
@@ -922,7 +941,7 @@ const SAT_INFO = {
   }
 
   // =========================
-  // 🌊 SENTINEL-3 (OCÉANOS / CLIMA)
+  // 🌊 SENTINEL-3 (OCÉANOS)
   // =========================
   if (satId === "28654") {
     cityUse = [
@@ -957,7 +976,7 @@ const SAT_INFO = {
   }
 
   // =========================
-  // 🌦 NOAA (METEO FALLBACK)
+  // 🌦 NOAA (USA METEO POLAR)
   // =========================
   if (satId === "25338") {
     cityUse = [
@@ -968,6 +987,33 @@ const SAT_INFO = {
     ];
   }
 
+  // =========================
+  // 🌍 METEOSAT (EU GEO STATIONARY)
+  // =========================
+  if (satId === "38552") {
+    cityUse = [
+      "Tormentas en tiempo real",
+      "Seguimiento de borrascas",
+      "Nubes sobre Europa y África",
+      "Fenómenos extremos (huracanes, DANA)"
+    ];
+  }
+
+  // =========================
+  // 🌍 METOP (EU / NOAA COOPERATION)
+  // =========================
+  if (satId === "38771" || satId === "37849" || satId === "29499") {
+    cityUse = [
+      "Temperatura atmosférica",
+      "Humedad global",
+      "Predicción meteorológica avanzada",
+      "Monitoreo climático europeo"
+    ];
+  }
+
+  // =========================
+  // FINAL PUSH
+  // =========================
   insights.push({
     title: "USO",
     items: cityUse
@@ -986,8 +1032,6 @@ const SAT_INFO = {
 
   return insights;
 }
-
-
   
 function renderSatPatch(catnr) {
 
