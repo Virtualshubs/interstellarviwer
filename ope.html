@@ -1517,8 +1517,7 @@ function renderMissionNav() {
   `).join("");
 }
 
-
-  function renderMissionPanel() {
+function renderMissionPanel() {
   const panel = document.getElementById("missionPanel");
   const id = window.currentMission;
 
@@ -1539,8 +1538,21 @@ function renderMissionNav() {
     <div class="missionSatCount">
       🛰 ${mission.satellites.length} satélites
     </div>
+
+    <div class="missionImpactGrid">
+      ${mission.impacts?.map(i => `
+        <div class="impactCard">
+          <div class="impactIcon">
+            ${IMPACT_ICONS[i.tag] || "❓"}
+          </div>
+          <div class="impactLabel">
+            ${i.name}
+          </div>
+        </div>
+      `).join("") || ""}
+    </div>
   `;
-}
+}}
 
 function selectMission(id) {
   const mission = MISSIONS[id];
