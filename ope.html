@@ -496,6 +496,35 @@ pre {
   font-size:13px;
   color:#7ec8ff;
 }
+
+  #missionPanel{
+    position:relative;
+}
+
+.missionCloseBtn{
+    position:absolute;
+    top:12px;
+    right:12px;
+
+    width:32px;
+    height:32px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:18px;
+    transition:.2s;
+}
+
+.missionCloseBtn:hover{
+    background:rgba(255,255,255,.18);
+    transform:scale(1.08);
+}
 </style>
 </head>
 
@@ -1526,6 +1555,14 @@ function renderMissionPanel() {
       </ul>
     </div>
   `;
+}
+
+  function closeMissionPanel() {
+  const panel = document.getElementById("missionPanel");
+
+  panel.style.display = "none";
+
+  window.currentMission = null;
 }
 
 function selectMission(id) {
