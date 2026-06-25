@@ -1212,33 +1212,43 @@ async function run() {
 
   passes.sort((a,b) => b.score - a.score);
 
-  if (!passes.length || passes[0].maxElev < 5) {
+  const top = passes[0];
+
+  // =========================
+  // 🧠 SIEMPRE ACTUALIZAR PANEL INFO
+  // =========================
+  renderSatInfoPanel(
+    window.currentCATNR,
+    top ? top.maxElev : 0
+  );
+
+  // =========================
+  // 🛰 CASO SIN PASOS
+  // =========================
+  if (!passes.length || !top || top.maxElev < 5) {
 
     best.innerHTML = `
       🔴 SIN PASOS VISIBLES<br>
-      El satélite <b>${SATS[window.currentCATNR]}</b> no cruza este punto.
+      Satélite: <b>${SATS[window.currentCATNR]}</b><br>
+      <br>
+      <i>El satélite no cruza este punto en el periodo analizado</i>
     `;
 
     ranking.innerHTML = "";
     out.innerText = "";
+
     return;
   }
 
-  const top = passes[0];
-
-  renderSatInfoPanel(window.currentCATNR, top.maxElev);
-
-  const insights = getContextInsight(window.currentCATNR, top.maxElev);
-
-
-
+  // =========================
+  // 🛰 CASO NORMAL
+  // =========================
   best.innerHTML = `
-  🟢 MEJOR PASO<br>
-  Satélite: <b>${SATS[window.currentCATNR]}</b><br>
-  Elevación: <b>${top.maxElev.toFixed(1)}°</b><br>
-  Score: <b>${Math.round(top.score)}</b><br>
-  Inicio: ${top.start}<br>
-
+    🟢 MEJOR PASO<br>
+    Satélite: <b>${SATS[window.currentCATNR]}</b><br>
+    Elevación: <b>${top.maxElev.toFixed(1)}°</b><br>
+    Score: <b>${Math.round(top.score)}</b><br>
+    Inicio: ${top.start}<br>
   `;
 
   ranking.innerHTML = "<b>🏆 TOP 5 PASOS</b>";
