@@ -406,7 +406,7 @@ pre {
   gap: 10px;
 
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: 50px;
 
   background: rgba(0,0,0,0.35);
   backdrop-filter: blur(10px);
@@ -510,31 +510,32 @@ pre {
 <div id="ui">
   <h3>🛰 Orbital Pass Engine</h3>
 
-<!-- SAT -->
 <select id="satSelect" onchange="changeSatellite()">
 
-  <!-- ISS -->
-  <option value="25544">ISS</option>
+  <optgroup label="🚀 Human Spaceflight">
+    <option value="25544">ISS</option>
+  </optgroup>
 
-  <!-- COPERNICUS - SENTINEL 1 -->
-  <option value="39634">Sentinel-1A</option>
-  <option value="39084">Sentinel-1B</option>
+  <optgroup label="🌍 Copernicus">
 
-  <!-- COPERNICUS - SENTINEL 2 -->
-  <option value="42063">Sentinel-2B</option>
-  <option value="29780">Sentinel-2A</option>
+    <option value="39634">Sentinel-1A</option>
+    <option value="39084">Sentinel-1B</option>
 
-  <!-- COPERNICUS - SENTINEL 3 -->
-  <option value="28654">Sentinel-3A</option>
+    <option value="29780">Sentinel-2A</option>
+    <option value="42063">Sentinel-2B</option>
 
-  <!-- COPERNICUS - SENTINEL 5P -->
-  <option value="43618">Sentinel-5P</option>
+    <option value="28654">Sentinel-3A</option>
 
-  <!-- METEO / NOAA -->
-  <option value="25338">NOAA-15</option>
+    <option value="43618">Sentinel-5P</option>
 
-    <!-- 🌍 METEOROLOGÍA EUROPEA (EUMETSAT) -->
-  <option value="38552">Meteosat-10</option>
+  </optgroup>
+
+  <optgroup label="☁️ Meteorología">
+
+    <option value="25338">NOAA-15</option>
+    <option value="38552">Meteosat-10</option>
+
+  </optgroup>
 
 </select>
 
