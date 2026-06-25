@@ -496,74 +496,13 @@ pre {
   font-size:13px;
   color:#7ec8ff;
 }
-
-  .missionImpactGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.impactCard {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  padding: 12px;
-  text-align: center;
-  transition: 0.25s ease;
-  backdrop-filter: blur(6px);
-}
-
-.impactCard:hover {
-  transform: translateY(-3px) scale(1.03);
-  border-color: rgba(255,255,255,0.2);
-}
-
-.impactIcon {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 6px;
-  opacity: 0.9;
-}
-
-.impactLabel {
-  font-size: 11px;
-  opacity: 0.85;
-  letter-spacing: 0.3px;
-}
-  .missionGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.impactCard {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 10px;
-}
-
-.impactIcon {
-  width: 20px;
-  height: 20px;
-}
-
-.impactLabel {
-  font-size: 12px;
-  color: white;
-}
 </style>
 </head>
 
 <body>
 
   <div id="missionNav"></div>
-  <div id="missionPanel">
-  </div>
+  <div id="missionPanel"></div>
 
 <div id="ui">
   <h3>🛰 Orbital Pass Engine</h3>
@@ -735,9 +674,7 @@ let earth;
 let zoom = 420;
 let targetZoom = 420;
   
-window.currentMission = "copernicus";
-renderMissionNav();
-renderMissionPanel();
+window.currentMission = null;
 window.latestSatrec = null;
 
 init();
@@ -1069,18 +1006,7 @@ const SAT_INFO = {
 }
 };
 
-const IMPACT_ICONS = {
-  agriculture: "/icons/agriculture.svg",
-  climate: "/icons/climate.svg",
-  ocean: "/icons/ocean.svg",
-  urban: "/icons/urban.svg",
-  storm: "/icons/storm.svg",
-  atmosphere: "/icons/atmosphere.svg",
-  science: "/icons/science.svg",
-  gravity: "/icons/gravity.svg",
-  observation: "/icons/observation.svg",
-  prediction: "/icons/prediction.svg"
-};
+
 
 
 const MISSIONS = {
@@ -1088,44 +1014,24 @@ const MISSIONS = {
     label: "Copernicus",
     satellites: ["39634","42063","29780","43618","28654"],
     description: "Observación global de la Tierra (Europa)",
-    icon: "https://3d.staratlas.es/icons/copernicus.png",
-
-    impacts: [
-      { name: "Agricultura", tag: "agriculture" },
-      { name: "Clima", tag: "climate" },
-      { name: "Océanos", tag: "ocean" },
-      { name: "Urbanismo", tag: "urban" },
-      { name: "Atmósfera", tag: "atmosphere" }
-    ]
+    icon: "https://3d.staratlas.es/icons/copernicus.png"
   },
 
   meteorology: {
     label: "Meteorología",
     satellites: ["25338","38552"],
     description: "Clima y predicción atmosférica",
-    icon: "https://3d.staratlas.es/icons/weather.png",
-
-    impacts: [
-      { name: "Tormentas", tag: "storm" },
-      { name: "Predicción", tag: "prediction" },
-      { name: "Atmósfera", tag: "atmosphere" },
-      { name: "Nubes", tag: "climate" }
-    ]
+    icon: "https://3d.staratlas.es/icons/weather.png"
   },
 
   human: {
     label: "Human Spaceflight",
     satellites: ["25544"],
     description: "Actividad humana en órbita",
-    icon: "https://3d.staratlas.es/icons/iss.png",
-
-    impacts: [
-      { name: "Ciencia", tag: "science" },
-      { name: "Microgravedad", tag: "gravity" },
-      { name: "Observación", tag: "observation" }
-    ]
+    icon: "https://3d.staratlas.es/icons/iss.png"
   }
 };
+
   
 
   
@@ -1459,7 +1365,7 @@ async function run() {
   );
 
   renderMissionNav();
-
+  renderMissionPanel();
 
   // =========================
   // 🛰 CASO SIN PASOS
@@ -1538,7 +1444,7 @@ function renderMissionNav() {
 }
 
 
-function renderMissionPanel() {
+  function renderMissionPanel() {
   const panel = document.getElementById("missionPanel");
   const id = window.currentMission;
 
@@ -1559,28 +1465,18 @@ function renderMissionPanel() {
     <div class="missionSatCount">
       🛰 ${mission.satellites.length} satélites
     </div>
-
-    <div class="missionGrid">
-      ${mission.impacts.map(i => `
-        <div class="impactCard">
-          <img class="impactIcon" src="${IMPACT_ICONS[i.tag]}" />
-          <div class="impactLabel">${i.name}</div>
-        </div>
-      `).join("")}
-    </div>
   `;
 }
+
 function selectMission(id) {
   const mission = MISSIONS[id];
   if (!mission) return;
 
   window.currentMission = id;
 
-  // primero actualizas UI
-  renderMissionNav();
   renderMissionPanel();
+  renderMissionNav();
 
-  // luego cargas satélite
   const firstSat = mission.satellites[0];
   loadSatellite(firstSat);
 }
