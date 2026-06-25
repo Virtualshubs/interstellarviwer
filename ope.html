@@ -1009,31 +1009,73 @@ const SAT_INFO = {
 
 
 
-
 const MISSIONS = {
   copernicus: {
     label: "Copernicus",
     satellites: ["39634","42063","29780","43618","28654"],
-    description: "Observación global de la Tierra (Europa)",
-    icon: "https://3d.staratlas.es/icons/copernicus.png"
+    description: "Sistema europeo de observación terrestre en tiempo real para monitorizar cambios ambientales, superficie y océanos.",
+
+    objectives: [
+      "Monitorizar el estado del planeta Tierra de forma continua y global",
+      "Detectar cambios en ecosistemas, océanos, hielo y superficie terrestre",
+      "Apoyar la toma de decisiones en crisis climáticas y desastres naturales",
+      "Generar datos abiertos para investigación científica y políticas públicas"
+    ],
+
+    satelliteObjectives: [
+      "Captura multiespectral de alta resolución de la superficie terrestre",
+      "Seguimiento de cambios en vegetación, agua y uso del suelo",
+      "Detección de eventos extremos como incendios o inundaciones",
+      "Construcción de series temporales para análisis climático"
+    ],
+
+    icon: "https://3d.staratlas.es/ISS/1366_521.jpg"
   },
 
   meteorology: {
     label: "Meteorología",
     satellites: ["25338","38552"],
-    description: "Clima y predicción atmosférica",
-    icon: "https://3d.staratlas.es/icons/weather.png"
+    description: "Red orbital dedicada a la observación atmosférica y la predicción de fenómenos meteorológicos globales.",
+
+    objectives: [
+      "Mejorar la predicción meteorológica a corto y medio plazo",
+      "Monitorizar la dinámica atmosférica global en tiempo real",
+      "Detectar fenómenos extremos como tormentas, huracanes y frentes",
+      "Reducir el impacto de desastres meteorológicos en la población"
+    ],
+
+    satelliteObjectives: [
+      "Observación continua de nubes, humedad y temperatura atmosférica",
+      "Seguimiento de sistemas de tormentas en evolución",
+      "Captura de datos para modelos numéricos de predicción",
+      "Apoyo a sistemas de alerta temprana"
+    ],
+
+    icon: "https://3d.staratlas.es/ISS/1366_521.jpg"
   },
 
   human: {
     label: "Human Spaceflight",
     satellites: ["25544"],
-    description: "Actividad humana en órbita",
-    icon: "https://3d.staratlas.es/icons/iss.png"
+    description: "Seguimiento de actividad humana en órbita y operaciones tripuladas en la Estación Espacial Internacional.",
+
+    objectives: [
+      "Mantener la presencia humana segura y continua en órbita terrestre",
+      "Apoyar misiones científicas en microgravedad",
+      "Coordinar operaciones internacionales en la Estación Espacial Internacional",
+      "Servir como plataforma de investigación para futuras misiones profundas"
+    ],
+
+    satelliteObjectives: [
+      "Monitoreo de la órbita y trayectoria de la ISS",
+      "Soporte a comunicaciones y navegación tripulada",
+      "Seguimiento de actividad científica a bordo",
+      "Control de seguridad orbital y prevención de colisiones"
+    ],
+
+    icon: "https://3d.staratlas.es/ISS/1366_521.jpg"
   }
 };
-
-  
 
   
 
@@ -1445,7 +1487,7 @@ function renderMissionNav() {
 }
 
 
-  function renderMissionPanel() {
+function renderMissionPanel() {
   const panel = document.getElementById("missionPanel");
   const id = window.currentMission;
 
@@ -1464,7 +1506,21 @@ function renderMissionNav() {
     </div>
 
     <div class="missionSatCount">
-      🛰 ${mission.satellites.length} satélites
+      🛰 ${mission.satellites.length} satélites activos
+    </div>
+
+    <div class="missionObjectives">
+      <div class="sectionTitle">🎯 Objetivo de la misión</div>
+      <ul>
+        ${mission.objectives.map(o => `<li>${o}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="missionSatelliteObjectives">
+      <div class="sectionTitle">📡 Función del conjunto orbital</div>
+      <ul>
+        ${mission.satelliteObjectives.map(o => `<li>${o}</li>`).join("")}
+      </ul>
     </div>
   `;
 }
