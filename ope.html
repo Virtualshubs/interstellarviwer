@@ -616,8 +616,11 @@ pre {
 
 let scene, camera, renderer;
 let earth;
-let zoom = 320;
-let targetZoom = 320;
+let zoom = 420;
+let targetZoom = 420;
+  
+window.currentMission = null;
+window.latestSatrec = null;
 
 init();
 
@@ -1307,6 +1310,7 @@ async function run() {
   );
 
   renderMissionNav();
+  renderMissionPanel();
 
   // =========================
   // 🛰 CASO SIN PASOS
@@ -1380,18 +1384,41 @@ Score: ${Math.round(p.score)}
 
 
 
-function selectMission(id) {
-  const mission = MISSIONS[id];
+  function renderMissionPanel() {
+  const panel = document.getElementById("missionPanel");
+  const id = window.currentMission;
 
+  if (!panel || !id) return;
+
+  const mission = MISSIONS[id];
   if (!mission) return;
 
-  // cambia satélite activo al primero del grupo
-  const firstSat = mission.satellites[0];
+  panel.innerHTML = `
+    <div class="missionTitle">
+      🧭 ${mission.label}
+    </div>
 
-  loadSatellite(firstSat);
+    <div class="missionDesc">
+      ${mission.description}
+    </div>
 
-  // opcional: guardar contexto
+    <div class="missionSatCount">
+      🛰 ${mission.satellites.length} satélites
+    </div>
+  `;
+}
+
+function selectMission(id) {
+  const mission = MISSIONS[id];
+  if (!mission) return;
+
   window.currentMission = id;
+
+  renderMissionPanel();
+  renderMissionNav();
+
+  const firstSat = mission.satellites[0];
+  loadSatellite(firstSat);
 }
   
 </script>
