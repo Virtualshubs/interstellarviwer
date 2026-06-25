@@ -1212,44 +1212,17 @@ async function run() {
 
   passes.sort((a,b) => b.score - a.score);
 
-// =========================
-// 🧠 HYBRID MODE CHECK (LEO vs GEO)
-// =========================
-const hasPasses = passes && passes.length > 0;
+  if (!passes.length || passes[0].maxElev < 5) {
 
-// detectamos GEO (sin pases útiles)
-const isGeo = !hasPasses || passes[0].maxElev < 5;
-
-// =========================
-// 🌍 GEO / NO VISIBILITY MODE
-// =========================
-if (isGeo) {
-
-  const insights = getContextInsight(window.currentCATNR, 0);
-
-  let insightHTML = "";
-
-  insights.forEach(block => {
-    insightHTML += `
-      <div class="insightBlock">
-        <div class="insightTitle">${block.title}</div>
-        ${block.items.map(i => `<div class="insightItem">• ${i}</div>`).join("")}
-      </div>
+    best.innerHTML = `
+      🔴 SIN PASOS VISIBLES<br>
+      El satélite <b>${SATS[window.currentCATNR]}</b> no cruza este punto.
     `;
-  });
 
-  best.innerHTML = `
-    🌍 OBSERVATION MODE (NO ORBITAL PASSES)<br>
-    Satélite: <b>${SATS[window.currentCATNR]}</b><br>
-    <br>
-    ${insightHTML}
-  `;
-
-  ranking.innerHTML = "";
-  out.innerText = "";
-
-  return;
-}
+    ranking.innerHTML = "";
+    out.innerText = "";
+    return;
+  }
 
   const top = passes[0];
 
