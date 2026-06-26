@@ -829,7 +829,10 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   animate();
 }
-function onGlobeClick(event) {
+
+
+
+  function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -842,22 +845,29 @@ function onGlobeClick(event) {
   if (!intersects.length) return;
 
   // =========================
-  // 🔥 punto en coordenadas del mundo
+  // 🔥 punto de intersección
   // =========================
-  const point = intersects[0].point.clone().normalize();
+  let point = intersects[0].point.clone();
 
   // =========================
-  // 🌍 LAT / LON DIRECTO (SIN GMST)
+  // 🧭 COMPENSAR ROTACIÓN DE LA TIERRA (GMST)
+  // =========================
+  const gmst = satellite.gstime(new Date());
+  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
+  point.applyMatrix4(invRotation);
+
+  point.normalize();
+
+  // =========================
+  // 🌍 LAT / LON
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
-
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-  // normalización estándar
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 guardar estado
+  // 📍 GUARDAR ESTADO
   // =========================
   window.lat = lat;
   window.lon = lon;
@@ -874,6 +884,9 @@ function onGlobeClick(event) {
 
   run();
 }
+
+
+  
 
 function onWheelZoom(e) {
   const el = e.target;
