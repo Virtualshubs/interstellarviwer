@@ -738,6 +738,11 @@ window.addEventListener("DOMContentLoaded", () => {
   if (panel) panel.style.display = "none";
 });
 
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("lat").style.display = "none";
+  document.getElementById("lon").style.display = "none";
+});
   
   targetZoom += e.deltaY * 0.2;
   targetZoom = Math.max(180, Math.min(800, targetZoom));
