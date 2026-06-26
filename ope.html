@@ -717,9 +717,6 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // =========================
-  // 🌍 EARTH
-  // =========================
 // =========================
 // 🌍 EARTH (textura real)
 // =========================
@@ -730,11 +727,8 @@ const earthTexture = textureLoader.load(
   "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
 );
 
+// opcional pero recomendado (mejora calidad)
 earthTexture.colorSpace = THREE.SRGBColorSpace;
-
-// 🌍 AJUSTE DE MERIDIANO
-earthTexture.center.set(0.5, 0.5);
-earthTexture.rotation = THREE.MathUtils.degToRad(90); // prueba 90 o -90
 
 earth = new THREE.Mesh(
   new THREE.SphereGeometry(100, 64, 64),
