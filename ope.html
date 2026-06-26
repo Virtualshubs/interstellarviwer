@@ -683,6 +683,13 @@ let scene, camera, renderer;
 let earth;
 let zoom = 420;
 let targetZoom = 420;
+
+
+let isDragging = false;
+let previousMouse = { x: 0, y: 0 };
+
+let targetRotation = { x: 0, y: 0 };
+
   
 window.currentMission = null;
 window.latestSatrec = null;
@@ -746,6 +753,33 @@ scene.add(earth);
   // =========================
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
+
+
+  window.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  previousMouse.x = e.clientX;
+  previousMouse.y = e.clientY;
+});
+
+window.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+
+  const deltaX = e.clientX - previousMouse.x;
+  const deltaY = e.clientY - previousMouse.y;
+
+  previousMouse.x = e.clientX;
+  previousMouse.y = e.clientY;
+
+  // sensibilidad
+  const speed = 0.005;
+
+  targetRotation.y += deltaX * speed;
+  targetRotation.x += deltaY * speed;
+});
 
   // =========================
   // 🖱️ CLICK EN GLOBO
@@ -862,6 +896,9 @@ function animate() {
 
   camera.position.set(0, 140, zoom);
   camera.lookAt(0, 0, 0);
+
+  earth.rotation.y += (targetRotation.y - earth.rotation.y) * 0.1;
+earth.rotation.x += (targetRotation.x - earth.rotation.x) * 0.1;
 
   renderer.render(scene, camera);
 }
