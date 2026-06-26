@@ -830,7 +830,7 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
-function onGlobeClick(event) {
+  function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -839,29 +839,37 @@ function onGlobeClick(event) {
   raycaster.setFromCamera(mouse, camera);
 
   const intersects = raycaster.intersectObject(earth);
-
   if (!intersects.length) return;
 
   // =========================
-  // 🌍 punto en espacio local de la esfera
+  // 🔥 punto de intersección
   // =========================
-  let point = earth.worldToLocal(intersects[0].point.clone()).normalize();
+  let point = intersects[0].point.clone();
 
   // =========================
-  // LAT / LON
+  // 🧭 COMPENSAR ROTACIÓN TIERRA (GMST)
+  // =========================
+  const gmst = satellite.gstime(new Date());
+  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
+  point.applyMatrix4(invRotation);
+
+  point.normalize();
+
+  // =========================
+  // 🌍 LAT / LON
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
 
-  // 👇 ESTE OFFSET es el que ajusta el meridiano (CRÍTICO)
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-  lon = lon + 90; // ajuste de textura (blue marble / three.js sphere mapping)
+  // 🔧 FIX CLAVE: alinear Greenwich correctamente
+  lon = -lon;
 
-  // normalizar
+  // normalización estándar [-180, 180]
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // STATE
+  // 📍 GUARDAR ESTADO
   // =========================
   window.lat = lat;
   window.lon = lon;
@@ -878,7 +886,6 @@ function onGlobeClick(event) {
 
   run();
 }
-  
 
 function onWheelZoom(e) {
   const el = e.target;
@@ -893,6 +900,8 @@ function onWheelZoom(e) {
   targetZoom += e.deltaY * 0.2;
   targetZoom = Math.max(180, Math.min(800, targetZoom));
 }
+  
+
 
   
   
