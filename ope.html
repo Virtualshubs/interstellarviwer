@@ -1352,15 +1352,17 @@ const duration = Math.max(
   (refinedEnd.getTime() - refinedStart.getTime()) / 60000
 );
 
-        passes.push({
-          start: refinedStart,
-          end: refinedEnd,
-          maxElev: refinedMax.elevation,
-          duration,
-          score: scorePass(refinedMax.elevation, duration),
-          class: getClass(refinedMax.elevation)
-        });
-
+       passes.push({
+  start: refinedStart,
+  end: refinedEnd,
+  maxElev: refinedMax.elevation,
+  duration,
+  score: scorePass(refinedMax.elevation, duration),
+  class: getClass(refinedMax.elevation),
+  city: window.currentCityName,
+  lat: window.lat,
+  lon: window.lon
+});
         current = null;
       }
     }
@@ -1555,13 +1557,16 @@ async function run() {
   // =========================
   // 🟢 MEJOR PASO
   // =========================
-  best.innerHTML = `
-    🟢 MEJOR PASO<br>
-    Satélite: <b>${SATS[window.currentCATNR]}</b><br>
-    Elevación: <b>${top.maxElev.toFixed(1)}°</b><br>
-    Score: <b>${Math.round(top.score)}</b><br>
-    Inicio: ${top.start}<br>
-  `;
+best.innerHTML = `
+  🟢 MEJOR PASO<br>
+  por CIUDAD: <b>${window.currentCityName || "Desconocida"}</b><br>
+  LAT: <b>${window.lat.toFixed(4)}</b> | LON: <b>${window.lon.toFixed(4)}</b><br>
+  <br>
+  Satélite: <b>${SATS[window.currentCATNR]}</b><br>
+  Elevación: <b>${top.maxElev.toFixed(1)}°</b><br>
+  Score: <b>${Math.round(top.score)}</b><br>
+  Inicio: ${top.start}<br>
+`;
 
   // =========================
   // 🏆 TOP 5
@@ -1569,13 +1574,16 @@ async function run() {
   ranking.innerHTML = "<b>🏆 TOP 5 PASOS</b>";
 
   passes.slice(0, 5).forEach((p, i) => {
-    ranking.innerHTML += `
-      <div class="rankCard">
-        #${i + 1} ${p.class}<br>
-        Elev: ${p.maxElev.toFixed(1)}°<br>
-        Score: ${Math.round(p.score)}<br>
-      </div>
-    `;
+  ranking.innerHTML += `
+  <div class="rankCard">
+    #${i+1} ${p.class}<br>
+    🛰 ${SATS[window.currentCATNR]}<br>
+    📍 ${window.currentCityName}<br>
+    LAT ${window.lat.toFixed(2)} | LON ${window.lon.toFixed(2)}<br>
+    Elev: ${p.maxElev.toFixed(1)}°<br>
+    Score: ${Math.round(p.score)}<br>
+  </div>
+`;
   });
 
   // =========================
