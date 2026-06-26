@@ -717,6 +717,12 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+scene.add(window.sunLight);
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+scene.add(ambient);
+
 // =========================
 // 🌍 EARTH (textura real)
 // =========================
@@ -732,8 +738,11 @@ earthTexture.colorSpace = THREE.SRGBColorSpace;
 
 earth = new THREE.Mesh(
   new THREE.SphereGeometry(100, 64, 64),
-new THREE.MeshBasicMaterial({ 
-  map: earthTexture })
+  new THREE.MeshStandardMaterial({
+    map: earthTexture,
+    emissive: new THREE.Color(0x111111),
+    emissiveIntensity: 0.2
+  })
 );
 
 scene.add(earth);
