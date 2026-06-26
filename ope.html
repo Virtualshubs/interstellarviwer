@@ -1333,8 +1333,11 @@ function getPasses(satrec, startDate, hours = 168) {
 
         // 🔍 refinamiento máximo
         const refinedMax = refineMaximum(satrec, current.maxDate);
-
-        const duration = (refinedEnd - refinedStart) / 60000;
+        
+const duration = Math.max(
+  0,
+  (refinedEnd.getTime() - refinedStart.getTime()) / 60000
+);
 
         passes.push({
           start: refinedStart,
@@ -1387,6 +1390,22 @@ function refineBoundary(satrec, approxTime, direction) {
 
   return best;
 }
+
+
+  function getElevation(satrec, date) {
+  const pv = satellite.propagate(satrec, date);
+  if (!pv.position) return null;
+
+  const gmst = satellite.gstime(date);
+  const ecf = satellite.eciToEcf(pv.position, gmst);
+
+  const observer = getObserver();
+  const look = satellite.ecfToLookAngles(observer, ecf);
+
+  return look.elevation * 180 / Math.PI;
+}
+
+  
 
 // =========================
 // STATE
