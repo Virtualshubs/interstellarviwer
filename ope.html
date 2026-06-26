@@ -1289,7 +1289,7 @@ function getPasses(satrec, startDate, hours = 168) {
 
   const observerGd = getObserver();
 
-  const step = 20; // búsqueda inicial
+const step = 10; // ultra precisión (más coste CPU)
   const passes = [];
 
   let current = null;
