@@ -898,6 +898,9 @@ function animate() {
   camera.lookAt(0, 0, 0);
 
 
+  earth.rotation.y += (targetRotation.y - earth.rotation.y) * 0.1;
+earth.rotation.x += (targetRotation.x - earth.rotation.x) * 0.1;
+  
   renderer.render(scene, camera);
 }
 
