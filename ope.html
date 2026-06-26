@@ -1276,8 +1276,9 @@ function getPasses(satrec, startDate, hours = 168) {
 
   const observerGd = getObserver();
 
-  const step = 20;
+  const step = 20; // búsqueda inicial
   const passes = [];
+
   let current = null;
 
   for (let t = 0; t <= hours * 3600; t += step) {
@@ -1291,34 +1292,57 @@ function getPasses(satrec, startDate, hours = 168) {
     const ecf = satellite.eciToEcf(pv.position, gmst);
 
     const look = satellite.ecfToLookAngles(observerGd, ecf);
-
     const elev = look.elevation * 180 / Math.PI;
+
     const visible = elev > 0;
 
+    // =========================
+    // INICIO PASO
+    // =========================
     if (visible && !current) {
-      current = { start: date, maxElev: elev, duration: 0 };
+      current = {
+        start: date,
+        maxElev: elev,
+        maxDate: date,
+        duration: 0
+      };
     }
 
+    // =========================
+    // DURANTE PASO
+    // =========================
     if (current) {
-      current.duration += step;
-      if (elev > current.maxElev) current.maxElev = elev;
 
+      current.duration += step;
+
+      if (elev > current.maxElev) {
+        current.maxElev = elev;
+        current.maxDate = date;
+      }
+
+      // =========================
+      // FIN PASO
+      // =========================
       if (!visible) {
 
-        const durMin = current.duration / 60;
+        // 🔍 refinamiento inicio
+        const refinedStart = refineBoundary(satrec, current.start, -1);
 
-        if (current.maxElev < 5) {
-          current = null;
-          continue;
-        }
+        // 🔍 refinamiento fin
+        const refinedEnd = refineBoundary(satrec, date, 1);
+
+        // 🔍 refinamiento máximo
+        const refinedMax = refineMaximum(satrec, current.maxDate);
+
+        const duration = (refinedEnd - refinedStart) / 60000;
 
         passes.push({
-          start: current.start,
-          end: date,
-          maxElev: current.maxElev,
-          duration: durMin,
-          score: scorePass(current.maxElev, durMin),
-          class: getClass(current.maxElev)
+          start: refinedStart,
+          end: refinedEnd,
+          maxElev: refinedMax.elevation,
+          duration,
+          score: scorePass(refinedMax.elevation, duration),
+          class: getClass(refinedMax.elevation)
         });
 
         current = null;
@@ -1327,6 +1351,41 @@ function getPasses(satrec, startDate, hours = 168) {
   }
 
   return passes;
+}
+
+
+  function refineMaximum(satrec, approxTime) {
+  let bestElev = -999;
+  let bestDate = approxTime;
+
+  for (let dt = -30; dt <= 30; dt += 1) {
+    const date = new Date(approxTime.getTime() + dt * 1000);
+    const elev = getElevation(satrec, date);
+
+    if (elev !== null && elev > bestElev) {
+      bestElev = elev;
+      bestDate = date;
+    }
+  }
+
+  return { date: bestDate, elevation: bestElev };
+}
+
+function refineBoundary(satrec, approxTime, direction) {
+  let best = approxTime;
+
+  for (let dt = -30; dt <= 30; dt += 1) {
+    const t = direction > 0 ? dt : -dt;
+
+    const date = new Date(approxTime.getTime() + t * 1000);
+    const elev = getElevation(satrec, date);
+
+    if (elev !== null && elev > 0) {
+      best = date;
+    }
+  }
+
+  return best;
 }
 
 // =========================
