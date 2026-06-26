@@ -739,38 +739,41 @@ earth = new THREE.Mesh(
 
 scene.add(earth);
 
+const atmosphereInner = new THREE.Mesh(
+  new THREE.SphereGeometry(103, 64, 64),
+  new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.06,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  })
+);
 
-  // =========================
-// 🌫 ATMOSFERA (HALO)
-// =========================
 const atmosphereOuter = new THREE.Mesh(
   new THREE.SphereGeometry(106, 64, 64),
   new THREE.MeshBasicMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.08,
+    opacity: 0.03,
     side: THREE.BackSide,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   })
 );
 
-scene.add(atmosphereOuter);
-
-
-  const atmosphereInner = new THREE.Mesh(
-  new THREE.SphereGeometry(103, 64, 64),
+const atmosphereGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(112, 64, 64),
   new THREE.MeshBasicMaterial({
-    color: 0x99ccff,
+    color: 0x88ccff,
     transparent: true,
-    opacity: 0.15,
+    opacity: 0.015,
     side: THREE.BackSide,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   })
 );
-
-scene.add(atmosphereInner);
   
   // =========================
   // 🛰 SAT
