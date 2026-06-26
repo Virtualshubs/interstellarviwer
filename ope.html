@@ -747,13 +747,48 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("lat").style.display = "none";
   document.getElementById("lon").style.display = "none";
 });
+
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+window.addEventListener("click", onMapClick);
+
   
   targetZoom += e.deltaY * 0.2;
   targetZoom = Math.max(180, Math.min(800, targetZoom));
+  
 });
 
 
+function onMapClick(event) {
 
+  const rect = renderer.domElement.getBoundingClientRect();
+
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObject(earth);
+
+  if (!intersects.length) return;
+
+  const p = intersects[0].point.clone().normalize();
+
+  const lat = Math.asin(p.y) * 180 / Math.PI;
+  const lon = Math.atan2(p.x, p.z) * 180 / Math.PI;
+
+  window.lat = lat;
+  window.lon = lon;
+
+  window.currentCityName = "Mapa libre";
+
+  console.log("📍 NEW COORDS:", lat, lon);
+
+  // refrescar cálculo
+  run();
+}
   
   
   animate();
