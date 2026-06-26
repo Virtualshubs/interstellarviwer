@@ -688,7 +688,11 @@ let targetZoom = 420;
 let isDragging = false;
 let previousMouse = { x: 0, y: 0 };
 
-let targetRotation = { x: 0, y: 0 };
+let cameraLon = 0;
+let cameraLat = 20;
+
+let targetLon = cameraLon;
+let targetLat = cameraLat;
 
   
 window.currentMission = null;
@@ -774,11 +778,13 @@ window.addEventListener("mousemove", (e) => {
   previousMouse.x = e.clientX;
   previousMouse.y = e.clientY;
 
-  // sensibilidad
-  const speed = 0.005;
+ const speed = 0.2;
 
-  targetRotation.y += deltaX * speed;
-  targetRotation.x += deltaY * speed;
+targetLon -= deltaX * speed;
+targetLat += deltaY * speed;
+
+// evitar dar la vuelta por los polos
+targetLat = Math.max(-85, Math.min(85, targetLat));
 });
 
   // =========================
@@ -838,10 +844,12 @@ window.addEventListener("mousemove", (e) => {
 
   if (!intersects.length) return;
 
-  const point = intersects[0].point.clone().normalize();
+ const point = earth.worldToLocal(
+    intersects[0].point.clone()
+).normalize();
 
-  const lat = Math.asin(point.y) * 180 / Math.PI;
-  const lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
+const lat = Math.asin(point.y) * 180 / Math.PI;
+const lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
   window.lat = lat;
   window.lon = lon;
@@ -894,12 +902,19 @@ function animate() {
 
   zoom += (targetZoom - zoom) * 0.1;
 
-  camera.position.set(0, 140, zoom);
-  camera.lookAt(0, 0, 0);
+ cameraLon += (targetLon - cameraLon) * 0.1;
+cameraLat += (targetLat - cameraLat) * 0.1;
+
+const phi = THREE.MathUtils.degToRad(90 - cameraLat);
+const theta = THREE.MathUtils.degToRad(cameraLon);
+
+camera.position.x = zoom * Math.sin(phi) * Math.cos(theta);
+camera.position.y = zoom * Math.cos(phi);
+camera.position.z = zoom * Math.sin(phi) * Math.sin(theta);
+
+camera.lookAt(0, 0, 0);
 
 
-  earth.rotation.y += (targetRotation.y - earth.rotation.y) * 0.1;
-earth.rotation.x += (targetRotation.x - earth.rotation.x) * 0.1;
   
   renderer.render(scene, camera);
 }
