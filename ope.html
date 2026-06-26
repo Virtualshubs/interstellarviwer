@@ -1441,7 +1441,23 @@ function changeCity() {
 
   const val = document.getElementById("citySelect").value;
 
-  if (val === "custom") return;
+  const latInput = document.getElementById("lat");
+  const lonInput = document.getElementById("lon");
+
+  // =========================
+  // CUSTOM MODE
+  // =========================
+  if (val === "custom") {
+    latInput.style.display = "inline-block";
+    lonInput.style.display = "inline-block";
+    return;
+  }
+
+  // =========================
+  // NORMAL MODE
+  // =========================
+  latInput.style.display = "none";
+  lonInput.style.display = "none";
 
   const [lat, lon] = val.split(",");
   window.lat = parseFloat(lat);
@@ -1449,10 +1465,9 @@ function changeCity() {
 
   window.currentCityName =
     document.getElementById("citySelect")
-    .options[document.getElementById("citySelect").selectedIndex]
-    .text;
+      .options[document.getElementById("citySelect").selectedIndex]
+      .text;
 }
-
 // =========================
 // SAT
 // =========================
