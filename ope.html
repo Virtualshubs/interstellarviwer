@@ -830,7 +830,6 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
-
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -840,29 +839,21 @@ function onGlobeClick(event) {
   raycaster.setFromCamera(mouse, camera);
 
   const intersects = raycaster.intersectObject(earth);
-
   if (!intersects.length) return;
 
   // =========================
-  // 🔥 punto de intersección
+  // 🔥 punto en mundo
   // =========================
-  let point = intersects[0].point.clone();
+  const point = intersects[0].point.clone().normalize();
 
   // =========================
-  // 🧭 COMPENSAR ROTACIÓN DE LA TIERRA (GMST)
-  // =========================
-  const gmst = satellite.gstime(new Date());
-  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
-  point.applyMatrix4(invRotation);
-
-  point.normalize();
-
-  // =========================
-  // 🌍 LAT / LON
+  // 🌍 LAT / LON (SIN COMPENSAR GMST)
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
+
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
+  // normalización estándar
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
