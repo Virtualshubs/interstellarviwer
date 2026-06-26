@@ -674,7 +674,7 @@ pre {
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
-
+<script src="https://unpkg.com/suncalc/suncalc.js"></script>
 
 <script>
 
@@ -732,9 +732,7 @@ earthTexture.colorSpace = THREE.SRGBColorSpace;
 
 earth = new THREE.Mesh(
   new THREE.SphereGeometry(100, 64, 64),
-  new THREE.MeshBasicMaterial({
-    map: earthTexture
-  })
+new THREE.MeshStandardMaterial({ map: earthTexture })
 );
 
 scene.add(earth);
@@ -863,6 +861,10 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   animate();
 }
+
+
+
+  
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -937,7 +939,17 @@ function onWheelZoom(e) {
   
 
 
-  
+  function getSunDirection(now) {
+  const pos = SunCalc.getPosition(now, 0, 0);
+
+  const sunDir = new THREE.Vector3(
+    Math.cos(pos.azimuth) * Math.cos(pos.altitude),
+    Math.sin(pos.altitude),
+    Math.sin(pos.azimuth) * Math.cos(pos.altitude)
+  );
+
+  return sunDir.normalize();
+}
   
   
 function animate() {
@@ -946,36 +958,68 @@ function animate() {
 
   const now = new Date();
 
-
+  // =========================
+  // 🌍 ROTACIÓN TIERRA (GMST)
+  // =========================
   if (earth) {
     const gmst = satellite.gstime(now);
     earth.rotation.y = -gmst;
   }
 
-
+  // =========================
+  // 🛰 SATÉLITES
+  // =========================
   if (window.latestSatrec) {
     updateSatellitePosition(window.latestSatrec, now);
   }
 
+  // =========================
+  // 🌞 SOL (SunCalc)
+  // =========================
+  if (typeof SunCalc !== "undefined") {
+
+    const pos = SunCalc.getPosition(now, 0, 0);
+
+    const sunDir = new THREE.Vector3(
+      Math.cos(pos.azimuth) * Math.cos(pos.altitude),
+      Math.sin(pos.altitude),
+      Math.sin(pos.azimuth) * Math.cos(pos.altitude)
+    ).normalize();
+
+    if (!window.sunLight) {
+      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      scene.add(window.sunLight);
+    }
+
+    window.sunLight.position.copy(
+      sunDir.clone().multiplyScalar(1000)
+    );
+
+    window.sunLight.lookAt(0, 0, 0);
+  }
+
+  // =========================
+  // 🎥 CÁMARA (ORBITAL CONTROL MANUAL)
+  // =========================
   zoom += (targetZoom - zoom) * 0.1;
 
- cameraLon += (targetLon - cameraLon) * 0.1;
-cameraLat += (targetLat - cameraLat) * 0.1;
+  cameraLon += (targetLon - cameraLon) * 0.1;
+  cameraLat += (targetLat - cameraLat) * 0.1;
 
-const phi = THREE.MathUtils.degToRad(90 - cameraLat);
-const theta = THREE.MathUtils.degToRad(cameraLon);
+  const phi = THREE.MathUtils.degToRad(90 - cameraLat);
+  const theta = THREE.MathUtils.degToRad(cameraLon);
 
-camera.position.x = zoom * Math.sin(phi) * Math.cos(theta);
-camera.position.y = zoom * Math.cos(phi);
-camera.position.z = zoom * Math.sin(phi) * Math.sin(theta);
+  camera.position.x = zoom * Math.sin(phi) * Math.cos(theta);
+  camera.position.y = zoom * Math.cos(phi);
+  camera.position.z = zoom * Math.sin(phi) * Math.sin(theta);
 
-camera.lookAt(0, 0, 0);
+  camera.lookAt(0, 0, 0);
 
-
-  
+  // =========================
+  // 🎬 RENDER
+  // =========================
   renderer.render(scene, camera);
 }
-
 
 function getObserver() {
   return {
