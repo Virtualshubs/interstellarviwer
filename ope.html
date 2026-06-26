@@ -985,38 +985,38 @@ function getSunECI(date) {
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-  // =========================
-  // 🌞 SOL (CORREGIDO A SISTEMA COHERENTE)
-  // =========================
-  if (typeof SunCalc !== "undefined") {
+// =========================
+// 🌞 SOL (ECI COHERENTE CON SATELLITE.JS)
+// =========================
 
-    const pos = SunCalc.getPosition(now, 0, 0);
+// obtener posición del sol en sistema ECI real
+const sunEci = satellite.sunPosition(now);
 
-    // vector local (Tierra fija)
-    const localSun = new THREE.Vector3(
-      Math.cos(pos.altitude) * Math.cos(pos.azimuth),
-      Math.sin(pos.altitude),
-      Math.cos(pos.altitude) * Math.sin(pos.azimuth)
-    );
+// convertir a vector THREE
+const sunDir = new THREE.Vector3(
+  sunEci.x,
+  sunEci.y,
+  sunEci.z
+).normalize();
 
-    // 🔥 PASAMOS A SISTEMA ECI (COMPENSANDO GMST)
-    const gmst = satellite.gstime(now);
-    const rot = new THREE.Matrix4().makeRotationY(-gmst);
+// crear luz si no existe
+if (!window.sunLight) {
+  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
 
-    const sunDir = localSun.applyMatrix4(rot).normalize();
+  // opcional: mejora contraste día/noche
+  window.sunLight.intensity = 1.6;
 
-    if (!window.sunLight) {
-      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
-      scene.add(window.sunLight);
-    }
+  scene.add(window.sunLight);
+}
 
-    window.sunLight.position.copy(
-      sunDir.clone().multiplyScalar(1000)
-    );
+// posicionar luz solar (dirección fija en ECI)
+window.sunLight.position.copy(
+  sunDir.clone().multiplyScalar(1000)
+);
 
-    window.sunLight.target.position.set(0, 0, 0);
-    window.sunLight.target.updateMatrixWorld();
-  }
+// objetivo siempre al centro de la Tierra
+window.sunLight.target.position.set(0, 0, 0);
+window.sunLight.target.updateMatrixWorld();
 
   // =========================
   // 🎥 CÁMARA
