@@ -842,15 +842,27 @@ function onGlobeClick(event) {
 
   if (!intersects.length) return;
 
-  // 🔥 SOLO esto
-  const point = intersects[0].point.clone().normalize();
+  // =========================
+  // 🌍 punto en espacio local de la esfera
+  // =========================
+  let point = earth.worldToLocal(intersects[0].point.clone()).normalize();
 
-  // 🌍 LAT / LON directo
+  // =========================
+  // LAT / LON
+  // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
+
+  // 👇 ESTE OFFSET es el que ajusta el meridiano (CRÍTICO)
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
+  lon = lon + 90; // ajuste de textura (blue marble / three.js sphere mapping)
+
+  // normalizar
   lon = ((lon + 180) % 360) - 180;
 
+  // =========================
+  // STATE
+  // =========================
   window.lat = lat;
   window.lon = lon;
 
