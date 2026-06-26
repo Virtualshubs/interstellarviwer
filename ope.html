@@ -1616,24 +1616,30 @@ function renderMissionPanel() {
   `;
 }
 
-  function closeMissionPanel() {
+ function closeMissionPanel() {
   const panel = document.getElementById("missionPanel");
 
   panel.style.display = "none";
-
   window.currentMission = null;
+
+  renderMissionNav(); // para quitar highlight activo
 }
 
-function selectMission(id) {
-  const mission = MISSIONS[id];
-  if (!mission) return;
 
+function openMissionPanel() {
+  const panel = document.getElementById("missionPanel");
+  panel.style.display = "block";
+  renderMissionPanel();
+}
+  
+  
+function selectMission(id) {
   window.currentMission = id;
 
   renderMissionNav();
+  openMissionPanel();
 
-  const firstSat = mission.satellites[0];
-  loadSatellite(firstSat);
+  loadSatellite(MISSIONS[id].satellites[0]);
 }
   
 </script>
