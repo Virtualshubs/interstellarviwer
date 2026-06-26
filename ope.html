@@ -829,6 +829,8 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   animate();
 }
+
+
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -841,24 +843,31 @@ function onGlobeClick(event) {
 
   if (!intersects.length) return;
 
+  // =========================
+  // 🔥 punto de intersección
+  // =========================
   let point = intersects[0].point.clone();
 
-  // 🧭 compensación GMST (bien como lo tenías)
+  // =========================
+  // 🧭 COMPENSAR ROTACIÓN DE LA TIERRA (GMST)
+  // =========================
   const gmst = satellite.gstime(new Date());
   const invRotation = new THREE.Matrix4().makeRotationY(gmst);
   point.applyMatrix4(invRotation);
 
   point.normalize();
 
+  // =========================
+  // 🌍 LAT / LON
+  // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
-
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
-
-  // 🔥 FIX CRÍTICO: meridiano
-  lon += 90;
 
   lon = ((lon + 180) % 360) - 180;
 
+  // =========================
+  // 📍 GUARDAR ESTADO
+  // =========================
   window.lat = lat;
   window.lon = lon;
 
@@ -875,9 +884,6 @@ function onGlobeClick(event) {
   run();
 }
 
-
-
-  
 function onWheelZoom(e) {
   const el = e.target;
 
@@ -891,6 +897,8 @@ function onWheelZoom(e) {
   targetZoom += e.deltaY * 0.2;
   targetZoom = Math.max(180, Math.min(800, targetZoom));
 }
+
+  
   
   
 function animate() {
