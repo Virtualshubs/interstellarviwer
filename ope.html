@@ -452,7 +452,7 @@ pre {
 
   #missionPanel{
  position:fixed;
-
+  display: none;
   top:50%;
   left:50%;
 
@@ -731,6 +731,14 @@ window.addEventListener("wheel", (e) => {
     return;
   }
 
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  const panel = document.getElementById("missionPanel");
+  if (panel) panel.style.display = "none";
+});
+
+  
   targetZoom += e.deltaY * 0.2;
   targetZoom = Math.max(180, Math.min(800, targetZoom));
 });
