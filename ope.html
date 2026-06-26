@@ -1503,20 +1503,28 @@ async function loadSatellite(catnr) {
 // =========================
 async function run() {
 
+  // =========================
+  // 📍 APLICAR COORDENADAS CUSTOM SI APLICA
+  // =========================
+  applyCoordsIfCustom();
+
   const best = document.getElementById("best");
   const ranking = document.getElementById("ranking");
   const out = document.getElementById("out");
 
   if (!window.latestSatrec) return;
 
+  // =========================
+  // 🛰 CÁLCULO DE PASADAS
+  // =========================
   const passes = getPasses(window.latestSatrec, new Date(), 168);
 
-  passes.sort((a,b) => b.score - a.score);
+  passes.sort((a, b) => b.score - a.score);
 
   const top = passes[0];
 
   // =========================
-  // 🧠 SIEMPRE ACTUALIZAR PANEL INFO
+  // 🧠 PANEL INFO SIEMPRE ACTUALIZADO
   // =========================
   renderSatInfoPanel(
     window.currentCATNR,
@@ -1527,7 +1535,7 @@ async function run() {
   renderMissionPanel();
 
   // =========================
-  // 🛰 CASO SIN PASOS
+  // 🛰 SIN PASOS VISIBLES
   // =========================
   if (!passes.length || !top || top.maxElev < 5) {
 
@@ -1540,13 +1548,12 @@ async function run() {
 
     ranking.innerHTML = "";
     out.innerText = "";
-  
 
     return;
   }
 
   // =========================
-  // 🛰 CASO NORMAL
+  // 🟢 MEJOR PASO
   // =========================
   best.innerHTML = `
     🟢 MEJOR PASO<br>
@@ -1556,20 +1563,26 @@ async function run() {
     Inicio: ${top.start}<br>
   `;
 
+  // =========================
+  // 🏆 TOP 5
+  // =========================
   ranking.innerHTML = "<b>🏆 TOP 5 PASOS</b>";
 
-  passes.slice(0,5).forEach((p,i)=>{
+  passes.slice(0, 5).forEach((p, i) => {
     ranking.innerHTML += `
       <div class="rankCard">
-        #${i+1} ${p.class}<br>
+        #${i + 1} ${p.class}<br>
         Elev: ${p.maxElev.toFixed(1)}°<br>
         Score: ${Math.round(p.score)}<br>
       </div>
     `;
   });
 
-  out.innerText = passes.map((p,i)=>`
-PASS ${i+1} ${p.class}
+  // =========================
+  // 📄 OUTPUT DETALLADO
+  // =========================
+  out.innerText = passes.map((p, i) => `
+PASS ${i + 1} ${p.class}
 ──────────────────
 Inicio: ${p.start}
 Fin: ${p.end}
@@ -1578,9 +1591,6 @@ Duración: ${p.duration.toFixed(1)} min
 Score: ${Math.round(p.score)}
 `).join("\n");
 }
-
-
-
 
   
 function renderMissionNav() {
