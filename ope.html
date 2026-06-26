@@ -947,20 +947,21 @@ function onWheelZoom(e) {
   
 
 
-  function getSunDirection(now) {
-  const pos = SunCalc.getPosition(now, 0, 0);
+function getSunECI(date) {
+  const pos = SunCalc.getPosition(date, 0, 0);
 
-  const sunDir = new THREE.Vector3(
-    Math.cos(pos.azimuth) * Math.cos(pos.altitude),
+  const local = new THREE.Vector3(
+    Math.cos(pos.altitude) * Math.cos(pos.azimuth),
     Math.sin(pos.altitude),
-    Math.sin(pos.azimuth) * Math.cos(pos.altitude)
+    Math.cos(pos.altitude) * Math.sin(pos.azimuth)
   );
 
-  return sunDir.normalize();
+  const gmst = satellite.gstime(date);
+  const rot = new THREE.Matrix4().makeRotationY(-gmst);
+
+  return local.applyMatrix4(rot).normalize();
 }
-  
-  
-function animate() {
+  function animate() {
 
   requestAnimationFrame(animate);
 
@@ -982,17 +983,24 @@ function animate() {
   }
 
   // =========================
-  // 🌞 SOL (SunCalc)
+  // 🌞 SOL (CORREGIDO A SISTEMA COHERENTE)
   // =========================
   if (typeof SunCalc !== "undefined") {
 
     const pos = SunCalc.getPosition(now, 0, 0);
 
-    const sunDir = new THREE.Vector3(
-      Math.cos(pos.azimuth) * Math.cos(pos.altitude),
+    // vector local (Tierra fija)
+    const localSun = new THREE.Vector3(
+      Math.cos(pos.altitude) * Math.cos(pos.azimuth),
       Math.sin(pos.altitude),
-      Math.sin(pos.azimuth) * Math.cos(pos.altitude)
-    ).normalize();
+      Math.cos(pos.altitude) * Math.sin(pos.azimuth)
+    );
+
+    // 🔥 PASAMOS A SISTEMA ECI (COMPENSANDO GMST)
+    const gmst = satellite.gstime(now);
+    const rot = new THREE.Matrix4().makeRotationY(-gmst);
+
+    const sunDir = localSun.applyMatrix4(rot).normalize();
 
     if (!window.sunLight) {
       window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
@@ -1003,11 +1011,12 @@ function animate() {
       sunDir.clone().multiplyScalar(1000)
     );
 
-    window.sunLight.lookAt(0, 0, 0);
+    window.sunLight.target.position.set(0, 0, 0);
+    window.sunLight.target.updateMatrixWorld();
   }
 
   // =========================
-  // 🎥 CÁMARA (ORBITAL CONTROL MANUAL)
+  // 🎥 CÁMARA
   // =========================
   zoom += (targetZoom - zoom) * 0.1;
 
