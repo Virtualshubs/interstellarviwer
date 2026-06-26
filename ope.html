@@ -709,16 +709,27 @@ function init() {
   // =========================
   // 🌍 EARTH
   // =========================
-  earth = new THREE.Mesh(
-    new THREE.SphereGeometry(100, 32, 32),
-    new THREE.MeshBasicMaterial({
-      color: 0x2233ff,
-      wireframe: true
-    })
-  );
+// =========================
+// 🌍 EARTH (textura real)
+// =========================
 
-  scene.add(earth);
+const textureLoader = new THREE.TextureLoader();
 
+const earthTexture = textureLoader.load(
+  "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+);
+
+// opcional pero recomendado (mejora calidad)
+earthTexture.colorSpace = THREE.SRGBColorSpace;
+
+earth = new THREE.Mesh(
+  new THREE.SphereGeometry(100, 64, 64),
+  new THREE.MeshBasicMaterial({
+    map: earthTexture
+  })
+);
+
+scene.add(earth);
   // =========================
   // 🛰 SAT
   // =========================
