@@ -738,6 +738,22 @@ earth = new THREE.Mesh(
 );
 
 scene.add(earth);
+
+
+  // =========================
+// 🌫 ATMOSFERA (HALO)
+// =========================
+
+const atmosphereMaterial = new THREE.MeshBasicMaterial({
+  color: 0x4aa3ff,
+  transparent: true,
+  opacity: 0.08,
+  side: THREE.BackSide,
+  blending: THREE.AdditiveBlending
+});
+
+
+
   // =========================
   // 🛰 SAT
   // =========================
