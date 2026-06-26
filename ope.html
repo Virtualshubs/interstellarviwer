@@ -830,8 +830,7 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
-
-  function onGlobeClick(event) {
+function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -844,18 +843,12 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   if (!intersects.length) return;
 
   // =========================
-  // 🔥 punto de intersección
+  // 🌍 punto en espacio de la esfera
   // =========================
   let point = intersects[0].point.clone();
 
-  // =========================
-  // 🧭 COMPENSAR ROTACIÓN DE LA TIERRA (GMST)
-  // =========================
-  const gmst = satellite.gstime(new Date());
-
-  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
-  point.applyMatrix4(invRotation);
-
+  // 🔥 pasar a coordenadas locales reales del globo
+  earth.worldToLocal(point);
   point.normalize();
 
   // =========================
@@ -865,15 +858,22 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
+  // 🧭 ajuste de meridiano (clave en tu sistema actual)
+  lon = lon - 90;
+
+  // normalización [-180, 180]
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 GUARDAR ESTADO
+  // 📍 guardar estado global
   // =========================
   window.lat = lat;
   window.lon = lon;
 
-  document.getElementById("citySelect").value = "custom";
+  window.currentCityName = "Custom (Globe)";
+
+  const select = document.getElementById("citySelect");
+  if (select) select.value = "custom";
 
   const latInput = document.getElementById("lat");
   const lonInput = document.getElementById("lon");
@@ -881,11 +881,11 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   if (latInput) latInput.value = lat.toFixed(4);
   if (lonInput) lonInput.value = lon.toFixed(4);
 
-  window.currentCityName = "Custom (Globe)";
-
+  // =========================
+  // 🔁 recalcular sistema
+  // =========================
   run();
 }
-
 function onWheelZoom(e) {
   const el = e.target;
 
