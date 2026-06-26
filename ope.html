@@ -990,37 +990,42 @@ function getSunECI(date) {
   }
 
 // =========================
-// 🌞 SOL SEGURO (NO BREAKING)
+// 🌞 SOL CORREGIDO (COHERENTE CON GMST)
 // =========================
 
-if (typeof satellite !== "undefined") {
+const pos = SunCalc.getPosition(now, 0, 0);
 
-  const sunECI = satellite.sunPosition
-    ? satellite.sunPosition(now)
-    : null;
+// vector en sistema "Tierra fija"
+const localSun = new THREE.Vector3(
+  Math.cos(pos.altitude) * Math.cos(pos.azimuth),
+  Math.sin(pos.altitude),
+  Math.cos(pos.altitude) * Math.sin(pos.azimuth)
+);
 
-  if (sunECI) {
+// 🔥 llevamos al sistema ECI igual que satélites
+const gmst = satellite.gstime(now);
+const rot = new THREE.Matrix4().makeRotationY(-gmst);
 
-    const sunDir = new THREE.Vector3(
-      sunECI.x,
-      sunECI.y,
-      sunECI.z
-    ).normalize();
+const sunDir = localSun.applyMatrix4(rot).normalize();
 
-    if (!window.sunLight) {
-      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-      scene.add(window.sunLight);
-    }
+// luz
+if (!window.sunLight) {
+  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  scene.add(window.sunLight);
 
-    window.sunLight.position.copy(
-      sunDir.multiplyScalar(1000)
-    );
-
-    window.sunLight.target.position.set(0, 0, 0);
-    window.sunLight.target.updateMatrixWorld();
-  }
+  window.sunLight.target = new THREE.Object3D();
+  scene.add(window.sunLight.target);
 }
 
+window.sunLight.position.copy(
+  sunDir.clone().multiplyScalar(1000)
+);
+
+window.sunLight.target.position.set(0, 0, 0);
+window.sunLight.target.updateMatrixWorld();
+
+
+    
   // =========================
   // 🎥 CÁMARA
   // =========================
