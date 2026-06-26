@@ -829,7 +829,6 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   animate();
 }
-
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -839,15 +838,16 @@ function onGlobeClick(event) {
   raycaster.setFromCamera(mouse, camera);
 
   const intersects = raycaster.intersectObject(earth);
+
   if (!intersects.length) return;
 
   // =========================
-  // 🔥 punto en mundo
+  // 🔥 punto en coordenadas del mundo
   // =========================
   const point = intersects[0].point.clone().normalize();
 
   // =========================
-  // 🌍 LAT / LON (SIN COMPENSAR GMST)
+  // 🌍 LAT / LON DIRECTO (SIN GMST)
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
 
@@ -857,7 +857,7 @@ function onGlobeClick(event) {
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 GUARDAR ESTADO
+  // 📍 guardar estado
   // =========================
   window.lat = lat;
   window.lon = lon;
