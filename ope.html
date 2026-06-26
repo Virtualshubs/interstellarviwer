@@ -691,6 +691,7 @@ init();
 
 function init() {
   scene = new THREE.Scene();
+
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
@@ -700,11 +701,14 @@ function init() {
 
   camera.position.set(0, 140, zoom);
   camera.lookAt(0, 0, 0);
+
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-
+  // =========================
+  // 🌍 EARTH
+  // =========================
   earth = new THREE.Mesh(
     new THREE.SphereGeometry(100, 32, 32),
     new THREE.MeshBasicMaterial({
@@ -715,6 +719,9 @@ function init() {
 
   scene.add(earth);
 
+  // =========================
+  // 🛰 SAT
+  // =========================
   const satMesh = new THREE.Mesh(
     new THREE.SphereGeometry(3, 12, 12),
     new THREE.MeshBasicMaterial({ color: 0xff4444 })
@@ -723,46 +730,58 @@ function init() {
   scene.add(satMesh);
   window.satMesh = satMesh;
 
+  // =========================
+  // 🎯 RAYCASTER GLOBAL
+  // =========================
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
 
-window.addEventListener("wheel", (e) => {
-  const el = e.target;
-  if (
-    el.closest("#roadmapModal") ||
-    el.closest("#best") ||
-    el.closest("#ranking") ||
-    el.closest("#out")
-  ) {
-    return;
-  }
+  // =========================
+  // 🖱️ CLICK EN GLOBO
+  // =========================
+  renderer.domElement.addEventListener("pointerdown", onGlobeClick);
+
+  // =========================
+  // 🌀 ZOOM
+  // =========================
+  window.addEventListener("wheel", onWheelZoom);
+
+  // =========================
+  // 🧼 UI INIT
+  // =========================
+  window.addEventListener("DOMContentLoaded", () => {
+    const panel = document.getElementById("missionPanel");
+    if (panel) panel.style.display = "none";
+
+    const lat = document.getElementById("lat");
+    const lon = document.getElementById("lon");
+
+    if (lat) lat.style.display = "none";
+    if (lon) lon.style.display = "none";
+  });
+
+  // =========================
+  // 🌍 DEFAULT STATE
+  // =========================
+  window.lat = 40.4168;
+  window.lon = -3.7038;
+  window.currentCATNR = "25544";
+  window.currentCityName = "Madrid";
+
+  const satSelect = document.getElementById("satSelect");
+  if (satSelect) satSelect.value = "25544";
+
+  const citySelect = document.getElementById("citySelect");
+  if (citySelect) citySelect.value = "40.4168,-3.7038";
+
+  loadSatellite("25544");
+
+  animate();
+}
 
 
 
-window.addEventListener("DOMContentLoaded", () => {
-  const panel = document.getElementById("missionPanel");
-  if (panel) panel.style.display = "none";
-});
-
-
-window.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("lat").style.display = "none";
-  document.getElementById("lon").style.display = "none";
-});
-
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-window.addEventListener("click", onMapClick);
-
-  
-  targetZoom += e.deltaY * 0.2;
-  targetZoom = Math.max(180, Math.min(800, targetZoom));
-  
-});
-
-
-function onMapClick(event) {
-
+  function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -774,40 +793,43 @@ function onMapClick(event) {
 
   if (!intersects.length) return;
 
-  const p = intersects[0].point.clone().normalize();
+  const point = intersects[0].point.clone().normalize();
 
-  const lat = Math.asin(p.y) * 180 / Math.PI;
-  const lon = Math.atan2(p.x, p.z) * 180 / Math.PI;
+  const lat = Math.asin(point.y) * 180 / Math.PI;
+  const lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
   window.lat = lat;
   window.lon = lon;
 
-  window.currentCityName = "Mapa libre";
+  document.getElementById("citySelect").value = "custom";
 
-  console.log("📍 NEW COORDS:", lat, lon);
+  const latInput = document.getElementById("lat");
+  const lonInput = document.getElementById("lon");
 
-  // refrescar cálculo
+  if (latInput) latInput.value = lat.toFixed(4);
+  if (lonInput) lonInput.value = lon.toFixed(4);
+
+  window.currentCityName = "Custom (Globe)";
+
   run();
 }
-  
-  
-  animate();
 
-  window.lat = 40.4168;
-  window.lon = -3.7038;
-  window.currentCATNR = "25544";
 
-  const satSelect = document.getElementById("satSelect");
-  if (satSelect) satSelect.value = "25544";
+function onWheelZoom(e) {
+  const el = e.target;
 
-  const citySelect = document.getElementById("citySelect");
-  if (citySelect) citySelect.value = "40.4168,-3.7038";
+  if (
+    el.closest("#roadmapModal") ||
+    el.closest("#best") ||
+    el.closest("#ranking") ||
+    el.closest("#out")
+  ) return;
 
-  window.currentCityName = "Madrid";
-
-  loadSatellite("25544");
+  targetZoom += e.deltaY * 0.2;
+  targetZoom = Math.max(180, Math.min(800, targetZoom));
 }
-
+  
+  
 function animate() {
 
   requestAnimationFrame(animate);
