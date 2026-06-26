@@ -732,7 +732,8 @@ earthTexture.colorSpace = THREE.SRGBColorSpace;
 
 earth = new THREE.Mesh(
   new THREE.SphereGeometry(100, 64, 64),
-new THREE.MeshStandardMaterial({ map: earthTexture })
+new THREE.MeshBasicMaterial({ 
+  map: earthTexture })
 );
 
 scene.add(earth);
