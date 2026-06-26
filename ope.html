@@ -1592,6 +1592,23 @@ Score: ${Math.round(p.score)}
 `).join("\n");
 }
 
+
+
+  function applyCoordsIfCustom() {
+  const val = document.getElementById("citySelect").value;
+
+  if (val !== "custom") return;
+
+  const lat = parseFloat(document.getElementById("lat").value);
+  const lon = parseFloat(document.getElementById("lon").value);
+
+  if (!isNaN(lat) && !isNaN(lon)) {
+    window.lat = lat;
+    window.lon = lon;
+    window.currentCityName = "Custom";
+  }
+}
+
   
 function renderMissionNav() {
   const nav = document.getElementById("missionNav");
