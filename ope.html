@@ -829,8 +829,7 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   animate();
 }
-
-  function onGlobeClick(event) {
+function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -839,6 +838,7 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   raycaster.setFromCamera(mouse, camera);
 
   const intersects = raycaster.intersectObject(earth);
+
   if (!intersects.length) return;
 
   // =========================
@@ -862,10 +862,10 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-  // 🔧 FIX CLAVE: alinear Greenwich correctamente
+  // 🔥 FIX MERIDIANO (ESTE/OESTE INVERTIDO)
   lon = -lon;
 
-  // normalización estándar [-180, 180]
+  // normalización estándar
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
