@@ -885,29 +885,34 @@ function onGlobeClick(event) {
   if (!intersects.length) return;
 
   // =========================
-  // 🌍 PUNTO
+  // 🌍 punto en esfera (mundo rotado)
   // =========================
   const point = intersects[0].point.clone().normalize();
 
   // =========================
-  // 🌍 LAT / LON (UNA SOLA VEZ)
+  // 🧭 DESHACER ROTACIÓN DE LA TIERRA (GMST)
   // =========================
-  let lat = Math.asin(point.y) * 180 / Math.PI;
+  const gmst = satellite.gstime(new Date());
+  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
+
+  point.applyMatrix4(invRotation);
+
+  // =========================
+  // 🌍 LAT / LON REAL (sistema fijo)
+  // =========================
+  const lat = Math.asin(point.y) * 180 / Math.PI;
+
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
   // =========================
-  // 🧭 AJUSTE SOLO VISUAL
+  // 🧭 ajuste SOLO visual de textura
   // =========================
   lon = -lon;
-
-  if (typeof EARTH_LON_OFFSET !== "undefined") {
-    lon += EARTH_LON_OFFSET;
-  }
 
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 GUARDAR
+  // 📍 guardar estado
   // =========================
   window.lat = lat;
   window.lon = lon;
