@@ -954,6 +954,27 @@ function onWheelZoom(e) {
 
 
 
+function updateSunLight(now) {
+
+  const sunEci = satellite.sunPosition(now);
+  const gmst = satellite.gstime(now);
+  const sunEcf = satellite.eciToEcf(sunEci, gmst);
+
+  const sunDir = new THREE.Vector3(
+    sunEcf.x,
+    sunEcf.y,
+    sunEcf.z
+  ).normalize();
+
+  window.sunLight.position.copy(
+    sunDir.clone().multiplyScalar(1000)
+  );
+
+  window.sunLight.target.position.set(0, 0, 0);
+  window.sunLight.target.updateMatrixWorld();
+}
+  
+
 
   function animate() {
 
@@ -1005,6 +1026,7 @@ if (typeof satellite !== "undefined") {
     sunDir.clone().multiplyScalar(1000)
   );
 
+  
   window.sunLight.target.position.set(0, 0, 0);
   window.sunLight.target.updateMatrixWorld();
 }
@@ -1026,10 +1048,10 @@ if (typeof satellite !== "undefined") {
 
   camera.lookAt(0, 0, 0);
 
-  // =========================
-  // 🎬 RENDER
-  // =========================
-  renderer.render(scene, camera);
+updateSunLight(now);
+updateSatellitePosition(...);
+earth.rotation.y = -gmst;
+renderer.render(scene, camera);
 }
   
 
