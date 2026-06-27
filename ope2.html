@@ -872,8 +872,6 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 }
 
 
-
-  
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -886,41 +884,30 @@ function onGlobeClick(event) {
 
   if (!intersects.length) return;
 
- let point = intersects[0].point.clone();
-point.normalize();
-
-// =========================
-// 🌍 LAT / LON (SISTEMA FÍSICO)
-// =========================
-let lat = Math.asin(point.y) * 180 / Math.PI;
-let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
-
-// =========================
-// 🧭 AJUSTE SOLO DE MAPA (VISUAL)
-// =========================
-// invierte textura si tu mapa está en espejo
-lon = -lon;
-
-// offset fijo de calibración del mapa (NO física)
-lon = lon + EARTH_LON_OFFSET;
-
-// normalización
-lon = ((lon + 180) % 360) - 180;
-// =========================
-// 🌍 LAT / LON
-// =========================
-const lat = Math.asin(point.y) * 180 / Math.PI;
-
-let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
-
-// 🔥 FIX MERIDIANO (ESTE/OESTE INVERTIDO)
-lon = -lon;
-
-// normalización estándar
-lon = ((lon + 180) % 360) - 180;
+  // =========================
+  // 🌍 PUNTO
+  // =========================
+  const point = intersects[0].point.clone().normalize();
 
   // =========================
-  // 📍 GUARDAR ESTADO
+  // 🌍 LAT / LON (UNA SOLA VEZ)
+  // =========================
+  let lat = Math.asin(point.y) * 180 / Math.PI;
+  let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
+
+  // =========================
+  // 🧭 AJUSTE SOLO VISUAL
+  // =========================
+  lon = -lon;
+
+  if (typeof EARTH_LON_OFFSET !== "undefined") {
+    lon += EARTH_LON_OFFSET;
+  }
+
+  lon = ((lon + 180) % 360) - 180;
+
+  // =========================
+  // 📍 GUARDAR
   // =========================
   window.lat = lat;
   window.lon = lon;
