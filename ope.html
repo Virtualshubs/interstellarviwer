@@ -719,10 +719,8 @@ function init() {
 
   
 window.sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
-
 scene.add(window.sunLight);
 
-// 🔥 FIX CRÍTICO
 window.sunLight.target = new THREE.Object3D();
 scene.add(window.sunLight.target);
 
@@ -785,6 +783,9 @@ const atmosphereGlow = new THREE.Mesh(
     depthWrite: false
   })
 );
+  scene.add(atmosphereInner);
+scene.add(atmosphereOuter);
+scene.add(atmosphereGlow);
   
   // =========================
   // 🛰 SAT
