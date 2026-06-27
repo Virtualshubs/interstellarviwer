@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Orbital Pass Engine</title>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: radial-gradient(circle at 50% 30%, #05070d, #000 70%);
+  color: #E6F1FF;
+}
+
+canvas { display: block; }
+
+#ui {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+
+  width: 460px;
+  max-height: 92vh;
+  overflow: auto;
+
+  padding: 16px;
+  border-radius: 16px;
+
+  background: rgba(8, 12, 20, 0.78);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(120, 180, 255, 0.18);
+
+  box-shadow:
+    0 0 45px rgba(70, 120, 255, 0.10),
+    inset 0 0 25px rgba(255,255,255,0.02);
+}
+
+#ui::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 180, 255, 0.5),
+    transparent
+  );
+  opacity: 0.6;
+}
+
+
+#ui h3 {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-size: 30px;
+  color: #9CCBFF;
+  text-transform: uppercase;
+}
+
+button, select, input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(120, 180, 255, 0.14);
+
+  color: #E6F1FF;
+
+  border-radius: 10px;
+  outline: none;
+
+  font-size: 12px;
+  letter-spacing: 0.02em;
+
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  border-color: rgba(120, 180, 255, 0.35);
+  background: rgba(120, 180, 255, 0.06);
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+
+.highlight {
+  margin-top: 14px;
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 170, 0.08),
+    rgba(0, 120, 255, 0.06)
+  );
+
+  border: 1px solid rgba(0, 255, 170, 0.18);
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  box-shadow: inset 0 0 18px rgba(0,255,150,0.05);
+}
+
+.insightBlock {
+  margin-top: 10px;
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(120, 180, 255, 0.12);
+
+  position: relative;
+}
+
+/* left accent bar (HUD feel) */
+.insightBlock::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(120, 180, 255, 0.35);
+  border-radius: 2px;
+}
+
+.insightTitle {
+  font-size: 30px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7FB3FF;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.insightItem {
+  font-size: 12px;
+  opacity: 0.92;
+  margin: 3px 0;
+  padding-left: 8px;
+  border-left: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+
+.rankCard {
+  margin-top: 8px;
+  padding: 10px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  font-size: 12px;
+
+  transition: all 0.2s ease;
+}
+
+.rankCard:hover {
+  border-color: rgba(120, 180, 255, 0.28);
+  background: rgba(120, 180, 255, 0.05);
+}
+
+
+
+pre {
+  white-space: pre-wrap;
+  font-size: 11px;
+  margin-top: 10px;
+
+  opacity: 0.65;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+}
+
+
+
+#ui::-webkit-scrollbar {
+  width: 6px;
+}
+
+#ui::-webkit-scrollbar-thumb {
+  background: rgba(120, 180, 255, 0.25);
+  border-radius: 10px;
+}
+
+#ui::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+  #satInfoPanel {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 340px;
+  max-height: 92vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 16px;
+  z-index: 20;
+  background: rgba(8, 12, 20, 0.78);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(120, 180, 255, 0.18);
+  box-shadow:
+    0 0 40px rgba(70, 120, 255, 0.12),
+    inset 0 0 20px rgba(255,255,255,0.02);
+  color: #E6F1FF;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+  .satPanelTitle {
+  font-size: 25px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9CCBFF;
+}
+
+  #satHeader {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  box-shadow: 0 0 20px rgba(120,180,255,0.15);
+}
+
+  #satHeader img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  filter: contrast(1.1) brightness(0.9);
+}
+
+  #satHeader::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.1),
+    rgba(0,0,0,0.7)
+  );
+
+  pointer-events: none;
+}
+
+  .satBlock {
+  margin-top: 10px;
+  padding: 10px 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(120, 180, 255, 0.10);
+
+  position: relative;
+}
+
+  .satBlock::before {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+
+  width: 2px;
+
+  background: rgba(120, 180, 255, 0.35);
+  border-radius: 2px;
+}
+  .satBlockTitle {
+  font-size: 10px;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  color: #7FB3FF;
+
+  margin-bottom: 6px;
+
+  opacity: 0.85;
+}
+
+  .satItem {
+  font-size: 12px;
+
+  margin: 3px 0;
+
+  opacity: 0.92;
+
+  padding-left: 6px;
+
+  border-left: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+  #satInfoPanel {
+  animation: satFadeIn 0.25s ease-out;
+}
+
+@keyframes satFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#satPatch {
+  position: fixed;
+
+  bottom: 18px;
+  right: 18px;
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255,255,255,0.18),
+    rgba(120,180,255,0.10) 45%,
+    rgba(10,14,20,0.92) 100%
+  );
+
+  border: 1px solid rgba(120, 180, 255, 0.35);
+
+  box-shadow:
+    0 0 20px rgba(120,180,255,0.25),
+    inset 0 0 14px rgba(255,255,255,0.05);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  z-index: 50;
+
+  /* pequeño “peso HUD” */
+  backdrop-filter: blur(10px);
+}
+  #satPatch {
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#satPatch:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 28px rgba(120,180,255,0.35),
+    inset 0 0 14px rgba(255,255,255,0.06);
+}
+  
+#satPatch img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+ 
+
+  filter: drop-shadow(0 0 6px rgba(120,180,255,0.4));
+}
+
+#missionNav {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.missionSlot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+  border-radius: 50px;
+
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.missionSlot:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.missionSlot.active {
+  background: rgba(0,150,255,0.25);
+  border-color: rgba(0,150,255,0.6);
+}
+
+.missionSlot img {
+  width: 28px;
+  height: 28px;
+}
+
+.missionMeta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.missionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+.missionSub {
+  font-size: 10px;
+  opacity: 0.7;
+  color: white;
+}
+
+  #missionPanel{
+ position:fixed;
+  display: none;
+  top:50%;
+  left:50%;
+
+  transform:translate(-50%,-50%);
+
+  width:420px;
+  min-height:180px;
+
+  padding:24px;
+
+  background:rgba(8,12,18,0.95);
+  backdrop-filter:blur(20px);
+
+  border:1px solid rgba(120,180,255,0.35);
+  border-radius:20px;
+
+  box-shadow:
+    0 0 40px rgba(120,180,255,0.25);
+
+  color:white;
+
+  z-index:9999;
+
+  overflow:hidden;
+}
+
+  .missionTitle{
+  font-size:24px;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+.missionDesc{
+  font-size:14px;
+  line-height:1.6;
+  opacity:0.85;
+  margin-bottom:16px;
+}
+
+.missionSatCount{
+  font-size:13px;
+  color:#7ec8ff;
+}
+
+
+</style>
+</head>
+
+<body>
+
+  <div id="missionNav"></div>
+   <div id="missionPanel"></div>
+
+
+<div id="ui">
+  <h3>🛰 Orbital Pass Engine</h3>
+
+<select id="satSelect" onchange="changeSatellite()">
+
+  <optgroup label="🚀 Human Spaceflight">
+    <option value="25544">ISS</option>
+  </optgroup>
+
+  <optgroup label="🌍 Copernicus">
+
+    <option value="39634">Sentinel-1A</option>
+    <option value="39084">Sentinel-1B</option>
+
+    <option value="29780">Sentinel-2A</option>
+    <option value="42063">Sentinel-2B</option>
+
+    <option value="28654">Sentinel-3A</option>
+
+    <option value="43618">Sentinel-5P</option>
+
+  </optgroup>
+
+  <optgroup label="☁️ Meteorología">
+
+    <option value="25338">NOAA-15</option>
+    <option value="38552">Meteosat-10</option>
+
+  </optgroup>
+
+</select>
+
+<!-- CITY SELECT -->
+<select id="citySelect" onchange="changeCity()">
+
+  <optgroup label="Andalucía">
+    <option value="36.7213,-4.4214">Málaga</option>
+    <option value="37.3891,-5.9845">Sevilla</option>
+    <option value="36.8340,-2.4637">Almería</option>
+    <option value="37.8882,-4.7794">Córdoba</option>
+    <option value="37.1773,-3.5986">Granada</option>
+    <option value="37.2614,-6.9447">Huelva</option>
+    <option value="37.7796,-3.7849">Jaén</option>
+    <option value="36.5271,-6.2886">Cádiz</option>
+  </optgroup>
+
+  <optgroup label="Aragón">
+    <option value="41.6561,-0.8773">Zaragoza</option>
+    <option value="40.3456,-1.1065">Teruel</option>
+    <option value="42.1362,-0.4087">Huesca</option>
+  </optgroup>
+
+  <optgroup label="Asturias">
+    <option value="43.3614,-5.8494">Oviedo</option>
+    <option value="43.5453,-5.6615">Gijón</option>
+  </optgroup>
+
+  <optgroup label="Illes Balears">
+    <option value="39.5696,2.6502">Palma</option>
+  </optgroup>
+
+  <optgroup label="Canarias">
+    <option value="28.1235,-15.4363">Las Palmas de Gran Canaria</option>
+    <option value="28.4636,-16.2518">Santa Cruz de Tenerife</option>
+  </optgroup>
+
+  <optgroup label="Cantabria">
+    <option value="43.4623,-3.8099">Santander</option>
+  </optgroup>
+
+  <optgroup label="Castilla-La Mancha">
+    <option value="39.8628,-4.0273">Toledo</option>
+    <option value="38.9943,-1.8585">Albacete</option>
+    <option value="38.9861,-3.9273">Ciudad Real</option>
+    <option value="40.0704,-2.1374">Cuenca</option>
+    <option value="40.6333,-3.1669">Guadalajara</option>
+  </optgroup>
+
+  <optgroup label="Castilla y León">
+    <option value="41.6523,-4.7245">Valladolid</option>
+    <option value="40.6566,-4.6811">Ávila</option>
+    <option value="42.3439,-3.6969">Burgos</option>
+    <option value="42.5987,-5.5671">León</option>
+    <option value="42.0097,-4.5288">Palencia</option>
+    <option value="40.9701,-5.6635">Salamanca</option>
+    <option value="41.7636,-2.4688">Soria</option>
+    <option value="40.9481,-4.1184">Segovia</option>
+    <option value="41.5035,-5.7468">Zamora</option>
+  </optgroup>
+
+  <optgroup label="Cataluña">
+    <option value="41.3874,2.1686">Barcelona</option>
+    <option value="41.9794,2.8214">Girona</option>
+    <option value="41.6176,0.6200">Lleida</option>
+    <option value="41.1189,1.2445">Tarragona</option>
+  </optgroup>
+
+  <optgroup label="Comunitat Valenciana">
+    <option value="39.4699,-0.3763">Valencia</option>
+    <option value="38.3452,-0.4810">Alicante</option>
+    <option value="39.9864,-0.0513">Castellón</option>
+  </optgroup>
+
+  <optgroup label="Extremadura">
+    <option value="38.8786,-6.9703">Mérida</option>
+    <option value="39.4760,-6.3722">Cáceres</option>
+    <option value="38.8794,-6.9707">Badajoz</option>
+  </optgroup>
+
+  <optgroup label="Galicia">
+    <option value="42.8782,-8.5448">Santiago</option>
+    <option value="43.3623,-8.4115">A Coruña</option>
+    <option value="42.3358,-7.8639">Ourense</option>
+    <option value="42.4310,-8.6444">Pontevedra</option>
+    <option value="43.0097,-7.5560">Lugo</option>
+  </optgroup>
+
+  <optgroup label="Madrid">
+    <option value="40.4168,-3.7038">Madrid</option>
+  </optgroup>
+
+  <optgroup label="Murcia">
+    <option value="37.9922,-1.1307">Murcia</option>
+    <option value="37.6257,-0.9966">Cartagena</option>
+  </optgroup>
+
+  <optgroup label="Navarra">
+    <option value="42.8125,-1.6458">Pamplona</option>
+  </optgroup>
+
+  <optgroup label="País Vasco">
+    <option value="42.8467,-2.6726">Vitoria</option>
+    <option value="43.2630,-2.9350">Bilbao</option>
+    <option value="43.3183,-1.9812">San Sebastián</option>
+  </optgroup>
+
+  <optgroup label="La Rioja">
+    <option value="42.4627,-2.4449">Logroño</option>
+  </optgroup>
+
+  <optgroup label="Ceuta y Melilla">
+    <option value="35.8894,-5.3213">Ceuta</option>
+    <option value="35.2923,-2.9381">Melilla</option>
+  </optgroup>
+
+  <option value="custom">📍 Coordenadas personalizadas</option>
+
+</select>
+
+
+  <input id="lat" placeholder="Latitude" style="display:none;">
+  <input id="lon" placeholder="Longitude" style="display:none;">
+
+  <button onclick="run()">Calcular semana</button>
+
+  <div id="best" class="highlight">Esperando datos...</div>
+  <div id="ranking"></div>
+  <pre id="out">---</pre>
+</div>
+
+  <div id="satInfoPanel">
+       
+  </div>
+  <div id="satPatch"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
+<script src="https://unpkg.com/suncalc/suncalc.js"></script>
+
+<script>
+
+
+let scene, camera, renderer;
+let earth;
+let zoom = 420;
+let targetZoom = 420;
+
+
+let isDragging = false;
+let previousMouse = { x: 0, y: 0 };
+
+let cameraLon = 0;
+let cameraLat = 20;
+
+let targetLon = cameraLon;
+let targetLat = cameraLat;
+
+  const EARTH_OFFSET = 0;
+  
+window.currentMission = null;
+window.latestSatrec = null;
+
+init();
+
+function init() {
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    1,
+    20000
+  );
+
+  camera.position.set(0, 140, zoom);
+  camera.lookAt(0, 0, 0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  
+window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+scene.add(window.sunLight);
+
+// =========================
+// 🌍 EARTH (textura real)
+// =========================
+
+const textureLoader = new THREE.TextureLoader();
+
+const earthTexture = textureLoader.load(
+  "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+);
+
+// opcional pero recomendado (mejora calidad)
+earthTexture.colorSpace = THREE.SRGBColorSpace;
+
+earth = new THREE.Mesh(
+  new THREE.SphereGeometry(100, 64, 64),
+  new THREE.MeshStandardMaterial({
+    map: earthTexture,
+    emissive: new THREE.Color(0x111111),
+    emissiveIntensity: 0.2
+  })
+);
+
+scene.add(earth);
+
+const atmosphereInner = new THREE.Mesh(
+  new THREE.SphereGeometry(103, 64, 64),
+  new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.06,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  })
+);  scene.add(atmosphereInner);
+
+const atmosphereOuter = new THREE.Mesh(
+  new THREE.SphereGeometry(106, 64, 64),
+  new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.03,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  })
+);
+scene.add(atmosphereOuter);
+const atmosphereGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(112, 64, 64),
+  new THREE.MeshBasicMaterial({
+    color: 0x88ccff,
+    transparent: true,
+    opacity: 0.015,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  })
+);
+
+scene.add(atmosphereGlow);
+  // =========================
+  // 🛰 SAT
+  // =========================
+  const satMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(3, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff4444 })
+  );
+
+  scene.add(satMesh);
+  window.satMesh = satMesh;
+
+  // =========================
+  // 🎯 RAYCASTER GLOBAL
+  // =========================
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+
+  window.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  previousMouse.x = e.clientX;
+  previousMouse.y = e.clientY;
+});
+
+window.addEventListener("mouseup", () => {
+  isDragging = false;
+});
+
+window.addEventListener("mousemove", (e) => {
+  if (!isDragging) return;
+
+  const deltaX = e.clientX - previousMouse.x;
+  const deltaY = e.clientY - previousMouse.y;
+
+  previousMouse.x = e.clientX;
+  previousMouse.y = e.clientY;
+
+ const speed = 0.2;
+
+targetLon -= deltaX * speed;
+targetLat += deltaY * speed;
+
+// evitar dar la vuelta por los polos
+targetLat = Math.max(-85, Math.min(85, targetLat));
+});
+
+  // =========================
+  // 🖱️ CLICK EN GLOBO
+  // =========================
+  renderer.domElement.addEventListener("pointerdown", onGlobeClick);
+
+  // =========================
+  // 🌀 ZOOM
+  // =========================
+  window.addEventListener("wheel", onWheelZoom);
+
+  // =========================
+  // 🧼 UI INIT
+  // =========================
+  window.addEventListener("DOMContentLoaded", () => {
+    const panel = document.getElementById("missionPanel");
+    if (panel) panel.style.display = "none";
+
+    const lat = document.getElementById("lat");
+    const lon = document.getElementById("lon");
+
+    if (lat) lat.style.display = "none";
+    if (lon) lon.style.display = "none";
+  });
+
+  // =========================
+  // 🌍 DEFAULT STATE
+  // =========================
+  window.lat = 40.4168;
+  window.lon = -3.7038;
+  window.currentCATNR = "25544";
+  window.currentCityName = "Madrid";
+
+  const satSelect = document.getElementById("satSelect");
+  if (satSelect) satSelect.value = "25544";
+
+  const citySelect = document.getElementById("citySelect");
+  if (citySelect) citySelect.value = "40.4168,-3.7038";
+
+  loadSatellite("25544");
+
+  animate();
+}
+
+
+
+  
+function onGlobeClick(event) {
+  const rect = renderer.domElement.getBoundingClientRect();
+
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObject(earth);
+
+  if (!intersects.length) return;
+
+  // =========================
+  // 🔥 punto de intersección
+  // =========================
+  let point = intersects[0].point.clone();
+
+// =========================
+// 🧭 COMPENSAR ROTACIÓN TIERRA (GMST)
+// =========================
+let point = intersects[0].point.clone();
+
+point.normalize();
+
+const lat = Math.asin(point.y) * 180 / Math.PI;
+
+let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
+
+// solo ajuste visual
+lon = -lon;
+lon = ((lon + 180) % 360) - 180;
+
+point.normalize();
+
+// =========================
+// 🌍 LAT / LON
+// =========================
+const lat = Math.asin(point.y) * 180 / Math.PI;
+
+let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
+
+// 🔥 FIX MERIDIANO (ESTE/OESTE INVERTIDO)
+lon = -lon;
+
+// normalización estándar
+lon = ((lon + 180) % 360) - 180;
+
+  // =========================
+  // 📍 GUARDAR ESTADO
+  // =========================
+  window.lat = lat;
+  window.lon = lon;
+
+  document.getElementById("citySelect").value = "custom";
+
+  const latInput = document.getElementById("lat");
+  const lonInput = document.getElementById("lon");
+
+  if (latInput) latInput.value = lat.toFixed(4);
+  if (lonInput) lonInput.value = lon.toFixed(4);
+
+  window.currentCityName = "Custom (Globe)";
+
+  run();
+}
+
+function onWheelZoom(e) {
+  const el = e.target;
+
+  if (
+    el.closest("#roadmapModal") ||
+    el.closest("#best") ||
+    el.closest("#ranking") ||
+    el.closest("#out")
+  ) return;
+
+  targetZoom += e.deltaY * 0.2;
+  targetZoom = Math.max(180, Math.min(800, targetZoom));
+}
+  
+
+
+function getSunECI(date) {
+  const pos = SunCalc.getPosition(date, 0, 0);
+
+  const local = new THREE.Vector3(
+    Math.cos(pos.altitude) * Math.cos(pos.azimuth),
+    Math.sin(pos.altitude),
+    Math.cos(pos.altitude) * Math.sin(pos.azimuth)
+  );
+
+  const gmst = satellite.gstime(date);
+  const rot = new THREE.Matrix4().makeRotationY(-gmst);
+
+  return local.applyMatrix4(rot).normalize();
+}
+
+
+
+
+  function animate() {
+
+  requestAnimationFrame(animate);
+
+  const now = new Date();
+
+  // =========================
+  // 🌍 ROTACIÓN TIERRA (GMST)
+  // =========================
+  if (earth) {
+    const gmst = satellite.gstime(now);
+earth.rotation.y = -gmst + EARTH_OFFSET;
+  }
+
+  // =========================
+  // 🛰 SATÉLITES
+  // =========================
+  if (window.latestSatrec) {
+    updateSatellitePosition(window.latestSatrec, now);
+  }
+
+const sunEci = satellite.sunPosition(now);
+const gmst = satellite.gstime(now);
+const sunEcf = satellite.eciToEcf(sunEci, gmst);
+
+const sunDir = new THREE.Vector3(
+  sunEcf.x,
+  sunEcf.y,
+  sunEcf.z
+).normalize();
+
+if (!window.sunLight) {
+  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+  scene.add(window.sunLight);
+
+  window.sunLight.target = new THREE.Object3D();
+  scene.add(window.sunLight.target);
+}
+
+window.sunLight.position.copy(
+  sunDir.clone().multiplyScalar(1000)
+);
+
+window.sunLight.target.position.set(0, 0, 0);
+window.sunLight.target.updateMatrixWorld();
+
+  // =========================
+  // 🎥 CÁMARA
+  // =========================
+  zoom += (targetZoom - zoom) * 0.1;
+
+  cameraLon += (targetLon - cameraLon) * 0.1;
+  cameraLat += (targetLat - cameraLat) * 0.1;
+
+  const phi = THREE.MathUtils.degToRad(90 - cameraLat);
+  const theta = THREE.MathUtils.degToRad(cameraLon);
+
+  camera.position.x = zoom * Math.sin(phi) * Math.cos(theta);
+  camera.position.y = zoom * Math.cos(phi);
+  camera.position.z = zoom * Math.sin(phi) * Math.sin(theta);
+
+  camera.lookAt(0, 0, 0);
+
+  // =========================
+  // 🎬 RENDER
+  // =========================
+  renderer.render(scene, camera);
+}
+  
+
+function getObserver() {
+  return {
+    latitude: window.lat || 40.4168,
+    longitude: window.lon || -3.7038,
+    height: 0.3
+  };
+}
+
+// =========================
+// SAT POSITION
+// =========================
+function updateSatellitePosition(satrec, date) {
+
+  const pv = satellite.propagate(satrec, date);
+  if (!pv.position) return;
+
+  const gmst = satellite.gstime(date);
+  const ecf = satellite.eciToEcf(pv.position, gmst);
+
+  const scale = 0.05;
+
+  window.satMesh.position.set(
+    ecf.x * scale,
+    ecf.z * scale,
+    ecf.y * scale
+  );
+}
+
+// =========================
+// ENGINE
+// =========================
+function scorePass(maxElev, durationMin) {
+  return (maxElev * maxElev) * (durationMin / 10);
+}
+
+function getClass(maxElev) {
+  if (maxElev >= 75) return "🟢 PERFECTO";
+  if (maxElev >= 60) return "🟢 EXCELENTE";
+  if (maxElev >= 45) return "🟡 MUY BUENO";
+  if (maxElev >= 30) return "🟡 BUENO";
+  if (maxElev >= 15) return "🟠 DÉBIL";
+  return "🔴 MUY BAJO";
+}
+
+const SAT_INFO = {
+
+  // =========================
+  // 🧑‍🚀 ISS
+  // =========================
+  "25544": {
+    name: "ISS",
+    image: "https://3d.staratlas.es/ISS/1366_521.jpg",
+    patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
+    type: "Estación espacial",
+    mission: "Microgravedad",
+    instruments: [
+      "Laboratorios científicos",
+      "Cámaras de observación terrestre",
+      "Experimentos biomédicos"
+    ],
+    capabilities: [
+      "Observación humana en órbita",
+      "Experimentos en microgravedad",
+      "Fotografía terrestre general"
+    ]
+  },
+
+  // =========================
+  // 🌍 COPERNICUS - SENTINEL 1
+  // =========================
+
+  "39634": {
+    name: "Sentinel-1A",
+    image: "https://3d.staratlas.es/ISS/emblem900x900.png",
+    patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
+    type: "Radar SAR",
+    mission: "Copernicus - Observación radar de la Tierra",
+    instruments: [
+      "Radar de apertura sintética (C-band SAR)"
+    ],
+    capabilities: [
+      "Detección de inundaciones",
+      "Deformación del terreno",
+      "Monitoreo de hielo marino",
+      "Operación nocturna y con nubes"
+    ]
+  },
+
+  "39084": {
+    name: "Sentinel-1B",
+    image: "https://3d.staratlas.es/Sentinel-1.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
+    type: "Radar SAR",
+    mission: "Copernicus - Observación radar de la Tierra",
+    instruments: [
+      "Radar de apertura sintética (C-band SAR)"
+    ],
+    capabilities: [
+      "Refuerzo de Sentinel-1A",
+      "Mayor frecuencia de revisita",
+      "Monitoreo continuo global"
+    ]
+  },
+
+  // =========================
+  // 🌱 COPERNICUS - SENTINEL 2
+  // =========================
+
+  "42063": {
+    name: "Sentinel-2B",
+    image: "https://3d.staratlas.es/ISS/emblem900x900.png",
+    patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
+    type: "Óptico multispectral",
+    mission: "Copernicus - Observación óptica de la Tierra",
+    instruments: [
+      "Cámara multiespectral",
+      "13 bandas espectrales"
+    ],
+    capabilities: [
+      "Análisis agrícola",
+      "Vegetación y salud de cultivos",
+      "Urbanismo y crecimiento urbano",
+      "Calidad del agua"
+    ]
+  },
+
+  "29780": {
+    name: "Sentinel-2A",
+    image: "https://3d.staratlas.es/Sentinel-2.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
+    type: "Óptico multispectral",
+    mission: "Copernicus - Observación óptica de la Tierra",
+    instruments: [
+      "Cámara multiespectral",
+      "13 bandas espectrales"
+    ],
+    capabilities: [
+      "Mapeo de vegetación",
+      "Agricultura de precisión",
+      "Monitoreo urbano",
+      "Recursos hídricos"
+    ]
+  },
+
+  // =========================
+  // 🌊 COPERNICUS - OCEANOS
+  // =========================
+
+  "28654": {
+    name: "Sentinel-3A",
+    image: "https://3d.staratlas.es/Sentinel-3.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-3_patch.png",
+    type: "Oceanografía / Clima",
+    mission: "Copernicus - Océanos y clima global",
+    instruments: [
+      "Altímetro radar",
+      "Radiómetro óptico",
+      "Sensor térmico"
+    ],
+    capabilities: [
+      "Temperatura del océano",
+      "Nivel del mar",
+      "Color del océano",
+      "Clima global"
+    ]
+  },
+
+  // =========================
+  // 🌫️ COPERNICUS - ATMOSFERA
+  // =========================
+
+  "43618": {
+    name: "Sentinel-5P",
+    image: "https://3d.staratlas.es/Sentinel-5P.jpg",
+    patch: "https://3d.staratlas.es/Sentinel-5P_patch.png",
+    type: "Monitoreo atmosférico",
+    mission: "Copernicus - Calidad del aire",
+    instruments: [
+      "Espectrómetro TROPOMI"
+    ],
+    capabilities: [
+      "CO2 y NO2 global",
+      "Calidad del aire",
+      "Contaminación urbana",
+      "Ozono atmosférico"
+    ]
+  },
+
+  // =========================
+  // 🌦️ NOAA (NO COPERNICUS PERO LO MANTENEMOS)
+  // =========================
+
+  "25338": {
+    name: "NOAA-15",
+    image: "https://3d.staratlas.es/NOAA_logo.svg.png",
+    patch: "https://3d.staratlas.es/NOAA_logo.svg.png",
+    type: "Meteorológico",
+    mission: "Clima global y predicción meteorológica",
+    instruments: [
+      "Radiómetro AVHRR",
+      "Sensores atmosféricos",
+      "Sondas meteorológicas"
+    ],
+    capabilities: [
+      "Predicción del tiempo",
+      "Seguimiento de tormentas",
+      "Temperatura global",
+      "Cobertura de nubes"
+    ]
+  },
+  "38552": {
+  name: "Meteosat-10",
+  image: "https://3d.staratlas.es/Meteosat.jpg",
+  patch: "https://3d.staratlas.es/Meteosat_patch.png",
+  type: "Meteorológico geoestacionario",
+  mission: "EUMETSAT - Observación meteorológica Europa",
+  instruments: [
+    "Imager multiespectral",
+    "Sensores infrarrojos",
+    "Canales visibles y térmicos"
+  ],
+  capabilities: [
+    "Seguimiento de tormentas",
+    "Nubes en tiempo real",
+    "Temperatura atmosférica",
+    "Fenómenos extremos (huracanes, borrascas)"
+  ]
+}
+};
+
+
+
+const MISSIONS = {
+  copernicus: {
+    label: "Copernicus",
+    satellites: ["39634","42063","29780","43618","28654"],
+    description: "Sistema europeo de observación terrestre en tiempo real para monitorizar cambios ambientales, superficie y océanos.",
+
+    objectives: [
+      "Monitorizar el estado del planeta Tierra de forma continua y global",
+      "Detectar cambios en ecosistemas, océanos, hielo y superficie terrestre",
+      "Apoyar la toma de decisiones en crisis climáticas y desastres naturales",
+      "Generar datos abiertos para investigación científica y políticas públicas"
+    ],
+
+    satelliteObjectives: [
+      "Captura multiespectral de alta resolución de la superficie terrestre",
+      "Seguimiento de cambios en vegetación, agua y uso del suelo",
+      "Detección de eventos extremos como incendios o inundaciones",
+      "Construcción de series temporales para análisis climático"
+    ],
+
+    icon: "https://3d.staratlas.es/ISS/1366_521.jpg"
+  },
+
+  meteorology: {
+    label: "Meteorología",
+    satellites: ["25338","38552"],
+    description: "Red orbital dedicada a la observación atmosférica y la predicción de fenómenos meteorológicos globales.",
+
+    objectives: [
+      "Mejorar la predicción meteorológica a corto y medio plazo",
+      "Monitorizar la dinámica atmosférica global en tiempo real",
+      "Detectar fenómenos extremos como tormentas, huracanes y frentes",
+      "Reducir el impacto de desastres meteorológicos en la población"
+    ],
+
+    satelliteObjectives: [
+      "Observación continua de nubes, humedad y temperatura atmosférica",
+      "Seguimiento de sistemas de tormentas en evolución",
+      "Captura de datos para modelos numéricos de predicción",
+      "Apoyo a sistemas de alerta temprana"
+    ],
+
+    icon: "https://3d.staratlas.es/ISS/1366_521.jpg"
+  },
+
+  human: {
+    label: "Human Spaceflight",
+    satellites: ["25544"],
+    description: "Seguimiento de actividad humana en órbita y operaciones tripuladas en la Estación Espacial Internacional.",
+
+    objectives: [
+      "Mantener la presencia humana segura y continua en órbita terrestre",
+      "Apoyar misiones científicas en microgravedad",
+      "Coordinar operaciones internacionales en la Estación Espacial Internacional",
+      "Servir como plataforma de investigación para futuras misiones profundas"
+    ],
+
+    satelliteObjectives: [
+      "Monitoreo de la órbita y trayectoria de la ISS",
+      "Soporte a comunicaciones y navegación tripulada",
+      "Seguimiento de actividad científica a bordo",
+      "Control de seguridad orbital y prevención de colisiones"
+    ],
+
+    icon: "https://3d.staratlas.es/ISS/1366_521.jpg"
+  }
+};
+
+  
+
+function getContextInsight(satId, maxElev) {
+
+  const info = SAT_INFO[satId];
+
+  let insights = [];
+
+  // =========================
+  // BASE INFO
+  // =========================
+  if (info) {
+    insights.push({ title: "MISIÓN", items: [info.mission] });
+    insights.push({ title: "TIPO", items: [info.type] });
+    insights.push({ title: "INSTRUMENTOS", items: info.instruments });
+    insights.push({ title: "CAPACIDADES", items: info.capabilities });
+  }
+
+  // =========================
+  // 🌍 CITY / EARTH USE LAYER
+  // =========================
+  let cityUse = [];
+
+  // =========================
+  // 🛰 SENTINEL-1 (RADAR)
+  // =========================
+  if (satId === "39634" || satId === "39084") {
+    cityUse = [
+      "Inundaciones",
+      "Deformación del terreno",
+      "Hielo marino",
+      "Infraestructura crítica"
+    ];
+  }
+
+  // =========================
+  // 🌱 SENTINEL-2 (ÓPTICO)
+  // =========================
+  if (satId === "42063" || satId === "29780") {
+    cityUse = [
+      "Agricultura de precisión",
+      "Vegetación y salud de cultivos",
+      "Uso del suelo",
+      "Urbanismo",
+      "Recursos hídricos"
+    ];
+  }
+
+  // =========================
+  // 🌊 SENTINEL-3 (OCÉANOS)
+  // =========================
+  if (satId === "28654") {
+    cityUse = [
+      "Temperatura del océano",
+      "Nivel del mar",
+      "Color del agua",
+      "Clima global"
+    ];
+  }
+
+  // =========================
+  // 🌫 SENTINEL-5P (ATMÓSFERA)
+  // =========================
+  if (satId === "43618") {
+    cityUse = [
+      "Calidad del aire",
+      "Contaminación urbana",
+      "Ozono atmosférico",
+      "Emisiones industriales"
+    ];
+  }
+
+  // =========================
+  // 🧑‍🚀 ISS
+  // =========================
+  if (satId === "25544") {
+    cityUse = [
+      "Observación orbital",
+      "Investigación científica",
+      "Experimentos en microgravedad"
+    ];
+  }
+
+  // =========================
+  // 🌦 NOAA (USA METEO POLAR)
+  // =========================
+  if (satId === "25338") {
+    cityUse = [
+      "Predicción del tiempo",
+      "Tormentas",
+      "Nubosidad",
+      "Temperatura global"
+    ];
+  }
+
+  // =========================
+  // 🌍 METEOSAT (EU GEO STATIONARY)
+  // =========================
+  if (satId === "38552") {
+    cityUse = [
+      "Tormentas en tiempo real",
+      "Seguimiento de borrascas",
+      "Nubes sobre Europa y África",
+      "Fenómenos extremos (huracanes, DANA)"
+    ];
+  }
+
+  // =========================
+  // 🌍 METOP (EU / NOAA COOPERATION)
+  // =========================
+  if (satId === "38771" || satId === "37849" || satId === "29499") {
+    cityUse = [
+      "Temperatura atmosférica",
+      "Humedad global",
+      "Predicción meteorológica avanzada",
+      "Monitoreo climático europeo"
+    ];
+  }
+
+  // =========================
+  // FINAL PUSH
+  // =========================
+  insights.push({
+    title: "USO",
+    items: cityUse
+  });
+
+  // =========================
+  // 📊 QUALITY SYSTEM
+  // =========================
+  if (maxElev > 70) {
+    insights.push({ title: "CALIDAD", items: ["MUY ALTA 🔥"] });
+  } else if (maxElev > 45) {
+    insights.push({ title: "CALIDAD", items: ["MEDIA 🟡"] });
+  } else {
+    insights.push({ title: "CALIDAD", items: ["BAJA 🟠"] });
+  }
+
+  return insights;
+}
+  
+function renderSatPatch(catnr) {
+
+  const el = document.getElementById("satPatch");
+  const info = SAT_INFO[catnr];
+
+  if (!el || !info) return;
+
+  if (info.patch) {
+    el.innerHTML = `<img src="${info.patch}">`;
+  } else {
+    el.innerHTML = "🛰";
+  }
+}
+
+  // =========================
+// infopanel
+// =========================
+
+ function renderSatInfoPanel(catnr, maxElev) {
+
+  const panel = document.getElementById("satInfoPanel");
+  const info = SAT_INFO[catnr];
+  if (!panel || !info) return;
+
+  const insights = getContextInsight(catnr, maxElev);
+
+  panel.innerHTML = `
+    
+    <div id="satHeader">
+      <img src="${info.image || ''}">
+    </div>
+
+    <div class="satPanelTitle">🛰 ${info.name}</div>
+
+    ${insights.map(block => `
+      <div class="satBlock">
+        <div class="satBlockTitle">${block.title}</div>
+        ${block.items.map(i => `
+          <div class="satItem">• ${i}</div>
+        `).join("")}
+      </div>
+    `).join("")}
+
+  `;
+}
+
+// =========================
+// PASSES
+// =========================
+function getPasses(satrec, startDate, hours = 168) {
+
+  const observerGd = getObserver();
+
+const step = 10; // ultra precisión (más coste CPU)
+  const passes = [];
+
+  let current = null;
+
+  for (let t = 0; t <= hours * 3600; t += step) {
+
+    const date = new Date(startDate.getTime() + t * 1000);
+
+    const pv = satellite.propagate(satrec, date);
+    if (!pv.position) continue;
+
+    const gmst = satellite.gstime(date);
+    const ecf = satellite.eciToEcf(pv.position, gmst);
+
+    const look = satellite.ecfToLookAngles(observerGd, ecf);
+    const elev = look.elevation * 180 / Math.PI;
+
+    const visible = elev > 0;
+
+    // =========================
+    // INICIO PASO
+    // =========================
+    if (visible && !current) {
+      current = {
+        start: date,
+        maxElev: elev,
+        maxDate: date,
+        duration: 0
+      };
+    }
+
+    // =========================
+    // DURANTE PASO
+    // =========================
+    if (current) {
+
+      current.duration += step;
+
+      if (elev > current.maxElev) {
+        current.maxElev = elev;
+        current.maxDate = date;
+      }
+
+      // =========================
+      // FIN PASO
+      // =========================
+      if (!visible) {
+
+        // 🔍 refinamiento inicio
+        const refinedStart = refineBoundary(satrec, current.start, -1);
+
+        // 🔍 refinamiento fin
+        const refinedEnd = refineBoundary(satrec, date, 1);
+
+        // 🔍 refinamiento máximo
+        const refinedMax = refineMaximum(satrec, current.maxDate);
+        
+const duration = Math.max(
+  0,
+  (refinedEnd.getTime() - refinedStart.getTime()) / 60000
+);
+
+       passes.push({
+  start: refinedStart,
+  end: refinedEnd,
+  maxElev: refinedMax.elevation,
+  duration,
+  score: scorePass(refinedMax.elevation, duration),
+  class: getClass(refinedMax.elevation),
+  city: window.currentCityName,
+  lat: window.lat,
+  lon: window.lon
+});
+        current = null;
+      }
+    }
+  }
+
+  return passes;
+}
+
+
+  function refineMaximum(satrec, approxTime) {
+  let bestElev = -999;
+  let bestDate = approxTime;
+
+  for (let dt = -30; dt <= 30; dt += 1) {
+    const date = new Date(approxTime.getTime() + dt * 1000);
+    const elev = getElevation(satrec, date);
+
+    if (elev !== null && elev > bestElev) {
+      bestElev = elev;
+      bestDate = date;
+    }
+  }
+
+  return { date: bestDate, elevation: bestElev };
+}
+
+function refineBoundary(satrec, approxTime, direction) {
+  let best = approxTime;
+
+  for (let dt = -30; dt <= 30; dt += 1) {
+    const t = direction > 0 ? dt : -dt;
+
+    const date = new Date(approxTime.getTime() + t * 1000);
+    const elev = getElevation(satrec, date);
+
+    if (elev !== null && elev > 0) {
+      best = date;
+    }
+  }
+
+  return best;
+}
+
+
+  function getElevation(satrec, date) {
+  const pv = satellite.propagate(satrec, date);
+  if (!pv.position) return null;
+
+  const gmst = satellite.gstime(date);
+  const ecf = satellite.eciToEcf(pv.position, gmst);
+
+  const observer = getObserver();
+  const look = satellite.ecfToLookAngles(observer, ecf);
+
+  return look.elevation * 180 / Math.PI;
+}
+
+  
+
+// =========================
+// STATE
+// =========================
+const SATS = {
+  "25544": "ISS",
+  "39634": "Sentinel-1A",
+  "39084": "Sentinel-1B",
+  "42063": "Sentinel-2B",
+  "29780": "Sentinel-2A",
+  "43618": "Sentinel-5P",
+  "28654": "Sentinel-3A",
+  "25338": "NOAA-15",
+  "38552": "Meteosat-10"
+};
+
+window.currentCATNR = "25544";
+window.lat = 40.4168;
+window.lon = -3.7038;
+
+// =========================
+// CITY
+// =========================
+function changeCity() {
+
+  const val = document.getElementById("citySelect").value;
+
+  const latInput = document.getElementById("lat");
+  const lonInput = document.getElementById("lon");
+
+  // =========================
+  // CUSTOM MODE
+  // =========================
+  if (val === "custom") {
+    latInput.style.display = "inline-block";
+    lonInput.style.display = "inline-block";
+    return;
+  }
+
+  // =========================
+  // NORMAL MODE
+  // =========================
+  latInput.style.display = "none";
+  lonInput.style.display = "none";
+
+  const [lat, lon] = val.split(",");
+  window.lat = parseFloat(lat);
+  window.lon = parseFloat(lon);
+
+  window.currentCityName =
+    document.getElementById("citySelect")
+      .options[document.getElementById("citySelect").selectedIndex]
+      .text;
+}
+// =========================
+// SAT
+// =========================
+function changeSatellite() {
+  loadSatellite(document.getElementById("satSelect").value);
+}
+
+async function loadSatellite(catnr) {
+
+  const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${catnr}&FORMAT=TLE`;
+
+  const res = await fetch(url);
+  const text = await res.text();
+
+  const lines = text.trim().split("\n");
+  const satrec = satellite.twoline2satrec(lines[1], lines[2]);
+
+  window.latestSatrec = satrec;
+  window.currentCATNR = catnr;
+
+  renderSatPatch(catnr);
+
+  run();
+}
+
+// =========================
+// RUN
+// =========================
+async function run() {
+
+  // =========================
+  // 📍 APLICAR COORDENADAS CUSTOM SI APLICA
+  // =========================
+  applyCoordsIfCustom();
+
+  const best = document.getElementById("best");
+  const ranking = document.getElementById("ranking");
+  const out = document.getElementById("out");
+
+  if (!window.latestSatrec) return;
+
+  // =========================
+  // 🛰 CÁLCULO DE PASADAS
+  // =========================
+  const passes = getPasses(window.latestSatrec, new Date(), 168);
+
+  passes.sort((a, b) => b.score - a.score);
+
+  const top = passes[0];
+
+  // =========================
+  // 🧠 PANEL INFO SIEMPRE ACTUALIZADO
+  // =========================
+  renderSatInfoPanel(
+    window.currentCATNR,
+    top ? top.maxElev : 0
+  );
+
+  renderMissionNav();
+  renderMissionPanel();
+
+  // =========================
+  // 🛰 SIN PASOS VISIBLES
+  // =========================
+  if (!passes.length || !top || top.maxElev < 5) {
+
+    best.innerHTML = `
+      🔴 SIN PASOS VISIBLES<br>
+      Satélite: <b>${SATS[window.currentCATNR]}</b><br>
+      <br>
+      <i>El satélite no cruza este punto en el periodo analizado</i>
+    `;
+
+    ranking.innerHTML = "";
+    out.innerText = "";
+
+    return;
+  }
+
+  // =========================
+  // 🟢 MEJOR PASO
+  // =========================
+best.innerHTML = `
+  🟢 MEJOR PASO<br>
+  por CIUDAD: <b>${window.currentCityName || "Desconocida"}</b><br>
+  LAT: <b>${window.lat.toFixed(4)}</b> | LON: <b>${window.lon.toFixed(4)}</b><br>
+  <br>
+  Satélite: <b>${SATS[window.currentCATNR]}</b><br>
+  Elevación: <b>${top.maxElev.toFixed(1)}°</b><br>
+  Score: <b>${Math.round(top.score)}</b><br>
+  Inicio: ${top.start}<br>
+`;
+
+  // =========================
+  // 🏆 TOP 5
+  // =========================
+  ranking.innerHTML = "<b>🏆 TOP 5 PASOS</b>";
+
+  passes.slice(0, 5).forEach((p, i) => {
+  ranking.innerHTML += `
+  <div class="rankCard">
+    #${i+1} ${p.class}<br>
+    🛰 ${SATS[window.currentCATNR]}<br>
+    📍 ${window.currentCityName}<br>
+    LAT ${window.lat.toFixed(2)} | LON ${window.lon.toFixed(2)}<br>
+    Elev: ${p.maxElev.toFixed(1)}°<br>
+    Score: ${Math.round(p.score)}<br>
+  </div>
+`;
+  });
+
+  // =========================
+  // 📄 OUTPUT DETALLADO
+  // =========================
+  out.innerText = passes.map((p, i) => `
+PASS ${i + 1} ${p.class}
+──────────────────
+Inicio: ${p.start}
+Fin: ${p.end}
+Elev max: ${p.maxElev.toFixed(1)}°
+Duración: ${p.duration.toFixed(1)} min
+Score: ${Math.round(p.score)}
+`).join("\n");
+}
+
+
+
+  function applyCoordsIfCustom() {
+  const val = document.getElementById("citySelect").value;
+
+  if (val !== "custom") return;
+
+  const lat = parseFloat(document.getElementById("lat").value);
+  const lon = parseFloat(document.getElementById("lon").value);
+
+  if (!isNaN(lat) && !isNaN(lon)) {
+    window.lat = lat;
+    window.lon = lon;
+    window.currentCityName = "Custom";
+  }
+}
+
+  
+function renderMissionNav() {
+  const nav = document.getElementById("missionNav");
+
+  nav.innerHTML = Object.entries(MISSIONS).map(([id, m]) => `
+    <div class="missionSlot ${window.currentMission === id ? "active" : ""}"
+         title="${m.label}"
+         onclick="selectMission('${id}')">
+
+      <img src="${m.icon}">
+
+      <div class="missionMeta">
+        <div class="missionLabel">${m.label}</div>
+      </div>
+
+    </div>
+  `).join("");
+}
+
+
+function renderMissionPanel() {
+  const panel = document.getElementById("missionPanel");
+  const id = window.currentMission;
+
+  if (!panel || !id) return;
+
+  const mission = MISSIONS[id];
+  if (!mission) return;
+
+  panel.innerHTML = `
+    <button class="missionCloseBtn" onclick="closeMissionPanel()">
+      ✕
+    </button>
+
+    <div class="missionTitle">
+      🧭 ${mission.label}
+    </div>
+
+    <div class="missionDesc">
+      ${mission.description}
+    </div>
+
+    <div class="missionSatCount">
+      🛰 ${mission.satellites.length} satélites activos
+    </div>
+
+    <div class="missionObjectives">
+      <div class="sectionTitle">🎯 Objetivo de la misión</div>
+      <ul>
+        ${mission.objectives.map(o => `<li>${o}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="missionSatelliteObjectives">
+      <div class="sectionTitle">📡 Función del conjunto orbital</div>
+      <ul>
+        ${mission.satelliteObjectives.map(o => `<li>${o}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
+
+ function closeMissionPanel() {
+  const panel = document.getElementById("missionPanel");
+
+  panel.style.display = "none";
+  window.currentMission = null;
+
+  renderMissionNav(); // para quitar highlight activo
+}
+
+
+function openMissionPanel() {
+  const panel = document.getElementById("missionPanel");
+  panel.style.display = "block";
+  renderMissionPanel();
+}
+  
+  
+function selectMission(id) {
+  window.currentMission = id;
+
+  renderMissionNav();
+  openMissionPanel();
+
+  loadSatellite(MISSIONS[id].satellites[0]);
+}
+  
+</script>
+
+</body>
+</html>
