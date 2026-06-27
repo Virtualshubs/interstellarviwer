@@ -755,7 +755,7 @@ const atmosphereInner = new THREE.Mesh(
     blending: THREE.AdditiveBlending,
     depthWrite: false
   })
-);
+);  scene.add(atmosphereInner);
 
 const atmosphereOuter = new THREE.Mesh(
   new THREE.SphereGeometry(106, 64, 64),
@@ -768,7 +768,7 @@ const atmosphereOuter = new THREE.Mesh(
     depthWrite: false
   })
 );
-
+scene.add(atmosphereOuter);
 const atmosphereGlow = new THREE.Mesh(
   new THREE.SphereGeometry(112, 64, 64),
   new THREE.MeshBasicMaterial({
@@ -780,7 +780,8 @@ const atmosphereGlow = new THREE.Mesh(
     depthWrite: false
   })
 );
-  
+
+scene.add(atmosphereGlow);
   // =========================
   // 🛰 SAT
   // =========================
