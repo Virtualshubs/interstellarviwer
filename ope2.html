@@ -745,6 +745,10 @@ earth = new THREE.Mesh(
 
 scene.add(earth);
 
+
+  const AXIAL_TILT = THREE.MathUtils.degToRad(23.44);
+earth.rotation.x = AXIAL_TILT;
+
 const atmosphereInner = new THREE.Mesh(
   new THREE.SphereGeometry(103, 64, 64),
   new THREE.MeshBasicMaterial({
@@ -871,7 +875,6 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
-
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -889,16 +892,28 @@ function onGlobeClick(event) {
   // =========================
   const point = intersects[0].point.clone().normalize();
 
-  // =========================
-  // 🧭 DESHACER ROTACIÓN DE LA TIERRA (GMST)
-  // =========================
-  const gmst = satellite.gstime(new Date());
-  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
-
-  point.applyMatrix4(invRotation);
+  const now = new Date();
+  const gmst = satellite.gstime(now);
 
   // =========================
-  // 🌍 LAT / LON REAL (sistema fijo)
+  // 🧭 DESHACER ROTACIÓN DIARIA (GMST)
+  // =========================
+  const invY = new THREE.Matrix4().makeRotationY(gmst);
+
+  // =========================
+  // 🌍 DESHACER INCLINACIÓN AXIAL
+  // =========================
+  const AXIAL_TILT = THREE.MathUtils.degToRad(23.44);
+  const invTilt = new THREE.Matrix4().makeRotationX(-AXIAL_TILT);
+
+  // =========================
+  // 🔁 APLICAR TRANSFORMACIONES INVERSAS
+  // =========================
+  point.applyMatrix4(invY);
+  point.applyMatrix4(invTilt);
+
+  // =========================
+  // 🌍 LAT / LON REAL (sistema limpio)
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
 
@@ -908,11 +923,10 @@ function onGlobeClick(event) {
   // 🧭 ajuste SOLO visual de textura
   // =========================
   lon = -lon;
-
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 guardar estado
+  // 📍 guardar estado global
   // =========================
   window.lat = lat;
   window.lon = lon;
