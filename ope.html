@@ -1014,10 +1014,11 @@ if (typeof satellite !== "undefined") {
       scene.add(window.sunLight);
     }
 
-    window.sunLight.position.copy(
-      sunDir.multiplyScalar(1000)
-    );
-
+window.sunLight.position.set(
+    sunDir.z * 1000,
+    sunDir.y * 1000,
+   -sunDir.x * 1000
+);
     window.sunLight.target.position.set(0, 0, 0);
     window.sunLight.target.updateMatrixWorld();
   }
