@@ -718,8 +718,13 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   
-window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+window.sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
+
 scene.add(window.sunLight);
+
+// 🔥 FIX CRÍTICO
+window.sunLight.target = new THREE.Object3D();
+scene.add(window.sunLight.target);
 
 // =========================
 // 🌍 EARTH (textura real)
