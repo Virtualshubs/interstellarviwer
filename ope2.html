@@ -872,7 +872,6 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
-
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -882,16 +881,16 @@ function onGlobeClick(event) {
   raycaster.setFromCamera(mouse, camera);
 
   const intersects = raycaster.intersectObject(earth);
-
   if (!intersects.length) return;
 
   // =========================
-  // 🌍 punto en esfera (mundo rotado)
+  // 🌍 punto en mundo (YA incluye rotación visual de la Tierra)
   // =========================
   const point = intersects[0].point.clone().normalize();
 
   // =========================
-  // 🧭 DESHACER ROTACIÓN DE LA TIERRA (GMST)
+  // 🧭 DESHACER SOLO ROTACIÓN DIARIA (GMST)
+  // 👉 IMPORTANTE: NO tocar inclinación axial aquí
   // =========================
   const gmst = satellite.gstime(new Date());
   const invRotation = new THREE.Matrix4().makeRotationY(gmst);
@@ -899,18 +898,19 @@ function onGlobeClick(event) {
   point.applyMatrix4(invRotation);
 
   // =========================
-  // 🌍 LAT / LON REAL (sistema fijo)
+  // 🌍 LAT / LON CORRECTO (frame terrestre fijo)
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
 
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-  // =========================
-  // 🧭 ajuste SOLO visual de textura
-  // =========================
-  lon = -lon;
-
+  // normalización estándar
   lon = ((lon + 180) % 360) - 180;
+
+  // ⚠️ IMPORTANTE:
+  // este flip era solo “visual hack” en versiones anteriores
+  // ahora lo eliminamos para evitar desajuste hemisférico
+  // lon = -lon;
 
   // =========================
   // 📍 guardar estado
