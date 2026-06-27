@@ -875,6 +875,8 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
+
+  
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -892,28 +894,16 @@ function onGlobeClick(event) {
   // =========================
   const point = intersects[0].point.clone().normalize();
 
-  const now = new Date();
-  const gmst = satellite.gstime(now);
+  // =========================
+  // 🧭 DESHACER ROTACIÓN DE LA TIERRA (GMST)
+  // =========================
+  const gmst = satellite.gstime(new Date());
+  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
+
+  point.applyMatrix4(invRotation);
 
   // =========================
-  // 🧭 DESHACER ROTACIÓN DIARIA (GMST)
-  // =========================
-  const invY = new THREE.Matrix4().makeRotationY(gmst);
-
-  // =========================
-  // 🌍 DESHACER INCLINACIÓN AXIAL
-  // =========================
-  const AXIAL_TILT = THREE.MathUtils.degToRad(23.44);
-  const invTilt = new THREE.Matrix4().makeRotationX(-AXIAL_TILT);
-
-  // =========================
-  // 🔁 APLICAR TRANSFORMACIONES INVERSAS
-  // =========================
-  point.applyMatrix4(invY);
-  point.applyMatrix4(invTilt);
-
-  // =========================
-  // 🌍 LAT / LON REAL (sistema limpio)
+  // 🌍 LAT / LON REAL (sistema fijo)
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
 
@@ -923,10 +913,11 @@ function onGlobeClick(event) {
   // 🧭 ajuste SOLO visual de textura
   // =========================
   lon = -lon;
+
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 guardar estado global
+  // 📍 guardar estado
   // =========================
   window.lat = lat;
   window.lon = lon;
@@ -943,6 +934,8 @@ function onGlobeClick(event) {
 
   run();
 }
+
+  
 
 function onWheelZoom(e) {
   const el = e.target;
