@@ -894,24 +894,19 @@ function onGlobeClick(event) {
   // =========================
   // 🧭 COMPENSAR ROTACIÓN TIERRA (GMST)
   // =========================
-  const gmst = satellite.gstime(new Date());
-  const invRotation = new THREE.Matrix4().makeRotationY(gmst);
-  point.applyMatrix4(invRotation);
 
-  point.normalize();
 
-  // =========================
-  // 🌍 LAT / LON
-  // =========================
-  const lat = Math.asin(point.y) * 180 / Math.PI;
 
-  let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
+point.normalize();
 
-  // 🔥 FIX MERIDIANO (ESTE/OESTE INVERTIDO)
-  lon = -lon;
+// 🌍 LAT
+const lat = Math.asin(point.y) * 180 / Math.PI;
 
-  // normalización estándar
-  lon = ((lon + 180) % 360) - 180;
+// 🌍 LON
+let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
+
+// normalización estándar
+lon = ((lon + 180) % 360) - 180;
 
   // =========================
   // 📍 GUARDAR ESTADO
