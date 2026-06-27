@@ -987,37 +987,37 @@ function getSunECI(date) {
   }
 
 // =========================
-// 🌞 SOL (ECI COHERENTE CON SATELLITE.JS)
+// 🌞 SOL SEGURO (NO BREAKING)
 // =========================
 
-// obtener posición del sol en sistema ECI real
-const sunEci = satellite.sunPosition(now);
+if (typeof satellite !== "undefined") {
 
-// convertir a vector THREE
-const sunDir = new THREE.Vector3(
-  sunEci.x,
-  sunEci.y,
-  sunEci.z
-).normalize();
+  const sunECI = satellite.sunPosition
+    ? satellite.sunPosition(now)
+    : null;
 
-// crear luz si no existe
-if (!window.sunLight) {
-  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  if (sunECI) {
 
-  // opcional: mejora contraste día/noche
-  window.sunLight.intensity = 1.6;
+    const sunDir = new THREE.Vector3(
+      sunECI.x,
+      sunECI.y,
+      sunECI.z
+    ).normalize();
 
-  scene.add(window.sunLight);
+    if (!window.sunLight) {
+      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+      scene.add(window.sunLight);
+    }
+
+    window.sunLight.position.copy(
+      sunDir.multiplyScalar(1000)
+    );
+
+    window.sunLight.target.position.set(0, 0, 0);
+    window.sunLight.target.updateMatrixWorld();
+  }
 }
 
-// posicionar luz solar (dirección fija en ECI)
-window.sunLight.position.copy(
-  sunDir.clone().multiplyScalar(1000)
-);
-
-// objetivo siempre al centro de la Tierra
-window.sunLight.target.position.set(0, 0, 0);
-window.sunLight.target.updateMatrixWorld();
   // =========================
   // 🎥 CÁMARA
   // =========================
