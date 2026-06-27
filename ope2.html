@@ -721,10 +721,6 @@ function init() {
 window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
 scene.add(window.sunLight);
 
-  // 🔥 ESTO FALTABA
-window.sunLight.target = new THREE.Object3D();
-scene.add(window.sunLight.target);
-
 // =========================
 // 🌍 EARTH (textura real)
 // =========================
@@ -995,33 +991,30 @@ function getSunECI(date) {
 
 if (typeof satellite !== "undefined") {
 
- const sunEci = satellite.sunPosition(now);
+  const sunECI = satellite.sunPosition
+    ? satellite.sunPosition(now)
+    : null;
 
-if (sunEci) {
+  if (sunECI) {
 
-  const gmst = satellite.gstime(now);
+    const sunDir = new THREE.Vector3(
+      sunECI.x,
+      sunECI.y,
+      sunECI.z
+    ).normalize();
 
-  // 🔥 PASAR SOL A ECF (correcto)
-  const sunEcf = satellite.eciToEcf(sunEci, gmst);
+    if (!window.sunLight) {
+      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+      scene.add(window.sunLight);
+    }
 
-  // 🔥 IMPORTANTE: usar MISMO frame que la Tierra (Three.js)
-  const sunDir = new THREE.Vector3(
-    sunEcf.x,
-    sunEcf.y,
-    sunEcf.z
-  ).normalize();
+    window.sunLight.position.copy(
+      sunDir.multiplyScalar(1000)
+    );
 
-  if (!window.sunLight) {
-    window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-    scene.add(window.sunLight);
+    window.sunLight.target.position.set(0, 0, 0);
+    window.sunLight.target.updateMatrixWorld();
   }
-
-  // 👉 aquí NO hay trucos de escala raros
-  window.sunLight.position.copy(sunDir.clone().multiplyScalar(1000));
-
-  window.sunLight.target.position.set(0, 0, 0);
-  window.sunLight.target.updateMatrixWorld();
-}
 }
 
   // =========================
