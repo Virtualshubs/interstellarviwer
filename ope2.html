@@ -695,6 +695,7 @@ let targetLon = cameraLon;
 let targetLat = cameraLat;
 
   const EARTH_LON_OFFSET = 0;
+  const EARTH_OBLIQUITY = 23.44 * Math.PI / 180;
 window.currentMission = null;
 window.latestSatrec = null;
 
@@ -964,7 +965,7 @@ function getSunECI(date) {
 
 
 
-  function animate() {
+function animate() {
 
   requestAnimationFrame(animate);
 
@@ -975,7 +976,11 @@ function getSunECI(date) {
   // =========================
   if (earth) {
     const gmst = satellite.gstime(now);
-   earth.rotation.y = -gmst + EARTH_LON_OFFSET;
+
+    earth.rotation.y = -gmst + EARTH_LON_OFFSET;
+
+    // 🌍 INCLINACIÓN AXIAL (ESTACIONES)
+    earth.rotation.x = EARTH_OBLIQUITY;
   }
 
   // =========================
@@ -985,37 +990,40 @@ function getSunECI(date) {
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-// =========================
-// 🌞 SOL SEGURO (NO BREAKING)
-// =========================
+  // =========================
+  // 🌞 SOL (FÍSICAMENTE CORRECTO)
+  // =========================
+  if (typeof satellite !== "undefined") {
 
-if (typeof satellite !== "undefined") {
+    const sunECI = satellite.sunPosition
+      ? satellite.sunPosition(now)
+      : null;
 
-  const sunECI = satellite.sunPosition
-    ? satellite.sunPosition(now)
-    : null;
+    if (sunECI) {
 
-  if (sunECI) {
+      // vector solar en espacio inercial
+      const sunDir = new THREE.Vector3(
+        sunECI.x,
+        sunECI.y,
+        sunECI.z
+      ).normalize();
 
-    const sunDir = new THREE.Vector3(
-      sunECI.x,
-      sunECI.y,
-      sunECI.z
-    ).normalize();
+      // 🔥 IMPORTANTE:
+      // NO inclinar el sol aquí (ya está en sistema inercial)
 
-    if (!window.sunLight) {
-      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-      scene.add(window.sunLight);
+      if (!window.sunLight) {
+        window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+        scene.add(window.sunLight);
+      }
+
+      window.sunLight.position.copy(
+        sunDir.clone().multiplyScalar(1000)
+      );
+
+      window.sunLight.target.position.set(0, 0, 0);
+      window.sunLight.target.updateMatrixWorld();
     }
-
-    window.sunLight.position.copy(
-      sunDir.multiplyScalar(1000)
-    );
-
-    window.sunLight.target.position.set(0, 0, 0);
-    window.sunLight.target.updateMatrixWorld();
   }
-}
 
   // =========================
   // 🎥 CÁMARA
