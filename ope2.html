@@ -695,7 +695,6 @@ let targetLon = cameraLon;
 let targetLat = cameraLat;
 
   const EARTH_LON_OFFSET = 0;
-  const EARTH_OBLIQUITY = 23.44 * Math.PI / 180;
 window.currentMission = null;
 window.latestSatrec = null;
 
@@ -872,6 +871,7 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
   animate();
 }
 
+
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -881,16 +881,16 @@ function onGlobeClick(event) {
   raycaster.setFromCamera(mouse, camera);
 
   const intersects = raycaster.intersectObject(earth);
+
   if (!intersects.length) return;
 
   // =========================
-  // 🌍 punto en mundo (YA incluye rotación visual de la Tierra)
+  // 🌍 punto en esfera (mundo rotado)
   // =========================
   const point = intersects[0].point.clone().normalize();
 
   // =========================
-  // 🧭 DESHACER SOLO ROTACIÓN DIARIA (GMST)
-  // 👉 IMPORTANTE: NO tocar inclinación axial aquí
+  // 🧭 DESHACER ROTACIÓN DE LA TIERRA (GMST)
   // =========================
   const gmst = satellite.gstime(new Date());
   const invRotation = new THREE.Matrix4().makeRotationY(gmst);
@@ -898,19 +898,18 @@ function onGlobeClick(event) {
   point.applyMatrix4(invRotation);
 
   // =========================
-  // 🌍 LAT / LON CORRECTO (frame terrestre fijo)
+  // 🌍 LAT / LON REAL (sistema fijo)
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
 
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-  // normalización estándar
-  lon = ((lon + 180) % 360) - 180;
+  // =========================
+  // 🧭 ajuste SOLO visual de textura
+  // =========================
+  lon = -lon;
 
-  // ⚠️ IMPORTANTE:
-  // este flip era solo “visual hack” en versiones anteriores
-  // ahora lo eliminamos para evitar desajuste hemisférico
-  // lon = -lon;
+  lon = ((lon + 180) % 360) - 180;
 
   // =========================
   // 📍 guardar estado
@@ -965,7 +964,7 @@ function getSunECI(date) {
 
 
 
-function animate() {
+  function animate() {
 
   requestAnimationFrame(animate);
 
@@ -976,11 +975,7 @@ function animate() {
   // =========================
   if (earth) {
     const gmst = satellite.gstime(now);
-
-    earth.rotation.y = -gmst + EARTH_LON_OFFSET;
-
-    // 🌍 INCLINACIÓN AXIAL (ESTACIONES)
-    earth.rotation.x = EARTH_OBLIQUITY;
+   earth.rotation.y = -gmst + EARTH_LON_OFFSET;
   }
 
   // =========================
@@ -990,40 +985,37 @@ function animate() {
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-  // =========================
-  // 🌞 SOL (FÍSICAMENTE CORRECTO)
-  // =========================
-  if (typeof satellite !== "undefined") {
+// =========================
+// 🌞 SOL SEGURO (NO BREAKING)
+// =========================
 
-    const sunECI = satellite.sunPosition
-      ? satellite.sunPosition(now)
-      : null;
+if (typeof satellite !== "undefined") {
 
-    if (sunECI) {
+  const sunECI = satellite.sunPosition
+    ? satellite.sunPosition(now)
+    : null;
 
-      // vector solar en espacio inercial
-      const sunDir = new THREE.Vector3(
-        sunECI.x,
-        sunECI.y,
-        sunECI.z
-      ).normalize();
+  if (sunECI) {
 
-      // 🔥 IMPORTANTE:
-      // NO inclinar el sol aquí (ya está en sistema inercial)
+    const sunDir = new THREE.Vector3(
+      sunECI.x,
+      sunECI.y,
+      sunECI.z
+    ).normalize();
 
-      if (!window.sunLight) {
-        window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-        scene.add(window.sunLight);
-      }
-
-      window.sunLight.position.copy(
-        sunDir.clone().multiplyScalar(1000)
-      );
-
-      window.sunLight.target.position.set(0, 0, 0);
-      window.sunLight.target.updateMatrixWorld();
+    if (!window.sunLight) {
+      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+      scene.add(window.sunLight);
     }
+
+    window.sunLight.position.copy(
+      sunDir.multiplyScalar(1000)
+    );
+
+    window.sunLight.target.position.set(0, 0, 0);
+    window.sunLight.target.updateMatrixWorld();
   }
+}
 
   // =========================
   // 🎥 CÁMARA
