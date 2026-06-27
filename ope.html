@@ -718,11 +718,8 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   
-window.sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
+window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
 scene.add(window.sunLight);
-
-window.sunLight.target = new THREE.Object3D();
-scene.add(window.sunLight.target);
 
 // =========================
 // 🌍 EARTH (textura real)
@@ -783,9 +780,6 @@ const atmosphereGlow = new THREE.Mesh(
     depthWrite: false
   })
 );
-  scene.add(atmosphereInner);
-scene.add(atmosphereOuter);
-scene.add(atmosphereGlow);
   
   // =========================
   // 🛰 SAT
@@ -953,27 +947,22 @@ function onWheelZoom(e) {
   
 
 
+function getSunECI(date) {
+  const pos = SunCalc.getPosition(date, 0, 0);
 
-function updateSunLight(now) {
-
-  const sunEci = satellite.sunPosition(now);
-  const gmst = satellite.gstime(now);
-  const sunEcf = satellite.eciToEcf(sunEci, gmst);
-
-  const sunDir = new THREE.Vector3(
-    sunEcf.x,
-    sunEcf.y,
-    sunEcf.z
-  ).normalize();
-
-  window.sunLight.position.copy(
-    sunDir.clone().multiplyScalar(1000)
+  const local = new THREE.Vector3(
+    Math.cos(pos.altitude) * Math.cos(pos.azimuth),
+    Math.sin(pos.altitude),
+    Math.cos(pos.altitude) * Math.sin(pos.azimuth)
   );
 
-  window.sunLight.target.position.set(0, 0, 0);
-  window.sunLight.target.updateMatrixWorld();
+  const gmst = satellite.gstime(date);
+  const rot = new THREE.Matrix4().makeRotationY(-gmst);
+
+  return local.applyMatrix4(rot).normalize();
 }
-  
+
+
 
 
   function animate() {
@@ -998,37 +987,35 @@ function updateSunLight(now) {
   }
 
 // =========================
-// 🌞 SOL CORRECTO (ECI → ECF)
+// 🌞 SOL SEGURO (NO BREAKING)
 // =========================
 
 if (typeof satellite !== "undefined") {
 
-  const sunEci = satellite.sunPosition(now);
+  const sunECI = satellite.sunPosition
+    ? satellite.sunPosition(now)
+    : null;
 
-  const gmst = satellite.gstime(now);
-  const sunEcf = satellite.eciToEcf(sunEci, gmst);
+  if (sunECI) {
 
-  const sunDir = new THREE.Vector3(
-    sunEcf.x,
-    sunEcf.y,
-    sunEcf.z
-  ).normalize();
+    const sunDir = new THREE.Vector3(
+      sunECI.x,
+      sunECI.y,
+      sunECI.z
+    ).normalize();
 
-  if (!window.sunLight) {
-    window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-    scene.add(window.sunLight);
+    if (!window.sunLight) {
+      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+      scene.add(window.sunLight);
+    }
 
-    window.sunLight.target = new THREE.Object3D();
-    scene.add(window.sunLight.target);
+    window.sunLight.position.copy(
+      sunDir.multiplyScalar(1000)
+    );
+
+    window.sunLight.target.position.set(0, 0, 0);
+    window.sunLight.target.updateMatrixWorld();
   }
-
-  window.sunLight.position.copy(
-    sunDir.clone().multiplyScalar(1000)
-  );
-
-  
-  window.sunLight.target.position.set(0, 0, 0);
-  window.sunLight.target.updateMatrixWorld();
 }
 
   // =========================
@@ -1048,10 +1035,10 @@ if (typeof satellite !== "undefined") {
 
   camera.lookAt(0, 0, 0);
 
-updateSunLight(now);
-updateSatellitePosition(...);
-earth.rotation.y = -gmst;
-renderer.render(scene, camera);
+  // =========================
+  // 🎬 RENDER
+  // =========================
+  renderer.render(scene, camera);
 }
   
 
