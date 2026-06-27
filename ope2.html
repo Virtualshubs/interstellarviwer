@@ -694,8 +694,7 @@ let cameraLat = 20;
 let targetLon = cameraLon;
 let targetLat = cameraLat;
 
-  const EARTH_OFFSET = 0;
-  
+  const EARTH_LON_OFFSET = 0;
 window.currentMission = null;
 window.latestSatrec = null;
 
@@ -887,28 +886,26 @@ function onGlobeClick(event) {
 
   if (!intersects.length) return;
 
-  // =========================
-  // 🔥 punto de intersección
-  // =========================
-  let point = intersects[0].point.clone();
-
-// =========================
-// 🧭 COMPENSAR ROTACIÓN TIERRA (GMST)
-// =========================
-let point = intersects[0].point.clone();
-
+ let point = intersects[0].point.clone();
 point.normalize();
 
-const lat = Math.asin(point.y) * 180 / Math.PI;
-
+// =========================
+// 🌍 LAT / LON (SISTEMA FÍSICO)
+// =========================
+let lat = Math.asin(point.y) * 180 / Math.PI;
 let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-// solo ajuste visual
+// =========================
+// 🧭 AJUSTE SOLO DE MAPA (VISUAL)
+// =========================
+// invierte textura si tu mapa está en espejo
 lon = -lon;
+
+// offset fijo de calibración del mapa (NO física)
+lon = lon + EARTH_LON_OFFSET;
+
+// normalización
 lon = ((lon + 180) % 360) - 180;
-
-point.normalize();
-
 // =========================
 // 🌍 LAT / LON
 // =========================
@@ -986,7 +983,7 @@ function getSunECI(date) {
   // =========================
   if (earth) {
     const gmst = satellite.gstime(now);
-earth.rotation.y = -gmst + EARTH_OFFSET;
+   earth.rotation.y = -gmst + EARTH_LON_OFFSET;
   }
 
   // =========================
@@ -996,30 +993,37 @@ earth.rotation.y = -gmst + EARTH_OFFSET;
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-const sunEci = satellite.sunPosition(now);
-const gmst = satellite.gstime(now);
-const sunEcf = satellite.eciToEcf(sunEci, gmst);
+// =========================
+// 🌞 SOL SEGURO (NO BREAKING)
+// =========================
 
-const sunDir = new THREE.Vector3(
-  sunEcf.x,
-  sunEcf.y,
-  sunEcf.z
-).normalize();
+if (typeof satellite !== "undefined") {
 
-if (!window.sunLight) {
-  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-  scene.add(window.sunLight);
+  const sunECI = satellite.sunPosition
+    ? satellite.sunPosition(now)
+    : null;
 
-  window.sunLight.target = new THREE.Object3D();
-  scene.add(window.sunLight.target);
+  if (sunECI) {
+
+    const sunDir = new THREE.Vector3(
+      sunECI.x,
+      sunECI.y,
+      sunECI.z
+    ).normalize();
+
+    if (!window.sunLight) {
+      window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+      scene.add(window.sunLight);
+    }
+
+    window.sunLight.position.copy(
+      sunDir.multiplyScalar(1000)
+    );
+
+    window.sunLight.target.position.set(0, 0, 0);
+    window.sunLight.target.updateMatrixWorld();
+  }
 }
-
-window.sunLight.position.copy(
-  sunDir.clone().multiplyScalar(1000)
-);
-
-window.sunLight.target.position.set(0, 0, 0);
-window.sunLight.target.updateMatrixWorld();
 
   // =========================
   // 🎥 CÁMARA
