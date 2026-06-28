@@ -765,20 +765,78 @@ function init() {
 
   scene.add(earth);
 
-  // =========================
-// 🧭 EJE NORTE-SUR DEBUG
+ // =========================
+// 🧭 DEBUG GEO AXIS (NORTE-SUR)
 // =========================
 
 const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
 
 const axisGeometry = new THREE.BufferGeometry().setFromPoints([
-  new THREE.Vector3(0, -120, 0), // Sur
-  new THREE.Vector3(0, 120, 0)   // Norte
+  new THREE.Vector3(0, -100, 0), // Sur
+  new THREE.Vector3(0,  100, 0)  // Norte
 ]);
 
 const axisLine = new THREE.Line(axisGeometry, axisMaterial);
-
 earth.add(axisLine);
+
+
+// =========================
+// 🌍 MERIDIANOS DEBUG
+// =========================
+
+function createMeridian(lonDeg, color = 0x00ffcc) {
+  const points = [];
+
+  const lon = THREE.MathUtils.degToRad(lonDeg);
+  const R = 100;
+
+  for (let lat = -90; lat <= 90; lat += 2) {
+    const phi = THREE.MathUtils.degToRad(lat);
+
+    const x = Math.cos(phi) * Math.cos(lon);
+    const y = Math.sin(phi);
+    const z = Math.cos(phi) * Math.sin(lon);
+
+    points.push(new THREE.Vector3(x * R, y * R, z * R));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({ color });
+
+  return new THREE.Line(geometry, material);
+}
+
+// meridianos clave
+const meridians = [0, 90, 180, -90];
+
+meridians.forEach(lon => {
+  earth.add(createMeridian(lon));
+});
+
+
+// =========================
+// 🌍 ECUADOR DEBUG
+// =========================
+
+const eqPoints = [];
+const R = 100;
+
+for (let lon = 0; lon <= 360; lon += 2) {
+  const lambda = THREE.MathUtils.degToRad(lon);
+
+  const x = Math.cos(lambda);
+  const y = 0;
+  const z = Math.sin(lambda);
+
+  eqPoints.push(new THREE.Vector3(x * R, y * R, z * R));
+}
+
+const eqGeometry = new THREE.BufferGeometry().setFromPoints(eqPoints);
+const eqMaterial = new THREE.LineBasicMaterial({ color: 0xffaa00 });
+
+const equator = new THREE.Line(eqGeometry, eqMaterial);
+earth.add(equator);
+  
 
   // =========================
   // 🌫 ATMÓSFERA
