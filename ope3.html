@@ -1011,19 +1011,24 @@ const sunECI = getSunECI(now);
 const gmst = satellite.gstime(now);
 
 const sunECEF = sunECI.clone().applyAxisAngle(
-  new THREE.Vector3(0,1,0),
+  new THREE.Vector3(0, 1, 0),
   -gmst
 );
 
 if (!window.sunLight) {
   window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+
+  // IMPORTANTE: añadir target a la escena
   scene.add(window.sunLight);
+  scene.add(window.sunLight.target);
 }
 
-window.sunLight.position.copy(sunECEF.multiplyScalar(1000));
+// posición de la luz (dirección solar)
+window.sunLight.position.copy(sunECEF.clone().multiplyScalar(1000));
+
+// siempre mirando al centro de la Tierra
 window.sunLight.target.position.set(0, 0, 0);
 window.sunLight.target.updateMatrixWorld();
-
   // =========================
   // 🎥 CÁMARA
   // =========================
