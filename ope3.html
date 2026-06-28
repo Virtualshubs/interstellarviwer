@@ -976,9 +976,7 @@ const south = createLabel("S");
 south.position.set(0, -120, 0);
 earth.add(south);
 
-
-
-  function onGlobeClick(event) {
+function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
 
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -986,7 +984,10 @@ earth.add(south);
 
   raycaster.setFromCamera(mouse, camera);
 
-  const intersects = raycaster.intersectObject(earth);
+  // =========================
+  // 🌍 RAYCAST CORRECTO (grupo con inclinación)
+  // =========================
+  const intersects = raycaster.intersectObject(earthGroup, true);
 
   if (!intersects.length) return;
 
@@ -1001,11 +1002,11 @@ earth.add(south);
 
   const gmst = satellite.gstime(new Date());
 
-  // 1) deshacer inclinación axial (Z)
-  const invTilt = new THREE.Matrix4().makeRotationZ(-EARTH_TILT);
-
-  // 2) deshacer rotación terrestre (Y)
+  // 1) deshacer rotación diaria de la Tierra (Y)
   const invRotation = new THREE.Matrix4().makeRotationY(gmst);
+
+  // 2) deshacer inclinación axial (Z)
+  const invTilt = new THREE.Matrix4().makeRotationZ(-EARTH_TILT);
 
   // ⚠️ orden inverso al aplicado en escena
   point.applyMatrix4(invRotation);
@@ -1025,7 +1026,7 @@ earth.add(south);
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 guardar estado
+  // 📍 guardar estado global
   // =========================
   window.lat = lat;
   window.lon = lon;
@@ -1042,7 +1043,6 @@ earth.add(south);
 
   run();
 }
-  
 
 function onWheelZoom(e) {
   const el = e.target;
