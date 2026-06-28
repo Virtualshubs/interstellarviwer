@@ -841,46 +841,49 @@ emissiveIntensity: 0.0
   earth.add(new THREE.Line(eqGeometry, eqMaterial));
 
   // =========================
-  // 🌫 ATMÓSFERA
-  // =========================
-  const atmosphereInner = new THREE.Mesh(
-    new THREE.SphereGeometry(103, 64, 64),
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.06,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  scene.add(atmosphereInner);
+// 🌫 ATMÓSFERA REALISTA SIMPLE
+// =========================
 
-  const atmosphereOuter = new THREE.Mesh(
-    new THREE.SphereGeometry(106, 64, 64),
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.03,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  scene.add(atmosphereOuter);
+const atmosphereGeometry = new THREE.SphereGeometry(108, 128, 128);
 
-  const atmosphereGlow = new THREE.Mesh(
-    new THREE.SphereGeometry(112, 64, 64),
-    new THREE.MeshBasicMaterial({
-      color: 0x88ccff,
-      transparent: true,
-      opacity: 0.015,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  scene.add(atmosphereGlow);
+const atmosphereMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    glowColor: { value: new THREE.Color(0x8ecaff) },
+    intensity: { value: 0.9 }
+  },
+  vertexShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 glowColor;
+    uniform float intensity;
+
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      float fresnel = pow(1.0 - abs(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0))), 3.0);
+
+      float alpha = fresnel * intensity;
+
+      gl_FragColor = vec4(glowColor, alpha);
+    }
+  `,
+  side: THREE.BackSide,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+scene.add(atmosphere);
 
   // =========================
   // 🛰 SATÉLITE
