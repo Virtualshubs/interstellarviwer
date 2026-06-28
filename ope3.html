@@ -717,85 +717,98 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  
-window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  // =========================
+  // ☀️ LUZ SOLAR
+  // =========================
+  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  scene.add(window.sunLight);
 
+  // 🔴 CRÍTICO: target debe estar en escena
+  window.sunLight.target = new THREE.Object3D();
   scene.add(window.sunLight.target);
 
-  window.sunDebug = new THREE.Mesh(
-  new THREE.SphereGeometry(5),
-  new THREE.MeshBasicMaterial({ color: 0xffff00 })
-);
-
-scene.add(window.sunDebug);
-
-
-// =========================
-// 🌍 EARTH (textura real)
-// =========================
-
-const textureLoader = new THREE.TextureLoader();
-
-const earthTexture = textureLoader.load(
-  "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-);
-
-// opcional pero recomendado (mejora calidad)
-earthTexture.colorSpace = THREE.SRGBColorSpace;
-
-earth = new THREE.Mesh(
-  new THREE.SphereGeometry(100, 64, 64),
-  new THREE.MeshStandardMaterial({
-    map: earthTexture,
-    emissive: new THREE.Color(0x111111),
-    emissiveIntensity: 0.2
-  })
-);
-
-scene.add(earth);
-
-
-
-
-const atmosphereInner = new THREE.Mesh(
-  new THREE.SphereGeometry(103, 64, 64),
-  new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.06,
-    side: THREE.BackSide,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  })
-);  scene.add(atmosphereInner);
-
-const atmosphereOuter = new THREE.Mesh(
-  new THREE.SphereGeometry(106, 64, 64),
-  new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.03,
-    side: THREE.BackSide,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  })
-);
-scene.add(atmosphereOuter);
-const atmosphereGlow = new THREE.Mesh(
-  new THREE.SphereGeometry(112, 64, 64),
-  new THREE.MeshBasicMaterial({
-    color: 0x88ccff,
-    transparent: true,
-    opacity: 0.015,
-    side: THREE.BackSide,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  })
-);
-
-scene.add(atmosphereGlow);
   // =========================
-  // 🛰 SAT
+  // 💡 LUZ AMBIENTAL (IMPRESCINDIBLE)
+  // =========================
+  const ambient = new THREE.AmbientLight(0xffffff, 0.25);
+  scene.add(ambient);
+
+  // =========================
+  // 🔆 DEBUG SOL
+  // =========================
+  window.sunDebug = new THREE.Mesh(
+    new THREE.SphereGeometry(5),
+    new THREE.MeshBasicMaterial({ color: 0xffff00 })
+  );
+
+  scene.add(window.sunDebug);
+
+  // =========================
+  // 🌍 TIERRA
+  // =========================
+  const textureLoader = new THREE.TextureLoader();
+
+  const earthTexture = textureLoader.load(
+    "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  );
+
+  earthTexture.colorSpace = THREE.SRGBColorSpace;
+
+  earth = new THREE.Mesh(
+    new THREE.SphereGeometry(100, 64, 64),
+    new THREE.MeshStandardMaterial({
+      map: earthTexture,
+      emissive: new THREE.Color(0x111111),
+      emissiveIntensity: 0.2
+    })
+  );
+
+  scene.add(earth);
+
+  // =========================
+  // 🌫 ATMÓSFERA
+  // =========================
+  const atmosphereInner = new THREE.Mesh(
+    new THREE.SphereGeometry(103, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.06,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  scene.add(atmosphereInner);
+
+  const atmosphereOuter = new THREE.Mesh(
+    new THREE.SphereGeometry(106, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.03,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  scene.add(atmosphereOuter);
+
+  const atmosphereGlow = new THREE.Mesh(
+    new THREE.SphereGeometry(112, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0x88ccff,
+      transparent: true,
+      opacity: 0.015,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  scene.add(atmosphereGlow);
+
+  // =========================
+  // 🛰 SATÉLITE
   // =========================
   const satMesh = new THREE.Mesh(
     new THREE.SphereGeometry(3, 12, 12),
@@ -806,48 +819,39 @@ scene.add(atmosphereGlow);
   window.satMesh = satMesh;
 
   // =========================
-  // 🎯 RAYCASTER GLOBAL
+  // 🎯 INPUTS
   // =========================
   raycaster = new THREE.Raycaster();
   mouse = new THREE.Vector2();
 
-
   window.addEventListener("mousedown", (e) => {
-  isDragging = true;
-  previousMouse.x = e.clientX;
-  previousMouse.y = e.clientY;
-});
+    isDragging = true;
+    previousMouse.x = e.clientX;
+    previousMouse.y = e.clientY;
+  });
 
-window.addEventListener("mouseup", () => {
-  isDragging = false;
-});
+  window.addEventListener("mouseup", () => {
+    isDragging = false;
+  });
 
-window.addEventListener("mousemove", (e) => {
-  if (!isDragging) return;
+  window.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
 
-  const deltaX = e.clientX - previousMouse.x;
-  const deltaY = e.clientY - previousMouse.y;
+    const deltaX = e.clientX - previousMouse.x;
+    const deltaY = e.clientY - previousMouse.y;
 
-  previousMouse.x = e.clientX;
-  previousMouse.y = e.clientY;
+    previousMouse.x = e.clientX;
+    previousMouse.y = e.clientY;
 
- const speed = 0.2;
+    const speed = 0.2;
 
-targetLon -= deltaX * speed;
-targetLat += deltaY * speed;
+    targetLon -= deltaX * speed;
+    targetLat += deltaY * speed;
 
-// evitar dar la vuelta por los polos
-targetLat = Math.max(-85, Math.min(85, targetLat));
-});
+    targetLat = Math.max(-85, Math.min(85, targetLat));
+  });
 
-  // =========================
-  // 🖱️ CLICK EN GLOBO
-  // =========================
   renderer.domElement.addEventListener("pointerdown", onGlobeClick);
-
-  // =========================
-  // 🌀 ZOOM
-  // =========================
   window.addEventListener("wheel", onWheelZoom);
 
   // =========================
@@ -882,7 +886,6 @@ targetLat = Math.max(-85, Math.min(85, targetLat));
 
   animate();
 }
-
 
   
 function onGlobeClick(event) {
