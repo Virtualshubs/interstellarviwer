@@ -840,46 +840,56 @@ emissiveIntensity: 0.0
 
   earth.add(new THREE.Line(eqGeometry, eqMaterial));
 
-  // =========================
-// 🌫 ATMÓSFERA REALISTA SIMPLE
-// =========================
-
 const atmosphereGeometry = new THREE.SphereGeometry(108, 128, 128);
 
 const atmosphereMaterial = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  side: THREE.BackSide,
+  blending: THREE.AdditiveBlending,
+
   uniforms: {
-    glowColor: { value: new THREE.Color(0x8ecaff) },
-    intensity: { value: 0.9 }
+    color: { value: new THREE.Color(0x8ecaff) },
+    power: { value: 2.2 },      // suavidad del borde
+    intensity: { value: 0.8 }   // fuerza global
   },
+
   vertexShader: `
     varying vec3 vNormal;
-    varying vec3 vPosition;
+    varying vec3 vWorldPos;
 
     void main() {
       vNormal = normalize(normalMatrix * normal);
-      vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+      vec4 worldPos = modelMatrix * vec4(position, 1.0);
+      vWorldPos = worldPos.xyz;
+
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
   `,
+
   fragmentShader: `
-    uniform vec3 glowColor;
+    uniform vec3 color;
+    uniform float power;
     uniform float intensity;
 
     varying vec3 vNormal;
-    varying vec3 vPosition;
+    varying vec3 vWorldPos;
 
     void main() {
-      float fresnel = pow(1.0 - abs(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0))), 3.0);
 
-      float alpha = fresnel * intensity;
+      vec3 viewDir = normalize(cameraPosition - vWorldPos);
 
-      gl_FragColor = vec4(glowColor, alpha);
+      float fresnel = 1.0 - dot(viewDir, vNormal);
+      fresnel = pow(fresnel, power);
+
+      // caída suave hacia el espacio
+      float edgeFade = smoothstep(0.2, 1.0, fresnel);
+
+      float alpha = edgeFade * intensity;
+
+      gl_FragColor = vec4(color, alpha);
     }
-  `,
-  side: THREE.BackSide,
-  transparent: true,
-  blending: THREE.AdditiveBlending,
-  depthWrite: false
+  `
 });
 
 const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
