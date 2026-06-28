@@ -1076,22 +1076,39 @@ function onWheelZoom(e) {
   
 
 function getSunECI(date) {
-  const jd = date.getTime() / 86400000 + 2440587.5;
 
+  const jd = date.getTime() / 86400000 + 2440587.5;
   const n = jd - 2451545.0;
 
+  // Longitud media
   const L = (280.46 + 0.9856474 * n) % 360;
-  const g = THREE.MathUtils.degToRad((357.528 + 0.9856003 * n) % 360);
 
-  const lambda = THREE.MathUtils.degToRad(
-    L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)
+  // Anomalía media
+  const g = THREE.MathUtils.degToRad(
+    (357.528 + 0.9856003 * n) % 360
   );
 
-  return new THREE.Vector3(
-    Math.cos(lambda),
-    Math.sin(lambda),
-    0
-  ).normalize();
+  // Longitud eclíptica aparente
+  const lambda = THREE.MathUtils.degToRad(
+    L +
+    1.915 * Math.sin(g) +
+    0.020 * Math.sin(2 * g)
+  );
+
+  // Oblicuidad de la eclíptica
+  const epsilon = THREE.MathUtils.degToRad(23.439291);
+
+  // Conversión Eclíptica → ECI
+  const x = Math.cos(lambda);
+
+  const y =
+    Math.cos(epsilon) * Math.sin(lambda);
+
+  const z =
+    Math.sin(epsilon) * Math.sin(lambda);
+
+  return new THREE.Vector3(x, y, z).normalize();
+
 }
   
 function animate() {
