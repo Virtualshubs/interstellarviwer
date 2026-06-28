@@ -840,28 +840,40 @@ emissiveIntensity: 0.0
 
   earth.add(new THREE.Line(eqGeometry, eqMaterial));
 
-const atmosphereGeometry = new THREE.SphereGeometry(108, 128, 128);
+const atmosphereGeometry = new THREE.SphereGeometry(108.3, 128, 128);
 
 const atmosphereMaterial = new THREE.ShaderMaterial({
   transparent: true,
   depthWrite: false,
+
+  // 👇 clave para look suave (evita look neón)
+  blending: THREE.CustomBlending,
+  blendSrc: THREE.SrcAlphaFactor,
+  blendDst: THREE.OneMinusSrcAlphaFactor,
+
   side: THREE.BackSide,
-  blending: THREE.AdditiveBlending,
 
   uniforms: {
     color: { value: new THREE.Color(0x8ecaff) },
-    power: { value: 2.2 },      // suavidad del borde
-    intensity: { value: 0.8 }   // fuerza global
+    power: { value: 3.5 },      // suaviza el fresnel
+    intensity: { value: 0.7 },  // fuerza global
+    atmosphereStart: { value: 108.0 },
+    atmosphereEnd: { value: 118.0 }
   },
 
   vertexShader: `
     varying vec3 vNormal;
     varying vec3 vWorldPos;
+    varying float vHeight;
 
     void main() {
+      vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+
+      vWorldPos = worldPos;
       vNormal = normalize(normalMatrix * normal);
-      vec4 worldPos = modelMatrix * vec4(position, 1.0);
-      vWorldPos = worldPos.xyz;
+
+      // distancia al centro (altura atmosférica)
+      vHeight = length(worldPos);
 
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
@@ -871,29 +883,53 @@ const atmosphereMaterial = new THREE.ShaderMaterial({
     uniform vec3 color;
     uniform float power;
     uniform float intensity;
+    uniform float atmosphereStart;
+    uniform float atmosphereEnd;
 
     varying vec3 vNormal;
     varying vec3 vWorldPos;
+    varying float vHeight;
 
     void main() {
 
       vec3 viewDir = normalize(cameraPosition - vWorldPos);
 
+      // Fresnel (horizonte)
       float fresnel = 1.0 - dot(viewDir, vNormal);
       fresnel = pow(fresnel, power);
 
-      // caída suave hacia el espacio
-      float edgeFade = smoothstep(0.2, 1.0, fresnel);
+      // fade por altura (lo que da look NASA real)
+      float heightFactor = smoothstep(atmosphereEnd, atmosphereStart, vHeight);
 
-      float alpha = edgeFade * intensity;
+      // glow del horizonte
+      float horizon = pow(fresnel, 1.8);
 
-      gl_FragColor = vec4(color, alpha);
+      float alpha = heightFactor * horizon * intensity;
+
+      // tint suave tipo Rayleigh
+      vec3 finalColor = mix(
+        vec3(0.4, 0.6, 1.0),
+        color,
+        fresnel
+      );
+
+      gl_FragColor = vec4(finalColor, alpha);
     }
   `
 });
 
 const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
 scene.add(atmosphere);
+
+    const outerAtmosphere = new THREE.Mesh(
+  new THREE.SphereGeometry(112, 128, 128),
+  atmosphereMaterial.clone()
+);
+
+outerAtmosphere.material.uniforms.intensity.value = 0.25;
+outerAtmosphere.material.uniforms.power.value = 4.0;
+
+scene.add(outerAtmosphere);
 
   // =========================
   // 🛰 SATÉLITE
