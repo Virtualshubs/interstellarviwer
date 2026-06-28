@@ -766,6 +766,21 @@ function init() {
   scene.add(earth);
 
   // =========================
+// 🧭 EJE NORTE-SUR DEBUG
+// =========================
+
+const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+const axisGeometry = new THREE.BufferGeometry().setFromPoints([
+  new THREE.Vector3(0, -120, 0), // Sur
+  new THREE.Vector3(0, 120, 0)   // Norte
+]);
+
+const axisLine = new THREE.Line(axisGeometry, axisMaterial);
+
+earth.add(axisLine);
+
+  // =========================
   // 🌫 ATMÓSFERA
   // =========================
   const atmosphereInner = new THREE.Mesh(
@@ -887,6 +902,46 @@ function init() {
   animate();
 }
 
+
+
+
+
+function createLabel(text) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = 256;
+  canvas.height = 256;
+
+  ctx.fillStyle = "white";
+  ctx.font = "bold 120px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 128, 128);
+
+  const texture = new THREE.CanvasTexture(canvas);
+
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: texture, transparent: true })
+  );
+
+  sprite.scale.set(30, 30, 1);
+  return sprite;
+}
+
+// Norte
+const north = createLabel("N");
+north.position.set(0, 120, 0);
+earth.add(north);
+
+// Sur
+const south = createLabel("S");
+south.position.set(0, -120, 0);
+earth.add(south);
+
+
+
+  
   
 function onGlobeClick(event) {
   const rect = renderer.domElement.getBoundingClientRect();
