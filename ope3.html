@@ -719,7 +719,8 @@ function init() {
 
   
 window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
-scene.add(window.sunLight);
+
+  scene.add(window.sunLight.target);
 
   window.sunDebug = new THREE.Mesh(
   new THREE.SphereGeometry(5),
@@ -728,7 +729,7 @@ scene.add(window.sunLight);
 
 scene.add(window.sunDebug);
 
-  window.sunDebug.position.copy(sunECEF.clone().multiplyScalar(1));
+
 // =========================
 // 🌍 EARTH (textura real)
 // =========================
@@ -1036,6 +1037,7 @@ window.sunLight.target.updateMatrixWorld();
   camera.position.z = zoom * Math.sin(phi) * Math.sin(theta);
 
   camera.lookAt(0, 0, 0);
+    window.sunDebug.position.set(0, 0, 0);
 
   // =========================
   // 🎬 RENDER
