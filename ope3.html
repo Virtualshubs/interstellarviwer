@@ -987,8 +987,8 @@ function getSunECI(date) {
 
   requestAnimationFrame(animate);
 
-  const now = new Date();
-
+ // const now = new Date();
+const now = new Date(Date.now() + 6 * 3600000);
   // =========================
   // 🌍 ROTACIÓN TIERRA (GMST)
   // =========================
