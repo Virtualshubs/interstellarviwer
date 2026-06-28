@@ -959,21 +959,23 @@ function onWheelZoom(e) {
   
 
 function getSunECI(date) {
+  const jd = date.getTime() / 86400000 + 2440587.5;
 
-  // movimiento solar aproximado (suficiente para tu sistema)
-  const msPerDay = 86400000;
-  const days = date.getTime() / msPerDay;
+  const n = jd - 2451545.0;
 
-  // ángulo del sol (1 vuelta al año simplificada)
-  const angle = days * 0.01720279; // ~0.9856° por día en rad
+  const L = (280.46 + 0.9856474 * n) % 360;
+  const g = THREE.MathUtils.degToRad((357.528 + 0.9856003 * n) % 360);
+
+  const lambda = THREE.MathUtils.degToRad(
+    L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)
+  );
 
   return new THREE.Vector3(
-    Math.cos(angle),
-    Math.sin(angle),
+    Math.cos(lambda),
+    Math.sin(lambda),
     0
   ).normalize();
-} 
-
+}
   
 
   function animate() {
@@ -1001,14 +1003,12 @@ function getSunECI(date) {
 // ☀️ SOL CORRECTO (ECI → ECEF)
 // =========================
 const sunECI = getSunECI(now);
-
-// GMST (misma referencia que la Tierra)
 const gmst = satellite.gstime(now);
 
-// rotación a sistema Tierra (ECEF)
-const rot = new THREE.Matrix4().makeRotationY(-gmst);
-
-const sunECEF = sunECI.clone().applyMatrix4(rot);
+const sunECEF = sunECI.clone().applyAxisAngle(
+  new THREE.Vector3(0,1,0),
+  -gmst
+);
 
 if (!window.sunLight) {
   window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
