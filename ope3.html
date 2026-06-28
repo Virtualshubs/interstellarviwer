@@ -699,8 +699,11 @@ window.currentMission = null;
 window.latestSatrec = null;
 
 init();
-
-function init() {
+  
+  
+  
+  
+  function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(
@@ -723,12 +726,11 @@ function init() {
   window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
   scene.add(window.sunLight);
 
-  // 🔴 CRÍTICO: target debe estar en escena
   window.sunLight.target = new THREE.Object3D();
   scene.add(window.sunLight.target);
 
   // =========================
-  // 💡 LUZ AMBIENTAL (IMPRESCINDIBLE)
+  // 💡 LUZ AMBIENTAL
   // =========================
   const ambient = new THREE.AmbientLight(0xffffff, 0.25);
   scene.add(ambient);
@@ -740,8 +742,16 @@ function init() {
     new THREE.SphereGeometry(5),
     new THREE.MeshBasicMaterial({ color: 0xffff00 })
   );
-
   scene.add(window.sunDebug);
+
+  // =========================
+  // 🌍 CONTENEDOR TIERRA (INCLINACIÓN GLOBAL)
+  // =========================
+  window.earthGroup = new THREE.Group();
+  scene.add(window.earthGroup);
+
+  const EARTH_TILT = THREE.MathUtils.degToRad(23.44);
+  window.earthGroup.rotation.z = EARTH_TILT;
 
   // =========================
   // 🌍 TIERRA
@@ -763,80 +773,69 @@ function init() {
     })
   );
 
-  scene.add(earth);
+  window.earthGroup.add(earth);
 
- // =========================
-// 🧭 DEBUG GEO AXIS (NORTE-SUR)
-// =========================
+  // =========================
+  // 🧭 EJE DEBUG
+  // =========================
+  const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
 
-const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+  const axisGeometry = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, -100, 0),
+    new THREE.Vector3(0, 100, 0)
+  ]);
 
-const axisGeometry = new THREE.BufferGeometry().setFromPoints([
-  new THREE.Vector3(0, -100, 0), // Sur
-  new THREE.Vector3(0,  100, 0)  // Norte
-]);
+  earth.add(new THREE.Line(axisGeometry, axisMaterial));
 
-const axisLine = new THREE.Line(axisGeometry, axisMaterial);
-earth.add(axisLine);
+  // =========================
+  // 🌍 MERIDIANOS
+  // =========================
+  function createMeridian(lonDeg, color = 0x00ffcc) {
+    const points = [];
 
+    const lon = THREE.MathUtils.degToRad(lonDeg);
+    const R = 100;
 
-// =========================
-// 🌍 MERIDIANOS DEBUG
-// =========================
+    for (let lat = -90; lat <= 90; lat += 2) {
+      const phi = THREE.MathUtils.degToRad(lat);
 
-function createMeridian(lonDeg, color = 0x00ffcc) {
-  const points = [];
+      const x = Math.cos(phi) * Math.cos(lon);
+      const y = Math.sin(phi);
+      const z = Math.cos(phi) * Math.sin(lon);
 
-  const lon = THREE.MathUtils.degToRad(lonDeg);
-  const R = 100;
+      points.push(new THREE.Vector3(x * R, y * R, z * R));
+    }
 
-  for (let lat = -90; lat <= 90; lat += 2) {
-    const phi = THREE.MathUtils.degToRad(lat);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({ color });
 
-    const x = Math.cos(phi) * Math.cos(lon);
-    const y = Math.sin(phi);
-    const z = Math.cos(phi) * Math.sin(lon);
-
-    points.push(new THREE.Vector3(x * R, y * R, z * R));
+    return new THREE.Line(geometry, material);
   }
 
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  const material = new THREE.LineBasicMaterial({ color });
+  [0, 90, 180, -90].forEach(lon => {
+    earth.add(createMeridian(lon));
+  });
 
-  return new THREE.Line(geometry, material);
-}
+  // =========================
+  // 🌍 ECUADOR
+  // =========================
+  const eqPoints = [];
+  const R = 100;
 
-// meridianos clave
-const meridians = [0, 90, 180, -90];
+  for (let lon = 0; lon <= 360; lon += 2) {
+    const lambda = THREE.MathUtils.degToRad(lon);
 
-meridians.forEach(lon => {
-  earth.add(createMeridian(lon));
-});
+    eqPoints.push(new THREE.Vector3(
+      Math.cos(lambda) * R,
+      0,
+      Math.sin(lambda) * R
+    ));
+  }
 
+  const eqGeometry = new THREE.BufferGeometry().setFromPoints(eqPoints);
+  const eqMaterial = new THREE.LineBasicMaterial({ color: 0xffaa00 });
 
-// =========================
-// 🌍 ECUADOR DEBUG
-// =========================
-
-const eqPoints = [];
-const R = 100;
-
-for (let lon = 0; lon <= 360; lon += 2) {
-  const lambda = THREE.MathUtils.degToRad(lon);
-
-  const x = Math.cos(lambda);
-  const y = 0;
-  const z = Math.sin(lambda);
-
-  eqPoints.push(new THREE.Vector3(x * R, y * R, z * R));
-}
-
-const eqGeometry = new THREE.BufferGeometry().setFromPoints(eqPoints);
-const eqMaterial = new THREE.LineBasicMaterial({ color: 0xffaa00 });
-
-const equator = new THREE.Line(eqGeometry, eqMaterial);
-earth.add(equator);
-  
+  earth.add(new THREE.Line(eqGeometry, eqMaterial));
 
   // =========================
   // 🌫 ATMÓSFERA
@@ -928,20 +927,6 @@ earth.add(equator);
   window.addEventListener("wheel", onWheelZoom);
 
   // =========================
-  // 🧼 UI INIT
-  // =========================
-  window.addEventListener("DOMContentLoaded", () => {
-    const panel = document.getElementById("missionPanel");
-    if (panel) panel.style.display = "none";
-
-    const lat = document.getElementById("lat");
-    const lon = document.getElementById("lon");
-
-    if (lat) lat.style.display = "none";
-    if (lon) lon.style.display = "none";
-  });
-
-  // =========================
   // 🌍 DEFAULT STATE
   // =========================
   window.lat = 40.4168;
@@ -949,19 +934,10 @@ earth.add(equator);
   window.currentCATNR = "25544";
   window.currentCityName = "Madrid";
 
-  const satSelect = document.getElementById("satSelect");
-  if (satSelect) satSelect.value = "25544";
-
-  const citySelect = document.getElementById("citySelect");
-  if (citySelect) citySelect.value = "40.4168,-3.7038";
-
   loadSatellite("25544");
 
   animate();
 }
-
-
-
 
 
 function createLabel(text) {
@@ -1095,19 +1071,18 @@ function getSunECI(date) {
   ).normalize();
 }
   
-
-  function animate() {
+function animate() {
 
   requestAnimationFrame(animate);
 
-const now = new Date();
+  const now = new Date();
 
   // =========================
-  // 🌍 ROTACIÓN TIERRA (GMST)
+  // 🌍 ROTACIÓN TIERRA (GMST + INCLINACIÓN)
   // =========================
-  if (earth) {
+  if (window.earthGroup) {
     const gmst = satellite.gstime(now);
-   earth.rotation.y = -gmst + EARTH_LON_OFFSET;
+    window.earthGroup.rotation.y = -gmst + EARTH_LON_OFFSET;
   }
 
   // =========================
@@ -1117,31 +1092,30 @@ const now = new Date();
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-// =========================
-// ☀️ SOL CORRECTO (ECI → ECEF)
-// =========================
-const sunECI = getSunECI(now);
-const gmst = satellite.gstime(now);
+  // =========================
+  // ☀️ SOL CORRECTO
+  // =========================
+  const sunECI = getSunECI(now);
+  const gmst = satellite.gstime(now);
 
-const sunECEF = sunECI.clone().applyAxisAngle(
-  new THREE.Vector3(0, 1, 0),
-  -gmst
-);
+  const sunECEF = sunECI.clone().applyAxisAngle(
+    new THREE.Vector3(0, 1, 0),
+    -gmst
+  );
 
-if (!window.sunLight) {
-  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+  if (!window.sunLight) {
+    window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+    scene.add(window.sunLight);
+    scene.add(window.sunLight.target);
+  }
 
-  // IMPORTANTE: añadir target a la escena
-  scene.add(window.sunLight);
-  scene.add(window.sunLight.target);
-}
+  window.sunLight.position.copy(
+    sunECEF.clone().multiplyScalar(1000)
+  );
 
-// posición de la luz (dirección solar)
-window.sunLight.position.copy(sunECEF.clone().multiplyScalar(1000));
+  window.sunLight.target.position.set(0, 0, 0);
+  window.sunLight.target.updateMatrixWorld();
 
-// siempre mirando al centro de la Tierra
-window.sunLight.target.position.set(0, 0, 0);
-window.sunLight.target.updateMatrixWorld();
   // =========================
   // 🎥 CÁMARA
   // =========================
@@ -1158,7 +1132,8 @@ window.sunLight.target.updateMatrixWorld();
   camera.position.z = zoom * Math.sin(phi) * Math.sin(theta);
 
   camera.lookAt(0, 0, 0);
-    window.sunDebug.position.set(0, 0, 0);
+
+  window.sunDebug.position.set(0, 0, 0);
 
   // =========================
   // 🎬 RENDER
