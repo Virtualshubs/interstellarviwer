@@ -985,48 +985,39 @@ function onGlobeClick(event) {
   raycaster.setFromCamera(mouse, camera);
 
   // =========================
-  // 🌍 RAYCAST CORRECTO (grupo con inclinación)
+  // 🌍 RAYCAST DIRECTO (más estable)
   // =========================
-  const intersects = raycaster.intersectObject(earthGroup, true);
+  const intersects = raycaster.intersectObject(earth, false);
 
   if (!intersects.length) return;
 
   // =========================
-  // 🌍 punto en esfera (mundo ya rotado e inclinado)
+  // 🌍 punto en mundo
   // =========================
-  const point = intersects[0].point.clone().normalize();
+  const point = intersects[0].point.clone(); // ❌ SIN normalize()
 
   // =========================
-  // 🧭 DESHACER ROTACIONES DEL SISTEMA
+  // 🧭 DESHACER ROTACIONES
   // =========================
-
   const gmst = satellite.gstime(new Date());
 
-  // 1) deshacer rotación diaria de la Tierra (Y)
   const invRotation = new THREE.Matrix4().makeRotationY(gmst);
-
-  // 2) deshacer inclinación axial (Z)
   const invTilt = new THREE.Matrix4().makeRotationZ(-EARTH_TILT);
 
-  // ⚠️ orden inverso al aplicado en escena
   point.applyMatrix4(invRotation);
   point.applyMatrix4(invTilt);
 
   // =========================
-  // 🌍 LAT / LON REAL
+  // 🌍 LAT / LON
   // =========================
   const lat = Math.asin(point.y) * 180 / Math.PI;
-
   let lon = Math.atan2(point.z, point.x) * 180 / Math.PI;
 
-  // =========================
-  // 🧭 ajuste visual textura
-  // =========================
   lon = -lon;
   lon = ((lon + 180) % 360) - 180;
 
   // =========================
-  // 📍 guardar estado global
+  // 📍 STATE
   // =========================
   window.lat = lat;
   window.lon = lon;
@@ -1043,6 +1034,7 @@ function onGlobeClick(event) {
 
   run();
 }
+  
 
 function onWheelZoom(e) {
   const el = e.target;
