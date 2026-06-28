@@ -695,7 +695,7 @@ let targetLon = cameraLon;
 let targetLat = cameraLat;
 
   
-  const EARTH_LON_OFFSET = 0;
+  //const EARTH_LON_OFFSET = 0;
 window.currentMission = null;
 window.latestSatrec = null;
 
@@ -1170,11 +1170,18 @@ function animate() {
   // =========================
   // 🌍 ROTACIÓN TIERRA (GMST + INCLINACIÓN)
   // =========================
-  if (window.earthGroup) {
-    const gmst = satellite.gstime(now);
-    window.earthGroup.rotation.y = -gmst + EARTH_LON_OFFSET;
-  }
+if (window.earthGroup) {
 
+  const gmst = satellite.gstime(now);
+
+  const sunECI = getSunECI(now);
+
+  // proyectamos el sol en el plano ecuatorial
+  const sunLon = Math.atan2(sunECI.z, sunECI.x);
+
+  // rotación Tierra + alineación solar
+  window.earthGroup.rotation.y = -gmst - sunLon;
+}
   // =========================
   // 🛰 SATÉLITES
   // =========================
