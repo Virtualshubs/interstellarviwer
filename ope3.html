@@ -846,7 +846,6 @@ const atmosphereMaterial = new THREE.ShaderMaterial({
   transparent: true,
   depthWrite: false,
 
-  // 👇 clave para look suave (evita look neón)
   blending: THREE.CustomBlending,
   blendSrc: THREE.SrcAlphaFactor,
   blendDst: THREE.OneMinusSrcAlphaFactor,
@@ -855,8 +854,8 @@ const atmosphereMaterial = new THREE.ShaderMaterial({
 
   uniforms: {
     color: { value: new THREE.Color(0x8ecaff) },
-    power: { value: 3.5 },      // suaviza el fresnel
-    intensity: { value: 0.7 },  // fuerza global
+    power: { value: 3.0 },              // menos agresivo
+    intensity: { value: 0.45 },        // menos opaco
     atmosphereStart: { value: 108.0 },
     atmosphereEnd: { value: 118.0 }
   },
@@ -872,7 +871,6 @@ const atmosphereMaterial = new THREE.ShaderMaterial({
       vWorldPos = worldPos;
       vNormal = normalize(normalMatrix * normal);
 
-      // distancia al centro (altura atmosférica)
       vHeight = length(worldPos);
 
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -894,23 +892,26 @@ const atmosphereMaterial = new THREE.ShaderMaterial({
 
       vec3 viewDir = normalize(cameraPosition - vWorldPos);
 
-      // Fresnel (horizonte)
+      // Fresnel suavizado
       float fresnel = 1.0 - dot(viewDir, vNormal);
       fresnel = pow(fresnel, power);
 
-      // fade por altura (lo que da look NASA real)
-      float heightFactor = smoothstep(atmosphereEnd, atmosphereStart, vHeight);
+      // 🔥 CLAVE: elimina opacidad interna
+      float heightFactor = pow(
+        smoothstep(atmosphereEnd, atmosphereStart, vHeight),
+        2.8
+      );
 
-      // glow del horizonte
-      float horizon = pow(fresnel, 1.8);
+      // horizonte
+      float horizon = pow(fresnel, 1.6);
 
       float alpha = heightFactor * horizon * intensity;
 
-      // tint suave tipo Rayleigh
+      // color más aireado (menos sólido)
       vec3 finalColor = mix(
-        vec3(0.4, 0.6, 1.0),
+        vec3(0.6, 0.8, 1.0),
         color,
-        fresnel
+        fresnel * 0.6
       );
 
       gl_FragColor = vec4(finalColor, alpha);
@@ -921,13 +922,13 @@ const atmosphereMaterial = new THREE.ShaderMaterial({
 const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
 scene.add(atmosphere);
 
-    const outerAtmosphere = new THREE.Mesh(
+ const outerAtmosphere = new THREE.Mesh(
   new THREE.SphereGeometry(112, 128, 128),
   atmosphereMaterial.clone()
 );
 
-outerAtmosphere.material.uniforms.intensity.value = 0.25;
-outerAtmosphere.material.uniforms.power.value = 4.0;
+outerAtmosphere.material.uniforms.intensity.value = 0.22;
+outerAtmosphere.material.uniforms.power.value = 3.8;
 
 scene.add(outerAtmosphere);
 
