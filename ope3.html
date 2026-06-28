@@ -929,15 +929,49 @@ init();
   renderer.domElement.addEventListener("pointerdown", onGlobeClick);
   window.addEventListener("wheel", onWheelZoom);
 
-  // =========================
-  // 🌍 DEFAULT STATE
-  // =========================
-  window.lat = 40.4168;
-  window.lon = -3.7038;
-  window.currentCATNR = "25544";
-  window.currentCityName = "Madrid";
+// =========================
+// 🧼 UI INIT
+// =========================
+window.addEventListener("DOMContentLoaded", () => {
+  const panel = document.getElementById("missionPanel");
+  if (panel) panel.style.display = "none";
 
-  loadSatellite("25544");
+  const lat = document.getElementById("lat");
+  const lon = document.getElementById("lon");
+
+  if (lat) lat.style.display = "none";
+  if (lon) lon.style.display = "none";
+});
+
+// =========================
+// 🌍 DEFAULT STATE
+// =========================
+window.lat = 40.4168;
+window.lon = -3.7038;
+window.currentCityName = "Madrid";
+window.currentCATNR = "25544";
+
+const satSelect = document.getElementById("satSelect");
+if (satSelect) satSelect.value = "25544";
+
+const citySelect = document.getElementById("citySelect");
+if (citySelect) {
+  citySelect.value = "40.4168,-3.7038";
+
+  // 🔥 CLAVE: sincroniza estado interno con UI
+  changeCity();
+}
+
+// =========================
+// 🔄 SYNC INPUTS (IMPORTANTE)
+// =========================
+const latInput = document.getElementById("lat");
+const lonInput = document.getElementById("lon");
+
+if (latInput) latInput.value = window.lat;
+if (lonInput) lonInput.value = window.lon;
+
+loadSatellite("25544");
 
   animate();
 }
