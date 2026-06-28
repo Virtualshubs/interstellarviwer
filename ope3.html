@@ -1074,26 +1074,24 @@ function onWheelZoom(e) {
   targetZoom = Math.max(180, Math.min(800, targetZoom));
 }
   
-const obliquity = THREE.MathUtils.degToRad(23.44);
 
 function getSunECI(date) {
-
   const jd = date.getTime() / 86400000 + 2440587.5;
+
   const n = jd - 2451545.0;
 
-  const L = THREE.MathUtils.degToRad((280.46 + 0.9856474 * n) % 360);
+  const L = (280.46 + 0.9856474 * n) % 360;
+  const g = THREE.MathUtils.degToRad((357.528 + 0.9856003 * n) % 360);
 
-  // vector orbital básico en plano eclíptico
-  let x = Math.cos(L);
-  let y = Math.sin(L);
-  let z = 0;
+  const lambda = THREE.MathUtils.degToRad(
+    L + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)
+  );
 
-  const v = new THREE.Vector3(x, y, z);
-
-  // inclinación eclíptica
-  v.applyAxisAngle(new THREE.Vector3(1, 0, 0), obliquity);
-
-  return v.normalize();
+  return new THREE.Vector3(
+    Math.cos(lambda),
+    Math.sin(lambda),
+    0
+  ).normalize();
 }
   
 function animate() {
