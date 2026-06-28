@@ -840,97 +840,47 @@ emissiveIntensity: 0.0
 
   earth.add(new THREE.Line(eqGeometry, eqMaterial));
 
-const atmosphereGeometry = new THREE.SphereGeometry(108.3, 128, 128);
+  // =========================
+  // 🌫 ATMÓSFERA
+  // =========================
+  const atmosphereInner = new THREE.Mesh(
+    new THREE.SphereGeometry(103, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.06,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  scene.add(atmosphereInner);
 
-const atmosphereMaterial = new THREE.ShaderMaterial({
-  transparent: true,
-  depthWrite: false,
+  const atmosphereOuter = new THREE.Mesh(
+    new THREE.SphereGeometry(106, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.03,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  scene.add(atmosphereOuter);
 
-  blending: THREE.CustomBlending,
-  blendSrc: THREE.SrcAlphaFactor,
-  blendDst: THREE.OneMinusSrcAlphaFactor,
-
-  side: THREE.BackSide,
-
-  uniforms: {
-    color: { value: new THREE.Color(0x8ecaff) },
-    power: { value: 3.0 },              // menos agresivo
-    intensity: { value: 0.45 },        // menos opaco
-    atmosphereStart: { value: 108.0 },
-    atmosphereEnd: { value: 118.0 }
-  },
-
-  vertexShader: `
-    varying vec3 vNormal;
-    varying vec3 vWorldPos;
-    varying float vHeight;
-
-    void main() {
-      vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-
-      vWorldPos = worldPos;
-      vNormal = normalize(normalMatrix * normal);
-
-      vHeight = length(worldPos);
-
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `,
-
-  fragmentShader: `
-    uniform vec3 color;
-    uniform float power;
-    uniform float intensity;
-    uniform float atmosphereStart;
-    uniform float atmosphereEnd;
-
-    varying vec3 vNormal;
-    varying vec3 vWorldPos;
-    varying float vHeight;
-
-    void main() {
-
-      vec3 viewDir = normalize(cameraPosition - vWorldPos);
-
-      // Fresnel suavizado
-      float fresnel = 1.0 - dot(viewDir, vNormal);
-      fresnel = pow(fresnel, power);
-
-      // 🔥 CLAVE: elimina opacidad interna
-      float heightFactor = pow(
-        smoothstep(atmosphereEnd, atmosphereStart, vHeight),
-        2.8
-      );
-
-      // horizonte
-      float horizon = pow(fresnel, 1.6);
-
-      float alpha = heightFactor * horizon * intensity;
-
-      // color más aireado (menos sólido)
-      vec3 finalColor = mix(
-        vec3(0.6, 0.8, 1.0),
-        color,
-        fresnel * 0.6
-      );
-
-      gl_FragColor = vec4(finalColor, alpha);
-    }
-  `
-});
-
-const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-scene.add(atmosphere);
-
- const outerAtmosphere = new THREE.Mesh(
-  new THREE.SphereGeometry(112, 128, 128),
-  atmosphereMaterial.clone()
-);
-
-outerAtmosphere.material.uniforms.intensity.value = 0.22;
-outerAtmosphere.material.uniforms.power.value = 3.8;
-
-scene.add(outerAtmosphere);
+  const atmosphereGlow = new THREE.Mesh(
+    new THREE.SphereGeometry(112, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0x88ccff,
+      transparent: true,
+      opacity: 0.015,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  scene.add(atmosphereGlow);
 
   // =========================
   // 🛰 SATÉLITE
