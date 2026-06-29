@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Sun Fixed r134</title>
+<title>Earth Sun Fixed (Stable r134)</title>
+
 <style>
   body { margin:0; overflow:hidden; background:black; }
   #info {
@@ -11,12 +12,13 @@
     left:10px;
     color:white;
     font-family:Arial;
+    z-index:10;
   }
 </style>
 </head>
-<body>
 
-<div id="info">Earth-Sun system (r134 stable)</div>
+<body>
+<div id="info">Earth-Sun system (stable + Madrid pin)</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
@@ -27,10 +29,10 @@
 // CORE
 // =====================
 let scene, camera, renderer;
-let earth, cloud, sunLight;
-let earthGroup;
+let earth, earthGroup;
+let sunLight;
 
-// zoom / controls
+// controls
 let distance = 3;
 let targetDistance = 3;
 let rotY = 0;
@@ -38,11 +40,8 @@ let rotX = 0;
 let targetRotY = 0;
 let targetRotX = 0;
 
-// time speed (REAL TIME)
+// time
 const TIME_SCALE = 1;
-
-// observer (España como referencia lógica)
-const observerLon = -3.7;
 
 // =====================
 // INIT
@@ -54,17 +53,28 @@ function init() {
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
 
   renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
   // =====================
-  // LIGHT (SOLO UNA)
+  // LIGHTS
   // =====================
+
+  // SOL (único correcto)
   sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
   scene.add(sunLight);
+
+  // Luz ambiental MUY tenue (solo lectura visual)
+  const ambient = new THREE.AmbientLight(0xffffff, 0.08);
+  scene.add(ambient);
 
   // =====================
   // EARTH GROUP
@@ -72,10 +82,12 @@ function init() {
   earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
-  // tilt real
+  // inclinación real
   earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
 
-  // earth
+  // =====================
+  // EARTH
+  // =====================
   const tex = new THREE.TextureLoader().load(
     "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
   );
@@ -85,9 +97,12 @@ function init() {
     new THREE.MeshStandardMaterial({ map: tex })
   );
 
+  // 🔥 FIX MAPA (MUY IMPORTANTE)
+  earth.rotation.y = Math.PI;
+
   earthGroup.add(earth);
 
-  // atmosphere simple
+  // atmósfera simple
   const atm = new THREE.Mesh(
     new THREE.SphereGeometry(1.02, 64, 64),
     new THREE.MeshBasicMaterial({
@@ -101,8 +116,22 @@ function init() {
   earth.add(atm);
 
   // =====================
+  // MADRID PIN
+  // =====================
+  const madrid = latLonToVec3(40.4168, -3.7038, 1.01);
+
+  const pin = new THREE.Mesh(
+    new THREE.SphereGeometry(0.02, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+
+  pin.position.copy(madrid);
+  earth.add(pin);
+
+  // =====================
   // CONTROLS
   // =====================
+
   window.addEventListener("wheel", e => {
     targetDistance += e.deltaY * 0.002;
     targetDistance = Math.max(2, Math.min(6, targetDistance));
@@ -124,21 +153,46 @@ function onResize(){
 }
 
 // =====================
-// SUN POSITION (correcto simple)
+// SUN (REAL satellite.js)
 // =====================
-function getSunDirection(date){
+function getSunECI(date){
 
-  const ms = date.getTime();
-  const t = ms / 86400000;
+  const pv = satellite.SolarPosition || satellite.sunPosition;
 
-  // ciclo diario simple (24h)
-  const angle = (t % 1) * Math.PI * 2;
+  // fallback seguro
+  if (!satellite.sunPosition) {
+    return new THREE.Vector3(1,0,0);
+  }
+
+  const gmst = satellite.gstime(date);
+  const sunPos = satellite.sunPosition(date);
+
+  // sunPos.position suele venir en ECI-like
+  const v = new THREE.Vector3(
+    sunPos.x || sunPos.position?.x,
+    sunPos.y || sunPos.position?.y,
+    sunPos.z || sunPos.position?.z
+  );
+
+  // ECI → ECEF (rotación correcta)
+  v.applyAxisAngle(new THREE.Vector3(0,1,0), gmst);
+
+  return v.normalize();
+}
+
+// =====================
+// LAT/LON → VECTOR
+// =====================
+function latLonToVec3(lat, lon, radius){
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+  const theta = THREE.MathUtils.degToRad(lon + 180);
 
   return new THREE.Vector3(
-    Math.cos(angle),
-    0.2,
-    Math.sin(angle)
-  ).normalize();
+    -(radius * Math.sin(phi) * Math.cos(theta)),
+     radius * Math.cos(phi),
+     radius * Math.sin(phi) * Math.sin(theta)
+  );
 }
 
 // =====================
@@ -151,13 +205,22 @@ function animate(){
   const now = new Date();
 
   // =====================
-  // ROTACIÓN TIERRA (24h real)
+  // ROTACIÓN TIERRA (estable)
   // =====================
-  const earthRotationSpeed = (2 * Math.PI) / 86400; // rad/sec
-
+  const earthRotationSpeed = (2 * Math.PI) / 86400;
   earthGroup.rotation.y += earthRotationSpeed * TIME_SCALE;
 
-  // camera smoothing
+  // =====================
+  // SUN
+  // =====================
+  const sunDir = getSunECI(now);
+
+  sunLight.position.copy(sunDir.clone().multiplyScalar(10));
+  sunLight.target.position.set(0,0,0);
+
+  // =====================
+  // CAMERA
+  // =====================
   rotY += (targetRotY - rotY) * 0.08;
   rotX += (targetRotX - rotX) * 0.08;
   distance += (targetDistance - distance) * 0.08;
@@ -165,15 +228,8 @@ function animate(){
   camera.position.x = distance * Math.cos(rotX) * Math.sin(rotY);
   camera.position.y = distance * Math.sin(rotX);
   camera.position.z = distance * Math.cos(rotX) * Math.cos(rotY);
+
   camera.lookAt(0,0,0);
-
-  // =====================
-  // SUN (solo dirección coherente)
-  // =====================
-  const sunDir = getSunDirection(now);
-
-  sunLight.position.copy(sunDir.clone().multiplyScalar(10));
-  sunLight.target.position.set(0,0,0);
 
   renderer.render(scene, camera);
 }
@@ -182,4 +238,3 @@ function animate(){
 
 </body>
 </html>
-🔥 Por
