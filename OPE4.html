@@ -1152,7 +1152,7 @@ function animate() {
   const now = new Date();
 
   // =========================
-  // 🌍 ROTACIÓN TIERRA (GMST + INCLINACIÓN)
+  // 🌍 ROTACIÓN TIERRA
   // =========================
   if (window.earthGroup) {
     const gmst = satellite.gstime(now);
@@ -1166,35 +1166,33 @@ function animate() {
     updateSatellitePosition(window.latestSatrec, now);
   }
 
-// =========================
-// ☀️ SOL (EN ECEF COHERENTE)
-// =========================
+  // =========================
+  // ☀️ SOL (CORRECTO)
+  // =========================
 
-// 1. Sol en ECI
-const sunECI = getSunECI(now);
+  // 1. Sol en ECI
+  const sunECI = getSunECI(now);
 
-// 2. Convertir a ECEF (alineado con earthGroup)
-const gmst = satellite.gstime(now);
+  // 2. ❌ NO aplicar GMST aquí (IMPORTANTE)
+  const sunDirWorld = sunECI.clone().normalize();
 
-const sunECEF = sunECI.clone().applyAxisAngle(
-  new THREE.Vector3(0, 1, 0),
-  gmst
-);
+  // 3. Convertir a espacio de la Tierra (clave)
+  const sunDirLocal = sunDirWorld.clone();
+  earth.worldToLocal(sunDirLocal);
+  sunDirLocal.normalize();
 
-// 3. NORMALIZAR y usar para shader
-window.sunDir.copy(sunECEF).normalize();
+  // 4. Shader
+  if (earth.material.userData.shader) {
+    earth.material.userData.shader.uniforms.sunDir.value.copy(sunDirLocal);
+  }
 
-if (earth.material.userData.shader) {
-  earth.material.userData.shader.uniforms.sunDir.value.copy(window.sunDir);
-}
+  // 5. Luz física (SI quieres mantenerla)
+  window.sunLight.position.copy(
+    sunDirWorld.clone().multiplyScalar(1000)
+  );
 
-// 4. Luz física coherente
-window.sunLight.position.copy(
-  sunECEF.clone().multiplyScalar(1000)
-);
-
-window.sunLight.target.position.set(0, 0, 0);
-window.sunLight.target.updateMatrixWorld();
+  window.sunLight.target.position.set(0, 0, 0);
+  window.sunLight.target.updateMatrixWorld();
 
   // =========================
   // 🎥 CÁMARA
@@ -1215,12 +1213,8 @@ window.sunLight.target.updateMatrixWorld();
 
   window.sunDebug.position.set(0, 0, 0);
 
-  // =========================
-  // 🎬 RENDER
-  // =========================
   renderer.render(scene, camera);
 }
-  
 
 function getObserver() {
   return {
