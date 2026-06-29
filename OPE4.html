@@ -698,7 +698,7 @@ let targetLat = cameraLat;
   const EARTH_LON_OFFSET = 0;
 window.currentMission = null;
 window.latestSatrec = null;
-
+window.sunDir = new THREE.Vector3();
 init();
   
   
@@ -771,6 +771,10 @@ init();
 
   window.earthGroup.add(earth);
 
+
+
+    
+
   // =========================
   // 🧭 EJE DEBUG
   // =========================
@@ -782,6 +786,43 @@ init();
   ]);
 
   earth.add(new THREE.Line(axisGeometry, axisMaterial));
+
+
+earth.material.onBeforeCompile = (shader) => {
+
+  shader.uniforms.sunDir = { value: new THREE.Vector3() };
+
+  shader.vertexShader = `
+    varying vec3 vNormalW;
+    ${shader.vertexShader}
+  `.replace(
+    "#include <begin_vertex>",
+    `
+      #include <begin_vertex>
+      vNormalW = normalize(normalMatrix * normal);
+    `
+  );
+
+  shader.fragmentShader = `
+    uniform vec3 sunDir;
+    varying vec3 vNormalW;
+    ${shader.fragmentShader}
+  `.replace(
+    "#include <dithering_fragment>",
+    `
+      float light = dot(normalize(vNormalW), normalize(sunDir));
+
+      float terminator = smoothstep(-0.05, 0.05, light);
+
+      gl_FragColor.rgb *= terminator;
+
+      #include <dithering_fragment>
+    `
+  );
+
+  earth.material.userData.shader = shader;
+};
+    
 
   // =========================
   // 🌍 MERIDIANOS
@@ -1129,6 +1170,11 @@ function animate() {
 // ☀️ SOL
 // =========================
 const sunECI = getSunECI(now);
+  window.sunDir.copy(sunECI).normalize();
+
+  if (earth.material.userData.shader) {
+  earth.material.userData.shader.uniforms.sunDir.value.copy(window.sunDir);
+}
 
 // GMST (ya lo estás usando para la Tierra)
 const gmst = satellite.gstime(now);
