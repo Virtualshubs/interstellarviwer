@@ -1135,14 +1135,17 @@ function animate() {
 // =========================
 const sunECI = getSunECI(now);
 
-if (!window.sunLight) {
-  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
-  scene.add(window.sunLight);
-  scene.add(window.sunLight.target);
-}
+// GMST (ya lo estás usando para la Tierra)
+const gmst = satellite.gstime(now);
+
+// Rotación ECI → ECEF
+const sunECEF = sunECI.clone().applyAxisAngle(
+  new THREE.Vector3(0, 1, 0),
+  gmst
+);
 
 window.sunLight.position.copy(
-  sunECI.clone().multiplyScalar(1000)
+  sunECEF.clone().multiplyScalar(1000)
 );
 
 window.sunLight.target.position.set(0, 0, 0);
