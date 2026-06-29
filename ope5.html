@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Earth Sun Fixed r134</title>
+<style>
+  body { margin:0; overflow:hidden; background:black; }
+  #info {
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+  }
+</style>
+</head>
+<body>
+
+<div id="info">Earth-Sun system (r134 stable)</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
+
+<script>
+
+// =====================
+// CORE
+// =====================
+let scene, camera, renderer;
+let earth, cloud, sunLight;
+let earthGroup;
+
+// zoom / controls
+let distance = 3;
+let targetDistance = 3;
+let rotY = 0;
+let rotX = 0;
+let targetRotY = 0;
+let targetRotX = 0;
+
+// time speed (REAL TIME)
+const TIME_SCALE = 1;
+
+// observer (España como referencia lógica)
+const observerLon = -3.7;
+
+// =====================
+// INIT
+// =====================
+init();
+animate();
+
+function init() {
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // =====================
+  // LIGHT (SOLO UNA)
+  // =====================
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  scene.add(sunLight);
+
+  // =====================
+  // EARTH GROUP
+  // =====================
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  // tilt real
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+
+  // earth
+  const tex = new THREE.TextureLoader().load(
+    "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  );
+
+  earth = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 64, 64),
+    new THREE.MeshStandardMaterial({ map: tex })
+  );
+
+  earthGroup.add(earth);
+
+  // atmosphere simple
+  const atm = new THREE.Mesh(
+    new THREE.SphereGeometry(1.02, 64, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0x88ccff,
+      transparent:true,
+      opacity:0.08,
+      side:THREE.BackSide
+    })
+  );
+
+  earth.add(atm);
+
+  // =====================
+  // CONTROLS
+  // =====================
+  window.addEventListener("wheel", e => {
+    targetDistance += e.deltaY * 0.002;
+    targetDistance = Math.max(2, Math.min(6, targetDistance));
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (e.buttons !== 1) return;
+    targetRotY += e.movementX * 0.005;
+    targetRotX += e.movementY * 0.005;
+  });
+
+  window.addEventListener("resize", onResize);
+}
+
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// =====================
+// SUN POSITION (correcto simple)
+// =====================
+function getSunDirection(date){
+
+  const ms = date.getTime();
+  const t = ms / 86400000;
+
+  // ciclo diario simple (24h)
+  const angle = (t % 1) * Math.PI * 2;
+
+  return new THREE.Vector3(
+    Math.cos(angle),
+    0.2,
+    Math.sin(angle)
+  ).normalize();
+}
+
+// =====================
+// ANIMATE
+// =====================
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  const now = new Date();
+
+  // =====================
+  // ROTACIÓN TIERRA (24h real)
+  // =====================
+  const earthRotationSpeed = (2 * Math.PI) / 86400; // rad/sec
+
+  earthGroup.rotation.y += earthRotationSpeed * TIME_SCALE;
+
+  // camera smoothing
+  rotY += (targetRotY - rotY) * 0.08;
+  rotX += (targetRotX - rotX) * 0.08;
+  distance += (targetDistance - distance) * 0.08;
+
+  camera.position.x = distance * Math.cos(rotX) * Math.sin(rotY);
+  camera.position.y = distance * Math.sin(rotX);
+  camera.position.z = distance * Math.cos(rotX) * Math.cos(rotY);
+  camera.lookAt(0,0,0);
+
+  // =====================
+  // SUN (solo dirección coherente)
+  // =====================
+  const sunDir = getSunDirection(now);
+
+  sunLight.position.copy(sunDir.clone().multiplyScalar(10));
+  sunLight.target.position.set(0,0,0);
+
+  renderer.render(scene, camera);
+}
+
+</script>
+
+</body>
+</html>
+🔥 Por
