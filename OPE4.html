@@ -721,24 +721,7 @@ init();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // =========================
-  // ☀️ LUZ SOLAR
-  // =========================
-  window.sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  scene.add(window.sunLight);
 
-  window.sunLight.target = new THREE.Object3D();
-  scene.add(window.sunLight.target);
-
-
-  // =========================
-  // 🔆 DEBUG SOL
-  // =========================
-  window.sunDebug = new THREE.Mesh(
-    new THREE.SphereGeometry(5),
-    new THREE.MeshBasicMaterial({ color: 0xffff00 })
-  );
-  scene.add(window.sunDebug);
 
   // =========================
   // 🌍 CONTENEDOR TIERRA (INCLINACIÓN GLOBAL)
