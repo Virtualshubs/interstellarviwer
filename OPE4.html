@@ -1167,24 +1167,28 @@ function animate() {
   }
 
 // =========================
-// ☀️ SOL
+// ☀️ SOL (EN ECEF COHERENTE)
 // =========================
+
+// 1. Sol en ECI
 const sunECI = getSunECI(now);
-  window.sunDir.copy(sunECI).normalize();
 
-  if (earth.material.userData.shader) {
-  earth.material.userData.shader.uniforms.sunDir.value.copy(window.sunDir);
-}
-
-// GMST (ya lo estás usando para la Tierra)
+// 2. Convertir a ECEF (alineado con earthGroup)
 const gmst = satellite.gstime(now);
 
-// Rotación ECI → ECEF
 const sunECEF = sunECI.clone().applyAxisAngle(
   new THREE.Vector3(0, 1, 0),
   gmst
 );
 
+// 3. NORMALIZAR y usar para shader
+window.sunDir.copy(sunECEF).normalize();
+
+if (earth.material.userData.shader) {
+  earth.material.userData.shader.uniforms.sunDir.value.copy(window.sunDir);
+}
+
+// 4. Luz física coherente
 window.sunLight.position.copy(
   sunECEF.clone().multiplyScalar(1000)
 );
