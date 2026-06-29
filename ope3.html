@@ -733,7 +733,7 @@ init();
   // =========================
   // 💡 LUZ AMBIENTAL
   // =========================
- const ambient = new THREE.AmbientLight(0xffffff, 0.12);
+ const ambient = new THREE.AmbientLight(0xffffff, 0.02);
   scene.add(ambient);
 
   // =========================
@@ -770,9 +770,7 @@ init();
   earth = new THREE.Mesh(
     new THREE.SphereGeometry(100, 64, 64),
     new THREE.MeshStandardMaterial({
-      map: earthTexture,
-  emissive: new THREE.Color(0x000000),
-emissiveIntensity: 0.0
+      map: earthTexture
     })
   );
 
