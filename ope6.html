@@ -83,6 +83,29 @@ let satMeshes = {};
 let satrecs = {};
 let currentSat = "25544";
 
+// ===================== 🎨 MISSION COLORS =====================
+const MISSION_COLOR = {
+  "ISS": 0x4aa3ff,        // azul
+  "Copernicus": 0xff7a18, // naranja fosforito
+  "NOAA": 0xb06cff,       // violeta
+  "Meteosat": 0xb06cff
+};
+
+function getMissionColor(id){
+
+  const sat = SAT_INFO[id];
+  if(!sat) return 0xffffff;
+
+  const name = sat.name.toLowerCase();
+
+  if(name.includes("sentinel")) return MISSION_COLOR["Copernicus"];
+  if(name.includes("iss")) return MISSION_COLOR["ISS"];
+  if(name.includes("noaa")) return MISSION_COLOR["NOAA"];
+  if(name.includes("meteosat")) return MISSION_COLOR["Meteosat"];
+
+  return 0xffffff;
+}
+
 // ===================== INIT =====================
 init();
 animate();
@@ -196,10 +219,9 @@ async function loadTLE(id){
 
     satrecs[id] = satellite.twoline2satrec(lines[1], lines[2]);
 
-    // create mesh if not exists
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.03, 10, 10),
-      new THREE.MeshBasicMaterial({ color: 0xff3333 })
+      new THREE.MeshBasicMaterial({ color: getMissionColor(id) })
     );
 
     scene.add(mesh);
@@ -233,13 +255,13 @@ function updateSatellites(){
 
     mesh.position.copy(latLonToVec3(lat, lon, 1.4));
 
-    // highlight selected
+    // highlight selected (SIEMPRE PRIORIDAD)
     if(id === currentSat){
       mesh.scale.set(2,2,2);
       mesh.material.color.set(0x00ff00);
     } else {
       mesh.scale.set(1,1,1);
-      mesh.material.color.set(0xff3333);
+      mesh.material.color.set(getMissionColor(id));
     }
   }
 }
