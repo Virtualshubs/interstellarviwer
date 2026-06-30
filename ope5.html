@@ -30,6 +30,9 @@
 let scene, camera, renderer;
 let earth, earthGroup, sunLight;
 
+// 🔧 FIX ROTATION TIME BASE
+let startTime = Date.now();
+
 // =====================
 // CAMERA CONTROL (FULL ORBIT)
 // =====================
@@ -67,16 +70,12 @@ function init(){
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // =====================
   // LIGHT
-  // =====================
   sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
   scene.add(sunLight);
   scene.add(new THREE.AmbientLight(0xffffff, 0.05));
 
-  // =====================
   // EARTH
-  // =====================
   earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
@@ -94,9 +93,7 @@ function init(){
   earth.rotation.y = Math.PI;
   earthGroup.add(earth);
 
-  // =====================
   // PIN MADRID
-  // =====================
   const pin = new THREE.Mesh(
     new THREE.SphereGeometry(0.02, 12, 12),
     new THREE.MeshBasicMaterial({ color: 0xff0000 })
@@ -105,10 +102,7 @@ function init(){
   pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
   earth.add(pin);
 
-  // =====================
   // CONTROLS
-  // =====================
-
   window.addEventListener("wheel", (e)=>{
     targetDistance += e.deltaY * 0.002;
     targetDistance = Math.max(1.8, Math.min(8, targetDistance));
@@ -195,22 +189,23 @@ function animate(){
   const now = new Date();
 
   // =====================
-  // ROTACIÓN TIERRA (estable)
+  // 🔧 FIX: STABLE REAL ROTATION (24h = 1 turn)
   // =====================
-  const rotationSpeed = (2*Math.PI)/86400;
-  earthGroup.rotation.y += rotationSpeed;
+  const nowMs = Date.now();
+  const elapsedSeconds = (nowMs - startTime) / 1000;
+
+  const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
+  earthGroup.rotation.y = rotation;
 
   // =====================
-  // SOL
+  // SOL (UNCHANGED)
   // =====================
   const sunDir = getSunDirection(now);
 
   sunLight.position.copy(sunDir.clone().multiplyScalar(10));
   sunLight.target.position.set(0,0,0);
 
-  // =====================
   // CAMERA SMOOTH ORBIT
-  // =====================
   rotY += (targetRotY - rotY) * 0.08;
   rotX += (targetRotX - rotX) * 0.08;
   distance += (targetDistance - distance) * 0.08;
