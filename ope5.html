@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Sun System (Stable + Controls)</title>
+<title>Earth Sun System (Stable + Time Corrected)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
@@ -18,7 +18,7 @@
 </head>
 
 <body>
-<div id="info">Stable Earth-Sun system (with zoom & rotation)</div>
+<div id="info">Stable Earth-Sun system (deltaTime corrected)</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 
@@ -29,6 +29,7 @@
 // =====================
 let scene, camera, renderer;
 let earth, earthGroup, sunLight;
+let clock;
 
 // =====================
 // CAMERA CONTROL
@@ -41,6 +42,11 @@ let targetRotY = 0;
 
 let isDragging = false;
 let lastX = 0;
+
+// =====================
+// SPEED CONTROL (CLAVE)
+// =====================
+const TIME_SCALE = 0.2; // 🔥 AJUSTA AQUÍ LA VELOCIDAD GLOBAL
 
 // =====================
 // INIT
@@ -62,6 +68,8 @@ function init(){
   renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+
+  clock = new THREE.Clock();
 
   // =====================
   // LIGHT
@@ -88,7 +96,6 @@ function init(){
   );
 
   earth.rotation.y = Math.PI;
-
   earthGroup.add(earth);
 
   // =====================
@@ -105,7 +112,6 @@ function init(){
   // =====================
   // CONTROLS
   // =====================
-
   window.addEventListener("wheel", (e)=>{
     targetDistance += e.deltaY * 0.002;
     targetDistance = Math.max(1.8, Math.min(8, targetDistance));
@@ -151,7 +157,7 @@ function latLonToVec3(lat, lon, r){
 }
 
 // =====================
-// SOL (estable)
+// SOL (igual que antes)
 // =====================
 function getSunDirection(date){
 
@@ -177,19 +183,22 @@ function getSunDirection(date){
 }
 
 // =====================
-// LOOP
+// LOOP (FIX REAL FPS DEPENDENT)
 // =====================
 function animate(){
 
   requestAnimationFrame(animate);
 
+  const delta = clock.getDelta(); // 🔥 tiempo real entre frames
+
   const now = new Date();
 
   // =====================
-  // ROTACIÓN TIERRA
+  // ROTACIÓN TIERRA (CORRECTA)
   // =====================
-  const rotationSpeed = (2*Math.PI)/86400;
-  earthGroup.rotation.y += rotationSpeed;
+  const rotationSpeed = (2*Math.PI) / 86400;
+
+  earthGroup.rotation.y += rotationSpeed * delta * TIME_SCALE;
 
   // =====================
   // SOL
@@ -200,10 +209,9 @@ function animate(){
   sunLight.target.position.set(0,0,0);
 
   // =====================
-  // CAMERA SMOOTH
+  // CAMERA
   // =====================
   rotY += (targetRotY - rotY) * 0.08;
-  distance += (targetDistance - distance) * 0.08;
 
   camera.position.x = distance * Math.sin(rotY);
   camera.position.z = distance * Math.cos(rotY);
