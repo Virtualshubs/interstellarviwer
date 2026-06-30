@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Earth + Sun + Correct TLE Frame Sync</title>
+
+<style>
+  body { margin:0; overflow:hidden; background:black; }
+  #info {
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+    z-index:10;
+  }
+  #ui {
+    position:absolute;
+    top:10px;
+    right:10px;
+    color:white;
+    font-family:Arial;
+    z-index:20;
+    background:rgba(0,0,0,0.5);
+    padding:10px;
+  }
+  select { width:220px; margin-top:5px; }
+</style>
+</head>
+
+<body>
+
+<div id="info">Earth + Sun (Stable) + Correct TLE Frame Sync</div>
+
+<div id="ui">
+  🛰️ Satellite focus<br/>
+  <select id="satSelect"></select>
+  <div id="satInfo"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+
+<script>
+
+// ======================================================
+// 🌍 BASE STABLE SYSTEM (NO TOCAR)
+// ======================================================
+let scene, camera, renderer;
+let earth, earthGroup, sunLight, ambientLight;
+
+let startTime = Date.now();
+
+let distance = 3;
+let targetDistance = 3;
+let rotY = 0, targetRotY = 0;
+let rotX = 0, targetRotX = 0;
+let isDragging = false;
+
+// ======================================================
+// 🛰️ SATELLITES
+// ======================================================
+const SAT_INFO = {
+  "25544": { name:"ISS", type:"Station" },
+
+  "39634": { name:"Sentinel-1A", type:"Copernicus" },
+  "39084": { name:"Sentinel-1B", type:"Copernicus" },
+  "29780": { name:"Sentinel-2A", type:"Copernicus" },
+  "42063": { name:"Sentinel-2B", type:"Copernicus" },
+  "28654": { name:"Sentinel-3A", type:"Copernicus" },
+  "43618": { name:"Sentinel-5P", type:"Copernicus" },
+
+  "25338": { name:"NOAA-15", type:"Weather" },
+  "38552": { name:"Meteosat-10", type:"Weather" }
+};
+
+let satMeshes = {};
+let satrecs = {};
+let currentSat = "25544";
+
+// ======================================================
+// COLORS
+// ======================================================
+function getColor(id){
+  const n = SAT_INFO[id].name.toLowerCase();
+  if(n.includes("sentinel")) return 0xff7a18;
+  if(n.includes("noaa") || n.includes("meteosat")) return 0xb06cff;
+  if(n.includes("iss")) return 0x4aa3ff;
+  return 0xffffff;
+}
+
+// ======================================================
+// INIT
+// ======================================================
+init();
+animate();
+
+function init(){
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // LIGHTS (RESTORED STABLE SYSTEM)
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  scene.add(sunLight);
+  scene.add(sunLight.target);
+
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.12);
+  scene.add(ambientLight);
+
+  // EARTH GROUP (IMPORTANT: ROTATION FRAME)
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+
+  const tex = new THREE.TextureLoader().load(
+    "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  );
+
+  earth = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 64, 64),
+    new THREE.MeshStandardMaterial({ map: tex })
+  );
+
+  earth.rotation.y = Math.PI;
+  earthGroup.add(earth);
+
+  // UI
+  const sel = document.getElementById("satSelect");
+  for(const id in SAT_INFO){
+    const o = document.createElement("option");
+    o.value = id;
+    o.textContent = SAT_INFO[id].name;
+    sel.appendChild(o);
+  }
+
+  sel.value = currentSat;
+  sel.onchange = (e)=>{
+    currentSat = e.target.value;
+    updateUI();
+  };
+
+  updateUI();
+
+  // LOAD TLE
+  for(const id in SAT_INFO){
+    loadTLE(id);
+  }
+
+  // CONTROLS
+  window.addEventListener("wheel",(e)=>{
+    targetDistance += e.deltaY * 0.002;
+    targetDistance = Math.max(1.8, Math.min(8, targetDistance));
+  });
+
+  window.addEventListener("mousedown",()=>isDragging=true);
+  window.addEventListener("mouseup",()=>isDragging=false);
+
+  window.addEventListener("mousemove",(e)=>{
+    if(!isDragging) return;
+    targetRotY += e.movementX * 0.005;
+    targetRotX += e.movementY * 0.005;
+  });
+
+  window.addEventListener("resize", onResize);
+}
+
+// ======================================================
+// TLE
+// ======================================================
+async function loadTLE(id){
+
+  const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${id}&FORMAT=tle`;
+  const res = await fetch(url);
+  const txt = await res.text();
+
+  const l = txt.trim().split("\n");
+  if(l.length < 3) return;
+
+  satrecs[id] = satellite.twoline2satrec(l[1], l[2]);
+
+  const m = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 10, 10),
+    new THREE.MeshBasicMaterial({ color: getColor(id) })
+  );
+
+  scene.add(m);
+  satMeshes[id] = m;
+}
+
+// ======================================================
+// 🔥 FIX CRÍTICO: FRAME CORRECTO
+// ======================================================
+function updateSatellites(){
+
+  const now = new Date();
+  const gmst = satellite.gstime(now);
+
+  for(const id in satrecs){
+
+    const satrec = satrecs[id];
+    const pv = satellite.propagate(satrec, now);
+    if(!pv.position) continue;
+
+    // ECI -> GEO (correct)
+    const geo = satellite.eciToGeodetic(pv.position, gmst);
+
+    const lat = satellite.degreesLat(geo.latitude);
+    const lon = satellite.degreesLong(geo.longitude);
+
+    const mesh = satMeshes[id];
+    if(!mesh) continue;
+
+    // IMPORTANT FIX:
+    // apply EARTH ROTATION FRAME CONSISTENCY
+    const earthRot = earthGroup.rotation.y;
+
+    const correctedLon = lon - THREE.MathUtils.radToDeg(earthRot);
+
+    mesh.position.copy(latLonToVec3(lat, correctedLon, 1.4));
+
+    if(id === currentSat){
+      mesh.scale.set(2,2,2);
+      mesh.material.color.set(0x00ff00);
+    } else {
+      mesh.scale.set(1,1,1);
+      mesh.material.color.set(getColor(id));
+    }
+  }
+}
+
+// ======================================================
+// LATLON
+// ======================================================
+function latLonToVec3(lat, lon, r){
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  return new THREE.Vector3(
+    -(r * Math.sin(phi) * Math.cos(theta)),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+// ======================================================
+// UI
+// ======================================================
+function updateUI(){
+  const s = SAT_INFO[currentSat];
+  document.getElementById("satInfo").innerHTML =
+    `<b>${s.name}</b><br>${s.type}`;
+}
+
+// ======================================================
+// ANIMATE (RESTORED SOL SYSTEM)
+// ======================================================
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  const now = new Date();
+
+  // 🌍 EARTH ROTATION (STABLE ORIGINAL MODEL)
+  const elapsed = (Date.now() - startTime) / 1000;
+  earthGroup.rotation.y = (elapsed / 86400) * (2 * Math.PI);
+
+  // ☀️ SIMPLE STABLE SUN (NO DRIFT)
+  const day = (now - new Date(now.getFullYear(),0,0)) / 86400000;
+
+  const decl = THREE.MathUtils.degToRad(
+    23.44 * Math.sin((2*Math.PI/365) * (day - 81))
+  );
+
+  const angle = (now.getHours()/24) * Math.PI * 2;
+
+  const sunDir = new THREE.Vector3(
+    Math.cos(angle),
+    Math.sin(decl),
+    Math.sin(angle)
+  ).normalize();
+
+  sunLight.position.copy(sunDir.clone().multiplyScalar(50));
+  sunLight.target.position.set(0,0,0);
+
+  const ambientFactor = Math.max(0.15, Math.abs(sunDir.y));
+  ambientLight.intensity = 0.08 + (1 - ambientFactor) * 0.15;
+
+  updateSatellites();
+
+  rotY += (targetRotY-rotY)*0.08;
+  rotX += (targetRotX-rotX)*0.08;
+  distance += (targetDistance-distance)*0.08;
+
+  camera.position.x = distance*Math.cos(rotX)*Math.sin(rotY);
+  camera.position.y = distance*Math.sin(rotX);
+  camera.position.z = distance*Math.cos(rotX)*Math.cos(rotY);
+
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene,camera);
+}
+
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+</script>
+
+</body>
+</html>
