@@ -2,31 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth + Copernicus Constellation (TLE)</title>
+<title>Earth + Copernicus Constellation (REAL TLE)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
-
-  #info {
-    position:absolute;
-    top:10px;
-    left:10px;
-    color:white;
-    font-family:Arial;
-    z-index:10;
-  }
-
-  #ui {
-    position:absolute;
-    top:10px;
-    right:10px;
-    color:white;
-    font-family:Arial;
-    z-index:20;
-    background:rgba(0,0,0,0.5);
-    padding:10px;
-  }
-
+  #info { position:absolute; top:10px; left:10px; color:white; font-family:Arial; z-index:10; }
+  #ui { position:absolute; top:10px; right:10px; color:white; font-family:Arial; z-index:20; background:rgba(0,0,0,0.5); padding:10px; }
   select { width:220px; margin-top:5px; }
 </style>
 </head>
@@ -62,19 +43,13 @@ let lastX = 0, lastY = 0;
 
 // ===================== SATELLITES =====================
 const SAT_INFO = {
-
   "25544": { name:"ISS", type:"Station", mission:"Microgravity" },
-
   "39634": { name:"Sentinel-1A", type:"Radar", mission:"Earth observation" },
   "39084": { name:"Sentinel-1B", type:"Radar", mission:"Earth observation" },
-
   "29780": { name:"Sentinel-2A", type:"Optical", mission:"Imaging Earth" },
   "42063": { name:"Sentinel-2B", type:"Optical", mission:"Imaging Earth" },
-
   "28654": { name:"Sentinel-3A", type:"Ocean", mission:"Climate" },
-
   "43618": { name:"Sentinel-5P", type:"Atmosphere", mission:"Air quality" },
-
   "25338": { name:"NOAA-15", type:"Meteorological", mission:"Weather monitoring" },
   "38552": { name:"Meteosat-10", type:"Geo Weather", mission:"Europe weather" }
 };
@@ -84,24 +59,21 @@ let satrecs = {};
 let currentSat = "25544";
 
 // ===================== 🎨 MISSION COLORS =====================
-const MISSION_COLOR = {
-  "ISS": 0x4aa3ff,        // azul
-  "Copernicus": 0xff7a18, // naranja fosforito
-  "NOAA": 0xb06cff,       // violeta
-  "Meteosat": 0xb06cff
+const COLOR = {
+  COPERNICUS: 0xff7a18,
+  ISS: 0x4aa3ff,
+  WEATHER: 0xb06cff
 };
 
-function getMissionColor(id){
-
+function getColor(id){
   const sat = SAT_INFO[id];
   if(!sat) return 0xffffff;
 
   const name = sat.name.toLowerCase();
 
-  if(name.includes("sentinel")) return MISSION_COLOR["Copernicus"];
-  if(name.includes("iss")) return MISSION_COLOR["ISS"];
-  if(name.includes("noaa")) return MISSION_COLOR["NOAA"];
-  if(name.includes("meteosat")) return MISSION_COLOR["Meteosat"];
+  if(name.includes("sentinel")) return COLOR.COPERNICUS;
+  if(name.includes("iss")) return COLOR.ISS;
+  if(name.includes("noaa") || name.includes("meteosat")) return COLOR.WEATHER;
 
   return 0xffffff;
 }
@@ -114,15 +86,12 @@ function init(){
 
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(
-    60, window.innerWidth/window.innerHeight, 0.1, 1000
-  );
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
 
   renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // LIGHTS
   sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
   scene.add(sunLight);
   scene.add(sunLight.target);
@@ -130,7 +99,7 @@ function init(){
   ambientLight = new THREE.AmbientLight(0xffffff, 0.12);
   scene.add(ambientLight);
 
-  // EARTH
+  // EARTH FRAME (GMST ROTATION)
   earthGroup = new THREE.Group();
   scene.add(earthGroup);
 
@@ -147,7 +116,7 @@ function init(){
 
   earthGroup.add(earth);
 
-  // MADRID PIN
+  // Madrid pin
   const madridPin = new THREE.Mesh(
     new THREE.SphereGeometry(0.02, 12, 12),
     new THREE.MeshBasicMaterial({ color: 0x00ff00 })
@@ -156,7 +125,7 @@ function init(){
   madridPin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
   earth.add(madridPin);
 
-  // SATELLITES UI
+  // UI
   const select = document.getElementById("satSelect");
 
   for(const id in SAT_INFO){
@@ -168,14 +137,14 @@ function init(){
 
   select.value = currentSat;
 
-  select.addEventListener("change", (e)=>{
+  select.addEventListener("change",(e)=>{
     currentSat = e.target.value;
     updateUI(currentSat);
   });
 
   updateUI(currentSat);
 
-  // LOAD ALL TLEs
+  // LOAD TLE
   for(const id in SAT_INFO){
     loadTLE(id);
   }
@@ -186,53 +155,40 @@ function init(){
     targetDistance = Math.max(1.8, Math.min(8, targetDistance));
   });
 
-  window.addEventListener("mousedown",(e)=>{
-    isDragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-  });
-
+  window.addEventListener("mousedown",()=> isDragging=true);
   window.addEventListener("mouseup",()=> isDragging=false);
 
   window.addEventListener("mousemove",(e)=>{
     if(!isDragging) return;
-    targetRotY += (e.clientX-lastX)*0.005;
-    targetRotX += (e.clientY-lastY)*0.005;
-    lastX = e.clientX;
-    lastY = e.clientY;
+    targetRotY += e.movementX * 0.005;
+    targetRotX += e.movementY * 0.005;
   });
 
   window.addEventListener("resize", onResize);
 }
 
-// ===================== TLE LOADER =====================
+// ===================== TLE =====================
 async function loadTLE(id){
 
-  try {
-    const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${id}&FORMAT=tle`;
-    const res = await fetch(url);
-    const text = await res.text();
+  const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${id}&FORMAT=tle`;
+  const res = await fetch(url);
+  const text = await res.text();
 
-    const lines = text.trim().split("\n");
+  const lines = text.trim().split("\n");
+  if(lines.length < 3) return;
 
-    if(lines.length < 3) return;
+  satrecs[id] = satellite.twoline2satrec(lines[1], lines[2]);
 
-    satrecs[id] = satellite.twoline2satrec(lines[1], lines[2]);
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 10, 10),
+    new THREE.MeshBasicMaterial({ color: getColor(id) })
+  );
 
-    const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.03, 10, 10),
-      new THREE.MeshBasicMaterial({ color: getMissionColor(id) })
-    );
-
-    scene.add(mesh);
-    satMeshes[id] = mesh;
-
-  } catch(e){
-    console.error("TLE error", id, e);
-  }
+  scene.add(mesh);
+  satMeshes[id] = mesh;
 }
 
-// ===================== UPDATE SATS =====================
+// ===================== UPDATE SATS (REAL TIME) =====================
 function updateSatellites(){
 
   const now = new Date();
@@ -242,7 +198,6 @@ function updateSatellites(){
 
     const satrec = satrecs[id];
     const posVel = satellite.propagate(satrec, now);
-
     if(!posVel.position) continue;
 
     const geo = satellite.eciToGeodetic(posVel.position, gmst);
@@ -255,13 +210,12 @@ function updateSatellites(){
 
     mesh.position.copy(latLonToVec3(lat, lon, 1.4));
 
-    // highlight selected (SIEMPRE PRIORIDAD)
     if(id === currentSat){
       mesh.scale.set(2,2,2);
       mesh.material.color.set(0x00ff00);
     } else {
       mesh.scale.set(1,1,1);
-      mesh.material.color.set(getMissionColor(id));
+      mesh.material.color.set(getColor(id));
     }
   }
 }
@@ -296,7 +250,6 @@ function animate(){
 
   const sunDir = new THREE.Vector3(1,1,0).normalize();
   sunLight.position.copy(sunDir.multiplyScalar(50));
-  sunLight.target.position.set(0,0,0);
 
   updateSatellites();
 
