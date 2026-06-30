@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Sun System + Satellite Layer</title>
+<title>Earth + Copernicus Constellation (TLE)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
@@ -27,28 +27,22 @@
     padding:10px;
   }
 
-  select { width:200px; margin-top:5px; }
+  select { width:220px; margin-top:5px; }
 </style>
 </head>
 
 <body>
 
-<div id="info">Earth + Sun System</div>
+<div id="info">Earth + Copernicus Satellite Constellation (REAL TLE)</div>
 
 <div id="ui">
-  🛰️ Satellite<br/>
-  <select id="satSelect">
-    <option value="25544">ISS</option>
-    <option value="39634">Sentinel-1A</option>
-    <option value="29780">Sentinel-2A</option>
-    <option value="28654">Sentinel-3A</option>
-    <option value="43618">Sentinel-5P</option>
-  </select>
-
+  🛰️ Satellite focus<br/>
+  <select id="satSelect"></select>
   <div id="satInfo"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
 
 <script>
 
@@ -66,17 +60,28 @@ let rotX = 0, targetRotX = 0;
 let isDragging = false;
 let lastX = 0, lastY = 0;
 
-// ===================== SATELLITE =====================
-let satMesh;
-let currentSat = "25544";
-
+// ===================== SATELLITES =====================
 const SAT_INFO = {
+
   "25544": { name:"ISS", type:"Station", mission:"Microgravity" },
+
   "39634": { name:"Sentinel-1A", type:"Radar", mission:"Earth observation" },
+  "39084": { name:"Sentinel-1B", type:"Radar", mission:"Earth observation" },
+
   "29780": { name:"Sentinel-2A", type:"Optical", mission:"Imaging Earth" },
+  "42063": { name:"Sentinel-2B", type:"Optical", mission:"Imaging Earth" },
+
   "28654": { name:"Sentinel-3A", type:"Ocean", mission:"Climate" },
-  "43618": { name:"Sentinel-5P", type:"Atmosphere", mission:"Air quality" }
+
+  "43618": { name:"Sentinel-5P", type:"Atmosphere", mission:"Air quality" },
+
+  "25338": { name:"NOAA-15", type:"Meteorological", mission:"Weather monitoring" },
+  "38552": { name:"Meteosat-10", type:"Geo Weather", mission:"Europe weather" }
 };
+
+let satMeshes = {};
+let satrecs = {};
+let currentSat = "25544";
 
 // ===================== INIT =====================
 init();
@@ -119,44 +124,38 @@ function init(){
 
   earthGroup.add(earth);
 
-    // =====================
-  // PIN MADRID (ADDED ONLY)
-  // =====================
+  // MADRID PIN
   const madridPin = new THREE.Mesh(
     new THREE.SphereGeometry(0.02, 12, 12),
     new THREE.MeshBasicMaterial({ color: 0x00ff00 })
   );
 
-  // Madrid: 40.4168, -3.7038
-  const phi = THREE.MathUtils.degToRad(90 - 40.4168);
-  const theta = THREE.MathUtils.degToRad(-3.7038 + 180);
-
-  const r = 1.01;
-
-  madridPin.position.set(
-    -(r * Math.sin(phi) * Math.cos(theta)),
-     r * Math.cos(phi),
-     r * Math.sin(phi) * Math.sin(theta)
-  );
-
+  madridPin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
   earth.add(madridPin);
 
-  // SATELLITE
-  satMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(0.03, 12, 12),
-    new THREE.MeshBasicMaterial({ color: 0xff0000 })
-  );
+  // SATELLITES UI
+  const select = document.getElementById("satSelect");
 
-  scene.add(satMesh);
+  for(const id in SAT_INFO){
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = SAT_INFO[id].name;
+    select.appendChild(opt);
+  }
 
-  // UI
-  document.getElementById("satSelect").addEventListener("change", (e)=>{
+  select.value = currentSat;
+
+  select.addEventListener("change", (e)=>{
     currentSat = e.target.value;
-
-    const sat = SAT_INFO[currentSat];
-    document.getElementById("satInfo").innerHTML =
-      sat.name + "<br>" + sat.type + "<br>" + sat.mission;
+    updateUI(currentSat);
   });
+
+  updateUI(currentSat);
+
+  // LOAD ALL TLEs
+  for(const id in SAT_INFO){
+    loadTLE(id);
+  }
 
   // controls
   window.addEventListener("wheel",(e)=>{
@@ -183,22 +182,85 @@ function init(){
   window.addEventListener("resize", onResize);
 }
 
-// ===================== SAT ORBIT =====================
-function updateSatellite(){
+// ===================== TLE LOADER =====================
+async function loadTLE(id){
 
-  const t = Date.now()*0.0001;
-  const id = parseInt(currentSat);
+  try {
+    const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${id}&FORMAT=tle`;
+    const res = await fetch(url);
+    const text = await res.text();
 
-  const inclination = (id % 90) * Math.PI/180;
-  const speed = 0.2 + (id % 10)*0.05;
+    const lines = text.trim().split("\n");
 
-  const angle = t * speed * Math.PI*2;
-  const r = 1.4;
+    if(lines.length < 3) return;
 
-  satMesh.position.set(
-    Math.cos(angle)*r,
-    Math.sin(angle)*Math.sin(inclination)*r,
-    Math.sin(angle)*Math.cos(inclination)*r
+    satrecs[id] = satellite.twoline2satrec(lines[1], lines[2]);
+
+    // create mesh if not exists
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.03, 10, 10),
+      new THREE.MeshBasicMaterial({ color: 0xff3333 })
+    );
+
+    scene.add(mesh);
+    satMeshes[id] = mesh;
+
+  } catch(e){
+    console.error("TLE error", id, e);
+  }
+}
+
+// ===================== UPDATE SATS =====================
+function updateSatellites(){
+
+  const now = new Date();
+  const gmst = satellite.gstime(now);
+
+  for(const id in satrecs){
+
+    const satrec = satrecs[id];
+    const posVel = satellite.propagate(satrec, now);
+
+    if(!posVel.position) continue;
+
+    const geo = satellite.eciToGeodetic(posVel.position, gmst);
+
+    const lat = satellite.degreesLat(geo.latitude);
+    const lon = satellite.degreesLong(geo.longitude);
+
+    const mesh = satMeshes[id];
+    if(!mesh) continue;
+
+    mesh.position.copy(latLonToVec3(lat, lon, 1.4));
+
+    // highlight selected
+    if(id === currentSat){
+      mesh.scale.set(2,2,2);
+      mesh.material.color.set(0x00ff00);
+    } else {
+      mesh.scale.set(1,1,1);
+      mesh.material.color.set(0xff3333);
+    }
+  }
+}
+
+// ===================== UI =====================
+function updateUI(id){
+  const sat = SAT_INFO[id];
+  document.getElementById("satInfo").innerHTML =
+    `<b>${sat.name}</b><br>${sat.type}<br>${sat.mission}`;
+}
+
+// ===================== LATLON =====================
+function latLonToVec3(lat, lon, r){
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  return new THREE.Vector3(
+    -(r * Math.sin(phi) * Math.cos(theta)),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta)
   );
 }
 
@@ -211,11 +273,10 @@ function animate(){
   earthGroup.rotation.y = rot;
 
   const sunDir = new THREE.Vector3(1,1,0).normalize();
-
   sunLight.position.copy(sunDir.multiplyScalar(50));
   sunLight.target.position.set(0,0,0);
 
-  updateSatellite();
+  updateSatellites();
 
   rotY += (targetRotY-rotY)*0.08;
   rotX += (targetRotX-rotX)*0.08;
