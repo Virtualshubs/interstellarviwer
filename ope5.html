@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Sun System (GMST Unified)</title>
+<title>Earth Sun System (Stable + Controls)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
@@ -18,10 +18,9 @@
 </head>
 
 <body>
-<div id="info">Earth-Sun system (GMST unified model)</div>
+<div id="info">Stable Earth-Sun system (with zoom & rotation)</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
 
 <script>
 
@@ -29,14 +28,19 @@
 // CORE
 // =====================
 let scene, camera, renderer;
-let earth, earthGroup;
-let sunLight;
+let earth, earthGroup, sunLight;
 
-// camera controls
+// =====================
+// CAMERA CONTROL
+// =====================
 let distance = 3;
 let targetDistance = 3;
+
 let rotY = 0;
 let targetRotY = 0;
+
+let isDragging = false;
+let lastX = 0;
 
 // =====================
 // INIT
@@ -60,25 +64,20 @@ function init(){
   document.body.appendChild(renderer.domElement);
 
   // =====================
-  // LIGHT (SOL)
+  // LIGHT
   // =====================
-  sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
   scene.add(sunLight);
-
-  scene.add(new THREE.AmbientLight(0xffffff, 0.06));
-
-  // =====================
-  // EARTH GROUP
-  // =====================
-  earthGroup = new THREE.Group();
-  scene.add(earthGroup);
-
-  // inclinación terrestre (OBLICUIDAD REAL)
-  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.05));
 
   // =====================
   // EARTH
   // =====================
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+
   const tex = new THREE.TextureLoader().load(
     "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
   );
@@ -88,13 +87,12 @@ function init(){
     new THREE.MeshStandardMaterial({ map: tex })
   );
 
-  // FIX textura (longitud 0 alineada)
   earth.rotation.y = Math.PI;
 
   earthGroup.add(earth);
 
   // =====================
-  // MADRID PIN
+  // PIN MADRID
   // =====================
   const pin = new THREE.Mesh(
     new THREE.SphereGeometry(0.02, 12, 12),
@@ -107,13 +105,25 @@ function init(){
   // =====================
   // CONTROLS
   // =====================
-  window.addEventListener("wheel", e=>{
-    targetDistance = Math.min(6, Math.max(2, targetDistance + e.deltaY*0.002));
+
+  window.addEventListener("wheel", (e)=>{
+    targetDistance += e.deltaY * 0.002;
+    targetDistance = Math.max(1.8, Math.min(8, targetDistance));
   });
 
-  window.addEventListener("mousemove", e=>{
-    if(e.buttons !== 1) return;
-    targetRotY += e.movementX * 0.005;
+  window.addEventListener("mousedown", (e)=>{
+    isDragging = true;
+    lastX = e.clientX;
+  });
+
+  window.addEventListener("mouseup", ()=>{
+    isDragging = false;
+  });
+
+  window.addEventListener("mousemove", (e)=>{
+    if(!isDragging) return;
+    targetRotY += (e.clientX - lastX) * 0.005;
+    lastX = e.clientX;
   });
 
   window.addEventListener("resize", onResize);
@@ -130,8 +140,8 @@ function onResize(){
 // =====================
 function latLonToVec3(lat, lon, r){
 
-  const phi = THREE.MathUtils.degToRad(90-lat);
-  const theta = THREE.MathUtils.degToRad(lon+180);
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+  const theta = THREE.MathUtils.degToRad(lon + 180);
 
   return new THREE.Vector3(
     -(r * Math.sin(phi) * Math.cos(theta)),
@@ -141,38 +151,33 @@ function latLonToVec3(lat, lon, r){
 }
 
 // =====================
-// SUN (ECI → ECEF coherente)
+// SOL (estable)
 // =====================
-function getSunECI(date){
+function getSunDirection(date){
 
-  const jd = date.getTime()/86400000 + 2440587.5;
-  const n = jd - 2451545.0;
+  const now = date;
 
-  const L = (280.46 + 0.9856474 * n) % 360;
-  const g = THREE.MathUtils.degToRad((357.528 + 0.9856003 * n) % 360);
-
-  const lambda = THREE.MathUtils.degToRad(
-    L + 1.915*Math.sin(g) + 0.020*Math.sin(2*g)
+  const dayOfYear = Math.floor(
+    (now - new Date(now.getFullYear(),0,0)) / 86400000
   );
 
-  const epsilon = THREE.MathUtils.degToRad(23.439291);
+  const decl = THREE.MathUtils.degToRad(
+    23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
+  );
 
-  const x = Math.cos(lambda);
-  const y = Math.cos(epsilon)*Math.sin(lambda);
-  const z = Math.sin(epsilon)*Math.sin(lambda);
+  const frac = (now.getTime() % 86400000) / 86400000;
 
-  return new THREE.Vector3(x,y,z).normalize();
+  const angle = frac * Math.PI * 2;
+
+  return new THREE.Vector3(
+    Math.cos(angle),
+    Math.sin(decl),
+    Math.sin(angle)
+  ).normalize();
 }
 
 // =====================
-// GMST
-// =====================
-function getGMST(date){
-  return satellite.gstime(date);
-}
-
-// =====================
-// LOOP (CRÍTICO)
+// LOOP
 // =====================
 function animate(){
 
@@ -181,32 +186,27 @@ function animate(){
   const now = new Date();
 
   // =====================
-  // EARTH ROTATION (ABSOLUTA, NO INTEGRADA)
+  // ROTACIÓN TIERRA
   // =====================
-  const gmst = getGMST(now);
-
-  earthGroup.rotation.y = -gmst;
+  const rotationSpeed = (2*Math.PI)/86400;
+  earthGroup.rotation.y += rotationSpeed;
 
   // =====================
-  // SUN (coherente con ECI → ECEF)
+  // SOL
   // =====================
-  const sunECI = getSunECI(now);
+  const sunDir = getSunDirection(now);
 
-  const sunECEF = sunECI.clone().applyAxisAngle(
-    new THREE.Vector3(0,1,0),
-    gmst
-  );
-
-  sunLight.position.copy(sunECEF.multiplyScalar(10));
+  sunLight.position.copy(sunDir.clone().multiplyScalar(10));
   sunLight.target.position.set(0,0,0);
 
   // =====================
-  // CAMERA
+  // CAMERA SMOOTH
   // =====================
-  rotY += (targetRotY - rotY)*0.08;
+  rotY += (targetRotY - rotY) * 0.08;
+  distance += (targetDistance - distance) * 0.08;
 
-  camera.position.x = distance*Math.sin(rotY);
-  camera.position.z = distance*Math.cos(rotY);
+  camera.position.x = distance * Math.sin(rotY);
+  camera.position.z = distance * Math.cos(rotY);
   camera.position.y = 1.2;
 
   camera.lookAt(0,0,0);
