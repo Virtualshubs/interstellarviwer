@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Earth Sun System + Satellite Layer</title>
+
+<style>
+  body { margin:0; overflow:hidden; background:black; }
+
+  #info {
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+    z-index:10;
+  }
+
+  #ui {
+    position:absolute;
+    top:10px;
+    right:10px;
+    color:white;
+    font-family:Arial;
+    z-index:20;
+    background:rgba(0,0,0,0.5);
+    padding:10px;
+  }
+
+  select { width:200px; margin-top:5px; }
+</style>
+</head>
+
+<body>
+
+<div id="info">Earth + Sun System</div>
+
+<div id="ui">
+  🛰️ Satellite<br/>
+  <select id="satSelect">
+    <option value="25544">ISS</option>
+    <option value="39634">Sentinel-1A</option>
+    <option value="29780">Sentinel-2A</option>
+    <option value="28654">Sentinel-3A</option>
+    <option value="43618">Sentinel-5P</option>
+  </select>
+
+  <div id="satInfo"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+
+<script>
+
+// ===================== CORE =====================
+let scene, camera, renderer;
+let earth, earthGroup, sunLight, ambientLight;
+
+let startTime = Date.now();
+
+// camera
+let distance = 3;
+let targetDistance = 3;
+let rotY = 0, targetRotY = 0;
+let rotX = 0, targetRotX = 0;
+let isDragging = false;
+let lastX = 0, lastY = 0;
+
+// ===================== SATELLITE =====================
+let satMesh;
+let currentSat = "25544";
+
+const SAT_INFO = {
+  "25544": { name:"ISS", type:"Station", mission:"Microgravity" },
+  "39634": { name:"Sentinel-1A", type:"Radar", mission:"Earth observation" },
+  "29780": { name:"Sentinel-2A", type:"Optical", mission:"Imaging Earth" },
+  "28654": { name:"Sentinel-3A", type:"Ocean", mission:"Climate" },
+  "43618": { name:"Sentinel-5P", type:"Atmosphere", mission:"Air quality" }
+};
+
+// ===================== INIT =====================
+init();
+animate();
+
+function init(){
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(
+    60, window.innerWidth/window.innerHeight, 0.1, 1000
+  );
+
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // LIGHTS
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  scene.add(sunLight);
+  scene.add(sunLight.target);
+
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.12);
+  scene.add(ambientLight);
+
+  // EARTH
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+
+  const tex = new THREE.TextureLoader().load(
+    "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  );
+
+  earth = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 64, 64),
+    new THREE.MeshStandardMaterial({ map: tex })
+  );
+
+  earthGroup.add(earth);
+
+    // =====================
+  // PIN MADRID (ADDED ONLY)
+  // =====================
+  const madridPin = new THREE.Mesh(
+    new THREE.SphereGeometry(0.02, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+  );
+
+  // Madrid: 40.4168, -3.7038
+  const phi = THREE.MathUtils.degToRad(90 - 40.4168);
+  const theta = THREE.MathUtils.degToRad(-3.7038 + 180);
+
+  const r = 1.01;
+
+  madridPin.position.set(
+    -(r * Math.sin(phi) * Math.cos(theta)),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta)
+  );
+
+  earth.add(madridPin);
+
+  // SATELLITE
+  satMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+
+  scene.add(satMesh);
+
+  // UI
+  document.getElementById("satSelect").addEventListener("change", (e)=>{
+    currentSat = e.target.value;
+
+    const sat = SAT_INFO[currentSat];
+    document.getElementById("satInfo").innerHTML =
+      sat.name + "<br>" + sat.type + "<br>" + sat.mission;
+  });
+
+  // controls
+  window.addEventListener("wheel",(e)=>{
+    targetDistance += e.deltaY * 0.002;
+    targetDistance = Math.max(1.8, Math.min(8, targetDistance));
+  });
+
+  window.addEventListener("mousedown",(e)=>{
+    isDragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  window.addEventListener("mouseup",()=> isDragging=false);
+
+  window.addEventListener("mousemove",(e)=>{
+    if(!isDragging) return;
+    targetRotY += (e.clientX-lastX)*0.005;
+    targetRotX += (e.clientY-lastY)*0.005;
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  window.addEventListener("resize", onResize);
+}
+
+// ===================== SAT ORBIT =====================
+function updateSatellite(){
+
+  const t = Date.now()*0.0001;
+  const id = parseInt(currentSat);
+
+  const inclination = (id % 90) * Math.PI/180;
+  const speed = 0.2 + (id % 10)*0.05;
+
+  const angle = t * speed * Math.PI*2;
+  const r = 1.4;
+
+  satMesh.position.set(
+    Math.cos(angle)*r,
+    Math.sin(angle)*Math.sin(inclination)*r,
+    Math.sin(angle)*Math.cos(inclination)*r
+  );
+}
+
+// ===================== LOOP =====================
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  const rot = ((Date.now()-startTime)/86400000)*(2*Math.PI);
+  earthGroup.rotation.y = rot;
+
+  const sunDir = new THREE.Vector3(1,1,0).normalize();
+
+  sunLight.position.copy(sunDir.multiplyScalar(50));
+  sunLight.target.position.set(0,0,0);
+
+  updateSatellite();
+
+  rotY += (targetRotY-rotY)*0.08;
+  rotX += (targetRotX-rotX)*0.08;
+  distance += (targetDistance-distance)*0.08;
+
+  camera.position.x = distance*Math.cos(rotX)*Math.sin(rotY);
+  camera.position.y = distance*Math.sin(rotX);
+  camera.position.z = distance*Math.cos(rotX)*Math.cos(rotY);
+
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene,camera);
+}
+
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+</script>
+
+</body>
+</html>
