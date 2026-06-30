@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Fixed System (Clean Model)</title>
+<title>Earth Sun System (GMST Unified)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
   #info {
-  position:absolute;
-  top:10px;
-  left:10px;
-  color:white;
-  font-family:Arial;
-  z-index:10;
-}
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+    z-index:10;
+  }
 </style>
 </head>
 
 <body>
-<div id="info">Earth fixed system (clean ECI/ECEF separation)</div>
+<div id="info">Earth-Sun system (GMST unified model)</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
@@ -29,13 +29,10 @@
 // CORE
 // =====================
 let scene, camera, renderer;
+let earth, earthGroup;
 let sunLight;
 
-let earthTiltGroup;
-let earthRotationGroup;
-let earth;
-
-// controls
+// camera controls
 let distance = 3;
 let targetDistance = 3;
 let rotY = 0;
@@ -63,26 +60,21 @@ function init(){
   document.body.appendChild(renderer.domElement);
 
   // =====================
-  // LIGHT
+  // LIGHT (SOL)
   // =====================
   sunLight = new THREE.DirectionalLight(0xffffff, 1.3);
   scene.add(sunLight);
 
-  // pequeña luz de lectura (NO física)
   scene.add(new THREE.AmbientLight(0xffffff, 0.06));
 
   // =====================
-  // EARTH HIERARCHY (CLAVE)
+  // EARTH GROUP
   // =====================
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
 
-  earthTiltGroup = new THREE.Group();
-  scene.add(earthTiltGroup);
-
-  // inclinación REAL
-  earthTiltGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
-
-  earthRotationGroup = new THREE.Group();
-  earthTiltGroup.add(earthRotationGroup);
+  // inclinación terrestre (OBLICUIDAD REAL)
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
 
   // =====================
   // EARTH
@@ -96,10 +88,10 @@ function init(){
     new THREE.MeshStandardMaterial({ map: tex })
   );
 
-  // FIX fundamental de orientación del mapa
+  // FIX textura (longitud 0 alineada)
   earth.rotation.y = Math.PI;
 
-  earthRotationGroup.add(earth);
+  earthGroup.add(earth);
 
   // =====================
   // MADRID PIN
@@ -149,24 +141,38 @@ function latLonToVec3(lat, lon, r){
 }
 
 // =====================
-// SUN (stable simplified model)
+// SUN (ECI → ECEF coherente)
 // =====================
-function getSunDirection(date){
+function getSunECI(date){
 
-  const ms = date.getTime();
-  const t = ms / 86400000;
+  const jd = date.getTime()/86400000 + 2440587.5;
+  const n = jd - 2451545.0;
 
-  const angle = (t % 1) * Math.PI * 2;
+  const L = (280.46 + 0.9856474 * n) % 360;
+  const g = THREE.MathUtils.degToRad((357.528 + 0.9856003 * n) % 360);
 
-  return new THREE.Vector3(
-    Math.cos(angle),
-    0.25,
-    Math.sin(angle)
-  ).normalize();
+  const lambda = THREE.MathUtils.degToRad(
+    L + 1.915*Math.sin(g) + 0.020*Math.sin(2*g)
+  );
+
+  const epsilon = THREE.MathUtils.degToRad(23.439291);
+
+  const x = Math.cos(lambda);
+  const y = Math.cos(epsilon)*Math.sin(lambda);
+  const z = Math.sin(epsilon)*Math.sin(lambda);
+
+  return new THREE.Vector3(x,y,z).normalize();
 }
 
 // =====================
-// LOOP
+// GMST
+// =====================
+function getGMST(date){
+  return satellite.gstime(date);
+}
+
+// =====================
+// LOOP (CRÍTICO)
 // =====================
 function animate(){
 
@@ -175,18 +181,23 @@ function animate(){
   const now = new Date();
 
   // =====================
-  // EARTH ROTATION (GMST simplified stable)
+  // EARTH ROTATION (ABSOLUTA, NO INTEGRADA)
   // =====================
-  const earthRotationSpeed = (2*Math.PI)/86400;
+  const gmst = getGMST(now);
 
-  earthRotationGroup.rotation.y += earthRotationSpeed;
+  earthGroup.rotation.y = -gmst;
 
   // =====================
-  // SUN
+  // SUN (coherente con ECI → ECEF)
   // =====================
-  const sunDir = getSunDirection(now);
+  const sunECI = getSunECI(now);
 
-  sunLight.position.copy(sunDir.clone().multiplyScalar(10));
+  const sunECEF = sunECI.clone().applyAxisAngle(
+    new THREE.Vector3(0,1,0),
+    gmst
+  );
+
+  sunLight.position.copy(sunECEF.multiplyScalar(10));
   sunLight.target.position.set(0,0,0);
 
   // =====================
