@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Sun System (Stable + Time Corrected)</title>
+<title>Earth Sun System (Stable + Full Orbit Controls)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
@@ -18,7 +18,7 @@
 </head>
 
 <body>
-<div id="info">Stable Earth-Sun system (deltaTime corrected)</div>
+<div id="info">Stable Earth-Sun system (full orbit camera)</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 
@@ -29,10 +29,9 @@
 // =====================
 let scene, camera, renderer;
 let earth, earthGroup, sunLight;
-let clock;
 
 // =====================
-// CAMERA CONTROL
+// CAMERA CONTROL (FULL ORBIT)
 // =====================
 let distance = 3;
 let targetDistance = 3;
@@ -40,13 +39,12 @@ let targetDistance = 3;
 let rotY = 0;
 let targetRotY = 0;
 
+let rotX = 0;
+let targetRotX = 0;
+
 let isDragging = false;
 let lastX = 0;
-
-// =====================
-// SPEED CONTROL (CLAVE)
-// =====================
-const TIME_SCALE = 0.2; // 🔥 AJUSTA AQUÍ LA VELOCIDAD GLOBAL
+let lastY = 0;
 
 // =====================
 // INIT
@@ -68,8 +66,6 @@ function init(){
   renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-
-  clock = new THREE.Clock();
 
   // =====================
   // LIGHT
@@ -112,6 +108,7 @@ function init(){
   // =====================
   // CONTROLS
   // =====================
+
   window.addEventListener("wheel", (e)=>{
     targetDistance += e.deltaY * 0.002;
     targetDistance = Math.max(1.8, Math.min(8, targetDistance));
@@ -120,6 +117,7 @@ function init(){
   window.addEventListener("mousedown", (e)=>{
     isDragging = true;
     lastX = e.clientX;
+    lastY = e.clientY;
   });
 
   window.addEventListener("mouseup", ()=>{
@@ -128,8 +126,15 @@ function init(){
 
   window.addEventListener("mousemove", (e)=>{
     if(!isDragging) return;
-    targetRotY += (e.clientX - lastX) * 0.005;
+
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+
+    targetRotY += dx * 0.005;
+    targetRotX += dy * 0.005;
+
     lastX = e.clientX;
+    lastY = e.clientY;
   });
 
   window.addEventListener("resize", onResize);
@@ -157,21 +162,19 @@ function latLonToVec3(lat, lon, r){
 }
 
 // =====================
-// SOL (igual que antes)
+// SOL
 // =====================
 function getSunDirection(date){
 
-  const now = date;
-
   const dayOfYear = Math.floor(
-    (now - new Date(now.getFullYear(),0,0)) / 86400000
+    (date - new Date(date.getFullYear(),0,0)) / 86400000
   );
 
   const decl = THREE.MathUtils.degToRad(
     23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
   );
 
-  const frac = (now.getTime() % 86400000) / 86400000;
+  const frac = (date.getTime() % 86400000) / 86400000;
 
   const angle = frac * Math.PI * 2;
 
@@ -183,22 +186,19 @@ function getSunDirection(date){
 }
 
 // =====================
-// LOOP (FIX REAL FPS DEPENDENT)
+// LOOP
 // =====================
 function animate(){
 
   requestAnimationFrame(animate);
 
-  const delta = clock.getDelta(); // 🔥 tiempo real entre frames
-
   const now = new Date();
 
   // =====================
-  // ROTACIÓN TIERRA (CORRECTA)
+  // ROTACIÓN TIERRA (estable)
   // =====================
-  const rotationSpeed = (2*Math.PI) / 86400;
-
-  earthGroup.rotation.y += rotationSpeed * delta * TIME_SCALE;
+  const rotationSpeed = (2*Math.PI)/86400;
+  earthGroup.rotation.y += rotationSpeed;
 
   // =====================
   // SOL
@@ -209,13 +209,15 @@ function animate(){
   sunLight.target.position.set(0,0,0);
 
   // =====================
-  // CAMERA
+  // CAMERA SMOOTH ORBIT
   // =====================
   rotY += (targetRotY - rotY) * 0.08;
+  rotX += (targetRotX - rotX) * 0.08;
+  distance += (targetDistance - distance) * 0.08;
 
-  camera.position.x = distance * Math.sin(rotY);
-  camera.position.z = distance * Math.cos(rotY);
-  camera.position.y = 1.2;
+  camera.position.x = distance * Math.cos(rotX) * Math.sin(rotY);
+  camera.position.y = distance * Math.sin(rotX);
+  camera.position.z = distance * Math.cos(rotX) * Math.cos(rotY);
 
   camera.lookAt(0,0,0);
 
