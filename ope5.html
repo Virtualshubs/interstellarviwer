@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Earth Sun System (Stable + Full Orbit Controls)</title>
+<title>Earth Sun System (Stable + Final Fine Align)</title>
 
 <style>
   body { margin:0; overflow:hidden; background:black; }
@@ -18,7 +18,7 @@
 </head>
 
 <body>
-<div id="info">Stable Earth-Sun system (full orbit camera)</div>
+<div id="info">Stable Earth-Sun system (final fine alignment)</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 
@@ -28,13 +28,15 @@
 // CORE
 // =====================
 let scene, camera, renderer;
-let earth, earthGroup, sunLight;
+let earth, earthGroup, sunLight, ambientLight;
 
-// 🔧 FIX ROTATION TIME BASE
+// =====================
+// TIME BASE (stable rotation)
+// =====================
 let startTime = Date.now();
 
 // =====================
-// CAMERA CONTROL (FULL ORBIT)
+// CAMERA
 // =====================
 let distance = 3;
 let targetDistance = 3;
@@ -70,10 +72,12 @@ function init(){
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // LIGHT
-  sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
+  // LIGHTS
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
   scene.add(sunLight);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.05));
+
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.12);
+  scene.add(ambientLight);
 
   // EARTH
   earthGroup = new THREE.Group();
@@ -87,7 +91,13 @@ function init(){
 
   earth = new THREE.Mesh(
     new THREE.SphereGeometry(1, 64, 64),
-    new THREE.MeshStandardMaterial({ map: tex })
+    new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 1,
+      metalness: 0,
+      emissive: new THREE.Color(0x0a0a0a),
+      emissiveIntensity: 0.25
+    })
   );
 
   earth.rotation.y = Math.PI;
@@ -172,10 +182,11 @@ function getSunDirection(date){
 
   const angle = frac * Math.PI * 2;
 
+  // ☀️ FINAL MICRO ALIGNMENT (meridian correction ~0.35°)
   return new THREE.Vector3(
-    Math.cos(angle),
+    Math.cos(angle + THREE.MathUtils.degToRad(-0.35)),
     Math.sin(decl),
-    Math.sin(angle)
+    Math.sin(angle + THREE.MathUtils.degToRad(-0.35))
   ).normalize();
 }
 
@@ -188,24 +199,23 @@ function animate(){
 
   const now = new Date();
 
-  // =====================
-  // 🔧 FIX: STABLE REAL ROTATION (24h = 1 turn)
-  // =====================
+  // STABLE ROTATION (24h real)
   const nowMs = Date.now();
   const elapsedSeconds = (nowMs - startTime) / 1000;
 
   const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
   earthGroup.rotation.y = rotation;
 
-  // =====================
-  // SOL (UNCHANGED)
-  // =====================
+  // SUN LIGHT
   const sunDir = getSunDirection(now);
 
-  sunLight.position.copy(sunDir.clone().multiplyScalar(10));
+  sunLight.position.copy(sunDir.clone().multiplyScalar(50));
   sunLight.target.position.set(0,0,0);
 
-  // CAMERA SMOOTH ORBIT
+  const dayFactor = Math.max(0.15, Math.abs(sunDir.y));
+  ambientLight.intensity = 0.08 + (1 - dayFactor) * 0.15;
+
+  // CAMERA
   rotY += (targetRotY - rotY) * 0.08;
   rotX += (targetRotX - rotX) * 0.08;
   distance += (targetDistance - distance) * 0.08;
