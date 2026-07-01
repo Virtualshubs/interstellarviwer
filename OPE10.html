@@ -507,20 +507,6 @@ pre {
 }
 
   select { width:220px; margin-top:5px; }
-
-
-
-  #panel{
-  position:absolute;
-  top:10px;
-  right:10px;
-  background:rgba(0,0,0,0.6);
-  color:white;
-  padding:10px;
-  font-family:Arial;
-  font-size:12px;
-  border-radius:8px;
-}
 </style>
 </head>
 
@@ -533,13 +519,6 @@ pre {
   <select id="satSelect"></select>
   <button id="calcBtn">Calcular satélite</button>
   <div id="satInfo"></div>
-
-  <div id="panel">
-  <label><input type="checkbox" id="gridToggle" checked> Meridianos</label><br>
-  <label><input type="checkbox" id="equatorToggle" checked> Ecuador</label><br>
-  <label><input type="checkbox" id="axisToggle" checked> Eje terrestre</label><br>
-  <label><input type="checkbox" id="atmToggle" checked> Atmósfera</label>
-</div>
   
 </div>
 
@@ -562,13 +541,6 @@ let targetDistance = 3;
 let rotY = 0, targetRotY = 0;
 let rotX = 0, targetRotX = 0;
 let isDragging = false;
-
-  const overlays = {
-  grid: true,
-  equator: true,
-  axis: true,
-  atmosphere: true
-};
 
 // ======================================================
 // 🛰️ SATELLITES ENGINE
@@ -682,102 +654,6 @@ function init(){
   pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
   earth.add(pin);
 
-  let equatorLine;
-
-function createEquator(){
-  const points = [];
-  const segments = 128;
-
-  for(let i=0;i<=segments;i++){
-    const theta = (i/segments)*Math.PI*2;
-
-    const x = Math.cos(theta);
-    const z = Math.sin(theta);
-
-    points.push(new THREE.Vector3(x, 0, z));
-  }
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-  const material = new THREE.LineBasicMaterial({
-    color: 0x00ffff
-  });
-
-  equatorLine = new THREE.LineLoop(geometry, material);
-  earthGroup.add(equatorLine);
-}
-
-  let axisLine;
-
-function createAxis(){
-  const points = [
-    new THREE.Vector3(0, -1.2, 0),
-    new THREE.Vector3(0,  1.2, 0)
-  ];
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-  const material = new THREE.LineBasicMaterial({
-    color: 0xff4444
-  });
-
-  axisLine = new THREE.Line(geometry, material);
-  earthGroup.add(axisLine);
-}
-
-  let meridians = [];
-
-function createMeridians(){
-  const count = 24;
-
-  for(let m=0;m<count;m++){
-
-    const lon = (m/count)*Math.PI*2;
-
-    const points = [];
-
-    for(let lat=0;lat<=64;lat++){
-      const phi = (lat/64)*Math.PI;
-
-      const x = Math.sin(phi)*Math.cos(lon);
-      const y = Math.cos(phi);
-      const z = Math.sin(phi)*Math.sin(lon);
-
-      points.push(new THREE.Vector3(x,y,z));
-    }
-
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-    const material = new THREE.LineBasicMaterial({
-      color: 0x444444,
-      transparent:true,
-      opacity:0.4
-    });
-
-    const line = new THREE.Line(geometry, material);
-
-    earthGroup.add(line);
-    meridians.push(line);
-  }
-}
-
-
-  let atmosphere;
-
-function createAtmosphere(){
-  const geo = new THREE.SphereGeometry(1.02, 64, 64);
-
-  const mat = new THREE.MeshBasicMaterial({
-    color: 0x4aa3ff,
-    transparent: true,
-    opacity: 0.15,
-    side: THREE.BackSide
-  });
-
-  atmosphere = new THREE.Mesh(geo, mat);
-  earthGroup.add(atmosphere);
-}
-
   // =========================
   // UI
   // =========================
@@ -800,13 +676,9 @@ function createAtmosphere(){
     }
 
     updateUI();
-       createEquator();
-createAxis();
-createMeridians();
-createAtmosphere();
-    
   });
 
+  updateUI();
 
   // 🔥 SOLO CARGAR ISS AL INICIO
  // loadTLE("25544");
@@ -1006,25 +878,6 @@ function onResize(){
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-
-
-
-  document.getElementById("gridToggle").addEventListener("change",(e)=>{
-  meridians.forEach(m => m.visible = e.target.checked);
-});
-
-document.getElementById("equatorToggle").addEventListener("change",(e)=>{
-  equatorLine.visible = e.target.checked;
-});
-
-document.getElementById("axisToggle").addEventListener("change",(e)=>{
-  axisLine.visible = e.target.checked;
-});
-
-document.getElementById("atmToggle").addEventListener("change",(e)=>{
-  atmosphere.visible = e.target.checked;
-});
-  
 </script>
 
 </body>
