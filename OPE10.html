@@ -646,97 +646,29 @@ function init(){
   earthGroup.add(earth);
 
 
-   // =========================
-  // 🌍 MERIDIANOS
-  // =========================
-  function createMeridian(lonDeg, color = 0x00ffcc) {
-    const points = [];
 
-    const lon = THREE.MathUtils.degToRad(lonDeg);
-    const R = 100;
+// =========================
+// 🌐 ECUADOR
+// =========================
+const equator = createLatCircle(1.01, 0);
+earth.add(equator);
 
-    for (let lat = -90; lat <= 90; lat += 2) {
-      const phi = THREE.MathUtils.degToRad(lat);
+// =========================
+// 🌐 MERIDIANO GREENWICH
+// =========================
+const greenwich = createLonCircle(1.01, 0);
+earth.add(greenwich);
 
-      const x = Math.cos(phi) * Math.cos(lon);
-      const y = Math.sin(phi);
-      const z = Math.cos(phi) * Math.sin(lon);
+// =========================
+// 🌐 MERIDIANOS EXTRA (opcional visual)
+// =========================
+for (let lon = -180; lon <= 180; lon += 30) {
+  const meridian = createLonCircle(1.01, lon);
+  earth.add(meridian);
+}
 
-      points.push(new THREE.Vector3(x * R, y * R, z * R));
-    }
 
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    const material = new THREE.LineBasicMaterial({ color });
-
-    return new THREE.Line(geometry, material);
-  }
-
-  [0, 90, 180, -90].forEach(lon => {
-    earth.add(createMeridian(lon));
-  });
-
-  // =========================
-  // 🌍 ECUADOR
-  // =========================
-  const eqPoints = [];
-  const R = 100;
-
-  for (let lon = 0; lon <= 360; lon += 2) {
-    const lambda = THREE.MathUtils.degToRad(lon);
-
-    eqPoints.push(new THREE.Vector3(
-      Math.cos(lambda) * R,
-      0,
-      Math.sin(lambda) * R
-    ));
-  }
-
-  const eqGeometry = new THREE.BufferGeometry().setFromPoints(eqPoints);
-  const eqMaterial = new THREE.LineBasicMaterial({ color: 0xffaa00 });
-
-  earth.add(new THREE.Line(eqGeometry, eqMaterial));
-
-  // =========================
-  // 🌫 ATMÓSFERA
-  // =========================
-  const atmosphereInner = new THREE.Mesh(
-    new THREE.SphereGeometry(103, 64, 64),
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.06,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  scene.add(atmosphereInner);
-
-  const atmosphereOuter = new THREE.Mesh(
-    new THREE.SphereGeometry(106, 64, 64),
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.03,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  scene.add(atmosphereOuter);
-
-  const atmosphereGlow = new THREE.Mesh(
-    new THREE.SphereGeometry(112, 64, 64),
-    new THREE.MeshBasicMaterial({
-      color: 0x88ccff,
-      transparent: true,
-      opacity: 0.015,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    })
-  );
-  scene.add(atmosphereGlow);
+  
 
   // Madrid pin
   const pin = new THREE.Mesh(
@@ -761,15 +693,15 @@ function init(){
 
   select.value = currentSat;
 
-  select.addEventListener("change",(e)=>{
-    currentSat = e.target.value;
+select.addEventListener("change", async (e)=>{
+  currentSat = e.target.value;
 
-    if (!satrecs[currentSat]) {
-      loadTLE(currentSat);
-    }
+  if (!satrecs[currentSat]) {
+    await loadTLE(currentSat);
+  }
 
-    updateUI();
-  });
+  updateUI();
+});
 
   updateUI();
 
@@ -799,6 +731,63 @@ function init(){
 }
 
 
+
+
+
+function createLatCircle(radius, lat, segments = 128) {
+  const points = [];
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+
+  for (let i = 0; i <= segments; i++) {
+    const theta = (i / segments) * Math.PI * 2;
+
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color: 0x00ffff,
+    transparent: true,
+    opacity: 0.35
+  });
+
+  return new THREE.LineLoop(geometry, material);
+}
+
+
+  function createLonCircle(radius, lon, segments = 128) {
+  const points = [];
+
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  for (let i = 0; i <= segments; i++) {
+    const phi = (i / segments) * Math.PI;
+
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.15
+  });
+
+  return new THREE.Line(geometry, material);
+}
+
+
+
+  
 
   function loadSelectedSatellite() {
   const id = document.getElementById("satSelect").value;
