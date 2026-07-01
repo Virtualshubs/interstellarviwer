@@ -682,6 +682,101 @@ function init(){
   pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
   earth.add(pin);
 
+  let equatorLine;
+
+function createEquator(){
+  const points = [];
+  const segments = 128;
+
+  for(let i=0;i<=segments;i++){
+    const theta = (i/segments)*Math.PI*2;
+
+    const x = Math.cos(theta);
+    const z = Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, 0, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  const material = new THREE.LineBasicMaterial({
+    color: 0x00ffff
+  });
+
+  equatorLine = new THREE.LineLoop(geometry, material);
+  earthGroup.add(equatorLine);
+}
+
+  let axisLine;
+
+function createAxis(){
+  const points = [
+    new THREE.Vector3(0, -1.2, 0),
+    new THREE.Vector3(0,  1.2, 0)
+  ];
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+  const material = new THREE.LineBasicMaterial({
+    color: 0xff4444
+  });
+
+  axisLine = new THREE.Line(geometry, material);
+  earthGroup.add(axisLine);
+}
+
+  let meridians = [];
+
+function createMeridians(){
+  const count = 24;
+
+  for(let m=0;m<count;m++){
+
+    const lon = (m/count)*Math.PI*2;
+
+    const points = [];
+
+    for(let lat=0;lat<=64;lat++){
+      const phi = (lat/64)*Math.PI;
+
+      const x = Math.sin(phi)*Math.cos(lon);
+      const y = Math.cos(phi);
+      const z = Math.sin(phi)*Math.sin(lon);
+
+      points.push(new THREE.Vector3(x,y,z));
+    }
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    const material = new THREE.LineBasicMaterial({
+      color: 0x444444,
+      transparent:true,
+      opacity:0.4
+    });
+
+    const line = new THREE.Line(geometry, material);
+
+    earthGroup.add(line);
+    meridians.push(line);
+  }
+}
+
+
+  let atmosphere;
+
+function createAtmosphere(){
+  const geo = new THREE.SphereGeometry(1.02, 64, 64);
+
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0x4aa3ff,
+    transparent: true,
+    opacity: 0.15,
+    side: THREE.BackSide
+  });
+
+  atmosphere = new THREE.Mesh(geo, mat);
+  earthGroup.add(atmosphere);
+}
 
   // =========================
   // UI
@@ -705,14 +800,13 @@ function init(){
     }
 
     updateUI();
-    
-  });
-
-  updateUI();
-   createEquator();
+       createEquator();
 createAxis();
 createMeridians();
 createAtmosphere();
+    
+  });
+
 
   // 🔥 SOLO CARGAR ISS AL INICIO
  // loadTLE("25544");
@@ -914,101 +1008,6 @@ function onResize(){
 
 
 
-let equatorLine;
-
-function createEquator(){
-  const points = [];
-  const segments = 128;
-
-  for(let i=0;i<=segments;i++){
-    const theta = (i/segments)*Math.PI*2;
-
-    const x = Math.cos(theta);
-    const z = Math.sin(theta);
-
-    points.push(new THREE.Vector3(x, 0, z));
-  }
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-  const material = new THREE.LineBasicMaterial({
-    color: 0x00ffff
-  });
-
-  equatorLine = new THREE.LineLoop(geometry, material);
-  earthGroup.add(equatorLine);
-}
-
-  let axisLine;
-
-function createAxis(){
-  const points = [
-    new THREE.Vector3(0, -1.2, 0),
-    new THREE.Vector3(0,  1.2, 0)
-  ];
-
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-  const material = new THREE.LineBasicMaterial({
-    color: 0xff4444
-  });
-
-  axisLine = new THREE.Line(geometry, material);
-  earthGroup.add(axisLine);
-}
-
-  let meridians = [];
-
-function createMeridians(){
-  const count = 24;
-
-  for(let m=0;m<count;m++){
-
-    const lon = (m/count)*Math.PI*2;
-
-    const points = [];
-
-    for(let lat=0;lat<=64;lat++){
-      const phi = (lat/64)*Math.PI;
-
-      const x = Math.sin(phi)*Math.cos(lon);
-      const y = Math.cos(phi);
-      const z = Math.sin(phi)*Math.sin(lon);
-
-      points.push(new THREE.Vector3(x,y,z));
-    }
-
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-    const material = new THREE.LineBasicMaterial({
-      color: 0x444444,
-      transparent:true,
-      opacity:0.4
-    });
-
-    const line = new THREE.Line(geometry, material);
-
-    earthGroup.add(line);
-    meridians.push(line);
-  }
-}
-
-
-  let atmosphere;
-
-function createAtmosphere(){
-  const geo = new THREE.SphereGeometry(1.02, 64, 64);
-
-  const mat = new THREE.MeshBasicMaterial({
-    color: 0x4aa3ff,
-    transparent: true,
-    opacity: 0.15,
-    side: THREE.BackSide
-  });
-
-  atmosphere = new THREE.Mesh(geo, mat);
-  earthGroup.add(atmosphere);
-}
 
   document.getElementById("gridToggle").addEventListener("change",(e)=>{
   meridians.forEach(m => m.visible = e.target.checked);
