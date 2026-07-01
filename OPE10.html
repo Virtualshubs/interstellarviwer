@@ -852,7 +852,9 @@ function createLatCircle(radius, lat, segments = 128) {
   const material = new THREE.LineBasicMaterial({
     color: 0x00ffff,
     transparent: true,
-    opacity: 0.35
+    opacity: 0.35,
+      blending: THREE.AdditiveBlending,
+  depthWrite: false
   });
 
   return new THREE.LineLoop(geometry, material);
@@ -878,7 +880,9 @@ function createLatCircle(radius, lat, segments = 128) {
   const material = new THREE.LineBasicMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.15
+    opacity: 0.15,
+      blending: THREE.AdditiveBlending,
+  depthWrite: false
   });
 
   return new THREE.Line(geometry, material);
