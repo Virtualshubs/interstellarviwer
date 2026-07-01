@@ -718,6 +718,55 @@ for (let lon = -180; lon <= 180; lon += 30) {
 }
 
 
+  function createPoleLabel(text, color = 0x66ccff) {
+
+  const canvas = document.createElement("canvas");
+  const size = 256;
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "rgba(0,0,0,0)";
+  ctx.clearRect(0, 0, size, size);
+
+  ctx.font = "bold 140px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  // glow estilo estelar
+  ctx.shadowColor = "#66ccff";
+  ctx.shadowBlur = 20;
+
+  ctx.fillStyle = "#66ccff";
+  ctx.fillText(text, size / 2, size / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false
+  });
+
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(0.25, 0.25, 0.25);
+
+  return sprite;
+}
+
+  // =========================
+// 🧭 POLOS NORTE / SUR
+// =========================
+
+const northPole = createPoleLabel("N");
+northPole.position.copy(latLonToVec3(90, 0, 1.02));
+earth.add(northPole);
+
+const southPole = createPoleLabel("S");
+southPole.position.copy(latLonToVec3(-90, 0, 1.02));
+earth.add(southPole);
+
   
 
   // Madrid pin
