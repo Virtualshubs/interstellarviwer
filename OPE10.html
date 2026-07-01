@@ -517,7 +517,9 @@ pre {
 <div id="ui">
   🛰️ OPE<br/>
   <select id="satSelect"></select>
+  <button id="calcBtn">Calcular satélite</button>
   <div id="satInfo"></div>
+  
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
@@ -679,7 +681,11 @@ function init(){
   updateUI();
 
   // 🔥 SOLO CARGAR ISS AL INICIO
-  loadTLE("25544");
+ // loadTLE("25544");
+
+  document.getElementById("calcBtn").addEventListener("click", () => {
+  loadSelectedSatellite();
+});
 
   // controls
   window.addEventListener("wheel",(e)=>{
@@ -697,6 +703,21 @@ function init(){
   });
 
   window.addEventListener("resize", onResize);
+}
+
+
+
+  function loadSelectedSatellite() {
+  const id = document.getElementById("satSelect").value;
+
+  if (!id) return;
+
+  if (!satrecs[id]) {
+    loadTLE(id);
+  }
+
+  currentSat = id;
+  updateUI();
 }
 
 // ======================================================
