@@ -682,6 +682,13 @@ function init(){
   pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
   earth.add(pin);
 
+
+
+   createEquator();
+createAxis();
+createMeridians();
+createAtmosphere();
+
   // =========================
   // UI
   // =========================
@@ -732,11 +739,6 @@ function init(){
   });
 
   window.addEventListener("resize", onResize);
-
-  createEquator();
-createAxis();
-createMeridians();
-createAtmosphere();
 }
 
 
