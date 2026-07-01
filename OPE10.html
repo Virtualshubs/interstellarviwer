@@ -517,8 +517,8 @@ pre {
 <div id="ui">
   🛰️ OPE<br/>
   <select id="satSelect"></select>
-  <button id="calcBtn">Calcular satélite</button>
   <div id="satInfo"></div>
+   <button id="calcBtn">Calcular satélite</button>
   
 </div>
 
@@ -527,15 +527,9 @@ pre {
 
 <script>
 
-// ======================================================
-// 🌍 EARTH + SUN SYSTEM (UNCHANGED CORE - OK)
-// ======================================================
 let scene, camera, renderer;
 let earth, earthGroup, sunLight, ambientLight;
-
 let startTime = Date.now();
-
-// camera
 let distance = 3;
 let targetDistance = 3;
 let rotY = 0, targetRotY = 0;
@@ -543,7 +537,7 @@ let rotX = 0, targetRotX = 0;
 let isDragging = false;
 
 // ======================================================
-// 🛰️ SATELLITES ENGINE
+// SATELLITES ENGINE
 // ======================================================
 const SAT_INFO = {
   "25544": { name:"ISS", type:"Station", mission:"Microgravity" },
@@ -563,11 +557,11 @@ let satMeshes = {};
 let satrecs = {};
 let currentSat = "25544";
 
-// 🔥 CACHE TLE (CRÍTICO PARA NO BLOQUEAR)
+//CACHE TLE (CRÍTICO PARA NO BLOQUEAR)
 const TLE_CACHE = {};
 
 // ======================================================
-// 🎨 COLORS
+//  COLORS
 // ======================================================
 const COLORS = {
   COPERNICUS: 0xff7a18,
@@ -610,7 +604,7 @@ function init(){
   document.body.appendChild(renderer.domElement);
 
   // =========================
-  // 🌍 LIGHTS (UNCHANGED)
+  //  LIGHTS (UNCHANGED)
   // =========================
   sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
   scene.add(sunLight);
@@ -620,7 +614,7 @@ function init(){
   scene.add(ambientLight);
 
   // =========================
-  // 🌍 EARTH
+  //  EARTH
   // =========================
   earthGroup = new THREE.Group();
   scene.add(earthGroup);
@@ -646,7 +640,7 @@ function init(){
   earthGroup.add(earth);
 
 // =========================
-// 🌫️ ATMOSPHERE LAYERS
+//  ATMOSPHERE LAYERS
 // =========================
 function createAtmosphereLayer(radius, color, opacity) {
   const geometry = new THREE.SphereGeometry(radius, 64, 64);
@@ -665,7 +659,7 @@ function createAtmosphereLayer(radius, color, opacity) {
 
 
   // =========================
-// 🌫️ ATMOSPHERE (REALISTIC LAYERS)
+//  ATMOSPHERE (REALISTIC LAYERS)
 // =========================
 
 // capa baja (troposfera visual)
@@ -698,24 +692,26 @@ const atmosphereGlow = new THREE.Mesh(glowGeometry, glowMaterial);
 earth.add(atmosphereGlow);
 
 // =========================
-// 🌐 ECUADOR
+//  ECUADOR
 // =========================
 const equator = createLatCircle(1.01, 0);
 earth.add(equator);
 
 // =========================
-// 🌐 MERIDIANO GREENWICH
+//  MERIDIANO GREENWICH
 // =========================
 const greenwich = createLonCircle(1.01, 0);
 earth.add(greenwich);
 
 // =========================
-// 🌐 MERIDIANOS EXTRA (opcional visual)
+// MERIDIANOS EXTRA (opcional visual)
 // =========================
 for (let lon = -180; lon <= 180; lon += 30) {
   const meridian = createLonCircle(1.01, lon);
   earth.add(meridian);
 }
+
+  
 function createPoleLabel(text, color = 0x66ccff) {
 
   const canvas = document.createElement("canvas");
@@ -726,15 +722,11 @@ function createPoleLabel(text, color = 0x66ccff) {
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, size, size);
-
   ctx.font = "bold 140px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-
-  // glow más limpio (menos “mancha”, más ciencia)
   ctx.shadowColor = "#66ccff";
   ctx.shadowBlur = 25;
-
   ctx.fillStyle = "#66ccff";
   ctx.fillText(text, size / 2, size / 2);
 
@@ -745,13 +737,11 @@ function createPoleLabel(text, color = 0x66ccff) {
     map: texture,
     transparent: true,
     depthWrite: false,
-    depthTest: false, // 👈 importante para que no “se esconda” en la esfera
+    depthTest: false, // importante para que no “se esconda” en la esfera
     blending: THREE.AdditiveBlending
   });
 
   const sprite = new THREE.Sprite(material);
-
-  // 👇 más fino y menos “pegado”
   sprite.scale.set(0.22, 0.22, 0.22);
 
   return sprite;
@@ -759,10 +749,10 @@ function createPoleLabel(text, color = 0x66ccff) {
 
 
   // =========================
-// 🧭 POLOS NORTE / SUR
+//  POLOS NORTE / SUR
 // =========================
 
-const POLE_OFFSET = 1.08; // 👈 separación real de la superficie
+const POLE_OFFSET = 1.08; // separación real de la superficie
 
 const northPole = createPoleLabel("N");
 northPole.position.copy(latLonToVec3(90, 0, POLE_OFFSET));
@@ -807,7 +797,7 @@ select.addEventListener("change", async (e)=>{
 
   updateUI();
 
-  // 🔥 SOLO CARGAR ISS AL INICIO
+  // SOLO CARGAR ISS AL INICIO
  // loadTLE("25544");
 
   document.getElementById("calcBtn").addEventListener("click", () => {
@@ -855,7 +845,7 @@ function createLatCircle(radius, lat, segments = 128) {
   const material = new THREE.LineBasicMaterial({
     color: 0x00ffff,
     transparent: true,
-    opacity: 0.35,
+    opacity: 0.75,
       blending: THREE.AdditiveBlending,
   depthWrite: false
   });
@@ -883,7 +873,7 @@ function createLatCircle(radius, lat, segments = 128) {
   const material = new THREE.LineBasicMaterial({
     color: 0xffffff,
     transparent: true,
-    opacity: 0.15,
+    opacity: 0.55,
       blending: THREE.AdditiveBlending,
   depthWrite: false
   });
@@ -909,7 +899,7 @@ function createLatCircle(radius, lat, segments = 128) {
 }
 
 // ======================================================
-// 🛰️ TLE LOADER (FIXED + CACHE)
+// TLE LOADER (FIXED + CACHE)
 // ======================================================
 async function loadTLE(id){
 
@@ -935,7 +925,7 @@ async function loadTLE(id){
 }
 
 // ======================================================
-// 🛰️ CREATE VISUAL SATELLITE
+// CREATE VISUAL SATELLITE
 // ======================================================
 function createSatMesh(id){
 
@@ -951,7 +941,7 @@ function createSatMesh(id){
 }
 
 // ======================================================
-// 🛰️ UPDATE SATELLITES
+// UPDATE SATELLITES
 // ======================================================
 function updateSatellites(){
 
@@ -985,7 +975,7 @@ function updateSatellites(){
 }
 
 // ======================================================
-// 🌍 LATLON
+// LATLON
 // ======================================================
 function latLonToVec3(lat, lon, r){
 
@@ -1000,7 +990,7 @@ function latLonToVec3(lat, lon, r){
 }
 
 // ======================================================
-// 🧠 UI
+// UI
 // ======================================================
 function updateUI(){
   const sat = SAT_INFO[currentSat];
@@ -1009,7 +999,7 @@ function updateUI(){
 }
 
 // ======================================================
-// 🔁 LOOP
+// LOOP
 // ======================================================
 function animate(){
 
@@ -1017,12 +1007,12 @@ function animate(){
 
   const now = new Date();
 
-  // 🌍 EARTH ROTATION (UNCHANGED)
+  // EARTH ROTATION (UNCHANGED)
   const elapsedSeconds = (Date.now() - startTime) / 1000;
   const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
   earthGroup.rotation.y = rotation;
 
-  // ☀️ SUN (NO TOUCH - STABLE SYSTEM)
+  // SUN (NO TOUCH - STABLE SYSTEM)
   const dayOfYear = Math.floor(
     (now - new Date(now.getFullYear(),0,0)) / 86400000
   );
@@ -1043,10 +1033,10 @@ function animate(){
   sunLight.position.copy(sunDir.clone().multiplyScalar(50));
   sunLight.target.position.set(0,0,0);
 
-  // 🛰️ SATELLITES
+  //  SATELLITES
   updateSatellites();
 
-  // 🎥 CAMERA
+  //  CAMERA
   rotY += (targetRotY-rotY)*0.08;
   rotX += (targetRotX-rotX)*0.08;
   distance += (targetDistance-distance)*0.08;
