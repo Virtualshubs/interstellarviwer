@@ -716,9 +716,7 @@ for (let lon = -180; lon <= 180; lon += 30) {
   const meridian = createLonCircle(1.01, lon);
   earth.add(meridian);
 }
-
-
-  function createPoleLabel(text, color = 0x66ccff) {
+function createPoleLabel(text, color = 0x66ccff) {
 
   const canvas = document.createElement("canvas");
   const size = 256;
@@ -727,47 +725,52 @@ for (let lon = -180; lon <= 180; lon += 30) {
 
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "rgba(0,0,0,0)";
   ctx.clearRect(0, 0, size, size);
 
   ctx.font = "bold 140px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // glow estilo estelar
+  // glow más limpio (menos “mancha”, más ciencia)
   ctx.shadowColor = "#66ccff";
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur = 25;
 
   ctx.fillStyle = "#66ccff";
   ctx.fillText(text, size / 2, size / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
 
   const material = new THREE.SpriteMaterial({
     map: texture,
     transparent: true,
-    depthWrite: false
+    depthWrite: false,
+    depthTest: false, // 👈 importante para que no “se esconda” en la esfera
+    blending: THREE.AdditiveBlending
   });
 
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(0.25, 0.25, 0.25);
+
+  // 👇 más fino y menos “pegado”
+  sprite.scale.set(0.22, 0.22, 0.22);
 
   return sprite;
 }
+
 
   // =========================
 // 🧭 POLOS NORTE / SUR
 // =========================
 
+const POLE_OFFSET = 1.08; // 👈 separación real de la superficie
+
 const northPole = createPoleLabel("N");
-northPole.position.copy(latLonToVec3(90, 0, 1.02));
+northPole.position.copy(latLonToVec3(90, 0, POLE_OFFSET));
 earth.add(northPole);
 
 const southPole = createPoleLabel("S");
-southPole.position.copy(latLonToVec3(-90, 0, 1.02));
+southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
 earth.add(southPole);
-
-  
 
   // Madrid pin
   const pin = new THREE.Mesh(
