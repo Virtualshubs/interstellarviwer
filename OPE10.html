@@ -645,7 +645,57 @@ function init(){
   earth.rotation.y = Math.PI;
   earthGroup.add(earth);
 
+// =========================
+// 🌫️ ATMOSPHERE LAYERS
+// =========================
+function createAtmosphereLayer(radius, color, opacity) {
+  const geometry = new THREE.SphereGeometry(radius, 64, 64);
 
+  const material = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: opacity,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  return new THREE.Mesh(geometry, material);
+}
+
+
+  // =========================
+// 🌫️ ATMOSPHERE (REALISTIC LAYERS)
+// =========================
+
+// capa baja (troposfera visual)
+const atm1 = createAtmosphereLayer(1.03, 0x4aa3ff, 0.25);
+
+// estratosfera (más difusa)
+const atm2 = createAtmosphereLayer(1.06, 0x2f7bff, 0.12);
+
+// borde superior (ionosfera glow)
+const atm3 = createAtmosphereLayer(1.12, 0x1a3cff, 0.06);
+
+earth.add(atm1);
+earth.add(atm2);
+earth.add(atm3);
+
+
+  // glow extra hacia borde de planeta
+const glowGeometry = new THREE.SphereGeometry(1.02, 64, 64);
+
+const glowMaterial = new THREE.MeshBasicMaterial({
+  color: 0x6fb6ff,
+  transparent: true,
+  opacity: 0.08,
+  side: THREE.BackSide,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const atmosphereGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+earth.add(atmosphereGlow);
 
 // =========================
 // 🌐 ECUADOR
