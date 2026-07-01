@@ -704,6 +704,7 @@ function init(){
     }
 
     updateUI();
+    
   });
 
   updateUI();
@@ -731,6 +732,11 @@ function init(){
   });
 
   window.addEventListener("resize", onResize);
+
+  createEquator();
+createAxis();
+createMeridians();
+createAtmosphere();
 }
 
 
