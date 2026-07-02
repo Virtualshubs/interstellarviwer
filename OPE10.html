@@ -567,6 +567,8 @@ let rotX = 0, targetRotX = 0;
 let isDragging = false;
   let compassGroup = null;
 let compassVisible = false;
+  let starSphere;
+let stars;
 
 // ======================================================
 // SATELLITES ENGINE
@@ -670,6 +672,7 @@ function init(){
 
   earth.rotation.y = Math.PI;
   earthGroup.add(earth);
+  buildStarSphere();
 
 // =========================
 //  ATMOSPHERE LAYERS
@@ -1046,7 +1049,61 @@ function createLatCircle(radius, lat, segments = 128) {
 }
 
 
+function buildStarSphere(){
 
+    // Grupo independiente
+    starSphere = new THREE.Group();
+
+    scene.add(starSphere);
+
+    const STAR_COUNT = 1200;
+    const STAR_RADIUS = 250;
+
+    const positions = [];
+
+    for(let i=0;i<STAR_COUNT;i++){
+
+        // distribución uniforme sobre una esfera
+        const u = Math.random();
+        const v = Math.random();
+
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+
+        const x = STAR_RADIUS * Math.sin(phi) * Math.cos(theta);
+        const y = STAR_RADIUS * Math.cos(phi);
+        const z = STAR_RADIUS * Math.sin(phi) * Math.sin(theta);
+
+        positions.push(x,y,z);
+
+    }
+
+    const geometry = new THREE.BufferGeometry();
+
+    geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions,3)
+    );
+
+    const material = new THREE.PointsMaterial({
+
+        color:0xffffff,
+
+        size:0.7,
+
+        transparent:true,
+
+        opacity:0.9,
+
+        depthWrite:false
+
+    });
+
+    stars = new THREE.Points(geometry,material);
+
+    starSphere.add(stars);
+
+}
   
 
   function loadSelectedSatellite() {
