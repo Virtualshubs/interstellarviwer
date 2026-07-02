@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>OPE</title>
+
+<style>
+
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: radial-gradient(circle at 50% 30%, #05070d, #000 70%);
+  color: #E6F1FF;
+}
+
+    #info {
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+    z-index:10;
+  }
+  
+  #logo{
+
+    position:fixed;
+
+    bottom:20px;
+    right:20px;     /* cambia a left:20px si lo quieres a la izquierda */
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    overflow:hidden;
+    z-index:1000;
+background:rgba(255,255,255,.04);
+backdrop-filter:blur(8px);
+border:1px solid rgba(255,255,255,.15);
+padding:6px;
+    pointer-events:none;
+}
+
+#logo img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+}
+canvas { display: block; }
+
+#ui {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+
+  width: 460px;
+  max-height: 92vh;
+  overflow: auto;
+
+  padding: 16px;
+  border-radius: 16px;
+
+  background: rgba(8, 12, 20, 0.78);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(120, 180, 255, 0.18);
+
+  box-shadow:
+    0 0 45px rgba(70, 120, 255, 0.10),
+    inset 0 0 25px rgba(255,255,255,0.02);
+}
+
+#ui::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 180, 255, 0.5),
+    transparent
+  );
+  opacity: 0.6;
+}
+
+
+#ui h3 {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-size: 30px;
+  color: #9CCBFF;
+  text-transform: uppercase;
+}
+
+button, select, input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(120, 180, 255, 0.14);
+
+  color: #E6F1FF;
+
+  border-radius: 10px;
+  outline: none;
+
+  font-size: 12px;
+  letter-spacing: 0.02em;
+
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  border-color: rgba(120, 180, 255, 0.35);
+  background: rgba(120, 180, 255, 0.06);
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+
+.highlight {
+  margin-top: 14px;
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 170, 0.08),
+    rgba(0, 120, 255, 0.06)
+  );
+
+  border: 1px solid rgba(0, 255, 170, 0.18);
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  box-shadow: inset 0 0 18px rgba(0,255,150,0.05);
+}
+
+.insightBlock {
+  margin-top: 10px;
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(120, 180, 255, 0.12);
+
+  position: relative;
+}
+
+/* left accent bar (HUD feel) */
+.insightBlock::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(120, 180, 255, 0.35);
+  border-radius: 2px;
+}
+
+.insightTitle {
+  font-size: 30px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7FB3FF;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.insightItem {
+  font-size: 12px;
+  opacity: 0.92;
+  margin: 3px 0;
+  padding-left: 8px;
+  border-left: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+
+.rankCard {
+  margin-top: 8px;
+  padding: 10px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  font-size: 12px;
+
+  transition: all 0.2s ease;
+}
+
+.rankCard:hover {
+  border-color: rgba(120, 180, 255, 0.28);
+  background: rgba(120, 180, 255, 0.05);
+}
+
+
+
+pre {
+  white-space: pre-wrap;
+  font-size: 11px;
+  margin-top: 10px;
+
+  opacity: 0.65;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+}
+
+
+
+#ui::-webkit-scrollbar {
+  width: 6px;
+}
+
+#ui::-webkit-scrollbar-thumb {
+  background: rgba(120, 180, 255, 0.25);
+  border-radius: 10px;
+}
+
+#ui::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+  #satInfoPanel {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 340px;
+  max-height: 92vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 16px;
+  z-index: 20;
+  background: rgba(8, 12, 20, 0.78);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(120, 180, 255, 0.18);
+  box-shadow:
+    0 0 40px rgba(70, 120, 255, 0.12),
+    inset 0 0 20px rgba(255,255,255,0.02);
+  color: #E6F1FF;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+  .satPanelTitle {
+  font-size: 25px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9CCBFF;
+}
+
+  #satHeader {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  box-shadow: 0 0 20px rgba(120,180,255,0.15);
+}
+
+  #satHeader img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  filter: contrast(1.1) brightness(0.9);
+}
+
+  #satHeader::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.1),
+    rgba(0,0,0,0.7)
+  );
+
+  pointer-events: none;
+}
+
+  .satBlock {
+  margin-top: 10px;
+  padding: 10px 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(120, 180, 255, 0.10);
+
+  position: relative;
+}
+
+  .satBlock::before {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+
+  width: 2px;
+
+  background: rgba(120, 180, 255, 0.35);
+  border-radius: 2px;
+}
+  .satBlockTitle {
+  font-size: 10px;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  color: #7FB3FF;
+
+  margin-bottom: 6px;
+
+  opacity: 0.85;
+}
+
+  .satItem {
+  font-size: 12px;
+
+  margin: 3px 0;
+
+  opacity: 0.92;
+
+  padding-left: 6px;
+
+  border-left: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+  #satInfoPanel {
+  animation: satFadeIn 0.25s ease-out;
+}
+
+@keyframes satFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#satPatch {
+  position: fixed;
+
+  bottom: 18px;
+  right: 18px;
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255,255,255,0.18),
+    rgba(120,180,255,0.10) 45%,
+    rgba(10,14,20,0.92) 100%
+  );
+
+  border: 1px solid rgba(120, 180, 255, 0.35);
+
+  box-shadow:
+    0 0 20px rgba(120,180,255,0.25),
+    inset 0 0 14px rgba(255,255,255,0.05);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  z-index: 50;
+
+  /* pequeño “peso HUD” */
+  backdrop-filter: blur(10px);
+}
+  #satPatch {
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#satPatch:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 28px rgba(120,180,255,0.35),
+    inset 0 0 14px rgba(255,255,255,0.06);
+}
+  
+#satPatch img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+ 
+
+  filter: drop-shadow(0 0 6px rgba(120,180,255,0.4));
+}
+
+#missionNav {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.missionSlot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+  border-radius: 50px;
+
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.missionSlot:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.missionSlot.active {
+  background: rgba(0,150,255,0.25);
+  border-color: rgba(0,150,255,0.6);
+}
+
+.missionSlot img {
+  width: 28px;
+  height: 28px;
+}
+
+.missionMeta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.missionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+.missionSub {
+  font-size: 10px;
+  opacity: 0.7;
+  color: white;
+}
+
+  #missionPanel{
+ position:fixed;
+  display: none;
+  top:50%;
+  left:50%;
+
+  transform:translate(-50%,-50%);
+
+  width:420px;
+  min-height:180px;
+
+  padding:24px;
+
+  background:rgba(8,12,18,0.95);
+  backdrop-filter:blur(20px);
+
+  border:1px solid rgba(120,180,255,0.35);
+  border-radius:20px;
+
+  box-shadow:
+    0 0 40px rgba(120,180,255,0.25);
+
+  color:white;
+
+  z-index:9999;
+
+  overflow:hidden;
+}
+
+  .missionTitle{
+  font-size:24px;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+.missionDesc{
+  font-size:14px;
+  line-height:1.6;
+  opacity:0.85;
+  margin-bottom:16px;
+}
+
+.missionSatCount{
+  font-size:13px;
+  color:#7ec8ff;
+}
+
+  select { width:220px; margin-top:5px; }
+</style>
+</head>
+
+<body>
+
+
+
+<div id="ui">
+  🛰️ OPE<br/>
+  <select id="satSelect"></select>
+  <div id="satInfo"></div>
+   <button id="calcBtn">Calcular satélite</button>
+  <button id="compassBtn">🧭</button>
+  
+</div>
+
+  <div id="logo">
+    <img src="https://3d.staratlas.es/logoope.png" alt="Orbital Pass Engine">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+
+<script>
+
+let scene, camera, renderer;
+let earth, earthGroup, sunLight, ambientLight;
+let startTime = Date.now();
+let distance = 3;
+let targetDistance = 3;
+let rotY = 0, targetRotY = 0;
+let rotX = 0, targetRotX = 0;
+let isDragging = false;
+  let compassGroup = null;
+let compassVisible = false;
+  let starSphere;
+let stars;
+
+// ======================================================
+// SATELLITES ENGINE
+// ======================================================
+const SAT_INFO = {
+  "25544": { name:"ISS", type:"Station", mission:"Microgravity" },
+
+  "39634": { name:"Sentinel-1A", type:"Radar", mission:"Copernicus" },
+  "39084": { name:"Sentinel-1B", type:"Radar", mission:"Copernicus" },
+  "29780": { name:"Sentinel-2A", type:"Optical", mission:"Copernicus" },
+  "42063": { name:"Sentinel-2B", type:"Optical", mission:"Copernicus" },
+  "28654": { name:"Sentinel-3A", type:"Ocean", mission:"Copernicus" },
+  "43618": { name:"Sentinel-5P", type:"Atmosphere", mission:"Copernicus" },
+
+  "25338": { name:"NOAA-15", type:"Meteorological", mission:"Weather" },
+  "38552": { name:"Meteosat-10", type:"Geo Weather", mission:"Weather" }
+};
+
+let satMeshes = {};
+let satrecs = {};
+let currentSat = "25544";
+
+//CACHE TLE (CRÍTICO PARA NO BLOQUEAR)
+const TLE_CACHE = {};
+
+// ======================================================
+//  COLORS
+// ======================================================
+const COLORS = {
+  COPERNICUS: 0xff7a18,
+  WEATHER: 0xb06cff,
+  ISS: 0x4aa3ff
+};
+
+function getColor(id){
+  const sat = SAT_INFO[id];
+  if(!sat) return 0xffffff;
+
+  const name = sat.name.toLowerCase();
+
+  if(name.includes("sentinel")) return COLORS.COPERNICUS;
+  if(name.includes("noaa") || name.includes("meteosat")) return COLORS.WEATHER;
+  if(name.includes("iss")) return COLORS.ISS;
+
+  return 0xffffff;
+}
+
+// ======================================================
+// INIT
+// ======================================================
+init();
+animate();
+
+function init(){
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth/window.innerHeight,
+    0.1,
+    1000
+  );
+
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // =========================
+  //  LIGHTS (UNCHANGED)
+  // =========================
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  scene.add(sunLight);
+  scene.add(sunLight.target);
+
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.12);
+  scene.add(ambientLight);
+
+  // =========================
+  //  EARTH
+  // =========================
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+
+  const tex = new THREE.TextureLoader().load(
+    "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  );
+
+  earth = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 64, 64),
+    new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 1,
+      metalness: 0,
+      emissive: new THREE.Color(0x0a0a0a),
+      emissiveIntensity: 0.25
+    })
+  );
+
+  earth.rotation.y = Math.PI;
+  earthGroup.add(earth);
+  buildStarSphere();
+
+// =========================
+//  ATMOSPHERE LAYERS
+// =========================
+function createAtmosphereLayer(radius, color, opacity) {
+  const geometry = new THREE.SphereGeometry(radius, 64, 64);
+
+  const material = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: opacity,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  return new THREE.Mesh(geometry, material);
+}
+
+
+  // =========================
+//  ATMOSPHERE (REALISTIC LAYERS)
+// =========================
+
+// capa baja (troposfera visual)
+const atm1 = createAtmosphereLayer(1.03, 0x4aa3ff, 0.25);
+
+// estratosfera (más difusa)
+const atm2 = createAtmosphereLayer(1.06, 0x2f7bff, 0.12);
+
+// borde superior (ionosfera glow)
+const atm3 = createAtmosphereLayer(1.12, 0x1a3cff, 0.06);
+
+earth.add(atm1);
+earth.add(atm2);
+earth.add(atm3);
+
+
+  // glow extra hacia borde de planeta
+const glowGeometry = new THREE.SphereGeometry(1.02, 64, 64);
+
+const glowMaterial = new THREE.MeshBasicMaterial({
+  color: 0x6fb6ff,
+  transparent: true,
+  opacity: 0.08,
+  side: THREE.BackSide,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const atmosphereGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+earth.add(atmosphereGlow);
+
+// =========================
+// 🌍 ECUADOR
+// =========================
+const equator = createLatCircle(1.01, 0);
+equator.material.opacity = 0.7;
+equator.material.color.setHex(0x66ccff);
+
+earth.add(equator);
+
+// =========================
+// 🌍 PARALELOS PRINCIPALES
+// =========================
+
+const parallels = [
+    {lat:60, opacity:0.35},
+    {lat:30, opacity:0.25},
+    {lat:-30, opacity:0.25},
+    {lat:-60, opacity:0.35}
+];
+
+for(const p of parallels){
+
+    const line = createLatCircle(1.01, p.lat);
+
+    line.material.color.setHex(0x66ccff);
+    line.material.opacity = p.opacity;
+
+    earth.add(line);
+
+}
+
+
+// =========================
+// 🌍 MERIDIANOS
+// =========================
+
+for(let lon=-180; lon<=180; lon+=30){
+
+    if(lon===0) continue;
+
+    const meridian = createLonCircle(1.01,lon);
+
+    earth.add(meridian);
+
+}
+
+  
+function createPoleLabel(text, color = 0x66ccff) {
+
+  const canvas = document.createElement("canvas");
+  const size = 256;
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, size, size);
+  ctx.font = "bold 140px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "#66ccff";
+  ctx.shadowBlur = 25;
+  ctx.fillStyle = "#66ccff";
+  ctx.fillText(text, size / 2, size / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false, // importante para que no “se esconda” en la esfera
+    blending: THREE.AdditiveBlending
+  });
+
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(0.22, 0.22, 0.22);
+
+  return sprite;
+}
+
+
+  // =========================
+//  POLOS NORTE / SUR
+// =========================
+
+const POLE_OFFSET = 1.08; // separación real de la superficie
+
+const northPole = createPoleLabel("N");
+northPole.position.copy(latLonToVec3(90, 0, POLE_OFFSET));
+earth.add(northPole);
+
+const southPole = createPoleLabel("S");
+southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
+earth.add(southPole);
+
+  // Madrid pin
+  const pin = new THREE.Mesh(
+    new THREE.SphereGeometry(0.02, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+
+  pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
+  earth.add(pin);
+
+  // =========================
+  // UI
+  // =========================
+  const select = document.getElementById("satSelect");
+
+  for(const id in SAT_INFO){
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = SAT_INFO[id].name;
+    select.appendChild(opt);
+  }
+
+  select.value = currentSat;
+
+select.addEventListener("change", async (e)=>{
+  currentSat = e.target.value;
+
+  if (!satrecs[currentSat]) {
+    await loadTLE(currentSat);
+  }
+
+  updateUI();
+});
+
+  updateUI();
+
+  // SOLO CARGAR ISS AL INICIO
+ // loadTLE("25544");
+
+  document.getElementById("calcBtn").addEventListener("click", () => {
+  loadSelectedSatellite();
+});
+
+  document.getElementById("compassBtn")
+    .addEventListener("click", toggleCompass);
+
+  // controls
+  window.addEventListener("wheel",(e)=>{
+    targetDistance += e.deltaY * 0.002;
+    targetDistance = Math.max(1.8, Math.min(8, targetDistance));
+  });
+
+  window.addEventListener("mousedown",()=> isDragging = true);
+  window.addEventListener("mouseup",()=> isDragging = false);
+
+  window.addEventListener("mousemove",(e)=>{
+    if(!isDragging) return;
+    targetRotY += e.movementX * 0.005;
+    targetRotX += e.movementY * 0.005;
+  });
+
+  window.addEventListener("resize", onResize);
+}
+
+
+function buildCompass(){
+
+    if(compassGroup) return;
+
+    compassGroup = new THREE.Group();
+
+    earth.add(compassGroup);
+
+    addCompassLabel("60°N",60);
+    addCompassLabel("30°N",30);
+
+    addCompassLabel("Ecuador",0);
+
+    addCompassLabel("30°S",-30);
+    addCompassLabel("60°S",-60);
+
+  addLongitudeLabel("60°O",-60);
+addLongitudeLabel("30°O",-30);
+
+addLongitudeLabel("Greenwich",0);
+
+addLongitudeLabel("30°E",30);
+addLongitudeLabel("60°E",60);
+
+    compassGroup.visible = false;
+
+}
+
+  function toggleCompass(){
+
+    if(!compassGroup){
+        buildCompass();
+    }
+
+    compassVisible = !compassVisible;
+
+    compassGroup.visible = compassVisible;
+
+}
+
+
+function createCompassLabel(text){
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0,0,256,256);
+
+    ctx.font = "bold 70px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillStyle = "#66ccff";
+    ctx.shadowColor = "#66ccff";
+    ctx.shadowBlur = 10;
+
+    ctx.fillText(text,128,128);
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    const material = new THREE.SpriteMaterial({
+        map:texture,
+        transparent:true,
+        depthWrite:false,
+        depthTest:false,
+        blending:THREE.AdditiveBlending
+    });
+
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(0.11,0.11,0.11);
+
+    return sprite;
+}
+
+  function addCompassLabel(text, lat){
+
+    const label = createCompassLabel(text);
+
+    label.position.copy(
+        latLonToVec3(lat,110,1.12)
+    );
+
+    compassGroup.add(label);
+
+}
+
+
+
+function addLongitudeLabel(text, lon){
+
+    const label = createCompassLabel(text);
+
+    label.position.copy(
+        latLonToVec3(0, lon, 1.12)
+    );
+
+    compassGroup.add(label);
+
+}
+
+
+  
+
+function createLatCircle(radius, lat, segments = 128) {
+  const points = [];
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+
+  for (let i = 0; i <= segments; i++) {
+    const theta = (i / segments) * Math.PI * 2;
+
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color: 0x39FF14,
+    transparent: true,
+    opacity: 0.75,
+      blending: THREE.AdditiveBlending,
+  depthWrite: false
+  });
+
+  return new THREE.LineLoop(geometry, material);
+}
+
+
+  function createLonCircle(radius, lon, segments = 128) {
+  const points = [];
+
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  for (let i = 0; i <= segments; i++) {
+    const phi = (i / segments) * Math.PI;
+
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.15,
+      blending: THREE.AdditiveBlending,
+  depthWrite: false
+  });
+
+  return new THREE.Line(geometry, material);
+}
+
+
+function buildStarSphere(){
+
+    // Grupo independiente
+    starSphere = new THREE.Group();
+
+    scene.add(starSphere);
+
+    const STAR_COUNT = 1200;
+    const STAR_RADIUS = 250;
+
+    const positions = [];
+
+    for(let i=0;i<STAR_COUNT;i++){
+
+        // distribución uniforme sobre una esfera
+        const u = Math.random();
+        const v = Math.random();
+
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+
+        const x = STAR_RADIUS * Math.sin(phi) * Math.cos(theta);
+        const y = STAR_RADIUS * Math.cos(phi);
+        const z = STAR_RADIUS * Math.sin(phi) * Math.sin(theta);
+
+        positions.push(x,y,z);
+
+    }
+
+    const geometry = new THREE.BufferGeometry();
+
+    geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions,3)
+    );
+
+    const material = new THREE.PointsMaterial({
+
+        color:0xffffff,
+
+        size:0.7,
+
+        transparent:true,
+
+        opacity:0.9,
+
+        depthWrite:false
+
+    });
+
+    stars = new THREE.Points(geometry,material);
+
+    starSphere.add(stars);
+
+}
+  
+
+  function loadSelectedSatellite() {
+  const id = document.getElementById("satSelect").value;
+
+  if (!id) return;
+
+  if (!satrecs[id]) {
+    loadTLE(id);
+  }
+
+  currentSat = id;
+  updateUI();
+}
+
+// ======================================================
+// TLE LOADER (FIXED + CACHE)
+// ======================================================
+async function loadTLE(id){
+
+  if (TLE_CACHE[id]) {
+    satrecs[id] = TLE_CACHE[id];
+    createSatMesh(id);
+    return;
+  }
+
+  const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${id}&FORMAT=tle`;
+  const res = await fetch(url);
+  const text = await res.text();
+
+  const lines = text.trim().split("\n");
+  if(lines.length < 3) return;
+
+  const satrec = satellite.twoline2satrec(lines[1], lines[2]);
+
+  TLE_CACHE[id] = satrec;
+  satrecs[id] = satrec;
+
+  createSatMesh(id);
+}
+
+// ======================================================
+// CREATE VISUAL SATELLITE
+// ======================================================
+function createSatMesh(id){
+
+  if (satMeshes[id]) return;
+
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 10, 10),
+    new THREE.MeshBasicMaterial({ color: getColor(id) })
+  );
+
+  scene.add(mesh);
+  satMeshes[id] = mesh;
+}
+
+// ======================================================
+// UPDATE SATELLITES
+// ======================================================
+function updateSatellites(){
+
+  const now = new Date();
+  const gmst = satellite.gstime(now);
+
+  for(const id in satrecs){
+
+    const satrec = satrecs[id];
+    const pv = satellite.propagate(satrec, now);
+    if(!pv.position) continue;
+
+    const geo = satellite.eciToGeodetic(pv.position, gmst);
+
+    const lat = satellite.degreesLat(geo.latitude);
+    const lon = satellite.degreesLong(geo.longitude);
+
+    const mesh = satMeshes[id];
+    if(!mesh) continue;
+
+    mesh.position.copy(latLonToVec3(lat, lon, 1.4));
+
+    if(id === currentSat){
+      mesh.scale.set(2,2,2);
+      mesh.material.color.set(0x00ff00);
+    } else {
+      mesh.scale.set(1,1,1);
+      mesh.material.color.set(getColor(id));
+    }
+  }
+}
+
+// ======================================================
+// LATLON
+// ======================================================
+function latLonToVec3(lat, lon, r){
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  return new THREE.Vector3(
+    -(r * Math.sin(phi) * Math.cos(theta)),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+// ======================================================
+// UI
+// ======================================================
+function updateUI(){
+  const sat = SAT_INFO[currentSat];
+  document.getElementById("satInfo").innerHTML =
+    `<b>${sat.name}</b><br>${sat.type}<br>${sat.mission}`;
+}
+
+// ======================================================
+// LOOP
+// ======================================================
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  const now = new Date();
+
+  // EARTH ROTATION (UNCHANGED)
+  const elapsedSeconds = (Date.now() - startTime) / 1000;
+  const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
+  earthGroup.rotation.y = rotation;
+
+  // SUN (NO TOUCH - STABLE SYSTEM)
+  const dayOfYear = Math.floor(
+    (now - new Date(now.getFullYear(),0,0)) / 86400000
+  );
+
+  const decl = THREE.MathUtils.degToRad(
+    23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
+  );
+
+  const frac = (now.getTime() % 86400000) / 86400000;
+  const angle = frac * Math.PI * 2;
+
+  const sunDir = new THREE.Vector3(
+    Math.cos(angle),
+    Math.sin(decl),
+    Math.sin(angle)
+  ).normalize();
+
+  sunLight.position.copy(sunDir.clone().multiplyScalar(50));
+  sunLight.target.position.set(0,0,0);
+
+  //  SATELLITES
+  updateSatellites();
+
+  //  CAMERA
+  rotY += (targetRotY-rotY)*0.08;
+  rotX += (targetRotX-rotX)*0.08;
+  distance += (targetDistance-distance)*0.08;
+
+  camera.position.x = distance*Math.cos(rotX)*Math.sin(rotY);
+  camera.position.y = distance*Math.sin(rotX);
+  camera.position.z = distance*Math.cos(rotX)*Math.cos(rotY);
+
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene,camera);
+}
+
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+</script>
+
+</body>
+</html>
