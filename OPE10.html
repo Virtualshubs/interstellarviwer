@@ -692,23 +692,55 @@ const atmosphereGlow = new THREE.Mesh(glowGeometry, glowMaterial);
 earth.add(atmosphereGlow);
 
 // =========================
-//  ECUADOR
+// 🌍 ECUADOR
 // =========================
 const equator = createLatCircle(1.01, 0);
+equator.material.opacity = 0.7;
+equator.material.color.setHex(0x66ccff);
+
 earth.add(equator);
 
 // =========================
-//  MERIDIANO GREENWICH
+// 🌍 PARALELOS PRINCIPALES
 // =========================
-const greenwich = createLonCircle(1.01, 0);
+
+const parallels = [
+    {lat:60, opacity:0.35},
+    {lat:30, opacity:0.25},
+    {lat:-30, opacity:0.25},
+    {lat:-60, opacity:0.35}
+];
+
+for(const p of parallels){
+
+    const line = createLatCircle(1.01, p.lat);
+
+    line.material.color.setHex(0x66ccff);
+    line.material.opacity = p.opacity;
+
+    earth.add(line);
+
+}
+
+// =========================
+// 🌍 MERIDIANO GREENWICH
+// =========================
+
+const greenwich = createLonCircle(1.01,0);
 earth.add(greenwich);
 
 // =========================
-// MERIDIANOS EXTRA (opcional visual)
+// 🌍 MERIDIANOS
 // =========================
-for (let lon = -180; lon <= 180; lon += 30) {
-  const meridian = createLonCircle(1.01, lon);
-  earth.add(meridian);
+
+for(let lon=-180; lon<=180; lon+=30){
+
+    if(lon===0) continue;
+
+    const meridian = createLonCircle(1.01,lon);
+
+    earth.add(meridian);
+
 }
 
   
