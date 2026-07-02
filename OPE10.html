@@ -877,7 +877,7 @@ select.addEventListener("change", async (e)=>{
   // controls
   window.addEventListener("wheel",(e)=>{
     targetDistance += e.deltaY * 0.002;
-    targetDistance = Math.max(1.8, Math.min(8, targetDistance));
+    targetDistance = Math.max(1.2, Math.min(8, targetDistance));
   });
 
   window.addEventListener("mousedown",()=> isDragging = true);
