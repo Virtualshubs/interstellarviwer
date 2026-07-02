@@ -738,7 +738,7 @@ for(let lon=-180; lon<=180; lon+=30){
 }
 
   
-function createPoleLabel(text, color = 0x66ccff) {
+function createLabel(text, color = 0x66ccff) {
 
   const canvas = document.createElement("canvas");
   const size = 256;
@@ -773,20 +773,40 @@ function createPoleLabel(text, color = 0x66ccff) {
   return sprite;
 }
 
-
   // =========================
-//  POLOS NORTE / SUR
+// 🌍 LATITUDE LABEL
 // =========================
 
-const POLE_OFFSET = 1.08; // separación real de la superficie
+function addLatitudeLabel(text, lat) {
 
-const northPole = createPoleLabel("N");
-northPole.position.copy(latLonToVec3(90, 0, POLE_OFFSET));
-earth.add(northPole);
+    const label = createLabel(text);
 
-const southPole = createPoleLabel("S");
-southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
-earth.add(southPole);
+    // Lateral derecho del planeta
+    label.position.copy(
+        latLonToVec3(lat, 110, 1.10)
+    );
+
+    earth.add(label);
+
+}
+
+// =========================
+// 🌍 LATITUDE LABELS
+// =========================
+
+addLatitudeLabel("N", 90);
+
+addLatitudeLabel("60°N", 60);
+
+addLatitudeLabel("30°N", 30);
+
+addLatitudeLabel("Ecuador", 0);
+
+addLatitudeLabel("30°S", -30);
+
+addLatitudeLabel("60°S", -60);
+
+addLatitudeLabel("S", -90);
 
   // Madrid pin
   const pin = new THREE.Mesh(
