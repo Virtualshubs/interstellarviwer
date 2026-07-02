@@ -519,7 +519,7 @@ pre {
   <select id="satSelect"></select>
   <div id="satInfo"></div>
    <button id="calcBtn">Calcular satélite</button>
-  <button id="compassBtn">🧭 Compass</button>
+  <button id="compassBtn">🧭</button>
   
 </div>
 
@@ -871,6 +871,14 @@ function buildCompass(){
     addCompassLabel("30°S",-30);
     addCompassLabel("60°S",-60);
 
+  addLongitudeLabel("60°O",-60);
+addLongitudeLabel("30°O",-30);
+
+addLongitudeLabel("Greenwich",0);
+
+addLongitudeLabel("30°E",30);
+addLongitudeLabel("60°E",60);
+
     compassGroup.visible = false;
 
 }
@@ -935,6 +943,23 @@ function createCompassLabel(text){
     compassGroup.add(label);
 
 }
+
+
+
+function addLongitudeLabel(text, lon){
+
+    const label = createCompassLabel(text);
+
+    label.position.copy(
+        latLonToVec3(0, lon, 1.12)
+    );
+
+    compassGroup.add(label);
+
+}
+
+
+  
 
 function createLatCircle(radius, lat, segments = 128) {
   const points = [];
