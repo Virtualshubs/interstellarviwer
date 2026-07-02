@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+
+<title>Space Asset Configurator</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#0b1018;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden;
+}
+
+#container{
+
+    display:flex;
+    width:100vw;
+    height:100vh;
+
+}
+
+/*=========================================
+            VISOR
+=========================================*/
+
+#viewer{
+
+    flex:1;
+    background:black;
+    position:relative;
+
+}
+
+#viewer canvas{
+
+    width:100%;
+    height:100%;
+    display:block;
+
+}
+
+#viewerTitle{
+
+    position:absolute;
+    top:15px;
+    left:15px;
+
+    padding:10px 16px;
+
+    background:rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.15);
+
+    border-radius:8px;
+
+    font-size:14px;
+
+}
+
+/*=========================================
+            PANEL
+=========================================*/
+
+#panel{
+
+    width:420px;
+
+    background:#151c28;
+
+    border-left:1px solid #2d3648;
+
+    overflow:auto;
+
+    padding:20px;
+
+}
+
+h2{
+
+    margin:0 0 25px 0;
+    font-weight:normal;
+
+}
+
+.section{
+
+    margin-bottom:25px;
+
+}
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-size:13px;
+
+    color:#7ea4ff;
+
+}
+
+input[type=file]{
+
+    width:100%;
+
+}
+
+textarea{
+
+    width:100%;
+
+    height:320px;
+
+    resize:vertical;
+
+    background:#0d1320;
+
+    color:#7dffcb;
+
+    border:1px solid #334056;
+
+    border-radius:6px;
+
+    padding:12px;
+
+    font-family:Consolas,monospace;
+
+    font-size:13px;
+
+}
+
+button{
+
+    width:100%;
+
+    margin-bottom:12px;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    background:#1f6fff;
+
+    color:white;
+
+    font-size:14px;
+
+}
+
+button:hover{
+
+    background:#3984ff;
+
+}
+
+#status{
+
+    margin-top:20px;
+
+    padding:12px;
+
+    background:#0d1320;
+
+    border-radius:6px;
+
+    font-size:13px;
+
+    color:#9fd2ff;
+
+}
+
+/*=========================================
+        DATOS LEÍDOS
+=========================================*/
+
+#preview{
+
+    margin-top:25px;
+
+    padding:15px;
+
+    background:#0d1320;
+
+    border-radius:6px;
+
+    font-size:13px;
+
+    line-height:1.7;
+
+}
+
+#preview b{
+
+    color:#7ea4ff;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="container">
+
+    <!-- ==========================================
+                    VISOR 3D
+    =========================================== -->
+
+    <div id="viewer">
+
+        <div id="viewerTitle">
+
+            Space Asset Preview
+
+        </div>
+
+        <!-- Aquí irá el renderer de Three.js -->
+
+    </div>
+
+    <!-- ==========================================
+                    PANEL
+    =========================================== -->
+
+    <div id="panel">
+
+        <h2>
+
+            🚀 Space Asset Configurator
+
+        </h2>
+
+        <div class="section">
+
+            <label>
+
+                Modelo GLB
+
+            </label>
+
+            <input
+                type="file"
+                id="glbInput"
+                accept=".glb,.gltf">
+
+        </div>
+
+        <div class="section">
+
+            <label>
+
+                Metadata JSON
+
+            </label>
+
+<textarea id="metadata">
+{
+  "catalogId":40697,
+  "name":"Sentinel-2A",
+  "mission":"Copernicus",
+  "operator":"ESA",
+  "instrument":"MSI",
+  "orbitProvider":"CelesTrak",
+  "orbitId":"40697",
+  "description":"Earth Observation Satellite"
+}
+</textarea>
+
+        </div>
+
+        <button id="validateBtn">
+
+            Validar JSON
+
+        </button>
+
+        <button id="sealBtn">
+
+            Sellar Activo
+
+        </button>
+
+        <button id="downloadBtn">
+
+            Descargar GLB
+
+        </button>
+
+        <div id="status">
+
+            Esperando modelo...
+
+        </div>
+
+        <div id="preview">
+
+            <b>Nombre:</b> -<br>
+
+            <b>ID:</b> -<br>
+
+            <b>Misión:</b> -<br>
+
+            <b>Proveedor:</b> -<br>
+
+            <b>Instrumento:</b> -<br>
+
+            <b>Operador:</b> -
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
