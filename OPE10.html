@@ -641,12 +641,12 @@ function init(){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 0.8;
 
   // =========================
   //  LIGHTS (UNCHANGED)
   // =========================
-  sunLight = new THREE.DirectionalLight(0xffffff, 1.22);
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
   scene.add(sunLight);
   scene.add(sunLight.target);
 
