@@ -519,6 +519,7 @@ pre {
   <select id="satSelect"></select>
   <div id="satInfo"></div>
    <button id="calcBtn">Calcular satélite</button>
+  <button id="compassBtn">🧭 Compass</button>
   
 </div>
 
@@ -535,6 +536,8 @@ let targetDistance = 3;
 let rotY = 0, targetRotY = 0;
 let rotX = 0, targetRotX = 0;
 let isDragging = false;
+  let compassGroup = null;
+let compassVisible = false;
 
 // ======================================================
 // SATELLITES ENGINE
@@ -830,6 +833,9 @@ select.addEventListener("change", async (e)=>{
   loadSelectedSatellite();
 });
 
+  document.getElementById("compassBtn")
+    .addEventListener("click", toggleCompass);
+
   // controls
   window.addEventListener("wheel",(e)=>{
     targetDistance += e.deltaY * 0.002;
@@ -849,7 +855,27 @@ select.addEventListener("change", async (e)=>{
 }
 
 
+function buildCompass(){
 
+    if (compassGroup) return;
+
+    compassGroup = new THREE.Group();
+
+    earth.add(compassGroup);
+
+}
+
+  function toggleCompass(){
+
+    if(!compassGroup){
+        buildCompass();
+    }
+
+    compassVisible = !compassVisible;
+
+    compassGroup.visible = compassVisible;
+
+}
 
 
 function createLatCircle(radius, lat, segments = 128) {
