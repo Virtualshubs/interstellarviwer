@@ -519,7 +519,6 @@ pre {
   <select id="satSelect"></select>
   <div id="satInfo"></div>
    <button id="calcBtn">Calcular satélite</button>
-  <button id="compassBtn">🧭</button>
   
 </div>
 
@@ -536,7 +535,6 @@ let targetDistance = 3;
 let rotY = 0, targetRotY = 0;
 let rotX = 0, targetRotX = 0;
 let isDragging = false;
-let compassOverlay;
 
 // ======================================================
 // SATELLITES ENGINE
@@ -640,17 +638,7 @@ function init(){
 
   earth.rotation.y = Math.PI;
   earthGroup.add(earth);
-  
 
-// =========================
-// 🧭 COMPASS OVERLAY
-// =========================
-compassOverlay = new THREE.Group();
-compassOverlay.visible = false;
-
-earth.add(compassOverlay);
-
-  
 // =========================
 //  ATMOSPHERE LAYERS
 // =========================
@@ -800,21 +788,6 @@ const southPole = createPoleLabel("S");
 southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
 earth.add(southPole);
 
-
-
-
-addLatitudeLabel("60°N", 60);
-
-addLatitudeLabel("30°N", 30);
-
-addLatitudeLabel("Ecuador", 0);
-
-addLatitudeLabel("30°S", -30);
-
-addLatitudeLabel("60°S", -60);
-
-  
-
   // Madrid pin
   const pin = new THREE.Mesh(
     new THREE.SphereGeometry(0.02, 12, 12),
@@ -857,8 +830,6 @@ select.addEventListener("change", async (e)=>{
   loadSelectedSatellite();
 });
 
-  document.getElementById("compassBtn").addEventListener("click", toggleCompass);
-
   // controls
   window.addEventListener("wheel",(e)=>{
     targetDistance += e.deltaY * 0.002;
@@ -878,30 +849,7 @@ select.addEventListener("change", async (e)=>{
 }
 
 
-function toggleCompass(){
 
-    compassOverlay.visible = !compassOverlay.visible;
-
-}
-
-
-
-
-function addLatitudeLabel(text, lat){
-
-    const label = createPoleLabel(text);
-
-    label.scale.set(0.12,0.12,0.12);
-
-    label.position.copy(
-        latLonToVec3(lat,110,1.10)
-    );
-
-    compassOverlay.add(label);
-
-}
-
-  
 
 
 function createLatCircle(radius, lat, segments = 128) {
