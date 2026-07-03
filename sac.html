@@ -44,7 +44,40 @@ h3{margin:10px 0 5px 0;font-size:14px}
     <div id="originalBox" class="box">Esperando modelo...</div>
 
     <h3>Datos estructurados (Space)</h3>
-    <textarea id="spaceInput" placeholder='Pega aquí el JSON Space'></textarea>
+ <textarea id="spaceInput">
+{
+  "identity": {
+    "name": "Sentinel-2A",
+    "norad": 40697,
+    "cospar": "2015-028A"
+  },
+  "mission": {
+    "agency": "ESA",
+    "operator": "Copernicus",
+    "mission": "Earth Observation",
+    "type": "Optical Multispectral",
+    "status": "Active"
+  },
+  "orbit": {
+    "provider": "celestrak",
+    "format": "TLE",
+    "query": {
+      "mode": "CATNR",
+      "value": 40697
+    }
+  },
+  "payload": {
+    "instruments": [
+      "MSI"
+    ]
+  },
+  "capabilities": [
+    "Agriculture",
+    "Water",
+    "Vegetation"
+  ]
+}
+</textarea>
 
     <button id="mergeBtn" disabled>Fusionar Space</button>
     <button id="validateBtn" disabled>Validar resultado</button>
