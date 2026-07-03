@@ -1,39 +1,61 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>SAC</title>
+<title>SAC v2</title>
+
 <style>
 body{margin:0;background:#0b1018;color:#fff;font-family:Arial;overflow:hidden}
 #container{display:flex;height:100vh}
 #viewer{flex:1;background:#111}
 #panel{width:420px;background:#151c28;padding:20px;overflow:auto}
-textarea{width:100%;height:260px;background:#0d1320;color:#7dffcb}
-button{width:100%;padding:10px;margin:8px 0}
-#preview,#status{background:#0d1320;padding:10px;margin-top:10px}
+
+textarea{
+ width:100%;
+ height:180px;
+ background:#0d1320;
+ color:#7dffcb;
+ margin-bottom:10px;
+}
+
+button{width:100%;padding:10px;margin:6px 0}
+
+.box{
+ background:#0d1320;
+ padding:10px;
+ margin-top:10px;
+ white-space:pre-wrap;
+ font-size:12px;
+}
+
+h3{margin:10px 0 5px 0;font-size:14px}
 </style>
 </head>
+
 <body>
 <div id="container">
-<div id="viewer"></div>
-<div id="panel">
-<input type="file" id="glbInput" accept=".glb,.gltf">
-<textarea id="metadata">{
- "catalogId":40697,
- "name":"Sentinel-2A",
- "mission":"Copernicus",
- "operator":"ESA",
- "instrument":"MSI",
- "orbitProvider":"CelesTrak",
- "orbitId":"40697"
-}</textarea>
-<button id="validateBtn">Validar JSON</button>
-<button id="sealBtn" disabled>Sellar activo</button>
-<button id="downloadBtn" disabled>Descargar GLB</button>
-<div id="status">Esperando modelo...</div>
-<div id="preview"></div>
-</div>
+  <div id="viewer"></div>
+
+  <div id="panel">
+
+    <input type="file" id="glbInput" accept=".glb,.gltf">
+
+    <h3>Metadatos del GLB (originales)</h3>
+    <div id="originalBox" class="box">Esperando modelo...</div>
+
+    <h3>Nuevos datos estructurados (Space)</h3>
+    <textarea id="spaceInput" placeholder='Pega aquí el JSON Space'></textarea>
+
+    <button id="mergeBtn" disabled>Fusionar Space</button>
+    <button id="validateBtn" disabled>Validar resultado</button>
+    <button id="sealBtn" disabled>Sellar activo</button>
+    <button id="downloadBtn" disabled>Descargar GLB</button>
+
+    <h3>Metadatos finales</h3>
+    <div id="finalBox" class="box"></div>
+
+    <div id="status" class="box">Esperando modelo...</div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
@@ -42,71 +64,157 @@ button{width:100%;padding:10px;margin:8px 0}
 <script src="https://unpkg.com/three@0.134.0/examples/js/exporters/GLTFExporter.js"></script>
 
 <script>
-let scene,camera,renderer,controls,currentModel,currentGLTF;
-let metadataObject=null,sealed=false;
+let scene,camera,renderer,controls;
+let currentModel=null;
+let originalMetadata={};
+let finalMetadata=null;
+let sealed=false;
 
 const viewer=document.getElementById("viewer");
+
 scene=new THREE.Scene();
 scene.background=new THREE.Color(0x10141d);
-camera=new THREE.PerspectiveCamera(60,viewer.clientWidth/viewer.clientHeight,0.1,1000);
-camera.position.set(2,2,4);
-renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
-renderer.setSize(viewer.clientWidth,viewer.clientHeight);
-viewer.appendChild(renderer.domElement);
-controls=new THREE.OrbitControls(camera,renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff,0x444444,1.2));
-const dl=new THREE.DirectionalLight(0xffffff,2);dl.position.set(5,5,5);scene.add(dl);
-scene.add(new THREE.GridHelper(10,10));
-(function a(){requestAnimationFrame(a);controls.update();renderer.render(scene,camera)})();
 
+camera=new THREE.PerspectiveCamera(60,1,0.1,1000);
+camera.position.set(2,2,4);
+
+renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth-420,window.innerHeight);
+viewer.appendChild(renderer.domElement);
+
+controls=new THREE.OrbitControls(camera,renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x444444,1.2));
+const dl=new THREE.DirectionalLight(0xffffff,2);
+dl.position.set(5,5,5);
+scene.add(dl);
+
+scene.add(new THREE.GridHelper(10,10));
+
+function animate(){
+ requestAnimationFrame(animate);
+ controls.update();
+ renderer.render(scene,camera);
+}
+animate();
+
+/* =======================
+   1. CARGAR GLB
+======================= */
 document.getElementById("glbInput").onchange=e=>{
- const f=e.target.files[0]; if(!f)return;
- const url=URL.createObjectURL(f);
- new THREE.GLTFLoader().load(url,g=>{
-   if(currentModel)scene.remove(currentModel);
-   currentGLTF=g;
-   currentModel=g.scene;
+ const file=e.target.files[0];
+ if(!file)return;
+
+ const url=URL.createObjectURL(file);
+
+ new THREE.GLTFLoader().load(url,gltf=>{
+
+   if(currentModel) scene.remove(currentModel);
+
+   currentModel=gltf.scene;
    scene.add(currentModel);
-   document.getElementById("status").textContent="Modelo cargado";
+
+   /* LEER METADATOS ORIGINALES */
+   originalMetadata =
+     gltf.parser?.json?.asset?.extras || {};
+
+   document.getElementById("originalBox").textContent =
+     JSON.stringify(originalMetadata,null,2);
+
+   document.getElementById("status").textContent =
+     "Modelo cargado";
+
+   document.getElementById("mergeBtn").disabled=false;
+
    URL.revokeObjectURL(url);
  });
 };
 
-validateBtn.onclick=()=>{
+/* =======================
+   2. FUSIONAR SPACE
+======================= */
+document.getElementById("mergeBtn").onclick=()=>{
+
  try{
-  metadataObject=JSON.parse(metadata.value);
-  preview.innerHTML=`
-  <b>Nombre:</b> ${metadataObject.name||"-"}<br>
-  <b>ID:</b> ${metadataObject.catalogId||"-"}<br>
-  <b>Misión:</b> ${metadataObject.mission||"-"}<br>
-  <b>Proveedor:</b> ${metadataObject.orbitProvider||"-"}<br>
-  <b>Instrumento:</b> ${metadataObject.instrument||"-"}<br>
-  <b>Operador:</b> ${metadataObject.operator||"-"}`;
-  status.textContent="✔ JSON válido";
-  sealBtn.disabled=false;
+   const spaceData =
+     JSON.parse(document.getElementById("spaceInput").value || "{}");
+
+   finalMetadata = {
+     ...originalMetadata,
+     Space: spaceData
+   };
+
+   document.getElementById("finalBox").textContent =
+     JSON.stringify(finalMetadata,null,2);
+
+   document.getElementById("status").textContent =
+     "Space añadido correctamente";
+
+   document.getElementById("validateBtn").disabled=false;
+
  }catch(err){
-  status.textContent="❌ JSON inválido";
+   document.getElementById("status").textContent =
+     "JSON inválido en Space";
  }
 };
 
-sealBtn.onclick=()=>{
- if(!currentModel||!metadataObject){alert("Carga un modelo y valida el JSON.");return;}
- currentModel.userData.asset={extras:metadataObject};
- sealed=true;
- status.textContent="✔ Activo sellado (en memoria)";
- downloadBtn.disabled=false;
+/* =======================
+   3. VALIDAR
+======================= */
+document.getElementById("validateBtn").onclick=()=>{
+
+ if(!finalMetadata){
+   alert("Primero fusiona Space");
+   return;
+ }
+
+ document.getElementById("status").textContent =
+   "Metadatos validados";
+
+ document.getElementById("sealBtn").disabled=false;
 };
 
-downloadBtn.onclick=()=>{
- if(!sealed){alert("Primero sella el activo.");return;}
+/* =======================
+   4. SELLAR
+======================= */
+document.getElementById("sealBtn").onclick=()=>{
+
+ if(!currentModel || !finalMetadata) return;
+
+ currentModel.userData.asset = {
+   extras: finalMetadata
+ };
+
+ sealed=true;
+
+ document.getElementById("status").textContent =
+   "Activo sellado";
+
+ document.getElementById("downloadBtn").disabled=false;
+};
+
+/* =======================
+   5. DESCARGAR
+======================= */
+document.getElementById("downloadBtn").onclick=()=>{
+
+ if(!sealed) return;
+
  const exporter=new THREE.GLTFExporter();
- exporter.parse(scene,(result)=>{
-   const blob=new Blob([JSON.stringify(result,null,2)],{type:"model/gltf+json"});
+
+ exporter.parse(scene,result=>{
+
+   const blob=new Blob(
+     [JSON.stringify(result,null,2)],
+     {type:"model/gltf+json"}
+   );
+
    const a=document.createElement("a");
    a.href=URL.createObjectURL(blob);
-   a.download="space_asset.gltf";
+   a.download="sac_asset.gltf";
    a.click();
- },{binary:false,includeCustomExtensions:true});
+
+ },{binary:false});
 };
 </script>
 </body>
