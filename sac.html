@@ -101,38 +101,85 @@ h3{margin:10px 0 5px 0;font-size:14px}
 let scene,camera,renderer,controls;
 let currentModel=null;
 
-let originalMetadata={};
-let finalMetadata=null;
-let sealed=false;
-
-/* ================= VIEWER ================= */
-
 scene=new THREE.Scene();
-scene.background=new THREE.Color(0x10141d);
+scene.background=new THREE.Color(0x0b1018);
 
-camera=new THREE.PerspectiveCamera(60,1,0.1,1000);
-camera.position.set(2,2,4);
+/* ================= CAMERA ================= */
+camera=new THREE.PerspectiveCamera(
+  50,
+  (window.innerWidth - 420) / window.innerHeight,
+  0.1,
+  2000
+);
+camera.position.set(2.5,2,4);
 
-renderer=new THREE.WebGLRenderer({antialias:true});
+/* ================= RENDERER (MEJORADO) ================= */
+renderer=new THREE.WebGLRenderer({
+  antialias:true,
+  alpha:false,
+  powerPreference:"high-performance"
+});
+
 renderer.setSize(window.innerWidth-420,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+/* 🔥 CALIDAD VISUAL */
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+
 document.getElementById("viewer").appendChild(renderer.domElement);
 
+/* ================= CONTROLS ================= */
 controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=0.05;
+controls.minDistance=1;
+controls.maxDistance=50;
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x444444,1.2));
+/* ================= LIGHTING (MEJORADO) ================= */
 
-const dl=new THREE.DirectionalLight(0xffffff,2);
-dl.position.set(5,5,5);
+// Luz ambiente suave
+scene.add(new THREE.AmbientLight(0xffffff,0.35));
+
+// Luz hemisférica más natural
+const hemi=new THREE.HemisphereLight(0xffffff,0x223344,0.8);
+scene.add(hemi);
+
+// Luz direccional principal (tipo sol)
+const dl=new THREE.DirectionalLight(0xffffff,2.2);
+dl.position.set(5,8,5);
+dl.castShadow=false;
 scene.add(dl);
 
-scene.add(new THREE.GridHelper(10,10));
+// Luz secundaria para relleno
+const dl2=new THREE.DirectionalLight(0x88aaff,0.6);
+dl2.position.set(-5,3,-5);
+scene.add(dl2);
 
+/* ================= GRID (OPCIONAL MÁS LIMPIO) ================= */
+const grid=new THREE.GridHelper(10,10,0x334455,0x1a2633);
+grid.position.y=0;
+scene.add(grid);
+
+/* ================= LOOP ================= */
 function animate(){
- requestAnimationFrame(animate);
- controls.update();
- renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+
+  controls.update();
+
+  renderer.render(scene,camera);
 }
 animate();
+
+/* ================= RESIZE FIX ================= */
+window.addEventListener("resize",()=>{
+
+  camera.aspect=(window.innerWidth-420)/window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth-420,window.innerHeight);
+});
 
 /* ================= METADATA EXTRACTOR ================= */
 
@@ -183,9 +230,14 @@ document.getElementById("mergeBtn").onclick = () => {
 
   try {
 
-    const space = JSON.parse(
+    let space = JSON.parse(
       document.getElementById("spaceInput").value || "{}"
     );
+
+    // 🔥 NORMALIZACIÓN CRÍTICA
+    if (space.Space) {
+      space = space.Space;
+    }
 
     finalMetadata = {
       ...originalMetadata,
@@ -193,7 +245,7 @@ document.getElementById("mergeBtn").onclick = () => {
     };
 
     document.getElementById("finalBox").textContent =
-      JSON.stringify(finalMetadata,null,2);
+      JSON.stringify(finalMetadata, null, 2);
 
     document.getElementById("status").textContent =
       "Space añadido correctamente";
