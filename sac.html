@@ -12,7 +12,7 @@ body{margin:0;background:#0b1018;color:#fff;font-family:Arial;overflow:hidden}
 
 textarea{
  width:100%;
- height:180px;
+ height:160px;
  background:#0d1320;
  color:#7dffcb;
  margin-bottom:10px;
@@ -43,7 +43,7 @@ h3{margin:10px 0 5px 0;font-size:14px}
     <h3>Metadatos del GLB (originales)</h3>
     <div id="originalBox" class="box">Esperando modelo...</div>
 
-    <h3>Nuevos datos estructurados (Space)</h3>
+    <h3>Datos estructurados (Space)</h3>
     <textarea id="spaceInput" placeholder='Pega aquí el JSON Space'></textarea>
 
     <button id="mergeBtn" disabled>Fusionar Space</button>
@@ -64,13 +64,15 @@ h3{margin:10px 0 5px 0;font-size:14px}
 <script src="https://unpkg.com/three@0.134.0/examples/js/exporters/GLTFExporter.js"></script>
 
 <script>
+
 let scene,camera,renderer,controls;
 let currentModel=null;
+
 let originalMetadata={};
 let finalMetadata=null;
 let sealed=false;
 
-const viewer=document.getElementById("viewer");
+/* ================= VIEWER ================= */
 
 scene=new THREE.Scene();
 scene.background=new THREE.Color(0x10141d);
@@ -80,11 +82,12 @@ camera.position.set(2,2,4);
 
 renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth-420,window.innerHeight);
-viewer.appendChild(renderer.domElement);
+document.getElementById("viewer").appendChild(renderer.domElement);
 
 controls=new THREE.OrbitControls(camera,renderer.domElement);
 
 scene.add(new THREE.HemisphereLight(0xffffff,0x444444,1.2));
+
 const dl=new THREE.DirectionalLight(0xffffff,2);
 dl.position.set(5,5,5);
 scene.add(dl);
@@ -98,124 +101,132 @@ function animate(){
 }
 animate();
 
-/* =======================
-   1. CARGAR GLB
-======================= */
-document.getElementById("glbInput").onchange=e=>{
- const file=e.target.files[0];
- if(!file)return;
+/* ================= METADATA EXTRACTOR ================= */
 
- const url=URL.createObjectURL(file);
+function extractMetadata(json){
 
- new THREE.GLTFLoader().load(url,gltf=>{
+  return {
+    asset: json.asset?.extras || {},
+    scene: (json.scenes || []).map(s => s.extras || {}),
+    nodes: (json.nodes || []).map(n => n.extras || {})
+  };
+}
 
-   if(currentModel) scene.remove(currentModel);
+/* ================= 1. LOAD GLB ================= */
 
-   currentModel=gltf.scene;
-   scene.add(currentModel);
+document.getElementById("glbInput").onchange = e => {
 
-   /* LEER METADATOS ORIGINALES */
-   originalMetadata =
-     gltf.parser?.json?.asset?.extras || {};
+  const file = e.target.files[0];
+  if (!file) return;
 
-   document.getElementById("originalBox").textContent =
-     JSON.stringify(originalMetadata,null,2);
+  const url = URL.createObjectURL(file);
 
-   document.getElementById("status").textContent =
-     "Modelo cargado";
+  new THREE.GLTFLoader().load(url, gltf => {
 
-   document.getElementById("mergeBtn").disabled=false;
+    if (currentModel) scene.remove(currentModel);
 
-   URL.revokeObjectURL(url);
- });
+    currentModel = gltf.scene;
+    scene.add(currentModel);
+
+    const json = gltf.parser.json;
+
+    originalMetadata = extractMetadata(json);
+
+    document.getElementById("originalBox").textContent =
+      JSON.stringify(originalMetadata,null,2);
+
+    document.getElementById("status").textContent =
+      "Modelo cargado + metadatos leídos";
+
+    document.getElementById("mergeBtn").disabled = false;
+
+    URL.revokeObjectURL(url);
+  });
 };
 
-/* =======================
-   2. FUSIONAR SPACE
-======================= */
-document.getElementById("mergeBtn").onclick=()=>{
+/* ================= 2. MERGE SPACE ================= */
 
- try{
-   const spaceData =
-     JSON.parse(document.getElementById("spaceInput").value || "{}");
+document.getElementById("mergeBtn").onclick = () => {
 
-   finalMetadata = {
-     ...originalMetadata,
-     Space: spaceData
-   };
+  try {
 
-   document.getElementById("finalBox").textContent =
-     JSON.stringify(finalMetadata,null,2);
+    const space = JSON.parse(
+      document.getElementById("spaceInput").value || "{}"
+    );
 
-   document.getElementById("status").textContent =
-     "Space añadido correctamente";
+    finalMetadata = {
+      ...originalMetadata,
+      Space: space
+    };
 
-   document.getElementById("validateBtn").disabled=false;
+    document.getElementById("finalBox").textContent =
+      JSON.stringify(finalMetadata,null,2);
 
- }catch(err){
-   document.getElementById("status").textContent =
-     "JSON inválido en Space";
- }
+    document.getElementById("status").textContent =
+      "Space añadido correctamente";
+
+    document.getElementById("validateBtn").disabled = false;
+
+  } catch (e) {
+    document.getElementById("status").textContent =
+      "JSON inválido en Space";
+  }
 };
 
-/* =======================
-   3. VALIDAR
-======================= */
-document.getElementById("validateBtn").onclick=()=>{
+/* ================= 3. VALIDATE ================= */
 
- if(!finalMetadata){
-   alert("Primero fusiona Space");
-   return;
- }
+document.getElementById("validateBtn").onclick = () => {
 
- document.getElementById("status").textContent =
-   "Metadatos validados";
+  if (!finalMetadata) return;
 
- document.getElementById("sealBtn").disabled=false;
+  document.getElementById("status").textContent =
+    "Metadatos validados";
+
+  document.getElementById("sealBtn").disabled = false;
 };
 
-/* =======================
-   4. SELLAR
-======================= */
-document.getElementById("sealBtn").onclick=()=>{
+/* ================= 4. SEAL ================= */
 
- if(!currentModel || !finalMetadata) return;
+document.getElementById("sealBtn").onclick = () => {
 
- currentModel.userData.asset = {
-   extras: finalMetadata
- };
+  if (!currentModel || !finalMetadata) return;
 
- sealed=true;
+  currentModel.userData.asset = {
+    extras: finalMetadata
+  };
 
- document.getElementById("status").textContent =
-   "Activo sellado";
+  sealed = true;
 
- document.getElementById("downloadBtn").disabled=false;
+  document.getElementById("status").textContent =
+    "Activo sellado";
+
+  document.getElementById("downloadBtn").disabled = false;
 };
 
-/* =======================
-   5. DESCARGAR
-======================= */
-document.getElementById("downloadBtn").onclick=()=>{
+/* ================= 5. DOWNLOAD ================= */
 
- if(!sealed) return;
+document.getElementById("downloadBtn").onclick = () => {
 
- const exporter=new THREE.GLTFExporter();
+  if (!sealed) return;
 
- exporter.parse(scene,result=>{
+  const exporter = new THREE.GLTFExporter();
 
-   const blob=new Blob(
-     [JSON.stringify(result,null,2)],
-     {type:"model/gltf+json"}
-   );
+  exporter.parse(scene, result => {
 
-   const a=document.createElement("a");
-   a.href=URL.createObjectURL(blob);
-   a.download="sac_asset.gltf";
-   a.click();
+    const blob = new Blob(
+      [JSON.stringify(result, null, 2)],
+      { type: "model/gltf+json" }
+    );
 
- },{binary:false});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "sac_asset.gltf";
+    a.click();
+
+  }, { binary:false });
+
 };
+
 </script>
 </body>
 </html>
