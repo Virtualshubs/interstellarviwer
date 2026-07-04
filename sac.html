@@ -42,6 +42,21 @@ h3{margin:10px 0 5px 0;font-size:14px}
 
    <label>Satélite predefinido</label>
 
+   <div class="section">
+
+    <label>Modelo 3D</label>
+
+    <input
+        id="modelUrlInput"
+        type="text"
+        placeholder="URL del modelo GLB">
+
+    <small>
+        Modelo predefinido. Puedes sustituirlo por el GLB de tu propia biblioteca.
+    </small>
+
+</div>
+
 <div class="section">
 
     <label>Satélite</label>
@@ -238,17 +253,30 @@ function initSatelliteSelector(){
 
 }
 
+document
+.getElementById("modelUrlInput")
+.addEventListener("change",()=>{
 
+    const url =
+        document.getElementById("modelUrlInput").value.trim();
 
- function fillSpaceTemplate(sat){
+    if(url){
+
+        loadRemoteModel(url);
+
+    }
+
+});
+
+function fillSpaceTemplate(sat){
+
+    const norad = Object.keys(SAT_INFO).find(
+        id => SAT_INFO[id] === sat
+    );
 
     const space={
 
-        norad:parseInt(
-            Object.keys(SAT_INFO).find(
-                id=>SAT_INFO[id]===sat
-            )
-        ),
+        norad:parseInt(norad),
 
         name:sat.name,
 
@@ -266,15 +294,71 @@ function initSatelliteSelector(){
 
     };
 
-    document.getElementById("spaceInput").value=
+    document.getElementById("spaceInput").value =
         JSON.stringify(space,null,2);
+
+    document.getElementById("modelUrlInput").value =
+        sat.modelUrl || "";
+
+    if(sat.modelUrl){
+
+        loadRemoteModel(sat.modelUrl);
+
+    }
 
 }
 
 
+ function loadRemoteModel(url){
 
+    if(!url)return;
 
+    const loader = new THREE.GLTFLoader();
 
+    loader.load(
+
+        url,
+
+        gltf=>{
+
+            if(currentModel){
+
+                scene.remove(currentModel);
+
+            }
+
+            currentModel = gltf.scene;
+
+            scene.add(currentModel);
+
+            const json = gltf.parser.json;
+
+            originalMetadata = extractMetadata(json);
+
+            document.getElementById("originalBox").textContent =
+                JSON.stringify(originalMetadata,null,2);
+
+            document.getElementById("status").textContent =
+                "Modelo cargado desde biblioteca.";
+
+            document.getElementById("mergeBtn").disabled = false;
+
+        },
+
+        undefined,
+
+        err=>{
+
+            console.error(err);
+
+            document.getElementById("status").textContent =
+                "No se pudo cargar el modelo.";
+
+        }
+
+    );
+
+}
 
  
 /* ================= METADATA EXTRACTOR ================= */
