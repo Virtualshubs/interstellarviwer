@@ -40,6 +40,20 @@ h3{margin:10px 0 5px 0;font-size:14px}
 
     <input type="file" id="glbInput" accept=".glb,.gltf">
 
+   <label>Satélite predefinido</label>
+
+<div class="section">
+
+    <label>Satélite</label>
+
+    <select id="satelliteSelector">
+
+        <option value="">Seleccionar...</option>
+
+    </select>
+
+</div>
+
     <h3>Metadatos del GLB (originales)</h3>
     <div id="originalBox" class="box">Esperando modelo...</div>
 
@@ -91,6 +105,8 @@ h3{margin:10px 0 5px 0;font-size:14px}
   </div>
 </div>
 
+ 
+<script src="/sat-info.js"></script>
 <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
 <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://unpkg.com/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -170,6 +186,8 @@ function animate(){
 
   renderer.render(scene,camera);
 }
+
+ initSatelliteSelector();
 animate();
 
 /* ================= RESIZE FIX ================= */
@@ -181,6 +199,84 @@ window.addEventListener("resize",()=>{
   renderer.setSize(window.innerWidth-420,window.innerHeight);
 });
 
+
+
+
+/* =================select satelite ================= */
+
+
+
+
+
+function initSatelliteSelector(){
+
+    const selector=document.getElementById("satelliteSelector");
+
+    for(const norad in SAT_INFO){
+
+        const sat=SAT_INFO[norad];
+
+        const option=document.createElement("option");
+
+        option.value=norad;
+
+        option.textContent=sat.name;
+
+        selector.appendChild(option);
+
+    }
+
+    selector.addEventListener("change",()=>{
+
+        const sat=SAT_INFO[selector.value];
+
+        if(!sat)return;
+
+        fillSpaceTemplate(sat);
+
+    });
+
+}
+
+
+
+ function fillSpaceTemplate(sat){
+
+    const space={
+
+        norad:parseInt(
+            Object.keys(SAT_INFO).find(
+                id=>SAT_INFO[id]===sat
+            )
+        ),
+
+        name:sat.name,
+
+        type:sat.type,
+
+        mission:sat.mission,
+
+        image:sat.image,
+
+        patch:sat.patch,
+
+        instruments:sat.instruments,
+
+        capabilities:sat.capabilities
+
+    };
+
+    document.getElementById("spaceInput").value=
+        JSON.stringify(space,null,2);
+
+}
+
+
+
+
+
+
+ 
 /* ================= METADATA EXTRACTOR ================= */
 
 function extractMetadata(json){
