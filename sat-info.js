@@ -6,6 +6,7 @@ const SAT_INFO = {
   // =========================
   "25544": {
     name: "ISS",
+    modelUrl:"https://3d.staratlas.es/iss.glb",
     image: "https://3d.staratlas.es/ISS/1366_521.jpg",
     patch: "https://3d.staratlas.es/ISS/emblem900x900.png",
     type: "Estación espacial",
@@ -28,6 +29,7 @@ const SAT_INFO = {
 
   "39634": {
     name: "Sentinel-1A",
+    modelUrl:"",
     image: "https://3d.staratlas.es/ISS/emblem900x900.png",
     patch: "https://3d.staratlas.es/Sentinel-1_patch_card_full.png",
     type: "Radar SAR",
@@ -45,6 +47,7 @@ const SAT_INFO = {
 
   "39084": {
     name: "Sentinel-1B",
+      modelUrl:"",
     image: "https://3d.staratlas.es/Sentinel-1.jpg",
     patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Radar SAR",
@@ -65,6 +68,7 @@ const SAT_INFO = {
 
   "42063": {
     name: "Sentinel-2B",
+      modelUrl:"",
     image: "https://3d.staratlas.es/ISS/emblem900x900.png",
     patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Óptico multispectral",
@@ -83,6 +87,7 @@ const SAT_INFO = {
 
   "29780": {
     name: "Sentinel-2A",
+      modelUrl:"",
     image: "https://3d.staratlas.es/Sentinel-2.jpg",
     patch: "https://3d.staratlas.es/Sentinel-2_patch.png",
     type: "Óptico multispectral",
@@ -105,6 +110,7 @@ const SAT_INFO = {
 
   "28654": {
     name: "Sentinel-3A",
+      modelUrl:"",
     image: "https://3d.staratlas.es/Sentinel-3.jpg",
     patch: "https://3d.staratlas.es/Sentinel-3_patch.png",
     type: "Oceanografía / Clima",
@@ -128,6 +134,7 @@ const SAT_INFO = {
 
   "43618": {
     name: "Sentinel-5P",
+      modelUrl:"",
     image: "https://3d.staratlas.es/Sentinel-5P.jpg",
     patch: "https://3d.staratlas.es/Sentinel-5P_patch.png",
     type: "Monitoreo atmosférico",
@@ -149,6 +156,7 @@ const SAT_INFO = {
 
   "25338": {
     name: "NOAA-15",
+      modelUrl:"",
     image: "https://3d.staratlas.es/NOAA_logo.svg.png",
     patch: "https://3d.staratlas.es/NOAA_logo.svg.png",
     type: "Meteorológico",
@@ -167,6 +175,7 @@ const SAT_INFO = {
   },
   "38552": {
   name: "Meteosat-10",
+      modelUrl:"",
   image: "https://3d.staratlas.es/Meteosat.jpg",
   patch: "https://3d.staratlas.es/Meteosat_patch.png",
   type: "Meteorológico geoestacionario",
