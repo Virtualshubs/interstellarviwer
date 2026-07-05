@@ -710,52 +710,568 @@ const SAT_INFO = {
     group: "EARTH"
   },
 
-  // =========================
-  // WEATHER
-  // =========================
 
-// NOAA
 
-"28654": {
-    name:"NOAA-18",
-    type:"Meteorological",
-    mission:"Weather",
-    group:"WEATHER"
-},
+    "alos-4-daichi-4": { name: "ALOS-4 (DAICHI-4)", type: "Optical", mission: "JAXA", group: "EARTH" },
+  "alsat-1b": { name: "ALSAT-1B", type: "Optical", mission: "Algeria", group: "EARTH" },
+  "biomass": { name: "BIOMASS", type: "Radar", mission: "ESA", group: "EARTH" },
+  "carbonite-1-cbnt-1": { name: "CARBONITE 1 (CBNT-1)", type: "Optical", mission: "Commercial", group: "EARTH" },
+  "cas500-1": { name: "CAS500-1", type: "Optical", mission: "KARI", group: "EARTH" },
+  "cas500-2": { name: "CAS500-2", type: "Optical", mission: "KARI", group: "EARTH" },
+  "cas500-3": { name: "CAS500-3", type: "Optical", mission: "KARI", group: "EARTH" },
+  "cartosat-2c": { name: "CARTOSAT-2C", type: "Optical", mission: "ISRO", group: "EARTH" },
+  "cartosat-2d": { name: "CARTOSAT-2D", type: "Optical", mission: "ISRO", group: "EARTH" },
+  "cartosat-2e": { name: "CARTOSAT-2E", type: "Optical", mission: "ISRO", group: "EARTH" },
+  "cartosat-2f": { name: "CARTOSAT-2F", type: "Optical", mission: "ISRO", group: "EARTH" },
+  "cartosat-3": { name: "CARTOSAT-3", type: "Optical", mission: "ISRO", group: "EARTH" },
+  "co3d-1": { name: "CO3D 1", type: "Optical", mission: "CNES", group: "EARTH" },
+  "co3d-2": { name: "CO3D 2", type: "Optical", mission: "CNES", group: "EARTH" },
+  "co3d-3": { name: "CO3D 3", type: "Optical", mission: "CNES", group: "EARTH" },
+  "co3d-4": { name: "CO3D 4", type: "Optical", mission: "CNES", group: "EARTH" },
+  "csg-1": { name: "CSG-1", type: "Radar", mission: "Italy (ASI)", group: "EARTH" },
+  "csg-2": { name: "CSG-2", type: "Radar", mission: "Italy (ASI)", group: "EARTH" },
+  "csg-3": { name: "CSG-3", type: "Radar", mission: "Italy (ASI)", group: "EARTH" },
+  "formosat-5": { name: "FORMOSAT-5", type: "Optical", mission: "Taiwan", group: "EARTH" },
+  "gaofen-1": { name: "GAOFEN-1 series", type: "Optical", mission: "CNSA", group: "EARTH" },
+  "gaofen-3": { name: "GAOFEN-3", type: "Radar", mission: "CNSA", group: "EARTH" },
+  "gaofen-4": { name: "GAOFEN-4", type: "Optical", mission: "CNSA (GEO)", group: "EARTH" },
+  "gaofen-5": { name: "GAOFEN-5", type: "Multispectral", mission: "CNSA", group: "EARTH" },
+  "gaofen-6": { name: "GAOFEN-6", type: "Optical", mission: "CNSA", group: "EARTH" },
+  "gaofen-8": { name: "GAOFEN-8", type: "Optical", mission: "CNSA", group: "EARTH" },
+  "gokturk-1a": { name: "GOKTURK-1A", type: "Optical", mission: "Turkey", group: "EARTH" },
+  "gosat-gw": { name: "GOSAT-GW (IBUKI GW)", type: "Climate", mission: "JAXA", group: "EARTH" },
+  "hysys": { name: "HYSIS", type: "Spectral", mission: "NASA/ISRO", group: "EARTH" },
+  "icesat-2": { name: "ICESAT-2", type: "Laser Altimetry", mission: "NASA", group: "EARTH" },
+  "ionosfera-m": { name: "IONOSFERA-M", type: "Scientific", mission: "Russia", group: "EARTH" },
+  "jason-3": { name: "JASON-3", type: "Oceanography", mission: "NASA/CNES", group: "EARTH" },
+  "landsat-9": { name: "LANDSAT 9", type: "Optical", mission: "NASA/USGS", group: "EARTH" },
+  "microcarb": { name: "MICROCARB", type: "Climate", mission: "CNES", group: "EARTH" },
+  "nemo-hd": { name: "NEMO-HD", type: "Optical", mission: "Slovenia", group: "EARTH" },
+  "pleiades-neo": { name: "PLEIADES NEO", type: "Optical", mission: "Airbus/France", group: "EARTH" },
+  "resourcesat-2a": { name: "RESOURCESAT-2A", type: "Optical", mission: "ISRO", group: "EARTH" },
+  "resurs-p-4": { name: "RESURS-P 4", type: "Optical", mission: "Russia", group: "EARTH" },
+  "scatsat-1": { name: "SCATSAT-1", type: "Radar Scatterometer", mission: "ISRO", group: "EARTH" },
+  "skysat": { name: "SKYSAT constellation", type: "Optical", mission: "Planet Labs", group: "EARTH" },
+  "swot": { name: "SWOT", type: "Altimetry", mission: "NASA/CNES", group: "EARTH" },
+  "zy-3-02": { name: "ZIYUAN 3-02", type: "Optical", mission: "CNSA", group: "EARTH" },
 
-"33591": {
-    name:"NOAA-19",
-    type:"Meteorological",
-    mission:"Weather",
-    group:"WEATHER"
-},
 
-// METEOSAT
+// =========================
+// WEATHER
+// =========================
+
+// NOAA (no nuevos en tu JSON aquí)
+
+// METEOSAT (ya tenías 9, 10, 11)
 
 "28912": {
-    name:"Meteosat-8",
-    type:"Geo Weather",
-    mission:"Weather",
-    group:"WEATHER"
-},
-
-"33574": {
-    name:"Meteosat-9",
+    name:"METEOSAT-9 (MSG-2)",
     type:"Geo Weather",
     mission:"Weather",
     group:"WEATHER"
 },
 
 "38552": {
-    name:"Meteosat-10",
+    name:"METEOSAT-10 (MSG-3)",
     type:"Geo Weather",
     mission:"Weather",
     group:"WEATHER"
 },
 
 "40732": {
-    name:"Meteosat-11",
+    name:"METEOSAT-11 (MSG-4)",
     type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// METEOSAT / MTG / nuevas generaciones
+
+"54743": {
+    name:"METEOSAT-12 (MTG-I1)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"64723": {
+    name:"MTG-S1",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// GOES
+
+"35491": {
+    name:"GOES 14",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"36411": {
+    name:"GOES 15 (EWS-G2)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41866": {
+    name:"GOES 16",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43226": {
+    name:"GOES 17",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"51850": {
+    name:"GOES 18",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"60133": {
+    name:"GOES 19",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// HIMAWARI
+
+"40267": {
+    name:"HIMAWARI-8",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41836": {
+    name:"HIMAWARI-9",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// INSAT / GEO Asia
+
+"39216": {
+    name:"INSAT-3D",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41752": {
+    name:"INSAT-3DR",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58990": {
+    name:"INSAT-3DS",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// KOREA / CHINA GEO
+
+"36744": {
+    name:"COMS 1",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43823": {
+    name:"GEO-KOMPSAT-2A",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"40367": {
+    name:"FENGYUN 2G",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43491": {
+    name:"FENGYUN 2H",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// POLAR ORBIT WEATHER (NOAA / METOP / SENTINEL)
+
+"37849": {
+    name:"SUOMI NPP",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43013": {
+    name:"NOAA 20 (JPSS-1)",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"54234": {
+    name:"NOAA 21 (JPSS-2)",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"38771": {
+    name:"METOP-B",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43689": {
+    name:"METOP-C",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"65159": {
+    name:"METOP-SGA1",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41335": {
+    name:"SENTINEL-3A",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43437": {
+    name:"SENTINEL-3B",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// FENGYUN (polar meteorological)
+
+"32958": {
+    name:"FENGYUN 3A",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"37214": {
+    name:"FENGYUN 3B",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"39260": {
+    name:"FENGYUN 3C",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43010": {
+    name:"FENGYUN 3D",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"49008": {
+    name:"FENGYUN 3E",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57490": {
+    name:"FENGYUN 3F",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"56232": {
+    name:"FENGYUN 3G",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"65815": {
+    name:"FENGYUN 3H",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41882": {
+    name:"FENGYUN 4A",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// METEOR (Russia)
+
+"40069": {
+    name:"METEOR-M 2",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"44387": {
+    name:"METEOR-M2 2",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57166": {
+    name:"METEOR-M2 3",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"59051": {
+    name:"METEOR-M2 4",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// ARKTIKA (high inclination weather/ice monitoring)
+
+"47719": {
+    name:"ARKTIKA-M 1",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58584": {
+    name:"ARKTIKA-M 2",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// CYGFM constellation (experimental weather/earth obs)
+
+"41884": {
+    name:"CYGFM05",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41885": {
+    name:"CYGFM04",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41886": {
+    name:"CYGFM02",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41887": {
+    name:"CYGFM01",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41888": {
+    name:"CYGFM08",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41890": {
+    name:"CYGFM07",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41891": {
+    name:"CYGFM03",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// TIANMU-1 constellation
+
+"55973": {
+    name:"TIANMU-1 03",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"55974": {
+    name:"TIANMU-1 04",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"55975": {
+    name:"TIANMU-1 05",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"55976": {
+    name:"TIANMU-1 06",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57399": {
+    name:"TIANMU-1 07",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57400": {
+    name:"TIANMU-1 08",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57401": {
+    name:"TIANMU-1 09",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57402": {
+    name:"TIANMU-1 10",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58645": {
+    name:"TIANMU-1 11",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58646": {
+    name:"TIANMU-1 12",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58647": {
+    name:"TIANMU-1 13",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58648": {
+    name:"TIANMU-1 14",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58700": {
+    name:"TIANMU-1 15",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58701": {
+    name:"TIANMU-1 16",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58702": {
+    name:"TIANMU-1 17",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58703": {
+    name:"TIANMU-1 18",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58660": {
+    name:"TIANMU-1 19",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58661": {
+    name:"TIANMU-1 20",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58662": {
+    name:"TIANMU-1 21",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58663": {
+    name:"TIANMU-1 22",
+    type:"Meteorological",
     mission:"Weather",
     group:"WEATHER"
 },
@@ -763,41 +1279,233 @@ const SAT_INFO = {
 // =========================
 // GALILEO
 // =========================
+// =========================
+// GALILEO / AUI
+// =========================
 
-"37846": { name:"GSAT0101 (Galileo PFM)", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"37847": { name:"GSAT0102", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"38857": { name:"GSAT0103", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"40128": { name:"GSAT0201", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"40129": { name:"GSAT0202", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"40544": { name:"GSAT0203", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"40545": { name:"GSAT0204", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"40890": { name:"GSAT0206", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41174": { name:"GSAT0209", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41175": { name:"GSAT0208", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41549": { name:"GSAT0211", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41550": { name:"GSAT0210", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41859": { name:"GSAT0207", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41860": { name:"GSAT0212", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41861": { name:"GSAT0213", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"41862": { name:"GSAT0214", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43055": { name:"GSAT0215", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43056": { name:"GSAT0216", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43057": { name:"GSAT0217", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43058": { name:"GSAT0218", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43564": { name:"GSAT0221", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43565": { name:"GSAT0222", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43566": { name:"GSAT0219", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"43567": { name:"GSAT0220", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"49809": { name:"GSAT0223", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"49810": { name:"GSAT0224", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"59598": { name:"GSAT0225", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"59600": { name:"GSAT0227", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"61182": { name:"GSAT0232", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"61183": { name:"GSAT0226", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"67160": { name:"GSAT0233", type:"Navigation", mission:"Galileo", group:"GALILEO" },
-"67162": { name:"GSAT0234", type:"Navigation", mission:"Galileo", group:"GALILEO" },
+"37846": {
+    name:"GALILEO-PFM (GSAT0101)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
 
+"37847": {
+    name:"GALILEO-FM2 (GSAT0102)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
 
+"38857": {
+    name:"GALILEO-FM3 (GSAT0103)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40128": {
+    name:"GALILEO 5 (GSAT0201)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40129": {
+    name:"GALILEO 6 (GSAT0202)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40544": {
+    name:"GALILEO 7 (GSAT0203)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40545": {
+    name:"GALILEO 8 (GSAT0204)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40890": {
+    name:"GALILEO 10 (GSAT0206)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41174": {
+    name:"GALILEO 12 (GSAT0209)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41175": {
+    name:"GALILEO 11 (GSAT0208)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41549": {
+    name:"GALILEO 14 (GSAT0211)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41550": {
+    name:"GALILEO 13 (GSAT0210)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41859": {
+    name:"GALILEO 15 (GSAT0207)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41860": {
+    name:"GALILEO 16 (GSAT0212)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41861": {
+    name:"GALILEO 17 (GSAT0213)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41862": {
+    name:"GALILEO 18 (GSAT0214)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43055": {
+    name:"GALILEO 19 (GSAT0215)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43056": {
+    name:"GALILEO 20 (GSAT0216)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43057": {
+    name:"GALILEO 21 (GSAT0217)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43058": {
+    name:"GALILEO 22 (GSAT0218)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43564": {
+    name:"GALILEO 25 (GSAT0221)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43565": {
+    name:"GALILEO 26 (GSAT0222)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43566": {
+    name:"GALILEO 23 (GSAT0219)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43567": {
+    name:"GALILEO 24 (GSAT0220)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"49809": {
+    name:"GALILEO 27 (GSAT0223)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"49810": {
+    name:"GALILEO 28 (GSAT0224)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"59598": {
+    name:"GALILEO 29 (GSAT0225)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"59600": {
+    name:"GALILEO 30 (GSAT0227)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"61182": {
+    name:"GALILEO 32 (GSAT0232)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"61183": {
+    name:"GALILEO 31 (GSAT0226)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"67160": {
+    name:"GALILEO 33 (GSAT0233)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"67162": {
+    name:"GALILEO 34 (GSAT0234)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
   
   
 
