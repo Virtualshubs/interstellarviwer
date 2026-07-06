@@ -640,6 +640,9 @@ let isDragging = false;
 let compassVisible = false;
   let starSphere;
 let stars;
+  let currentLat = null;
+let currentLon = null;
+let currentAlt = null;
 
 
 const SAT_INFO = {
@@ -2817,13 +2820,21 @@ function updateSatellites(){
 
     mesh.position.copy(latLonToVec3(lat, lon, 1.4));
 
-    if(id === currentSat){
-      mesh.scale.set(2,2,2);
-      mesh.material.color.set(0x00ff00);
-    } else {
-      mesh.scale.set(1,1,1);
-      mesh.material.color.set(getColor(id));
-    }
+if(id === currentSat){
+
+    currentLat = lat;
+    currentLon = lon;
+    currentAlt = geo.height;
+
+    mesh.scale.set(2,2,2);
+    mesh.material.color.set(0x00ff00);
+
+} else {
+
+    mesh.scale.set(1,1,1);
+    mesh.material.color.set(getColor(id));
+
+}
   }
 }
 
@@ -2846,11 +2857,28 @@ function latLonToVec3(lat, lon, r){
 // UI
 // ======================================================
 function updateUI(){
-  const sat = SAT_INFO[currentSat];
-  document.getElementById("satInfo").innerHTML =
-    `<b>${sat.name}</b><br>${sat.type}<br>${sat.mission}`;
-}
 
+    const sat = SAT_INFO[currentSat];
+
+    document.getElementById("satInfo").innerHTML = `
+        <b>${sat.name}</b><br>
+        ${sat.type}<br>
+        ${sat.mission}<br><br>
+
+        <b>Latitud:</b> ${
+            currentLat !== null ? currentLat.toFixed(2) + "°" : "--"
+        }<br>
+
+        <b>Longitud:</b> ${
+            currentLon !== null ? currentLon.toFixed(2) + "°" : "--"
+        }<br>
+
+        <b>Altitud:</b> ${
+            currentAlt !== null ? currentAlt.toFixed(1) + " km" : "--"
+        }
+
+    `;
+}
 // ======================================================
 // LOOP
 // ======================================================
@@ -2888,6 +2916,7 @@ function animate(){
 
   //  SATELLITES
   updateSatellites();
+  updateUI();
 
   //  CAMERA
   rotY += (targetRotY-rotY)*0.08;
