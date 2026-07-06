@@ -2491,10 +2491,9 @@ earth.add(southPole);
 
   select.value = currentSat;
 
-  loadLocations().then(()=>{
-
+loadLocations().then(() => {
+    console.log("Ciudades cargadas");
     buildLocationSelect();
-
 });
 
 select.addEventListener("change", async (e)=>{
