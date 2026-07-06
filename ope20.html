@@ -640,9 +640,11 @@ let isDragging = false;
 let compassVisible = false;
   let starSphere;
 let stars;
+
   let currentLat = null;
 let currentLon = null;
 let currentAlt = null;
+let currentSpeed = null;
 
 
 const SAT_INFO = {
@@ -2806,36 +2808,61 @@ function updateSatellites(){
 
   const now = new Date();
   const gmst = satellite.gstime(now);
+
   for(const id in satrecs){
+
     const satrec = satrecs[id];
+
     const pv = satellite.propagate(satrec, now);
+
     if(!pv.position) continue;
 
     const geo = satellite.eciToGeodetic(pv.position, gmst);
+
     const lat = satellite.degreesLat(geo.latitude);
     const lon = satellite.degreesLong(geo.longitude);
+    const altKm = geo.height;
+
+    // Velocidad orbital (km/s)
+    const velocity = pv.velocity
+      ? Math.sqrt(
+          pv.velocity.x * pv.velocity.x +
+          pv.velocity.y * pv.velocity.y +
+          pv.velocity.z * pv.velocity.z
+        )
+      : 0;
 
     const mesh = satMeshes[id];
     if(!mesh) continue;
 
+    // Guardamos datos para futuras herramientas
+    mesh.userData.lat = lat;
+    mesh.userData.lon = lon;
+    mesh.userData.alt = altKm;
+    mesh.userData.speed = velocity;
+
+    // Posición del satélite
     mesh.position.copy(latLonToVec3(lat, lon, 1.4));
 
-if(id === currentSat){
+    if(id === currentSat){
 
-    currentLat = lat;
-    currentLon = lon;
-    currentAlt = geo.height;
+      currentLat = lat;
+      currentLon = lon;
+      currentAlt = altKm;
+      currentSpeed = velocity;
 
-    mesh.scale.set(2,2,2);
-    mesh.material.color.set(0x00ff00);
+      mesh.scale.set(2,2,2);
+      mesh.material.color.set(0x00ff00);
 
-} else {
+    }else{
 
-    mesh.scale.set(1,1,1);
-    mesh.material.color.set(getColor(id));
+      mesh.scale.set(1,1,1);
+      mesh.material.color.set(getColor(id));
 
-}
+    }
+
   }
+
 }
 
 // ======================================================
@@ -2875,9 +2902,14 @@ function updateUI(){
 
         <b>Altitud:</b> ${
             currentAlt !== null ? currentAlt.toFixed(1) + " km" : "--"
+        }<br>
+
+        <b>Velocidad:</b> ${
+            currentSpeed !== null ? currentSpeed.toFixed(2) + " km/s" : "--"
         }
 
     `;
+
 }
 // ======================================================
 // LOOP
