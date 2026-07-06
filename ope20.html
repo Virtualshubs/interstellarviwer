@@ -645,6 +645,7 @@ let stars;
 let currentLon = null;
 let currentAlt = null;
 let currentSpeed = null;
+  let earthTiltQuat;
 
 
 const SAT_INFO = {
@@ -2284,6 +2285,13 @@ renderer.toneMappingExposure = 0.8;
 
   earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
 
+
+earthTiltQuat = new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 0, 1),
+    THREE.MathUtils.degToRad(23.44)
+);
+  
+
   const tex = new THREE.TextureLoader().load(
     "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
   );
@@ -2842,7 +2850,14 @@ function updateSatellites(){
     mesh.userData.speed = velocity;
 
 // Posición visual
-mesh.position.copy(latLonToVec3(lat, lon - 180, 1.4));
+const pos = latLonToVec3(lat, lon - 180, 1.4);
+
+pos.applyAxisAngle(
+    new THREE.Vector3(0, 0, 1),
+    THREE.MathUtils.degToRad(23.44)
+);
+
+mesh.position.copy(pos);
 
     if(id === currentSat){
 
