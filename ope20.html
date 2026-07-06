@@ -2842,7 +2842,7 @@ function updateSatellites(){
     mesh.userData.speed = velocity;
 
 // Posición visual
-mesh.position.copy(latLonToVec3(lat, lon - 180, 1.4));
+mesh.position.copy(latLonToVec3(lat, lon + 180, 1.4));
 
     if(id === currentSat){
 
