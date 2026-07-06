@@ -2841,8 +2841,8 @@ function updateSatellites(){
     mesh.userData.alt = altKm;
     mesh.userData.speed = velocity;
 
-    // Posición del satélite
-    mesh.position.copy(latLonToVec3(lat, lon, 1.4));
+// Posición visual
+mesh.position.copy(latLonToVec3(lat, lon - 180, 1.4));
 
     if(id === currentSat){
 
