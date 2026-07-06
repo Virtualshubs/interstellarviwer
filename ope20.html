@@ -2828,38 +2828,16 @@ async function loadLocations(){
 
 function buildLocationSelect(){
 
+    console.log("Entrando en buildLocationSelect");
+    console.log(LOCATIONS);
+
     const select = document.getElementById("citySelect");
 
-    select.innerHTML = "";
+    console.log(select);
 
-    for(const region in LOCATIONS){
-
-        const group = document.createElement("optgroup");
-        group.label = region;
-
-        LOCATIONS[region].forEach(city=>{
-
-            const option = document.createElement("option");
-
-            option.value = `${city.lat},${city.lon}`;
-            option.textContent = city.name;
-
-            group.appendChild(option);
-
-        });
-
-        select.appendChild(group);
-
-    }
-
-    const custom = document.createElement("option");
-    custom.value = "custom";
-    custom.textContent = "📍 Coordenadas personalizadas";
-
-    select.appendChild(custom);
+    select.innerHTML = "<option>PRUEBA</option>";
 
 }
-
 
   
 
