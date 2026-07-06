@@ -1,0 +1,3058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>3DTWINS OPE</title>
+<link
+rel="stylesheet"
+href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0">
+<style>
+
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: radial-gradient(circle at 50% 30%, #05070d, #000 70%);
+  color: #E6F1FF;
+}
+
+    #info {
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+    z-index:10;
+  }
+  
+  #logo{
+
+    position:fixed;
+
+    bottom:20px;
+    right:20px;     /* cambia a left:20px si lo quieres a la izquierda */
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    overflow:hidden;
+    z-index:1000;
+background:rgba(255,255,255,.04);
+backdrop-filter:blur(8px);
+border:1px solid rgba(255,255,255,.15);
+padding:6px;
+    pointer-events:none;
+}
+
+#logo img{
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
+
+}
+
+
+
+
+#dock{
+    position:absolute;
+
+    left:50%;
+    bottom:20px;
+    transform:translateX(-50%);
+
+    display:flex;
+    gap:10px;
+
+    padding:10px 14px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.08);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,.15);
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,.35);
+}
+
+  .dockButton{
+
+    width:46px;
+    height:46px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.08);
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.dockButton:hover{
+
+    transform:translateY(-4px) scale(1.08);
+
+    background:rgba(255,255,255,.18);
+}
+.material-symbols-rounded{
+
+    font-size:26px;
+
+    color:white;
+
+    user-select:none;
+
+    pointer-events:none;
+
+}
+  
+  
+canvas { display: block; }
+
+#ui {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+
+  width: 400px;
+  max-height: 92vh;
+  overflow: auto;
+
+  padding: 16px;
+  border-radius: 16px;
+
+  background: rgba(8, 12, 20, 0.78);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(120, 180, 255, 0.18);
+
+  box-shadow:
+    0 0 45px rgba(70, 120, 255, 0.10),
+    inset 0 0 25px rgba(255,255,255,0.02);
+}
+
+#ui::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 180, 255, 0.5),
+    transparent
+  );
+  opacity: 0.6;
+}
+
+
+#ui h3 {
+  margin: 0 0 12px 0;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  font-size: 24px;
+  color: #9CCBFF;
+  text-transform: uppercase;
+}
+
+button, select, input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(120, 180, 255, 0.14);
+
+  color: #E6F1FF;
+
+  border-radius: 10px;
+  outline: none;
+
+  font-size: 12px;
+  letter-spacing: 0.02em;
+
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  border-color: rgba(120, 180, 255, 0.35);
+  background: rgba(120, 180, 255, 0.06);
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+
+.highlight {
+  margin-top: 14px;
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 170, 0.08),
+    rgba(0, 120, 255, 0.06)
+  );
+
+  border: 1px solid rgba(0, 255, 170, 0.18);
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  box-shadow: inset 0 0 18px rgba(0,255,150,0.05);
+}
+
+.insightBlock {
+  margin-top: 10px;
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(120, 180, 255, 0.12);
+
+  position: relative;
+}
+
+/* left accent bar (HUD feel) */
+.insightBlock::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(120, 180, 255, 0.35);
+  border-radius: 2px;
+}
+
+.insightTitle {
+  font-size: 30px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7FB3FF;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.insightItem {
+  font-size: 12px;
+  opacity: 0.92;
+  margin: 3px 0;
+  padding-left: 8px;
+  border-left: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+
+.rankCard {
+  margin-top: 8px;
+  padding: 10px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  font-size: 12px;
+
+  transition: all 0.2s ease;
+}
+
+.rankCard:hover {
+  border-color: rgba(120, 180, 255, 0.28);
+  background: rgba(120, 180, 255, 0.05);
+}
+
+
+
+pre {
+  white-space: pre-wrap;
+  font-size: 11px;
+  margin-top: 10px;
+
+  opacity: 0.65;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+}
+
+
+
+#ui::-webkit-scrollbar {
+  width: 6px;
+}
+
+#ui::-webkit-scrollbar-thumb {
+  background: rgba(120, 180, 255, 0.25);
+  border-radius: 10px;
+}
+
+#ui::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+  #satInfoPanel {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 300px;
+  max-height: 92vh;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 16px;
+  z-index: 20;
+  background: rgba(8, 12, 20, 0.78);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(120, 180, 255, 0.18);
+  box-shadow:
+    0 0 40px rgba(70, 120, 255, 0.12),
+    inset 0 0 20px rgba(255,255,255,0.02);
+  color: #E6F1FF;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+  .satPanelTitle {
+  font-size: 25px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9CCBFF;
+}
+
+  #satHeader {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  border: 1px solid rgba(120, 180, 255, 0.25);
+  box-shadow: 0 0 20px rgba(120,180,255,0.15);
+}
+
+  #satHeader img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  filter: contrast(1.1) brightness(0.9);
+}
+
+  #satHeader::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.1),
+    rgba(0,0,0,0.7)
+  );
+
+  pointer-events: none;
+}
+
+  .satBlock {
+  margin-top: 10px;
+  padding: 10px 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.03);
+
+  border: 1px solid rgba(120, 180, 255, 0.10);
+
+  position: relative;
+}
+
+  .satBlock::before {
+  content: "";
+  position: absolute;
+
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+
+  width: 2px;
+
+  background: rgba(120, 180, 255, 0.35);
+  border-radius: 2px;
+}
+  .satBlockTitle {
+  font-size: 10px;
+
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  color: #7FB3FF;
+
+  margin-bottom: 6px;
+
+  opacity: 0.85;
+}
+
+  .satItem {
+  font-size: 12px;
+
+  margin: 3px 0;
+
+  opacity: 0.92;
+
+  padding-left: 6px;
+
+  border-left: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+  #satInfoPanel {
+  animation: satFadeIn 0.25s ease-out;
+}
+
+@keyframes satFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#satPatch {
+  position: fixed;
+
+  bottom: 18px;
+  right: 18px;
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255,255,255,0.18),
+    rgba(120,180,255,0.10) 45%,
+    rgba(10,14,20,0.92) 100%
+  );
+
+  border: 1px solid rgba(120, 180, 255, 0.35);
+
+  box-shadow:
+    0 0 20px rgba(120,180,255,0.25),
+    inset 0 0 14px rgba(255,255,255,0.05);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  z-index: 50;
+
+  /* pequeño “peso HUD” */
+  backdrop-filter: blur(10px);
+}
+  #satPatch {
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#satPatch:hover {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 28px rgba(120,180,255,0.35),
+    inset 0 0 14px rgba(255,255,255,0.06);
+}
+  
+#satPatch img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+ 
+
+  filter: drop-shadow(0 0 6px rgba(120,180,255,0.4));
+}
+
+#missionNav {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.missionSlot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+  border-radius: 50px;
+
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.missionSlot:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.missionSlot.active {
+  background: rgba(0,150,255,0.25);
+  border-color: rgba(0,150,255,0.6);
+}
+
+.missionSlot img {
+  width: 28px;
+  height: 28px;
+}
+
+.missionMeta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.missionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+
+.missionSub {
+  font-size: 10px;
+  opacity: 0.7;
+  color: white;
+}
+
+  #missionPanel{
+ position:fixed;
+  display: none;
+  top:50%;
+  left:50%;
+
+  transform:translate(-50%,-50%);
+
+  width:420px;
+  min-height:180px;
+
+  padding:24px;
+
+  background:rgba(8,12,18,0.95);
+  backdrop-filter:blur(20px);
+
+  border:1px solid rgba(120,180,255,0.35);
+  border-radius:20px;
+
+  box-shadow:
+    0 0 40px rgba(120,180,255,0.25);
+
+  color:white;
+
+  z-index:9999;
+
+  overflow:hidden;
+}
+
+  .missionTitle{
+  font-size:24px;
+  font-weight:600;
+  margin-bottom:12px;
+}
+
+.missionDesc{
+  font-size:14px;
+  line-height:1.6;
+  opacity:0.85;
+  margin-bottom:16px;
+}
+
+.missionSatCount{
+  font-size:13px;
+  color:#7ec8ff;
+}
+
+  select { width:220px; margin-top:5px; }
+</style>
+</head>
+
+<body>
+
+<div id="dock">
+    <button id="compassBtn" class="dockButton">
+       <span class="material-symbols-rounded"> explore 
+    </span>
+    </button>
+  </div>
+
+<div id="ui">
+   <h3>🛰 Orbital Pass Engine</h3>
+  <select id="satSelect"></select>
+  <select id="citySelect"></select>
+
+<input id="lat" placeholder="Latitude" style="display:none;">
+<input id="lon" placeholder="Longitude" style="display:none;">
+  
+  <div id="satInfo"></div>
+   <button id="calcBtn">Calcular satélite</button>  
+</div>
+
+  <div id="logo">
+    <img src="https://3d.staratlas.es/logoope.png" alt="Orbital Pass Engine">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
+<script>
+
+let scene, camera, renderer;
+let earth, earthGroup, sunLight, ambientLight;
+let startTime = Date.now();
+let distance = 3;
+let targetDistance = 3;
+let rotY = 0, targetRotY = 0;
+let rotX = 0, targetRotX = 0;
+let isDragging = false;
+  let compassGroup = null;
+let compassVisible = false;
+  let starSphere;
+let stars;
+
+  let currentLat = null;
+let currentLon = null;
+let currentAlt = null;
+let currentSpeed = null;
+  let earthTiltQuat;
+  
+let LOCATIONS = {};
+
+const SAT_INFO = {
+
+  // =========================
+  // ISS
+  // =========================
+
+  "25544": {
+    name: "ISS",
+    type: "Station",
+    mission: "Microgravity",
+    group: "ISS"
+  },
+
+  // =========================
+  // COPERNICUS (EARTH)
+  // =========================
+
+  "39634": {
+    name: "Sentinel-1A",
+    type: "Radar",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+  "40697": {
+    name: "Sentinel-2A",
+    type: "Optical",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+  "41335": {
+    name: "Sentinel-3A",
+    type: "Ocean",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+  "42063": {
+    name: "Sentinel-2B",
+    type: "Optical",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+  "42969": {
+    name: "Sentinel-5P",
+    type: "Atmosphere",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+  "43437": {
+    name: "Sentinel-3B",
+    type: "Ocean",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+  "62449": {
+    name: "Sentinel-1C",
+    type: "Radar",
+    mission: "Copernicus",
+    group: "EARTH"
+  },
+
+
+
+"39766": {
+  name: "ALOS-2",
+  type: "Radar",
+  mission: "JAXA",
+  group: "EARTH"
+},
+
+"62395": {
+  name: "ALOS-4 (DAICHI-4)",
+  type: "Radar",
+  mission: "JAXA",
+  group: "EARTH"
+},
+
+"41785": {
+  name: "ALSAT-1B",
+  type: "Optical",
+  mission: "Algeria",
+  group: "EARTH"
+},
+
+"38338": {
+  name: "ARIRANG-3 (KOMPSAT-3)",
+  type: "Optical",
+  mission: "KARI",
+  group: "EARTH"
+},
+
+"39227": {
+  name: "ARIRANG-5 (KOMPSAT-5)",
+  type: "Radar",
+  mission: "KARI",
+  group: "EARTH"
+},
+
+"40298": {
+  name: "ASNARO",
+  type: "Optical",
+  mission: "JAXA",
+  group: "EARTH"
+},
+
+"27424": {
+  name: "AQUA",
+  type: "Multispectral",
+  mission: "NASA",
+  group: "EARTH"
+},
+
+"28376": {
+  name: "AURA",
+  type: "Atmospheric",
+  mission: "NASA",
+  group: "EARTH"
+}, 
+
+  "63772": {
+  name: "BIOMASS",
+  type: "Radar",
+  mission: "ESA",
+  group: "EARTH"
+},
+
+  "61981": {
+  name: "CARBONITE 1 (CBNT-1)",
+  type: "Optical",
+  mission: "Commercial",
+  group: "EARTH"
+},
+
+"47953": {
+  name: "CAS500-1",
+  type: "Optical",
+  mission: "KARI",
+  group: "EARTH"
+},
+
+"54234": {
+  name: "CAS500-2",
+  type: "Optical",
+  mission: "KARI",
+  group: "EARTH"
+},
+
+"61759": {
+  name: "CAS500-3",
+  type: "Optical",
+  mission: "KARI",
+  group: "EARTH"
+},
+
+"29710": {
+  name: "CBERS 2B",
+  type: "Optical",
+  mission: "China/Brazil",
+  group: "EARTH"
+},
+
+"40336": {
+  name: "CBERS 4",
+  type: "Optical",
+  mission: "China/Brazil",
+  group: "EARTH"
+},
+
+"54239": {
+  name: "CBERS 4A",
+  type: "Optical",
+  mission: "China/Brazil",
+  group: "EARTH"
+},
+
+"28649": {
+  name: "CARTOSAT-1",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"32783": {
+  name: "CARTOSAT-2A",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"36795": {
+  name: "CARTOSAT-2B",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"41783": {
+  name: "CARTOSAT-2C",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"41948": {
+  name: "CARTOSAT-2D",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"43105": {
+  name: "CARTOSAT-2E",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"44804": {
+  name: "CARTOSAT-2F",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"44857": {
+  name: "CARTOSAT-3",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"55058": {
+  name: "CO3D 1",
+  type: "Optical",
+  mission: "CNES",
+  group: "EARTH"
+},
+
+"55059": {
+  name: "CO3D 2",
+  type: "Optical",
+  mission: "CNES",
+  group: "EARTH"
+},
+
+"55060": {
+  name: "CO3D 3",
+  type: "Optical",
+  mission: "CNES",
+  group: "EARTH"
+},
+
+"55061": {
+  name: "CO3D 4",
+  type: "Optical",
+  mission: "CNES",
+  group: "EARTH"
+},
+
+"31598": {
+  name: "COSMO-SKYMED 1",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+"32376": {
+  name: "COSMO-SKYMED 2",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+"33412": {
+  name: "COSMO-SKYMED 3",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+"37216": {
+  name: "COSMO-SKYMED 4",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+"43687": {
+  name: "CSG-1",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+"52941": {
+  name: "CSG-2",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+"59697": {
+  name: "CSG-3",
+  type: "Radar",
+  mission: "ASI",
+  group: "EARTH"
+},
+
+  "35681": {
+  name: "DEIMOS-1",
+  type: "Optical",
+  mission: "Deimos Imaging",
+  group: "EARTH"
+},
+
+"40013": {
+  name: "DEIMOS-2",
+  type: "Optical",
+  mission: "Deimos Imaging",
+  group: "EARTH"
+},
+
+"25757": {
+  name: "DLR-TUBSAT",
+  type: "Optical",
+  mission: "DLR",
+  group: "EARTH"
+},
+
+"35682": {
+  name: "DUBAISAT-1",
+  type: "Optical",
+  mission: "MBRSC",
+  group: "EARTH"
+},
+
+"39419": {
+  name: "DUBAISAT-2",
+  type: "Optical",
+  mission: "MBRSC",
+  group: "EARTH"
+},
+
+  "42965": {
+  name: "FORMOSAT-5",
+  type: "Optical",
+  mission: "Taiwan",
+  group: "EARTH"
+},
+
+  "39150": {
+  name: "GAOFEN-1",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"40940": {
+  name: "GAOFEN-1 02",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"41731": {
+  name: "GAOFEN-1 03",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"43259": {
+  name: "GAOFEN-1 04",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"54234": {
+  name: "GAOFEN-10R",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"44479": {
+  name: "GAOFEN-11 01",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"50010": {
+  name: "GAOFEN-12 01",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"51811": {
+  name: "GAOFEN-12 02",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"57800": {
+  name: "GAOFEN-12 03",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"60436": {
+  name: "GAOFEN-12 04",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"41727": {
+  name: "GAOFEN-3",
+  type: "Radar",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"41194": {
+  name: "GAOFEN-4",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"43582": {
+  name: "GAOFEN-5 01",
+  type: "Hyperspectral",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"43484": {
+  name: "GAOFEN-6",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"43857": {
+  name: "GAOFEN-8",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"44701": {
+  name: "GAOFEN-9 01",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"39030": {
+  name: "GOKTURK 2",
+  type: "Optical",
+  mission: "Turkey",
+  group: "EARTH"
+},
+
+"40335": {
+  name: "GOKTURK 1A",
+  type: "Optical",
+  mission: "Turkey",
+  group: "EARTH"
+},
+
+"33492": {
+  name: "GOSAT (IBUKI)",
+  type: "Climate",
+  mission: "JAXA",
+  group: "EARTH"
+},
+
+"64053": {
+  name: "GOSAT-GW (IBUKI GW)",
+  type: "Climate",
+  mission: "JAXA",
+  group: "EARTH"
+},
+
+"39574": {
+  name: "GPM-CORE",
+  type: "Precipitation",
+  mission: "NASA/JAXA",
+  group: "EARTH"
+},
+
+"43758": {
+  name: "HYSIS",
+  type: "Hyperspectral",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"31113": {
+  name: "HAIYANG-1B",
+  type: "Ocean",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"37781": {
+  name: "HAIYANG-2A",
+  type: "Ocean",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"40011": {
+  name: "HODOYOSHI-4",
+  type: "Optical",
+  mission: "Japan",
+  group: "EARTH"
+},
+
+"40015": {
+  name: "HODOYOSHI-3",
+  type: "Optical",
+  mission: "Japan",
+  group: "EARTH"
+},
+
+"33320": {
+  name: "HUANJING 1A (HJ-1A)",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"33321": {
+  name: "HUANJING 1B (HJ-1B)",
+  type: "Optical",
+  mission: "CNSA",
+  group: "EARTH"
+},
+
+"43613": {
+  name: "ICESAT-2",
+  type: "Laser Altimetry",
+  mission: "NASA",
+  group: "EARTH"
+},
+
+"62551": {
+  name: "IONOSFERA-M 1",
+  type: "Scientific",
+  mission: "Russia",
+  group: "EARTH"
+},
+
+"62552": {
+  name: "IONOSFERA-M 2",
+  type: "Scientific",
+  mission: "Russia",
+  group: "EARTH"
+},
+
+"63698": {
+  name: "IONOSFERA-M 3",
+  type: "Scientific",
+  mission: "Russia",
+  group: "EARTH"
+},
+
+"63699": {
+  name: "IONOSFERA-M 4",
+  type: "Scientific",
+  mission: "Russia",
+  group: "EARTH"
+},
+
+  "41240": {
+  name: "JASON-3",
+  type: "Oceanography",
+  mission: "NASA/CNES",
+  group: "EARTH"
+},
+
+"39731": {
+  name: "KAZEOSAT 1",
+  type: "Optical",
+  mission: "Kazakhstan",
+  group: "EARTH"
+},
+
+"40010": {
+  name: "KAZEOSAT 2",
+  type: "Optical",
+  mission: "Kazakhstan",
+  group: "EARTH"
+},
+
+"39084": {
+  name: "LANDSAT 8",
+  type: "Optical",
+  mission: "NASA/USGS",
+  group: "EARTH"
+},
+
+"49260": {
+  name: "LANDSAT 9",
+  type: "Optical",
+  mission: "NASA/USGS",
+  group: "EARTH"
+},
+
+"29709": {
+  name: "LAPAN-TUBSAT",
+  type: "Optical",
+  mission: "Indonesia",
+  group: "EARTH"
+},
+
+"41474": {
+  name: "LAPAN-A3",
+  type: "Optical",
+  mission: "Indonesia",
+  group: "EARTH"
+},
+
+"55003": {
+  name: "LEGION 1",
+  type: "Optical",
+  mission: "Maxar",
+  group: "EARTH"
+},
+
+"55004": {
+  name: "LEGION 2",
+  type: "Optical",
+  mission: "Maxar",
+  group: "EARTH"
+},
+
+"55005": {
+  name: "LEGION 3",
+  type: "Optical",
+  mission: "Maxar",
+  group: "EARTH"
+},
+
+"55006": {
+  name: "LEGION 4",
+  type: "Optical",
+  mission: "Maxar",
+  group: "EARTH"
+},
+
+  "40305": {
+  name: "MICROCARB",
+  type: "Climate",
+  mission: "CNES",
+  group: "EARTH"
+},
+
+"60492": {
+  name: "NEMO-HD",
+  type: "Optical",
+  mission: "Slovenia",
+  group: "EARTH"
+},
+
+"35931": {
+  name: "OCEANSAT-2",
+  type: "Oceanography",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+
+  "41851": {
+  name: "PARS 1",
+  type: "Optical",
+  mission: "Iran",
+  group: "EARTH"
+},
+
+"58689": {
+  name: "PATHFINDER 1",
+  type: "Optical",
+  mission: "BlackSky",
+  group: "EARTH"
+},
+
+"38012": {
+  name: "PLEIADES 1A",
+  type: "Optical",
+  mission: "CNES/Airbus",
+  group: "EARTH"
+},
+
+"39019": {
+  name: "PLEIADES 1B",
+  type: "Optical",
+  mission: "CNES/Airbus",
+  group: "EARTH"
+},
+
+"48279": {
+  name: "PLEIADES NEO 3",
+  type: "Optical",
+  mission: "Airbus",
+  group: "EARTH"
+},
+
+"59630": {
+  name: "PLEIADES NEO 4",
+  type: "Optical",
+  mission: "Airbus",
+  group: "EARTH"
+},
+
+"62283": {
+  name: "PRSC-E03",
+  type: "Optical",
+  mission: "China",
+  group: "EARTH"
+},
+
+"62282": {
+  name: "PRSC-EO1",
+  type: "Optical",
+  mission: "China",
+  group: "EARTH"
+},
+
+"62364": {
+  name: "PRSC-S1",
+  type: "Radar",
+  mission: "China",
+  group: "EARTH"
+},
+
+  "29228": {
+  name: "RESURS-DK 1",
+  type: "Optical",
+  mission: "Russia",
+  group: "EARTH"
+},
+
+"37387": {
+  name: "RESOURCESAT-2",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"41877": {
+  name: "RESOURCESAT-2A",
+  type: "Optical",
+  mission: "ISRO",
+  group: "EARTH"
+},
+
+"57188": {
+  name: "RESURS-P 4",
+  type: "Optical",
+  mission: "Russia",
+  group: "EARTH"
+},
+
+"32382": {
+  name: "RADARSAT-2",
+  type: "Radar",
+  mission: "CSA",
+  group: "EARTH"
+},
+
+"37791": {
+  name: "RASAT",
+  type: "Optical",
+  mission: "Turkey",
+  group: "EARTH"
+},
+
+
+// =========================
+// WEATHER
+// =========================
+
+// NOAA (no nuevos en tu JSON aquí)
+
+// METEOSAT (ya tenías 9, 10, 11)
+
+"28912": {
+    name:"METEOSAT-9 (MSG-2)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"38552": {
+    name:"METEOSAT-10 (MSG-3)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"40732": {
+    name:"METEOSAT-11 (MSG-4)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// METEOSAT / MTG / nuevas generaciones
+
+"54743": {
+    name:"METEOSAT-12 (MTG-I1)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"64723": {
+    name:"MTG-S1",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// GOES
+
+"35491": {
+    name:"GOES 14",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"36411": {
+    name:"GOES 15 (EWS-G2)",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41866": {
+    name:"GOES 16",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43226": {
+    name:"GOES 17",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"51850": {
+    name:"GOES 18",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"60133": {
+    name:"GOES 19",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// HIMAWARI
+
+"40267": {
+    name:"HIMAWARI-8",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41836": {
+    name:"HIMAWARI-9",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// INSAT / GEO Asia
+
+"39216": {
+    name:"INSAT-3D",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41752": {
+    name:"INSAT-3DR",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58990": {
+    name:"INSAT-3DS",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// KOREA / CHINA GEO
+
+"36744": {
+    name:"COMS 1",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43823": {
+    name:"GEO-KOMPSAT-2A",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"40367": {
+    name:"FENGYUN 2G",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43491": {
+    name:"FENGYUN 2H",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// POLAR ORBIT WEATHER (NOAA / METOP / SENTINEL)
+
+"37849": {
+    name:"SUOMI NPP",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43013": {
+    name:"NOAA 20 (JPSS-1)",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"54234": {
+    name:"NOAA 21 (JPSS-2)",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"38771": {
+    name:"METOP-B",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43689": {
+    name:"METOP-C",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"65159": {
+    name:"METOP-SGA1",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41335": {
+    name:"SENTINEL-3A",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43437": {
+    name:"SENTINEL-3B",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// FENGYUN (polar meteorological)
+
+"32958": {
+    name:"FENGYUN 3A",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"37214": {
+    name:"FENGYUN 3B",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"39260": {
+    name:"FENGYUN 3C",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"43010": {
+    name:"FENGYUN 3D",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"49008": {
+    name:"FENGYUN 3E",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57490": {
+    name:"FENGYUN 3F",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"56232": {
+    name:"FENGYUN 3G",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"65815": {
+    name:"FENGYUN 3H",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41882": {
+    name:"FENGYUN 4A",
+    type:"Geo Weather",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// METEOR (Russia)
+
+"40069": {
+    name:"METEOR-M 2",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"44387": {
+    name:"METEOR-M2 2",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57166": {
+    name:"METEOR-M2 3",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"59051": {
+    name:"METEOR-M2 4",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// ARKTIKA (high inclination weather/ice monitoring)
+
+"47719": {
+    name:"ARKTIKA-M 1",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58584": {
+    name:"ARKTIKA-M 2",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// CYGFM constellation (experimental weather/earth obs)
+
+"41884": {
+    name:"CYGFM05",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41885": {
+    name:"CYGFM04",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41886": {
+    name:"CYGFM02",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41887": {
+    name:"CYGFM01",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41888": {
+    name:"CYGFM08",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41890": {
+    name:"CYGFM07",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"41891": {
+    name:"CYGFM03",
+    type:"Experimental",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// TIANMU-1 constellation
+
+"55973": {
+    name:"TIANMU-1 03",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"55974": {
+    name:"TIANMU-1 04",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"55975": {
+    name:"TIANMU-1 05",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"55976": {
+    name:"TIANMU-1 06",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57399": {
+    name:"TIANMU-1 07",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57400": {
+    name:"TIANMU-1 08",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57401": {
+    name:"TIANMU-1 09",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"57402": {
+    name:"TIANMU-1 10",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58645": {
+    name:"TIANMU-1 11",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58646": {
+    name:"TIANMU-1 12",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58647": {
+    name:"TIANMU-1 13",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58648": {
+    name:"TIANMU-1 14",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58700": {
+    name:"TIANMU-1 15",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58701": {
+    name:"TIANMU-1 16",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58702": {
+    name:"TIANMU-1 17",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58703": {
+    name:"TIANMU-1 18",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58660": {
+    name:"TIANMU-1 19",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58661": {
+    name:"TIANMU-1 20",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58662": {
+    name:"TIANMU-1 21",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+"58663": {
+    name:"TIANMU-1 22",
+    type:"Meteorological",
+    mission:"Weather",
+    group:"WEATHER"
+},
+
+// =========================
+// GALILEO
+// =========================
+// =========================
+// GALILEO / AUI
+// =========================
+
+"37846": {
+    name:"GALILEO-PFM (GSAT0101)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"37847": {
+    name:"GALILEO-FM2 (GSAT0102)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"38857": {
+    name:"GALILEO-FM3 (GSAT0103)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40128": {
+    name:"GALILEO 5 (GSAT0201)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40129": {
+    name:"GALILEO 6 (GSAT0202)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40544": {
+    name:"GALILEO 7 (GSAT0203)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40545": {
+    name:"GALILEO 8 (GSAT0204)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"40890": {
+    name:"GALILEO 10 (GSAT0206)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41174": {
+    name:"GALILEO 12 (GSAT0209)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41175": {
+    name:"GALILEO 11 (GSAT0208)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41549": {
+    name:"GALILEO 14 (GSAT0211)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41550": {
+    name:"GALILEO 13 (GSAT0210)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41859": {
+    name:"GALILEO 15 (GSAT0207)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41860": {
+    name:"GALILEO 16 (GSAT0212)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41861": {
+    name:"GALILEO 17 (GSAT0213)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"41862": {
+    name:"GALILEO 18 (GSAT0214)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43055": {
+    name:"GALILEO 19 (GSAT0215)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43056": {
+    name:"GALILEO 20 (GSAT0216)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43057": {
+    name:"GALILEO 21 (GSAT0217)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43058": {
+    name:"GALILEO 22 (GSAT0218)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43564": {
+    name:"GALILEO 25 (GSAT0221)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43565": {
+    name:"GALILEO 26 (GSAT0222)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43566": {
+    name:"GALILEO 23 (GSAT0219)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"43567": {
+    name:"GALILEO 24 (GSAT0220)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"49809": {
+    name:"GALILEO 27 (GSAT0223)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"49810": {
+    name:"GALILEO 28 (GSAT0224)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"59598": {
+    name:"GALILEO 29 (GSAT0225)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"59600": {
+    name:"GALILEO 30 (GSAT0227)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"61182": {
+    name:"GALILEO 32 (GSAT0232)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"61183": {
+    name:"GALILEO 31 (GSAT0226)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"67160": {
+    name:"GALILEO 33 (GSAT0233)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+
+"67162": {
+    name:"GALILEO 34 (GSAT0234)",
+    type:"Navigation",
+    mission:"GNSS",
+    group:"GALILEO"
+},
+  
+  
+
+};
+
+
+  
+
+  // ======================================================
+// EPHEMERIDES FILES
+// ======================================================
+
+const EPHEMERIS_FILES = {
+
+  ISS: "efemerides/iss.json",
+
+  EARTH: "efemerides/earth.json",
+
+  WEATHER: "efemerides/weather.json",
+
+  GALILEO: "efemerides/galileo.json"
+
+};
+
+const LOCATIONS_FILE = "location/locationSpain.json";
+  
+let satMeshes = {};
+let satrecs = {};
+let currentSat = "25544";
+
+//CACHE TLE (CRÍTICO PARA NO BLOQUEAR)
+const TLE_CACHE = {};
+
+// ======================================================
+//  COLORS
+// ======================================================
+const COLORS = {
+  COPERNICUS: 0xff7a18,
+  WEATHER: 0xb06cff,
+  ISS: 0x4aa3ff
+};
+
+function getColor(id){
+  const sat = SAT_INFO[id];
+  if(!sat) return 0xffffff;
+
+  const name = sat.name.toLowerCase();
+
+  if(name.includes("sentinel")) return COLORS.COPERNICUS;
+  if(name.includes("noaa") || name.includes("meteosat")) return COLORS.WEATHER;
+  if(name.includes("iss")) return COLORS.ISS;
+
+  return 0xffffff;
+}
+
+// ======================================================
+// INIT
+// ======================================================
+init();
+animate();
+
+function init(){
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth/window.innerHeight,
+    0.1,
+    1000
+  );
+
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.8;
+
+  // =========================
+  //  LIGHTS (UNCHANGED)
+  // =========================
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  scene.add(sunLight);
+  scene.add(sunLight.target);
+
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.05);
+  scene.add(ambientLight);
+
+  // =========================
+  //  EARTH
+  // =========================
+  earthGroup = new THREE.Group();
+  scene.add(earthGroup);
+
+  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+
+
+earthTiltQuat = new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 0, 1),
+    THREE.MathUtils.degToRad(23.44)
+);
+  
+
+  const tex = new THREE.TextureLoader().load(
+    "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+  );
+tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  earth = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 64, 64),
+    new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 1,
+      metalness: 0,
+      emissive: new THREE.Color(0x0a0a0a),
+      emissiveIntensity: 0.25
+    })
+  );
+
+  earth.rotation.y = Math.PI;
+  earthGroup.add(earth);
+  buildStarSphere();
+
+// =========================
+//  ATMOSPHERE LAYERS
+// =========================
+function createAtmosphereLayer(radius, color, opacity) {
+  const geometry = new THREE.SphereGeometry(radius, 64, 64);
+
+  const material = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: opacity,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  return new THREE.Mesh(geometry, material);
+}
+
+
+  // =========================
+//  ATMOSPHERE (REALISTIC LAYERS)
+// =========================
+
+// capa baja (troposfera visual)
+const atm1 = createAtmosphereLayer(1.03, 0x4aa3ff, 0.25);
+
+// estratosfera (más difusa)
+const atm2 = createAtmosphereLayer(1.06, 0x2f7bff, 0.12);
+
+// borde superior (ionosfera glow)
+const atm3 = createAtmosphereLayer(1.12, 0x1a3cff, 0.06);
+
+earth.add(atm1);
+earth.add(atm2);
+earth.add(atm3);
+
+
+  // glow extra hacia borde de planeta
+const glowGeometry = new THREE.SphereGeometry(1.02, 64, 64);
+
+const glowMaterial = new THREE.MeshBasicMaterial({
+  color: 0x6fb6ff,
+  transparent: true,
+  opacity: 0.08,
+  side: THREE.BackSide,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const atmosphereGlow = new THREE.Mesh(glowGeometry, glowMaterial);
+earth.add(atmosphereGlow);
+
+// =========================
+// 🌍 ECUADOR
+// =========================
+const equator = createLatCircle(1.01, 0);
+equator.material.opacity = 0.7;
+equator.material.color.setHex(0x66ccff);
+
+earth.add(equator);
+
+// =========================
+// 🌍 PARALELOS PRINCIPALES
+// =========================
+
+const parallels = [
+    {lat:60, opacity:0.35},
+    {lat:30, opacity:0.25},
+    {lat:-30, opacity:0.25},
+    {lat:-60, opacity:0.35}
+];
+
+for(const p of parallels){
+
+    const line = createLatCircle(1.01, p.lat);
+
+    line.material.color.setHex(0x66ccff);
+    line.material.opacity = p.opacity;
+
+    earth.add(line);
+
+}
+
+
+// =========================
+// 🌍 MERIDIANOS
+// =========================
+
+for(let lon=-180; lon<=180; lon+=30){
+
+    if(lon===0) continue;
+
+    const meridian = createLonCircle(1.01,lon);
+
+    earth.add(meridian);
+
+}
+
+  
+function createPoleLabel(text, color = 0x66ccff) {
+
+  const canvas = document.createElement("canvas");
+  const size = 256;
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, size, size);
+  ctx.font = "bold 140px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "#66ccff";
+  ctx.shadowBlur = 25;
+  ctx.fillStyle = "#66ccff";
+  ctx.fillText(text, size / 2, size / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false, // importante para que no “se esconda” en la esfera
+    blending: THREE.AdditiveBlending
+  });
+
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(0.22, 0.22, 0.22);
+
+  return sprite;
+}
+
+
+  // =========================
+//  POLOS NORTE / SUR
+// =========================
+
+const POLE_OFFSET = 1.08; // separación real de la superficie
+
+const northPole = createPoleLabel("N");
+northPole.position.copy(latLonToVec3(90, 0, POLE_OFFSET));
+earth.add(northPole);
+
+const southPole = createPoleLabel("S");
+southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
+earth.add(southPole);
+
+  // Madrid pin
+  const pin = new THREE.Mesh(
+    new THREE.SphereGeometry(0.02, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+
+  pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
+  earth.add(pin);
+
+  // =========================
+  // UI
+  // =========================
+  const select = document.getElementById("satSelect");
+
+  for(const id in SAT_INFO){
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = SAT_INFO[id].name;
+    select.appendChild(opt);
+  }
+
+  select.value = currentSat;
+
+loadLocations().then(() => {
+    console.log("Ciudades cargadas");
+    buildLocationSelect();
+});
+
+select.addEventListener("change", async (e)=>{
+  currentSat = e.target.value;
+
+  if (!satrecs[currentSat]) {
+    await loadTLE(currentSat);
+  }
+
+  updateUI();
+});
+
+  updateUI();
+
+  // SOLO CARGAR ISS AL INICIO
+ // loadTLE("25544");
+
+  document.getElementById("calcBtn").addEventListener("click", () => {
+  loadSelectedSatellite();
+});
+
+  document.getElementById("compassBtn")
+    .addEventListener("click", toggleCompass);
+
+  // controls
+  window.addEventListener("wheel",(e)=>{
+    targetDistance += e.deltaY * 0.002;
+    targetDistance = Math.max(1.2, Math.min(8, targetDistance));
+  });
+
+  window.addEventListener("mousedown",()=> isDragging = true);
+  window.addEventListener("mouseup",()=> isDragging = false);
+
+  window.addEventListener("mousemove",(e)=>{
+    if(!isDragging) return;
+    targetRotY += e.movementX * 0.005;
+    targetRotX += e.movementY * 0.005;
+  });
+
+  window.addEventListener("resize", onResize);
+}
+
+
+function buildCompass(){
+
+    if(compassGroup) return;
+
+    compassGroup = new THREE.Group();
+
+    earth.add(compassGroup);
+
+    addCompassLabel("60°N",60);
+    addCompassLabel("30°N",30);
+
+    addCompassLabel("Ecuador",0);
+
+    addCompassLabel("30°S",-30);
+    addCompassLabel("60°S",-60);
+
+  addLongitudeLabel("60°O",-60);
+addLongitudeLabel("30°O",-30);
+
+addLongitudeLabel("G",0);
+
+addLongitudeLabel("30°E",30);
+addLongitudeLabel("60°E",60);
+
+    compassGroup.visible = false;
+
+}
+
+  function toggleCompass(){
+
+    if(!compassGroup){
+        buildCompass();
+    }
+
+    compassVisible = !compassVisible;
+
+    compassGroup.visible = compassVisible;
+
+}
+
+
+function createCompassLabel(text){
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0,0,256,256);
+
+    ctx.font = "bold 70px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillStyle = "#66ccff";
+    ctx.shadowColor = "#66ccff";
+    ctx.shadowBlur = 10;
+
+    ctx.fillText(text,128,128);
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    const material = new THREE.SpriteMaterial({
+        map:texture,
+        transparent:true,
+        depthWrite:false,
+        depthTest:false,
+        blending:THREE.AdditiveBlending
+    });
+
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(0.11,0.11,0.11);
+
+    return sprite;
+}
+
+  function addCompassLabel(text, lat){
+
+    const label = createCompassLabel(text);
+
+    label.position.copy(
+        latLonToVec3(lat,110,1.12)
+    );
+
+    compassGroup.add(label);
+
+}
+
+
+
+function addLongitudeLabel(text, lon){
+
+    const label = createCompassLabel(text);
+
+    label.position.copy(
+        latLonToVec3(0, lon, 1.12)
+    );
+
+    compassGroup.add(label);
+
+}
+
+
+  
+
+function createLatCircle(radius, lat, segments = 128) {
+  const points = [];
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+
+  for (let i = 0; i <= segments; i++) {
+    const theta = (i / segments) * Math.PI * 2;
+
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color: 0x39FF14,
+    transparent: true,
+    opacity: 0.75,
+      blending: THREE.AdditiveBlending,
+  depthWrite: false
+  });
+
+  return new THREE.LineLoop(geometry, material);
+}
+
+
+  function createLonCircle(radius, lon, segments = 128) {
+  const points = [];
+
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  for (let i = 0; i <= segments; i++) {
+    const phi = (i / segments) * Math.PI;
+
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.15,
+      blending: THREE.AdditiveBlending,
+  depthWrite: false
+  });
+
+  return new THREE.Line(geometry, material);
+}
+
+
+function buildStarSphere(){
+
+    // Grupo independiente
+    starSphere = new THREE.Group();
+
+    scene.add(starSphere);
+
+    const STAR_COUNT = 1200;
+    const STAR_RADIUS = 250;
+    const positions = [];
+    for(let i=0;i<STAR_COUNT;i++){
+
+        // distribución uniforme sobre una esfera
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const x = STAR_RADIUS * Math.sin(phi) * Math.cos(theta);
+        const y = STAR_RADIUS * Math.cos(phi);
+        const z = STAR_RADIUS * Math.sin(phi) * Math.sin(theta);
+
+        positions.push(x,y,z);
+
+    }
+
+    const geometry = new THREE.BufferGeometry();
+
+    geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions,3)
+    );
+
+    const material = new THREE.PointsMaterial({
+
+        color:0xffffff,
+
+        size:0.7,
+
+        transparent:true,
+
+        opacity:0.9,
+
+        depthWrite:false
+
+    });
+
+    stars = new THREE.Points(geometry,material);
+    starSphere.add(stars);
+
+}
+  
+
+  function loadSelectedSatellite() {
+  const id = document.getElementById("satSelect").value;
+
+  if (!id) return;
+
+  if (!satrecs[id]) {
+    loadTLE(id);
+  }
+
+  currentSat = id;
+  updateUI();
+}
+
+
+// ======================================================
+// LOAD EPHEMERIDES (LOCAL JSON)
+// ======================================================
+
+async function loadTLE(id){
+
+  if (TLE_CACHE[id]) {
+    satrecs[id] = TLE_CACHE[id];
+    createSatMesh(id);
+    return;
+
+  }
+
+  const group = SAT_INFO[id].group;
+
+  const file = EPHEMERIS_FILES[group];
+
+  if(!file){
+    console.error("No hay archivo para",group);
+    return;
+
+  }
+
+  const response = await fetch(file);
+  const data = await response.json();
+  const sat = data.find(
+      s => String(s.NORAD_CAT_ID) === String(id)
+  );
+
+  if(!sat){
+      console.warn("Satélite no encontrado:",id);
+      return;
+  }
+
+const satrec = satellite.json2satrec(sat);
+
+  TLE_CACHE[id]=satrec;
+  satrecs[id]=satrec;
+  createSatMesh(id);
+
+}
+
+// ======================================================
+// LOAD LOCATIONS
+// ======================================================
+
+async function loadLocations(){
+
+    const response = await fetch(LOCATIONS_FILE);
+
+    LOCATIONS = await response.json();
+
+}
+
+
+
+
+  // ======================================================
+// BUILD CITY SELECT
+// ======================================================
+
+function buildLocationSelect(){
+
+    const select = document.getElementById("citySelect");
+
+    select.innerHTML = "";
+
+    for(const region in LOCATIONS){
+
+        const group = document.createElement("optgroup");
+        group.label = region;
+
+        LOCATIONS[region].forEach(city=>{
+
+            const option = document.createElement("option");
+
+            option.value = `${city.lat},${city.lon}`;
+            option.textContent = city.name;
+
+            group.appendChild(option);
+
+        });
+
+        select.appendChild(group);
+
+    }
+
+    const custom = document.createElement("option");
+    custom.value = "custom";
+    custom.textContent = "📍 Coordenadas personalizadas";
+
+    select.appendChild(custom);
+
+}
+
+
+  
+
+// ======================================================
+// CREATE VISUAL SATELLITE
+// ======================================================
+function createSatMesh(id){
+  if (satMeshes[id]) return;
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 10, 10),
+    new THREE.MeshBasicMaterial({ color: getColor(id) })
+  );
+  scene.add(mesh);
+  satMeshes[id] = mesh;
+}
+
+// ======================================================
+// UPDATE SATELLITES
+// ======================================================
+function updateSatellites(){
+
+  const now = new Date();
+  const gmst = satellite.gstime(now);
+
+  for(const id in satrecs){
+
+    const satrec = satrecs[id];
+
+    const pv = satellite.propagate(satrec, now);
+
+    if(!pv.position) continue;
+
+    const geo = satellite.eciToGeodetic(pv.position, gmst);
+
+    const lat = satellite.degreesLat(geo.latitude);
+    const lon = satellite.degreesLong(geo.longitude);
+    const altKm = geo.height;
+
+    // Velocidad orbital (km/s)
+    const velocity = pv.velocity
+      ? Math.sqrt(
+          pv.velocity.x * pv.velocity.x +
+          pv.velocity.y * pv.velocity.y +
+          pv.velocity.z * pv.velocity.z
+        )
+      : 0;
+
+    const mesh = satMeshes[id];
+    if(!mesh) continue;
+
+    // Guardamos datos para futuras herramientas
+    mesh.userData.lat = lat;
+    mesh.userData.lon = lon;
+    mesh.userData.alt = altKm;
+    mesh.userData.speed = velocity;
+
+// Posición visual
+const pos = latLonToVec3(lat, lon - 180, 1.4);
+
+pos.applyAxisAngle(
+    new THREE.Vector3(0, 0, 1),
+    THREE.MathUtils.degToRad(23.44)
+);
+
+mesh.position.copy(pos);
+
+    if(id === currentSat){
+
+      currentLat = lat;
+      currentLon = lon;
+      currentAlt = altKm;
+      currentSpeed = velocity;
+
+      mesh.scale.set(2,2,2);
+      mesh.material.color.set(0x00ff00);
+
+    }else{
+
+      mesh.scale.set(1,1,1);
+      mesh.material.color.set(getColor(id));
+
+    }
+
+  }
+
+}
+
+// ======================================================
+// LATLON
+// ======================================================
+function latLonToVec3(lat, lon, r){
+
+  const phi = THREE.MathUtils.degToRad(90 - lat);
+  const theta = THREE.MathUtils.degToRad(lon + 180);
+
+  return new THREE.Vector3(
+    -(r * Math.sin(phi) * Math.cos(theta)),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+// ======================================================
+// UI
+// ======================================================
+function updateUI(){
+
+    const sat = SAT_INFO[currentSat];
+
+    document.getElementById("satInfo").innerHTML = `
+        <b>${sat.name}</b><br>
+        ${sat.type}<br>
+        ${sat.mission}<br><br>
+
+        <b>Latitud:</b> ${
+            currentLat !== null ? currentLat.toFixed(2) + "°" : "--"
+        }<br>
+
+        <b>Longitud:</b> ${
+            currentLon !== null ? currentLon.toFixed(2) + "°" : "--"
+        }<br>
+
+        <b>Altitud:</b> ${
+            currentAlt !== null ? currentAlt.toFixed(1) + " km" : "--"
+        }<br>
+
+        <b>Velocidad:</b> ${
+            currentSpeed !== null ? currentSpeed.toFixed(2) + " km/s" : "--"
+        }
+
+    `;
+
+}
+// ======================================================
+// LOOP
+// ======================================================
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  const now = new Date();
+
+  // EARTH ROTATION (UNCHANGED)
+  const elapsedSeconds = (Date.now() - startTime) / 1000;
+  const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
+  earthGroup.rotation.y = rotation;
+
+  // SUN (NO TOUCH - STABLE SYSTEM)
+  const dayOfYear = Math.floor(
+    (now - new Date(now.getFullYear(),0,0)) / 86400000
+  );
+
+  const decl = THREE.MathUtils.degToRad(
+    23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
+  );
+
+  const frac = (now.getTime() % 86400000) / 86400000;
+  const angle = frac * Math.PI * 2;
+
+  const sunDir = new THREE.Vector3(
+    Math.cos(angle),
+    Math.sin(decl),
+    Math.sin(angle)
+  ).normalize();
+
+  sunLight.position.copy(sunDir.clone().multiplyScalar(50));
+  sunLight.target.position.set(0,0,0);
+
+  //  SATELLITES
+  updateSatellites();
+  updateUI();
+
+  //  CAMERA
+  rotY += (targetRotY-rotY)*0.08;
+  rotX += (targetRotX-rotX)*0.08;
+  distance += (targetDistance-distance)*0.08;
+
+  camera.position.x = distance*Math.cos(rotX)*Math.sin(rotY);
+  camera.position.y = distance*Math.sin(rotX);
+  camera.position.z = distance*Math.cos(rotX)*Math.cos(rotY);
+
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene,camera);
+}
+
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+</script>
+
+</body>
+</html>
