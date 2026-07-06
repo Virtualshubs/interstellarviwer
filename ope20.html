@@ -646,7 +646,8 @@ let currentLon = null;
 let currentAlt = null;
 let currentSpeed = null;
   let earthTiltQuat;
-
+  
+let LOCATIONS = {};
 
 const SAT_INFO = {
 
@@ -2213,6 +2214,8 @@ const EPHEMERIS_FILES = {
 
 };
 
+const LOCATIONS_FILE = "location/locationSpain.json";
+  
 let satMeshes = {};
 let satrecs = {};
 let currentSat = "25544";
@@ -2482,6 +2485,12 @@ earth.add(southPole);
   }
 
   select.value = currentSat;
+
+  loadLocations().then(()=>{
+
+    buildLocationSelect();
+
+});
 
 select.addEventListener("change", async (e)=>{
   currentSat = e.target.value;
@@ -2794,7 +2803,61 @@ const satrec = satellite.json2satrec(sat);
 
 }
 
+// ======================================================
+// LOAD LOCATIONS
+// ======================================================
 
+async function loadLocations(){
+
+    const response = await fetch(LOCATIONS_FILE);
+
+    LOCATIONS = await response.json();
+
+}
+
+
+
+
+  // ======================================================
+// BUILD CITY SELECT
+// ======================================================
+
+function buildLocationSelect(){
+
+    const select = document.getElementById("citySelect");
+
+    select.innerHTML = "";
+
+    for(const region in LOCATIONS){
+
+        const group = document.createElement("optgroup");
+        group.label = region;
+
+        LOCATIONS[region].forEach(city=>{
+
+            const option = document.createElement("option");
+
+            option.value = `${city.lat},${city.lon}`;
+            option.textContent = city.name;
+
+            group.appendChild(option);
+
+        });
+
+        select.appendChild(group);
+
+    }
+
+    const custom = document.createElement("option");
+    custom.value = "custom";
+    custom.textContent = "📍 Coordenadas personalizadas";
+
+    select.appendChild(custom);
+
+}
+
+
+  
 
 // ======================================================
 // CREATE VISUAL SATELLITE
