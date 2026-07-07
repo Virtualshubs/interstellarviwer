@@ -671,8 +671,6 @@ let currentSpeed = null;
 let LOCATIONS = {};
   let currentPasses = [];
 
-  let cameraOffsetLon = 12; // grados
-
 const SAT_INFO = {
 
   
@@ -2503,42 +2501,21 @@ earth.add(southPole);
   // =========================
   const select = document.getElementById("satSelect");
 
- for(const id in SAT_INFO){
+  for(const id in SAT_INFO){
     const opt = document.createElement("option");
     opt.value = id;
     opt.textContent = SAT_INFO[id].name;
     select.appendChild(opt);
-}
+  }
 
-select.value = currentSat;
+  select.value = currentSat;
 
-loadLocations().then(() => {
+  loadLocations().then(() => {
 
     buildLocationSelect();
 
-    const citySelect = document.getElementById("citySelect");
-
-    // Enfocar la ciudad inicial (Madrid)
-    if(citySelect.value !== "custom"){
-
-        const [lat, lon] = citySelect.value.split(",").map(Number);
-
-        focusLocation(lat, lon);
-
-    }
-
-    // Cambio de ciudad
-    citySelect.addEventListener("change", () => {
-
-        updatePasses();
-
-        if(citySelect.value === "custom") return;
-
-        const [lat, lon] = citySelect.value.split(",").map(Number);
-
-        focusLocation(lat, lon);
-
-    });
+    document.getElementById("citySelect")
+        .addEventListener("change", updatePasses);
 
     updatePasses();
 
@@ -2919,23 +2896,7 @@ select.value = "40.4168,-3.7038";
 }
 
 
-
-  function focusLocation(lat, lon){
-
-    // Posición local sobre la Tierra (igual que los satélites)
-    const target = latLonToVec3(lat, lon - 180, 1.01);
-
-    // Convertir a coordenadas del mundo teniendo en cuenta
-    // TODAS las transformaciones del planeta
-    earth.localToWorld(target);
-
-    // Dirección desde la cámara al punto
-    const dir = target.clone().normalize();
-
-    targetRotY = Math.atan2(dir.x, dir.z);
-    targetRotX = Math.asin(dir.y);
-
-}
+  
 
 // ======================================================
 // CREATE VISUAL SATELLITE
