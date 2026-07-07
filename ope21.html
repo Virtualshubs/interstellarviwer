@@ -808,6 +808,138 @@ pre {
 }
 
   select { width:220px; margin-top:5px; }
+
+
+.pass-card{
+
+    background:
+    rgba(255,255,255,.035);
+
+    border:
+    1px solid rgba(120,180,255,.15);
+
+    border-radius:10px;
+
+    padding:14px;
+
+    margin-bottom:12px;
+
+}
+
+
+
+.pass-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+    color:#8da6c5;
+
+    margin-bottom:12px;
+
+}
+
+
+
+.pass-header strong{
+
+    color:#7dff9b;
+
+    font-size:11px;
+
+}
+
+
+
+.pass-times,
+.pass-data{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(3,1fr);
+
+    gap:8px;
+
+}
+
+
+
+.pass-times div,
+.pass-data div{
+
+    background:
+    rgba(255,255,255,.04);
+
+    padding:8px;
+
+    border-radius:6px;
+
+    font-size:13px;
+
+}
+
+
+
+small{
+
+    display:block;
+
+    color:#71839b;
+
+    font-size:9px;
+
+    letter-spacing:1.5px;
+
+    margin-bottom:4px;
+
+}
+
+
+
+.pass-route{
+
+    margin-top:12px;
+
+    text-align:center;
+
+    color:#a9c7ef;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+}
+
+
+
+.more-passes{
+
+    margin-top:10px;
+
+    font-size:12px;
+
+    color:#8da6c5;
+
+}
+
+
+
+.mini-pass{
+
+    padding:8px;
+
+    border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+}
+
+  
 </style>
 </head>
 
@@ -3532,106 +3664,172 @@ current.rating =
 
 
   
-  
  function renderPasses(){
 
     const div = document.getElementById("passesContent");
 
     if(currentPasses.length === 0){
 
-        div.innerHTML = "No hay pasos visibles.";
-
+        div.innerHTML = `
+        <div class="empty-state">
+            NO VISIBLE PASSES
+        </div>`;
         return;
 
     }
 
-    let html = "";
+
+    let html = `
+
+    <div class="section-title">
+        OBSERVATION WINDOWS
+    </div>
+
+    `;
+
 
     currentPasses.slice(0,3).forEach((p,i)=>{
 
         const r = p.rating;
 
+
         html += `
 
-        <div class="pass">
+        <div class="pass-card">
 
-        <b>🛰️ Mejor oportunidad de observación #${i+1}</b><br><br>
 
-        <b>Inicio:</b>
-        ${p.start.toLocaleString()}<br>
+            <div class="pass-header">
 
-        <b>Máximo:</b>
-        ${p.maxDate.toLocaleTimeString()}<br>
+                <span>
+                PASS ${String(i+1).padStart(2,"0")}
+                </span>
 
-        <b>Fin:</b>
-        ${p.end.toLocaleTimeString()}<br><br>
+                <strong>
+                ${r.icon} ${r.label}
+                </strong>
 
-        <b>Elevación máxima:</b>
-        ${p.maxElev.toFixed(1)}°<br>
+            </div>
 
-        <b>Distancia al cenit:</b>
-        ${p.zenithDistance.toFixed(1)}°<br>
 
-        <b>Duración:</b>
-        ${p.duration.toFixed(1)} min<br><br>
 
-        <b>Entrada:</b>
-        ${azimuthToText(p.azStart)}<br>
+            <div class="pass-times">
 
-        <b>Máximo:</b>
-        ${azimuthToText(p.azMax)}<br>
+                <div>
+                    <small>START</small>
+                    ${p.start.toLocaleTimeString()}
+                </div>
 
-        <b>Salida:</b>
-        ${azimuthToText(p.azEnd)}<br><br>
 
-        <b>Calidad orbital:</b>
-        ${r.icon} ${r.label}
-        (${r.score}/10)<br>
+                <div>
+                    <small>MAX</small>
+                    ${p.maxDate.toLocaleTimeString()}
+                </div>
+
+
+                <div>
+                    <small>END</small>
+                    ${p.end.toLocaleTimeString()}
+                </div>
+
+            </div>
+
+
+
+            <div class="pass-data">
+
+
+                <div>
+                    <small>ELEVATION</small>
+                    ${p.maxElev.toFixed(1)}°
+                </div>
+
+
+                <div>
+                    <small>DURATION</small>
+                    ${p.duration.toFixed(1)} min
+                </div>
+
+
+                <div>
+                    <small>SCORE</small>
+                    ${r.score}/10
+                </div>
+
+
+            </div>
+
+
+
+            <div class="pass-route">
+
+                ${azimuthToText(p.azStart)}
+                →
+
+                ${azimuthToText(p.azMax)}
+                →
+
+                ${azimuthToText(p.azEnd)}
+
+            </div>
+
 
         </div>
 
-        <hr>
 
         `;
 
     });
 
+
+
     if(currentPasses.length > 3){
 
-        html += "<details>";
+        html += `
 
-        html += "<summary>Ver 10 oportunidades más</summary><br>";
+        <details class="more-passes">
+
+        <summary>
+        MORE OPPORTUNITIES
+        </summary>
+
+        `;
+
 
         currentPasses.slice(3,13).forEach((p,i)=>{
 
             html += `
 
-            <b>#${i+4}</b>
+            <div class="mini-pass">
 
-            ${p.start.toLocaleString()}
+                <span>
+                #${i+4}
+                </span>
 
-            ·
+                ${p.start.toLocaleTimeString()}
 
-            ${p.maxElev.toFixed(1)}°
+                ·
 
-            ·
+                ${p.maxElev.toFixed(1)}°
 
-            ${p.duration.toFixed(1)} min
+                ·
 
-            ·
+                ${p.duration.toFixed(1)} min
 
-            ${p.rating.icon}
-            ${p.rating.score}/10
+                ·
 
-            <br>
+                ${p.rating.icon}
+
+            </div>
 
             `;
 
         });
 
-        html += "</details>";
+
+        html += `</details>`;
 
     }
+
 
     div.innerHTML = html;
 
