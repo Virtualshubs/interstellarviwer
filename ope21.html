@@ -671,13 +671,11 @@ let currentSpeed = null;
 let LOCATIONS = {};
   let currentPasses = [];
 
-const SAT_INFO = {
+  let cityPin;
+
 
   
-
-  // =========================
-  // ISS
-  // =========================
+const SAT_INFO = {
 
   "25544": {
     name: "ISS",
@@ -2487,55 +2485,93 @@ const southPole = createPoleLabel("S");
 southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
 earth.add(southPole);
 
+ 
+  
+   // ========================= 
   // Madrid pin
-  const pin = new THREE.Mesh(
-    new THREE.SphereGeometry(0.02, 12, 12),
-    new THREE.MeshBasicMaterial({ color: 0xff0000 })
-  );
+    // =========================
 
-  pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
-  earth.add(pin);
+  
+cityPin = new THREE.Mesh(
+    new THREE.SphereGeometry(0.02,12,12),
+    new THREE.MeshBasicMaterial({
+        color:0xff0000
+    })
+);
 
-  // =========================
-  // UI
-  // =========================
-  const select = document.getElementById("satSelect");
+cityPin.position.copy(
+    latLonToVec3(40.4168,-3.7038,1.01)
+);
 
-  for(const id in SAT_INFO){
+earth.add(cityPin);
+
+// =========================
+// UI
+// =========================
+const select = document.getElementById("satSelect");
+
+for(const id in SAT_INFO){
     const opt = document.createElement("option");
     opt.value = id;
     opt.textContent = SAT_INFO[id].name;
     select.appendChild(opt);
-  }
+}
 
-  select.value = currentSat;
+select.value = currentSat;
 
-  loadLocations().then(() => {
+loadLocations().then(() => {
 
     buildLocationSelect();
 
+    // Posicionar el pin en la ciudad inicial (Madrid)
+const value = document.getElementById("citySelect").value;
+
+if(value !== "custom"){
+
+    const [lat, lon] = value.split(",").map(Number);
+
+    moveCityPin(lat, lon);
+
+}
+
     document.getElementById("citySelect")
-        .addEventListener("change", updatePasses);
+        .addEventListener("change", () => {
+
+            const value = document.getElementById("citySelect").value;
+
+            if(value !== "custom"){
+
+                const [lat, lon] = value.split(",").map(Number);
+
+                moveCityPin(lat, lon);
+
+            }
+
+            updatePasses();
+
+        });
 
     updatePasses();
 
 });
 
 select.addEventListener("change", async (e)=>{
-  currentSat = e.target.value;
 
-  if (!satrecs[currentSat]) {
-    await loadTLE(currentSat);
-  }
+    currentSat = e.target.value;
 
-  updateUI();
-  updatePasses();
+    if(!satrecs[currentSat]){
+        await loadTLE(currentSat);
+    }
+
+    updateUI();
+    updatePasses();
+
 });
 
-  updateUI();
+updateUI();
 
-  // SOLO CARGAR ISS AL INICIO
- // loadTLE("25544");
+// SOLO CARGAR ISS AL INICIO
+// loadTLE("25544");
 
 document.getElementById("calcBtn").addEventListener("click", async () => {
 
@@ -2854,8 +2890,7 @@ async function loadLocations(){
 
 
 
-
-  // ======================================================
+// ======================================================
 // BUILD CITY SELECT
 // ======================================================
 
@@ -2870,7 +2905,7 @@ function buildLocationSelect(){
         const group = document.createElement("optgroup");
         group.label = region;
 
-        LOCATIONS[region].forEach(city=>{
+        LOCATIONS[region].forEach(city => {
 
             const option = document.createElement("option");
 
@@ -2890,14 +2925,26 @@ function buildLocationSelect(){
     custom.textContent = "📍 Coordenadas personalizadas";
 
     select.appendChild(custom);
-  // Seleccionar Madrid por defecto
-select.value = "40.4168,-3.7038";
+
+    // Madrid por defecto
+    select.value = "40.4168,-3.7038";
 
 }
 
 
-  
+// ======================================================
+// MOVE CITY PIN
+// ======================================================
 
+function moveCityPin(lat, lon){
+
+    if(!cityPin) return;
+
+    cityPin.position.copy(
+        latLonToVec3(lat, lon, 1.01)
+    );
+
+}
 // ======================================================
 // CREATE VISUAL SATELLITE
 // ======================================================
