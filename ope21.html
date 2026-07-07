@@ -3243,26 +3243,37 @@ function getPasses(id, days = 7){
 }
 
 
-  function azimuthToText(az){
+function azimuthToText(az){
 
     const dirs=[
 
-        "N",
-        "NE",
-        "E",
-        "SE",
-        "S",
-        "SO",
-        "O",
-        "NO"
+        "Norte",
+        "Norte-Noreste",
+        "Noreste",
+        "Este-Noreste",
+        "Este",
+        "Este-Sureste",
+        "Sureste",
+        "Sur-Sureste",
+        "Sur",
+        "Sur-Suroeste",
+        "Suroeste",
+        "Oeste-Suroeste",
+        "Oeste",
+        "Oeste-Noroeste",
+        "Noroeste",
+        "Norte-Noroeste"
 
     ];
 
     az=((az%360)+360)%360;
 
-    return dirs[Math.round(az/45)%8];
+    return dirs[Math.round(az/22.5)%16];
 
 }
+
+
+  
 
 function getPassQuality(score){
 
