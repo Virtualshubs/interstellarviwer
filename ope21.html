@@ -3032,8 +3032,6 @@ function updateUI(){
 
 
 
-
-
 function getPasses(id, days = 7){
 
     const satrec = satrecs[id];
@@ -3050,64 +3048,110 @@ function getPasses(id, days = 7){
         latitude:satellite.degreesToRadians(lat),
         longitude:satellite.degreesToRadians(lon),
         height:0
-
     };
 
+    // Comenzar siempre en minuto exacto
     const start=new Date();
+    start.setSeconds(0);
+    start.setMilliseconds(0);
+
     const passes=[];
     let current=null;
-  
+
     for(let t=0;t<=days*86400;t+=10){
+
         const date=new Date(start.getTime()+t*1000);
+
         const pv=satellite.propagate(satrec,date);
+
         if(!pv.position) continue;
+
         const gmst=satellite.gstime(date);
+
         const ecf=satellite.eciToEcf(pv.position,gmst);
+
         const look=satellite.ecfToLookAngles(observer,ecf);
+
         const elev=satellite.radiansToDegrees(look.elevation);
+
+        const az=satellite.radiansToDegrees(look.azimuth);
 
         if(elev>0){
 
             if(!current){
+
                 current={
+
                     start:date,
+
                     maxElev:elev,
-                    maxDate:date
+
+                    maxDate:date,
+
+                    azStart:az,
+
+                    azMax:az
+
                 };
+
             }
 
             if(elev>current.maxElev){
+
                 current.maxElev=elev;
+
                 current.maxDate=date;
+
+                current.azMax=az;
+
             }
 
         }else{
 
             if(current){
+
                 current.end=date;
+
+                current.azEnd=az;
+
                 current.duration=
+
                     (current.end-current.start)/60000;
+
                 current.score=
+
                     current.maxElev*2+
+
                     current.duration;
+
+                current.quality=getPassQuality(current.score);
+
                 passes.push(current);
+
                 current=null;
+
             }
+
         }
+
     }
-  
+
     passes.sort((a,b)=>b.score-a.score);
+
     return passes;
+
 }
 
 
-function renderPasses(){
+  
+  
+  function renderPasses(){
 
     const div=document.getElementById("passesContent");
 
     if(currentPasses.length===0){
 
-        div.innerHTML="No hay pasos.";
+        div.innerHTML="No hay pasos visibles.";
 
         return;
 
@@ -3118,28 +3162,76 @@ function renderPasses(){
     currentPasses.slice(0,3).forEach((p,i)=>{
 
         html+=`
+
         <div class="pass">
-            <b>#${i+1}</b><br>
-            ${p.start.toLocaleString()}<br>
-            Elevación máxima:
-            ${p.maxElev.toFixed(1)}°<br>
-            Duración:
-            ${p.duration.toFixed(1)} min
+
+        <b>⭐ Mejor paso #${i+1}</b><br><br>
+
+        <b>Inicio:</b>
+        ${p.start.toLocaleString()}<br>
+
+        <b>Máximo:</b>
+        ${p.maxDate.toLocaleTimeString()}<br>
+
+        <b>Fin:</b>
+        ${p.end.toLocaleTimeString()}<br><br>
+
+        <b>Elevación máxima:</b>
+        ${p.maxElev.toFixed(1)}°<br>
+
+        <b>Duración:</b>
+        ${p.duration.toFixed(1)} min<br>
+
+        <b>Entrada:</b>
+        ${azimuthToText(p.azStart)}<br>
+
+        <b>Máximo:</b>
+        ${azimuthToText(p.azMax)}<br>
+
+        <b>Salida:</b>
+        ${azimuthToText(p.azEnd)}<br>
+
+        <b>Calidad:</b>
+        ${p.quality}<br>
+
         </div>
+
         <hr>
+
         `;
+
     });
 
     if(currentPasses.length>3){
+
         html+="<details>";
-        html+="<summary>Ver más</summary>";
-        currentPasses.slice(3,13).forEach((p)=>{
+
+        html+="<summary>Ver 10 pasos más</summary><br>";
+
+        currentPasses.slice(3,13).forEach((p,i)=>{
+
             html+=`
+
+            <b>#${i+4}</b>
+
             ${p.start.toLocaleString()}
-            -
+
+            ·
+
             ${p.maxElev.toFixed(1)}°
+
+            ·
+
+            ${p.duration.toFixed(1)} min
+
+            ·
+
+            ${p.quality}
+
             <br>
+
             `;
+
         });
 
         html+="</details>";
@@ -3151,6 +3243,40 @@ function renderPasses(){
 }
 
 
+  function azimuthToText(az){
+
+    const dirs=[
+
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SO",
+        "O",
+        "NO"
+
+    ];
+
+    az=((az%360)+360)%360;
+
+    return dirs[Math.round(az/45)%8];
+
+}
+
+function getPassQuality(score){
+
+    if(score>220) return "★★★★★ Excelente";
+
+    if(score>170) return "★★★★ Muy bueno";
+
+    if(score>120) return "★★★ Bueno";
+
+    if(score>70) return "★★ Aceptable";
+
+    return "★ Bajo";
+
+}
 
   function updatePasses(){
 
