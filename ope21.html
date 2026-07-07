@@ -622,7 +622,22 @@ pre {
 <input id="lon" placeholder="Longitude" style="display:none;">
   
   <div id="satInfo"></div>
-   <button id="calcBtn">Calcular satélite</button>  
+   <button id="calcBtn">Calcular satélite</button> 
+
+<div id="passesPanel">
+
+    <div id="passesTitle">
+        Próximos pasos
+    </div>
+
+    <div id="passesContent">
+
+        Selecciona una ciudad y un satélite.
+
+    </div>
+
+</div>
+  
 </div>
 
   <div id="logo">
@@ -653,8 +668,11 @@ let currentSpeed = null;
   let earthTiltQuat;
   
 let LOCATIONS = {};
+  let currentPasses = [];
 
 const SAT_INFO = {
+
+  
 
   // =========================
   // ISS
@@ -2492,8 +2510,16 @@ earth.add(southPole);
   select.value = currentSat;
 
 loadLocations().then(() => {
+
     console.log("Ciudades cargadas");
+
     buildLocationSelect();
+
+    document.getElementById("citySelect")
+        .addEventListener("change", updatePasses);
+
+    updatePasses();
+
 });
 
 select.addEventListener("change", async (e)=>{
@@ -2504,6 +2530,7 @@ select.addEventListener("change", async (e)=>{
   }
 
   updateUI();
+  updatePasses();
 });
 
   updateUI();
@@ -2513,6 +2540,7 @@ select.addEventListener("change", async (e)=>{
 
   document.getElementById("calcBtn").addEventListener("click", () => {
   loadSelectedSatellite();
+    updatePasses();
 });
 
   document.getElementById("compassBtn")
@@ -2993,6 +3021,138 @@ function updateUI(){
     `;
 
 }
+
+
+
+
+
+
+function getPasses(id, days = 7){
+
+    const satrec = satrecs[id];
+
+    if(!satrec) return [];
+
+    const value = document.getElementById("citySelect").value;
+
+    if(value==="custom") return [];
+
+    const [lat,lon]=value.split(",").map(Number);
+
+    const observer={
+        latitude:satellite.degreesToRadians(lat),
+        longitude:satellite.degreesToRadians(lon),
+        height:0
+
+    };
+
+    const start=new Date();
+    const passes=[];
+    let current=null;
+  
+    for(let t=0;t<=days*86400;t+=10){
+        const date=new Date(start.getTime()+t*1000);
+        const pv=satellite.propagate(satrec,date);
+        if(!pv.position) continue;
+        const gmst=satellite.gstime(date);
+        const ecf=satellite.eciToEcf(pv.position,gmst);
+        const look=satellite.ecfToLookAngles(observer,ecf);
+        const elev=satellite.radiansToDegrees(look.elevation);
+
+        if(elev>0){
+
+            if(!current){
+                current={
+                    start:date,
+                    maxElev:elev,
+                    maxDate:date
+                };
+            }
+
+            if(elev>current.maxElev){
+                current.maxElev=elev;
+                current.maxDate=date;
+            }
+
+        }else{
+
+            if(current){
+                current.end=date;
+                current.duration=
+                    (current.end-current.start)/60000;
+                current.score=
+                    current.maxElev*2+
+                    current.duration;
+                passes.push(current);
+                current=null;
+            }
+        }
+    }
+  
+    passes.sort((a,b)=>b.score-a.score);
+    return passes;
+}
+
+
+function renderPasses(){
+
+    const div=document.getElementById("passesContent");
+
+    if(currentPasses.length===0){
+
+        div.innerHTML="No hay pasos.";
+
+        return;
+
+    }
+
+    let html="";
+
+    currentPasses.slice(0,3).forEach((p,i)=>{
+
+        html+=`
+        <div class="pass">
+            <b>#${i+1}</b><br>
+            ${p.start.toLocaleString()}<br>
+            Elevación máxima:
+            ${p.maxElev.toFixed(1)}°<br>
+            Duración:
+            ${p.duration.toFixed(1)} min
+        </div>
+        <hr>
+        `;
+    });
+
+    if(currentPasses.length>3){
+        html+="<details>";
+        html+="<summary>Ver más</summary>";
+        currentPasses.slice(3,13).forEach((p)=>{
+            html+=`
+            ${p.start.toLocaleString()}
+            -
+            ${p.maxElev.toFixed(1)}°
+            <br>
+            `;
+        });
+
+        html+="</details>";
+
+    }
+
+    div.innerHTML=html;
+
+}
+
+
+
+  function updatePasses(){
+
+    currentPasses=getPasses(currentSat);
+
+    renderPasses();
+
+}
+  
 // ======================================================
 // LOOP
 // ======================================================
