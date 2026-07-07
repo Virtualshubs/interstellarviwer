@@ -3208,14 +3208,19 @@ if(value === "custom"){
                 current.duration=
 
                     (current.end-current.start)/60000;
+              
+// Distancia al cenit
+current.zenithDistance =
+    90 - current.maxElev;
 
-                current.score=
+// Puntuación orbital (prioriza mucho la elevación)
+current.score =
+    current.maxElev * 3 +
+    current.duration * 1.5;
 
-                    current.maxElev*2+
-
-                    current.duration;
-
-                current.quality=getPassQuality(current.score);
+// Clasificación
+current.rating =
+    getPassRating(current);
 
                 passes.push(current);
 
@@ -3236,27 +3241,29 @@ if(value === "custom"){
 
   
   
-  function renderPasses(){
+ function renderPasses(){
 
-    const div=document.getElementById("passesContent");
+    const div = document.getElementById("passesContent");
 
-    if(currentPasses.length===0){
+    if(currentPasses.length === 0){
 
-        div.innerHTML="No hay pasos visibles.";
+        div.innerHTML = "No hay pasos visibles.";
 
         return;
 
     }
 
-    let html="";
+    let html = "";
 
     currentPasses.slice(0,3).forEach((p,i)=>{
 
-        html+=`
+        const r = p.rating;
+
+        html += `
 
         <div class="pass">
 
-        <b>⭐ Mejor paso #${i+1}</b><br><br>
+        <b>🛰️ Mejor oportunidad de observación #${i+1}</b><br><br>
 
         <b>Inicio:</b>
         ${p.start.toLocaleString()}<br>
@@ -3270,8 +3277,11 @@ if(value === "custom"){
         <b>Elevación máxima:</b>
         ${p.maxElev.toFixed(1)}°<br>
 
+        <b>Distancia al cenit:</b>
+        ${p.zenithDistance.toFixed(1)}°<br>
+
         <b>Duración:</b>
-        ${p.duration.toFixed(1)} min<br>
+        ${p.duration.toFixed(1)} min<br><br>
 
         <b>Entrada:</b>
         ${azimuthToText(p.azStart)}<br>
@@ -3280,10 +3290,11 @@ if(value === "custom"){
         ${azimuthToText(p.azMax)}<br>
 
         <b>Salida:</b>
-        ${azimuthToText(p.azEnd)}<br>
+        ${azimuthToText(p.azEnd)}<br><br>
 
-        <b>Calidad:</b>
-        ${p.quality}<br>
+        <b>Calidad orbital:</b>
+        ${r.icon} ${r.label}
+        (${r.score}/10)<br>
 
         </div>
 
@@ -3293,15 +3304,15 @@ if(value === "custom"){
 
     });
 
-    if(currentPasses.length>3){
+    if(currentPasses.length > 3){
 
-        html+="<details>";
+        html += "<details>";
 
-        html+="<summary>Ver 10 pasos más</summary><br>";
+        html += "<summary>Ver 10 oportunidades más</summary><br>";
 
         currentPasses.slice(3,13).forEach((p,i)=>{
 
-            html+=`
+            html += `
 
             <b>#${i+4}</b>
 
@@ -3317,7 +3328,8 @@ if(value === "custom"){
 
             ·
 
-            ${p.quality}
+            ${p.rating.icon}
+            ${p.rating.score}/10
 
             <br>
 
@@ -3325,11 +3337,11 @@ if(value === "custom"){
 
         });
 
-        html+="</details>";
+        html += "</details>";
 
     }
 
-    div.innerHTML=html;
+    div.innerHTML = html;
 
 }
 
@@ -3379,6 +3391,90 @@ function getPassQuality(score){
     return "★ Bajo";
 
 }
+
+
+function getPassRating(pass){
+
+    const e = pass.maxElev;
+
+    if(e >= 80){
+
+        return{
+
+            score:10,
+
+            label:"Cenital",
+
+            icon:"🔵",
+
+            color:"#00bfff"
+
+        };
+
+    }
+
+    if(e >= 60){
+
+        return{
+
+            score:9,
+
+            label:"Excelente",
+
+            icon:"🟢",
+
+            color:"#00c853"
+
+        };
+
+    }
+
+    if(e >= 40){
+
+        return{
+
+            score:7,
+
+            label:"Muy bueno",
+
+            icon:"🟡",
+
+            color:"#ffd600"
+
+        };
+
+    }
+
+    if(e >= 20){
+
+        return{
+
+            score:5,
+
+            label:"Bueno",
+
+            icon:"🟠",
+
+            color:"#ff9800"
+
+        };
+
+    }
+
+    return{
+
+        score:2,
+
+        label:"Bajo",
+
+        icon:"🔴",
+
+        color:"#ff3d00"
+
+    };
+
+}
+  
 
   function updatePasses(){
 
