@@ -600,6 +600,213 @@ pre {
   color:#7ec8ff;
 }
 
+  #satInfo{
+
+    background:
+    linear-gradient(
+        145deg,
+        rgba(20,30,45,.95),
+        rgba(5,10,18,.95)
+    );
+
+    border:1px solid rgba(120,180,255,.25);
+
+    border-radius:12px;
+
+    padding:18px;
+
+    color:#d8e9ff;
+
+    font-family:
+    "Orbitron",
+    "Roboto Mono",
+    monospace;
+
+    box-shadow:
+    0 0 25px rgba(0,120,255,.15);
+
+}
+
+
+/* HEADER */
+
+.mission-header{
+
+    border-bottom:
+    1px solid rgba(255,255,255,.12);
+
+    padding-bottom:12px;
+
+    margin-bottom:15px;
+
+}
+
+
+.mission-label{
+
+    font-size:11px;
+
+    letter-spacing:3px;
+
+    color:#7da8d8;
+
+}
+
+
+.mission-name{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    margin-top:4px;
+
+    color:white;
+
+}
+
+
+.mission-status{
+
+    margin-top:8px;
+
+    font-size:12px;
+
+    color:#5cff8d;
+
+}
+
+
+
+/* INFO */
+
+.mission-details{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    margin-bottom:20px;
+
+}
+
+
+.mission-details div{
+
+    background:
+    rgba(255,255,255,.04);
+
+    padding:10px;
+
+    border-radius:8px;
+
+}
+
+
+.mission-details span{
+
+    display:block;
+
+    font-size:10px;
+
+    color:#789;
+
+    letter-spacing:2px;
+
+}
+
+
+.mission-details strong{
+
+    font-size:13px;
+
+    color:white;
+
+}
+
+
+
+/* TELEMETRY */
+
+.telemetry-title{
+
+    font-size:11px;
+
+    letter-spacing:3px;
+
+    color:#7da8d8;
+
+    margin-bottom:10px;
+
+}
+
+
+
+.telemetry-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    1fr 1fr;
+
+    gap:10px;
+
+}
+
+
+
+.telemetry-card{
+
+    background:
+
+    linear-gradient(
+    135deg,
+    rgba(255,255,255,.07),
+    rgba(255,255,255,.02)
+    );
+
+
+    border:
+
+    1px solid rgba(255,255,255,.08);
+
+
+    padding:12px;
+
+    border-radius:8px;
+
+}
+
+
+
+.telemetry-card span{
+
+    display:block;
+
+    font-size:10px;
+
+    color:#8da6c5;
+
+    letter-spacing:2px;
+
+}
+
+
+
+.telemetry-card strong{
+
+    display:block;
+
+    margin-top:6px;
+
+    font-size:20px;
+
+    color:#ffffff;
+
+}
+
   select { width:220px; margin-top:5px; }
 </style>
 </head>
@@ -3072,28 +3279,113 @@ function updateUI(){
     const sat = SAT_INFO[currentSat];
 
     document.getElementById("satInfo").innerHTML = `
-        <b>${sat.name}</b><br>
-        ${sat.type}<br>
-        ${sat.mission}<br><br>
 
-        <b>Latitud:</b> ${
-            currentLat !== null ? currentLat.toFixed(2) + "°" : "--"
-        }<br>
+    <div class="mission-header">
 
-        <b>Longitud:</b> ${
-            currentLon !== null ? currentLon.toFixed(2) + "°" : "--"
-        }<br>
+        <div class="mission-label">
+            SPACECRAFT
+        </div>
 
-        <b>Altitud:</b> ${
-            currentAlt !== null ? currentAlt.toFixed(1) + " km" : "--"
-        }<br>
+        <div class="mission-name">
+            ${sat.name}
+        </div>
 
-        <b>Velocidad:</b> ${
-            currentSpeed !== null ? currentSpeed.toFixed(2) + " km/s" : "--"
-        }
+        <div class="mission-status">
+            ● TRACKING ACTIVE
+        </div>
+
+    </div>
+
+
+    <div class="mission-details">
+
+        <div>
+            <span>MISSION</span>
+            <strong>${sat.mission}</strong>
+        </div>
+
+        <div>
+            <span>CLASS</span>
+            <strong>${sat.type}</strong>
+        </div>
+
+    </div>
+
+
+    <div class="telemetry-title">
+        LIVE TELEMETRY
+    </div>
+
+
+    <div class="telemetry-grid">
+
+
+        <div class="telemetry-card">
+
+            <span>LATITUDE</span>
+
+            <strong>
+            ${
+                currentLat !== null 
+                ? currentLat.toFixed(2) + "°"
+                : "--"
+            }
+            </strong>
+
+        </div>
+
+
+
+        <div class="telemetry-card">
+
+            <span>LONGITUDE</span>
+
+            <strong>
+            ${
+                currentLon !== null 
+                ? currentLon.toFixed(2) + "°"
+                : "--"
+            }
+            </strong>
+
+        </div>
+
+
+
+        <div class="telemetry-card">
+
+            <span>ALTITUDE</span>
+
+            <strong>
+            ${
+                currentAlt !== null 
+                ? currentAlt.toFixed(1) + " km"
+                : "--"
+            }
+            </strong>
+
+        </div>
+
+
+
+        <div class="telemetry-card">
+
+            <span>VELOCITY</span>
+
+            <strong>
+            ${
+                currentSpeed !== null 
+                ? currentSpeed.toFixed(2) + " km/s"
+                : "--"
+            }
+            </strong>
+
+        </div>
+
+
+    </div>
 
     `;
-
 }
 
 
