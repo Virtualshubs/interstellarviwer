@@ -2509,9 +2509,7 @@ earth.add(southPole);
 
   select.value = currentSat;
 
-loadLocations().then(() => {
-
-    console.log("Ciudades cargadas");
+  loadLocations().then(() => {
 
     buildLocationSelect();
 
@@ -2885,6 +2883,8 @@ function buildLocationSelect(){
     custom.textContent = "📍 Coordenadas personalizadas";
 
     select.appendChild(custom);
+  // Seleccionar Madrid por defecto
+select.value = "40.4168,-3.7038";
 
 }
 
