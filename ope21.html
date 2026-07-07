@@ -1381,6 +1381,37 @@ small{
     font-size:11px;
 
 }
+
+  .pass-date{
+
+    margin-bottom:12px;
+
+    padding:8px 10px;
+
+    background:
+    rgba(80,160,255,.06);
+
+    border-left:
+    2px solid rgba(100,200,255,.45);
+
+    border-radius:6px;
+
+    font-size:13px;
+
+    letter-spacing:2px;
+
+    color:#d8e9ff;
+
+}
+
+
+.pass-date small{
+
+    display:block;
+
+    margin-bottom:4px;
+
+}
   
 </style>
 </head>
@@ -4160,12 +4191,26 @@ function renderPasses(){
             <div class="pass-header">
 
                 <span>
-                PASS ${String(i+1).padStart(2,"0")}
+                PASS ${String(i+1).padStart(2,"02")}
                 </span>
 
                 <strong>
                 ${r.icon} ${r.label}
                 </strong>
+
+            </div>
+
+
+
+            <div class="pass-date">
+
+                <small>DATE</small>
+
+                ${p.start.toLocaleDateString(undefined,{
+                    day:"2-digit",
+                    month:"short",
+                    year:"numeric"
+                }).toUpperCase()}
 
             </div>
 
@@ -4256,7 +4301,7 @@ function renderPasses(){
 
             <span>PASS</span>
             <span>QUALITY</span>
-            <span>TIME</span>
+            <span>DATE / TIME</span>
             <span>ELEV</span>
             <span>DURATION</span>
 
@@ -4290,7 +4335,17 @@ function renderPasses(){
 
                 <span>
 
-                    ${p.start.toLocaleTimeString()}
+                    ${p.start.toLocaleDateString(undefined,{
+                        day:"2-digit",
+                        month:"short"
+                    }).toUpperCase()}
+
+                    ·
+
+                    ${p.start.toLocaleTimeString([],{
+                        hour:"2-digit",
+                        minute:"2-digit"
+                    })}
 
                 </span>
 
