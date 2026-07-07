@@ -53,68 +53,225 @@ padding:6px;
 }
 
 
-
-
 #dock{
+
     position:absolute;
 
     left:50%;
-    bottom:20px;
+    bottom:24px;
+
     transform:translateX(-50%);
 
+
     display:flex;
-    gap:10px;
 
-    padding:10px 14px;
+    gap:8px;
 
-    border-radius:18px;
 
-    background:rgba(255,255,255,.08);
+    padding:8px 12px;
 
-    backdrop-filter:blur(12px);
-
-    border:1px solid rgba(255,255,255,.15);
-
-    box-shadow:
-        0 8px 32px rgba(0,0,0,.35);
-}
-
-  .dockButton{
-
-    width:46px;
-    height:46px;
-
-    border:none;
 
     border-radius:14px;
 
-    background:rgba(255,255,255,.08);
+
+    background:
+
+    linear-gradient(
+        145deg,
+        rgba(20,30,45,.92),
+        rgba(5,10,18,.92)
+    );
+
+
+    backdrop-filter:blur(18px);
+
+
+    border:
+
+    1px solid rgba(120,180,255,.22);
+
+
+    box-shadow:
+
+    0 10px 40px rgba(0,0,0,.55),
+
+    inset 0 0 20px rgba(80,160,255,.08);
+
+
+}
+
+
+
+/* BOTONES */
+
+.dockButton{
+
+
+    position:relative;
+
+
+    width:44px;
+
+    height:44px;
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    border:none;
+
+
+    border-radius:10px;
+
+
+    background:
+
+    rgba(255,255,255,.04);
+
 
     color:white;
+
 
     cursor:pointer;
 
-    transition:.25s;
+
+    transition:
+
+    .25s ease;
+
+
 }
+
+
+
+/* HOVER */
 
 .dockButton:hover{
 
-    transform:translateY(-4px) scale(1.08);
 
-    background:rgba(255,255,255,.18);
+    transform:
+
+    translateY(-5px);
+
+
+    background:
+
+    rgba(80,160,255,.18);
+
+
+    box-shadow:
+
+    0 0 18px rgba(80,160,255,.35);
+
+
 }
+
+
+
+/* ESTADO ACTIVO */
+
+.dockButton.active{
+
+
+    background:
+
+    rgba(80,160,255,.25);
+
+
+    box-shadow:
+
+    0 0 15px rgba(80,160,255,.45);
+
+
+}
+
+
+
+.dockButton.active::after{
+
+
+    content:"";
+
+
+    position:absolute;
+
+
+    bottom:-6px;
+
+
+    width:5px;
+
+    height:5px;
+
+
+    border-radius:50%;
+
+
+    background:#6cff9a;
+
+
+    box-shadow:
+
+    0 0 8px #6cff9a;
+
+
+}
+
+
+
+/* ICONOS */
+
 .material-symbols-rounded{
 
-    font-size:26px;
 
-    color:white;
+    font-size:24px;
+
+
+    color:#d9ecff;
+
 
     user-select:none;
 
+
     pointer-events:none;
 
+
 }
-  
+
+  #dock::before{
+
+    content:"ORBITAL CONTROL SYSTEM";
+
+    position:absolute;
+
+    top:-22px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+
+    font-family:
+    "Roboto Mono",
+    monospace;
+
+
+    font-size:9px;
+
+
+    letter-spacing:3px;
+
+
+    color:#7da8d8;
+
+
+    white-space:nowrap;
+
+}
   
 canvas { display: block; }
 
