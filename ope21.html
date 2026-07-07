@@ -2536,11 +2536,13 @@ select.addEventListener("change", async (e)=>{
   // SOLO CARGAR ISS AL INICIO
  // loadTLE("25544");
 
-  document.getElementById("calcBtn").addEventListener("click", () => {
-  loadSelectedSatellite();
-    updatePasses();
+document.getElementById("calcBtn").addEventListener("click", async () => {
+
+    await loadSelectedSatellite();
+
 });
 
+  
   document.getElementById("compassBtn")
     .addEventListener("click", toggleCompass);
 
@@ -2777,19 +2779,23 @@ function buildStarSphere(){
 }
   
 
-  function loadSelectedSatellite() {
-  const id = document.getElementById("satSelect").value;
+async function loadSelectedSatellite() {
 
-  if (!id) return;
+    const id = document.getElementById("satSelect").value;
 
-  if (!satrecs[id]) {
-    loadTLE(id);
-  }
+    if (!id) return;
 
-  currentSat = id;
-  updateUI();
+    if (!satrecs[id]) {
+        await loadTLE(id);
+    }
+
+    currentSat = id;
+
+    updateUI();
+
+    updatePasses();
+
 }
-
 
 // ======================================================
 // LOAD EPHEMERIDES (LOCAL JSON)
