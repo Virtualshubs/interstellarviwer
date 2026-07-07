@@ -272,6 +272,221 @@ padding:6px;
     white-space:nowrap;
 
 }
+
+  #trackingControl{
+
+
+    background:
+
+    linear-gradient(
+        145deg,
+        rgba(20,30,45,.92),
+        rgba(5,10,18,.92)
+    );
+
+
+    border:
+
+    1px solid rgba(120,180,255,.2);
+
+
+    border-radius:12px;
+
+
+    padding:16px;
+
+
+    width:260px;
+
+
+    font-family:
+
+    "Roboto Mono",
+    monospace;
+
+
+    box-shadow:
+
+    0 10px 35px rgba(0,0,0,.45);
+
+}
+
+
+
+.control-title{
+
+
+    font-size:11px;
+
+
+    letter-spacing:3px;
+
+
+    color:#7da8d8;
+
+
+    margin-bottom:15px;
+
+
+}
+
+
+
+#trackingControl label{
+
+
+    display:block;
+
+
+    font-size:10px;
+
+
+    letter-spacing:2px;
+
+
+    color:#7890aa;
+
+
+    margin:
+
+    12px 0 6px;
+
+
+}
+
+
+
+#trackingControl select{
+
+
+    width:100%;
+
+
+    height:38px;
+
+
+    padding:0 12px;
+
+
+    border-radius:8px;
+
+
+    border:
+
+    1px solid rgba(120,180,255,.2);
+
+
+    background:
+
+    rgba(255,255,255,.05);
+
+
+    color:white;
+
+
+    font-family:
+
+    inherit;
+
+
+    cursor:pointer;
+
+
+}
+
+
+
+#trackingControl select:hover{
+
+
+    border-color:
+
+    rgba(120,180,255,.5);
+
+
+}
+
+
+
+#trackingControl select option{
+
+
+    background:#101722;
+
+    color:white;
+
+}
+
+
+
+#calcBtn{
+
+
+    width:100%;
+
+
+    margin-top:18px;
+
+
+    height:42px;
+
+
+    border-radius:10px;
+
+
+    border:
+
+    1px solid rgba(100,200,255,.35);
+
+
+    background:
+
+    rgba(80,160,255,.18);
+
+
+    color:white;
+
+
+    font-family:
+
+    inherit;
+
+
+    letter-spacing:2px;
+
+
+    font-size:11px;
+
+
+    cursor:pointer;
+
+
+    transition:.25s;
+
+
+}
+
+
+
+#calcBtn:hover{
+
+
+    background:
+
+    rgba(80,160,255,.35);
+
+
+    box-shadow:
+
+    0 0 20px rgba(80,160,255,.3);
+
+
+    transform:
+
+    translateY(-2px);
+
+
+}
   
 canvas { display: block; }
 
@@ -1181,9 +1396,26 @@ small{
 
 <div id="ui">
    <h3>🛰 Orbital Pass Engine</h3>
+
+   <div class="control-title">
+        TRACKING CONFIGURATION
+    </div>
+
+  
+   <label>
+        SPACECRAFT
+    </label>
+
   <select id="satSelect"></select>
+   <label>
+        GROUND STATION
+    </label>
+
   <select id="citySelect"></select>
-   <button id="calcBtn">Calcular satélite</button> 
+  <button id="calcBtn">
+        INITIALIZE TRACKING
+    </button>
+
 
 <input id="lat" placeholder="Latitud" style="display:none;">
 <input id="lon" placeholder="Longitud" style="display:none;">
