@@ -2246,6 +2246,9 @@ let currentSat = "25544";
 //CACHE TLE (CRÍTICO PARA NO BLOQUEAR)
 const TLE_CACHE = {};
 
+  // CACHE PASSES
+const PASS_CACHE = {};
+
 // ======================================================
 //  COLORS
 // ======================================================
@@ -2828,10 +2831,16 @@ async function loadTLE(id){
   }
 
 const satrec = satellite.json2satrec(sat);
+TLE_CACHE[id]=satrec;
+satrecs[id]=satrec;
 
-  TLE_CACHE[id]=satrec;
-  satrecs[id]=satrec;
-  createSatMesh(id);
+createSatMesh(id);
+
+if(id===currentSat){
+
+    updatePasses();
+
+}
 
 }
 
@@ -3039,6 +3048,15 @@ function getPasses(id, days = 7){
 
     const [lat,lon]=value.split(",").map(Number);
 
+  const cacheKey =
+    `${id}_${lat}_${lon}_${start.toISOString().substring(0,10)}`;
+
+if(PASS_CACHE[cacheKey]){
+
+    return PASS_CACHE[cacheKey];
+
+}
+
     const observer={
         latitude:satellite.degreesToRadians(lat),
         longitude:satellite.degreesToRadians(lon),
@@ -3046,7 +3064,12 @@ function getPasses(id, days = 7){
 
     };
 
-    const start=new Date();
+const start = new Date();
+
+// siempre empezamos en un minuto exacto
+start.setSeconds(0);
+start.setMilliseconds(0);
+  
     const passes=[];
     let current=null;
   
@@ -3062,11 +3085,16 @@ function getPasses(id, days = 7){
         if(elev>0){
 
             if(!current){
-                current={
-                    start:date,
-                    maxElev:elev,
-                    maxDate:date
-                };
+            current = {
+
+    start: date,
+    end: null,
+    maxElev: elev,
+    maxDate: date,
+    duration: 0,
+    score: 0
+
+};
             }
 
             if(elev>current.maxElev){
@@ -3089,18 +3117,21 @@ function getPasses(id, days = 7){
         }
     }
   
-    passes.sort((a,b)=>b.score-a.score);
-    return passes;
+passes.sort((a,b)=>b.score-a.score);
+
+PASS_CACHE[cacheKey]=passes;
+
+return passes;
 }
 
 
 function renderPasses(){
 
-    const div=document.getElementById("passesContent");
+    const div = document.getElementById("passesContent");
 
     if(currentPasses.length===0){
 
-        div.innerHTML="No hay pasos.";
+        div.innerHTML="No hay pasos visibles durante los próximos 7 días.";
 
         return;
 
@@ -3108,51 +3139,94 @@ function renderPasses(){
 
     let html="";
 
+    // =====================================
+    // TOP 3
+    // =====================================
+
     currentPasses.slice(0,3).forEach((p,i)=>{
 
-        html+=`
+        html += `
+
         <div class="pass">
-            <b>#${i+1}</b><br>
+
+            <b>⭐ Mejor paso #${i+1}</b><br><br>
+
+            <b>Inicio:</b>
             ${p.start.toLocaleString()}<br>
-            Elevación máxima:
+
+            <b>Máxima elevación:</b>
+            ${p.maxDate.toLocaleTimeString()}<br>
+
+            <b>Elevación:</b>
             ${p.maxElev.toFixed(1)}°<br>
-            Duración:
-            ${p.duration.toFixed(1)} min
+
+            <b>Duración:</b>
+            ${p.duration.toFixed(1)} min<br>
+
+            <b>Puntuación:</b>
+            ${p.score.toFixed(0)}
+
         </div>
+
         <hr>
+
         `;
+
     });
 
+    // =====================================
+    // RESTO
+    // =====================================
+
     if(currentPasses.length>3){
-        html+="<details>";
-        html+="<summary>Ver más</summary>";
-        currentPasses.slice(3,13).forEach((p)=>{
-            html+=`
-            ${p.start.toLocaleString()}
-            -
-            ${p.maxElev.toFixed(1)}°
+
+        html += `
+        <details>
+
+            <summary>Ver 10 pasos más</summary>
             <br>
+        `;
+
+        currentPasses.slice(3,13).forEach((p,i)=>{
+
+            html += `
+
+            <b>#${i+4}</b>
+
+            ${p.start.toLocaleString()}
+
+            ·
+
+            ${p.maxElev.toFixed(1)}°
+
+            ·
+
+            ${p.duration.toFixed(1)} min
+
+            <br>
+
             `;
+
         });
 
-        html+="</details>";
+        html += "</details>";
 
     }
 
-    div.innerHTML=html;
+    div.innerHTML = html;
 
 }
 
 
+function updatePasses(){
 
-  function updatePasses(){
+    if(!satrecs[currentSat]) return;
 
     currentPasses=getPasses(currentSat);
 
     renderPasses();
 
 }
-  
 // ======================================================
 // LOOP
 // ======================================================
