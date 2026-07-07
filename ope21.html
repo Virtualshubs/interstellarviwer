@@ -2512,18 +2512,14 @@ earth.add(southPole);
 
   select.value = currentSat;
 
-  
-loadLocations().then(async ()=>{
+loadLocations().then(() => {
+
+    console.log("Ciudades cargadas");
 
     buildLocationSelect();
 
-    document
-      .getElementById("citySelect")
-      .addEventListener("change", updatePasses);
-
-    if(!satrecs[currentSat]){
-        await loadTLE(currentSat);
-    }
+    document.getElementById("citySelect")
+        .addEventListener("change", updatePasses);
 
     updatePasses();
 
@@ -2545,11 +2541,11 @@ select.addEventListener("change", async (e)=>{
   // SOLO CARGAR ISS AL INICIO
  // loadTLE("25544");
 
-document.getElementById("calcBtn").addEventListener("click", async ()=>{
-    await loadSelectedSatellite();
+  document.getElementById("calcBtn").addEventListener("click", () => {
+  loadSelectedSatellite();
     updatePasses();
 });
-  
+
   document.getElementById("compassBtn")
     .addEventListener("click", toggleCompass);
 
@@ -2786,21 +2782,19 @@ function buildStarSphere(){
 }
   
 
-async function loadSelectedSatellite(){
+  function loadSelectedSatellite() {
+  const id = document.getElementById("satSelect").value;
 
-    const id=document.getElementById("satSelect").value;
+  if (!id) return;
 
-    if(!id) return;
+  if (!satrecs[id]) {
+    loadTLE(id);
+  }
 
-    if(!satrecs[id]){
-        await loadTLE(id);
-    }
-
-    currentSat=id;
-
-    updateUI();
-
+  currentSat = id;
+  updateUI();
 }
+
 
 // ======================================================
 // LOAD EPHEMERIDES (LOCAL JSON)
