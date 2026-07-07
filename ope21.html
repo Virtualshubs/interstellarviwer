@@ -671,6 +671,8 @@ let currentSpeed = null;
 let LOCATIONS = {};
   let currentPasses = [];
 
+  let cameraOffsetLon = 12; // grados
+
 const SAT_INFO = {
 
   
@@ -2501,21 +2503,42 @@ earth.add(southPole);
   // =========================
   const select = document.getElementById("satSelect");
 
-  for(const id in SAT_INFO){
+ for(const id in SAT_INFO){
     const opt = document.createElement("option");
     opt.value = id;
     opt.textContent = SAT_INFO[id].name;
     select.appendChild(opt);
-  }
+}
 
-  select.value = currentSat;
+select.value = currentSat;
 
-  loadLocations().then(() => {
+loadLocations().then(() => {
 
     buildLocationSelect();
 
-    document.getElementById("citySelect")
-        .addEventListener("change", updatePasses);
+    const citySelect = document.getElementById("citySelect");
+
+    // Enfocar la ciudad inicial (Madrid)
+    if(citySelect.value !== "custom"){
+
+        const [lat, lon] = citySelect.value.split(",").map(Number);
+
+        focusLocation(lat, lon);
+
+    }
+
+    // Cambio de ciudad
+    citySelect.addEventListener("change", () => {
+
+        updatePasses();
+
+        if(citySelect.value === "custom") return;
+
+        const [lat, lon] = citySelect.value.split(",").map(Number);
+
+        focusLocation(lat, lon);
+
+    });
 
     updatePasses();
 
@@ -2895,7 +2918,13 @@ select.value = "40.4168,-3.7038";
 
 }
 
+function focusLocation(lat, lon){
 
+    targetRotX = THREE.MathUtils.degToRad(-lat);
+
+    targetRotY = THREE.MathUtils.degToRad(-(lon + cameraOffsetLon));
+
+}
   
 
 // ======================================================
