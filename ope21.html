@@ -619,8 +619,8 @@ pre {
   <select id="citySelect"></select>
    <button id="calcBtn">Calcular satélite</button> 
 
-<input id="lat" placeholder="Latitude" >
-<input id="lon" placeholder="Longitude" >
+<input id="lat" placeholder="Latitud" style="display:none;">
+<input id="lon" placeholder="Longitud" style="display:none;">
   
   <div id="satInfo"></div>
   
@@ -2534,22 +2534,32 @@ if(value !== "custom"){
 
 }
 
-    document.getElementById("citySelect")
-        .addEventListener("change", () => {
+ document.getElementById("citySelect").addEventListener("change", () => {
 
-            const value = document.getElementById("citySelect").value;
+    const value = document.getElementById("citySelect").value;
 
-            if(value !== "custom"){
+    const latInput = document.getElementById("lat");
+    const lonInput = document.getElementById("lon");
 
-                const [lat, lon] = value.split(",").map(Number);
+    if(value === "custom"){
 
-                moveCityPin(lat, lon);
+        latInput.style.display = "";
+        lonInput.style.display = "";
 
-            }
+    }else{
 
-            updatePasses();
+        latInput.style.display = "none";
+        lonInput.style.display = "none";
 
-        });
+        const [lat, lon] = value.split(",").map(Number);
+
+        moveCityPin(lat, lon);
+
+        updatePasses();
+
+    }
+
+});
 
     updatePasses();
 
@@ -2575,10 +2585,20 @@ updateUI();
 
 document.getElementById("calcBtn").addEventListener("click", async () => {
 
+    if(document.getElementById("citySelect").value === "custom"){
+
+        const lat = Number(document.getElementById("lat").value);
+        const lon = Number(document.getElementById("lon").value);
+
+        if(!isNaN(lat) && !isNaN(lon)){
+            moveCityPin(lat, lon);
+        }
+
+    }
+
     await loadSelectedSatellite();
 
 });
-
   
   document.getElementById("compassBtn")
     .addEventListener("click", toggleCompass);
@@ -3085,12 +3105,36 @@ function getPasses(id, days = 7){
 
     if(!satrec) return [];
 
-    const value = document.getElementById("citySelect").value;
 
-    if(value==="custom") return [];
 
-    const [lat,lon]=value.split(",").map(Number);
+  const value = document.getElementById("citySelect").value;
 
+let lat;
+let lon;
+
+if(value === "custom"){
+
+    lat = Number(document.getElementById("lat").value);
+    lon = Number(document.getElementById("lon").value);
+
+    if(
+        isNaN(lat) ||
+        isNaN(lon) ||
+        lat < -90 ||
+        lat > 90 ||
+        lon < -180 ||
+        lon > 180
+    ){
+        return [];
+    }
+
+}else{
+
+    [lat, lon] = value.split(",").map(Number);
+
+}
+
+  
     const observer={
         latitude:satellite.degreesToRadians(lat),
         longitude:satellite.degreesToRadians(lon),
