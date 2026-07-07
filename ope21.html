@@ -671,12 +671,9 @@ let currentSpeed = null;
 let LOCATIONS = {};
   let currentPasses = [];
 
-let cityPin;
-
+const SAT_INFO = {
 
   
-
-const SAT_INFO = {
 
   // =========================
   // ISS
@@ -2490,25 +2487,14 @@ const southPole = createPoleLabel("S");
 southPole.position.copy(latLonToVec3(-90, 0, POLE_OFFSET));
 earth.add(southPole);
 
+  // Madrid pin
+  const pin = new THREE.Mesh(
+    new THREE.SphereGeometry(0.02, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
 
-  
-
- // =========================
-// CITY PIN
-// =========================
-
-cityPin = new THREE.Mesh(
-    new THREE.SphereGeometry(0.02,12,12),
-    new THREE.MeshBasicMaterial({
-        color:0xff0000
-    })
-);
-
-cityPin.position.copy(
-    latLonToVec3(40.4168,-3.7038,1.01)
-);
-
-earth.add(cityPin);
+  pin.position.copy(latLonToVec3(40.4168, -3.7038, 1.01));
+  earth.add(pin);
 
   // =========================
   // UI
@@ -2524,39 +2510,26 @@ earth.add(cityPin);
 
   select.value = currentSat;
 
- loadLocations().then(() => {
+  loadLocations().then(() => {
 
     buildLocationSelect();
 
-    const value = document.getElementById("citySelect").value;
-
-    if(value !== "custom"){
-
-        const [lat, lon] = value.split(",").map(Number);
-
-        moveCityPin(lat, lon);
-
-    }
-
     document.getElementById("citySelect")
-    .addEventListener("change", () => {
-
-        const value = document.getElementById("citySelect").value;
-
-        if(value !== "custom"){
-
-            const [lat, lon] = value.split(",").map(Number);
-
-            moveCityPin(lat, lon);
-
-        }
-
-        updatePasses();
-
-    });
+        .addEventListener("change", updatePasses);
 
     updatePasses();
 
+});
+
+select.addEventListener("change", async (e)=>{
+  currentSat = e.target.value;
+
+  if (!satrecs[currentSat]) {
+    await loadTLE(currentSat);
+  }
+
+  updateUI();
+  updatePasses();
 });
 
   updateUI();
@@ -2923,18 +2896,7 @@ select.value = "40.4168,-3.7038";
 }
 
 
-
-
   
-  function moveCityPin(lat, lon){
-
-    if(!cityPin) return;
-
-    cityPin.position.copy(
-        latLonToVec3(lat, lon, 1.01)
-    );
-
-}
 
 // ======================================================
 // CREATE VISUAL SATELLITE
