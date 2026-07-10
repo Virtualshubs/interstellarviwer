@@ -1412,6 +1412,110 @@ small{
     margin-bottom:4px;
 
 }
+
+  /* ======================================================
+   EARTH FACTS
+====================================================== */
+
+#earthFactsPanel{
+
+    position:absolute;
+
+    top:20px;
+    right:20px;
+
+    width:320px;
+    max-height:calc(100vh - 40px);
+
+    overflow-y:auto;
+
+    background:rgba(10,15,25,.92);
+
+    border:1px solid rgba(120,170,255,.25);
+
+    border-radius:10px;
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:0 0 30px rgba(0,0,0,.45);
+
+    z-index:200;
+
+    padding:16px;
+
+}
+
+
+/* ======================================================
+   FACT ROW
+====================================================== */
+
+.fact-row{
+
+    padding:12px 0;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.fact-row:last-child{
+
+    border-bottom:none;
+
+}
+
+
+/* ======================================================
+   NAME
+====================================================== */
+
+.fact-name{
+
+    font-size:12px;
+
+    font-weight:600;
+
+    color:#8db7ff;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+}
+
+
+/* ======================================================
+   VALUE
+====================================================== */
+
+.fact-value{
+
+    margin-top:4px;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    color:white;
+
+}
+
+
+/* ======================================================
+   DESCRIPTION
+====================================================== */
+
+.fact-description{
+
+    margin-top:4px;
+
+    font-size:11px;
+
+    color:rgba(255,255,255,.55);
+
+    line-height:1.4;
+
+}
   
 </style>
 </head>
@@ -1425,7 +1529,7 @@ small{
     </button>
 
  <button
-    class="dockButto"
+    class="dockButton"
     onclick="toggleEarthFacts()">
 
     🌍
@@ -1485,7 +1589,7 @@ small{
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
-<script src="earth/vital.js"></script>
+
 
   
 <script>
@@ -4595,6 +4699,7 @@ function onResize(){
 }
 
 </script>
-
+<script src="earth/vital.js"></script>
+  
 </body>
 </html>
