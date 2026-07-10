@@ -1,0 +1,80 @@
+{
+  "title": "EARTH FACTS",
+  "facts": [
+    {
+      "name": "Radius",
+      "value": "6,371 km",
+      "description": "Mean equatorial radius"
+    },
+    {
+      "name": "Mass",
+      "value": "5.972 ×10²⁴ kg",
+      "description": "Planetary mass"
+    },
+    {
+      "name": "Density",
+      "value": "5.51 g/cm³",
+      "description": "Average density"
+    },
+    {
+      "name": "Gravity",
+      "value": "9.81 m/s²",
+      "description": "Surface gravity"
+    },
+    {
+      "name": "Escape Velocity",
+      "value": "11.186 km/s",
+      "description": "Minimum escape speed"
+    },
+    {
+      "name": "Rotation Period",
+      "value": "23 h 56 m 4 s",
+      "description": "Sidereal day"
+    },
+    {
+      "name": "Solar Day",
+      "value": "24 h",
+      "description": "Mean solar day"
+    },
+    {
+      "name": "Orbital Period",
+      "value": "365.256 days",
+      "description": "Sidereal year"
+    },
+    {
+      "name": "Orbital Velocity",
+      "value": "29.78 km/s",
+      "description": "Average orbital speed"
+    },
+    {
+      "name": "Axial Tilt",
+      "value": "23.44°",
+      "description": "Obliquity"
+    },
+    {
+      "name": "Surface Area",
+      "value": "510.1 M km²",
+      "description": "Total surface"
+    },
+    {
+      "name": "Land Area",
+      "value": "148.9 M km²",
+      "description": "Continents and islands"
+    },
+    {
+      "name": "Ocean Area",
+      "value": "361.2 M km²",
+      "description": "Global oceans"
+    },
+    {
+      "name": "Age",
+      "value": "4.54 Ga",
+      "description": "Estimated formation"
+    },
+    {
+      "name": "Natural Satellite",
+      "value": "Moon",
+      "description": "Earth's only natural satellite"
+    }
+  ]
+}
