@@ -70,7 +70,7 @@ async function loadEarthFacts(){
 
     try{
 
-        const response = await fetch("earth/vital.json");
+        const response = await fetch("vital.json");
 
         const data = await response.json();
 
