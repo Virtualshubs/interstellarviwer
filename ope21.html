@@ -1619,6 +1619,15 @@ let LOCATIONS = {};
   let cityPin;
 
 
+// ======================================================
+// EARTH FACTS
+// ======================================================
+
+let earthFactsVisible = false;
+let earthFactsData = null;
+
+
+  
   
 const SAT_INFO = {
 
@@ -4638,6 +4647,186 @@ function getPassRating(pass){
     renderPasses();
 
 }
+
+
+
+
+
+
+
+
+// ======================================================
+// TOGGLE EARTH FACTS
+// ======================================================
+
+function toggleEarthFacts(){
+
+    earthFactsVisible = !earthFactsVisible;
+
+    const panel = document.getElementById("earthFactsPanel");
+
+    if(earthFactsVisible){
+
+        if(panel){
+
+            panel.style.display = "block";
+
+            if(earthFactsData){
+
+                updateEarthFacts(earthFactsData);
+
+            }else{
+
+                loadEarthFacts();
+
+            }
+
+        }else{
+
+            renderEarthFacts();
+
+        }
+
+    }else{
+
+        if(panel){
+
+            panel.style.display = "none";
+
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// RENDER EARTH FACTS PANEL
+// ======================================================
+
+function renderEarthFacts(){
+
+    const panel = document.createElement("div");
+
+    panel.id = "earthFactsPanel";
+
+    // Usa aquí la clase que utilices para el panel lateral
+    panel.className = "side-panel";
+
+    panel.innerHTML = `
+
+        <div class="section-title">
+
+            EARTH FACTS
+
+        </div>
+
+        <div id="earthFactsContent">
+
+            Loading...
+
+        </div>
+
+    `;
+
+    document.body.appendChild(panel);
+
+    loadEarthFacts();
+
+}
+
+
+// ======================================================
+// LOAD JSON
+// ======================================================
+
+async function loadEarthFacts(){
+
+    try{
+
+        if(earthFactsData){
+
+            updateEarthFacts(earthFactsData);
+
+            return;
+
+        }
+
+        const response = await fetch("earth/vital.json");
+
+        earthFactsData = await response.json();
+
+        updateEarthFacts(earthFactsData);
+
+    }
+
+    catch(error){
+
+        console.error("Earth Facts:", error);
+
+        document.getElementById("earthFactsContent").innerHTML =
+
+            "<div class='empty-state'>Unable to load Earth Facts</div>";
+
+    }
+
+}
+
+
+// ======================================================
+// UPDATE PANEL
+// ======================================================
+
+function updateEarthFacts(data){
+
+    const div = document.getElementById("earthFactsContent");
+
+    if(!div) return;
+
+    let html = "";
+
+    for(const fact of data.facts){
+
+        html += `
+
+            <div class="fact-row">
+
+                <div class="fact-name">
+
+                    ${fact.name}
+
+                </div>
+
+                <div class="fact-value">
+
+                    ${fact.value}
+
+                </div>
+
+                <div class="fact-description">
+
+                    ${fact.description}
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+    div.innerHTML = html;
+
+}
+
+
+
+
+
+
+
+
+
   
 // ======================================================
 // LOOP
@@ -4699,7 +4888,7 @@ function onResize(){
 }
 
 </script>
-<script src="earth/vital.js"></script>
+
   
 </body>
 </html>
