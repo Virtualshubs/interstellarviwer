@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<title>JANUS V0</title>
+
+<style>
+
+html,body{
+
+    margin:0;
+    overflow:hidden;
+    background:#050505;
+    font-family:Arial;
+
+}
+
+#panel{
+
+    position:absolute;
+
+    top:15px;
+    left:15px;
+
+    background:rgba(0,0,0,.65);
+
+    color:white;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    font-size:13px;
+
+    line-height:22px;
+
+    min-width:180px;
+
+}
+
+#title{
+
+    font-size:18px;
+    margin-bottom:10px;
+    color:#5fd0ff;
+
+}
+
+.value{
+
+    float:right;
+    color:#8cff8c;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="panel">
+
+<div id="title">
+
+JANUS V0
+
+</div>
+
+Nodes
+<span id="nodes" class="value">0</span>
+<br>
+
+Links
+<span id="links" class="value">0</span>
+<br>
+
+Density
+<span id="density" class="value">0</span>
+<br>
+
+Avg Links
+<span id="avg" class="value">0</span>
+<br>
+
+Compression
+<span id="compression" class="value">0</span>
+<br>
+
+FPS
+<span id="fps" class="value">0</span>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134/build/three.min.js"></script>
+
+<script>
+
+//----------------------------------------------------
+// SCENE
+//----------------------------------------------------
+
+const scene=new THREE.Scene();
+
+scene.background=new THREE.Color(0x050505);
+
+//----------------------------------------------------
+// CAMERA
+//----------------------------------------------------
+
+const camera=new THREE.PerspectiveCamera(
+
+60,
+
+window.innerWidth/window.innerHeight,
+
+0.1,
+
+2000
+
+);
+
+camera.position.set(0,0,80);
+
+//----------------------------------------------------
+// RENDERER
+//----------------------------------------------------
+
+const renderer=new THREE.WebGLRenderer({
+
+antialias:true
+
+});
+
+renderer.setSize(
+
+window.innerWidth,
+
+window.innerHeight
+
+);
+
+document.body.appendChild(renderer.domElement);
+
+//----------------------------------------------------
+// LIGHT
+//----------------------------------------------------
+
+scene.add(
+
+new THREE.AmbientLight(0xffffff,.9)
+
+);
+
+const light=new THREE.DirectionalLight(
+
+0xffffff,
+
+1
+
+);
+
+light.position.set(20,40,30);
+
+scene.add(light);
+
+//----------------------------------------------------
+// GLOBALS
+//----------------------------------------------------
+
+const NODE_COUNT=150;
+
+const LINK_DISTANCE=6;
+
+let compression=0;
+
+let lastTime=performance.now();
+
+let frameCounter=0;
+
+let fps=0;
+
+//----------------------------------------------------
+// STORAGE
+//----------------------------------------------------
+
+const nodes=[];
+
+const nodeMeshes=[];
+
+const linkLines=[];
+
+//----------------------------------------------------
+// NODE
+//----------------------------------------------------
+
+class Node{
+
+    constructor(id){
+
+        this.id=id;
+
+        this.position=new THREE.Vector3(
+
+            (Math.random()-.5)*40,
+
+            (Math.random()-.5)*40,
+
+            (Math.random()-.5)*40
+
+        );
+
+        this.orientation=1;
+
+        this.links=[];
+
+    }
+
+}
+
+//----------------------------------------------------
+// CREATE NODES
+//----------------------------------------------------
+
+const sphereGeometry=
+
+new THREE.SphereGeometry(.35,12,12);
+
+for(let i=0;i<NODE_COUNT;i++){
+
+    const node=new Node(i);
+
+    nodes.push(node);
+
+    const material=
+
+    new THREE.MeshStandardMaterial({
+
+        color:0x66ccff
+
+    });
+
+    const mesh=
+
+    new THREE.Mesh(
+
+        sphereGeometry,
+
+        material
+
+    );
+
+    mesh.position.copy(node.position);
+
+    scene.add(mesh);
+
+    nodeMeshes.push(mesh);
+
+}
+
+//----------------------------------------------------
+// RESIZE
+//----------------------------------------------------
+
+window.addEventListener("resize",()=>{
+
+camera.aspect=
+
+window.innerWidth/window.innerHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+
+window.innerWidth,
+
+window.innerHeight
+
+);
+
+});
+
+//----------------------------------------------------
+// LINK MATERIAL
+//----------------------------------------------------
+
+const lineMaterial = new THREE.LineBasicMaterial({
+
+    color:0xffffff,
+    transparent:true,
+    opacity:0.25
+
+});
+
+//----------------------------------------------------
+// UPDATE SIMULATION
+//----------------------------------------------------
+
+function updateSimulation(){
+
+    compression += 0.002;
+
+    if(compression>1)
+        compression=1;
+
+    for(let i=0;i<nodes.length;i++){
+
+        const node = nodes[i];
+
+        //------------------------------------------------
+        // FORCE TOWARDS CENTER
+        //------------------------------------------------
+
+        node.position.multiplyScalar(
+
+            1-(compression*0.0015)
+
+        );
+
+        //------------------------------------------------
+        // SMALL RANDOM MOTION
+        //------------------------------------------------
+
+        node.position.x += (Math.random()-0.5)*0.05;
+        node.position.y += (Math.random()-0.5)*0.05;
+        node.position.z += (Math.random()-0.5)*0.05;
+
+        //------------------------------------------------
+        // UPDATE MESH
+        //------------------------------------------------
+
+        nodeMeshes[i].position.copy(node.position);
+
+        //------------------------------------------------
+        // RESET LINKS
+        //------------------------------------------------
+
+        node.links=[];
+
+    }
+
+}
+
+//----------------------------------------------------
+// RENDER LINKS
+//----------------------------------------------------
+
+function renderLinks(){
+
+    //------------------------------------------------
+    // REMOVE OLD LINES
+    //------------------------------------------------
+
+    while(linkLines.length){
+
+        scene.remove(linkLines.pop());
+
+    }
+
+    let totalLinks=0;
+
+    //------------------------------------------------
+    // BUILD NEW LINKS
+    //------------------------------------------------
+
+    for(let i=0;i<nodes.length;i++){
+
+        for(let j=i+1;j<nodes.length;j++){
+
+            const a=nodes[i];
+            const b=nodes[j];
+
+            const d=a.position.distanceTo(b.position);
+
+            if(d<LINK_DISTANCE){
+
+                a.links.push(j);
+                b.links.push(i);
+
+                totalLinks++;
+
+                const geometry=new THREE.BufferGeometry();
+
+                geometry.setFromPoints([
+
+                    a.position,
+                    b.position
+
+                ]);
+
+                const line=new THREE.Line(
+
+                    geometry,
+                    lineMaterial
+
+                );
+
+                scene.add(line);
+
+                linkLines.push(line);
+
+            }
+
+        }
+
+    }
+
+    window.currentLinks=totalLinks;
+
+}
+
+//----------------------------------------------------
+// UPDATE METRICS
+//----------------------------------------------------
+
+function updateMetrics(){
+
+    let avgLinks=0;
+
+    for(const node of nodes){
+
+        avgLinks+=node.links.length;
+
+    }
+
+    avgLinks/=nodes.length;
+
+    //------------------------------------------------
+    // APPROX DENSITY
+    //------------------------------------------------
+
+    let radius=0;
+
+    for(const node of nodes){
+
+        radius+=node.position.length();
+
+    }
+
+    radius/=nodes.length;
+
+    const density=(1/(radius+0.001)).toFixed(3);
+
+    //------------------------------------------------
+    // FPS
+    //------------------------------------------------
+
+    frameCounter++;
+
+    const now=performance.now();
+
+    if(now-lastTime>1000){
+
+        fps=frameCounter;
+
+        frameCounter=0;
+
+        lastTime=now;
+
+    }
+
+    //------------------------------------------------
+    // PANEL
+    //------------------------------------------------
+
+    document.getElementById("nodes").textContent=nodes.length;
+
+    document.getElementById("links").textContent=window.currentLinks||0;
+
+    document.getElementById("density").textContent=density;
+
+    document.getElementById("avg").textContent=avgLinks.toFixed(2);
+
+    document.getElementById("compression").textContent=compression.toFixed(2);
+
+    document.getElementById("fps").textContent=fps;
+
+}
+
+function updateSimulation(){}
+
+function updateMetrics(){}
+
+function renderLinks(){}
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+updateSimulation();
+
+renderLinks();
+
+updateMetrics();
+
+renderer.render(scene,camera);
+
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
