@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JANUS V2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%;overflow:hidden;background:#050505;font-family:Arial}canvas{display:block}#ui,#info{position:absolute;top:15px;background:#111c;color:#fff;padding:12px;border:1px solid #333;border-radius:6px}#ui{left:15px;width:230px}#info{right:15px;width:190px}#ui div{margin:6px 0}button{width:100%;padding:8px;margin-top:10px;background:#222;color:white;border:1px solid #444}
+</style>
+</head>
+<body>
+
+<div id="ui">
+<b>JANUS V2</b>
+<div>Observed <span id="obs">0/5</span></div>
+<div>α <span id="aa">--</span></div>
+<div>β <span id="bb">--</span></div>
+<div>Accuracy <span id="acc">--</span></div>
+<button id="reveal">Reveal</button>
+</div>
+
+<div id="info">Observe 5 cells</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134/build/three.min.js"></script>
+<script>
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050505);
+
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,1000);
+camera.position.z=45;
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff,1));
+
+const ray=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+
+const N=5,S=4.2;
+const REAL_A=.8;
+const REAL_B=.6;
+
+let observed=0;
+let solved=false;
+
+const cells=[];
+const geo=new THREE.BoxGeometry(3.2,3.2,.5);
+
+function paint(c,s,o=1){
+if(s==1)c.mesh.material.color.set(0xff4444);
+else if(s==-1)c.mesh.material.color.set(0x4488ff);
+else c.mesh.material.color.set(0xffffff);
+c.mesh.material.transparent=true;
+c.mesh.material.opacity=o;
+}
+
+for(let y=0;y<N;y++){
+for(let x=0;x<N;x++){
+
+const mesh=new THREE.Mesh(
+geo,
+new THREE.MeshBasicMaterial({color:0x222222})
+);
+
+mesh.position.set((x-2)*S,-(y-2)*S,0);
+
+let v=Math.sin(x*REAL_A)+Math.cos(y*REAL_B);
+
+const c={
+id:cells.length,
+x,y,
+real:v>.5?1:v<-.5?-1:0,
+pred:null,
+obs:false,
+mesh
+};
+
+mesh.userData.cell=c;
+cells.push(c);
+scene.add(mesh);
+
+}
+}
+
+function state(x,y,a,b){
+let v=Math.sin(x*a)+Math.cos(y*b);
+return v>.5?1:v<-.5?-1:0;
+}
+
+function solve(){
+
+let best=999;
+let ba=0,bb=0;
+
+for(let a=.1;a<1.5;a+=.02){
+
+for(let b=.1;b<1.5;b+=.02){
+
+let error=0;
+
+for(const c of cells){
+
+if(!c.obs)continue;
+
+let s=state(c.x,c.y,a,b);
+
+if(s!=c.real)error++;
+
+}
+
+if(error<best){
+
+best=error;
+ba=a;
+bb=b;
+
+}
+
+}
+
+}
+
+document.getElementById("aa").textContent=ba.toFixed(2);
+document.getElementById("bb").textContent=bb.toFixed(2);
+
+for(const c of cells){
+
+if(c.obs)continue;
+
+c.pred=state(c.x,c.y,ba,bb);
+
+paint(c,c.pred,.35);
+
+}
+
+solved=true;
+
+}
+
+
+renderer.domElement.onclick=e=>{
+
+if(solved)return;
+
+mouse.x=e.clientX/innerWidth*2-1;
+mouse.y=-(e.clientY/innerHeight)*2+1;
+
+ray.setFromCamera(mouse,camera);
+
+let h=ray.intersectObjects(scene.children);
+
+if(!h.length)return;
+
+let c=h[0].object.userData.cell;
+
+if(!c||c.obs)return;
+
+c.obs=true;
+observed++;
+
+paint(c,c.real);
+
+document.getElementById("obs").textContent=observed+"/5";
+
+document.getElementById("info").innerHTML=
+"Cell "+c.id+"<br>State "+c.real;
+
+if(observed==5)solve();
+
+};
+
+
+document.getElementById("reveal").onclick=()=>{
+
+let ok=0,total=0;
+
+for(const c of cells){
+
+if(!c.obs){
+
+total++;
+
+if(c.pred==c.real)ok++;
+
+}
+
+paint(c,c.real,1);
+
+}
+
+document.getElementById("acc").textContent=
+Math.round(ok/total*100)+"%";
+
+};
+
+
+onresize=()=>{
+camera.aspect=innerWidth/innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(innerWidth,innerHeight);
+};
+
+
+(function loop(){
+requestAnimationFrame(loop);
+renderer.render(scene,camera);
+})();
+
+</script>
+</body>
+</html>
