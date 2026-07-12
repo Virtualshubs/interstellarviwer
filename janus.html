@@ -478,11 +478,7 @@ function updateMetrics(){
 
 }
 
-function updateSimulation(){}
 
-function updateMetrics(){}
-
-function renderLinks(){}
 
 function animate(){
 
@@ -493,6 +489,9 @@ updateSimulation();
 renderLinks();
 
 updateMetrics();
+    camera.position.x = Math.sin(performance.now()*0.0002)*80;
+camera.position.z = Math.cos(performance.now()*0.0002)*80;
+camera.lookAt(scene.position);
 
 renderer.render(scene,camera);
 
