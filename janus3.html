@@ -266,25 +266,15 @@ cell.mesh.material.opacity=opacity;
 }
 
 function getRequiredObservations(){
-
 const density=document.getElementById("density").value;
-
 switch(density){
-
 case "low":
-
 return Math.max(5,Math.round(N*1.2));
-
 case "medium":
-
 return Math.max(9,Math.round(N*2-1));
-
 case "high":
-
 return Math.max(9,Math.round(N*3));
-
 default:
-
 return 9;
 
 }
@@ -292,9 +282,7 @@ return 9;
 }
 
 function clearUniverse(){
-
 for(const c of cells){
-
 scene.remove(c.mesh);
 
 }
@@ -311,21 +299,13 @@ document.getElementById("acc").textContent="--";
 }
 
 function createUniverse(){
-
 clearUniverse();
-
 N=parseInt(document.getElementById("gridSize").value);
-
 required=getRequiredObservations();
-
 STEP=Math.min(4.2,28/N);
-
 const center=(N-1)/2;
-
 for(let y=0;y<N;y++){
-
 for(let x=0;x<N;x++){
-
 const mesh=new THREE.Mesh(
 
 geometry,
@@ -339,9 +319,7 @@ color:0x222222
 );
 
 mesh.scale.setScalar(5/N);
-
 mesh.position.set(
-
 (x-center)*STEP,
 -(y-center)*STEP,
 0
@@ -349,26 +327,20 @@ mesh.position.set(
 );
 
 const cell={
-
 id:cells.length,
-
 x,
 y,
 
 real:state(x,y,REAL_A,REAL_B),
 
 pred:null,
-
 obs:false,
-
 mesh
 
 };
 
 mesh.userData.cell=cell;
-
 cells.push(cell);
-
 scene.add(mesh);
 
 }
@@ -376,19 +348,12 @@ scene.add(mesh);
 }
 
 document.getElementById("obs").textContent=
-
 observed+" / "+required;
-
 document.getElementById("cellInfo").innerHTML=
-
 "<b>Universe</b><br><br>"+
-
 N+" × "+N+
-
 "<br><br>"+
-
 "Required observations : "+required;
-
 }
 
 document.getElementById("generate").onclick=()=>{
@@ -406,17 +371,11 @@ function solve(){
 let best=Infinity;
 let bestA=0;
 let bestB=0;
-
 for(let a=.1;a<1.5;a+=.02){
-
 for(let b=.1;b<1.5;b+=.02){
-
 let error=0;
-
 for(const c of cells){
-
 if(!c.obs)continue;
-
 if(state(c.x,c.y,a,b)!=c.real)
 error++;
 
@@ -480,13 +439,9 @@ document.getElementById("obs").textContent=
 observed+" / "+required;
 
 document.getElementById("cellInfo").innerHTML=
-
 "<b>Cell</b><br><br>"+
-
 "ID : "+cell.id+
-
 "<br>Grid : ("+cell.x+","+cell.y+")"+
-
 "<br>State : "+cell.real;
 
 if(observed>=required){
@@ -511,16 +466,11 @@ document.getElementById("reveal").onclick=()=>{
 
 let ok=0;
 let total=0;
-
 for(const c of cells){
-
 if(!c.obs){
-
 total++;
-
 if(c.pred==c.real)
 ok++;
-
 }
 
 paint(c,c.real,1);
@@ -538,11 +488,8 @@ acc+"%";
 };
 
 window.addEventListener("resize",()=>{
-
 camera.aspect=window.innerWidth/window.innerHeight;
-
 camera.updateProjectionMatrix();
-
 renderer.setSize(window.innerWidth,window.innerHeight);
 
 });
@@ -550,13 +497,9 @@ renderer.setSize(window.innerWidth,window.innerHeight);
 
 
 function suggestObservations(){
-
 suggested=[];
-
 const center=(N-1)/2;
-
 for(const c of cells){
-
 let score=0;
 
 // distancia al centro
@@ -576,17 +519,11 @@ c.score=score;
 }
 
 const ordered=[...cells].sort((a,b)=>b.score-a.score);
-
 for(let i=0;i<required;i++){
-
 const c=ordered[i];
-
 c.mesh.material.color.set(0xffff00);
-
 c.mesh.material.opacity=.8;
-
 c.suggested=true;
-
 suggested.push(c);
 
 }
@@ -594,16 +531,12 @@ suggested.push(c);
 }
 
   document.getElementById("suggest").onclick=()=>{
-
 suggestObservations();
-
 };
   
 
 (function animate(){
-
 requestAnimationFrame(animate);
-
 renderer.render(scene,camera);
 
 })();
