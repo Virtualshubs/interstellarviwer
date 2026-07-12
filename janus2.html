@@ -8,21 +8,17 @@
 </style>
 </head>
 <body>
-
 <div id="ui">
 <b>JANUS V2</b>
-<div>Observed <span id="obs">0/5</span></div>
+<div>Observed <span id="obs">0/9</span></div>
 <div>α <span id="aa">--</span></div>
 <div>β <span id="bb">--</span></div>
 <div>Accuracy <span id="acc">--</span></div>
 <button id="reveal">Reveal</button>
 </div>
-
 <div id="info">Observe 5 cells</div>
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.134/build/three.min.js"></script>
 <script>
-
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x050505);
 
@@ -93,21 +89,13 @@ function solve(){
 
 let best=999;
 let ba=0,bb=0;
-
 for(let a=.1;a<1.5;a+=.02){
-
 for(let b=.1;b<1.5;b+=.02){
-
 let error=0;
-
 for(const c of cells){
-
 if(!c.obs)continue;
-
 let s=state(c.x,c.y,a,b);
-
 if(s!=c.real)error++;
-
 }
 
 if(error<best){
@@ -117,77 +105,52 @@ ba=a;
 bb=b;
 
 }
-
 }
-
 }
 
 document.getElementById("aa").textContent=ba.toFixed(2);
 document.getElementById("bb").textContent=bb.toFixed(2);
 
 for(const c of cells){
-
 if(c.obs)continue;
-
 c.pred=state(c.x,c.y,ba,bb);
-
 paint(c,c.pred,.35);
-
 }
-
 solved=true;
-
 }
-
 
 renderer.domElement.onclick=e=>{
-
 if(solved)return;
-
 mouse.x=e.clientX/innerWidth*2-1;
 mouse.y=-(e.clientY/innerHeight)*2+1;
 
 ray.setFromCamera(mouse,camera);
-
 let h=ray.intersectObjects(scene.children);
-
 if(!h.length)return;
-
 let c=h[0].object.userData.cell;
-
 if(!c||c.obs)return;
 
 c.obs=true;
 observed++;
-
 paint(c,c.real);
-
-document.getElementById("obs").textContent=observed+"/5";
+  
+document.getElementById("obs").textContent=observed+"/9";
 
 document.getElementById("info").innerHTML=
 "Cell "+c.id+"<br>State "+c.real;
-
-if(observed==5)solve();
-
+if(observed==9)solve();
 };
 
 
 document.getElementById("reveal").onclick=()=>{
 
 let ok=0,total=0;
-
 for(const c of cells){
-
 if(!c.obs){
-
 total++;
-
 if(c.pred==c.real)ok++;
-
 }
-
 paint(c,c.real,1);
-
 }
 
 document.getElementById("acc").textContent=
@@ -195,13 +158,11 @@ Math.round(ok/total*100)+"%";
 
 };
 
-
 onresize=()=>{
 camera.aspect=innerWidth/innerHeight;
 camera.updateProjectionMatrix();
 renderer.setSize(innerWidth,innerHeight);
 };
-
 
 (function loop(){
 requestAnimationFrame(loop);
