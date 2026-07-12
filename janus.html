@@ -169,9 +169,9 @@ scene.add(light);
 // GLOBALS
 //----------------------------------------------------
 
-const NODE_COUNT=150;
+const NODE_COUNT=40;
 
-const LINK_DISTANCE=6;
+const LINK_DISTANCE=3;
 
 let compression=0;
 
@@ -299,7 +299,7 @@ const lineMaterial = new THREE.LineBasicMaterial({
 
 function updateSimulation(){
 
-    compression += 0.002;
+    compression += 0.0000005;
 
     if(compression>1)
         compression=1;
@@ -373,34 +373,40 @@ function renderLinks(){
 
             const d=a.position.distanceTo(b.position);
 
-            if(d<LINK_DISTANCE){
+         if(d<LINK_DISTANCE){
 
-                a.links.push(j);
-                b.links.push(i);
+    a.links.push(j);
+    b.links.push(i);
 
-                totalLinks++;
+    totalLinks++;
 
-                const geometry=new THREE.BufferGeometry();
+    // Limitar el número de líneas para no colapsar el render
+    if(totalLinks > 300){
+        window.currentLinks = totalLinks;
+        break;
+    }
 
-                geometry.setFromPoints([
+    const geometry = new THREE.BufferGeometry();
 
-                    a.position,
-                    b.position
+    geometry.setFromPoints([
 
-                ]);
+        a.position,
+        b.position
 
-                const line=new THREE.Line(
+    ]);
 
-                    geometry,
-                    lineMaterial
+    const line = new THREE.Line(
 
-                );
+        geometry,
+        lineMaterial
 
-                scene.add(line);
+    );
 
-                linkLines.push(line);
+    scene.add(line);
 
-            }
+    linkLines.push(line);
+
+}
 
         }
 
