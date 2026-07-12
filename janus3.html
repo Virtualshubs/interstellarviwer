@@ -159,6 +159,10 @@ Generate Universe
 <span id="acc">--</span>
 </div>
 
+  <button id="suggest">
+Predict Best Observation
+</button>
+
 <button id="solve">
 Predict Universe
 </button>
@@ -192,6 +196,7 @@ JANUS Experimental Prediction Engine
 <script>
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x050505);
+  let suggested=[];
 
 const camera=new THREE.PerspectiveCamera(
 45,
@@ -541,6 +546,59 @@ camera.updateProjectionMatrix();
 renderer.setSize(window.innerWidth,window.innerHeight);
 
 });
+
+
+
+function suggestObservations(){
+
+suggested=[];
+
+const center=(N-1)/2;
+
+for(const c of cells){
+
+let score=0;
+
+// distancia al centro
+score+=Math.abs(c.x-center);
+score+=Math.abs(c.y-center);
+
+// cercanía al borde
+score+=Math.min(
+c.x,
+N-1-c.x,
+c.y,
+N-1-c.y
+);
+
+c.score=score;
+
+}
+
+const ordered=[...cells].sort((a,b)=>b.score-a.score);
+
+for(let i=0;i<required;i++){
+
+const c=ordered[i];
+
+c.mesh.material.color.set(0xffff00);
+
+c.mesh.material.opacity=.8;
+
+c.suggested=true;
+
+suggested.push(c);
+
+}
+
+}
+
+  document.getElementById("suggest").onclick=()=>{
+
+suggestObservations();
+
+};
+  
 
 (function animate(){
 
