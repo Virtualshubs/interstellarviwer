@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JANUS V4</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#050505;
+color:white;
+}
+
+canvas{
+display:block;
+}
+
+#ui{
+position:absolute;
+top:15px;
+left:15px;
+width:250px;
+background:#111c;
+border:1px solid #333;
+border-radius:8px;
+padding:14px;
+backdrop-filter:blur(8px);
+}
+
+#info{
+position:absolute;
+top:15px;
+right:15px;
+width:230px;
+background:#111c;
+border:1px solid #333;
+border-radius:8px;
+padding:14px;
+backdrop-filter:blur(8px);
+}
+
+h2{
+font-size:18px;
+margin-bottom:12px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+margin:6px 0;
+}
+
+select,button{
+width:100%;
+margin-top:8px;
+padding:8px;
+background:#1d1d1d;
+border:1px solid #444;
+color:white;
+border-radius:4px;
+cursor:pointer;
+}
+
+button:hover{
+background:#333;
+}
+
+hr{
+border:none;
+border-top:1px solid #333;
+margin:12px 0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="ui">
+
+<h2>JANUS V4</h2>
+
+<div class="row">
+<span>Universe</span>
+<span id="universeName">Wave</span>
+</div>
+
+<div class="row">
+<span>Grid</span>
+<span id="gridLabel">5 × 5</span>
+</div>
+
+<div class="row">
+<span>Observed</span>
+<span id="obs">0 / 0</span>
+</div>
+
+<div class="row">
+<span>α</span>
+<span id="aa">--</span>
+</div>
+
+<div class="row">
+<span>β</span>
+<span id="bb">--</span>
+</div>
+
+<div class="row">
+<span>Accuracy</span>
+<span id="acc">--</span>
+</div>
+
+<hr>
+
+<select id="gridSize">
+<option value="5">5 × 5</option>
+<option value="10">10 × 10</option>
+<option value="15">15 × 15</option>
+<option value="20">20 × 20</option>
+<option value="25" selected>25 × 25</option>
+<option value="30">30 × 30</option>
+</select>
+
+<select id="universeType">
+<option value="wave">Wave</option>
+<option value="mixed">Mixed</option>
+<option value="poly">Polynomial</option>
+<option value="noise">Noise</option>
+<option value="random">Random</option>
+</select>
+
+<button id="generate">
+Generate Universe
+</button>
+
+<button id="suggest">
+Predict Best Observation
+</button>
+
+<button id="solve">
+Predict Universe
+</button>
+
+<button id="reveal">
+Reveal Universe
+</button>
+
+</div>
+
+<div id="info">
+
+<b>Universe information</b>
+
+<hr>
+
+<div id="cellInfo">
+
+Waiting...
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.134/build/three.min.js"></script>
+
+<script>
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050505);
+
+const camera=new THREE.PerspectiveCamera(
+45,
+innerWidth/innerHeight,
+0.1,
+3000
+);
+
+camera.position.set(0,0,45);
+
+const renderer=new THREE.WebGLRenderer({
+antialias:true
+});
+
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0xffffff,1));
+
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+
+const cells=[];
+const suggested=[];
+
+let N=25;
+let STEP=2;
+let observed=0;
+let required=9;
+let solved=false;
+
+let REAL_A=0;
+let REAL_B=0;
+let REAL_C=0;
+
+let universeType="wave";
+
+const geometry=new THREE.BoxGeometry(
+3.2,
+3.2,
+0.45
+);
+
+function paint(cell,value,o=1){
+
+if(value==1)
+cell.mesh.material.color.set(0xff4444);
+
+else if(value==-1)
+cell.mesh.material.color.set(0x4488ff);
+
+else
+cell.mesh.material.color.set(0xffffff);
+
+cell.mesh.material.transparent=true;
+cell.mesh.material.opacity=o;
+
+}
+
+function randomParameters(){
+
+REAL_A=.1+Math.random()*1.4;
+REAL_B=.1+Math.random()*1.4;
+REAL_C=.1+Math.random()*1.4;
+
+}
+
+function state(x,y,a,b,c){
+
+let v=0;
+
+switch(universeType){
+
+case "wave":
+
+v=Math.sin(x*a)+Math.cos(y*b);
+
+break;
+
+case "mixed":
+
+v=
+Math.sin(x*a)+
+Math.cos(y*b)+
+Math.sin((x+y)*c);
+
+break;
+
+case "poly":
+
+v=
+Math.sin(a*x*x*.05)+
+Math.cos(b*y*.8);
+
+break;
+
+case "noise":
+
+v=
+Math.sin(x*a)+
+Math.cos(y*b)+
+(Math.random()-.5)*0.25;
+
+break;
+
+case "random":
+
+return Math.floor(Math.random()*3)-1;
+
+}
+
+if(v>.5)return 1;
+if(v<-.5)return -1;
+
+return 0;
+
+}
+
+function clearUniverse(){
+
+for(const c of cells){
+
+scene.remove(c.mesh);
+
+}
+
+cells.length=0;
+suggested.length=0;
+
+observed=0;
+solved=false;
+
+document.getElementById("aa").textContent="--";
+document.getElementById("bb").textContent="--";
+document.getElementById("acc").textContent="--";
+
+}
+
+function createUniverse(){
+
+clearUniverse();
+
+N=parseInt(
+document.getElementById("gridSize").value
+);
+
+universeType=
+document.getElementById("universeType").value;
+
+randomParameters();
+
+required=Math.max(
+9,
+Math.round(N*2-1)
+);
+
+STEP=Math.min(
+4.2,
+28/N
+);
+
+const center=(N-1)/2;
+
+document.getElementById("gridLabel").textContent=
+N+" × "+N;
+
+document.getElementById("universeName").textContent=
+universeType;
+
+for(let y=0;y<N;y++){
+
+for(let x=0;x<N;x++){
+
+const mesh=new THREE.Mesh(
+
+geometry,
+
+new THREE.MeshBasicMaterial({
+
+color:0x222222
+
+})
+
+);
+
+mesh.scale.setScalar(5/N);
+
+mesh.position.set(
+
+(x-center)*STEP,
+
+-(y-center)*STEP,
+
+0
+
+);
+
+const cell={
+
+id:cells.length,
+
+x,
+
+y,
+
+real:state(
+x,
+y,
+REAL_A,
+REAL_B,
+REAL_C
+),
+
+pred:null,
+
+obs:false,
+
+mesh
+
+};
+
+mesh.userData.cell=cell;
+
+cells.push(cell);
+
+scene.add(mesh);
+
+}
+
+}
+
+document.getElementById("obs").textContent=
+observed+" / "+required;
+
+document.getElementById("cellInfo").innerHTML=
+
+"<b>"+universeType.toUpperCase()+"</b><br><br>"+
+
+"Grid : "+N+" × "+N+
+
+"<br><br>"+
+
+"Universe generated";
+
+}
+
+document.getElementById("generate").onclick=()=>{
+
+createUniverse();
+
+};
+
+createUniverse();
+  
+
+function solve(){
+
+let best=Infinity;
+let bestA=0;
+let bestB=0;
+
+for(let a=.1;a<1.5;a+=.02){
+
+for(let b=.1;b<1.5;b+=.02){
+
+let error=0;
+
+for(const c of cells){
+
+if(!c.obs)continue;
+
+let p=Math.sin(c.x*a)+Math.cos(c.y*b);
+
+let s=p>.5?1:p<-.5?-1:0;
+
+if(s!=c.real)error++;
+
+}
+
+if(error<best){
+
+best=error;
+bestA=a;
+bestB=b;
+
+}
+
+}
+
+}
+
+document.getElementById("aa").textContent=bestA.toFixed(2);
+document.getElementById("bb").textContent=bestB.toFixed(2);
+
+for(const c of cells){
+
+if(c.obs)continue;
+
+let p=Math.sin(c.x*bestA)+Math.cos(c.y*bestB);
+
+c.pred=p>.5?1:p<-.5?-1:0;
+
+paint(c,c.pred,.35);
+
+}
+
+solved=true;
+
+}
+
+function suggestObservations(){
+
+suggested.length=0;
+
+for(const c of cells){
+
+c.mesh.material.color.set(0x222222);
+
+}
+
+const center=(N-1)/2;
+
+const candidates=[];
+
+for(const c of cells){
+
+let score=0;
+
+// centro
+score+=8-Math.hypot(c.x-center,c.y-center);
+
+// borde
+score+=Math.min(
+c.x,
+N-1-c.x,
+c.y,
+N-1-c.y
+);
+
+// simetría
+score+=Math.abs(c.x-center);
+score+=Math.abs(c.y-center);
+
+candidates.push({
+cell:c,
+score
+});
+
+}
+
+candidates.sort((a,b)=>b.score-a.score);
+
+let i=0;
+
+while(suggested.length<required && i<candidates.length){
+
+const cell=candidates[i].cell;
+
+let ok=true;
+
+for(const s of suggested){
+
+const d=Math.hypot(
+cell.x-s.x,
+cell.y-s.y
+);
+
+if(d<2){
+
+ok=false;
+break;
+
+}
+
+}
+
+if(ok){
+
+cell.mesh.material.color.set(0xffff00);
+
+cell.mesh.material.opacity=.9;
+
+cell.suggested=true;
+
+suggested.push(cell);
+
+}
+
+i++;
+
+}
+
+document.getElementById("cellInfo").innerHTML=
+
+"<b>Suggested observations</b><br><br>"+
+
+suggested.length+
+
+" cells selected";
+
+}
+
+renderer.domElement.addEventListener("pointerdown",e=>{
+
+if(solved)return;
+
+mouse.x=(e.clientX/window.innerWidth)*2-1;
+mouse.y=-(e.clientY/window.innerHeight)*2+1;
+
+raycaster.setFromCamera(mouse,camera);
+
+const hit=raycaster.intersectObjects(scene.children);
+
+if(!hit.length)return;
+
+const cell=hit[0].object.userData.cell;
+
+if(!cell)return;
+if(cell.obs)return;
+
+cell.obs=true;
+
+observed++;
+
+paint(cell,cell.real);
+
+document.getElementById("obs").textContent=
+observed+" / "+required;
+
+document.getElementById("cellInfo").innerHTML=
+
+"<b>Cell</b><br><br>"+
+
+"("+cell.x+","+cell.y+")<br>"+
+
+"State : "+cell.real;
+
+if(observed>=required){
+
+solve();
+
+}
+
+});
+
+document.getElementById("suggest").onclick=()=>{
+
+suggestObservations();
+
+};
+
+document.getElementById("solve").onclick=()=>{
+
+if(!solved)
+solve();
+
+};
+
+document.getElementById("reveal").onclick=()=>{
+
+let ok=0;
+let total=0;
+
+for(const c of cells){
+
+if(!c.obs){
+
+total++;
+
+if(c.pred==c.real)
+ok++;
+
+}
+
+paint(c,c.real);
+
+}
+
+const acc=total
+?Math.round(ok/total*100)
+:100;
+
+document.getElementById("acc").textContent=
+acc+"%";
+
+document.getElementById("cellInfo").innerHTML=
+
+"<b>Universe</b><br><br>"+
+
+"Real α : "+REAL_A.toFixed(2)+
+"<br>"+
+"Real β : "+REAL_B.toFixed(2)+
+"<br>"+
+"Real γ : "+REAL_C.toFixed(2)+
+"<br><br>"+
+"Accuracy : "+acc+"%";
+
+};
+
+window.addEventListener("resize",()=>{
+
+camera.aspect=window.innerWidth/window.innerHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+window.innerWidth,
+window.innerHeight
+);
+
+});
+
+(function animate(){
+
+requestAnimationFrame(animate);
+
+renderer.render(
+scene,
+camera
+);
+
+})();
+
+
+
+</script>
+
+</body>
+</html>
