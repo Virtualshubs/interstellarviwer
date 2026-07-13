@@ -600,6 +600,7 @@ i++;
 
 document.getElementById("obs").textContent=
 observed+" / "+required;
+  analyzeUniverse();
 
 document.getElementById("cellInfo").innerHTML=
 
@@ -640,6 +641,83 @@ score+=Math.abs(cell.y-center);
 return score;
 
 }
+
+function analyzeUniverse(){
+
+const center=(N-1)/2;
+
+let horizontal=0;
+let vertical=0;
+let comparisons=0;
+
+for(let y=0;y<N;y++){
+
+for(let x=0;x<N-1;x++){
+
+const a=cells[y*N+x].real;
+const b=cells[y*N+x+1].real;
+
+if(a==b)horizontal++;
+
+comparisons++;
+
+}
+
+}
+
+for(let y=0;y<N-1;y++){
+
+for(let x=0;x<N;x++){
+
+const a=cells[y*N+x].real;
+const b=cells[(y+1)*N+x].real;
+
+if(a==b)vertical++;
+
+comparisons++;
+
+}
+
+}
+
+observer.continuity=(horizontal+vertical)/comparisons;
+
+if(observer.continuity>.80){
+
+observer.model="Structured";
+observer.strategy="Cross";
+observer.confidence=Math.round(observer.continuity*100);
+
+}
+else if(observer.continuity>.60){
+
+observer.model="Mixed";
+observer.strategy="Hybrid";
+observer.confidence=Math.round(observer.continuity*100);
+
+}
+else{
+
+observer.model="Chaotic";
+observer.strategy="Dense";
+observer.confidence=Math.round(observer.continuity*100);
+
+}
+
+document.getElementById("observerModel").textContent=
+observer.model;
+
+document.getElementById("confidence").textContent=
+observer.confidence+"%";
+
+document.getElementById("strategy").textContent=
+observer.strategy;
+
+}
+
+
+
+  
   
 
 document.getElementById("suggest").onclick=()=>{
