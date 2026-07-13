@@ -682,36 +682,52 @@ comparisons++;
 
 observer.continuity=(horizontal+vertical)/comparisons;
 
-if(observer.continuity>.80){
+//--------------------------------------------------
+// SIMETRÍA
+//--------------------------------------------------
 
-observer.model="Structured";
-observer.strategy="Cross";
-observer.confidence=Math.round(observer.continuity*100);
+let symmetry=0;
+let total=0;
 
-}
-else if(observer.continuity>.60){
+for(let y=0;y<N;y++){
 
-observer.model="Mixed";
-observer.strategy="Hybrid";
-observer.confidence=Math.round(observer.continuity*100);
+for(let x=0;x<N/2;x++){
 
-}
-else{
+const a=cells[y*N+x].real;
+const b=cells[y*N+(N-1-x)].real;
 
-observer.model="Chaotic";
-observer.strategy="Dense";
-observer.confidence=Math.round(observer.continuity*100);
+if(a==b)symmetry++;
+
+total++;
 
 }
+
+}
+
+observer.symmetry=symmetry/total;
+
+//--------------------------------------------------
+
+observer.confidence=Math.round(
+
+(observer.continuity*0.5+
+observer.symmetry*0.5)*100
+
+);
+
+observer.model="Measuring";
+
+observer.strategy="Learning";
+  
 
 document.getElementById("observerModel").textContent=
-observer.model;
+"C:"+observer.continuity.toFixed(2);
 
 document.getElementById("confidence").textContent=
-observer.confidence+"%";
+"S:"+observer.symmetry.toFixed(2);
 
 document.getElementById("strategy").textContent=
-observer.strategy;
+observer.confidence+"%";
 
 }
 
