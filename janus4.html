@@ -397,7 +397,6 @@ const cell={
 id:cells.length,
 
 x,
-
 y,
 
 real:state(
@@ -409,9 +408,7 @@ REAL_C
 ),
 
 pred:null,
-
 obs:false,
-
 mesh
 
 };
@@ -425,6 +422,9 @@ scene.add(mesh);
 }
 
 }
+
+// ← AQUÍ, una sola vez
+observer.analyze();
 
 document.getElementById("obs").textContent=
 observed+" / "+required;
@@ -505,115 +505,95 @@ solved=true;
 
 }
 
-function observer(){
+const observer={
 
-suggested.length=0;
+model:"Waiting...",
 
-observed=0;
+confidence:0,
 
-for(const c of cells){
+strategy:"Unknown",
 
-c.obs=false;
-c.suggested=false;
+continuity:0,
 
-c.mesh.material.color.set(0x222222);
-c.mesh.material.opacity=1;
+entropy:0,
 
-}
+symmetry:0,
 
-const center=(N-1)/2;
+correlation:0,
 
-const candidates=[];
+analyze(){
 
-for(const c of cells){
+this.continuity=0;
+this.entropy=0;
 
-let score=0;
+let changes=0;
 
-// Información central
-score+=8-Math.hypot(c.x-center,c.y-center);
+for(let y=0;y<N;y++){
 
-// Información de borde
-score+=Math.min(
-c.x,
-N-1-c.x,
-c.y,
-N-1-c.y
-);
+for(let x=1;x<N;x++){
 
-// Distribución simétrica
-score+=Math.abs(c.x-center);
-score+=Math.abs(c.y-center);
+const a=cells[y*N+x-1].real;
+const b=cells[y*N+x].real;
 
-candidates.push({
-cell:c,
-score
-});
-
-}
-
-candidates.sort((a,b)=>b.score-a.score);
-
-let i=0;
-
-while(suggested.length<required && i<candidates.length){
-
-const cell=candidates[i].cell;
-
-let ok=true;
-
-for(const s of suggested){
-
-const d=Math.hypot(
-cell.x-s.x,
-cell.y-s.y
-);
-
-if(d<2){
-
-ok=false;
-break;
+if(a!=b)changes++;
 
 }
 
 }
 
-if(ok){
+this.continuity=1-changes/(N*(N-1));
 
-cell.suggested=true;
+this.entropy=changes/(N*(N-1));
 
-cell.obs=true;
+if(this.continuity>.82){
 
-observed++;
+this.model="Wave";
 
-paint(cell,cell.real);
+this.strategy="Cross";
 
-cell.mesh.material.color.set(0xffff00);
-cell.mesh.material.opacity=.95;
-
-suggested.push(cell);
+this.confidence=Math.round(this.continuity*100);
 
 }
 
-i++;
+else if(this.continuity>.65){
+
+this.model="Structured";
+
+this.strategy="Hybrid";
+
+this.confidence=Math.round(this.continuity*100);
 
 }
 
-document.getElementById("obs").textContent=
-observed+" / "+required;
+else if(this.continuity>.45){
 
-document.getElementById("cellInfo").innerHTML=
+this.model="Noise";
 
-"<b>Observer</b><br><br>"+
+this.strategy="Dense";
 
-"Observed "+observed+
-
-"<br><br>"+
-
-"Strategy : Generic";
-
-solve();
+this.confidence=Math.round(this.continuity*100);
 
 }
+
+else{
+
+this.model="Random";
+
+this.strategy="Adaptive";
+
+this.confidence=Math.round(this.continuity*100);
+
+}
+
+document.getElementById("observerModel").textContent=this.model;
+
+document.getElementById("confidence").textContent=this.confidence+"%";
+
+document.getElementById("strategy").textContent=this.strategy;
+
+}
+
+};
 
 document.getElementById("suggest").onclick=()=>{
 
