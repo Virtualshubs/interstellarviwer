@@ -89,7 +89,7 @@ margin:12px 0;
 
 <div id="ui">
 
-<h2>JANUS V4</h2>
+<h2>JANUS V5</h2>
 
 <div class="row">
 <span>Universe</span>
@@ -104,6 +104,21 @@ margin:12px 0;
 <div class="row">
 <span>Observed</span>
 <span id="obs">0 / 0</span>
+</div>
+
+<div class="row">
+<span>Observer</span>
+<span id="observerModel">Waiting...</span>
+</div>
+
+<div class="row">
+<span>Confidence</span>
+<span id="confidence">--</span>
+</div>
+
+<div class="row">
+<span>Strategy</span>
+<span id="strategy">Unknown</span>
 </div>
 
 <div class="row">
@@ -145,7 +160,7 @@ Generate Universe
 </button>
 
 <button id="suggest">
-Predict Best Observation
+Observer
 </button>
 
 <button id="solve">
@@ -490,13 +505,19 @@ solved=true;
 
 }
 
-function suggestObservations(){
+function observer(){
 
 suggested.length=0;
 
+observed=0;
+
 for(const c of cells){
 
+c.obs=false;
+c.suggested=false;
+
 c.mesh.material.color.set(0x222222);
+c.mesh.material.opacity=1;
 
 }
 
@@ -508,10 +529,10 @@ for(const c of cells){
 
 let score=0;
 
-// centro
+// Información central
 score+=8-Math.hypot(c.x-center,c.y-center);
 
-// borde
+// Información de borde
 score+=Math.min(
 c.x,
 N-1-c.x,
@@ -519,7 +540,7 @@ c.y,
 N-1-c.y
 );
 
-// simetría
+// Distribución simétrica
 score+=Math.abs(c.x-center);
 score+=Math.abs(c.y-center);
 
@@ -558,11 +579,16 @@ break;
 
 if(ok){
 
-cell.mesh.material.color.set(0xffff00);
-
-cell.mesh.material.opacity=.9;
-
 cell.suggested=true;
+
+cell.obs=true;
+
+observed++;
+
+paint(cell,cell.real);
+
+cell.mesh.material.color.set(0xffff00);
+cell.mesh.material.opacity=.95;
 
 suggested.push(cell);
 
@@ -572,62 +598,26 @@ i++;
 
 }
 
-document.getElementById("cellInfo").innerHTML=
-
-"<b>Suggested observations</b><br><br>"+
-
-suggested.length+
-
-" cells selected";
-
-}
-
-renderer.domElement.addEventListener("pointerdown",e=>{
-
-if(solved)return;
-
-mouse.x=(e.clientX/window.innerWidth)*2-1;
-mouse.y=-(e.clientY/window.innerHeight)*2+1;
-
-raycaster.setFromCamera(mouse,camera);
-
-const hit=raycaster.intersectObjects(scene.children);
-
-if(!hit.length)return;
-
-const cell=hit[0].object.userData.cell;
-
-if(!cell)return;
-if(cell.obs)return;
-
-cell.obs=true;
-
-observed++;
-
-paint(cell,cell.real);
-
 document.getElementById("obs").textContent=
 observed+" / "+required;
 
 document.getElementById("cellInfo").innerHTML=
 
-"<b>Cell</b><br><br>"+
+"<b>Observer</b><br><br>"+
 
-"("+cell.x+","+cell.y+")<br>"+
+"Observed "+observed+
 
-"State : "+cell.real;
+"<br><br>"+
 
-if(observed>=required){
+"Strategy : Generic";
 
 solve();
 
 }
 
-});
-
 document.getElementById("suggest").onclick=()=>{
 
-suggestObservations();
+observer();
 
 };
 
