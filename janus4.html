@@ -220,6 +220,20 @@ const mouse=new THREE.Vector2();
 const cells=[];
 const suggested=[];
 
+
+const observer={
+model:"Waiting...",
+confidence:0,
+strategy:"Generic",
+continuity:0,
+entropy:0,
+symmetry:0,
+correlation:0
+};
+
+
+  
+
 let N=25;
 let STEP=2;
 let observed=0;
@@ -505,7 +519,7 @@ solved=true;
 
 }
 
-function observer(){
+function observeUniverse(){
 
 suggested.length=0;
 
@@ -527,26 +541,12 @@ const candidates=[];
 
 for(const c of cells){
 
-let score=0;
-
-// Información central
-score+=8-Math.hypot(c.x-center,c.y-center);
-
-// Información de borde
-score+=Math.min(
-c.x,
-N-1-c.x,
-c.y,
-N-1-c.y
-);
-
-// Distribución simétrica
-score+=Math.abs(c.x-center);
-score+=Math.abs(c.y-center);
-
 candidates.push({
+
 cell:c,
-score
+
+score:calculateObservationScore(c)
+
 });
 
 }
@@ -615,9 +615,36 @@ solve();
 
 }
 
+
+function calculateObservationScore(cell){
+
+const center=(N-1)/2;
+
+let score=0;
+
+// Información central
+score+=8-Math.hypot(cell.x-center,cell.y-center);
+
+// Información de borde
+score+=Math.min(
+cell.x,
+N-1-cell.x,
+cell.y,
+N-1-cell.y
+);
+
+// Distribución simétrica
+score+=Math.abs(cell.x-center);
+score+=Math.abs(cell.y-center);
+
+return score;
+
+}
+  
+
 document.getElementById("suggest").onclick=()=>{
 
-observer();
+observeUniverse();
 
 };
 
