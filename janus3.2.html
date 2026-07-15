@@ -71,85 +71,179 @@ JANUS DATA — Experimental distributed data representation.
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134/build/three.min.js"></script>
-<script >
-  // ======================================================
-// JANUS DATA V1
+<script>
+
+const CONFIG={
+
+    background:0x050505,
+
+    camera:{
+        fov:45,
+        near:0.1,
+        far:2000,
+        z:45
+    },
+
+    grid:{
+        size:16,
+        spacing:2.0,
+        cellSize:1.6,
+        cellDepth:0.35
+    },
+
+    colors:{
+        empty:0x222222,
+        zero:0xffffff,
+        one:0xff4444,
+        selected:0xffff00
+    }
+
+};
+
+// ======================================================
+// SCENE
 // ======================================================
 
-// ------------------------------------------------------
-// SCENE
-// ------------------------------------------------------
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(CONFIG.background);
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050505);
-
-// ------------------------------------------------------
+// ======================================================
 // CAMERA
-// ------------------------------------------------------
+// ======================================================
 
-const camera = new THREE.PerspectiveCamera(
-45,
-window.innerWidth/window.innerHeight,
-0.1,
-2000
+const camera=new THREE.PerspectiveCamera(
+    CONFIG.camera.fov,
+    window.innerWidth/window.innerHeight,
+    CONFIG.camera.near,
+    CONFIG.camera.far
 );
 
-camera.position.set(0,0,45);
+camera.position.set(0,0,CONFIG.camera.z);
 
-// ------------------------------------------------------
+// ======================================================
 // RENDERER
-// ------------------------------------------------------
+// ======================================================
 
-const renderer = new THREE.WebGLRenderer({
-antialias:true
+const renderer=new THREE.WebGLRenderer({
+    antialias:true
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
+
 renderer.setSize(
-window.innerWidth,
-window.innerHeight
+    window.innerWidth,
+    window.innerHeight
 );
 
 document.body.appendChild(renderer.domElement);
 
-// ------------------------------------------------------
+// ======================================================
 // LIGHT
-// ------------------------------------------------------
+// ======================================================
 
 scene.add(
-new THREE.AmbientLight(
-0xffffff,
-1
-)
+
+    new THREE.AmbientLight(
+        0xffffff,
+        1
+    )
+
 );
 
+// ======================================================
+// GLOBAL DATA
+// ======================================================
 
+const universe={
+    cells:[],
+    size:CONFIG.grid.size,
+    spacing:CONFIG.grid.spacing
+};
+
+const data={
+
+    message:"",
+    bytes:[],
+    bits:[]
+
+};
+
+const observer={
+
+    observed:[],
+    predicted:[]
+
+};
 
 
 // ======================================================
-// UNIVERSE
+// UNIVERSE ENGINE
 // ======================================================
 
-const cells=[];
+// ------------------------------------------------------
+// CELL GEOMETRY
+// ------------------------------------------------------
 
-let GRID=16;
-let STEP=2.0;
-
-// Geometría de una celda
-const geometry=new THREE.BoxGeometry(
-1.6,
-1.6,
-0.35
+const cellGeometry=new THREE.BoxGeometry(
+    CONFIG.grid.cellSize,
+    CONFIG.grid.cellSize,
+    CONFIG.grid.cellDepth
 );
 
-// Material base
-function createMaterial(){
+// ------------------------------------------------------
+// CELL MATERIAL
+// ------------------------------------------------------
+
+function createCellMaterial(){
 
     return new THREE.MeshBasicMaterial({
-
-        color:0x222222
-
+        color:CONFIG.colors.empty
     });
+
+}
+
+// ------------------------------------------------------
+// CREATE CELL
+// ------------------------------------------------------
+
+function createCell(x,y){
+
+    const mesh=new THREE.Mesh(
+        cellGeometry,
+        createCellMaterial()
+    );
+
+    const center=(universe.size-1)/2;
+
+    mesh.position.set(
+        (x-center)*universe.spacing,
+        -(y-center)*universe.spacing,
+        0
+    );
+
+    const cell={
+
+        id:universe.cells.length,
+
+        x,
+        y,
+
+        // JANUS STATE
+        // -1 = vacío
+        //  0 = estado A
+        //  1 = estado B
+
+        state:-1,
+
+        observed:false,
+
+        mesh
+
+    };
+
+    mesh.userData.cell=cell;
+
+    return cell;
 
 }
 
@@ -159,93 +253,87 @@ function createMaterial(){
 
 function clearUniverse(){
 
-    for(const cell of cells){
+    for(const cell of universe.cells){
 
         scene.remove(cell.mesh);
 
     }
 
-    cells.length=0;
+    universe.cells.length=0;
 
 }
 
 // ------------------------------------------------------
-// CREATE
+// BUILD
 // ------------------------------------------------------
 
-function createUniverse(size){
+function buildUniverse(size){
 
     clearUniverse();
 
-    GRID=size;
+    universe.size=size;
 
-    STEP=Math.min(
-        2.0,
-        30/GRID
+    universe.spacing=Math.min(
+        CONFIG.grid.spacing,
+        30/size
     );
 
-    const center=(GRID-1)/2;
+    for(let y=0;y<size;y++){
 
-    for(let y=0;y<GRID;y++){
+        for(let x=0;x<size;x++){
 
-        for(let x=0;x<GRID;x++){
+            const cell=createCell(x,y);
 
-            const mesh=new THREE.Mesh(
+            universe.cells.push(cell);
 
-                geometry,
-
-                createMaterial()
-
-            );
-
-            mesh.position.set(
-
-                (x-center)*STEP,
-
-                -(y-center)*STEP,
-
-                0
-
-            );
-
-            const cell={
-
-                id:cells.length,
-
-                x,
-
-                y,
-
-                bit:0,
-
-                mesh
-
-            };
-
-            mesh.userData.cell=cell;
-
-            cells.push(cell);
-
-            scene.add(mesh);
+            scene.add(cell.mesh);
 
         }
 
     }
 
     document.getElementById("gridInfo").textContent=
-
-        GRID+" × "+GRID;
+        size+" × "+size;
 
 }
-  
 
-// ======================================================
-// DATA
-// ======================================================
+// ------------------------------------------------------
+// RESET STATES
+// ------------------------------------------------------
 
-let originalMessage="";
-let bytes=[];
-let bits=[];
+function resetStates(){
+
+    for(const cell of universe.cells){
+
+        cell.state=-1;
+        cell.observed=false;
+
+    }
+
+}
+
+// ------------------------------------------------------
+// GET CELL
+// ------------------------------------------------------
+
+function getCell(x,y){
+
+    if(
+        x<0 ||
+        y<0 ||
+        x>=universe.size ||
+        y>=universe.size
+    ) return null;
+
+    return universe.cells[
+        y*universe.size+x
+    ];
+
+}
+
+  // ======================================================
+// DATA ENGINE
+// ======================================================
 
 // ------------------------------------------------------
 // TEXT -> BYTES
@@ -254,9 +342,7 @@ let bits=[];
 function textToBytes(text){
 
     return Array.from(
-
         new TextEncoder().encode(text)
-
     );
 
 }
@@ -265,116 +351,240 @@ function textToBytes(text){
 // BYTES -> BITS
 // ------------------------------------------------------
 
-function bytesToBits(byteArray){
+function bytesToBits(bytes){
 
-    const result=[];
+    const bits=[];
 
-    for(const byte of byteArray){
+    for(const byte of bytes){
 
         for(let i=7;i>=0;i--){
 
-            result.push(
-
+            bits.push(
                 (byte>>i)&1
-
             );
 
         }
 
     }
 
-    return result;
+    return bits;
 
 }
 
 // ------------------------------------------------------
-// LOAD MESSAGE
+// LOAD TEXT
 // ------------------------------------------------------
 
-function loadMessage(){
+function loadText(){
 
-    originalMessage=document
-    .getElementById("message")
-    .value;
+    data.message=
+        document.getElementById("message").value;
 
-    bytes=textToBytes(originalMessage);
+    data.bytes=
+        textToBytes(data.message);
 
-    bits=bytesToBits(bytes);
+    data.bits=
+        bytesToBits(data.bytes);
 
-    document.getElementById("originalMessage").textContent=
-    originalMessage;
-
-    document.getElementById("byteCount").textContent=
-    bytes.length;
-
-    document.getElementById("bitCount").textContent=
-    bits.length;
-
-    document.getElementById("infoBits").textContent=
-    bits.length;
+    updateDataPanel();
 
     console.clear();
 
     console.log("MESSAGE");
-    console.log(originalMessage);
+    console.log(data.message);
 
     console.log("BYTES");
-    console.log(bytes);
+    console.log(data.bytes);
 
     console.log("BITS");
-    console.log(bits.join(""));
+    console.log(data.bits.join(""));
+
+}
+
+// ------------------------------------------------------
+// UPDATE UI
+// ------------------------------------------------------
+
+function updateDataPanel(){
+
+    document.getElementById("originalMessage").textContent=
+        data.message;
+
+    document.getElementById("byteCount").textContent=
+        data.bytes.length;
+
+    document.getElementById("bitCount").textContent=
+        data.bits.length;
+
+    document.getElementById("infoBits").textContent=
+        data.bits.length;
 
 }
 
   // ======================================================
-// GENERATE
+// SPATIAL DISTRIBUTION ENGINE
 // ======================================================
 
+// ------------------------------------------------------
+// CLEAR STATES
+// ------------------------------------------------------
+
+function clearStates(){
+
+    for(const cell of universe.cells){
+
+        cell.state=-1;
+        cell.observed=false;
+
+    }
+
+}
+
+// ------------------------------------------------------
+// LINEAR DISTRIBUTION
+// (Primera implementación)
+// ------------------------------------------------------
+
+function distributeBits(){
+
+    clearStates();
+
+    let index=0;
+
+    for(const cell of universe.cells){
+
+        if(index<data.bits.length){
+
+            cell.state=data.bits[index];
+
+            index++;
+
+        }else{
+
+            cell.state=-1;
+
+        }
+
+    }
+
+}
+
+// ------------------------------------------------------
+// EXPORT STATES
+// ------------------------------------------------------
+
+function getUniverseStates(){
+
+    return universe.cells.map(cell=>cell.state);
+
+}
+
+
+  // ======================================================
+// RENDER ENGINE
+// ======================================================
+
+// ------------------------------------------------------
+// PAINT CELL
+// ------------------------------------------------------
+
+function paintCell(cell){
+
+    switch(cell.state){
+
+        case 1:
+
+            cell.mesh.material.color.set(
+                CONFIG.colors.one
+            );
+
+            break;
+
+        case 0:
+
+            cell.mesh.material.color.set(
+                CONFIG.colors.zero
+            );
+
+            break;
+
+        default:
+
+            cell.mesh.material.color.set(
+                CONFIG.colors.empty
+            );
+
+    }
+
+}
+
+// ------------------------------------------------------
+// PAINT UNIVERSE
+// ------------------------------------------------------
+
+function paintUniverse(){
+
+    for(const cell of universe.cells){
+
+        paintCell(cell);
+
+    }
+
+}
+
+// ------------------------------------------------------
+// REFRESH
+// ------------------------------------------------------
+
+function refreshUniverse(){
+
+    buildSpatialField();
+
+    paintUniverse();
+
+}
+  
 document.getElementById("generate").onclick=()=>{
 
-    loadMessage();
+    loadText();
+
+    refreshUniverse();
 
 };
-
   
-// ------------------------------------------------------
+// ======================================================
 // RESIZE
-// ------------------------------------------------------
+// ======================================================
 
 window.addEventListener("resize",()=>{
 
-camera.aspect=
-window.innerWidth/window.innerHeight;
+    camera.aspect=
+    window.innerWidth/window.innerHeight;
 
-camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 
-renderer.setSize(
-window.innerWidth,
-window.innerHeight
-);
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 
 });
 
-// ------------------------------------------------------
+// ======================================================
 // LOOP
-// ------------------------------------------------------
+// ======================================================
 
 function animate(){
 
-requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-renderer.render(
-scene,
-camera
-);
+    renderer.render(
+        scene,
+        camera
+    );
 
 }
-// ======================================================
-// START
-// ======================================================
-
-createUniverse(16);
-animate();
+  
 </script>
 
 </body>
