@@ -535,10 +535,9 @@ function paintUniverse(){
 // ------------------------------------------------------
 // REFRESH
 // ------------------------------------------------------
-
 function refreshUniverse(){
 
-    buildSpatialField();
+    distributeBits();
 
     paintUniverse();
 
@@ -584,6 +583,16 @@ function animate(){
     );
 
 }
+
+    // ======================================================
+// MAIN
+// ======================================================
+
+buildUniverse(CONFIG.grid.size);
+
+paintUniverse();
+
+animate();
   
 </script>
 
