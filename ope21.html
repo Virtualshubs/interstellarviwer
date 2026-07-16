@@ -4796,11 +4796,25 @@ function attachDigitalTwin(id){
         sat.modelURL,
 
         function(gltf){
+
             const model = gltf.scene;
-          model.scale.set(0.01,0.01,0.01);
+
+            // ======================================================
+            // CENTER MODEL
+            // ======================================================
+
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+
+            model.position.sub(center);
+
+            // Escala inicial
+            model.scale.set(0.01,0.01,0.01);
+
             scene.add(model);
-          model.position.set(0,0,0);
+
             mesh.userData.model = model;
+
         },
 
         undefined,
@@ -4814,7 +4828,6 @@ function attachDigitalTwin(id){
     );
 
 }
-
 
   
 // ======================================================
