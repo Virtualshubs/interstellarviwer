@@ -3934,7 +3934,7 @@ function moveCityPin(lat, lon){
 function createSatMesh(id){
   if (satMeshes[id]) return;
   const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(0.03, 10, 10),
+  new THREE.SphereGeometry(0.015, 10, 10)
     new THREE.MeshBasicMaterial({ color: getColor(id) })
   );
 scene.add(mesh);
@@ -4797,7 +4797,7 @@ function attachDigitalTwin(id){
 
         function(gltf){
             const model = gltf.scene;
-          model.scale.set(0.02,0.02,0.02);
+          model.scale.set(0.01,0.01,0.01);
             scene.add(model);
           model.position.set(0,0,0);
             mesh.userData.model = model;
