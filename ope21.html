@@ -1629,7 +1629,7 @@ let LOCATIONS = {};
 let earthFactsVisible = false;
 let earthFactsData = null;
 
-
+const gltfLoader = new THREE.GLTFLoader();
   
   
 const SAT_INFO = {
@@ -1638,7 +1638,8 @@ const SAT_INFO = {
     name: "ISS",
     type: "Station",
     mission: "Microgravity",
-    group: "ISS"
+    group: "ISS",
+    modelURL:"iss.glb"
   },
 
   // =========================
@@ -3925,16 +3926,49 @@ function moveCityPin(lat, lon){
 // ======================================================
 // CREATE VISUAL SATELLITE
 // ======================================================
+
+
 function createSatMesh(id){
-  if (satMeshes[id]) return;
-  const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(0.03, 10, 10),
-    new THREE.MeshBasicMaterial({ color: getColor(id) })
-  );
-  scene.add(mesh);
-  satMeshes[id] = mesh;
+
+    if(satMeshes[id]) return;
+    const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.02,10,10),
+        new THREE.MeshBasicMaterial({
+            color:getColor(id)
+        })
+    );
+
+    scene.add(mesh);
+    satMeshes[id] = mesh;
+    // Si existe modelo lo cargamos
+    updateSatelliteModel(id);
 }
 
+  // ======================================================
+// UPDATE SATELLITE MODEL
+// ======================================================
+
+function updateSatelliteModel(id){
+
+    const sat = SAT_INFO[id];
+    if(!sat || !sat.modelURL) return;
+    const mesh = satMeshes[id];
+    if(!mesh) return;
+
+    // Evitar cargarlo dos veces
+    if(mesh.userData.model) return;
+    gltfLoader.load(
+        sat.modelURL,
+        function(gltf){
+            const model = gltf.scene;
+            model.scale.setScalar(0.05);
+            scene.add(model);
+            mesh.userData.model = model;
+        }
+    );
+}
+
+  
 // ======================================================
 // UPDATE SATELLITES
 // ======================================================
@@ -3984,6 +4018,11 @@ pos.applyAxisAngle(
 );
 
 mesh.position.copy(pos);
+
+    if(mesh.userData.model){
+    mesh.userData.model.position.copy(mesh.position);
+    mesh.userData.model.quaternion.copy(mesh.quaternion);
+}
 
     if(id === currentSat){
 
