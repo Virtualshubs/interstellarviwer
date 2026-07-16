@@ -3934,7 +3934,7 @@ function moveCityPin(lat, lon){
 function createSatMesh(id){
   if (satMeshes[id]) return;
   const mesh = new THREE.Mesh(
-  new THREE.SphereGeometry(0.015, 10, 10),
+  new THREE.SphereGeometry(0.09, 10, 10),
     new THREE.MeshBasicMaterial({ color: getColor(id) })
   );
 scene.add(mesh);
