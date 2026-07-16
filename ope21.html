@@ -1591,6 +1591,7 @@ small{
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/satellite.js/dist/satellite.min.js"></script>
 
 
@@ -1629,7 +1630,11 @@ let LOCATIONS = {};
 let earthFactsVisible = false;
 let earthFactsData = null;
 
+// ======================================================
+// DIGITAL TWIN LOADER
+// ======================================================
 
+const twinLoader = new THREE.GLTFLoader();
   
   
 const SAT_INFO = {
@@ -1638,7 +1643,8 @@ const SAT_INFO = {
     name: "ISS",
     type: "Station",
     mission: "Microgravity",
-    group: "ISS"
+    group: "ISS",
+    modelURL:"https://3d.staratlas.es/iss.glb"
   },
 
   // =========================
@@ -3931,8 +3937,11 @@ function createSatMesh(id){
     new THREE.SphereGeometry(0.03, 10, 10),
     new THREE.MeshBasicMaterial({ color: getColor(id) })
   );
-  scene.add(mesh);
-  satMeshes[id] = mesh;
+scene.add(mesh);
+
+satMeshes[id] = mesh;
+
+attachDigitalTwin(id);
 }
 
 // ======================================================
@@ -4585,11 +4594,8 @@ function getPassRating(pass){
         return{
 
             score:9,
-
             label:"Excelente",
-
             icon:"🟢",
-
             color:"#00c853"
 
         };
@@ -4601,11 +4607,8 @@ function getPassRating(pass){
         return{
 
             score:7,
-
             label:"Muy bueno",
-
             icon:"🟡",
-
             color:"#ffd600"
 
         };
@@ -4615,13 +4618,9 @@ function getPassRating(pass){
     if(e >= 20){
 
         return{
-
             score:5,
-
             label:"Bueno",
-
             icon:"🟠",
-
             color:"#ff9800"
 
         };
@@ -4629,33 +4628,18 @@ function getPassRating(pass){
     }
 
     return{
-
         score:2,
-
         label:"Bajo",
-
         icon:"🔴",
-
         color:"#ff3d00"
-
     };
-
 }
   
 
   function updatePasses(){
-
     currentPasses=getPasses(currentSat);
-
     renderPasses();
-
 }
-
-
-
-
-
-
 
 
 // ======================================================
@@ -4665,37 +4649,22 @@ function getPassRating(pass){
 function toggleEarthFacts(){
 
     earthFactsVisible = !earthFactsVisible;
-
     const panel = document.getElementById("earthFactsPanel");
-
     if(earthFactsVisible){
-
         if(panel){
-
             panel.style.display = "block";
-
             if(earthFactsData){
-
                 updateEarthFacts(earthFactsData);
-
             }else{
-
                 loadEarthFacts();
-
             }
-
         }else{
-
             renderEarthFacts();
-
         }
 
     }else{
-
         if(panel){
-
             panel.style.display = "none";
-
         }
 
     }
@@ -4710,30 +4679,23 @@ function toggleEarthFacts(){
 function renderEarthFacts(){
 
     const panel = document.createElement("div");
-
     panel.id = "earthFactsPanel";
 
     // Usa aquí la clase que utilices para el panel lateral
     panel.className = "side-panel";
-
     panel.innerHTML = `
 
         <div class="section-title">
-
             EARTH FACTS
-
         </div>
 
         <div id="earthFactsContent">
-
             Loading...
-
         </div>
 
     `;
 
     document.body.appendChild(panel);
-
     loadEarthFacts();
 
 }
@@ -4746,19 +4708,14 @@ function renderEarthFacts(){
 async function loadEarthFacts(){
 
     try{
-
         if(earthFactsData){
-
             updateEarthFacts(earthFactsData);
-
             return;
 
         }
 
         const response = await fetch("earth/vital.json");
-
         earthFactsData = await response.json();
-
         updateEarthFacts(earthFactsData);
 
     }
@@ -4766,9 +4723,7 @@ async function loadEarthFacts(){
     catch(error){
 
         console.error("Earth Facts:", error);
-
         document.getElementById("earthFactsContent").innerHTML =
-
             "<div class='empty-state'>Unable to load Earth Facts</div>";
 
     }
@@ -4783,39 +4738,24 @@ async function loadEarthFacts(){
 function updateEarthFacts(data){
 
     const div = document.getElementById("earthFactsContent");
-
     if(!div) return;
-
     let html = "";
-
     for(const fact of data.facts){
 
         html += `
 
             <div class="fact-row">
-
                 <div class="fact-name">
-
                     ${fact.name}
-
                 </div>
-
                 <div class="fact-value">
-
                     ${fact.value}
-
                 </div>
-
                 <div class="fact-description">
-
                     ${fact.description}
-
                 </div>
-
             </div>
-
         `;
-
     }
 
     div.innerHTML = html;
@@ -4825,9 +4765,47 @@ function updateEarthFacts(data){
 
 
 
+// ======================================================
+// ATTACH DIGITAL TWIN
+// ======================================================
 
+function attachDigitalTwin(id){
 
+    const sat = SAT_INFO[id];
 
+    if(!sat) return;
+
+    if(!sat.modelURL) return;
+
+    const mesh = satMeshes[id];
+
+    if(!mesh) return;
+
+    twinLoader.load(
+
+        sat.modelURL,
+
+        function(gltf){
+
+            const model = gltf.scene;
+
+            scene.add(model);
+
+            mesh.userData.model = model;
+
+        },
+
+        undefined,
+
+        function(error){
+
+            console.error(error);
+
+        }
+
+    );
+
+}
 
 
   
