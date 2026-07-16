@@ -3456,7 +3456,7 @@ earth.add(southPole);
 
   
 cityPin = new THREE.Mesh(
-    new THREE.SphereGeometry(0.02,12,12),
+    new THREE.SphereGeometry(0.01,12,12),
     new THREE.MeshBasicMaterial({
         color:0xff0000
     })
@@ -3934,7 +3934,7 @@ function moveCityPin(lat, lon){
 function createSatMesh(id){
   if (satMeshes[id]) return;
   const mesh = new THREE.Mesh(
-  new THREE.SphereGeometry(0.009, 10, 10),
+  new THREE.SphereGeometry(0.005, 10, 10),
     new THREE.MeshBasicMaterial({ color: getColor(id) })
   );
 scene.add(mesh);
