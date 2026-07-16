@@ -1516,6 +1516,96 @@ small{
     line-height:1.4;
 
 }
+
+  #spacePanel{
+
+    position:absolute;
+
+    top:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:520px;
+
+    padding:18px;
+
+    border-radius:14px;
+
+    background:rgba(0,0,0,.55);
+
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:white;
+
+    z-index:100;
+
+}
+
+  .space-label{
+
+    color:#7ecbff;
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:6px;
+
+}
+
+  .space-title{
+
+    font-size:22px;
+
+    font-weight:600;
+
+    margin-bottom:16px;
+
+}
+
+  .space-title{
+
+    font-size:22px;
+
+    font-weight:600;
+
+    margin-bottom:16px;
+
+}
+
+  .space-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    padding:6px 0;
+
+    border-top:1px solid rgba(255,255,255,.05);
+
+}
+
+  .space-row span{
+
+    color:#8d98a5;
+
+    font-size:11px;
+
+    letter-spacing:1px;
+
+}
+
+  .space-row strong{
+
+    font-weight:500;
+
+}
   
 </style>
 </head>
@@ -1539,6 +1629,8 @@ small{
   </div>
 
 <div id="ui">
+<div id="spacePanel"></div>
+  
    <h3>🛰 Orbital Pass Engine</h3>
  
   <div class="control-title">
@@ -4783,6 +4875,10 @@ function updateEarthFacts(data){
 // ATTACH DIGITAL TWIN
 // ======================================================
 
+// ======================================================
+// ATTACH DIGITAL TWIN
+// ======================================================
+
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
@@ -4812,12 +4908,26 @@ function attachDigitalTwin(id){
 
             model.position.sub(center);
 
-            // Escala inicial
+            // ======================================================
+            // SCALE
+            // ======================================================
+
             model.scale.set(0.01,0.01,0.01);
+
+            // ======================================================
+            // ADD TO SCENE
+            // ======================================================
 
             scene.add(model);
 
+            // Guardamos referencia
             mesh.userData.model = model;
+
+            // ======================================================
+            // LOAD DIGITAL TWIN DATA
+            // ======================================================
+
+            renderSpaceMetadata(model);
 
         },
 
@@ -4830,6 +4940,56 @@ function attachDigitalTwin(id){
         }
 
     );
+
+}
+
+  // ======================================================
+// DIGITAL TWIN PANEL
+// ======================================================
+
+function renderSpaceMetadata(model){
+
+    if(!model) return;
+
+    const space = model.userData?.space;
+
+    if(!space) return;
+
+    let html = `
+
+        <div class="space-header">
+
+            <div class="space-label">
+                DIGITAL TWIN
+            </div>
+
+            <div class="space-title">
+                ${space.title || "Unnamed Asset"}
+            </div>
+
+        </div>
+
+    `;
+
+    for(const key in space){
+
+        if(key === "title") continue;
+
+        html += `
+
+            <div class="space-row">
+
+                <span>${key.toUpperCase()}</span>
+
+                <strong>${space[key]}</strong>
+
+            </div>
+
+        `;
+
+    }
+
+    document.getElementById("spacePanel").innerHTML = html;
 
 }
 
