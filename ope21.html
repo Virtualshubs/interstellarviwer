@@ -3994,6 +3994,16 @@ pos.applyAxisAngle(
 
 mesh.position.copy(pos);
 
+    // ======================================================
+// DIGITAL TWIN FOLLOW
+// ======================================================
+
+if(mesh.userData.model){
+
+    mesh.userData.model.position.copy(mesh.position);
+
+}
+
     if(id === currentSat){
 
       currentLat = lat;
@@ -4786,13 +4796,11 @@ function attachDigitalTwin(id){
         sat.modelURL,
 
         function(gltf){
-
             const model = gltf.scene;
-
+          model.scale.set(0.02,0.02,0.02);
             scene.add(model);
-
+          model.position.set(0,0,0);
             mesh.userData.model = model;
-
         },
 
         undefined,
