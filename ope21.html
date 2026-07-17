@@ -1677,10 +1677,9 @@ CAMERA TOGGLE
     🌍
     </button>
 
-  </div>
+  
 
-
-  <div id="cameraToggle">
+   <div id="cameraToggle">
 
     <button id="earthViewBtn" class="camera-active">
         🌍 Earth
@@ -1691,6 +1690,11 @@ CAMERA TOGGLE
 
 </div>
 
+
+  </div>
+
+
+ 
 <div id="ui">
   
    <h3>🛰 Orbital Pass Engine</h3>
@@ -1791,7 +1795,7 @@ const twinLoader = new THREE.GLTFLoader();
 let cameraMode = "earth";
 
 let followDistance = 3.5;   // Distancia respecto al satélite
-let minFollowDistance = 0.8;
+let minFollowDistance = 0.2;
 let maxFollowDistance = 8.0;
 
 const savedCamera = {
