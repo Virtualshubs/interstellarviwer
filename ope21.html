@@ -3337,6 +3337,7 @@ earthTiltQuat = new THREE.Quaternion().setFromAxisAngle(
   const tex = new THREE.TextureLoader().load(
     "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
   );
+  
 tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
   earth = new THREE.Mesh(
     new THREE.SphereGeometry(1, 64, 64),
@@ -3493,6 +3494,31 @@ for(const p of parallels){
 
 }
 
+
+// =========================
+// 🌍 nubes
+// =========================
+  
+const cloudsTexture = loader.load("textures/earth_clouds.png");
+
+const clouds = new THREE.Mesh(
+
+    new THREE.SphereGeometry(1.008,96,96),
+
+    new THREE.MeshPhongMaterial({
+
+        map: cloudsTexture,
+        transparent: true,
+        opacity: 0.45,
+        depthWrite:false
+
+    })
+
+);
+
+earth.add(clouds);
+
+  
 
 // =========================
 // 🌍 MERIDIANOS
@@ -5240,6 +5266,8 @@ else{
     }
 
 }
+
+  clouds.rotation.y += 0.00003;
 
     renderer.render(scene,camera);
 
