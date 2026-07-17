@@ -4251,16 +4251,13 @@ mesh.position.copy(pos);
 // DIGITAL TWIN FOLLOW
 // ======================================================
 
+if(mesh.userData.model){
 
-if(mesh.userData.anchor){
+    mesh.userData.model.position.copy(mesh.position);
 
-    const anchor = mesh.userData.anchor;
+    mesh.userData.model.lookAt(0,0,0);
 
-    // Misma posición que la esfera orbital
-    anchor.position.copy(mesh.position);
-
-    // Siempre orientado hacia la Tierra
-    anchor.lookAt(earthGroup.position);
+    mesh.userData.model.rotateX(Math.PI / 2);
 
 }
 
@@ -5039,11 +5036,16 @@ function updateEarthFacts(data){
 // ATTACH DIGITAL TWIN
 // ======================================================
 
+// ======================================================
+// ATTACH DIGITAL TWIN
+// ======================================================
+
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
 
     if(!sat) return;
+
     if(!sat.modelURL) return;
 
     const mesh = satMeshes[id];
@@ -5059,12 +5061,6 @@ function attachDigitalTwin(id){
             const model = gltf.scene;
 
             // ======================================================
-            // SCALE FIRST
-            // ======================================================
-
-            model.scale.set(0.01,0.01,0.01);
-
-            // ======================================================
             // CENTER MODEL
             // ======================================================
 
@@ -5074,26 +5070,18 @@ function attachDigitalTwin(id){
             model.position.sub(center);
 
             // ======================================================
-            // FIX MODEL ORIENTATION (ONLY ONCE)
+            // SCALE
             // ======================================================
 
-            model.rotateX(Math.PI / 2);
+            model.scale.set(0.01,0.01,0.01);
 
             // ======================================================
-            // CREATE ANCHOR
+            // ADD TO SCENE
             // ======================================================
 
-            const anchor = new THREE.Group();
+            scene.add(model);
 
-            anchor.add(model);
-
-            scene.add(anchor);
-
-            // ======================================================
-            // SAVE REFERENCES
-            // ======================================================
-
-            mesh.userData.anchor = anchor;
+            // Guardamos referencia
             mesh.userData.model = model;
 
             // ======================================================
@@ -5116,7 +5104,6 @@ function attachDigitalTwin(id){
 
 }
 
-  
   // ======================================================
 // DIGITAL TWIN PANEL
 // ======================================================
