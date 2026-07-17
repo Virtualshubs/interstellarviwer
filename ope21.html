@@ -5212,11 +5212,11 @@ else{
         const target = mesh.userData.model || mesh;
 
         // Cámara detrás del modelo usando su orientación
-        const offset = new THREE.Vector3(
-            0,
-            0.12,
-            0.60
-        );
+ const offset = new THREE.Vector3(
+    0,
+    0.25,
+    -0.70
+);
 
         offset.applyQuaternion(
             target.quaternion
