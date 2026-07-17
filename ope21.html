@@ -1606,6 +1606,58 @@ small{
     font-weight:500;
 
 }
+  /* ======================================================
+CAMERA TOGGLE
+====================================================== */
+
+#cameraToggle{
+
+    position:absolute;
+
+    top:18px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    display:flex;
+
+    gap:8px;
+
+    z-index:1000;
+
+}
+
+#cameraToggle button{
+
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    border:1px solid rgba(120,180,255,.35);
+
+    background:rgba(10,20,35,.85);
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+#cameraToggle button:hover{
+
+    background:rgba(40,80,120,.9);
+
+}
+
+.camera-active{
+
+    background:#2d9cff !important;
+
+}
+
   
 </style>
 </head>
@@ -1622,15 +1674,24 @@ small{
  <button
     class="dockButton"
     onclick="toggleEarthFacts()">
-
     🌍
-
     </button>
-  
+
   </div>
 
-<div id="ui">
 
+  <div id="cameraToggle">
+
+    <button id="earthViewBtn" class="camera-active">
+        🌍 Earth
+    </button>
+    <button id="followViewBtn">
+        🛰 Follow
+    </button>
+
+</div>
+
+<div id="ui">
   
    <h3>🛰 Orbital Pass Engine</h3>
  
@@ -1720,6 +1781,21 @@ let earthFactsData = null;
 // ======================================================
 
 const twinLoader = new THREE.GLTFLoader();
+
+
+  // ======================================================
+// CAMERA MODES
+// ======================================================
+
+let cameraMode = "earth";
+
+let savedCamera = {
+
+    rotX:0,
+    rotY:0,
+    distance:4
+
+};
   
   
 const SAT_INFO = {
@@ -3609,6 +3685,8 @@ if(value !== "custom"){
 
 });
 
+
+
     updatePasses();
 
 });
@@ -3626,7 +3704,53 @@ select.addEventListener("change", async (e)=>{
 
 });
 
+
+  // ======================================================
+// CAMERA MODES
+// ======================================================
+
+document.getElementById("earthViewBtn").onclick = ()=>{
+
+    cameraMode = "earth";
+
+    // Recuperar la vista anterior
+    targetRotX = savedCamera.rotX;
+    targetRotY = savedCamera.rotY;
+    targetDistance = savedCamera.distance;
+
+    document.getElementById("earthViewBtn")
+        .classList.add("camera-active");
+
+    document.getElementById("followViewBtn")
+        .classList.remove("camera-active");
+
+};
+
+document.getElementById("followViewBtn").onclick = ()=>{
+
+    // Guardamos la vista actual
+    savedCamera.rotX = rotX;
+    savedCamera.rotY = rotY;
+    savedCamera.distance = distance;
+
+    cameraMode = "follow";
+
+    document.getElementById("followViewBtn")
+        .classList.add("camera-active");
+
+    document.getElementById("earthViewBtn")
+        .classList.remove("camera-active");
+
+};
+  
+
 updateUI();
+
+
+
+
+
+  
 
 // SOLO CARGAR ISS AL INICIO
 // loadTLE("25544");
@@ -3668,6 +3792,17 @@ document.getElementById("calcBtn").addEventListener("click", async () => {
 
   window.addEventListener("resize", onResize);
 }
+
+
+
+
+
+
+
+
+
+
+  
 
 
 function buildCompass(){
@@ -3902,6 +4037,11 @@ async function loadSelectedSatellite() {
 
 }
 
+
+
+
+
+  
 // ======================================================
 // LOAD EPHEMERIDES (LOCAL JSON)
 // ======================================================
@@ -4992,53 +5132,105 @@ function renderSpaceMetadata(model){
 // ======================================================
 function animate(){
 
-  requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
-  const now = new Date();
+    const now = new Date();
 
-  // EARTH ROTATION (UNCHANGED)
-  const elapsedSeconds = (Date.now() - startTime) / 1000;
-  const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
-  earthGroup.rotation.y = rotation;
+    // ======================================================
+    // EARTH ROTATION
+    // ======================================================
 
-  // SUN (NO TOUCH - STABLE SYSTEM)
-  const dayOfYear = Math.floor(
-    (now - new Date(now.getFullYear(),0,0)) / 86400000
-  );
+    const elapsedSeconds = (Date.now() - startTime) / 1000;
+    const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
 
-  const decl = THREE.MathUtils.degToRad(
-    23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
-  );
+    earthGroup.rotation.y = rotation;
 
-  const frac = (now.getTime() % 86400000) / 86400000;
-  const angle = frac * Math.PI * 2;
+    // ======================================================
+    // SUN
+    // ======================================================
 
-  const sunDir = new THREE.Vector3(
-    Math.cos(angle),
-    Math.sin(decl),
-    Math.sin(angle)
-  ).normalize();
+    const dayOfYear = Math.floor(
+        (now - new Date(now.getFullYear(),0,0)) / 86400000
+    );
 
-  sunLight.position.copy(sunDir.clone().multiplyScalar(50));
-  sunLight.target.position.set(0,0,0);
+    const decl = THREE.MathUtils.degToRad(
+        23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
+    );
 
-  //  SATELLITES
-  updateSatellites();
-  updateUI();
+    const frac = (now.getTime() % 86400000) / 86400000;
+    const angle = frac * Math.PI * 2;
 
-  //  CAMERA
-  rotY += (targetRotY-rotY)*0.08;
-  rotX += (targetRotX-rotX)*0.08;
-  distance += (targetDistance-distance)*0.08;
+    const sunDir = new THREE.Vector3(
+        Math.cos(angle),
+        Math.sin(decl),
+        Math.sin(angle)
+    ).normalize();
 
-  camera.position.x = distance*Math.cos(rotX)*Math.sin(rotY);
-  camera.position.y = distance*Math.sin(rotX);
-  camera.position.z = distance*Math.cos(rotX)*Math.cos(rotY);
+    sunLight.position.copy(
+        sunDir.clone().multiplyScalar(50)
+    );
 
-  camera.lookAt(0,0,0);
+    sunLight.target.position.set(0,0,0);
 
-  renderer.render(scene,camera);
+    // ======================================================
+    // SATELLITES
+    // ======================================================
+
+    updateSatellites();
+    updateUI();
+
+    // ======================================================
+    // CAMERA
+    // ======================================================
+
+    if(cameraMode==="earth"){
+
+        rotY += (targetRotY-rotY)*0.08;
+        rotX += (targetRotX-rotX)*0.08;
+        distance += (targetDistance-distance)*0.08;
+
+        camera.position.x =
+            distance*Math.cos(rotX)*Math.sin(rotY);
+
+        camera.position.y =
+            distance*Math.sin(rotX);
+
+        camera.position.z =
+            distance*Math.cos(rotX)*Math.cos(rotY);
+
+        camera.lookAt(0,0,0);
+
+    }
+    else{
+
+        const mesh = satMeshes[currentSat];
+
+        if(mesh){
+
+            // Distancia de la cámara respecto al satélite
+            const offset = new THREE.Vector3(
+                0,
+                0.18,
+                0.45
+            );
+
+            const desired = mesh.position.clone().add(offset);
+
+            camera.position.lerp(
+                desired,
+                0.08
+            );
+
+            camera.lookAt(mesh.position);
+
+        }
+
+    }
+
+    renderer.render(scene,camera);
+
 }
+  
 
 function onResize(){
   camera.aspect = window.innerWidth/window.innerHeight;
