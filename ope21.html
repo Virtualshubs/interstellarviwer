@@ -1787,16 +1787,20 @@ const twinLoader = new THREE.GLTFLoader();
 // CAMERA MODES
 // ======================================================
 
+
 let cameraMode = "earth";
 
-let savedCamera = {
+let followDistance = 3.5;   // Distancia respecto al satélite
+let minFollowDistance = 0.8;
+let maxFollowDistance = 8.0;
 
-    rotX:0,
-    rotY:0,
-    distance:4
+const savedCamera = {
+
+    rotX: 0,
+    rotY: 0,
+    distance: 3
 
 };
-  
   
 const SAT_INFO = {
 
@@ -3775,20 +3779,44 @@ document.getElementById("calcBtn").addEventListener("click", async () => {
   document.getElementById("compassBtn")
     .addEventListener("click", toggleCompass);
 
-  // controls
-  window.addEventListener("wheel",(e)=>{
-    targetDistance += e.deltaY * 0.002;
-    targetDistance = Math.max(1.2, Math.min(8, targetDistance));
-  });
+// controls
+window.addEventListener("wheel",(e)=>{
 
-  window.addEventListener("mousedown",()=> isDragging = true);
-  window.addEventListener("mouseup",()=> isDragging = false);
+    if(cameraMode === "earth"){
 
-  window.addEventListener("mousemove",(e)=>{
+        targetDistance += e.deltaY * 0.002;
+
+        targetDistance = Math.max(
+            1.2,
+            Math.min(8, targetDistance)
+        );
+
+    }
+    else{
+
+        followDistance += e.deltaY * 0.003;
+
+        followDistance = Math.max(
+            minFollowDistance,
+            Math.min(maxFollowDistance, followDistance)
+        );
+
+    }
+
+});
+
+window.addEventListener("mousedown",()=> isDragging = true);
+
+window.addEventListener("mouseup",()=> isDragging = false);
+
+window.addEventListener("mousemove",(e)=>{
+
     if(!isDragging) return;
+
     targetRotY += e.movementX * 0.005;
     targetRotX += e.movementY * 0.005;
-  });
+
+});
 
   window.addEventListener("resize", onResize);
 }
@@ -5179,7 +5207,7 @@ function animate(){
     updateSatellites();
     updateUI();
 
- // ======================================================
+// ======================================================
 // CAMERA
 // ======================================================
 
@@ -5244,13 +5272,13 @@ else{
 
         const desired = target.position.clone();
 
-        // Colocamos la cámara detrás del satélite
+        // Distancia variable detrás del satélite
         desired.sub(
-            dir.clone().multiplyScalar(radius * 3.5)
+            dir.clone().multiplyScalar(radius * followDistance)
         );
 
-        // Un poco por encima
-        desired.y += radius * 0.6;
+        // Altura proporcional al zoom
+        desired.y += radius * (followDistance * 0.15);
 
         // Movimiento suave
         camera.position.lerp(
@@ -5258,7 +5286,7 @@ else{
             0.08
         );
 
-        // La cámara mira SIEMPRE al satélite
+        // La cámara mira siempre al satélite
         camera.lookAt(
             target.position
         );
