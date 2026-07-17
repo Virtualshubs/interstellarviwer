@@ -5179,53 +5179,64 @@ function animate(){
     updateSatellites();
     updateUI();
 
-    // ======================================================
-    // CAMERA
-    // ======================================================
+   // ======================================================
+// CAMERA
+// ======================================================
 
-    if(cameraMode==="earth"){
+if(cameraMode==="earth"){
 
-        rotY += (targetRotY-rotY)*0.08;
-        rotX += (targetRotX-rotX)*0.08;
-        distance += (targetDistance-distance)*0.08;
+    rotY += (targetRotY-rotY)*0.08;
+    rotX += (targetRotX-rotX)*0.08;
+    distance += (targetDistance-distance)*0.08;
 
-        camera.position.x =
-            distance*Math.cos(rotX)*Math.sin(rotY);
+    camera.position.x =
+        distance*Math.cos(rotX)*Math.sin(rotY);
 
-        camera.position.y =
-            distance*Math.sin(rotX);
+    camera.position.y =
+        distance*Math.sin(rotX);
 
-        camera.position.z =
-            distance*Math.cos(rotX)*Math.cos(rotY);
+    camera.position.z =
+        distance*Math.cos(rotX)*Math.cos(rotY);
 
-        camera.lookAt(0,0,0);
+    camera.lookAt(0,0,0);
+
+}
+else{
+
+    const mesh = satMeshes[currentSat];
+
+    if(mesh){
+
+        // Si existe un modelo GLB usamos ese.
+        // Si no, seguimos la esfera.
+        const target = mesh.userData.model || mesh;
+
+        // Cámara detrás del modelo usando su orientación
+        const offset = new THREE.Vector3(
+            0,
+            0.12,
+            0.60
+        );
+
+        offset.applyQuaternion(
+            target.quaternion
+        );
+
+        const desired = target.position.clone().add(offset);
+
+        camera.position.lerp(
+            desired,
+            0.08
+        );
+
+        // Mirar siempre hacia la Tierra
+        camera.lookAt(
+            earthGroup.position
+        );
 
     }
-    else{
 
-        const mesh = satMeshes[currentSat];
-
-        if(mesh){
-
-            // Distancia de la cámara respecto al satélite
-            const offset = new THREE.Vector3(
-                0,
-                0.18,
-                0.45
-            );
-
-            const desired = mesh.position.clone().add(offset);
-
-            camera.position.lerp(
-                desired,
-                0.08
-            );
-
-            camera.lookAt(mesh.position);
-
-        }
-
-    }
+}
 
     renderer.render(scene,camera);
 
