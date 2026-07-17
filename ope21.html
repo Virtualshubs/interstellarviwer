@@ -3377,7 +3377,7 @@ function createAtmosphereLayer(radius, color, opacity) {
 
 
 // =========================
-//  ATMOSPHERE (NEON EARTH)
+//  ATMOSPHERE (NEON EARTH V2)
 // =========================
 
 // Capa muy cercana a la superficie
@@ -3415,11 +3415,18 @@ const atm5 = createAtmosphereLayer(
     0.05
 );
 
-// Halo exterior
+// Transición hacia el espacio
 const atm6 = createAtmosphereLayer(
     1.125,
-    0x1B63FF,
+    0x3C7BFF,
     0.025
+);
+
+// Halo espacial muy difuso
+const atm7 = createAtmosphereLayer(
+    1.200,
+    0x7FFFFF,
+    0.008
 );
 
 earth.add(atm1);
@@ -3428,19 +3435,20 @@ earth.add(atm3);
 earth.add(atm4);
 earth.add(atm5);
 earth.add(atm6);
+earth.add(atm7);
 
 
 // =========================
 //  SURFACE GLOW
 // =========================
 
-const glowGeometry = new THREE.SphereGeometry(1.018, 96, 96);
+const glowGeometry = new THREE.SphereGeometry(1.012, 96, 96);
 
 const glowMaterial = new THREE.MeshBasicMaterial({
 
-    color: 0x9AFFF8,
+    color: 0xA8FFF9,
     transparent: true,
-    opacity: 0.14,
+    opacity: 0.16,
     side: THREE.BackSide,
     blending: THREE.AdditiveBlending,
     depthWrite: false
