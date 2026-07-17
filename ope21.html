@@ -3495,29 +3495,6 @@ for(const p of parallels){
 }
 
 
-// =========================
-// 🌍 nubes
-// =========================
-  
-const cloudsTexture = loader.load("https://3d.staratlas.es/nubes.png");
-
-const clouds = new THREE.Mesh(
-
-    new THREE.SphereGeometry(1.008,96,96),
-
-    new THREE.MeshPhongMaterial({
-
-        map: cloudsTexture,
-        transparent: true,
-        opacity: 0.45,
-        depthWrite:false
-
-    })
-
-);
-
-earth.add(clouds);
-
   
 
 // =========================
@@ -5081,43 +5058,30 @@ function attachDigitalTwin(id){
 // ======================================================
 
 function renderSpaceMetadata(model){
-
     if(!model) return;
-
     const space = model.userData?.space;
-
     if(!space) return;
-
     let html = `
 
         <div class="space-header">
-
             <div class="space-label">
                 DIGITAL TWIN
             </div>
-
             <div class="space-title">
                 ${space.title || "Unnamed Asset"}
             </div>
-
         </div>
 
     `;
 
     for(const key in space){
-
         if(key === "title") continue;
 
         html += `
-
             <div class="space-row">
-
                 <span>${key.toUpperCase()}</span>
-
                 <strong>${space[key]}</strong>
-
             </div>
-
         `;
 
     }
@@ -5216,15 +5180,10 @@ else{
         // ======================================================
 
         if(target.userData.radius === undefined){
-
             const bounds = new THREE.Box3().setFromObject(target);
-
             const sphere = new THREE.Sphere();
-
             bounds.getBoundingSphere(sphere);
-
             target.userData.radius = sphere.radius;
-
         }
 
         const radius = target.userData.radius;
@@ -5267,9 +5226,7 @@ else{
 
 }
 
-  clouds.rotation.y += 0.00003;
-
-    renderer.render(scene,camera);
+  renderer.render(scene,camera);
 
 }
   
