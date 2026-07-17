@@ -5179,7 +5179,7 @@ function animate(){
     updateSatellites();
     updateUI();
 
-   // ======================================================
+ // ======================================================
 // CAMERA
 // ======================================================
 
@@ -5190,13 +5190,13 @@ if(cameraMode==="earth"){
     distance += (targetDistance-distance)*0.08;
 
     camera.position.x =
-        distance*Math.cos(rotX)*Math.sin(rotY);
+        distance * Math.cos(rotX) * Math.sin(rotY);
 
     camera.position.y =
-        distance*Math.sin(rotX);
+        distance * Math.sin(rotX);
 
     camera.position.z =
-        distance*Math.cos(rotX)*Math.cos(rotY);
+        distance * Math.cos(rotX) * Math.cos(rotY);
 
     camera.lookAt(0,0,0);
 
@@ -5211,27 +5211,56 @@ else{
         // Si no, seguimos la esfera.
         const target = mesh.userData.model || mesh;
 
-        // Cámara detrás del modelo usando su orientación
- const offset = new THREE.Vector3(
-    0,
-    0.25,
-    -0.70
-);
+        // ======================================================
+        // CALCULAR TAMAÑO SOLO LA PRIMERA VEZ
+        // ======================================================
 
-        offset.applyQuaternion(
-            target.quaternion
+        if(target.userData.radius === undefined){
+
+            const bounds = new THREE.Box3().setFromObject(target);
+
+            const sphere = new THREE.Sphere();
+
+            bounds.getBoundingSphere(sphere);
+
+            target.userData.radius = sphere.radius;
+
+        }
+
+        const radius = target.userData.radius;
+
+        // ======================================================
+        // DIRECCIÓN SATÉLITE -> TIERRA
+        // ======================================================
+
+        const dir = earthGroup.position
+            .clone()
+            .sub(target.position)
+            .normalize();
+
+        // ======================================================
+        // POSICIÓN DE LA CÁMARA
+        // ======================================================
+
+        const desired = target.position.clone();
+
+        // Colocamos la cámara detrás del satélite
+        desired.sub(
+            dir.clone().multiplyScalar(radius * 3.5)
         );
 
-        const desired = target.position.clone().add(offset);
+        // Un poco por encima
+        desired.y += radius * 0.6;
 
+        // Movimiento suave
         camera.position.lerp(
             desired,
             0.08
         );
 
-        // Mirar siempre hacia la Tierra
+        // La cámara mira SIEMPRE al satélite
         camera.lookAt(
-            earthGroup.position
+            target.position
         );
 
     }
