@@ -3312,11 +3312,11 @@ renderer.toneMappingExposure = 0.8;
   // =========================
   //  LIGHTS (UNCHANGED)
   // =========================
-  sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  sunLight = new THREE.DirectionalLight(0xffffff, 1.1);
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.05);
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
   scene.add(ambientLight);
 
   // =========================
@@ -3347,7 +3347,7 @@ tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
       roughness: 1,
       metalness: 0,
       emissive: new THREE.Color(0x0a0a0a),
-      emissiveIntensity: 0.15
+      emissiveIntensity: 0.10,
     })
   );
 
