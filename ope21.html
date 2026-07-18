@@ -3319,41 +3319,76 @@ renderer.toneMappingExposure = 0.8;
   ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
   scene.add(ambientLight);
 
-  // =========================
-  //  EARTH
-  // =========================
-  earthGroup = new THREE.Group();
-  scene.add(earthGroup);
+// =========================
+//  EARTH
+// =========================
 
-  earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
+earthGroup = new THREE.Group();
+scene.add(earthGroup);
 
+earthGroup.rotation.z = THREE.MathUtils.degToRad(23.44);
 
 earthTiltQuat = new THREE.Quaternion().setFromAxisAngle(
-    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(0,0,1),
     THREE.MathUtils.degToRad(23.44)
 );
-  
 
-  const tex = new THREE.TextureLoader().load(
-  //   "https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+const tex = new THREE.TextureLoader().load(
     "https://3d.staratlas.es/bluemarbleNasa.jpg"
-  );
-  
-tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  earth = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 64, 64),
-    new THREE.MeshStandardMaterial({
-      map: tex,
-      roughness: 1,
-      metalness: 0,
-      emissive: new THREE.Color(0x0a0a0a),
-      emissiveIntensity: 0.10,
-    })
-  );
+);
 
-  earth.rotation.y = Math.PI;
-  earthGroup.add(earth);
-  buildStarSphere();
+// ===========================================
+// TEXTURE QUALITY
+// ===========================================
+
+// Color correcto
+tex.colorSpace = THREE.SRGBColorSpace;
+
+// Máxima nitidez disponible
+tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+// Filtrado de alta calidad
+tex.minFilter = THREE.LinearMipmapLinearFilter;
+tex.magFilter = THREE.LinearFilter;
+
+// Generación de mipmaps
+tex.generateMipmaps = true;
+
+tex.needsUpdate = true;
+
+
+// ===========================================
+// EARTH MATERIAL
+// ===========================================
+
+earth = new THREE.Mesh(
+
+    // Más geometría para aprovechar mejor la textura 21K
+    new THREE.SphereGeometry(
+        1,
+        256,
+        256
+    ),
+
+    new THREE.MeshStandardMaterial({
+
+        map: tex,
+
+        roughness: 0.95,
+        metalness: 0,
+
+        emissive: new THREE.Color(0x090909),
+        emissiveIntensity: 0.08
+
+    })
+
+);
+
+earth.rotation.y = Math.PI;
+
+earthGroup.add(earth);
+
+buildStarSphere();
 
 // =========================
 //  ATMOSPHERE LAYERS
