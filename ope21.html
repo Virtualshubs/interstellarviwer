@@ -3304,10 +3304,11 @@ function init(){
   renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+ // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.8;
+renderer.toneMappingExposure = 0.7;
 
   // =========================
   //  LIGHTS (UNCHANGED)
@@ -3316,7 +3317,7 @@ renderer.toneMappingExposure = 0.8;
   scene.add(sunLight);
   scene.add(sunLight.target);
 
-  ambientLight = new THREE.AmbientLight(0xffffff, 0.01);
+  ambientLight = new THREE.AmbientLight(0xffffff, 0.09);
   scene.add(ambientLight);
 
 // =========================
@@ -3334,7 +3335,7 @@ earthTiltQuat = new THREE.Quaternion().setFromAxisAngle(
 );
 
 const tex = new THREE.TextureLoader().load(
-    "https://3d.staratlas.es/bluemarbleNasa.jpg"
+    "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/august/world.topo.bathy.200408.3x21600x10800.jpg"
 );
 
 // ===========================================
