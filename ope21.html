@@ -1608,18 +1608,18 @@ CAMERA TOGGLE
     </button>
 
 
-
+  <div id="earthLayers"></div>
 
   </div>
 
-
+<div id="earthLayerInfo"></div>
  
 <div id="ui">
   
    <h3>🛰 Orbital Pass Engine</h3>
-  <div id="earthLayers"></div>
 
-<div id="earthLayerInfo"></div>
+
+
  
   <div class="control-title">
       Earth twin traking
@@ -1741,7 +1741,7 @@ let defaultEarthTexture = null;
 
 // Loader reutilizable
 const textureLoader = new THREE.TextureLoader();
-
+const earthTextureCache = {};
   
   
 const SAT_INFO = {
@@ -3922,8 +3922,7 @@ function createEarthLayersMenu(){
 
 }
 
-
-  // ======================================================
+// ======================================================
 // SET EARTH LAYER
 // ======================================================
 
@@ -3939,32 +3938,40 @@ function setEarthLayer(layer){
 
     }
 
+    // ¿Ya la tenemos cargada?
+    if(earthTextureCache[layer.id]){
+
+        earth.material.map = earthTextureCache[layer.id];
+        earth.material.needsUpdate = true;
+
+        return;
+
+    }
+
+    // Primera vez: descargar
     textureLoader.load(layer.src,function(texture){
 
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        texture.anisotropy =
-            renderer.capabilities.getMaxAnisotropy();
+        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-        texture.minFilter =
-            THREE.LinearMipmapLinearFilter;
-
-        texture.magFilter =
-            THREE.LinearFilter;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
 
         texture.generateMipmaps = true;
 
         texture.needsUpdate = true;
 
-        // SOLO sustituimos la textura
-        earth.material.map = texture;
+        // Guardamos la textura en memoria
+        earthTextureCache[layer.id] = texture;
 
+        // La aplicamos
+        earth.material.map = texture;
         earth.material.needsUpdate = true;
 
     });
 
 }
-
 
 
   // ======================================================
