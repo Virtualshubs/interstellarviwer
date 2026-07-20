@@ -3872,11 +3872,13 @@ async function loadEarthLayers(){
 
     try{
 
-        const response = await fetch("https://3d.staratlas.es/earth/earthLayers.json");
+        const response = await fetch("earth/earthLayers.json");
 
         const data = await response.json();
 
         earthLayers = data.layers || [];
+
+        preloadEarthLayers();
 
         createEarthLayersMenu();
 
@@ -3884,9 +3886,43 @@ async function loadEarthLayers(){
 
     catch(err){
 
-        console.error("Earth Layers:", err);
+        console.error(err);
 
     }
+
+}
+
+
+  // ======================================================
+// PRELOAD EARTH LAYERS
+// ======================================================
+
+function preloadEarthLayers(){
+
+    earthLayers.forEach(layer=>{
+
+        textureLoader.load(layer.src,function(texture){
+
+            texture.colorSpace = THREE.SRGBColorSpace;
+
+            texture.anisotropy =
+                renderer.capabilities.getMaxAnisotropy();
+
+            texture.minFilter =
+                THREE.LinearMipmapLinearFilter;
+
+            texture.magFilter =
+                THREE.LinearFilter;
+
+            texture.generateMipmaps = true;
+
+            texture.needsUpdate = true;
+
+            earthTextureCache[layer.id] = texture;
+
+        });
+
+    });
 
 }
 
@@ -3926,6 +3962,10 @@ function createEarthLayersMenu(){
 // SET EARTH LAYER
 // ======================================================
 
+// ======================================================
+// SET EARTH LAYER
+// ======================================================
+
 function setEarthLayer(layer){
 
     // Volver a Blue Marble
@@ -3938,38 +3978,20 @@ function setEarthLayer(layer){
 
     }
 
-    // ¿Ya la tenemos cargada?
-    if(earthTextureCache[layer.id]){
+    // La textura ya debería estar precargada
+    const texture = earthTextureCache[layer.id];
 
-        earth.material.map = earthTextureCache[layer.id];
-        earth.material.needsUpdate = true;
+    if(!texture){
+
+        console.warn("Earth Layer not loaded:", layer.id);
 
         return;
 
     }
 
-    // Primera vez: descargar
-    textureLoader.load(layer.src,function(texture){
-
-        texture.colorSpace = THREE.SRGBColorSpace;
-
-        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-
-        texture.minFilter = THREE.LinearMipmapLinearFilter;
-        texture.magFilter = THREE.LinearFilter;
-
-        texture.generateMipmaps = true;
-
-        texture.needsUpdate = true;
-
-        // Guardamos la textura en memoria
-        earthTextureCache[layer.id] = texture;
-
-        // La aplicamos
-        earth.material.map = texture;
-        earth.material.needsUpdate = true;
-
-    });
+    // Solo sustituimos la textura
+    earth.material.map = texture;
+    earth.material.needsUpdate = true;
 
 }
 
