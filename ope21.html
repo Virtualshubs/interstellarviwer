@@ -1538,7 +1538,7 @@ CAMERA TOGGLE
 
 .camera-active{
     background:#FE9A37 !important;
-  color: blak;
+  color: black;
 
 }
 
@@ -3505,7 +3505,7 @@ earth.add(atmosphereGlow);
 // =========================
 const equator = createLatCircle(1.01, 0);
 equator.material.opacity = 0.7;
-equator.material.color.setHex(0x66ccff);
+equator.material.color.setHex(0x#FE9A37);
 
 earth.add(equator);
 
@@ -3549,7 +3549,7 @@ for(let lon=-180; lon<=180; lon+=30){
 }
 
   
-function createPoleLabel(text, color = 0x66ccff) {
+function createPoleLabel(text, color = 0xFE9A37) {
 
   const canvas = document.createElement("canvas");
   const size = 256;
@@ -3609,7 +3609,7 @@ earth.add(southPole);
 cityPin = new THREE.Mesh(
     new THREE.SphereGeometry(0.009,12,12),
     new THREE.MeshBasicMaterial({
-        color:0xff0000
+        color:0xFE9A37
     })
 );
 
@@ -3870,7 +3870,7 @@ function createCompassLabel(text){
 
     ctx.clearRect(0,0,256,256);
 
-    ctx.font = "bold 70px Arial";
+    ctx.font = "bold 60px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
