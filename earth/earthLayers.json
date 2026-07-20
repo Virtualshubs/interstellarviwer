@@ -1,0 +1,62 @@
+{
+  "layers": [
+
+    {
+      "id": "vegetation",
+
+      "name": "Vegetation",
+
+      "description": "Global vegetation activity",
+
+      "category": "Land",
+
+      "provider": "NASA",
+
+      "source": "NASA NEO",
+
+      "dataset": "MODIS Vegetation",
+
+      "missions": [
+        "Terra",
+        "Aqua"
+      ],
+
+      "sensor": "MODIS",
+
+      "resolution": "3600 × 1800",
+
+      "date": "May 2026",
+
+      "src": "https://neo.gsfc.nasa.gov/servlet/RenderData?si=2050828&cs=rgb&format=JPEG&width=3600&height=1800"
+    },
+
+    {
+      "id": "seaTemperature",
+
+      "name": "Sea Surface Temperature",
+
+      "description": "Average sea surface temperature",
+
+      "category": "Ocean",
+
+      "provider": "NASA",
+
+      "source": "NASA NEO",
+
+      "dataset": "MYD28M",
+
+      "missions": [
+        "Aqua"
+      ],
+
+      "sensor": "MODIS",
+
+      "resolution": "3600 × 1800",
+
+      "date": "May 2026",
+
+      "src": "https://neo.gsfc.nasa.gov/servlet/RenderData?si=2050121&cs=rgb&format=JPEG&width=3600&height=1800"
+    }
+
+  ]
+}
