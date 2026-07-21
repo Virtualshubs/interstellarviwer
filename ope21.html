@@ -3942,11 +3942,17 @@ select.addEventListener("change", async (e)=>{
 
     currentSat = e.target.value;
 
+    // Actualizar botón de escena del gemelo digital
+    updateSceneButton(
+        SAT_INFO[currentSat]?.sceneURL || null
+    );
+
     if(!satrecs[currentSat]){
         await loadTLE(currentSat);
     }
 
     updateUI();
+
     updatePasses();
 
 });
@@ -5454,7 +5460,7 @@ function updateEarthFacts(data){
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
-  updateSceneButton(sat?.sceneURL || null);
+
 
   const sceneURL = sat.sceneURL || null;
 
