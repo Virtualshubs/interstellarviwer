@@ -5453,18 +5453,14 @@ function updateEarthFacts(data){
 
 
 
-// ======================================================
-// ATTACH DIGITAL TWIN
-// ======================================================
-
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
 
-    // Actualizar botón independientemente del modelo
-    updateSceneButton(
-        sat?.sceneURL || null
-    );
+    const sceneURL = sat?.sceneURL || null;
+
+    // Actualiza botón aunque no haya modelo
+    updateSceneButton(sceneURL);
 
     if(!sat) return;
 
@@ -5482,35 +5478,21 @@ function attachDigitalTwin(id){
 
             const model = gltf.scene;
 
-            // ======================================================
-            // CENTER MODEL
-            // ======================================================
-
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
 
             model.position.sub(center);
 
-            // ======================================================
-            // SCALE
-            // ======================================================
-
             model.scale.set(0.01,0.01,0.01);
-
-            // ======================================================
-            // ADD TO SCENE
-            // ======================================================
 
             scene.add(model);
 
-            // Guardamos referencia
             mesh.userData.model = model;
 
-            // ======================================================
-            // LOAD DIGITAL TWIN DATA
-            // ======================================================
-
             renderSpaceMetadata(model);
+
+            // Mantener actualización al terminar carga
+            updateSceneButton(sceneURL);
 
         },
 
