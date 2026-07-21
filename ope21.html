@@ -4472,14 +4472,16 @@ async function loadSelectedSatellite() {
 
     currentSat = id;
 
+    // Actualizar botón de escena del gemelo digital
+    updateSceneButton(
+        SAT_INFO[id]?.sceneURL || null
+    );
+
     updateUI();
 
     updatePasses();
 
 }
-
-
-
 
 
   
