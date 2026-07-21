@@ -1542,6 +1542,102 @@ CAMERA TOGGLE
 
 }
 
+
+  /* ======================================================
+   EARTH LAYERS
+====================================================== */
+
+#earthLayersPanel{
+
+    position:absolute;
+
+    right:25px;
+
+    bottom:25px;
+
+    width:260px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    z-index:100;
+
+}
+
+#earthLayers{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.earth-layer-btn{
+
+    background:rgba(20,20,20,.75);
+
+    color:white;
+
+    border:1px solid rgba(255,255,255,.15);
+
+    padding:8px 12px;
+
+    cursor:pointer;
+
+    text-align:left;
+
+}
+
+.earth-layer-btn:hover{
+
+    border-color:#ff8c00;
+
+}
+
+#earthLayerInfo{
+
+    background:rgba(10,10,10,.75);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    padding:12px;
+
+    color:white;
+
+    font-size:12px;
+
+    line-height:1.5;
+
+}
+
+.layer-title{
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    margin-bottom:8px;
+
+}
+
+.layer-description{
+
+    margin-bottom:12px;
+
+    opacity:.75;
+
+}
+
+.layer-item{
+
+    margin-bottom:6px;
+
+}
   
 </style>
 </head>
@@ -1578,7 +1674,13 @@ CAMERA TOGGLE
 
   </div>
 
+<div id="earthLayersPanel">
 
+    <div id="earthLayers"></div>
+
+    <div id="earthLayerInfo"></div>
+
+</div>
  
 <div id="ui">
   
@@ -1690,6 +1792,23 @@ const savedCamera = {
     distance: 3
 
 };
+
+
+
+
+
+// ======================================================
+// EARTH LAYERS
+// ======================================================
+
+let earthLayers = [];
+
+let activeEarthLayer = null;
+
+let defaultEarthTexture = null;
+
+const textureLoader = new THREE.TextureLoader();
+
   
 const SAT_INFO = {
 
@@ -3389,6 +3508,10 @@ earth.rotation.y = Math.PI;
 
 earthGroup.add(earth);
 
+  
+// Guardamos la textura Blue Marble
+defaultEarthTexture = tex;
+
 buildStarSphere();
 
 // =========================
@@ -3800,6 +3923,10 @@ window.addEventListener("mousemove",(e)=>{
 
 });
 
+
+
+  loadEarthLayers();
+
   window.addEventListener("resize", onResize);
 }
 
@@ -3807,7 +3934,180 @@ window.addEventListener("mousemove",(e)=>{
 
 
 
+// ======================================================
+// LOAD EARTH LAYERS
+// ======================================================
 
+async function loadEarthLayers(){
+
+    try{
+
+        const response = await fetch("earth/earthLayers.json");
+
+        const data = await response.json();
+
+        earthLayers = data.layers || [];
+
+        createEarthLayersMenu();
+
+    }
+
+    catch(err){
+
+        console.error("Earth Layers:", err);
+
+    }
+
+}
+
+
+  // ======================================================
+// CREATE EARTH LAYERS MENU
+// ======================================================
+
+function createEarthLayersMenu(){
+
+    const div = document.getElementById("earthLayers");
+
+    if(!div) return;
+
+    let html = "";
+
+    earthLayers.forEach(layer=>{
+
+        html += `
+            <button
+                class="earth-layer-btn"
+                onclick="toggleEarthLayer('${layer.id}')">
+
+                ${layer.name}
+
+            </button>
+        `;
+
+    });
+
+    div.innerHTML = html;
+
+}
+
+
+  // ======================================================
+// SET EARTH LAYER
+// ======================================================
+
+function setEarthLayer(layer){
+
+    // Volver a Blue Marble
+    if(layer === null){
+
+        earth.material.map = defaultEarthTexture;
+        earth.material.needsUpdate = true;
+
+        return;
+
+    }
+
+    textureLoader.load(layer.src,(texture)=>{
+
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        texture.anisotropy =
+            renderer.capabilities.getMaxAnisotropy();
+
+        texture.minFilter =
+            THREE.LinearMipmapLinearFilter;
+
+        texture.magFilter =
+            THREE.LinearFilter;
+
+        texture.generateMipmaps = true;
+
+        texture.needsUpdate = true;
+
+        earth.material.map = texture;
+
+        earth.material.needsUpdate = true;
+
+    });
+
+}
+
+
+
+  // ======================================================
+// TOGGLE EARTH LAYER
+// ======================================================
+
+function toggleEarthLayer(id){
+
+    if(activeEarthLayer === id){
+
+        activeEarthLayer = null;
+
+        setEarthLayer(null);
+
+        renderEarthLayerInfo(null);
+
+        return;
+
+    }
+
+    const layer = earthLayers.find(l => l.id === id);
+
+    if(!layer) return;
+
+    activeEarthLayer = id;
+
+    setEarthLayer(layer);
+
+    renderEarthLayerInfo(layer);
+
+}
+
+
+
+  // ======================================================
+// EARTH LAYER INFO
+// ======================================================
+
+function renderEarthLayerInfo(layer){
+
+    const div = document.getElementById("earthLayerInfo");
+
+    if(!div) return;
+
+    if(!layer){
+
+        div.innerHTML = "";
+
+        return;
+
+    }
+
+    div.innerHTML = `
+
+        <div class="layer-title">${layer.name}</div>
+
+        <div class="layer-description">
+            ${layer.description}
+        </div>
+
+        <div class="layer-item"><b>Provider:</b> ${layer.provider}</div>
+
+        <div class="layer-item"><b>Dataset:</b> ${layer.dataset}</div>
+
+        <div class="layer-item"><b>Sensor:</b> ${layer.sensor}</div>
+
+        <div class="layer-item"><b>Resolution:</b> ${layer.resolution}</div>
+
+        <div class="layer-item"><b>Date:</b> ${layer.date}</div>
+
+        <div class="layer-item"><b>Missions:</b> ${layer.missions.join(", ")}</div>
+
+    `;
+
+}
 
 
 
