@@ -5461,8 +5461,10 @@ function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
 
-
-  const sceneURL = sat.sceneURL || null;
+    // Actualizar botón independientemente del modelo
+    updateSceneButton(
+        sat?.sceneURL || null
+    );
 
     if(!sat) return;
 
@@ -5503,14 +5505,12 @@ function attachDigitalTwin(id){
 
             // Guardamos referencia
             mesh.userData.model = model;
-          
-// ======================================================
-// LOAD DIGITAL TWIN DATA
-// ======================================================
 
-renderSpaceMetadata(model);
+            // ======================================================
+            // LOAD DIGITAL TWIN DATA
+            // ======================================================
 
-updateSceneButton(sceneURL);
+            renderSpaceMetadata(model);
 
         },
 
@@ -5525,11 +5525,7 @@ updateSceneButton(sceneURL);
     );
 
 }
-
-
-
-
- // ======================================================
+// ======================================================
 // UPDATE SCENE BUTTON
 // ======================================================
 
@@ -5544,17 +5540,17 @@ function updateSceneButton(sceneURL){
 
         btn.style.display = "flex";
 
-        btn.onclick = () => {
+        btn.onclick = function(){
 
             openTwinScene(sceneURL);
 
         };
 
-    }
-
-    else{
+    }else{
 
         btn.style.display = "none";
+
+        btn.onclick = null;
 
     }
 
