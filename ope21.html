@@ -5518,11 +5518,16 @@ function updateSceneButton(sceneURL){
     if(!btn) return;
 
 
+    console.log("SCENE BUTTON UPDATE:", sceneURL);
+
+
     if(sceneURL){
 
         btn.style.display = "flex";
 
-        btn.onclick = function(){
+        btn.onclick = () => {
+
+            console.log("CLICK SCENE:", sceneURL);
 
             openTwinScene(sceneURL);
 
@@ -5531,8 +5536,6 @@ function updateSceneButton(sceneURL){
     }else{
 
         btn.style.display = "none";
-
-        btn.onclick = null;
 
     }
 
