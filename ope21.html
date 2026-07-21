@@ -5520,7 +5520,8 @@ updateSceneButton(sceneURL);
 
 
 
-// ======================================================
+
+ // ======================================================
 // UPDATE SCENE BUTTON
 // ======================================================
 
@@ -5530,11 +5531,12 @@ function updateSceneButton(sceneURL){
 
     if(!btn) return;
 
+
     if(sceneURL){
 
         btn.style.display = "flex";
 
-        btn.onclick = function(){
+        btn.onclick = () => {
 
             openTwinScene(sceneURL);
 
@@ -5546,25 +5548,7 @@ function updateSceneButton(sceneURL){
 
         btn.style.display = "none";
 
-        btn.onclick = null;
-
     }
-
-}
-
-  // ======================================================
-// OPEN DIGITAL TWIN
-// ======================================================
-
-function openTwinScene(url){
-
-    const modal = document.getElementById("twinModal");
-
-    const frame = document.getElementById("twinFrame");
-
-    frame.src = url;
-
-    modal.style.display = "flex";
 
 }
 
