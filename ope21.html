@@ -4478,11 +4478,6 @@ async function loadSelectedSatellite() {
 
     currentSat = id;
 
-    // Actualizar botón de escena del gemelo digital
-    updateSceneButton(
-        SAT_INFO[id]?.sceneURL || null
-    );
-
     updateUI();
 
     updatePasses();
@@ -5453,16 +5448,20 @@ function updateEarthFacts(data){
 
 
 
+// ======================================================
+// ATTACH DIGITAL TWIN
+// ======================================================
+
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
 
-    const sceneURL = sat?.sceneURL || null;
-
-    // Actualiza botón aunque no haya modelo
-    updateSceneButton(sceneURL);
-
     if(!sat) return;
+
+    // Actualiza botón según el satélite actual
+    updateSceneButton(
+        sat.sceneURL || null
+    );
 
     if(!sat.modelURL) return;
 
@@ -5478,21 +5477,34 @@ function attachDigitalTwin(id){
 
             const model = gltf.scene;
 
+            // ======================================================
+            // CENTER MODEL
+            // ======================================================
+
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
 
             model.position.sub(center);
 
+            // ======================================================
+            // SCALE
+            // ======================================================
+
             model.scale.set(0.01,0.01,0.01);
+
+            // ======================================================
+            // ADD TO SCENE
+            // ======================================================
 
             scene.add(model);
 
             mesh.userData.model = model;
 
-            renderSpaceMetadata(model);
+            // ======================================================
+            // LOAD DIGITAL TWIN DATA
+            // ======================================================
 
-            // Mantener actualización al terminar carga
-            updateSceneButton(sceneURL);
+            renderSpaceMetadata(model);
 
         },
 
@@ -5507,6 +5519,8 @@ function attachDigitalTwin(id){
     );
 
 }
+
+
 // ======================================================
 // UPDATE SCENE BUTTON
 // ======================================================
@@ -5518,16 +5532,11 @@ function updateSceneButton(sceneURL){
     if(!btn) return;
 
 
-    console.log("SCENE BUTTON UPDATE:", sceneURL);
-
-
     if(sceneURL){
 
         btn.style.display = "flex";
 
-        btn.onclick = () => {
-
-            console.log("CLICK SCENE:", sceneURL);
+        btn.onclick = function(){
 
             openTwinScene(sceneURL);
 
@@ -5536,6 +5545,8 @@ function updateSceneButton(sceneURL){
     }else{
 
         btn.style.display = "none";
+
+        btn.onclick = null;
 
     }
 
