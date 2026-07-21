@@ -3942,17 +3942,11 @@ select.addEventListener("change", async (e)=>{
 
     currentSat = e.target.value;
 
-    // Actualizar botón de escena del gemelo digital
-    updateSceneButton(
-        SAT_INFO[currentSat]?.sceneURL || null
-    );
-
     if(!satrecs[currentSat]){
         await loadTLE(currentSat);
     }
 
     updateUI();
-
     updatePasses();
 
 });
@@ -4483,6 +4477,9 @@ async function loadSelectedSatellite() {
     updatePasses();
 
 }
+
+
+
 
 
   
@@ -5456,12 +5453,9 @@ function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
 
-    if(!sat) return;
+  const sceneURL = sat.sceneURL || null;
 
-    // Actualiza botón según el satélite actual
-    updateSceneButton(
-        sat.sceneURL || null
-    );
+    if(!sat) return;
 
     if(!sat.modelURL) return;
 
@@ -5498,13 +5492,16 @@ function attachDigitalTwin(id){
 
             scene.add(model);
 
+            // Guardamos referencia
             mesh.userData.model = model;
+          
+// ======================================================
+// LOAD DIGITAL TWIN DATA
+// ======================================================
 
-            // ======================================================
-            // LOAD DIGITAL TWIN DATA
-            // ======================================================
+renderSpaceMetadata(model);
 
-            renderSpaceMetadata(model);
+updateSceneButton(sceneURL);
 
         },
 
@@ -5521,6 +5518,7 @@ function attachDigitalTwin(id){
 }
 
 
+
 // ======================================================
 // UPDATE SCENE BUTTON
 // ======================================================
@@ -5530,7 +5528,6 @@ function updateSceneButton(sceneURL){
     const btn = document.getElementById("openTwinBtn");
 
     if(!btn) return;
-
 
     if(sceneURL){
 
@@ -5542,13 +5539,31 @@ function updateSceneButton(sceneURL){
 
         };
 
-    }else{
+    }
+
+    else{
 
         btn.style.display = "none";
 
         btn.onclick = null;
 
     }
+
+}
+
+  // ======================================================
+// OPEN DIGITAL TWIN
+// ======================================================
+
+function openTwinScene(url){
+
+    const modal = document.getElementById("twinModal");
+
+    const frame = document.getElementById("twinFrame");
+
+    frame.src = url;
+
+    modal.style.display = "flex";
 
 }
 
