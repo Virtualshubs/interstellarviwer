@@ -27,7 +27,7 @@
 
       "date": "May 2026",
 
-      "src": "https://neo.gsfc.nasa.gov/servlet/RenderData?si=2050828&cs=rgb&format=JPEG&width=3600&height=1800"
+      "src": "https://3d.staratlas.es/earth/Vegetacion.jpeg"
     },
 
     {
@@ -55,7 +55,7 @@
 
       "date": "May 2026",
 
-      "src": "https://neo.gsfc.nasa.gov/servlet/RenderData?si=2050121&cs=rgb&format=JPEG&width=3600&height=1800"
+      "src": "https://3d.staratlas.es/earth/Temperatura.jpeg"
     }
 
   ]
