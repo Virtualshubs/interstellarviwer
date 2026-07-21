@@ -384,30 +384,55 @@ document.getElementById("sealBtn").onclick = () => {
   document.getElementById("downloadBtn").disabled = false;
 };
 
+
+
 /* ================= 5. DOWNLOAD ================= */
 
 document.getElementById("downloadBtn").onclick = () => {
 
-  if (!sealed) return;
+  if (!sealed || !currentModel) return;
+
+  // Escena temporal SOLO para exportar el activo
+  const exportScene = new THREE.Scene();
+
+  // Clonamos el modelo para no modificar el original
+  const exportModel = currentModel.clone(true);
+
+  exportScene.add(exportModel);
 
   const exporter = new THREE.GLTFExporter();
 
-  exporter.parse(scene, result => {
+  exporter.parse(
 
-    const blob = new Blob(
-      [JSON.stringify(result, null, 2)],
-      { type: "model/gltf+json" }
-    );
+    exportScene,
 
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "sac_asset.gltf";
-    a.click();
+    result => {
 
-  }, { binary:false });
+      const blob = new Blob(
+        [JSON.stringify(result, null, 2)],
+        { type: "model/gltf+json" }
+      );
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "sac_asset.gltf";
+      a.click();
+
+      URL.revokeObjectURL(url);
+
+    },
+
+    {
+      binary: false,
+      onlyVisible: true,
+      truncateDrawRange: true
+    }
+
+  );
 
 };
-
 </script>
 </body>
 </html>
