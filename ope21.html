@@ -1542,40 +1542,6 @@ CAMERA TOGGLE
 
 }
 
-  #earthLayers{
-
-    position:absolute;
-
-    right:30px;
-
-    bottom:170px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:8px;
-
-}
-
-.earth-layer-btn{
-
-    cursor:pointer;
-
-}
-
-#earthLayerInfo{
-
-    position:absolute;
-
-    right:30px;
-
-    bottom:30px;
-
-    width:260px;
-
-}
-
   
 </style>
 </head>
@@ -1608,18 +1574,15 @@ CAMERA TOGGLE
     </button>
 
 
-  <div id="earthLayers"></div>
+
 
   </div>
 
-<div id="earthLayerInfo"></div>
+
  
 <div id="ui">
   
    <h3>🛰 Orbital Pass Engine</h3>
-
-
-
  
   <div class="control-title">
       Earth twin traking
@@ -1713,6 +1676,7 @@ const twinLoader = new THREE.GLTFLoader();
 // CAMERA MODES
 // ======================================================
 
+
 let cameraMode = "earth";
 
 let followDistance = 3.5;   // Distancia respecto al satélite
@@ -1726,23 +1690,6 @@ const savedCamera = {
     distance: 3
 
 };
-
-
-
-// ======================================================
-// EARTH LAYERS
-// ======================================================
-
-let earthLayers = [];
-
-let activeEarthLayer = null;
-
-let defaultEarthTexture = null;
-
-// Loader reutilizable
-const textureLoader = new THREE.TextureLoader();
-const earthTextureCache = {};
-  
   
 const SAT_INFO = {
 
@@ -3442,12 +3389,7 @@ earth.rotation.y = Math.PI;
 
 earthGroup.add(earth);
 
-  // Guardamos la textura original
-defaultEarthTexture = tex;
-
 buildStarSphere();
-
-  loadEarthLayers();
 
 // =========================
 //  ATMOSPHERE LAYERS
@@ -3864,221 +3806,9 @@ window.addEventListener("mousemove",(e)=>{
 
 
 
-// ======================================================
-// LOAD EARTH LAYERS cambio texturas
-// ======================================================
 
-async function loadEarthLayers(){
 
-    try{
 
-        const response = await fetch("earth/earthLayers.json");
-
-        const data = await response.json();
-
-        earthLayers = data.layers || [];
-
-        preloadEarthLayers();
-
-        createEarthLayersMenu();
-
-    }
-
-    catch(err){
-
-        console.error(err);
-
-    }
-
-}
-
-
-  // ======================================================
-// PRELOAD EARTH LAYERS
-// ======================================================
-
-function preloadEarthLayers(){
-
-    earthLayers.forEach(layer=>{
-
-        textureLoader.load(layer.src,function(texture){
-
-            texture.colorSpace = THREE.SRGBColorSpace;
-
-            texture.anisotropy =
-                renderer.capabilities.getMaxAnisotropy();
-
-            texture.minFilter =
-                THREE.LinearMipmapLinearFilter;
-
-            texture.magFilter =
-                THREE.LinearFilter;
-
-            texture.generateMipmaps = true;
-
-            texture.needsUpdate = true;
-
-            earthTextureCache[layer.id] = texture;
-
-        });
-
-    });
-
-}
-
-// ======================================================
-// CREATE EARTH LAYERS MENU
-// ======================================================
-
-function createEarthLayersMenu(){
-
-    const div = document.getElementById("earthLayers");
-
-    if(!div) return;
-
-    let html = "";
-
-    earthLayers.forEach(layer=>{
-
-        html += `
-
-        <button
-            class="earth-layer-btn"
-            onclick="toggleEarthLayer('${layer.id}')">
-
-            ${layer.name}
-
-        </button>
-
-        `;
-
-    });
-
-    div.innerHTML = html;
-
-}
-
-// ======================================================
-// SET EARTH LAYER
-// ======================================================
-
-// ======================================================
-// SET EARTH LAYER
-// ======================================================
-
-function setEarthLayer(layer){
-
-    // Volver a Blue Marble
-    if(layer === null){
-
-        earth.material.map = defaultEarthTexture;
-        earth.material.needsUpdate = true;
-
-        return;
-
-    }
-
-    // La textura ya debería estar precargada
-    const texture = earthTextureCache[layer.id];
-
-    if(!texture){
-
-        console.warn("Earth Layer not loaded:", layer.id);
-
-        return;
-
-    }
-
-    // Solo sustituimos la textura
-    earth.material.map = texture;
-    earth.material.needsUpdate = true;
-
-}
-
-
-  // ======================================================
-// TOGGLE EARTH LAYER
-// ======================================================
-
-function toggleEarthLayer(id){
-
-    // Desactivar
-    if(activeEarthLayer === id){
-
-        activeEarthLayer = null;
-
-        setEarthLayer(null);
-
-        renderEarthLayerInfo(null);
-
-        return;
-
-    }
-
-    const layer = earthLayers.find(l=>l.id===id);
-
-    if(!layer) return;
-
-    activeEarthLayer = id;
-
-    setEarthLayer(layer);
-
-    renderEarthLayerInfo(layer);
-
-}
-
-
-  // ======================================================
-// EARTH LAYER INFO
-// ======================================================
-
-function renderEarthLayerInfo(layer){
-
-    const div = document.getElementById("earthLayerInfo");
-
-    if(!div) return;
-
-    if(!layer){
-
-        div.innerHTML = "";
-
-        return;
-
-    }
-
-    div.innerHTML = `
-
-        <div class="layer-title">
-
-            ${layer.name}
-
-        </div>
-
-        <div>${layer.description}</div>
-
-        <br>
-
-        <b>Provider</b><br>
-        ${layer.provider}<br><br>
-
-        <b>Dataset</b><br>
-        ${layer.dataset}<br><br>
-
-        <b>Missions</b><br>
-        ${layer.missions.join(", ")}<br><br>
-
-        <b>Sensor</b><br>
-        ${layer.sensor}<br><br>
-
-        <b>Resolution</b><br>
-        ${layer.resolution}<br><br>
-
-        <b>Date</b><br>
-        ${layer.date}
-
-    `;
-
-}
 
 
 
