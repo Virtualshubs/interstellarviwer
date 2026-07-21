@@ -5452,6 +5452,7 @@ function updateEarthFacts(data){
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
+  updateSceneButton(sat?.sceneURL || null);
 
   const sceneURL = sat.sceneURL || null;
 
