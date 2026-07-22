@@ -5465,13 +5465,21 @@ function updateEarthFacts(data){
 // ATTACH DIGITAL TWIN
 // ======================================================
 
+// ======================================================
+// ATTACH DIGITAL TWIN
+// ======================================================
+
 function attachDigitalTwin(id){
 
     const sat = SAT_INFO[id];
 
-  const sceneURL = sat.sceneURL || null;
-
     if(!sat) return;
+
+    // ======================================================
+    // UPDATE SCENE BUTTON (ALWAYS)
+    // ======================================================
+
+    updateSceneButton(sat.sceneURL || null);
 
     if(!sat.modelURL) return;
 
@@ -5510,14 +5518,12 @@ function attachDigitalTwin(id){
 
             // Guardamos referencia
             mesh.userData.model = model;
-          
-// ======================================================
-// LOAD DIGITAL TWIN DATA
-// ======================================================
 
-renderSpaceMetadata(model);
+            // ======================================================
+            // LOAD DIGITAL TWIN DATA
+            // ======================================================
 
-updateSceneButton(sceneURL);
+            renderSpaceMetadata(model);
 
         },
 
