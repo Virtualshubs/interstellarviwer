@@ -4488,6 +4488,8 @@ async function loadSelectedSatellite() {
 
     currentSat = id;
 
+    updateSceneButton(SAT_INFO[id]?.sceneURL || null);
+  
     updateUI();
 
     updatePasses();
