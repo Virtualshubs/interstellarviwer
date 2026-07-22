@@ -5627,22 +5627,34 @@ function renderSpaceMetadata(model){
 
 
 
-  function showActiveFires(){
+function showActiveFires(){
 
-    const lat = parseFloat(latInput.value);
-    const lon = parseFloat(lonInput.value);
+    const city = document.getElementById("citySelect").value;
+
+    let lat, lon;
+
+    if(city === "custom"){
+
+        lat = parseFloat(document.getElementById("lat").value);
+        lon = parseFloat(document.getElementById("lon").value);
+
+    }else{
+
+        [lat, lon] = city.split(",").map(Number);
+
+    }
 
     const today = new Date();
     const yesterday = new Date(today);
-    yesterday.setDate(today.getDate()-1);
+    yesterday.setDate(today.getDate() - 1);
 
     const d1 = yesterday.toISOString().slice(0,10);
     const d2 = today.toISOString().slice(0,10);
 
     const url =
-      `https://firms.modaps.eosdis.nasa.gov/map/#t:tsd-daily;d:${d1}..${d2};@${lon},${lat},10z`;
+        `https://firms.modaps.eosdis.nasa.gov/map/#t:tsd-daily;d:${d1}..${d2};@${lon},${lat},10z`;
 
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(url, "_blank");
 }
 
   
