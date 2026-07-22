@@ -1720,6 +1720,120 @@ CAMERA TOGGLE
     display:none;
 
 }
+
+
+  #panel{
+position:absolute;
+top:15px;
+right:15px;
+width:400px;
+height:calc(100vh - 30px);
+background:#141b26;
+border:1px solid rgba(255,255,255,.08);
+border-radius:10px;
+padding:18px;
+overflow-y:auto;
+z-index:1000;
+box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+#panel h1{
+font-size:20px;
+margin-bottom:4px;
+}
+
+#panel small{
+display:block;
+margin-bottom:15px;
+font-size:12px;
+color:#7d8ca5;
+}
+
+#count{
+margin-bottom:18px;
+font-size:12px;
+color:#8fc7ff;
+}
+
+.group{
+margin-bottom:14px;
+}
+
+.group label{
+display:block;
+margin-bottom:5px;
+font-size:12px;
+color:#bfc9d9;
+}
+
+select,
+input{
+width:100%;
+height:36px;
+padding:0 10px;
+background:#1f2838;
+border:none;
+border-radius:6px;
+color:#fff;
+}
+
+.resolution{
+display:flex;
+gap:10px;
+}
+
+.resolution .group{
+flex:1;
+margin-bottom:0;
+}
+
+button{
+width:100%;
+height:40px;
+margin-top:15px;
+background:#0099ff;
+border:none;
+border-radius:6px;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#00b7ff;
+}
+
+#viewer{
+margin-top:18px;
+}
+
+#preview{
+display:block;
+width:100%;
+aspect-ratio:2/1;
+object-fit:contain;
+background:#10151d;
+border:1px solid rgba(255,255,255,.08);
+border-radius:8px;
+}
+
+textarea{
+width:100%;
+height:70px;
+margin-top:12px;
+padding:8px;
+background:#10151d;
+border:none;
+border-radius:6px;
+resize:none;
+font-size:11px;
+color:#65ff7c;
+}
+
+#status{
+margin-top:10px;
+font-size:12px;
+color:#7fe28f;
+}
   
 </style>
 </head>
@@ -1853,6 +1967,128 @@ CAMERA TOGGLE
 </div>
   
 </div>
+
+
+
+<div id="panel">
+
+<h1>NASA GIBS Explorer</h1>
+
+<small>Dynamic WMS Catalog Browser</small>
+
+<div id="count">
+Loading layers...
+</div>
+
+<div class="group">
+
+<label>Family</label>
+
+<select id="family"></select>
+
+</div>
+
+<div class="group">
+
+<label>Search Layer</label>
+
+<input
+id="search"
+placeholder="cloud, fire, temperature..."
+>
+
+</div>
+
+<div class="group">
+
+<label>Dataset</label>
+
+<select id="layer"></select>
+
+</div>
+
+<div class="group">
+
+<label>Available Date</label>
+
+<select id="date"></select>
+
+</div>
+
+<div class="group">
+
+<label>Image Quality</label>
+
+<select id="size">
+
+<option value="1800,900">
+Preview · 1800×900
+</option>
+
+<option value="3600,1800" selected>
+Standard · 3600×1800
+</option>
+
+<option value="5400,2700">
+High · 5400×2700
+</option>
+
+<option value="7200,3600">
+Ultra · 7200×3600
+</option>
+
+</select>
+
+</div>
+
+<div class="resolution">
+
+<div class="group">
+
+<label>Width</label>
+
+<input
+id="width"
+type="number"
+value="3600"
+>
+
+</div>
+
+<div class="group">
+
+<label>Height</label>
+
+<input
+id="height"
+type="number"
+value="1800"
+>
+
+</div>
+
+</div>
+
+<button id="generate">
+Generate Image
+</button>
+
+<div id="viewer">
+
+<img id="preview">
+
+</div>
+
+<textarea id="url" readonly></textarea>
+
+<div id="status">
+Waiting...
+</div>
+
+</div>
+
+
+  
 
   <div id="logo">
     <img src="https://3d.staratlas.es/logoope.png" alt="Orbital Pass Engine">
@@ -5889,6 +6125,650 @@ function onResize(){
 
 </script>
 
+  <script>
+
+
+const CAPABILITIES =
+
+"https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetCapabilities";
+
+
+
+let layers=[];
+
+  let filteredLayers=[];
+
+const familySelect =
+document.getElementById("family");
+
   
+
+
+const layerSelect =
+document.getElementById("layer");
+
+
+const dateSelect =
+document.getElementById("date");
+
+
+const sizeSelect =
+document.getElementById("size");
+
+
+const preview =
+document.getElementById("preview");
+
+
+const status =
+document.getElementById("status");
+
+
+const output =
+document.getElementById("url");
+
+
+const search =
+document.getElementById("search");
+
+
+
+document.getElementById("size")
+.onchange=function(){
+
+
+const values =
+this.value.split(",");
+
+
+document.getElementById("width").value =
+values[0];
+
+
+document.getElementById("height").value =
+values[1];
+
+
+};
+
+
+
+
+
+
+async function loadCapabilities(){
+
+
+try{
+
+
+status.innerHTML=
+"Loading capabilities...";
+
+
+const response =
+await fetch(CAPABILITIES);
+
+const text =
+await response.text();
+
+const xml =
+new DOMParser()
+.parseFromString(text,"text/xml");
+
+
+const nodes =
+xml.querySelectorAll("Layer > Layer");
+
+
+
+layers=[];
+
+
+
+nodes.forEach(node=>{
+
+const name =
+node.querySelector(":scope > Name");
+
+if(!name) return;
+
+const title =
+node.querySelector(":scope > Title");
+
+let times=[];
+
+const dimensions =
+node.querySelectorAll(":scope > Dimension");
+
+dimensions.forEach(dim=>{
+
+
+if(
+dim.getAttribute("name")
+==="time"
+){
+
+times =
+parseTime(
+dim.textContent.trim()
+);
+
+}
+
+
+});
+
+
+
+
+const layerName=name.textContent.trim();
+const layerTitle=title?title.textContent.trim():layerName;
+
+layers.push({
+
+name:layerName,
+
+title:layerTitle,
+
+times,
+
+family:detectFamily(layerName,layerTitle)
+
+});
+
+
+});
+
+
+
+
+
+document.getElementById("count").innerHTML=
+
+"Available layers: "
++
+layers.length;
+
+
+buildFamilies();
+buildMenu();
+
+
+
+status.innerHTML=
+"✅ Capabilities loaded";
+
+
+}
+
+catch(e){
+
+
+console.error(e);
+
+status.innerHTML=
+"❌ Capability error";
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+function parseTime(value){
+
+
+if(!value)
+return [];
+
+let dates=[];
+
+if(value.includes(",")){
+
+
+dates=value
+.split(",")
+.map(v=>v.trim());
+
+
+}
+
+
+
+else if(value.includes("/")){
+
+
+const parts=value.split("/");
+
+
+let current=
+new Date(parts[0]);
+
+
+const end=
+new Date(parts[1]);
+
+
+
+while(current<=end){
+
+
+dates.push(
+current.toISOString()
+.substring(0,10)
+);
+
+
+
+current.setDate(
+current.getDate()+1
+);
+
+
+}
+
+
+}
+
+
+
+return dates.reverse();
+
+
+}
+
+
+
+
+
+function detectFamily(name,title){
+
+const text=(name+" "+title).toLowerCase();
+
+if(
+text.includes("fire")||
+text.includes("burn")
+)return "Fires";
+
+if(
+text.includes("cloud")||
+text.includes("aerosol")||
+text.includes("dust")||
+text.includes("ozone")||
+text.includes("atmos")
+)return "Atmosphere";
+
+if(
+text.includes("temperature")||
+text.includes("sst")||
+text.includes("sea_surface")
+)return "Temperature";
+
+if(
+text.includes("chlorophyll")||
+text.includes("phytoplankton")||
+text.includes("ocean")
+)return "Ocean";
+
+if(
+text.includes("vegetation")||
+text.includes("ndvi")||
+text.includes("evi")
+)return "Vegetation";
+
+if(
+text.includes("snow")||
+text.includes("ice")
+)return "Cryosphere";
+
+if(
+text.includes("population")||
+text.includes("city")||
+text.includes("night")
+)return "Human";
+
+if(
+text.includes("truecolor")||
+text.includes("blue")
+)return "Imagery";
+
+return "Other";
+
+}
+
+
+
+function buildFamilies(){
+
+const families=[
+...new Set(
+layers.map(l=>l.family)
+)
+].sort();
+
+familySelect.innerHTML="";
+
+const all=document.createElement("option");
+all.value="All";
+all.textContent="All";
+familySelect.appendChild(all);
+
+families.forEach(f=>{
+
+const option=document.createElement("option");
+
+option.value=f;
+option.textContent=f;
+
+familySelect.appendChild(option);
+
+});
+
+}
+  
+
+
+function buildMenu(){
+
+layerSelect.innerHTML="";
+
+const family=familySelect.value||"All";
+
+filteredLayers=
+family==="All"
+?layers
+:layers.filter(layer=>layer.family===family);
+
+filteredLayers
+.slice(0,500)
+.forEach((layer,index)=>{
+
+const option=document.createElement("option");
+option.value=index;
+option.textContent=layer.title;
+layerSelect.appendChild(option);
+
+});
+
+
+updateDates();
+
+updateRecommendedSize();
+
+}
+
+
+
+function updateDates(){
+
+dateSelect.innerHTML="";
+
+const layer =
+filteredLayers[layerSelect.value];
+
+if(!layer || layer.times.length===0){
+
+const option =
+document.createElement("option");
+
+option.value =
+new Date()
+.toISOString()
+.substring(0,10);
+
+option.textContent =
+"Default";
+
+dateSelect.appendChild(option);
+
+return;
+
+}
+
+layer.times.forEach(date=>{
+
+const option =
+document.createElement("option");
+
+option.value=date;
+option.textContent=date;
+
+dateSelect.appendChild(option);
+
+});
+
+}
+
+
+
+
+
+
+  
+function updateRecommendedSize(){
+
+const layer =
+filteredLayers[layerSelect.value];
+
+if(!layer)
+return;
+
+let size="3600,1800";
+
+const name =
+(
+layer.name+
+" "+
+layer.title
+)
+.toLowerCase();
+
+if(
+name.includes("blue") ||
+name.includes("truecolor") ||
+name.includes("viirs")
+){
+
+size="5400,2700";
+
+}
+
+if(
+name.includes("fire") ||
+name.includes("active")
+){
+
+size="1800,900";
+
+}
+
+if(
+name.includes("aerosol") ||
+name.includes("temperature") ||
+name.includes("precipitation")
+){
+
+size="3600,1800";
+
+}
+
+sizeSelect.value=size;
+
+const values =
+size.split(",");
+
+document.getElementById("width").value =
+values[0];
+
+document.getElementById("height").value =
+values[1];
+
+}
+
+
+layerSelect.onchange=function(){
+
+updateDates();
+
+updateRecommendedSize();
+
+};
+
+
+familySelect.onchange=function(){
+
+search.value="";
+
+buildMenu();
+
+};
+
+
+search.oninput=function(){
+
+const value=search.value.toLowerCase();
+
+const family=familySelect.value||"All";
+
+
+filteredLayers=
+family==="All"
+?layers
+:layers.filter(layer=>layer.family===family);
+
+
+
+layerSelect.innerHTML="";
+
+
+filteredLayers
+.filter(layer=>
+
+layer.title.toLowerCase().includes(value)
+
+||
+
+layer.name.toLowerCase().includes(value)
+
+)
+
+.slice(0,500)
+
+.forEach((layer,index)=>{
+
+
+const option=document.createElement("option");
+
+
+option.value=index;
+
+
+option.textContent=layer.title;
+
+
+layerSelect.appendChild(option);
+
+
+});
+
+
+updateDates();
+
+updateRecommendedSize();
+
+};
+
+
+
+  
+function generate(){
+
+const layer =
+filteredLayers[layerSelect.value];
+
+if(!layer)
+return;
+
+
+const params =
+new URLSearchParams({
+
+SERVICE:"WMS",
+
+REQUEST:"GetMap",
+
+VERSION:"1.3.0",
+
+LAYERS:
+layer.name,
+
+FORMAT:"image/jpeg",
+
+CRS:"EPSG:4326",
+
+BBOX:"-90,-180,90,180",
+
+WIDTH:
+document.getElementById("width").value,
+
+HEIGHT:
+document.getElementById("height").value,
+
+TIME:
+dateSelect.value
+
+});
+
+
+const url =
+"https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?"
++
+params.toString();
+
+
+output.value=url;
+
+status.innerHTML=
+"Loading image...";
+
+
+preview.onload=function(){
+
+status.innerHTML=
+"✅ Image loaded";
+
+};
+
+
+preview.onerror=function(){
+
+status.innerHTML=
+"❌ No data available";
+
+};
+
+
+preview.src=url;
+
+}
+
+
+document
+.getElementById("generate")
+.onclick=
+generate;
+
+
+loadCapabilities();
+
+
+</script>
 </body>
 </html>
