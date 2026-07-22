@@ -2085,6 +2085,14 @@ Generate Image
 Waiting...
 </div>
 
+<button
+id="applyTexture"
+disabled>
+
+Apply to Earth
+
+</button>
+
 </div>
 
 
@@ -4516,6 +4524,61 @@ function renderEarthLayerInfo(layer){
 
 
 
+
+
+
+  
+
+// ======================================================
+// SET EARTH LAYER FROM URL
+// ======================================================
+
+function setEarthLayerFromURL(url){
+
+    if(!url) return;
+
+    textureLoader.load(url,(texture)=>{
+
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        texture.anisotropy =
+            renderer.capabilities.getMaxAnisotropy();
+
+        texture.minFilter =
+            THREE.LinearMipmapLinearFilter;
+
+        texture.magFilter =
+            THREE.LinearFilter;
+
+        texture.generateMipmaps = true;
+
+        texture.needsUpdate = true;
+
+        earth.material.map = texture;
+
+        earth.material.needsUpdate = true;
+
+    });
+
+}
+
+document
+.getElementById("applyTexture")
+.onclick=function(){
+
+setEarthLayerFromURL(output.value);
+
+};
+
+
+
+
+
+
+
+  
+
+
 function buildCompass(){
 
     if(compassGroup) return;
@@ -5717,9 +5780,6 @@ function updateEarthFacts(data){
 
 
 
-// ======================================================
-// ATTACH DIGITAL TWIN
-// ======================================================
 
 // ======================================================
 // ATTACH DIGITAL TWIN
@@ -6125,6 +6185,18 @@ function onResize(){
 
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+  
   <script>
 
 
@@ -6738,19 +6810,25 @@ output.value=url;
 status.innerHTML=
 "Loading image...";
 
-
 preview.onload=function(){
 
-status.innerHTML=
-"✅ Image loaded";
+    status.innerHTML=
+    "✅ Image loaded";
+
+    document
+    .getElementById("applyTexture")
+    .disabled=false;
 
 };
 
-
 preview.onerror=function(){
 
-status.innerHTML=
-"❌ No data available";
+    status.innerHTML=
+    "❌ No data available";
+
+    document
+    .getElementById("applyTexture")
+    .disabled=true;
 
 };
 
