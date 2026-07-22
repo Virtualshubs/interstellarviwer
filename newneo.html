@@ -763,19 +763,18 @@ updateRecommendedSize();
 
 
 
-
 function updateDates(){
 
 dateSelect.innerHTML="";
 
 const layer =
-layers[layerSelect.value];
+filteredLayers[layerSelect.value];
 
 if(!layer || layer.times.length===0){
 
-
 const option =
 document.createElement("option");
+
 option.value =
 new Date()
 .toISOString()
@@ -786,173 +785,110 @@ option.textContent =
 
 dateSelect.appendChild(option);
 
-
 return;
 
-
 }
-
-
-
 
 layer.times.forEach(date=>{
 
-
 const option =
 document.createElement("option");
+
 option.value=date;
 option.textContent=date;
+
 dateSelect.appendChild(option);
 
-
 });
-
 
 }
 
 
 
 
+
+
+  
 function updateRecommendedSize(){
 
 const layer =
 filteredLayers[layerSelect.value];
 
-
 if(!layer)
 return;
 
-
-
 let size="3600,1800";
-
-
 
 const name =
 (
 layer.name+
 " "+
 layer.title
-
 )
 .toLowerCase();
 
-
-
-
 if(
-
-name.includes("blue")
-
-||
-
-name.includes("truecolor")
-
-||
-
+name.includes("blue") ||
+name.includes("truecolor") ||
 name.includes("viirs")
-
 ){
 
 size="5400,2700";
 
 }
 
-
-
 if(
-
-name.includes("fire")
-
-||
-
+name.includes("fire") ||
 name.includes("active")
-
 ){
 
 size="1800,900";
 
 }
 
-
-
 if(
-
-name.includes("aerosol")
-
-||
-
-name.includes("temperature")
-
-||
-
+name.includes("aerosol") ||
+name.includes("temperature") ||
 name.includes("precipitation")
-
 ){
 
 size="3600,1800";
 
 }
 
-
-
 sizeSelect.value=size;
-
-
 
 const values =
 size.split(",");
 
-
 document.getElementById("width").value =
 values[0];
 
-
 document.getElementById("height").value =
 values[1];
-
 
 }
 
 
 layerSelect.onchange=function(){
 
-
 updateDates();
 
 updateRecommendedSize();
 
-
 };
-
-  
-layerSelect.onchange=function(){
-
-    updateDates();
-
-    updateRecommendedSize();
-
-};
-
-
 
 
 search.oninput=function(){
 
-
 const value =
 search.value.toLowerCase();
-
-
 
 layerSelect.innerHTML="";
 
 
-
 filteredLayers
-
 .filter(layer=>
-
 
 layer.title
 .toLowerCase()
@@ -968,23 +904,17 @@ layer.name
 
 .slice(0,500)
 
-.forEach(layer=>{
-
+.forEach((layer,index)=>{
 
 const option =
 document.createElement("option");
 
-
-option.value =
-layers.indexOf(layer);
-
+option.value=index;
 
 option.textContent =
 layer.title;
 
-
 layerSelect.appendChild(option);
-
 
 });
 
@@ -992,7 +922,6 @@ layerSelect.appendChild(option);
 updateDates();
 
 updateRecommendedSize();
-
 
 };
 
@@ -1003,15 +932,18 @@ updateRecommendedSize();
 
 
 
-
+  
 function generate(){
 
 const layer =
 filteredLayers[layerSelect.value];
 
+if(!layer)
+return;
+
+
 const params =
 new URLSearchParams({
-
 
 SERVICE:"WMS",
 
@@ -1037,16 +969,11 @@ document.getElementById("height").value,
 TIME:
 dateSelect.value
 
-
 });
 
 
-
-
 const url =
-
 "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?"
-
 +
 params.toString();
 
@@ -1056,22 +983,19 @@ output.value=url;
 status.innerHTML=
 "Loading image...";
 
+
 preview.onload=function(){
 
 status.innerHTML=
 "✅ Image loaded";
 
-
 };
-
 
 
 preview.onerror=function(){
 
-
 status.innerHTML=
 "❌ No data available";
-
 
 };
 
@@ -1080,13 +1004,14 @@ preview.src=url;
 
 }
 
+
 document
 .getElementById("generate")
 .onclick=
 generate;
 
-loadCapabilities();
 
+loadCapabilities();
 
 
 </script>
