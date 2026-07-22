@@ -3961,6 +3961,8 @@ select.addEventListener("change", async (e)=>{
         await loadTLE(currentSat);
     }
 
+      updateSceneButton(SAT_INFO[currentSat]?.sceneURL || null);
+  
     updateUI();
     updatePasses();
 
