@@ -4,7 +4,7 @@
     {
   "id": "population",
 
-  "name": "Population Density",
+  "name": "Population Density SEDAC",
 
   "description": "This map shows how many people live in different areas on Earth. The map is divided into numerous small boxes, called grids. Each grid box is about 1 kilometer long by one kilometer wide, and it is color coded to show how many people live there. Lighter areas have fewer people. The red dots scattered across most countries show cities, where many people live in a small area",
 
@@ -32,13 +32,13 @@
 
       "name": "Blue Marble · Winter",
 
-      "description": "NASA Blue Marble winter composite",
+      "description": "NASA's Blue Marble: Next Generation images show Earth in true color. The images show how the surface would look to a human in space if our world had no clouds and no atmosphere. NASA's Terra satellite collected these images. There is one Blue Marble image for each month of the year 2004. These images allow us to explore changes on Earth's lands over time. Notice how the patterns of green (trees and plants), brown (exposed land surface), and white (snow) change from winter through spring, summer, and fall.",
 
       "category": "Basemap",
 
       "provider": "NASA",
 
-      "source": "NASA Visible Earth",
+      "source": "NASA Visible Earth Topography and Bathymetry",
 
       "dataset": "Blue Marble",
 
@@ -58,13 +58,13 @@
 
       "name": "Blue Marble · Spring",
 
-      "description": "NASA Blue Marble spring composite",
+      "description": "NASA's Blue Marble: Next Generation images show Earth in true color. The images show how the surface would look to a human in space if our world had no clouds and no atmosphere. NASA's Terra satellite collected these images. There is one Blue Marble image for each month of the year 2004. These images allow us to explore changes on Earth's lands over time. Notice how the patterns of green (trees and plants), brown (exposed land surface), and white (snow) change from winter through spring, summer, and fall.",
 
       "category": "Basemap",
 
       "provider": "NASA",
 
-      "source": "NASA Visible Earth",
+      "source": "NASA Visible Earth Topography and Bathymetry",
 
       "dataset": "Blue Marble",
 
@@ -84,13 +84,13 @@
 
       "name": "Blue Marble · Summer",
 
-      "description": "NASA Blue Marble summer composite",
+      "description": "NASA's Blue Marble: Next Generation images show Earth in true color. The images show how the surface would look to a human in space if our world had no clouds and no atmosphere. NASA's Terra satellite collected these images. There is one Blue Marble image for each month of the year 2004. These images allow us to explore changes on Earth's lands over time. Notice how the patterns of green (trees and plants), brown (exposed land surface), and white (snow) change from winter through spring, summer, and fall.",
 
       "category": "Basemap",
 
       "provider": "NASA",
 
-      "source": "NASA Visible Earth",
+      "source": "NASA Visible Earth Topography and Bathymetry",
 
       "dataset": "Blue Marble",
 
@@ -110,13 +110,13 @@
 
       "name": "Blue Marble · Autumn",
 
-      "description": "NASA Blue Marble autumn composite",
+      "description": "NASA's Blue Marble: Next Generation images show Earth in true color. The images show how the surface would look to a human in space if our world had no clouds and no atmosphere. NASA's Terra satellite collected these images. There is one Blue Marble image for each month of the year 2004. These images allow us to explore changes on Earth's lands over time. Notice how the patterns of green (trees and plants), brown (exposed land surface), and white (snow) change from winter through spring, summer, and fall.",
 
       "category": "Basemap",
 
       "provider": "NASA",
 
-      "source": "NASA Visible Earth",
+      "source": "NASA Visible Earth Topography and Bathymetry",
 
       "dataset": "Blue Marble",
 
@@ -163,7 +163,7 @@
     {
       "id": "seaTemperature",
 
-      "name": "Sea Surface Temperature",
+      "name": "Sea Surface Temperature MODIS",
 
       "description": "Sea surface temperature is the temperature of the top millimeter of the ocean's surface. Sea surface temperatures influence weather, including hurricanes, as well as plant and animal life in the ocean",
 
