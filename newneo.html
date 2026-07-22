@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>NASA GIBS Explorer</title>
+<title>NASA GIBS Dynamic Explorer</title>
+
 
 <style>
 
@@ -16,20 +18,22 @@
     font-family:Arial,Helvetica,sans-serif;
 }
 
+
 body{
 
-    background:#0b1018;
-    color:#fff;
-
+    height:100vh;
     display:flex;
 
-    height:100vh;
+    background:#090d14;
+    color:white;
 
 }
 
+
+
 #panel{
 
-    width:360px;
+    width:420px;
 
     background:#141b26;
 
@@ -37,9 +41,12 @@ body{
 
     overflow:auto;
 
-    border-right:1px solid rgba(255,255,255,.08);
+    border-right:
+    1px solid rgba(255,255,255,.08);
 
 }
+
+
 
 h1{
 
@@ -48,29 +55,37 @@ h1{
 
 }
 
+
+
 small{
 
     color:#7d8ca5;
 
 }
 
+
+
 .group{
 
-    margin-top:22px;
+    margin-top:20px;
 
 }
+
+
 
 label{
 
     display:block;
 
-    margin-bottom:6px;
-
     font-size:13px;
 
     color:#bfc9d9;
 
+    margin-bottom:6px;
+
 }
+
+
 
 select,
 input{
@@ -79,21 +94,23 @@ input{
 
     padding:10px;
 
-    background:#1f2838;
-
-    color:white;
-
     border:none;
 
     border-radius:8px;
 
+    background:#1f2838;
+
+    color:white;
+
 }
+
+
 
 button{
 
     width:100%;
 
-    margin-top:25px;
+    margin-top:20px;
 
     padding:12px;
 
@@ -105,17 +122,19 @@ button{
 
     color:white;
 
-    font-size:15px;
-
     cursor:pointer;
 
 }
+
+
 
 button:hover{
 
     background:#00b7ff;
 
 }
+
+
 
 textarea{
 
@@ -135,15 +154,15 @@ textarea{
 
     padding:10px;
 
-    resize:none;
-
     font-size:12px;
 
 }
 
+
+
 #status{
 
-    margin-top:18px;
+    margin-top:15px;
 
     font-size:13px;
 
@@ -151,128 +170,186 @@ textarea{
 
 }
 
+
+
+#count{
+
+    margin-top:15px;
+
+    font-size:13px;
+
+    color:#8fc7ff;
+
+}
+
+
+
 #viewer{
 
     flex:1;
 
     display:flex;
 
-    align-items:center;
-
     justify-content:center;
 
-    background:#090d14;
+    align-items:center;
 
 }
+
+
 
 img{
 
     max-width:95%;
-
     max-height:95%;
 
     border-radius:10px;
 
-    box-shadow:0 0 30px rgba(0,0,0,.4);
-
 }
+
+
 
 </style>
 
+
 </head>
+
+
 <body>
+
 
 <div id="panel">
 
-<h1>NASA GIBS Explorer</h1>
 
-<small>Dynamic WMS URL Generator</small>
+<h1>
+NASA GIBS Explorer
+</h1>
+
+
+<small>
+Dynamic GetCapabilities Browser
+</small>
+
+
+
+<div id="count">
+
+Loading layers...
+
+</div>
+
+
 
 <div class="group">
 
-<label>Dataset</label>
+
+<label>
+Search Layer
+</label>
+
+
+<input
+id="search"
+placeholder="cloud, fire, temperature..."
+>
+
+
+</div>
+
+
+
+<div class="group">
+
+
+<label>
+Dataset
+</label>
+
 
 <select id="layer">
 
-<option value="BlueMarble_NextGeneration">
-Blue Marble
-</option>
-
-<option value="MODIS_Terra_CorrectedReflectance_TrueColor">
-True Color
-</option>
-
-<option value="MODIS_Terra_CorrectedReflectance_Bands367">
-Bands 367
-</option>
-
-<option value="MODIS_Terra_SurfaceReflectance_Bands143">
-Surface Reflectance
-</option>
 
 </select>
 
+
 </div>
+
+
+
 
 <div class="group">
 
-<label>Date</label>
+
+<label>
+Date
+</label>
+
 
 <input
 type="date"
-id="date">
+id="date"
+>
+
 
 </div>
 
+
+
+
 <div class="group">
 
-<label>Width</label>
+
+<label>
+Width
+</label>
+
 
 <input
 id="width"
 type="number"
-value="3600">
+value="3600"
+>
+
 
 </div>
 
+
+
 <div class="group">
 
-<label>Height</label>
+
+<label>
+Height
+</label>
+
 
 <input
 id="height"
 type="number"
-value="1800">
+value="1800"
+>
+
 
 </div>
 
-<div class="group">
 
-<label>Format</label>
 
-<select id="format">
-
-<option value="image/jpeg">
-JPEG
-</option>
-
-<option value="image/png">
-PNG
-</option>
-
-</select>
-
-</div>
 
 <button id="generate">
 
-Generate URL
+Generate Image
 
 </button>
 
+
+
+
 <textarea
 id="url"
-readonly></textarea>
+readonly
+></textarea>
+
+
 
 <div id="status">
 
@@ -280,7 +357,11 @@ Waiting...
 
 </div>
 
+
+
 </div>
+
+
 
 <div id="viewer">
 
@@ -288,16 +369,328 @@ Waiting...
 
 </div>
 
+
+
+
 <script>
 
-const preview=document.getElementById("preview");
 
-const status=document.getElementById("status");
+const CAPABILITIES =
 
-const output=document.getElementById("url");
+"https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetCapabilities";
 
-document.getElementById("date").value=
+
+
+let layers=[];
+
+
+
+const select =
+document.getElementById("layer");
+
+
+const search =
+document.getElementById("search");
+
+
+const preview =
+document.getElementById("preview");
+
+
+const status =
+document.getElementById("status");
+
+
+const output =
+document.getElementById("url");
+
+
+
+
+document.getElementById("date").value =
+
 new Date().toISOString().substring(0,10);
+
+
+
+
+
+async function loadCapabilities(){
+
+
+try{
+
+
+status.innerHTML="Loading capabilities...";
+
+
+
+const response =
+await fetch(CAPABILITIES);
+
+
+
+const text =
+await response.text();
+
+
+
+const xml =
+new DOMParser()
+.parseFromString(text,"text/xml");
+
+
+
+const nodes =
+xml.querySelectorAll("Layer > Layer > Name");
+
+
+
+layers=[];
+
+
+
+nodes.forEach(node=>{
+
+
+const name =
+node.textContent;
+
+
+
+const parent =
+node.parentElement;
+
+
+
+const title =
+parent.querySelector("Title");
+
+
+layers.push({
+
+name:name,
+
+title:title?
+title.textContent:
+name
+
+});
+
+
+});
+
+
+
+document.getElementById("count").innerHTML =
+
+"Available layers: "
++
+layers.length;
+
+
+
+buildMenu();
+
+
+
+status.innerHTML=
+"✅ Capabilities loaded";
+
+
+}
+
+catch(e){
+
+
+status.innerHTML=
+"❌ Error loading capabilities";
+
+
+console.error(e);
+
+
+}
+
+
+}
+
+
+
+
+function buildMenu(){
+
+
+select.innerHTML="";
+
+
+
+layers
+.slice(0,500)
+.forEach((layer)=>{
+
+
+const option =
+document.createElement("option");
+
+
+option.value=
+layer.name;
+
+
+option.textContent=
+layer.title;
+
+
+select.appendChild(option);
+
+
+});
+
+
+}
+
+
+
+
+
+search.oninput=function(){
+
+
+const value =
+search.value.toLowerCase();
+
+
+
+select.innerHTML="";
+
+
+
+layers
+
+.filter(l=>
+
+l.title
+.toLowerCase()
+.includes(value)
+
+||
+
+l.name
+.toLowerCase()
+.includes(value)
+
+)
+
+.slice(0,500)
+
+.forEach(layer=>{
+
+
+const option =
+document.createElement("option");
+
+
+option.value=
+layer.name;
+
+
+option.textContent=
+layer.title;
+
+
+select.appendChild(option);
+
+
+});
+
+
+};
+
+
+
+
+
+
+function generate(){
+
+
+
+const params =
+new URLSearchParams({
+
+
+SERVICE:"WMS",
+
+REQUEST:"GetMap",
+
+VERSION:"1.3.0",
+
+LAYERS:
+select.value,
+
+FORMAT:"image/jpeg",
+
+CRS:"EPSG:4326",
+
+BBOX:"-90,-180,90,180",
+
+WIDTH:
+document.getElementById("width").value,
+
+HEIGHT:
+document.getElementById("height").value,
+
+TIME:
+document.getElementById("date").value
+
+
+});
+
+
+
+const url =
+
+"https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?"
+
++
+params.toString();
+
+
+
+output.value=url;
+
+
+
+status.innerHTML=
+"Loading image...";
+
+
+
+preview.onload=function(){
+
+status.innerHTML=
+"✅ Image loaded";
+
+};
+
+
+
+preview.onerror=function(){
+
+status.innerHTML=
+"❌ Layer unavailable";
+
+};
+
+
+
+preview.src=url;
+
+
+}
+
+
 
 document
 .getElementById("generate")
@@ -305,64 +698,14 @@ document
 
 
 
-function generate(){
 
-    const params=new URLSearchParams({
+loadCapabilities();
 
-        SERVICE:"WMS",
 
-        REQUEST:"GetMap",
-
-        VERSION:"1.3.0",
-
-        LAYERS:
-        document.getElementById("layer").value,
-
-        FORMAT:
-        document.getElementById("format").value,
-
-        CRS:"EPSG:4326",
-
-        BBOX:"-90,-180,90,180",
-
-        WIDTH:
-        document.getElementById("width").value,
-
-        HEIGHT:
-        document.getElementById("height").value,
-
-        TIME:
-        document.getElementById("date").value
-
-    });
-
-    const url=
-    "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?"
-    +params.toString();
-
-    output.value=url;
-
-    status.innerHTML="Loading image...";
-
-    preview.onload=function(){
-
-        status.innerHTML="✅ Image Loaded";
-
-    }
-
-    preview.onerror=function(){
-
-        status.innerHTML="❌ Unable to load image";
-
-    }
-
-    preview.src=url;
-
-}
-
-generate();
 
 </script>
 
+
 </body>
+
 </html>
