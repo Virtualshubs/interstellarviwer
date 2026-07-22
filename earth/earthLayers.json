@@ -2,6 +2,32 @@
   "layers": [
 
     {
+  "id": "population",
+
+  "name": "Population Density",
+
+  "description": "This map shows how many people live in different areas on Earth. The map is divided into numerous small boxes, called grids. Each grid box is about 1 kilometer long by one kilometer wide, and it is color coded to show how many people live there. Lighter areas have fewer people. The red dots scattered across most countries show cities, where many people live in a small area",
+
+  "category": "Human",
+
+  "provider": "NASA",
+
+  "source": "NASA Earth Observations (NEO)",
+
+  "dataset": "SEDAC Population",
+
+  "missions": [],
+
+  "sensor": "Composite",
+
+  "resolution": "3600 × 1800",
+
+  "date": "Latest Available",
+
+  "src": "https://3d.staratlas.es/earth/earthpopulation.jpeg"
+},
+
+    {
       "id": "blueMarbleWinter",
 
       "name": "Blue Marble · Winter",
@@ -108,9 +134,9 @@
     {
       "id": "vegetation",
 
-      "name": "Vegetation",
+      "name": "Vegetation MODIS",
 
-      "description": "Global vegetation activity",
+      "description": "Our lives depend upon plants and trees. They feed us and give us clothes. They absorb carbon dioxide and give off oxygen we need to breathe. Plants even provide many of our medicines and building materials. So when the plants and trees around us change, these changes can affect our health, our environment, and our economy",
 
       "category": "Land",
 
@@ -139,7 +165,7 @@
 
       "name": "Sea Surface Temperature",
 
-      "description": "Average sea surface temperature",
+      "description": "Sea surface temperature is the temperature of the top millimeter of the ocean's surface. Sea surface temperatures influence weather, including hurricanes, as well as plant and animal life in the ocean",
 
       "category": "Ocean",
 
