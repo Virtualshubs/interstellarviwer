@@ -1762,7 +1762,11 @@ CAMERA TOGGLE
 </button>
 
   <button onclick="showActiveFires()">
-    🔥 Fuegos activos
+    🔥 Fuegos activos en la zona
+</button>
+
+  <button class="btn" onclick="openCopernicus()">
+    🛰️ Ver en Copernicus
 </button>
 
   </div>
@@ -5657,6 +5661,28 @@ function showActiveFires(){
     window.open(url, "_blank");
 }
 
+
+  function openCopernicus(){
+
+    const city = document.getElementById("citySelect").value;
+
+    let lat, lon;
+
+    if(city === "custom"){
+
+        lat = parseFloat(document.getElementById("lat").value);
+        lon = parseFloat(document.getElementById("lon").value);
+
+    }else{
+
+        [lat, lon] = city.split(",").map(Number);
+
+    }
+
+    const url = `https://browser.dataspace.copernicus.eu/?zoom=14&lat=${lat}&lng=${lon}`;
+
+    window.open(url, "_blank");
+}
   
 // ======================================================
 // LOOP
