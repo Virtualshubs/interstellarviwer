@@ -1761,6 +1761,9 @@ CAMERA TOGGLE
 
 </button>
 
+  <button onclick="showActiveFires()">
+    🔥 Fuegos activos
+</button>
 
   </div>
 
@@ -5620,6 +5623,26 @@ function renderSpaceMetadata(model){
 
     document.getElementById("spacePanel").innerHTML = html;
 
+}
+
+
+
+  function showActiveFires(){
+
+    const lat = parseFloat(latInput.value);
+    const lon = parseFloat(lonInput.value);
+
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate()-1);
+
+    const d1 = yesterday.toISOString().slice(0,10);
+    const d2 = today.toISOString().slice(0,10);
+
+    const url =
+      `https://firms.modaps.eosdis.nasa.gov/map/#t:tsd-daily;d:${d1}..${d2};@${lon},${lat},10z`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
 }
 
   
