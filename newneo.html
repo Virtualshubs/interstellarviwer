@@ -702,7 +702,8 @@ return "Other";
 }
 
 
-  function buildFamilies(){
+
+function buildFamilies(){
 
 const families=[
 ...new Set(
@@ -748,15 +749,15 @@ filteredLayers
 .forEach((layer,index)=>{
 
 const option=document.createElement("option");
-
 option.value=index;
 option.textContent=layer.title;
-
 layerSelect.appendChild(option);
 
 });
 
+
 updateDates();
+
 updateRecommendedSize();
 
 }
@@ -879,10 +880,28 @@ updateRecommendedSize();
 };
 
 
+familySelect.onchange=function(){
+
+search.value="";
+
+buildMenu();
+
+};
+
+
 search.oninput=function(){
 
-const value =
-search.value.toLowerCase();
+const value=search.value.toLowerCase();
+
+const family=familySelect.value||"All";
+
+
+filteredLayers=
+family==="All"
+?layers
+:layers.filter(layer=>layer.family===family);
+
+
 
 layerSelect.innerHTML="";
 
@@ -890,15 +909,11 @@ layerSelect.innerHTML="";
 filteredLayers
 .filter(layer=>
 
-layer.title
-.toLowerCase()
-.includes(value)
+layer.title.toLowerCase().includes(value)
 
 ||
 
-layer.name
-.toLowerCase()
-.includes(value)
+layer.name.toLowerCase().includes(value)
 
 )
 
@@ -906,15 +921,18 @@ layer.name
 
 .forEach((layer,index)=>{
 
-const option =
-document.createElement("option");
+
+const option=document.createElement("option");
+
 
 option.value=index;
 
-option.textContent =
-layer.title;
+
+option.textContent=layer.title;
+
 
 layerSelect.appendChild(option);
+
 
 });
 
@@ -924,11 +942,6 @@ updateDates();
 updateRecommendedSize();
 
 };
-
-
-
-
-
 
 
 
