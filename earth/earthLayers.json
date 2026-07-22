@@ -2,6 +2,110 @@
   "layers": [
 
     {
+      "id": "blueMarbleWinter",
+
+      "name": "Blue Marble · Winter",
+
+      "description": "NASA Blue Marble winter composite",
+
+      "category": "Basemap",
+
+      "provider": "NASA",
+
+      "source": "NASA Visible Earth",
+
+      "dataset": "Blue Marble",
+
+      "missions": [],
+
+      "sensor": "Composite",
+
+      "resolution": "5400 × 2700",
+
+      "date": "Winter",
+
+      "src": "https://3d.staratlas.es/earth/EneroBlueMarble.jpg"
+    },
+
+    {
+      "id": "blueMarbleSpring",
+
+      "name": "Blue Marble · Spring",
+
+      "description": "NASA Blue Marble spring composite",
+
+      "category": "Basemap",
+
+      "provider": "NASA",
+
+      "source": "NASA Visible Earth",
+
+      "dataset": "Blue Marble",
+
+      "missions": [],
+
+      "sensor": "Composite",
+
+      "resolution": "5400 × 2700",
+
+      "date": "Spring",
+
+      "src": "https://3d.staratlas.es/earth/MayoBlueMarble.jpg"
+    },
+
+    {
+      "id": "blueMarbleSummer",
+
+      "name": "Blue Marble · Summer",
+
+      "description": "NASA Blue Marble summer composite",
+
+      "category": "Basemap",
+
+      "provider": "NASA",
+
+      "source": "NASA Visible Earth",
+
+      "dataset": "Blue Marble",
+
+      "missions": [],
+
+      "sensor": "Composite",
+
+      "resolution": "5400 × 2700",
+
+      "date": "Summer",
+
+      "src": "https://3d.staratlas.es/earth/AgostoBlueMarble.jpg"
+    },
+
+    {
+      "id": "blueMarbleAutumn",
+
+      "name": "Blue Marble · Autumn",
+
+      "description": "NASA Blue Marble autumn composite",
+
+      "category": "Basemap",
+
+      "provider": "NASA",
+
+      "source": "NASA Visible Earth",
+
+      "dataset": "Blue Marble",
+
+      "missions": [],
+
+      "sensor": "Composite",
+
+      "resolution": "5400 × 2700",
+
+      "date": "Autumn",
+
+      "src": "https://3d.staratlas.es/earth/NoviembreBlueMarble.jpg"
+    },
+
+    {
       "id": "vegetation",
 
       "name": "Vegetation",
