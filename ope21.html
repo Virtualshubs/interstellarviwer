@@ -1769,6 +1769,10 @@ CAMERA TOGGLE
     🛰️ Ver en Copernicus
 </button>
 
+  <button onclick="openWindy()">
+    🌧️ Radar meteorológico
+</button>
+
   </div>
 
 <div id="earthLayersPanel">
@@ -5683,6 +5687,33 @@ function showActiveFires(){
 
     window.open(url, "_blank");
 }
+
+
+
+
+function openWindy(){
+
+    const city = document.getElementById("citySelect").value;
+
+    let lat, lon;
+
+    if(city === "custom"){
+
+        lat = parseFloat(document.getElementById("lat").value);
+        lon = parseFloat(document.getElementById("lon").value);
+
+    }else{
+
+        [lat, lon] = city.split(",").map(Number);
+
+    }
+
+    const url = `https://www.windy.com/${lat}/${lon}?${lat},${lon},11`;
+
+    window.open(url, "_blank");
+}
+
+  
   
 // ======================================================
 // LOOP
