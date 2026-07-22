@@ -219,10 +219,19 @@ placeholder="cloud, fire, temperature..."
 </div>
 
 
+<div class="group">
 
+<label>
+Family
+</label>
+
+<select id="family"></select>
+
+</div>
 
 <div class="group">
 
+  
 
 <label>
 Dataset
@@ -385,6 +394,13 @@ const CAPABILITIES =
 
 let layers=[];
 
+  let filteredLayers=[];
+
+const familySelect =
+document.getElementById("family");
+
+  
+
 
 const layerSelect =
 document.getElementById("layer");
@@ -504,19 +520,20 @@ dim.textContent.trim()
 
 
 
+const layerName=name.textContent.trim();
+const layerTitle=title?title.textContent.trim():layerName;
+
 layers.push({
 
-name:name.textContent.trim(),
+name:layerName,
 
-title:title?
-title.textContent.trim():
-name.textContent.trim(),
+title:layerTitle,
 
-times:times
+times,
 
+family:detectFamily(layerName,layerTitle)
 
 });
-
 
 
 });
@@ -532,7 +549,7 @@ document.getElementById("count").innerHTML=
 layers.length;
 
 
-
+buildFamilies();
 buildMenu();
 
 
@@ -629,40 +646,120 @@ return dates.reverse();
 
 
 
+function detectFamily(name,title){
 
+const text=(name+" "+title).toLowerCase();
+
+if(
+text.includes("fire")||
+text.includes("burn")
+)return "Fires";
+
+if(
+text.includes("cloud")||
+text.includes("aerosol")||
+text.includes("dust")||
+text.includes("ozone")||
+text.includes("atmos")
+)return "Atmosphere";
+
+if(
+text.includes("temperature")||
+text.includes("sst")||
+text.includes("sea_surface")
+)return "Temperature";
+
+if(
+text.includes("chlorophyll")||
+text.includes("phytoplankton")||
+text.includes("ocean")
+)return "Ocean";
+
+if(
+text.includes("vegetation")||
+text.includes("ndvi")||
+text.includes("evi")
+)return "Vegetation";
+
+if(
+text.includes("snow")||
+text.includes("ice")
+)return "Cryosphere";
+
+if(
+text.includes("population")||
+text.includes("city")||
+text.includes("night")
+)return "Human";
+
+if(
+text.includes("truecolor")||
+text.includes("blue")
+)return "Imagery";
+
+return "Other";
+
+}
+
+
+  function buildFamilies(){
+
+const families=[
+...new Set(
+layers.map(l=>l.family)
+)
+].sort();
+
+familySelect.innerHTML="";
+
+const all=document.createElement("option");
+all.value="All";
+all.textContent="All";
+familySelect.appendChild(all);
+
+families.forEach(f=>{
+
+const option=document.createElement("option");
+
+option.value=f;
+option.textContent=f;
+
+familySelect.appendChild(option);
+
+});
+
+}
+  
 
 
 function buildMenu(){
 
 layerSelect.innerHTML="";
 
-layers
+const family=familySelect.value||"All";
+
+filteredLayers=
+family==="All"
+?layers
+:layers.filter(layer=>layer.family===family);
+
+filteredLayers
 .slice(0,500)
 .forEach((layer,index)=>{
 
-const option =
-document.createElement("option");
+const option=document.createElement("option");
 
 option.value=index;
-
-option.textContent =
-layer.title;
+option.textContent=layer.title;
 
 layerSelect.appendChild(option);
 
-
-
 });
 
-
 updateDates();
-
 updateRecommendedSize();
 
-
 }
-
-
 
 
 
@@ -718,9 +815,8 @@ dateSelect.appendChild(option);
 
 function updateRecommendedSize(){
 
-
 const layer =
-layers[layerSelect.value];
+filteredLayers[layerSelect.value];
 
 
 if(!layer)
@@ -829,6 +925,16 @@ updateRecommendedSize();
 
 };
 
+  
+layerSelect.onchange=function(){
+
+    updateDates();
+
+    updateRecommendedSize();
+
+};
+
+
 
 
 search.oninput=function(){
@@ -843,7 +949,7 @@ layerSelect.innerHTML="";
 
 
 
-layers
+filteredLayers
 
 .filter(layer=>
 
@@ -901,7 +1007,7 @@ updateRecommendedSize();
 function generate(){
 
 const layer =
-layers[layerSelect.value];
+filteredLayers[layerSelect.value];
 
 const params =
 new URLSearchParams({
