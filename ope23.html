@@ -1723,6 +1723,9 @@ CAMERA TOGGLE
 
 
   #panel{
+    overflow:hidden;
+    transition:max-height .3s ease;
+    max-height:90vh;
 position:absolute;
 top:15px;
 right:15px;
@@ -1735,6 +1738,12 @@ padding:18px;
 overflow-y:auto;
 z-index:1000;
 box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+  #panel.minimized{
+
+max-height:42px;
+
 }
 
 #panel h1{
@@ -1887,9 +1896,28 @@ color:#7fe28f;
     🌧️ Radar meteorológico
 </button>
 
+
   </div>
 
+
+
+<div class="panel-header">
+
+    <div>
+
+        <h1>NASA GIBS Explorer</h1>
+        <small>Dynamic WMS Catalog Browser</small>
+
+    </div>
+
+    <button id="togglePanel">−</button>
+
+</div>
+
+  
 <div id="earthLayersPanel">
+
+  
 
     <div id="earthLayers"></div>
 
@@ -4573,7 +4601,18 @@ setEarthLayerFromURL(output.value);
 
 
 
+const toggle=document.getElementById("togglePanel");
 
+toggle.onclick=function(){
+
+    panel.classList.toggle("minimized");
+
+    this.textContent=
+    panel.classList.contains("minimized")
+    ? "+"
+    : "−";
+
+};
 
 
   
