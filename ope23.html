@@ -1904,6 +1904,15 @@ Apply to Earth
 
 </button>
 
+  <button
+    id="downloadTexture"
+    style="display:none;">
+
+    <span class="material-symbols-rounded">download</span>
+    Download Texture
+
+</button>
+
 </div>
 
 
@@ -4398,6 +4407,43 @@ toggle.onclick=function(){
 };
 
 
+
+
+
+
+// ======================================================
+// DOWNLOAD NASA GIBS TEXTURE
+// ======================================================
+
+function downloadTexture(){
+
+    if(!output.value) return;
+
+    const link =
+    document.createElement("a");
+
+    link.href = output.value;
+
+    link.download = "NASA_GIBS_Texture.jpg";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+}
+
+document
+.getElementById("downloadTexture")
+.onclick =
+downloadTexture;
+
+
+
+
+
+  
   
 
 
@@ -6639,7 +6685,11 @@ preview.onload=function(){
 
     document
     .getElementById("applyTexture")
-    .disabled=false;
+    .style.display="block";
+
+    document
+    .getElementById("downloadTexture")
+    .style.display="block";
 
 };
 
@@ -6650,7 +6700,11 @@ preview.onerror=function(){
 
     document
     .getElementById("applyTexture")
-    .disabled=true;
+    .style.display="none";
+
+    document
+    .getElementById("downloadTexture")
+    .style.display="none";
 
 };
 
