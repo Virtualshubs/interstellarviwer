@@ -62,187 +62,189 @@ padding:6px;
 
     transform:translateX(-50%);
 
-
     display:flex;
-
     gap:8px;
-
+    align-items:center;
 
     padding:8px 12px;
 
-
     border-radius:14px;
 
-
     background:
-
     linear-gradient(
         145deg,
         rgba(20,30,45,.92),
         rgba(5,10,18,.92)
     );
 
-
     backdrop-filter:blur(18px);
 
-
     border:
-
     1px solid rgba(120,180,255,.22);
 
-
     box-shadow:
-
     0 10px 40px rgba(0,0,0,.55),
-
     inset 0 0 20px rgba(80,160,255,.08);
-
 
 }
 
 
-
+/* ===================================================== */
 /* BOTONES */
+/* ===================================================== */
 
-.dockButton{
-
+.dockButton,
+#earthViewBtn,
+#followViewBtn,
+#openTwinBtn,
+#togglePanel,
+#dock .btn,
+#dock button{
 
     position:relative;
 
-
-    width:44px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
 
     height:44px;
+    min-width:150px;
 
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
+    padding:0 14px;
 
     border:none;
-
-
     border-radius:10px;
 
-
-    background:
-
-    rgba(255,255,255,.04);
-
+    background:rgba(255,255,255,.04);
 
     color:white;
 
-
     cursor:pointer;
 
+    transition:.25s ease;
 
-    transition:
-
-    .25s ease;
-
+    white-space:nowrap;
 
 }
 
 
+/* ===================================================== */
+/* BOTÓN SOLO ICONO */
+/* ===================================================== */
 
+#compassBtn{
+
+    width:44px;
+    min-width:44px;
+
+    padding:0;
+
+    justify-content:center;
+
+}
+
+
+/* ===================================================== */
+/* NASA GIBS */
+/* ===================================================== */
+
+#togglePanel{
+
+    justify-content:space-between;
+
+    min-width:170px;
+
+}
+
+#togglePanelIcon{
+
+    font-size:18px;
+
+    margin-left:12px;
+
+}
+
+
+/* ===================================================== */
 /* HOVER */
+/* ===================================================== */
 
-.dockButton:hover{
+#dock button:hover{
 
-
-    transform:
-
-    translateY(-5px);
-
+    transform:translateY(-4px);
 
     background:
-
     rgba(80,160,255,.18);
 
-
     box-shadow:
-
     0 0 18px rgba(80,160,255,.35);
 
-
 }
 
 
-
+/* ===================================================== */
 /* ESTADO ACTIVO */
+/* ===================================================== */
 
+.camera-active,
 .dockButton.active{
 
-
     background:
-
     rgba(80,160,255,.25);
 
-
     box-shadow:
-
     0 0 15px rgba(80,160,255,.45);
-
 
 }
 
 
-
+.camera-active::after,
 .dockButton.active::after{
-
 
     content:"";
 
-
     position:absolute;
-
 
     bottom:-6px;
 
-
     width:5px;
-
     height:5px;
-
 
     border-radius:50%;
 
-
     background:#FE9A37;
 
-
     box-shadow:
-
     0 0 8px #6cff9a;
-
 
 }
 
 
-
+/* ===================================================== */
 /* ICONOS */
+/* ===================================================== */
 
 .material-symbols-rounded{
 
-
-    font-size:24px;
-
+    font-size:20px;
 
     color:#d9ecff;
 
+    flex-shrink:0;
 
     user-select:none;
 
-
     pointer-events:none;
-
 
 }
 
-  #dock::before{
+
+/* ===================================================== */
+/* TÍTULO SUPERIOR */
+/* ===================================================== */
+
+#dock::before{
 
     content:"ORBITAL CONTROL SYSTEM";
 
@@ -254,27 +256,26 @@ padding:6px;
 
     transform:translateX(-50%);
 
-
     font-family:
     "Roboto Mono",
     monospace;
 
-
     font-size:9px;
-
 
     letter-spacing:3px;
 
-
     color:#7da8d8;
-
 
     white-space:nowrap;
 
 }
 
-  #trackingControl{
 
+/* ===================================================== */
+/* TRACKING PANEL */
+/* ===================================================== */
+
+#trackingControl{
 
     background:
 
@@ -284,29 +285,21 @@ padding:6px;
         rgba(5,10,18,.92)
     );
 
-
     border:
 
     1px solid rgba(120,180,255,.2);
 
-
     border-radius:12px;
-
 
     padding:16px;
 
-
     width:260px;
 
-
     font-family:
-
     "Roboto Mono",
     monospace;
 
-
     box-shadow:
-
     0 10px 35px rgba(0,0,0,.45);
 
 }
@@ -1788,57 +1781,83 @@ color:#7fe28f;
   <div id="spacePanel"></div>
 
 <div id="dock">
-  
+
     <button id="compassBtn" class="dockButton">
-       <span class="material-symbols-rounded"> explore 
-    </span>
+        <span class="material-symbols-rounded">explore</span>
     </button>
 
- <button
-    class="dockButton"
-    onclick="toggleEarthFacts()">
-    🌍 Earth data
+    <button
+        class="dockButton"
+        onclick="toggleEarthFacts()">
+
+        <span class="material-symbols-rounded">globe</span>
+        Earth Data
+
     </button>
 
-  
-<button id="togglePanel" > NASA GIBS −</button>
- 
-<button id="earthViewBtn" class="camera-active">
-    <span class="material-symbols-rounded">language</span>
-    General View
-</button>
+    <button id="togglePanel">
 
-<button id="followViewBtn">
-    <span class="material-symbols-rounded">satellite_alt</span>
-    Satellite View
-</button>
+        <span class="material-symbols-rounded">layers</span>
+        NASA GIBS
 
-<button
-    id="openTwinBtn"
-    class="action-btn"
-    style="display:none;">
+        <span
+            id="togglePanelIcon"
+            class="material-symbols-rounded">
 
-    <span class="material-symbols-rounded">deployed_code</span>
-    View Satellite Twin
+            expand_less
 
-</button>
+        </span>
 
-<button onclick="showActiveFires()">
-    <span class="material-symbols-rounded">local_fire_department</span>
-    Active Fires
-</button>
+    </button>
 
-<button class="btn" onclick="openCopernicus()">
-    <span class="material-symbols-rounded">satellite_alt</span>
-    View in Copernicus
-</button>
+    <button id="earthViewBtn" class="camera-active">
 
-<button onclick="openWindy()">
-    <span class="material-symbols-rounded">radar</span>
-    Weather Radar
-</button>
-  
-  </div>
+        <span class="material-symbols-rounded">language</span>
+        General View
+
+    </button>
+
+    <button id="followViewBtn">
+
+        <span class="material-symbols-rounded">satellite_alt</span>
+        Satellite View
+
+    </button>
+
+    <button
+        id="openTwinBtn"
+        class="action-btn"
+        style="display:none;">
+
+        <span class="material-symbols-rounded">view_in_ar</span>
+        View Satellite Twin
+
+    </button>
+
+    <button onclick="showActiveFires()">
+
+        <span class="material-symbols-rounded">local_fire_department</span>
+        Active Fires
+
+    </button>
+
+    <button
+        class="btn"
+        onclick="openCopernicus()">
+
+        <span class="material-symbols-rounded">public</span>
+        View in Copernicus
+
+    </button>
+
+    <button onclick="openWindy()">
+
+        <span class="material-symbols-rounded">radar</span>
+        Weather Radar
+
+    </button>
+
+</div>
 
 
 
