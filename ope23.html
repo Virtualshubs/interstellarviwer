@@ -1803,36 +1803,40 @@ color:#7fe28f;
   
 <button id="togglePanel" > NASA GIBS −</button>
  
+<button id="earthViewBtn" class="camera-active">
+    <span class="material-symbols-rounded">language</span>
+    General View
+</button>
 
-    <button id="earthViewBtn" class="camera-active">
-        🎥 General view
-    </button>
-    <button id="followViewBtn">
-        🛰 Sat view
-    </button>
+<button id="followViewBtn">
+    <span class="material-symbols-rounded">satellite_alt</span>
+    Satellite View
+</button>
 
-
-  <button
+<button
     id="openTwinBtn"
     class="action-btn"
     style="display:none;">
 
-    View Sat twin
+    <span class="material-symbols-rounded">deployed_code</span>
+    View Satellite Twin
 
 </button>
 
-  <button onclick="showActiveFires()">
-    🔥 Fuegos activos
+<button onclick="showActiveFires()">
+    <span class="material-symbols-rounded">local_fire_department</span>
+    Active Fires
 </button>
 
-  <button class="btn" onclick="openCopernicus()">
-    🛰️ Ver en Copernicus
+<button class="btn" onclick="openCopernicus()">
+    <span class="material-symbols-rounded">satellite_alt</span>
+    View in Copernicus
 </button>
 
-  <button onclick="openWindy()">
-    🌧️ Radar meteorológico
+<button onclick="openWindy()">
+    <span class="material-symbols-rounded">radar</span>
+    Weather Radar
 </button>
-
   
   </div>
 
