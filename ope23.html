@@ -66,7 +66,7 @@ padding:6px;
     gap:8px;
     align-items:center;
 
-    padding:8px 12px;
+    padding:12px 12px;
 
     border-radius:14px;
 
@@ -451,7 +451,7 @@ canvas { display: block; }
   left: 12px;
   z-index: 10;
   width: 400px;
-  max-height: 80vh;
+  max-height: 85vh;
   overflow: auto;
   padding: 16px;
   border-radius: 16px;
@@ -900,36 +900,33 @@ pre {
 /* HEADER */
 
 .mission-header{
-    border-bottom:
-    1px solid rgba(255,255,255,.12);
-    padding-bottom:12px;
-    margin-bottom:15px;
+    border-bottom:1px solid rgba(255,255,255,.12);
+    padding-bottom:16px;
+    margin-bottom:22px;
 
 }
 
-
 .mission-label{
+
     font-size:11px;
-    letter-spacing:3px;
+    letter-spacing:2.5px;
     color:#7da8d8;
 
 }
 
-
 .mission-name{
 
-    font-size:24px;
+    margin-top:6px;
+    font-size:26px;
     font-weight:700;
-    margin-top:4px;
+    line-height:1.2;
     color:white;
 
 }
 
-
 .mission-status{
-    margin-top:8px;
-    font-size:12px;
-    color:#5cff8d;
+    margin-top:12px;
+    font-size:13px;
 
 }
 
@@ -938,37 +935,32 @@ pre {
 /* INFO */
 
 .mission-details{
+
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-bottom:20px;
+    gap:12px;
+    margin-bottom:24px;
 
 }
-
 
 .mission-details div{
-    background:
-    rgba(255,255,255,.04);
-    padding:10px;
-    border-radius:8px;
+    padding:14px;
+    border-radius:10px;
 
 }
-
 
 .mission-details span{
-    display:block;
+    margin-bottom:6px;
     font-size:10px;
-    color:#789;
-    letter-spacing:2px;
+    letter-spacing:1.8px;
 
 }
-
 
 .mission-details strong{
-    font-size:13px;
-    color:white;
-}
+    display:block;
+    font-size:14px;
 
+}
 
 
 /* TELEMETRY */
@@ -1498,7 +1490,7 @@ CAMERA TOGGLE
 #panel{
 overflow:hidden;
 transition:max-height .3s ease;
-max-height: 80vh;
+max-height: 85vh;
 position:absolute;
 top:10px;
 right:10px;
@@ -4400,8 +4392,8 @@ toggle.onclick=function(){
 
     this.textContent=
     panel.classList.contains("minimized")
-    ? "+"
-    : "−";
+    ? "NASA GIBS +"
+    : "NASA GIBS −";
 
 };
 
@@ -4420,7 +4412,7 @@ function buildCompass(){
     addCompassLabel("60°N",60);
     addCompassLabel("30°N",30);
 
-    addCompassLabel("Ecuador",0);
+    addCompassLabel("E",0);
 
     addCompassLabel("30°S",-30);
     addCompassLabel("60°S",-60);
