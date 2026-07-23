@@ -1549,95 +1549,61 @@ CAMERA TOGGLE
 ====================================================== */
 
 #earthLayersPanel{
-
     position:absolute;
-
     right: 10px;
-
    top: 160px;
-
     width: 400px;
-
     display:flex;
-
     flex-direction:column;
-
     gap:12px;
-
     z-index:100;
-
 }
 
 #earthLayers{
-
     display:flex;
-
     flex-direction:column;
-
     gap:8px;
-
 }
 
 .earth-layer-btn{
-
     background:rgba(20,20,20,.75);
-
     color:white;
-
     border:1px solid rgba(255,255,255,.15);
-
     padding:8px 12px;
-
     cursor:pointer;
-
     text-align:left;
 
 }
 
 .earth-layer-btn:hover{
-
     border-color:#ff8c00;
-
 }
 
+  
 #earthLayerInfo{
-
     background:rgba(10,10,10,.75);
-
     border:1px solid rgba(255,255,255,.12);
-
     padding:12px;
-
     color:white;
-
     font-size:12px;
-
     line-height:1.5;
 
 }
 
 .layer-title{
-
     font-size:15px;
-
     font-weight:bold;
-
     margin-bottom:8px;
-
 }
 
 .layer-description{
-
     margin-bottom:12px;
-
     opacity:.75;
 
 }
 
 .layer-item{
-
     margin-bottom:6px;
-
 }
 
 
@@ -1648,85 +1614,55 @@ CAMERA TOGGLE
 ====================================================== */
 
 .twin-modal{
-
     position:fixed;
-
     inset:0;
-
     display:none;
-
     justify-content:center;
-
     align-items:center;
-
     background:rgba(0,0,0,.85);
-
     z-index:5000;
 
 }
 
 .twin-window{
-
     width:90%;
-
     height:90%;
-
     position:relative;
-
     background:#111;
-
     border:1px solid rgba(255,255,255,.15);
 
 }
 
 #twinFrame{
-
     width:100%;
-
     height:100%;
-
     border:none;
-
 }
 
 .twin-close{
-
     position:absolute;
-
     top:15px;
-
     right:15px;
-
     width:45px;
-
     height:45px;
-
     border:none;
-
     cursor:pointer;
-
     z-index:20;
-
     color:white;
-
     background:rgba(0,0,0,.7);
-
     font-size:18px;
-
 }
 
 #openTwinBtn{
-
     display:none;
-
 }
 
 
-  #panel{
-    overflow:hidden;
-    transition:max-height .3s ease;
-    max-height:90vh;
-position:absolute;
+#panel{
+overflow:hidden;
+transition:max-height .3s ease;
+max-height:90vh;
+position:relative;
 top:10px;
 right:10px;
 width:400px;
@@ -1844,42 +1780,34 @@ font-size:12px;
 color:#7fe28f;
 }
 
-  #togglePanel{
+#togglePanel{
 
+position:absolute;
+top:10px;
+right:10px;
 width:38px;
 height:38px;
-left: 5px;
 border:none;
-border-radius:50px;
-
+border-radius:50%;
 background:#ff9d3b;
 color:#fff;
-
 font-size:17px;
 font-weight:bold;
-line-height:28px;
+line-height:38px;
 text-align:center;
-
 cursor:pointer;
-
 transition:all .25s ease;
-
 box-shadow:0 0 10px rgba(255,157,59,.35);
 
 }
 
 #togglePanel:hover{
-
 background:#ffb14f;
-
 box-shadow:0 0 16px rgba(255,177,79,.55);
-
 transform:scale(1.08);
-
 }
 
 #togglePanel:active{
-
 transform:scale(.95);
 
 }
