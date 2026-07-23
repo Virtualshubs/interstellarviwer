@@ -1554,7 +1554,7 @@ CAMERA TOGGLE
 
     right: 10px;
 
-   top: 145px;
+   top: 160px;
 
     width: 400px;
 
@@ -1742,7 +1742,7 @@ box-shadow:0 10px 30px rgba(0,0,0,.45);
 
   #panel.minimized{
 width:380px;
-max-height: 70px;
+max-height: 100px;
 background:transparent;
 }
 
@@ -1842,6 +1842,46 @@ color:#65ff7c;
 margin-top:10px;
 font-size:12px;
 color:#7fe28f;
+}
+
+  #togglePanel{
+
+width:28px;
+height:28px;
+
+border:none;
+border-radius:8px;
+
+background:#ff9d3b;
+color:#fff;
+
+font-size:20px;
+font-weight:bold;
+line-height:28px;
+text-align:center;
+
+cursor:pointer;
+
+transition:all .25s ease;
+
+box-shadow:0 0 10px rgba(255,157,59,.35);
+
+}
+
+#togglePanel:hover{
+
+background:#ffb14f;
+
+box-shadow:0 0 16px rgba(255,177,79,.55);
+
+transform:scale(1.08);
+
+}
+
+#togglePanel:active{
+
+transform:scale(.95);
+
 }
   
 </style>
@@ -1984,9 +2024,9 @@ color:#7fe28f;
 
 
 
-<div id="panel">
+<div id="panel" class="minimized">
 
-<button id="togglePanel">−</button>
+<button id="togglePanel" >−</button>
 
 <h1>NASA GIBS Explorer</h1>
 
