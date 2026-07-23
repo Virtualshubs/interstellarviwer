@@ -1552,11 +1552,11 @@ CAMERA TOGGLE
 
     position:absolute;
 
-    right: 15px;
+    right: 20px;
 
-   top: 15px;
+   top: 65px;
 
-    width: 300px;
+    width: 400px;
 
     display:flex;
 
@@ -1727,8 +1727,8 @@ CAMERA TOGGLE
     transition:max-height .3s ease;
     max-height:90vh;
 position:absolute;
-top:15px;
-right:15px;
+top:10px;
+right:20px;
 width:400px;
 height:calc(100vh - 30px);
 background:#141b26;
@@ -1736,13 +1736,13 @@ border:1px solid rgba(255,255,255,.08);
 border-radius:10px;
 padding:18px;
 overflow-y:auto;
-z-index:1000;
+z-index: 500;
 box-shadow:0 10px 30px rgba(0,0,0,.45);
 }
 
   #panel.minimized{
 
-max-height:42px;
+max-height:38px;
 
 }
 
@@ -1860,7 +1860,7 @@ color:#7fe28f;
  <button
     class="dockButton"
     onclick="toggleEarthFacts()">
-    🌍 Twin
+    🌍 Earth data
     </button>
 
   
@@ -1868,7 +1868,7 @@ color:#7fe28f;
  
 
     <button id="earthViewBtn" class="camera-active">
-        🌍 General view
+        🎥 General view
     </button>
     <button id="followViewBtn">
         🛰 Sat view
@@ -1880,12 +1880,12 @@ color:#7fe28f;
     class="action-btn"
     style="display:none;">
 
-    OPEN DIGITAL TWIN VIEW
+    View Sat twin
 
 </button>
 
   <button onclick="showActiveFires()">
-    🔥 Fuegos activos en la zona
+    🔥 Fuegos activos
 </button>
 
   <button class="btn" onclick="openCopernicus()">
@@ -1942,10 +1942,10 @@ color:#7fe28f;
   
 <div id="ui">
   
-   <h3>🛰 Orbital Pass Engine</h3>
+   <h3> Orbital Pass Engine</h3>
  
   <div class="control-title">
-      Earth twin traking
+      Earth twin traking by 3D Twins
     </div>
 
    <div>
@@ -2096,7 +2096,7 @@ Generate Image
 
 </div>
 
-<textarea id="url" readonly></textarea>
+<textarea id="url" readonly hidden></textarea>
 
 <div id="status">
 Waiting...
