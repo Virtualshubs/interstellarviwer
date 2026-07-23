@@ -413,73 +413,34 @@ padding:6px;
 
 
 #calcBtn{
-
-
+  
     width:100%;
-
-
-    margin: 10px;
-
-
+    margin: 0px;
     height:42px;
-
-
     border-radius:10px;
-
-
     border:
-
     1px solid rgba(100,200,255,.35);
-
-
     background:
-
     rgba(80,160,255,.18);
-
-
     color:white;
-
-
     font-family:
-
     inherit;
-
-
     letter-spacing:2px;
-
-
     font-size:11px;
-
-
     cursor:pointer;
-
-
     transition:.25s;
-
-
 }
 
 
 
 #calcBtn:hover{
 
-
     background:
-
     rgba(80,160,255,.35);
-
-
-    box-shadow:
-
-    0 0 20px rgba(80,160,255,.3);
-
-
+    box-shadow:  0 0 20px rgba(80,160,255,.3);
     transform:
-
     translateY(-2px);
  
-
-
 }
   
 canvas { display: block; }
@@ -489,19 +450,14 @@ canvas { display: block; }
   top: 12px;
   left: 12px;
   z-index: 10;
-
   width: 400px;
-  max-height: 92vh;
+  max-height: 88vh;
   overflow: auto;
-
   padding: 16px;
   border-radius: 16px;
-
   background: rgba(8, 12, 20, 0.78);
   backdrop-filter: blur(14px);
-
   border: 1px solid rgba(120, 180, 255, 0.18);
-
   box-shadow:
     0 0 45px rgba(70, 120, 255, 0.10),
     inset 0 0 25px rgba(255,255,255,0.02);
@@ -514,7 +470,6 @@ canvas { display: block; }
   left: 0;
   right: 0;
   height: 2px;
-
   background: linear-gradient(
     90deg,
     transparent,
@@ -567,9 +522,7 @@ button:active {
 .highlight {
   margin-top: 14px;
   padding: 14px;
-
   border-radius: 14px;
-
   background: linear-gradient(
     180deg,
     rgba(0, 255, 170, 0.08),
@@ -577,25 +530,21 @@ button:active {
   );
 
   border: 1px solid rgba(0, 255, 170, 0.18);
-
   font-size: 13px;
   line-height: 1.55;
-
   box-shadow: inset 0 0 18px rgba(0,255,150,0.05);
 }
+  
 
 .insightBlock {
   margin-top: 10px;
   padding: 12px;
-
   border-radius: 12px;
-
   background: rgba(255,255,255,0.03);
-
   border: 1px solid rgba(120, 180, 255, 0.12);
-
   position: relative;
 }
+  
 
 /* left accent bar (HUD feel) */
 .insightBlock::before {
@@ -630,15 +579,10 @@ button:active {
 .rankCard {
   margin-top: 8px;
   padding: 10px;
-
   border-radius: 12px;
-
   background: rgba(255,255,255,0.03);
-
   border: 1px solid rgba(255,255,255,0.08);
-
   font-size: 12px;
-
   transition: all 0.2s ease;
 }
 
@@ -653,9 +597,7 @@ pre {
   white-space: pre-wrap;
   font-size: 11px;
   margin-top: 10px;
-
   opacity: 0.65;
-
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
 }
 
@@ -719,16 +661,13 @@ pre {
   width: 100%;
   height: 100%;
   object-fit: cover;
-
   filter: contrast(1.1) brightness(0.9);
 }
 
   #satHeader::after {
   content: "";
-
   position: absolute;
   inset: 0;
-
   background: linear-gradient(
     180deg,
     rgba(0,0,0,0.1),
@@ -741,51 +680,38 @@ pre {
   .satBlock {
   margin-top: 10px;
   padding: 10px 12px;
-
   border-radius: 12px;
-
   background: rgba(255,255,255,0.03);
-
   border: 1px solid rgba(120, 180, 255, 0.10);
-
   position: relative;
 }
 
   .satBlock::before {
   content: "";
   position: absolute;
-
   left: 0;
   top: 10px;
   bottom: 10px;
-
   width: 2px;
-
   background: rgba(120, 180, 255, 0.35);
   border-radius: 2px;
 }
+
+  
   .satBlockTitle {
   font-size: 10px;
-
   letter-spacing: 0.16em;
   text-transform: uppercase;
-
   color: #7FB3FF;
-
   margin-bottom: 6px;
-
   opacity: 0.85;
 }
 
   .satItem {
   font-size: 12px;
-
   margin: 3px 0;
-
   opacity: 0.92;
-
   padding-left: 6px;
-
   border-left: 1px solid rgba(120, 180, 255, 0.25);
 }
 
@@ -806,15 +732,11 @@ pre {
 
 #satPatch {
   position: fixed;
-
   bottom: 18px;
   right: 18px;
-
   width: 72px;
   height: 72px;
-
   border-radius: 50%;
-
   background: radial-gradient(
     circle at 30% 30%,
     rgba(255,255,255,0.18),
@@ -823,7 +745,6 @@ pre {
   );
 
   border: 1px solid rgba(120, 180, 255, 0.35);
-
   box-shadow:
     0 0 20px rgba(120,180,255,0.25),
     inset 0 0 14px rgba(255,255,255,0.05);
@@ -831,17 +752,16 @@ pre {
   display: flex;
   align-items: center;
   justify-content: center;
-
   overflow: hidden;
-
   z-index: 50;
-
   /* pequeño “peso HUD” */
   backdrop-filter: blur(10px);
 }
+  
   #satPatch {
   transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
+  
 
 #satPatch:hover {
   transform: scale(1.08);
@@ -873,16 +793,12 @@ pre {
   display: flex;
   align-items: center;
   gap: 10px;
-
   padding: 10px 14px;
   border-radius: 50px;
-
   background: rgba(0,0,0,0.35);
   backdrop-filter: blur(10px);
-
   cursor: pointer;
   transition: all 0.2s ease;
-
   border: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -924,27 +840,19 @@ pre {
   display: none;
   top:50%;
   left:50%;
-
   transform:translate(-50%,-50%);
-
   width:420px;
   min-height:180px;
-
   padding:24px;
-
   background:rgba(8,12,18,0.95);
   backdrop-filter:blur(20px);
-
   border:1px solid rgba(120,180,255,0.35);
   border-radius:20px;
-
   box-shadow:
     0 0 40px rgba(120,180,255,0.25);
 
   color:white;
-
   z-index:9999;
-
   overflow:hidden;
 }
 
@@ -976,18 +884,13 @@ pre {
     );
 
     border:1px solid rgba(120,180,255,.25);
-
     border-radius:12px;
-
     padding:18px;
-
     color:#d8e9ff;
-
     font-family:
     "Orbitron",
     "Roboto Mono",
     monospace;
-
     box-shadow:
     0 0 25px rgba(0,120,255,.15);
 
@@ -997,23 +900,17 @@ pre {
 /* HEADER */
 
 .mission-header{
-
     border-bottom:
     1px solid rgba(255,255,255,.12);
-
     padding-bottom:12px;
-
     margin-bottom:15px;
 
 }
 
 
 .mission-label{
-
     font-size:11px;
-
     letter-spacing:3px;
-
     color:#7da8d8;
 
 }
@@ -1022,22 +919,16 @@ pre {
 .mission-name{
 
     font-size:24px;
-
     font-weight:700;
-
     margin-top:4px;
-
     color:white;
 
 }
 
 
 .mission-status{
-
     margin-top:8px;
-
     font-size:12px;
-
     color:#5cff8d;
 
 }
@@ -1047,49 +938,35 @@ pre {
 /* INFO */
 
 .mission-details{
-
     display:grid;
-
     grid-template-columns:1fr 1fr;
-
     gap:10px;
-
     margin-bottom:20px;
 
 }
 
 
 .mission-details div{
-
     background:
     rgba(255,255,255,.04);
-
     padding:10px;
-
     border-radius:8px;
 
 }
 
 
 .mission-details span{
-
     display:block;
-
     font-size:10px;
-
     color:#789;
-
     letter-spacing:2px;
 
 }
 
 
 .mission-details strong{
-
     font-size:13px;
-
     color:white;
-
 }
 
 
@@ -1097,13 +974,9 @@ pre {
 /* TELEMETRY */
 
 .telemetry-title{
-
     font-size:11px;
-
     letter-spacing:3px;
-
     color:#7da8d8;
-
     margin-bottom:10px;
 
 }
@@ -1113,10 +986,8 @@ pre {
 .telemetry-grid{
 
     display:grid;
-
     grid-template-columns:
     1fr 1fr;
-
     gap:10px;
 
 }
@@ -1126,21 +997,17 @@ pre {
 .telemetry-card{
 
     background:
-
     linear-gradient(
     135deg,
     rgba(255,255,255,.07),
     rgba(255,255,255,.02)
     );
 
-
     border:
 
     1px solid rgba(255,255,255,.08);
 
-
     padding:12px;
-
     border-radius:8px;
 
 }
@@ -1150,11 +1017,8 @@ pre {
 .telemetry-card span{
 
     display:block;
-
     font-size:10px;
-
     color:#8da6c5;
-
     letter-spacing:2px;
 
 }
@@ -1164,11 +1028,8 @@ pre {
 .telemetry-card strong{
 
     display:block;
-
     margin-top:6px;
-
     font-size:20px;
-
     color:#ffffff;
 
 }
@@ -1185,9 +1046,7 @@ pre {
     1px solid rgba(120,180,255,.15);
 
     border-radius:10px;
-
     padding:14px;
-
     margin:12px;
 
 }
@@ -1197,15 +1056,10 @@ pre {
 .pass-header{
 
     display:flex;
-
     justify-content:space-between;
-
     font-size:12px;
-
     letter-spacing:2px;
-
     color:#8da6c5;
-
     margin-bottom:12px;
 
 }
@@ -1213,9 +1067,7 @@ pre {
 
 
 .pass-header strong{
-
     color:#7dff9b;
-
     font-size:11px;
 
 }
@@ -1226,10 +1078,8 @@ pre {
 .pass-data{
 
     display:grid;
-
     grid-template-columns:
     repeat(3,1fr);
-
     gap:8px;
 
 }
@@ -1243,9 +1093,7 @@ pre {
     rgba(255,255,255,.04);
 
     padding:8px;
-
     border-radius:6px;
-
     font-size:13px;
 
 }
@@ -1255,13 +1103,9 @@ pre {
 small{
 
     display:block;
-
     color:#71839b;
-
     font-size:9px;
-
     letter-spacing:1.5px;
-
     margin-bottom:4px;
 
 }
