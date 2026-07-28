@@ -690,49 +690,94 @@ createGridSearch();
 
 
 
-// ===============================
-// GRID SEARCH INPUT
-// ===============================
+function createDataGrid(items){
 
-function createGridSearch(){
+const grid=document.getElementById("dataGrid");
+
+grid.innerHTML="";
 
 
-const box=document.getElementById("queryBox");
+observationGrid=[];
+
+
+// agrupamos por fecha
+
+const dates={};
+
+
+items.forEach(item=>{
+
+
+const dt=item.properties?.datetime;
+
+
+if(!dt) return;
+
+
+const day=dt.split("T")[0];
+
+
+if(!dates[day])
+dates[day]=[];
+
+
+dates[day].push(item);
+
+
+});
+
+
+
+// crear una celda por fecha
+
+Object.keys(dates)
+.sort()
+.forEach((date,i)=>{
+
+
+const cell={
+
+id:i,
+
+date,
+
+state:0,
+
+items:dates[date]
+
+};
+
+
+observationGrid.push(cell);
 
 
 
 const div=document.createElement("div");
 
-
-div.innerHTML=`
-
-<div style="margin-top:15px">
-
-Lat:
-
-<input id="gridLat" value="0">
+div.className="dataCell";
 
 
-Lon:
-
-<input id="gridLon" value="0">
-
-
-<button onclick="searchGrid()">
-SEARCH CELL
-</button>
+div.textContent=
+`${date}\n${cell.items.length} obs`;
 
 
-</div>
 
-`;
+div.style.background="#16803c";
 
 
-box.appendChild(div);
+div.onclick=
+()=>showCellData(cell);
+
+
+
+grid.appendChild(div);
+
+
+
+});
 
 
 }
-
 
 
 // ===============================
