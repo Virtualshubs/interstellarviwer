@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ESA DATA v0.3</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+
+body{
+background:#0b1018;color:#fff;height:100vh;
+display:flex;justify-content:center;align-items:center
+}
+
+#panel{
+width:1100px;height:990px;background:#141b25;
+border:1px solid #2b3647;border-radius:12px;
+display:flex;flex-direction:column;overflow:hidden
+}
+
+#header{
+background:#182230;padding:14px 18px;
+display:flex;gap:10px;align-items:center
+}
+
+#search{
+flex:1;padding:10px;background:#0f1622;color:#fff;
+border:1px solid #33435b;border-radius:6px
+}
+
+button{
+background:#ff8c00;color:#fff;border:none;
+padding:10px 16px;border-radius:6px;
+cursor:pointer;font-weight:bold
+}
+
+#status{
+padding:8px 18px;
+border-bottom:1px solid #263240;
+color:#8fb8ff
+}
+
+#content{
+display:grid;
+grid-template-columns:420px 1fr;
+height:100%
+}
+
+#cards,#detail{
+overflow:auto;
+padding:16px
+}
+
+.card{
+background:#1a2432;
+border:1px solid #2d3d52;
+border-radius:8px;
+padding:14px;
+margin-bottom:12px
+}
+
+.card h3{
+color:#ffb04d;
+margin-bottom:8px
+}
+
+.card p{
+font-size:13px;
+color:#cfd8e6;
+margin:4px 0
+}
+
+.open{margin-top:10px}
+
+.row{
+display:flex;
+padding:7px 0;
+border-bottom:1px solid rgba(255,255,255,.08)
+}
+
+.key{
+width:170px;
+color:#7bc3ff;
+font-weight:bold
+}
+
+.value{
+flex:1;
+word-break:break-word
+}
+
+input{
+background:#0f1622;
+border:1px solid #33435b;
+color:#fff;
+padding:6px;
+border-radius:5px;
+width:180px
+}
+
+details{margin-top:18px}
+
+pre{
+white-space:pre-wrap;
+font-size:12px
+}
+
+#queryBox{
+margin-top:20px;
+padding:12px;
+border:1px solid #2d3d52;
+border-radius:8px;
+background:#111923
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div id="panel">
+  <div id="header">
+    <input id="search" value="Biomass">
+    <button id="load">SEARCH</button>
+  </div>
+
+  <div id="status">Ready</div>
+
+  <div id="content">
+    <div id="cards"></div>
+
+    <div id="detail">
+      <h2>Select a collection</h2>
+      <div id="meta"></div>
+      <div id="queryBox"></div>
+
+      <details>
+        <summary>Raw JSON</summary>
+        <pre id="raw"></pre>
+      </details>
+
+    </div>
+  </div>
+</div>
+  
+<script>
+
+const BASE="https://catalog.maap.eo.esa.int/catalogue";
+let collections=[];
+
+document.getElementById("load").onclick=load;
+
+async function load(){
+  const q=document.getElementById("search").value.trim();
+  document.getElementById("status").textContent="Loading...";
+  const res=await fetch(`${BASE}/collections?q=${encodeURIComponent(q)}`);
+  const data=await res.json();
+  collections=data.collections||[];
+  renderCards();
+  document.getElementById("status").textContent=`${collections.length} collections`;
+}
+
+
+// ===============================
+// RENDER COLLECTION CARDS
+// ===============================
+
+function renderCards(){
+  const c=document.getElementById("cards");
+  c.innerHTML="";
+
+  collections.forEach(col=>{
+    const d=document.createElement("div");
+    d.className="card";
+
+    d.innerHTML=`
+      <h3>${col.id}</h3>
+      <p><b>${col.title||""}</b></p>
+      <p>${(col.description||"").substring(0,180)}...</p>
+      <button class="open">OPEN</button>
+    `;
+
+    d.querySelector("button").onclick=()=>show(col);
+    c.appendChild(d);
+  });
+}
+
+
+// ===============================
+// SHOW COLLECTION
+// ===============================
+
+function show(col){
+
+  const meta=document.getElementById("meta");
+  meta.innerHTML="";
+  document.getElementById("queryBox").innerHTML="";
+
+  add("ID",col.id);
+  add("Title",col.title);
+  add("Type",col.type);
+  add("Version",col.version);
+  add("Created",col.created);
+  add("Updated",col.updated);
+  add("Description",col.description);
+
+  if(col.keywords)add("Keywords",col.keywords.join(", "));
+
+  document.getElementById("raw").textContent=
+  JSON.stringify(col,null,2);
+
+  createQuery(col);
+
+
+  function add(k,v){
+    if(v===undefined)return;
+
+    const r=document.createElement("div");
+    r.className="row";
+    r.innerHTML=`
+      <div class="key">${k}</div>
+      <div class="value">${v}</div>
+    `;
+
+    meta.appendChild(r);
+  }
+
+}
+
+
+// ===============================
+// DATA QUERY
+// ===============================
+
+function createQuery(col){
+
+  const items=col.links?.find(l=>l.rel==="items");
+  if(!items)return;
+
+  const box=document.getElementById("queryBox");
+
+  box.innerHTML=`
+    <h3 style="color:#ffb04d;margin-bottom:12px">DATA QUERY</h3>
+
+    <div class="row">
+      <div class="key">Latitude</div>
+      <input id="qlat" value="40.4">
+    </div>
+
+    <div class="row">
+      <div class="key">Longitude</div>
+      <input id="qlon" value="-3.7">
+    </div>
+
+    <div class="row">
+      <div class="key">Radius km</div>
+      <input id="qrad" value="10">
+    </div>
+
+    <div class="row">
+      <div class="key">Date</div>
+      <input id="qdate" type="date">
+    </div>
+
+    <button id="queryBtn">SEARCH DATA</button>
+  `;
+
+
+  document.getElementById("qdate").value=
+  new Date().toISOString().split("T")[0];
+
+
+  document.getElementById("queryBtn").onclick=async()=>{
+
+    const lat=Number(document.getElementById("qlat").value);
+    const lon=Number(document.getElementById("qlon").value);
+    const radius=Number(document.getElementById("qrad").value);
+    const date=document.getElementById("qdate").value;
+
+    const delta=radius/111;
+
+    const bbox=[
+      lon-delta,
+      lat-delta,
+      lon+delta,
+      lat+delta
+    ].join(",");
+
+
+    const url=
+    `${items.href}?bbox=${bbox}&datetime=${date}T00:00:00Z`;
+
+
+    console.log("QUERY URL:",url);
+
+    document.getElementById("status").textContent=
+    "Searching data...";
+
+
+    try{
+
+      const res=await fetch(url);
+      const data=await res.json();
+
+      document.getElementById("raw").textContent=
+      JSON.stringify(data,null,2);
+
+      document.getElementById("status").textContent=
+      "Query completed";
+
+    }
+    catch(e){
+
+      console.error(e);
+
+      document.getElementById("status").textContent=
+      "Query error";
+
+    }
+
+  };
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
