@@ -113,11 +113,14 @@ border-radius:8px;
 background:#111923
 }
 
-  #dataGrid{
+#dataGrid{
 
 display:grid;
-grid-template-columns:repeat(4,55px);
-gap:5px;
+
+grid-template-columns:repeat(auto-fill,120px);
+
+gap:8px;
+
 margin-top:15px;
 
 }
@@ -125,21 +128,36 @@ margin-top:15px;
 
 .dataCell{
 
-height:55px;
+height:70px;
 
 display:flex;
+
 align-items:center;
+
 justify-content:center;
+
+text-align:center;
 
 font-size:11px;
 
 cursor:pointer;
 
-border-radius:6px;
+border-radius:8px;
+
+padding:6px;
 
 color:white;
 
 background:#222;
+
+transition:0.2s;
+
+}
+
+
+.dataCell:hover{
+
+transform:scale(1.05);
 
 }
 
