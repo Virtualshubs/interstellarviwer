@@ -419,10 +419,9 @@ const q=document.getElementById("search").value.trim();
 document.getElementById("status").textContent="Loading...";
 
 
-const res=await fetch(
-`${BASE}/collections?q=${encodeURIComponent(q)}`
+const res = await fetch(
+`${BASE}/collections?q=${encodeURIComponent(q)}&limit=1000`
 );
-
 
 const data=await res.json();
 
