@@ -236,6 +236,7 @@ document.getElementById("status").textContent=
 }
 
 
+
 // ===============================
 // RENDER COLLECTION CARDS
 // ===============================
@@ -280,6 +281,7 @@ c.appendChild(d);
 });
 
 }
+
 
 
 // ===============================
@@ -327,6 +329,7 @@ loadItems(activeDataset);
 }
 
 
+
 // ===============================
 // PARSE COLLECTION
 // ===============================
@@ -359,8 +362,9 @@ l=>l.rel==="items"
 }
 
 
+
 // ===============================
-// LOAD AVAILABLE ITEMS
+// LOAD ITEMS
 // ===============================
 
 async function loadItems(data){
@@ -410,7 +414,6 @@ document.getElementById("status").textContent=
 
 }
 
-
 catch(e){
 
 console.error(e);
@@ -425,8 +428,10 @@ document.getElementById("status").textContent=
 
 
 
+
+
 // ===============================
-// BUILD AVAILABLE DATA + CELLS
+// AVAILABLE DATA + SPATIAL GRID
 // ===============================
 
 function renderAvailableData(json){
@@ -455,7 +460,6 @@ return;
 }
 
 
-// guardar observaciones
 
 currentItems=json.features;
 
@@ -468,16 +472,14 @@ const dates={};
 json.features.forEach(item=>{
 
 
-const dt=
-item.properties?.datetime;
+const dt=item.properties?.datetime;
 
 
 if(!dt)
 return;
 
 
-const day=
-dt.split("T")[0];
+const day=dt.split("T")[0];
 
 
 if(!dates[day])
@@ -517,18 +519,18 @@ ${dates[date]} observations
 
 box.appendChild(r);
 
-
 });
 
 
-// NUEVA CAPA CELDAS
+
+
 
 const title=document.createElement("h3");
 
 title.style.color="#66ccff";
 title.style.marginTop="20px";
 
-title.textContent="DATA CELLS";
+title.textContent="SPATIAL DATA CELLS";
 
 
 box.appendChild(title);
@@ -547,12 +549,14 @@ box.appendChild(grid);
 createDataGrid(json.features);
 
 
+
 }
 
 
 
+
 // ===============================
-// CREATE DATA GRID
+// CREATE SPATIAL GRID
 // ===============================
 
 function createDataGrid(items){
@@ -566,18 +570,23 @@ grid.innerHTML="";
 observationGrid=[];
 
 
-const size=4;
+// mapa simple lat/lon
+const rows=18;
+const cols=36;
 
 
 
-for(let y=0;y<size;y++){
+for(let y=0;y<rows;y++){
 
 
-for(let x=0;x<size;x++){
+for(let x=0;x<cols;x++){
 
 
 
 const cell={
+
+
+id:y*cols+x,
 
 
 x,
@@ -587,23 +596,23 @@ y,
 state:-1,
 
 
-items:[],
-
-
 latMin:
--90 + y*(180/size),
+-90+y*(180/rows),
 
 
 latMax:
--90 +(y+1)*(180/size),
+-90+(y+1)*(180/rows),
 
 
 lonMin:
--180+x*(360/size),
+-180+x*(360/cols),
 
 
 lonMax:
--180+(x+1)*(360/size)
+-180+(x+1)*(360/cols),
+
+
+items:[]
 
 
 };
@@ -617,11 +626,6 @@ observationGrid.push(cell);
 const div=document.createElement("div");
 
 div.className="dataCell";
-
-
-div.textContent=
-`${x},${y}`;
-
 
 
 div.onclick=
@@ -639,25 +643,46 @@ grid.appendChild(div);
 
 
 
+
+
 // asignar observaciones
 
 items.forEach(item=>{
 
 
-const geom=item.geometry;
-
-
-if(!geom)
-return;
-
-
-
 let coords=null;
 
 
+const geom=item.geometry;
 
-if(geom.type==="Point")
+
+
+if(geom){
+
+
+if(geom.type==="Point"){
+
 coords=geom.coordinates;
+
+}
+
+
+}
+
+
+// fallback bbox
+
+if(!coords && item.bbox){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
 
 
 
@@ -667,6 +692,7 @@ return;
 
 
 const lon=coords[0];
+
 const lat=coords[1];
 
 
@@ -676,6 +702,7 @@ observationGrid.find(c=>
 
 lat>=c.latMin &&
 lat<c.latMax &&
+
 lon>=c.lonMin &&
 lon<c.lonMax
 
@@ -692,115 +719,66 @@ cell.items.push(item);
 }
 
 
+
 });
 
 
 
 updateGrid();
 
-
-
 createGridSearch();
-
 
 
 }
 
 
 
-function createDataGrid(items){
 
-const grid=document.getElementById("dataGrid");
+// ===============================
+// SEARCH LAT LON
+// ===============================
 
-grid.innerHTML="";
-
-
-observationGrid=[];
+function createGridSearch(){
 
 
-// agrupamos por fecha
-
-const dates={};
-
-
-items.forEach(item=>{
-
-
-const dt=item.properties?.datetime;
-
-
-if(!dt) return;
-
-
-const day=dt.split("T")[0];
-
-
-if(!dates[day])
-dates[day]=[];
-
-
-dates[day].push(item);
-
-
-});
-
-
-
-// crear una celda por fecha
-
-Object.keys(dates)
-.sort()
-.forEach((date,i)=>{
-
-
-const cell={
-
-id:i,
-
-date,
-
-state:0,
-
-items:dates[date]
-
-};
-
-
-observationGrid.push(cell);
-
+const box=document.getElementById("queryBox");
 
 
 const div=document.createElement("div");
 
-div.className="dataCell";
+
+div.innerHTML=`
+
+<div style="margin-top:15px">
+
+Lat:
+
+<input id="gridLat" value="0">
 
 
-div.textContent=
-`${date}\n${cell.items.length} obs`;
+Lon:
+
+<input id="gridLon" value="0">
 
 
-
-div.style.background="#16803c";
-
-
-div.onclick=
-()=>showCellData(cell);
+<button onclick="searchGrid()">
+SEARCH CELL
+</button>
 
 
+</div>
 
-grid.appendChild(div);
+`;
 
 
-
-});
+box.appendChild(div);
 
 
 }
 
 
-// ===============================
-// FILTER CELL
-// ===============================
+
+
 
 function searchGrid(){
 
@@ -821,8 +799,10 @@ if(
 
 lat>=c.latMin &&
 lat<c.latMax &&
+
 lon>=c.lonMin &&
 lon<c.lonMax &&
+
 c.items.length
 
 ){
@@ -847,10 +827,13 @@ c.state=-1;
 });
 
 
+
 updateGrid();
 
 
 }
+
+
 
 
 
@@ -865,12 +848,11 @@ const cells=
 document.querySelectorAll(".dataCell");
 
 
+
 cells.forEach((div,i)=>{
 
 
-const cell=
-observationGrid[i];
-
+const cell=observationGrid[i];
 
 
 if(cell.state===-1){
@@ -902,6 +884,8 @@ div.style.background="#ff8c00";
 
 
 
+
+
 // ===============================
 // SHOW CELL DATA
 // ===============================
@@ -922,12 +906,15 @@ observations:cell.items
 },
 
 null,
+
 2
 
 );
 
 
 }
+
+
 
 
 
@@ -950,6 +937,7 @@ r.className="row";
 r.innerHTML=`
 
 <div class="key">${key}</div>
+
 <div class="value">${value}</div>
 
 `;
