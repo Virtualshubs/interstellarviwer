@@ -283,73 +283,64 @@ background:#111923;
 
 }
 
-
-
-/* GRID CELDAS */
-
 #dataGrid{
 
-display:grid;
+position:relative;
 
-grid-template-columns:repeat(36,1fr);
-grid-template-rows:repeat(18,1fr);
+width:720px;
+height:360px;
 
-aspect-ratio:2/1;
+margin-top:15px;
 
-width:100%;
-max-width:900px;
+border:1px solid #33435b;
 
-margin:20px auto;
-
-gap:1px;
-
-}
-
-
-/* CELDAS */
-
-.dataCell{
-
-display:flex;
-
-align-items:center;
-justify-content:center;
-
-aspect-ratio:1/1;
-
-font-size:10px;
-
-cursor:pointer;
-
-background:#222;
-
-color:#fff;
-
-border:1px solid rgba(255,255,255,.08);
-
-transition:.2s;
-
-padding:2px;
+background:#0b1018;
 
 overflow:hidden;
 
 }
 
-.dataCell:hover{
 
-transform:scale(1.08);
+/* ===============================
+   SPATIAL CELL
+=============================== */
 
-z-index:2;
+.dataCell{
+
+position:absolute;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+text-align:center;
+
+font-size:10px;
+
+cursor:pointer;
+
+color:white;
+
+border-radius:2px;
+
+background:#222;
+
+border:1px solid rgba(255,255,255,.08);
+
+transition:.2s;
 
 }
 
 
 .dataCell:hover{
 
-transform:scale(1.05);
+transform:scale(1.15);
+
+z-index:10;
 
 }
-
 
 
 /* RAW JSON */
@@ -762,11 +753,8 @@ createSpatialGrid(json.features);
 
 }
 
-// ===============================
-// CREATE SPATIAL GRID
-// ===============================
+function createDataGrid(items){
 
-function createSpatialGrid(items){
 
 const grid=document.getElementById("dataGrid");
 
@@ -776,19 +764,28 @@ grid.innerHTML="";
 observationGrid=[];
 
 
-// resolución inicial del mapa
-// 18 bandas latitud x 36 bandas longitud
+// ===============================
+// EARTH GRID
+// ===============================
 
 const rows=18;
 const cols=36;
 
+
+const mapWidth=720;
+const mapHeight=360;
+
+
+
+// ===============================
+// CREATE CELLS
+// ===============================
 
 
 for(let y=0;y<rows;y++){
 
 
 for(let x=0;x<cols;x++){
-
 
 
 const cell={
@@ -799,12 +796,6 @@ id:y*cols+x,
 
 x,
 y,
-
-
-// estados JANUS
-// -1 = sin observaciones
-// 0 = contiene datos
-// 1 = resultado búsqueda
 
 
 state:-1,
@@ -828,6 +819,7 @@ lonMax:
 
 items:[]
 
+
 };
 
 
@@ -836,13 +828,44 @@ observationGrid.push(cell);
 
 
 
+// ===============================
+// CREATE VISUAL CELL
+// ===============================
+
+
 const div=document.createElement("div");
+
 
 div.className="dataCell";
 
 
-div.textContent=
-"";
+// posición cartográfica
+
+const left=
+((cell.lonMin+180)/360)*mapWidth;
+
+
+const top=
+((90-cell.latMax)/180)*mapHeight;
+
+
+const width=
+((cell.lonMax-cell.lonMin)/360)*mapWidth;
+
+
+const height=
+((cell.latMax-cell.latMin)/180)*mapHeight;
+
+
+
+div.style.left=left+"px";
+
+div.style.top=top+"px";
+
+div.style.width=width+"px";
+
+div.style.height=height+"px";
+
 
 
 div.onclick=
@@ -860,11 +883,10 @@ grid.appendChild(div);
 
 
 
-
-
 // ===============================
-// DISTRIBUIR OBSERVACIONES
+// ASSIGN OBSERVATIONS
 // ===============================
+
 
 items.forEach(item=>{
 
@@ -872,24 +894,27 @@ items.forEach(item=>{
 let coords=null;
 
 
-
 const geom=item.geometry;
 
 
 
-// punto directo STAC
+if(geom){
 
-if(geom && geom.type==="Point"){
+
+if(geom.type==="Point"){
 
 coords=geom.coordinates;
 
 }
 
 
+}
 
-// si no hay punto usamos bbox
+
+// fallback bbox
 
 if(!coords && item.bbox){
+
 
 coords=[
 
@@ -898,6 +923,7 @@ coords=[
 (item.bbox[1]+item.bbox[3])/2
 
 ];
+
 
 }
 
@@ -915,16 +941,14 @@ const lat=coords[1];
 
 
 
-
-const cell=observationGrid.find(c=>
-
+const cell=
+observationGrid.find(c=>
 
 lat>=c.latMin &&
 lat<c.latMax &&
 
 lon>=c.lonMin &&
 lon<c.lonMax
-
 
 );
 
@@ -935,10 +959,12 @@ if(cell){
 
 cell.state=0;
 
+
 cell.items.push(item);
 
 
 }
+
 
 
 });
@@ -948,13 +974,12 @@ cell.items.push(item);
 updateGrid();
 
 
+
 createGridSearch();
 
 
+
 }
-
-
-
 
 
 // ===============================
