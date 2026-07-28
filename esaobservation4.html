@@ -5,130 +5,309 @@
 <title>ESA DATA v0.3</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif
+}
+
 
 body{
-background:#0b1018;color:#fff;height:100vh;
-display:flex;justify-content:center;align-items:center
+
+background:#0b1018;
+color:#fff;
+
+width:100vw;
+height:100vh;
+
+overflow:hidden;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
 }
+
+
+/* PANEL PRINCIPAL */
 
 #panel{
-width:100vh;height:99vh;background:#141b25;
-border:1px solid #2b3647;border-radius:12px;
-display:flex;flex-direction:column;overflow:hidden
+
+width:100vw;
+height:100vh;
+
+background:#141b25;
+
+border:none;
+border-radius:0;
+
+display:flex;
+flex-direction:column;
+
+overflow:hidden;
+
 }
+
+
+
+/* HEADER */
 
 #header{
-background:#182230;padding:14px 18px;
-display:flex;gap:10px;align-items:center
+
+background:#182230;
+
+padding:14px 18px;
+
+display:flex;
+
+gap:10px;
+
+align-items:center;
+
 }
+
 
 #search{
-flex:1;padding:10px;background:#0f1622;color:#fff;
-border:1px solid #33435b;border-radius:6px
+
+flex:1;
+
+padding:10px;
+
+background:#0f1622;
+
+color:#fff;
+
+border:1px solid #33435b;
+
+border-radius:6px;
+
 }
+
+
 
 button{
-background:#ff8c00;color:#fff;border:none;
-padding:10px 16px;border-radius:6px;
-cursor:pointer;font-weight:bold
+
+background:#ff8c00;
+
+color:#fff;
+
+border:none;
+
+padding:10px 16px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-weight:bold;
+
 }
+
+
+
+/* STATUS */
 
 #status{
+
 padding:8px 18px;
+
 border-bottom:1px solid #263240;
-color:#8fb8ff
+
+color:#8fb8ff;
+
 }
+
+
+
+/* CONTENIDO */
 
 #content{
+
 display:grid;
-grid-template-columns:420px 1fr;
-height:100%
+
+grid-template-columns:380px 1fr;
+
+height:calc(100vh - 90px);
+
+overflow:hidden;
+
 }
 
-#cards,#detail{
+
+
+/* COLUMNAS */
+
+#cards,
+#detail{
+
 overflow:auto;
-padding:16px
+
+padding:16px;
+
 }
+
+
+
+/* TARJETAS */
 
 .card{
+
 background:#1a2432;
+
 border:1px solid #2d3d52;
+
 border-radius:8px;
+
 padding:14px;
-margin-bottom:12px
+
+margin-bottom:12px;
+
 }
+
 
 .card h3{
+
 color:#ffb04d;
-margin-bottom:8px
+
+margin-bottom:8px;
+
 }
+
 
 .card p{
+
 font-size:13px;
+
 color:#cfd8e6;
-margin:4px 0
+
+margin:4px 0;
+
 }
 
-.open{margin-top:10px}
+
+
+.open{
+
+margin-top:10px;
+
+}
+
+
+
+/* DATOS */
 
 .row{
+
 display:flex;
+
 padding:7px 0;
+
 border-bottom:1px solid rgba(255,255,255,.08)
+
 }
+
 
 .key{
+
 width:170px;
+
 color:#7bc3ff;
-font-weight:bold
+
+font-weight:bold;
+
 }
+
 
 .value{
+
 flex:1;
-word-break:break-word
+
+word-break:break-word;
+
 }
+
+
+
+/* INPUTS */
 
 input{
+
 background:#0f1622;
+
 border:1px solid #33435b;
+
 color:#fff;
+
 padding:6px;
+
 border-radius:5px;
-width:180px
+
+width:180px;
+
 }
 
-details{margin-top:18px}
+
+
+details{
+
+margin-top:18px;
+
+}
+
 
 pre{
+
 white-space:pre-wrap;
-font-size:12px
+
+font-size:12px;
+
 }
 
+
+
+/* CONTENEDOR DATOS */
+
 #queryBox{
+
 margin-top:20px;
+
 padding:12px;
+
 border:1px solid #2d3d52;
+
 border-radius:8px;
-background:#111923
+
+background:#111923;
+
 }
+
+
+
+/* GRID CELDAS */
 
 #dataGrid{
 
 display:grid;
 
-grid-template-columns:repeat(auto-fill,120px);
+grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
 
-gap:8px;
+gap:10px;
 
 margin-top:15px;
+
+width:100%;
 
 }
 
 
+
+/* CELDAS */
+
 .dataCell{
 
-height:70px;
+min-height:80px;
 
 display:flex;
 
@@ -144,15 +323,18 @@ cursor:pointer;
 
 border-radius:8px;
 
-padding:6px;
+padding:8px;
 
 color:white;
 
 background:#222;
 
-transition:0.2s;
+transition:.2s;
+
+border:1px solid rgba(255,255,255,.1);
 
 }
+
 
 
 .dataCell:hover{
@@ -160,6 +342,20 @@ transition:0.2s;
 transform:scale(1.05);
 
 }
+
+
+
+/* RAW JSON */
+
+#raw{
+
+max-height:60vh;
+
+overflow:auto;
+
+}
+
+
 
 </style>
 </head>
