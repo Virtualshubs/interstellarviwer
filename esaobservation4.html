@@ -285,19 +285,25 @@ background:#111923;
 
 
 
-/* GRID CELDAS */
+/* GRID CELDAS - MAPA CARTESIANO */
 
 #dataGrid{
 
 display:grid;
 
-grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+grid-template-columns:repeat(36,1fr);
 
-gap:10px;
+grid-template-rows:repeat(18,1fr);
 
-margin-top:15px;
+aspect-ratio:2 / 1;
 
 width:100%;
+
+max-width:1000px;
+
+margin:20px auto;
+
+gap:1px;
 
 }
 
@@ -307,7 +313,7 @@ width:100%;
 
 .dataCell{
 
-min-height:80px;
+aspect-ratio:1 / 1;
 
 display:flex;
 
@@ -317,13 +323,11 @@ justify-content:center;
 
 text-align:center;
 
-font-size:11px;
+font-size:10px;
 
 cursor:pointer;
 
-border-radius:8px;
-
-padding:8px;
+padding:0;
 
 color:white;
 
@@ -333,13 +337,17 @@ transition:.2s;
 
 border:1px solid rgba(255,255,255,.1);
 
+overflow:hidden;
+
 }
 
 
 
 .dataCell:hover{
 
-transform:scale(1.05);
+transform:scale(1.08);
+
+z-index:2;
 
 }
 
@@ -354,7 +362,6 @@ max-height:60vh;
 overflow:auto;
 
 }
-
 
 
 </style>
