@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ESA DATA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{
+background:#0b1018;
+color:#fff;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+#panel{
+width:900px;
+height:700px;
+background:#141b25;
+border:1px solid #2b3647;
+border-radius:12px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+#header{
+padding:16px 20px;
+background:#182230;
+font-size:18px;
+font-weight:bold;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+button{
+background:#ff8c00;
+border:none;
+color:#fff;
+padding:10px 18px;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+button:hover{
+opacity:.9;
+}
+#status{
+padding:10px 20px;
+font-size:13px;
+color:#8fb8ff;
+border-bottom:1px solid #263240;
+}
+#content{
+flex:1;
+overflow:auto;
+padding:20px;
+}
+.row{
+display:flex;
+padding:8px 0;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+.key{
+width:220px;
+font-weight:bold;
+color:#6fb8ff;
+}
+.value{
+flex:1;
+word-break:break-word;
+}
+details{
+margin-top:20px;
+background:#0d1420;
+padding:12px;
+border-radius:8px;
+}
+pre{
+white-space:pre-wrap;
+font-size:12px;
+}
+</style>
+
+</head>
+<body>
+
+<div id="panel">
+
+<div id="header">
+<span>ESA DATA</span>
+<button id="loadBtn">Load Biomass</button>
+</div>
+
+<div id="status">
+Ready
+</div>
+
+<div id="content">
+
+<div id="metadata"></div>
+
+<details>
+<summary>Raw JSON</summary>
+<pre id="json"></pre>
+</details>
+
+</div>
+
+</div>
+
+<script>
+
+const ENDPOINT="https://catalog.maap.eo.esa.int/catalogue/collections?q=Biomass";
+
+const btn=document.getElementById("loadBtn");
+const status=document.getElementById("status");
+const metadata=document.getElementById("metadata");
+const jsonViewer=document.getElementById("json");
+
+btn.onclick=loadESA;
+
+async function loadESA(){
+
+status.textContent="Loading ESA catalogue...";
+
+metadata.innerHTML="";
+jsonViewer.textContent="";
+
+try{
+
+const response=await fetch(ENDPOINT);
+
+const data=await response.json();
+
+status.textContent="Catalogue loaded";
+
+jsonViewer.textContent=JSON.stringify(data,null,2);
+
+render(data);
+
+}
+catch(err){
+
+status.textContent="Error: "+err.message;
+
+console.error(err);
+
+}
+
+}
+
+function render(data){
+
+metadata.innerHTML="";
+
+if(!data.collections){
+
+metadata.innerHTML="<p>No collections found.</p>";
+
+return;
+
+}
+
+data.collections.forEach(collection=>{
+
+const block=document.createElement("div");
+
+block.style.marginBottom="25px";
+
+addRow(block,"Title",collection.title);
+addRow(block,"ID",collection.id);
+addRow(block,"Description",collection.description);
+addRow(block,"Type",collection.type);
+addRow(block,"Version",collection.version);
+
+if(collection.created)
+addRow(block,"Created",collection.created);
+
+if(collection.updated)
+addRow(block,"Updated",collection.updated);
+
+if(collection.keywords)
+addRow(block,"Keywords",collection.keywords.join(", "));
+
+metadata.appendChild(block);
+
+});
+
+}
+
+function addRow(parent,key,value){
+
+if(value===undefined||value===null)return;
+
+const row=document.createElement("div");
+row.className="row";
+
+const k=document.createElement("div");
+k.className="key";
+k.textContent=key;
+
+const v=document.createElement("div");
+v.className="value";
+v.textContent=value;
+
+row.appendChild(k);
+row.appendChild(v);
+
+parent.appendChild(row);
+
+}
+
+</script>
+
+</body>
+</html>
