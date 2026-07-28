@@ -363,19 +363,6 @@ overflow:auto;
 
 }
 
-  select{
-
-background:#0f1622;
-border:1px solid #33435b;
-color:white;
-
-padding:8px;
-
-border-radius:5px;
-
-width:280px;
-
-}
 
 </style>
 </head>
@@ -383,23 +370,10 @@ width:280px;
 <body>
 
 <div id="panel">
-<div id="header">
-
-<select id="collectionSelect">
-
-<option value="">
-Loading catalogue...
-</option>
-
-</select>
-
-<input id="search" value="Biomass">
-
-<button id="load">
-SEARCH
-</button>
-
-</div>
+  <div id="header">
+    <input id="search" value="Biomass">
+    <button id="load">SEARCH</button>
+  </div>
 
   <div id="status">Ready</div>
 
@@ -421,7 +395,7 @@ SEARCH
 </div>
   
 <script>
-loadCollectionsList();
+
 const BASE="https://catalog.maap.eo.esa.int/catalogue";
 
 let collections=[];
@@ -590,102 +564,7 @@ l=>l.rel==="items"
 
 }
 
-// =======================================
-// LOAD FULL CATALOG
-// =======================================
 
-async function loadCollectionsList(){
-
-const res=await fetch(
-`${BASE}/collections?limit=1000`
-);
-
-const json=await res.json();
-
-buildSelector(json.collections||[]);
-
-}
-
-
-
-// =======================================
-// BUILD SELECT
-// =======================================
-
-function buildSelector(list){
-
-const select=document.getElementById("collectionSelect");
-
-select.innerHTML="";
-
-
-
-// agrupamos por familia
-
-const groups={};
-
-
-
-list.forEach(col=>{
-
-const family=
-col.id
-.split("_")[0]
-.split("-")[0];
-
-if(!groups[family])
-groups[family]=[];
-
-groups[family].push(col);
-
-});
-
-
-
-Object.keys(groups)
-.sort()
-.forEach(family=>{
-
-const optgroup=
-document.createElement("optgroup");
-
-optgroup.label=family;
-
-
-
-groups[family]
-.sort((a,b)=>a.id.localeCompare(b.id))
-.forEach(col=>{
-
-const option=
-document.createElement("option");
-
-option.value=col.id;
-
-option.textContent=
-col.id;
-
-optgroup.appendChild(option);
-
-});
-
-
-
-select.appendChild(optgroup);
-
-});
-
-
-
-select.onchange=function(){
-
-document.getElementById("search").value=this.value;
-
-load();
-
-};
-
-}
 
 // ===============================
 // LOAD ITEMS
