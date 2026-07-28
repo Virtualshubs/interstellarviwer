@@ -583,31 +583,70 @@ document.getElementById("status").textContent=
 try{
 
 
-// primero buscamos la observación más reciente
+let referenceDate=null;
+
+
+
+// =================================
+// DETERMINAR FECHA DE REFERENCIA
+// =================================
+
+
+// misión terminada
+if(data.endDate){
+
+
+referenceDate=data.endDate;
+
+
+console.log(
+"USING DATASET END DATE:",
+referenceDate
+);
+
+
+}
+
+
+// misión activa
+else{
+
 
 const latestURL =
 `${data.items}?limit=1&sortby=-datetime`;
 
 
-console.log("LATEST QUERY:",latestURL);
-
-
-const latestRes = await fetch(latestURL);
-
-
-const latestJSON = await latestRes.json();
+console.log(
+"LATEST QUERY:",
+latestURL
+);
 
 
 
-if(!latestJSON.features || latestJSON.features.length===0){
+const latestRes =
+await fetch(latestURL);
 
-throw new Error("No latest observation");
+
+
+const latestJSON =
+await latestRes.json();
+
+
+
+if(
+!latestJSON.features ||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
 
 }
 
 
 
-const latestDate =
+referenceDate =
 latestJSON.features[0]
 .properties
 .datetime;
@@ -615,32 +654,74 @@ latestJSON.features[0]
 
 
 console.log(
-"LATEST DATE:",
-latestDate
+"USING LATEST OBSERVATION:",
+referenceDate
+);
+
+
+}
+
+
+
+// =================================
+// PEDIR VENTANA DE DATOS
+// =================================
+
+
+const url =
+`${data.items}?limit=2000&datetime=../${referenceDate}`;
+
+
+
+console.log(
+"ITEM QUERY:",
+url
 );
 
 
 
-
-// ahora pedimos las 2000 más cercanas a esa fecha
-
-const url =
-`${data.items}?limit=2000&datetime=../${latestDate}&sortby=-datetime`;
+const res =
+await fetch(url);
 
 
 
-console.log("ITEM QUERY:",url);
+const json =
+await res.json();
 
 
 
-const res=await fetch(url);
+
+// =================================
+// ORDENAR POR FECHA DESCENDENTE
+// =================================
 
 
-const json=await res.json();
+if(json.features){
+
+
+json.features.sort((a,b)=>{
+
+
+return new Date(
+b.properties.datetime
+)
+-
+new Date(
+a.properties.datetime
+);
+
+
+});
+
+
+}
 
 
 
-console.log("ITEMS:",json);
+console.log(
+"ITEMS:",
+json
+);
 
 
 
@@ -649,7 +730,11 @@ renderAvailableData(json);
 
 
 document.getElementById("raw").textContent=
-JSON.stringify(json,null,2);
+JSON.stringify(
+json,
+null,
+2
+);
 
 
 
@@ -671,8 +756,6 @@ document.getElementById("status").textContent=
 
 
 }
-
-
 
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
