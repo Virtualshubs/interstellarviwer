@@ -583,11 +583,54 @@ document.getElementById("status").textContent=
 try{
 
 
-const url=
-`${data.items}?limit=4000`;
+// primero buscamos la observación más reciente
+
+const latestURL =
+`${data.items}?limit=1&sortby=-datetime`;
+
+
+console.log("LATEST QUERY:",latestURL);
+
+
+const latestRes = await fetch(latestURL);
+
+
+const latestJSON = await latestRes.json();
+
+
+
+if(!latestJSON.features || latestJSON.features.length===0){
+
+throw new Error("No latest observation");
+
+}
+
+
+
+const latestDate =
+latestJSON.features[0]
+.properties
+.datetime;
+
+
+
+console.log(
+"LATEST DATE:",
+latestDate
+);
+
+
+
+
+// ahora pedimos las 2000 más cercanas a esa fecha
+
+const url =
+`${data.items}?limit=2000&datetime=../${latestDate}&sortby=-datetime`;
+
 
 
 console.log("ITEM QUERY:",url);
+
 
 
 const res=await fetch(url);
@@ -628,8 +671,6 @@ document.getElementById("status").textContent=
 
 
 }
-
-
 
 
 
