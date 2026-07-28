@@ -275,10 +275,13 @@ return{
 
 id:col.id,
 title:col.title,
+
 startDate:
 col.extent?.temporal?.interval?.[0]?.[0]||null,
+
 endDate:
 col.extent?.temporal?.interval?.[0]?.[1]||null,
+
 bbox:
 col.extent?.spatial?.bbox?.[0]||null,
 
@@ -327,7 +330,7 @@ container.appendChild(r);
 
 function createQuery(data){
 
-if(!data.items)return;
+if(!data.id)return;
 
 
 const box=document.getElementById("queryBox");
@@ -342,19 +345,19 @@ DATA QUERY
 
 <div class="row">
 <div class="key">Latitude</div>
-<input id="qlat" value="40.4">
+<input id="qlat" value="-3.4653">
 </div>
 
 
 <div class="row">
 <div class="key">Longitude</div>
-<input id="qlon" value="-3.7">
+<input id="qlon" value="-62.2159">
 </div>
 
 
 <div class="row">
 <div class="key">Radius km</div>
-<input id="qrad" value="10">
+<input id="qrad" value="100">
 </div>
 
 
@@ -373,6 +376,7 @@ SEARCH DATA
 
 const dateInput=document.getElementById("qdate");
 
+
 if(data.startDate){
 
 dateInput.min=
@@ -388,8 +392,10 @@ data.endDate.split("T")[0];
 
 }
 
+
 dateInput.value=
 new Date().toISOString().split("T")[0];
+
 
 document.getElementById("queryBtn").onclick=
 ()=>fetchItems(data);
@@ -398,7 +404,7 @@ document.getElementById("queryBtn").onclick=
 
 
 // ===============================
-// REQUEST ITEMS
+// SEARCH STAC
 // ===============================
 
 async function fetchItems(data){
@@ -419,7 +425,6 @@ const date=
 document.getElementById("qdate").value;
 
 
-
 const delta=radius/111;
 
 
@@ -432,35 +437,50 @@ lat+delta
 
 ].join(",");
 
+
+
+const datetime=
+`${date}T00:00:00Z/${date}T23:59:59Z`;
+
+
+
 const url=
-`${data.items}?bbox=${bbox}&datetime=${date}T00:00:00Z`;
+`${BASE}/search?collections=${data.id}&bbox=${bbox}&datetime=${datetime}`;
+
 
 console.log("QUERY URL:",url);
+
 
 document.getElementById("status").textContent=
 "Searching data...";
 
+
 try{
 
-
 const res=await fetch(url);
+
 const result=await res.json();
+
+
 document.getElementById("raw").textContent=
 JSON.stringify(result,null,2);
 
+
 document.getElementById("status").textContent=
-"Query completed";
+`${result.numberMatched||0} products found`;
 
 
 }
 
 catch(e){
+
 console.error(e);
 
 document.getElementById("status").textContent=
 "Query error";
 
 }
+
 
 }
 
