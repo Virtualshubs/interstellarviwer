@@ -300,15 +300,6 @@ button:hover{
 <!-- ===================================================== -->
 
 <script>
-  // ======================================================
-// SIMPLE SPATIAL DATA EXPLORER
-// Three.js r234
-// ======================================================
-
-
-// ======================================================
-// STATE
-// ======================================================
 
 let scene;
 let camera;
@@ -319,29 +310,33 @@ let selectedCell = null;
 let gridData = [];
 
 let currentLocation = {
-    lat: 38.995,
-    lon: -1.855,
+    lat:38.995,
+    lon:-1.855,
     radius:500
 };
 
 
+const STAC_URL =
+"https://catalog.maap.eo.esa.int/catalogue/search";
+
+
 // ======================================================
-// INIT THREE
+// THREE
 // ======================================================
 
 function initThree(){
 
-    const canvas = document.getElementById("three");
+    const canvas=document.getElementById("three");
+
+    scene=new THREE.Scene();
+
+    scene.background=
+    new THREE.Color(0x070b12);
 
 
-    scene = new THREE.Scene();
-
-    scene.background = new THREE.Color(0x070b12);
-
-
-    camera = new THREE.PerspectiveCamera(
+    camera=new THREE.PerspectiveCamera(
         45,
-        canvas.clientWidth / canvas.clientHeight,
+        canvas.clientWidth/canvas.clientHeight,
         0.1,
         1000
     );
@@ -354,11 +349,10 @@ function initThree(){
     );
 
 
-    renderer = new THREE.WebGLRenderer({
-
+    renderer=
+    new THREE.WebGLRenderer({
         canvas,
         antialias:true
-
     });
 
 
@@ -368,26 +362,12 @@ function initThree(){
     );
 
 
-    const light = new THREE.DirectionalLight(
-        0xffffff,
-        2
+    scene.add(
+        new THREE.AmbientLight(
+            0xffffff,
+            1
+        )
     );
-
-    light.position.set(
-        5,
-        5,
-        5
-    );
-
-    scene.add(light);
-
-
-    const ambient = new THREE.AmbientLight(
-        0xffffff,
-        .5
-    );
-
-    scene.add(ambient);
 
 
     animate();
@@ -395,10 +375,6 @@ function initThree(){
 }
 
 
-
-// ======================================================
-// LOOP
-// ======================================================
 
 function animate(){
 
@@ -414,27 +390,37 @@ function animate(){
 
 
 // ======================================================
-// CREATE GRID
+// GRID
 // ======================================================
 
 function createGrid(){
 
-
-    const grid = document.getElementById("grid");
+    const grid=document.getElementById("grid");
 
     grid.innerHTML="";
-
 
     gridData=[];
 
 
-    const size = 8;
+    const size=8;
+
+    const step=0.05;
 
 
     for(let y=0;y<size;y++){
 
-
         for(let x=0;x<size;x++){
+
+
+            const lat1=
+            currentLocation.lat+
+            ((y-size/2)*step);
+
+
+            const lon1=
+            currentLocation.lon+
+            ((x-size/2)*step);
+
 
 
             const cell={
@@ -444,18 +430,16 @@ function createGrid(){
                 x,
                 y,
 
-                lat:
 
-                currentLocation.lat +
+                bbox:[
 
-                ((y-size/2)*0.05),
+                    lon1,
+                    lat1,
 
+                    lon1+step,
+                    lat1+step
 
-                lon:
-
-                currentLocation.lon +
-
-                ((x-size/2)*0.05),
+                ],
 
 
                 observations:[]
@@ -468,13 +452,15 @@ function createGrid(){
 
 
 
-            const div=document.createElement("div");
+            const div=
+            document.createElement("div");
 
 
             div.className="cell";
 
 
-            div.dataset.id=cell.id;
+            div.dataset.id=
+            cell.id;
 
 
 
@@ -485,9 +471,11 @@ function createGrid(){
             };
 
 
-
             grid.appendChild(div);
 
+
+
+            querySTAC(cell);
 
 
         }
@@ -500,8 +488,101 @@ function createGrid(){
 
 
 // ======================================================
+// STAC QUERY
+// ======================================================
+
+async function querySTAC(cell){
+
+
+    try{
+
+
+        const body={
+
+            bbox:cell.bbox,
+
+            limit:20
+
+        };
+
+
+
+        const response=
+        await fetch(
+            STAC_URL,
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                JSON.stringify(body)
+
+            }
+        );
+
+
+
+        const data=
+        await response.json();
+
+
+
+        cell.observations=
+        data.features || [];
+
+
+
+        if(cell.observations.length){
+
+            const div=
+            document.querySelector(
+                `[data-id="${cell.id}"]`
+            );
+
+
+            if(div){
+
+                div.classList.add(
+                    "active"
+                );
+
+            }
+
+        }
+
+
+
+        console.log(
+            "CELL",
+            cell.id,
+            cell.observations
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "STAC ERROR",
+            error
+        );
+
+    }
+
+
+}
+
+
+
+// ======================================================
 // SELECT CELL
 // ======================================================
+
 
 function selectCell(cell){
 
@@ -511,20 +592,16 @@ function selectCell(cell){
 
     document
     .querySelectorAll(".cell")
-    .forEach(c=>c.classList.remove("active"));
-
+    .forEach(c=>
+        c.classList.remove("active")
+    );
 
 
     document
-    .querySelector(`[data-id="${cell.id}"]`)
+    .querySelector(
+        `[data-id="${cell.id}"]`
+    )
     .classList.add("active");
-
-
-
-    console.log(
-        "Selected cell",
-        cell
-    );
 
 
 
@@ -539,14 +616,24 @@ function selectCell(cell){
 // SHOW DATA
 // ======================================================
 
+
 function showCellData(cell){
 
 
-    const products =
-    document.getElementById("products");
+    const products=
+    document.getElementById(
+        "products"
+    );
+
+
+    const layers=
+    document.getElementById(
+        "layers"
+    );
 
 
     products.innerHTML="";
+    layers.innerHTML="";
 
 
 
@@ -559,15 +646,8 @@ function showCellData(cell){
 
     addItem(
         products,
-        "LAT",
-        cell.lat.toFixed(4)
-    );
-
-
-    addItem(
-        products,
-        "LON",
-        cell.lon.toFixed(4)
+        "BBOX",
+        cell.bbox.join(", ")
     );
 
 
@@ -579,17 +659,39 @@ function showCellData(cell){
 
 
 
-    document
-    .getElementById("layers")
-    .innerHTML="";
+    cell.observations.forEach(
+        obs=>{
 
 
-    addItem(
-        layers,
-        "STATUS",
-        "Waiting STAC query"
+            addItem(
+                products,
+                obs.collection ||
+                "PRODUCT",
+                obs.id
+            );
+
+
+            if(obs.assets){
+
+                Object.keys(obs.assets)
+                .forEach(asset=>{
+
+
+                    addItem(
+                        layers,
+                        "ASSET",
+                        asset
+                    );
+
+
+                });
+
+
+            }
+
+
+        }
     );
-
 
 
 }
@@ -597,13 +699,20 @@ function showCellData(cell){
 
 
 // ======================================================
-// UI HELPERS
+// UI
 // ======================================================
 
-function addItem(container,key,value){
 
+function addItem(
+    container,
+    key,
+    value
+){
 
-    const div=document.createElement("div");
+    const div=
+    document.createElement(
+        "div"
+    );
 
 
     div.className="item";
@@ -618,49 +727,33 @@ function addItem(container,key,value){
 
     container.appendChild(div);
 
-
 }
 
 
 
 // ======================================================
-// LOAD OBSERVATIONS
+// LOAD
 // ======================================================
+
 
 document
 .getElementById("load")
 .onclick=function(){
 
 
-
-    currentLocation.lat =
+    currentLocation.lat=
     Number(
         document.getElementById("lat").value
     );
 
 
-    currentLocation.lon =
+    currentLocation.lon=
     Number(
         document.getElementById("lon").value
     );
 
 
-    currentLocation.radius =
-    Number(
-        document.getElementById("radius").value
-    );
-
-
-
     createGrid();
-
-
-
-    console.log(
-        "Spatial search:",
-        currentLocation
-    );
-
 
 
 };
@@ -668,7 +761,7 @@ document
 
 
 // ======================================================
-// GEOMETRY PLACEHOLDER
+// TEST GEOMETRY
 // ======================================================
 
 document
@@ -676,16 +769,8 @@ document
 .onclick=function(){
 
 
-    if(!selectedCell){
-
-        alert(
-            "Select a cell first"
-        );
-
-        return;
-
-    }
-
+    if(!selectedCell)
+    return;
 
 
     createTestTerrain();
@@ -695,45 +780,36 @@ document
 
 
 
-// ======================================================
-// TEST TERRAIN
-// ======================================================
-
 function createTestTerrain(){
 
 
-    const geometry =
+    const geometry=
     new THREE.PlaneGeometry(
         3,
         3,
-        30,
-        30
+        50,
+        50
     );
 
 
-    const position =
+    const pos=
     geometry.attributes.position;
 
 
-    for(
-        let i=0;
-        i<position.count;
-        i++
-    ){
+    for(let i=0;i<pos.count;i++){
 
-        const x =
-        position.getX(i);
+        const x=
+        pos.getX(i);
 
-
-        const y =
-        position.getY(i);
+        const y=
+        pos.getY(i);
 
 
-        position.setZ(
+        pos.setZ(
             i,
             Math.sin(x*3)*
             Math.cos(y*3)*
-            .2
+            0.2
         );
 
     }
@@ -742,28 +818,18 @@ function createTestTerrain(){
     geometry.computeVertexNormals();
 
 
-
-    const material =
-    new THREE.MeshStandardMaterial({
-
-        color:0x557755,
-
-        wireframe:false
-
-    });
-
-
-
-    const mesh =
+    const mesh=
     new THREE.Mesh(
         geometry,
-        material
+        new THREE.MeshStandardMaterial(
+        {
+            color:0x557755
+        })
     );
 
 
-    mesh.rotation.x =
+    mesh.rotation.x=
     -Math.PI/2;
-
 
 
     scene.add(mesh);
@@ -773,13 +839,13 @@ function createTestTerrain(){
 
 
 
-// ======================================================
 // START
-// ======================================================
 
 initThree();
 
 createGrid();
+
+
 </script>
 
 </body>
