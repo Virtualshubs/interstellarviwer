@@ -157,21 +157,27 @@ let activeDataset=null;
 
 document.getElementById("load").onclick=load;
 
+
 async function load(){
 
 const q=document.getElementById("search").value.trim();
 
 document.getElementById("status").textContent="Loading...";
 
+
 const res=await fetch(
 `${BASE}/collections?q=${encodeURIComponent(q)}`
 );
 
+
 const data=await res.json();
+
 
 collections=data.collections||[];
 
+
 renderCards();
+
 
 document.getElementById("status").textContent=
 `${collections.length} collections`;
@@ -189,11 +195,13 @@ const c=document.getElementById("cards");
 
 c.innerHTML="";
 
+
 collections.forEach(col=>{
 
 const d=document.createElement("div");
 
 d.className="card";
+
 
 d.innerHTML=`
 
@@ -211,8 +219,10 @@ OPEN
 
 `;
 
+
 d.querySelector("button").onclick=
 ()=>show(col);
+
 
 c.appendChild(d);
 
@@ -231,12 +241,12 @@ const meta=document.getElementById("meta");
 
 meta.innerHTML="";
 
+
 document.getElementById("queryBox").innerHTML="";
 
 
 add(meta,"ID",col.id);
 add(meta,"Title",col.title);
-add(meta,"Type",col.type);
 add(meta,"Version",col.version);
 add(meta,"Created",col.created);
 add(meta,"Updated",col.updated);
@@ -247,26 +257,27 @@ if(col.keywords)
 add(meta,"Keywords",col.keywords.join(", "));
 
 
+
 activeDataset=parseCollection(col);
 
 
+
 add(meta,"DATA START",activeDataset.startDate||"");
-add(meta,"DATA END",activeDataset.endDate||"Present");
-add(meta,"ITEMS",activeDataset.items||"");
-add(meta,"QUERYABLES",activeDataset.queryables||"");
+add(meta,"DATA END",activeDataset.endDate||"");
 
 
 document.getElementById("raw").textContent=
 JSON.stringify(col,null,2);
 
 
-createQuery(activeDataset);
+
+loadItems(activeDataset);
 
 }
 
 
 // ===============================
-// PARSE DATASET
+// PARSE COLLECTION
 // ===============================
 
 function parseCollection(col){
@@ -274,26 +285,23 @@ function parseCollection(col){
 return{
 
 id:col.id,
+
 title:col.title,
+
 
 startDate:
 col.extent?.temporal?.interval?.[0]?.[0]||null,
 
+
 endDate:
 col.extent?.temporal?.interval?.[0]?.[1]||null,
 
-bbox:
-col.extent?.spatial?.bbox?.[0]||null,
 
 items:
 col.links?.find(
 l=>l.rel==="items"
-)?.href||null,
-
-queryables:
-col.links?.find(
-l=>l.rel.includes("queryables")
 )?.href||null
+
 
 };
 
@@ -301,16 +309,177 @@ l=>l.rel.includes("queryables")
 
 
 // ===============================
-// ADD METADATA ROW
+// LOAD AVAILABLE ITEMS
+// ===============================
+
+async function loadItems(data){
+
+if(!data.items)
+return;
+
+
+document.getElementById("status").textContent=
+"Reading dataset...";
+
+
+try{
+
+
+const url=
+`${data.items}?limit=100`;
+
+
+console.log("ITEM QUERY:",url);
+
+
+const res=await fetch(url);
+
+
+const json=await res.json();
+
+
+
+console.log("ITEMS:",json);
+
+
+
+renderAvailableData(json);
+
+
+
+document.getElementById("raw").textContent=
+JSON.stringify(json,null,2);
+
+
+
+document.getElementById("status").textContent=
+`${json.numberMatched||json.features.length} products indexed`;
+
+
+
+}
+
+
+catch(e){
+
+console.error(e);
+
+document.getElementById("status").textContent=
+"Items error";
+
+}
+
+
+}
+
+
+// ===============================
+// BUILD DATE INDEX
+// ===============================
+
+function renderAvailableData(json){
+
+const box=document.getElementById("queryBox");
+
+
+box.innerHTML=`
+<h3 style="color:#ffb04d;margin-bottom:12px">
+AVAILABLE DATA
+</h3>
+`;
+
+
+
+if(!json.features||json.features.length===0){
+
+box.innerHTML+=`
+<p>No products found</p>
+`;
+
+return;
+
+}
+
+
+
+const dates={};
+
+
+
+json.features.forEach(item=>{
+
+
+const dt=
+item.properties?.datetime;
+
+
+if(!dt)
+return;
+
+
+const day=
+dt.split("T")[0];
+
+
+if(!dates[day])
+dates[day]=0;
+
+
+dates[day]++;
+
+
+});
+
+
+
+Object.keys(dates)
+.sort()
+.forEach(date=>{
+
+
+const r=document.createElement("div");
+
+
+r.className="row";
+
+
+r.innerHTML=`
+
+<div class="key">
+${date}
+</div>
+
+<div class="value">
+${dates[date]} observations
+</div>
+
+`;
+
+
+box.appendChild(r);
+
+
+});
+
+
+}
+
+
+// ===============================
+// ADD ROW
 // ===============================
 
 function add(container,key,value){
 
-if(value===undefined)return;
+if(value===undefined)
+return;
+
 
 const r=document.createElement("div");
 
+
 r.className="row";
+
 
 r.innerHTML=`
 
@@ -319,170 +488,11 @@ r.innerHTML=`
 
 `;
 
+
 container.appendChild(r);
 
 }
 
-
-// ===============================
-// DATA QUERY
-// ===============================
-
-function createQuery(data){
-
-if(!data.id)return;
-
-
-const box=document.getElementById("queryBox");
-
-
-box.innerHTML=`
-
-<h3 style="color:#ffb04d;margin-bottom:12px">
-DATA QUERY
-</h3>
-
-
-<div class="row">
-<div class="key">Latitude</div>
-<input id="qlat" value="-3.4653">
-</div>
-
-
-<div class="row">
-<div class="key">Longitude</div>
-<input id="qlon" value="-62.2159">
-</div>
-
-
-<div class="row">
-<div class="key">Radius km</div>
-<input id="qrad" value="100">
-</div>
-
-
-<div class="row">
-<div class="key">Date</div>
-<input id="qdate" type="date">
-</div>
-
-
-<button id="queryBtn">
-SEARCH DATA
-</button>
-
-`;
-
-
-const dateInput=document.getElementById("qdate");
-
-
-if(data.startDate){
-
-dateInput.min=
-data.startDate.split("T")[0];
-
-}
-
-
-if(data.endDate){
-
-dateInput.max=
-data.endDate.split("T")[0];
-
-}
-
-
-dateInput.value=
-new Date().toISOString().split("T")[0];
-
-
-document.getElementById("queryBtn").onclick=
-()=>fetchItems(data);
-
-}
-
-
-// ===============================
-// SEARCH STAC
-// ===============================
-
-async function fetchItems(data){
-
-const lat=
-Number(document.getElementById("qlat").value);
-
-
-const lon=
-Number(document.getElementById("qlon").value);
-
-
-const radius=
-Number(document.getElementById("qrad").value);
-
-
-const date=
-document.getElementById("qdate").value;
-
-
-const delta=radius/111;
-
-
-const bbox=[
-
-lon-delta,
-lat-delta,
-lon+delta,
-lat+delta
-
-].join(",");
-
-
-
-const datetime=
-`${date}T00:00:00Z/${date}T23:59:59Z`;
-
-
-
-const url=
-`${BASE}/search?collections=${data.id}&bbox=${bbox}&datetime=${datetime}`;
-
-
-console.log("QUERY URL:",url);
-
-
-document.getElementById("status").textContent=
-"Searching data...";
-
-
-try{
-
-const res=await fetch(url);
-
-const result=await res.json();
-
-
-document.getElementById("raw").textContent=
-JSON.stringify(result,null,2);
-
-
-document.getElementById("status").textContent=
-`${result.numberMatched||0} products found`;
-
-
-}
-
-catch(e){
-
-console.error(e);
-
-document.getElementById("status").textContent=
-"Query error";
-
-}
-
-
-}
 
 </script>
 </body>
