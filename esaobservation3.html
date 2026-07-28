@@ -146,43 +146,80 @@ background:#111923
 <script>
 
 const BASE="https://catalog.maap.eo.esa.int/catalogue";
+
 let collections=[];
+let activeDataset=null;
+
+
+// ===============================
+// LOAD CATALOG
+// ===============================
 
 document.getElementById("load").onclick=load;
 
 async function load(){
-  const q=document.getElementById("search").value.trim();
-  document.getElementById("status").textContent="Loading...";
-  const res=await fetch(`${BASE}/collections?q=${encodeURIComponent(q)}`);
-  const data=await res.json();
-  collections=data.collections||[];
-  renderCards();
-  document.getElementById("status").textContent=`${collections.length} collections`;
+
+const q=document.getElementById("search").value.trim();
+
+document.getElementById("status").textContent="Loading...";
+
+const res=await fetch(
+`${BASE}/collections?q=${encodeURIComponent(q)}`
+);
+
+const data=await res.json();
+
+collections=data.collections||[];
+
+renderCards();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
 }
+
 
 // ===============================
 // RENDER COLLECTION CARDS
 // ===============================
 
 function renderCards(){
-  const c=document.getElementById("cards");
-  c.innerHTML="";
 
-  collections.forEach(col=>{
-    const d=document.createElement("div");
-    d.className="card";
+const c=document.getElementById("cards");
 
-    d.innerHTML=`
-      <h3>${col.id}</h3>
-      <p><b>${col.title||""}</b></p>
-      <p>${(col.description||"").substring(0,180)}...</p>
-      <button class="open">OPEN</button>
-    `;
+c.innerHTML="";
 
-    d.querySelector("button").onclick=()=>show(col);
-    c.appendChild(d);
-  });
+collections.forEach(col=>{
+
+const d=document.createElement("div");
+
+d.className="card";
+
+d.innerHTML=`
+
+<h3>${col.id}</h3>
+
+<p><b>${col.title||""}</b></p>
+
+<p>
+${(col.description||"").substring(0,180)}...
+</p>
+
+<button class="open">
+OPEN
+</button>
+
+`;
+
+d.querySelector("button").onclick=
+()=>show(col);
+
+c.appendChild(d);
+
+});
+
 }
+
 
 // ===============================
 // SHOW COLLECTION
@@ -190,38 +227,96 @@ function renderCards(){
 
 function show(col){
 
-  const meta=document.getElementById("meta");
-  meta.innerHTML="";
-  document.getElementById("queryBox").innerHTML="";
+const meta=document.getElementById("meta");
 
-  add("ID",col.id);
-  add("Title",col.title);
-  add("Type",col.type);
-  add("Version",col.version);
-  add("Created",col.created);
-  add("Updated",col.updated);
-  add("Description",col.description);
+meta.innerHTML="";
 
-  if(col.keywords)add("Keywords",col.keywords.join(", "));
-
-  document.getElementById("raw").textContent=
-  JSON.stringify(col,null,2);
-
-  createQuery(col);
+document.getElementById("queryBox").innerHTML="";
 
 
-  function add(k,v){
-    if(v===undefined)return;
+add(meta,"ID",col.id);
+add(meta,"Title",col.title);
+add(meta,"Type",col.type);
+add(meta,"Version",col.version);
+add(meta,"Created",col.created);
+add(meta,"Updated",col.updated);
+add(meta,"Description",col.description);
 
-    const r=document.createElement("div");
-    r.className="row";
-    r.innerHTML=`
-      <div class="key">${k}</div>
-      <div class="value">${v}</div>
-    `;
 
-    meta.appendChild(r);
-  }
+if(col.keywords)
+add(meta,"Keywords",col.keywords.join(", "));
+
+
+activeDataset=parseCollection(col);
+
+
+add(meta,"DATA START",activeDataset.startDate||"");
+add(meta,"DATA END",activeDataset.endDate||"Present");
+add(meta,"ITEMS",activeDataset.items||"");
+add(meta,"QUERYABLES",activeDataset.queryables||"");
+
+
+document.getElementById("raw").textContent=
+JSON.stringify(col,null,2);
+
+
+createQuery(activeDataset);
+
+}
+
+
+// ===============================
+// PARSE DATASET
+// ===============================
+
+function parseCollection(col){
+
+return{
+
+id:col.id,
+title:col.title,
+startDate:
+col.extent?.temporal?.interval?.[0]?.[0]||null,
+endDate:
+col.extent?.temporal?.interval?.[0]?.[1]||null,
+bbox:
+col.extent?.spatial?.bbox?.[0]||null,
+
+items:
+col.links?.find(
+l=>l.rel==="items"
+)?.href||null,
+
+queryables:
+col.links?.find(
+l=>l.rel.includes("queryables")
+)?.href||null
+
+};
+
+}
+
+
+// ===============================
+// ADD METADATA ROW
+// ===============================
+
+function add(container,key,value){
+
+if(value===undefined)return;
+
+const r=document.createElement("div");
+
+r.className="row";
+
+r.innerHTML=`
+
+<div class="key">${key}</div>
+<div class="value">${value}</div>
+
+`;
+
+container.appendChild(r);
 
 }
 
@@ -230,93 +325,142 @@ function show(col){
 // DATA QUERY
 // ===============================
 
-function createQuery(col){
+function createQuery(data){
 
-  const items=col.links?.find(l=>l.rel==="items");
-  if(!items)return;
-
-  const box=document.getElementById("queryBox");
-
-  box.innerHTML=`
-    <h3 style="color:#ffb04d;margin-bottom:12px">DATA QUERY</h3>
-
-    <div class="row">
-      <div class="key">Latitude</div>
-      <input id="qlat" value="40.4">
-    </div>
-
-    <div class="row">
-      <div class="key">Longitude</div>
-      <input id="qlon" value="-3.7">
-    </div>
-
-    <div class="row">
-      <div class="key">Radius km</div>
-      <input id="qrad" value="10">
-    </div>
-
-    <div class="row">
-      <div class="key">Date</div>
-      <input id="qdate" type="date">
-    </div>
-
-    <button id="queryBtn">SEARCH DATA</button>
-  `;
+if(!data.items)return;
 
 
-  document.getElementById("qdate").value=
-  new Date().toISOString().split("T")[0];
+const box=document.getElementById("queryBox");
 
 
-  document.getElementById("queryBtn").onclick=async()=>{
+box.innerHTML=`
 
-    const lat=Number(document.getElementById("qlat").value);
-    const lon=Number(document.getElementById("qlon").value);
-    const radius=Number(document.getElementById("qrad").value);
-    const date=document.getElementById("qdate").value;
-
-    const delta=radius/111;
-
-    const bbox=[
-      lon-delta,
-      lat-delta,
-      lon+delta,
-      lat+delta
-    ].join(",");
+<h3 style="color:#ffb04d;margin-bottom:12px">
+DATA QUERY
+</h3>
 
 
-    const url=
-    `${items.href}?bbox=${bbox}&datetime=${date}T00:00:00Z`;
+<div class="row">
+<div class="key">Latitude</div>
+<input id="qlat" value="40.4">
+</div>
 
 
-    console.log("QUERY URL:",url);
+<div class="row">
+<div class="key">Longitude</div>
+<input id="qlon" value="-3.7">
+</div>
 
-    document.getElementById("status").textContent=
-    "Searching data...";
+
+<div class="row">
+<div class="key">Radius km</div>
+<input id="qrad" value="10">
+</div>
 
 
-    try{
+<div class="row">
+<div class="key">Date</div>
+<input id="qdate" type="date">
+</div>
 
-      const res=await fetch(url);
-      const data=await res.json();
 
-      document.getElementById("raw").textContent=
-      JSON.stringify(data,null,2);
+<button id="queryBtn">
+SEARCH DATA
+</button>
 
-      document.getElementById("status").textContent=
-      "Query completed";
+`;
 
-    }
-    catch(e){
 
-      console.error(e);
+const dateInput=document.getElementById("qdate");
 
-      document.getElementById("status").textContent=
-      "Query error";
+if(data.startDate){
 
-    }
+dateInput.min=
+data.startDate.split("T")[0];
 
-  };
+}
+
+
+if(data.endDate){
+
+dateInput.max=
+data.endDate.split("T")[0];
+
+}
+
+dateInput.value=
+new Date().toISOString().split("T")[0];
+
+document.getElementById("queryBtn").onclick=
+()=>fetchItems(data);
+
+}
+
+
+// ===============================
+// REQUEST ITEMS
+// ===============================
+
+async function fetchItems(data){
+
+const lat=
+Number(document.getElementById("qlat").value);
+
+
+const lon=
+Number(document.getElementById("qlon").value);
+
+
+const radius=
+Number(document.getElementById("qrad").value);
+
+
+const date=
+document.getElementById("qdate").value;
+
+
+
+const delta=radius/111;
+
+
+const bbox=[
+
+lon-delta,
+lat-delta,
+lon+delta,
+lat+delta
+
+].join(",");
+
+const url=
+`${data.items}?bbox=${bbox}&datetime=${date}T00:00:00Z`;
+
+console.log("QUERY URL:",url);
+
+document.getElementById("status").textContent=
+"Searching data...";
+
+try{
+
+
+const res=await fetch(url);
+const result=await res.json();
+document.getElementById("raw").textContent=
+JSON.stringify(result,null,2);
+
+document.getElementById("status").textContent=
+"Query completed";
+
+
+}
+
+catch(e){
+console.error(e);
+
+document.getElementById("status").textContent=
+"Query error";
+
+}
 
 }
 
