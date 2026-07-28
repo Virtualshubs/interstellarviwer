@@ -291,50 +291,57 @@ background:#111923;
 
 display:grid;
 
-grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+grid-template-columns:repeat(36,1fr);
+grid-template-rows:repeat(18,1fr);
 
-gap:10px;
-
-margin-top:15px;
+aspect-ratio:2/1;
 
 width:100%;
+max-width:900px;
+
+margin:20px auto;
+
+gap:1px;
 
 }
-
 
 
 /* CELDAS */
 
 .dataCell{
 
-min-height:80px;
-
 display:flex;
 
 align-items:center;
-
 justify-content:center;
 
-text-align:center;
+aspect-ratio:1/1;
 
-font-size:11px;
+font-size:10px;
 
 cursor:pointer;
 
-border-radius:8px;
-
-padding:8px;
-
-color:white;
-
 background:#222;
+
+color:#fff;
+
+border:1px solid rgba(255,255,255,.08);
 
 transition:.2s;
 
-border:1px solid rgba(255,255,255,.1);
+padding:2px;
+
+overflow:hidden;
 
 }
 
+.dataCell:hover{
+
+transform:scale(1.08);
+
+z-index:2;
+
+}
 
 
 .dataCell:hover{
