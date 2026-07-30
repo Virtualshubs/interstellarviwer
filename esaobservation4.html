@@ -1257,6 +1257,18 @@ div.textContent=
 }
 
 
+  if(cell.discovered){
+
+    div.style.background="#ff66cc";
+
+    div.textContent=
+    `${cell.items.length}`;
+
+    return;
+
+}
+
+
 
 });
 
@@ -1362,15 +1374,18 @@ container.appendChild(r);
 
 
 
-  // ===================================
+// ===================================
 // REDISCOVER MAP
 // ===================================
 
 async function expandObservationMap(){
 
-    // Debe existir al menos una celda con datos
+    const seeds =
+    observationGrid.filter(c=>c.state===0);
 
-    if(!observationGrid.some(c=>c.state===0)){
+
+
+    if(seeds.length===0){
 
         console.log("No reference cells.");
 
@@ -1378,20 +1393,37 @@ async function expandObservationMap(){
 
     }
 
+
+
     document.getElementById("status").textContent =
     "Expanding observation map...";
 
+
+
+    const discovered =
     await discoverNeighbourCells();
+
+
 
     updateGrid();
 
+
+
+    console.log(
+        "NEW CELLS DISCOVERED:",
+        discovered
+    );
+
+
+
     document.getElementById("status").textContent =
-    "Expansion complete.";
+    `Expansion complete. ${discovered} new cells`;
 
 }
 
 
-  // ===================================
+
+// ===================================
 // DISCOVER NEIGHBOUR CELLS
 // ===================================
 
@@ -1401,52 +1433,106 @@ async function discoverNeighbourCells(){
 
     const queue=[];
 
+
+
     observationGrid.forEach(cell=>{
+
 
         if(cell.state===0){
 
+
             queue.push(cell);
+
 
             visited.add(cell.id);
 
+
         }
+
 
     });
 
 
+
+    let discovered=0;
+
+
+
     while(queue.length){
 
-        const cell=queue.shift();
 
-        const neighbours=getNeighbours(cell);
+        const cell =
+        queue.shift();
+
+
+
+        const neighbours =
+        getNeighbours(cell);
+
+
 
         for(const n of neighbours){
+
+
 
             if(visited.has(n.id))
                 continue;
 
+
+
             visited.add(n.id);
 
-            // Solo explorar las desconocidas
+
+
+            // Solo revisar celdas sin datos
 
             if(n.state!==-1)
                 continue;
 
+
+
+            const found =
             await inspectCell(n);
 
-            if(n.state===0){
+
+
+            if(found){
+
+
+                discovered++;
+
+
+                // marca visual
+
+                n.discovered=true;
+
+
 
                 queue.push(n);
 
+
             }
+
+
+
+            // refresco visual progresivo
+
+            updateGrid();
+
 
         }
 
+
     }
+
+
+    return discovered;
 
 }
 
-  // ===================================
+
+
+// ===================================
 // GET NEIGHBOURS
 // ===================================
 
@@ -1454,28 +1540,47 @@ function getNeighbours(cell){
 
     const result=[];
 
+
+
     const dirs=[
 
         [-1,-1],[0,-1],[1,-1],
 
-        [-1,0],         [1,0],
+        [-1,0],[1,0],
 
         [-1,1],[0,1],[1,1]
 
     ];
 
+
+
     dirs.forEach(d=>{
 
-        const x=cell.x+d[0];
-        const y=cell.y+d[1];
 
-        const neighbour=
-        observationGrid.find(c=>c.x===x && c.y===y);
+        const x =
+        cell.x+d[0];
+
+
+        const y =
+        cell.y+d[1];
+
+
+
+        const neighbour =
+        observationGrid.find(c=>
+            c.x===x &&
+            c.y===y
+        );
+
+
 
         if(neighbour)
             result.push(neighbour);
 
+
     });
+
+
 
     return result;
 
@@ -1483,25 +1588,25 @@ function getNeighbours(cell){
 
 
 
-  // ===================================
+// ===================================
 // INSPECT CELL
 // ===================================
 
 async function inspectCell(cell){
 
+
     if(!activeDataset)
-        return;
+        return false;
 
-    const lat=
-    (cell.latMin+cell.latMax)/2;
 
-    const lon=
-    (cell.lonMin+cell.lonMax)/2;
 
-    const datetime=
-    activeDataset.endDate || activeDataset.startDate;
+    const datetime =
+    activeDataset.endDate ||
+    activeDataset.startDate;
 
-    const url=
+
+
+    const url =
 
     `${activeDataset.items}`+
 
@@ -1512,27 +1617,69 @@ async function inspectCell(cell){
     `&bbox=${cell.lonMin},${cell.latMin},${cell.lonMax},${cell.latMax}`;
 
 
+
     try{
 
-        const res=await fetch(url);
 
-        const json=await res.json();
+        const res =
+        await fetch(url);
 
-        if(json.features && json.features.length){
+
+
+        const json =
+        await res.json();
+
+
+
+        const count =
+        json.features?.length || 0;
+
+
+
+        console.log(
+            "INSPECT CELL:",
+            cell.x,
+            cell.y,
+            count
+        );
+
+
+
+        if(count>0){
+
 
             cell.state=0;
 
-            cell.items.push(...json.features);
+
+
+            cell.items.push(
+                ...json.features
+            );
+
+
+
+            return true;
+
 
         }
+
 
     }
 
     catch(e){
 
-        console.log(e);
+
+        console.log(
+            "CELL ERROR",
+            e
+        );
+
 
     }
+
+
+
+    return false;
 
 }
 
