@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ESA DATA v0.3</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif
+}
+
+
+body{
+
+background:#0b1018;
+color:#fff;
+
+width:100vw;
+height:100vh;
+
+overflow:hidden;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+}
+
+
+/* PANEL PRINCIPAL */
+
+#panel{
+
+width:100vw;
+height:100vh;
+
+background:#141b25;
+
+border:none;
+border-radius:0;
+
+display:flex;
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+
+
+/* HEADER */
+
+#header{
+
+background:#182230;
+
+padding:14px 18px;
+
+display:flex;
+
+gap:10px;
+
+align-items:center;
+
+}
+
+
+#search{
+
+flex:1;
+
+padding:10px;
+
+background:#0f1622;
+
+color:#fff;
+
+border:1px solid #33435b;
+
+border-radius:6px;
+
+}
+
+
+
+button{
+
+background:#ff8c00;
+
+color:#fff;
+
+border:none;
+
+padding:10px 16px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-weight:bold;
+
+}
+
+
+
+/* STATUS */
+
+#status{
+
+padding:8px 18px;
+
+border-bottom:1px solid #263240;
+
+color:#8fb8ff;
+
+}
+
+
+
+/* CONTENIDO */
+
+#content{
+
+display:grid;
+
+grid-template-columns:380px 1fr;
+
+height:calc(100vh - 90px);
+
+overflow:hidden;
+
+}
+
+
+
+/* COLUMNAS */
+
+#cards,
+#detail{
+
+overflow:auto;
+
+padding:16px;
+
+}
+
+
+
+/* TARJETAS */
+
+.card{
+
+background:#1a2432;
+
+border:1px solid #2d3d52;
+
+border-radius:8px;
+
+padding:14px;
+
+margin-bottom:12px;
+
+}
+
+
+.card h3{
+
+color:#ffb04d;
+
+margin-bottom:8px;
+
+}
+
+
+.card p{
+
+font-size:13px;
+
+color:#cfd8e6;
+
+margin:4px 0;
+
+}
+
+
+
+.open{
+
+margin-top:10px;
+
+}
+
+
+
+/* DATOS */
+
+.row{
+
+display:flex;
+
+padding:7px 0;
+
+border-bottom:1px solid rgba(255,255,255,.08)
+
+}
+
+
+.key{
+
+width:170px;
+
+color:#7bc3ff;
+
+font-weight:bold;
+
+}
+
+
+.value{
+
+flex:1;
+
+word-break:break-word;
+
+}
+
+
+
+/* INPUTS */
+
+input{
+
+background:#0f1622;
+
+border:1px solid #33435b;
+
+color:#fff;
+
+padding:6px;
+
+border-radius:5px;
+
+width:180px;
+
+}
+
+
+
+details{
+
+margin-top:18px;
+
+}
+
+
+pre{
+
+white-space:pre-wrap;
+
+font-size:12px;
+
+}
+
+
+
+/* CONTENEDOR DATOS */
+
+#queryBox{
+
+margin-top:20px;
+
+padding:12px;
+
+border:1px solid #2d3d52;
+
+border-radius:8px;
+
+background:#111923;
+
+}
+
+
+
+/* GRID CELDAS - MAPA CARTESIANO */
+
+#dataGrid{
+
+display:grid;
+
+grid-template-columns:repeat(36,1fr);
+
+grid-template-rows:repeat(18,1fr);
+
+aspect-ratio:2 / 1;
+
+width:100%;
+
+max-width:1000px;
+
+margin:20px auto;
+
+gap:1px;
+
+}
+
+
+
+/* CELDAS */
+
+.dataCell{
+
+aspect-ratio:1 / 1;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+text-align:center;
+
+font-size:10px;
+
+cursor:pointer;
+
+padding:0;
+
+color:white;
+
+background:#222;
+
+transition:.2s;
+
+border:1px solid rgba(255,255,255,.1);
+
+overflow:hidden;
+
+}
+
+
+
+.dataCell:hover{
+
+transform:scale(1.08);
+
+z-index:2;
+
+}
+
+
+
+/* RAW JSON */
+
+#raw{
+
+max-height:60vh;
+
+overflow:auto;
+
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div id="panel">
+  <div id="header">
+    <input id="search" value="Biomass">
+    <button id="load">SEARCH</button>
+  </div>
+
+  <div id="status">Ready</div>
+
+  <div id="content">
+    <div id="cards"></div>
+
+    <div id="detail">
+      <h2>Select a collection</h2>
+      <div id="meta"></div>
+      <div id="queryBox"></div>
+              <button id="expandMapBtn" onclick="expandObservationMap()">
+REDISCOVER MAP
+</button>
+
+      <details>
+
+        <summary>Raw JSON</summary>
+        <pre id="raw"></pre>
+      </details>
+
+    </div>
+  </div>
+</div>
+  
+<script>
+
+const BASE="https://catalog.maap.eo.esa.int/catalogue";
+
+let collections=[];
+let activeDataset=null;
+
+let observationGrid=[];
+let currentItems=[];
+
+
+// ===============================
+// LOAD CATALOG
+// ===============================
+
+document.getElementById("load").onclick=load;
+
+
+async function load(){
+
+const q=document.getElementById("search").value.trim();
+
+document.getElementById("status").textContent="Loading...";
+
+
+const res = await fetch(
+`${BASE}/collections?q=${encodeURIComponent(q)}&limit=1000`
+);
+
+const data=await res.json();
+
+
+collections=data.collections||[];
+
+
+renderCards();
+
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+}
+
+
+
+// ===============================
+// RENDER COLLECTION CARDS
+// ===============================
+
+function renderCards(){
+
+const c=document.getElementById("cards");
+
+c.innerHTML="";
+
+
+collections.forEach(col=>{
+
+const d=document.createElement("div");
+
+d.className="card";
+
+
+d.innerHTML=`
+
+<h3>${col.id}</h3>
+
+<p><b>${col.title||""}</b></p>
+
+<p>
+${(col.description||"").substring(0,180)}...
+</p>
+
+<button class="open">
+OPEN
+</button>
+
+`;
+
+
+d.querySelector("button").onclick=
+()=>show(col);
+
+
+c.appendChild(d);
+
+});
+
+}
+
+
+
+// ===============================
+// SHOW COLLECTION
+// ===============================
+
+function show(col){
+
+const meta=document.getElementById("meta");
+
+meta.innerHTML="";
+
+
+document.getElementById("queryBox").innerHTML="";
+
+
+add(meta,"ID",col.id);
+add(meta,"Title",col.title);
+add(meta,"Version",col.version);
+add(meta,"Created",col.created);
+add(meta,"Updated",col.updated);
+add(meta,"Description",col.description);
+
+
+if(col.keywords)
+add(meta,"Keywords",col.keywords.join(", "));
+
+
+
+activeDataset=parseCollection(col);
+
+
+
+add(meta,"DATA START",activeDataset.startDate||"");
+add(meta,"DATA END",activeDataset.endDate||"");
+
+
+document.getElementById("raw").textContent=
+JSON.stringify(col,null,2);
+
+
+
+loadItems(activeDataset);
+
+}
+
+
+
+// ===============================
+// PARSE COLLECTION
+// ===============================
+
+function parseCollection(col){
+
+return{
+
+id:col.id,
+
+title:col.title,
+
+
+startDate:
+col.extent?.temporal?.interval?.[0]?.[0]||null,
+
+
+endDate:
+col.extent?.temporal?.interval?.[0]?.[1]||null,
+
+
+items:
+col.links?.find(
+l=>l.rel==="items"
+)?.href||null
+
+
+};
+
+}
+
+
+
+// ===============================
+// LOAD ITEMS
+// ===============================
+
+async function loadItems(data){
+
+if(!data.items)
+return;
+
+
+document.getElementById("status").textContent=
+"Reading dataset...";
+
+
+try{
+
+
+let referenceDate=null;
+
+
+
+// =================================
+// DETERMINAR FECHA DE REFERENCIA
+// =================================
+
+
+// misión terminada
+if(data.endDate){
+
+
+referenceDate=data.endDate;
+
+
+console.log(
+"USING DATASET END DATE:",
+referenceDate
+);
+
+
+}
+
+
+// misión activa
+else{
+
+
+const latestURL =
+`${data.items}?limit=1&sortby=-datetime`;
+
+
+console.log(
+"LATEST QUERY:",
+latestURL
+);
+
+
+
+const latestRes =
+await fetch(latestURL);
+
+
+
+const latestJSON =
+await latestRes.json();
+
+
+
+if(
+!latestJSON.features ||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+
+
+referenceDate =
+latestJSON.features[0]
+.properties
+.datetime;
+
+
+
+console.log(
+"USING LATEST OBSERVATION:",
+referenceDate
+);
+
+
+}
+
+
+
+// =================================
+// PEDIR VENTANA DE DATOS
+// =================================
+
+
+const url =
+`${data.items}?limit=1500&datetime=../${referenceDate}`;
+
+
+
+console.log(
+"ITEM QUERY:",
+url
+);
+
+
+
+const res =
+await fetch(url);
+
+
+
+const json =
+await res.json();
+
+  activeDataset.nextPage =
+json.links?.find(
+    l=>l.rel==="next"
+)?.href || null;
+
+
+
+
+// =================================
+// ORDENAR POR FECHA DESCENDENTE
+// =================================
+
+
+if(json.features){
+
+
+json.features.sort((a,b)=>{
+
+
+return new Date(
+b.properties.datetime
+)
+-
+new Date(
+a.properties.datetime
+);
+
+
+});
+
+
+}
+
+
+
+console.log(
+"ITEMS:",
+json
+);
+
+
+
+renderAvailableData(json);
+
+
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+json,
+null,
+2
+);
+
+
+
+document.getElementById("status").textContent=
+`${json.numberMatched||json.features.length} products indexed`;
+
+
+
+}
+
+catch(e){
+
+console.error(e);
+
+document.getElementById("status").textContent=
+"Items error";
+
+}
+
+
+}
+
+// ===============================
+// AVAILABLE DATA + SPATIAL GRID
+// ===============================
+
+function renderAvailableData(json){
+
+const box=document.getElementById("queryBox");
+
+
+box.innerHTML=`
+
+<h3 style="color:#ffb04d;margin-bottom:12px">
+AVAILABLE DATA
+</h3>
+
+`;
+
+
+
+if(!json.features||json.features.length===0){
+
+box.innerHTML+=`
+<p>No products found</p>
+`;
+
+return;
+
+}
+
+
+
+currentItems=json.features;
+
+
+
+// resumen fechas
+
+const dates={};
+
+
+
+json.features.forEach(item=>{
+
+
+const dt=item.properties?.datetime;
+
+
+if(!dt)
+return;
+
+
+const day=dt.split("T")[0];
+
+
+if(!dates[day])
+dates[day]=0;
+
+
+dates[day]++;
+
+
+});
+
+
+
+Object.keys(dates)
+.sort()
+.forEach(date=>{
+
+
+const r=document.createElement("div");
+
+
+r.className="row";
+
+
+r.innerHTML=`
+
+<div class="key">
+${date}
+</div>
+
+<div class="value">
+${dates[date]} observations
+</div>
+
+`;
+
+
+box.appendChild(r);
+
+
+});
+
+
+
+
+// ===============================
+// SPATIAL CELLS
+// ===============================
+
+
+const title=document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginTop="20px";
+
+title.textContent=
+"SPATIAL DATA CELLS";
+
+
+box.appendChild(title);
+
+
+
+const grid=document.createElement("div");
+
+grid.id="dataGrid";
+
+
+box.appendChild(grid);
+
+
+
+createSpatialGrid(json.features);
+
+
+}
+
+// ===============================
+// CREATE SPATIAL GRID
+// ===============================
+
+function createSpatialGrid(items){
+
+const grid=document.getElementById("dataGrid");
+
+grid.innerHTML="";
+
+
+observationGrid=[];
+
+
+// resolución inicial del mapa
+// 18 bandas latitud x 36 bandas longitud
+
+const rows=18;
+const cols=36;
+
+
+
+for(let y=0;y<rows;y++){
+
+
+for(let x=0;x<cols;x++){
+
+
+
+const cell={
+
+
+id:y*cols+x,
+
+
+x,
+y,
+
+
+// estados JANUS
+// -1 = sin observaciones
+// 0 = contiene datos
+// 1 = resultado búsqueda
+
+
+state:-1,
+
+
+latMin:
+-90 + y*(180/rows),
+
+
+latMax:
+-90 +(y+1)*(180/rows),
+
+
+lonMin:
+-180+x*(360/cols),
+
+
+lonMax:
+-180+(x+1)*(360/cols),
+
+
+items:[]
+
+};
+
+
+
+observationGrid.push(cell);
+
+
+
+const div=document.createElement("div");
+
+div.className="dataCell";
+
+
+div.textContent=
+"";
+
+
+div.onclick=
+()=>showCellData(cell);
+
+
+
+grid.appendChild(div);
+
+
+
+}
+
+}
+
+
+
+
+
+// ===============================
+// DISTRIBUIR OBSERVACIONES
+// ===============================
+
+items.forEach(item=>{
+
+
+let coords=null;
+
+
+
+const geom=item.geometry;
+
+
+
+// punto directo STAC
+
+if(geom && geom.type==="Point"){
+
+coords=geom.coordinates;
+
+}
+
+
+
+// si no hay punto usamos bbox
+
+if(!coords && item.bbox){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
+
+
+
+if(!coords)
+return;
+
+
+
+const lon=coords[0];
+
+const lat=coords[1];
+
+
+
+
+
+const cell=observationGrid.find(c=>
+
+
+lat>=c.latMin &&
+lat<c.latMax &&
+
+lon>=c.lonMin &&
+lon<c.lonMax
+
+
+);
+
+
+
+if(cell){
+
+
+cell.state=0;
+
+cell.items.push(item);
+
+
+}
+
+
+});
+
+
+
+updateGrid();
+
+
+createGridSearch();
+
+
+}
+
+
+
+
+
+// ===============================
+// SEARCH LAT LON
+// ===============================
+
+function createGridSearch(){
+
+
+const box=document.getElementById("queryBox");
+
+
+const div=document.createElement("div");
+
+
+div.innerHTML=`
+
+<div style="margin-top:15px">
+
+
+Lat:
+
+<input id="gridLat" value="0">
+
+
+Lon:
+
+<input id="gridLon" value="0">
+
+
+<button onclick="searchGrid()">
+
+SEARCH POSITION
+
+</button>
+
+
+</div>
+
+`;
+
+
+
+box.appendChild(div);
+
+
+
+}
+
+
+
+
+function searchGrid(){
+
+
+const lat=
+Number(document.getElementById("gridLat").value);
+
+
+const lon=
+Number(document.getElementById("gridLon").value);
+
+
+
+
+observationGrid.forEach(cell=>{
+
+
+if(
+
+lat>=cell.latMin &&
+lat<cell.latMax &&
+
+lon>=cell.lonMin &&
+lon<cell.lonMax &&
+
+cell.items.length>0
+
+){
+
+
+cell.state=1;
+
+
+}
+
+else if(cell.items.length>0){
+
+
+cell.state=0;
+
+
+}
+
+else{
+
+
+cell.state=-1;
+
+
+}
+
+
+});
+
+
+
+updateGrid();
+
+
+}
+
+
+
+
+// ===============================
+// UPDATE VISUAL STATES
+// ===============================
+
+function updateGrid(){
+
+    const cells =
+    document.querySelectorAll(".dataCell");
+
+
+    cells.forEach((div,index)=>{
+
+        const cell =
+        observationGrid[index];
+
+
+        // ==========================
+        // NUEVA CELDA DESCUBIERTA
+        // ==========================
+
+        if(cell.discovered){
+
+            div.style.background="#ff66cc";
+
+            div.textContent=
+            `${cell.items.length}`;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // SIN OBSERVACIONES
+        // ==========================
+
+        if(cell.state===-1){
+
+            div.style.background="#222";
+
+            div.textContent="";
+
+            return;
+
+        }
+
+
+        // ==========================
+        // OBSERVACIÓN
+        // ==========================
+
+        if(cell.state===0){
+
+            div.style.background="#16803c";
+
+            div.textContent=
+            `${cell.items.length}`;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // CELDA SELECCIONADA
+        // ==========================
+
+        if(cell.state===1){
+
+            div.style.background="#ff8c00";
+
+            div.textContent=
+            `${cell.items.length}`;
+
+            return;
+
+        }
+
+    });
+
+}
+
+
+
+// ===============================
+// SHOW CELL DATA
+// ===============================
+
+function showCellData(cell){
+
+
+document.getElementById("raw").textContent=
+
+
+JSON.stringify(
+
+{
+
+CELL_INFO:{
+
+
+id:cell.id,
+
+
+latRange:
+
+`${cell.latMin} / ${cell.latMax}`,
+
+
+lonRange:
+
+`${cell.lonMin} / ${cell.lonMax}`,
+
+
+state:cell.state,
+
+
+observations:
+cell.items.length
+
+
+},
+
+
+OBSERVATIONS:
+
+cell.items
+
+
+},
+
+null,
+
+2
+
+
+);
+
+
+}
+
+
+
+
+
+// ===============================
+// ADD ROW
+// ===============================
+
+function add(container,key,value){
+
+
+if(value===undefined)
+return;
+
+
+const r=document.createElement("div");
+
+
+r.className="row";
+
+
+r.innerHTML=`
+
+<div class="key">${key}</div>
+
+<div class="value">${value}</div>
+
+`;
+
+
+container.appendChild(r);
+
+
+}
+
+
+
+// ===================================
+// REDISCOVER MAP
+// ===================================
+
+async function expandObservationMap(){
+
+
+    const seeds =
+    observationGrid.filter(c=>c.state===0);
+
+
+
+    if(seeds.length===0){
+
+        console.log("No reference cells.");
+
+        return;
+
+    }
+
+
+
+    if(!activeDataset.nextPage){
+
+        console.log(
+            "No more catalog pages."
+        );
+
+        document.getElementById("status").textContent =
+        "No more data pages.";
+
+        return;
+
+    }
+
+
+
+    document.getElementById("status").textContent =
+    "Expanding observation map...";
+
+
+
+    const discovered =
+    await discoverNeighbourCells();
+
+
+
+    updateGrid();
+
+
+
+    console.log(
+        "NEW CELLS:",
+        discovered
+    );
+
+
+
+    document.getElementById("status").textContent =
+    `Expansion complete. ${discovered} new cells`;
+
+}
+
+
+
+
+// ===================================
+// DISCOVER NEIGHBOUR CELLS
+// ===================================
+
+async function discoverNeighbourCells(){
+
+
+    const visited=new Set();
+
+
+    const queue=[];
+
+
+
+    observationGrid.forEach(cell=>{
+
+
+        if(cell.state===0){
+
+            queue.push(cell);
+
+            visited.add(cell.id);
+
+        }
+
+
+    });
+
+
+
+    let discovered=0;
+
+
+
+    while(queue.length){
+
+
+        const cell =
+        queue.shift();
+
+
+
+        const neighbours =
+        getNeighbours(cell);
+
+
+
+        for(const n of neighbours){
+
+
+
+            if(visited.has(n.id))
+                continue;
+
+
+
+            visited.add(n.id);
+
+
+
+            if(n.state!==-1)
+                continue;
+
+
+
+            const found =
+            await inspectCell(n);
+
+
+
+            if(found){
+
+                discovered++;
+                queue.push(n);
+
+            }
+
+            updateGrid();
+
+        }
+
+    }
+
+
+    return discovered;
+
+}
+
+
+
+
+// ===================================
+// GET NEIGHBOURS
+// ===================================
+
+function getNeighbours(cell){
+
+
+    const result=[];
+
+
+    const dirs=[
+
+        [-1,-1],[0,-1],[1,-1],
+
+        [-1,0],[1,0],
+
+        [-1,1],[0,1],[1,1]
+
+    ];
+
+
+
+    dirs.forEach(d=>{
+
+
+        const x =
+        cell.x+d[0];
+
+
+        const y =
+        cell.y+d[1];
+
+
+
+        const neighbour =
+        observationGrid.find(c=>
+            c.x===x &&
+            c.y===y
+        );
+
+
+
+        if(neighbour)
+            result.push(neighbour);
+
+
+    });
+
+
+
+    return result;
+
+}
+
+
+
+
+
+// ===================================
+// INSPECT NEXT CATALOG PAGE
+// ===================================
+
+async function inspectCell(cell){
+
+
+    if(!activeDataset.nextPage)
+        return false;
+
+
+
+    try{
+
+
+        console.log(
+            "READING NEXT PAGE:",
+            activeDataset.nextPage
+        );
+
+
+
+        const res =
+        await fetch(activeDataset.nextPage);
+
+
+
+        const json =
+        await res.json();
+
+
+
+        // guardar siguiente página
+
+        activeDataset.nextPage =
+        json.links?.find(
+            l=>l.rel==="next"
+        )?.href || null;
+
+
+
+        if(
+            !json.features ||
+            json.features.length===0
+        ){
+
+            return false;
+
+        }
+
+
+
+        const before =
+        cell.items.length;
+
+
+
+        appendSpatialData(
+            json.features
+        );
+
+
+
+        return (
+            cell.items.length > before
+        );
+
+
+    }
+
+
+    catch(e){
+
+
+        console.log(
+            "PAGE ERROR",
+            e
+        );
+
+
+        return false;
+
+
+    }
+
+
+}
+
+  // ===================================
+// APPEND SPATIAL DATA
+// ===================================
+
+function appendSpatialData(items){
+
+
+    items.forEach(item=>{
+
+
+        let coords=null;
+
+
+
+        if(
+            item.geometry &&
+            item.geometry.type==="Point"
+        ){
+
+            coords =
+            item.geometry.coordinates;
+
+        }
+
+
+
+        if(
+            !coords &&
+            item.bbox
+        ){
+
+            coords=[
+
+                (item.bbox[0]+item.bbox[2])/2,
+
+                (item.bbox[1]+item.bbox[3])/2
+
+            ];
+
+        }
+
+
+
+        if(!coords)
+            return;
+
+
+
+        const lon =
+        coords[0];
+
+
+        const lat =
+        coords[1];
+
+
+
+        const cell =
+        observationGrid.find(c=>
+
+
+            lat>=c.latMin &&
+            lat<c.latMax &&
+
+            lon>=c.lonMin &&
+            lon<c.lonMax
+
+
+        );
+
+
+
+        if(cell){
+
+
+            const exists =
+            cell.items.some(
+                x=>x.id===item.id
+            );
+
+
+
+            if(!exists){
+
+
+                // comprobar si era una celda vacía
+
+                const wasEmpty =
+                cell.items.length===0;
+
+
+
+                cell.items.push(item);
+
+
+
+                cell.state=0;
+
+
+
+                // nueva cobertura descubierta
+
+                if(wasEmpty){
+
+                    cell.discovered=true;
+
+                }
+
+
+            }
+
+
+        }
+
+
+    });
+
+
+}
+  
+</script>
+</body>
+</html>
