@@ -2272,5 +2272,245 @@ function appendSpatialData(items){
 }
   
 </script>
+
+  <script>
+
+const DATASET="https://3d.staratlas.es/renderdata.json";
+
+async function load(){
+
+try{
+
+const res=await fetch(DATASET);
+const text=await res.text();
+const json=JSON.parse(text);
+
+console.log("JSON OK");
+
+renderDataset(json);
+
+}
+
+catch(e){
+
+console.error(e);
+
+document.getElementById("status").textContent=
+"Unable to load dataset";
+
+}
+
+}
+
+load();
+
+
+
+// ==========================================
+// RENDER DATASET
+// ==========================================
+
+function renderDataset(json){
+
+const info=json.CELL_INFO||{};
+const observations=json.OBSERVATIONS||[];
+
+
+
+document.getElementById("status").textContent=
+"Dataset Loaded";
+
+document.getElementById("count").textContent=
+observations.length;
+
+document.getElementById("cellId").textContent=
+info.id||"-";
+
+document.getElementById("latRange").textContent=
+info.latRange||"-";
+
+document.getElementById("lonRange").textContent=
+info.lonRange||"-";
+
+document.getElementById("cellState").textContent=
+info.state??"-";
+
+
+
+const totalAssets=
+observations.reduce((t,o)=>{
+
+return t+Object.keys(o.assets||{}).length;
+
+},0);
+
+
+
+document.getElementById("assetCount").textContent=
+totalAssets;
+
+
+
+const container=
+document.getElementById("observations");
+
+container.innerHTML="";
+
+
+
+observations.forEach((obs,index)=>{
+
+const assets=
+Object.keys(obs.assets||{}).length;
+
+
+
+const card=
+document.createElement("div");
+
+card.className="card";
+
+
+
+card.innerHTML=`
+
+<h2>Observation ${index+1}</h2>
+
+<div class="row">
+<div class="label">ID</div>
+<div class="value">${obs.id||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Collection</div>
+<div class="value">${obs.collection||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Datetime</div>
+<div class="value">${obs.properties?.datetime||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Assets</div>
+<div class="value">${assets}</div>
+</div>
+
+<div id="assets${index}"></div>
+
+<button onclick="toggleRaw(${index})">
+RAW JSON
+</button>
+
+<pre id="raw${index}" style="display:none"></pre>
+
+`;
+
+container.appendChild(card);
+
+document.getElementById("raw"+index).textContent=
+JSON.stringify(obs,null,2);
+
+renderAssets(obs,index);
+
+});
+
+}
+
+
+
+// ==========================================
+// RENDER ASSETS
+// ==========================================
+
+function renderAssets(obs,index){
+
+const box=
+document.getElementById("assets"+index);
+
+if(!obs.assets)
+return;
+
+
+
+Object.entries(obs.assets).forEach(([name,asset])=>{
+
+const div=
+document.createElement("div");
+
+div.className="asset";
+
+const type=asset.type||"Unknown";
+
+let html=`
+
+<div class="assetHeader">
+
+<div>
+
+<div class="assetName">${name}</div>
+
+<div class="assetType">${type}</div>
+
+</div>
+
+<a href="${asset.href}" target="_blank">
+Open
+</a>
+
+</div>
+
+`;
+
+
+
+if(type.startsWith("image/")){
+
+html+=`
+
+<img
+class="assetPreview"
+src="${asset.href}"
+loading="lazy"
+onclick="window.open('${asset.href}','_blank')"
+onerror="this.style.display='none';"
+>
+
+`;
+
+}
+
+
+
+div.innerHTML=html;
+
+box.appendChild(div);
+
+});
+
+}
+
+
+
+// ==========================================
+// RAW
+// ==========================================
+
+function toggleRaw(i){
+
+const pre=
+document.getElementById("raw"+i);
+
+pre.style.display=
+pre.style.display==="none"
+?
+"block"
+:
+"none";
+
+}
+
+</script>
+  
 </body>
 </html>
