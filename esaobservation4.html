@@ -386,6 +386,9 @@ overflow:auto;
       <div id="queryBox"></div>
 
       <details>
+        <button id="expandMapBtn" onclick="expandObservationMap()">
+REDISCOVER MAP
+</button>
         <summary>Raw JSON</summary>
         <pre id="raw"></pre>
       </details>
@@ -1353,6 +1356,182 @@ r.innerHTML=`
 
 container.appendChild(r);
 
+
+}
+
+
+
+  // ===================================
+// REDISCOVER MAP
+// ===================================
+
+async function expandObservationMap(){
+
+    // Debe existir al menos una celda con datos
+
+    if(!observationGrid.some(c=>c.state===0)){
+
+        console.log("No reference cells.");
+
+        return;
+
+    }
+
+    document.getElementById("status").textContent =
+    "Expanding observation map...";
+
+    await discoverNeighbourCells();
+
+    updateGrid();
+
+    document.getElementById("status").textContent =
+    "Expansion complete.";
+
+}
+
+
+  // ===================================
+// DISCOVER NEIGHBOUR CELLS
+// ===================================
+
+async function discoverNeighbourCells(){
+
+    const visited=new Set();
+
+    const queue=[];
+
+    observationGrid.forEach(cell=>{
+
+        if(cell.state===0){
+
+            queue.push(cell);
+
+            visited.add(cell.id);
+
+        }
+
+    });
+
+
+    while(queue.length){
+
+        const cell=queue.shift();
+
+        const neighbours=getNeighbours(cell);
+
+        for(const n of neighbours){
+
+            if(visited.has(n.id))
+                continue;
+
+            visited.add(n.id);
+
+            // Solo explorar las desconocidas
+
+            if(n.state!==-1)
+                continue;
+
+            await inspectCell(n);
+
+            if(n.state===0){
+
+                queue.push(n);
+
+            }
+
+        }
+
+    }
+
+}
+
+  // ===================================
+// GET NEIGHBOURS
+// ===================================
+
+function getNeighbours(cell){
+
+    const result=[];
+
+    const dirs=[
+
+        [-1,-1],[0,-1],[1,-1],
+
+        [-1,0],         [1,0],
+
+        [-1,1],[0,1],[1,1]
+
+    ];
+
+    dirs.forEach(d=>{
+
+        const x=cell.x+d[0];
+        const y=cell.y+d[1];
+
+        const neighbour=
+        observationGrid.find(c=>c.x===x && c.y===y);
+
+        if(neighbour)
+            result.push(neighbour);
+
+    });
+
+    return result;
+
+}
+
+
+
+  // ===================================
+// INSPECT CELL
+// ===================================
+
+async function inspectCell(cell){
+
+    if(!activeDataset)
+        return;
+
+    const lat=
+    (cell.latMin+cell.latMax)/2;
+
+    const lon=
+    (cell.lonMin+cell.lonMax)/2;
+
+    const datetime=
+    activeDataset.endDate || activeDataset.startDate;
+
+    const url=
+
+    `${activeDataset.items}`+
+
+    `?limit=1500`+
+
+    `&datetime=../${datetime}`+
+
+    `&bbox=${cell.lonMin},${cell.latMin},${cell.lonMax},${cell.latMax}`;
+
+
+    try{
+
+        const res=await fetch(url);
+
+        const json=await res.json();
+
+        if(json.features && json.features.length){
+
+            cell.state=0;
+
+            cell.items.push(...json.features);
+
+        }
+
+    }
+
+    catch(e){
+
+        console.log(e);
+
+    }
 
 }
 
