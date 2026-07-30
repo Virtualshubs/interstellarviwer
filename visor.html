@@ -184,105 +184,173 @@ pre{
 
 <script>
 
-const DATASET="https://3d.staratlas.es/renderdata.json";
+const DATASET = "cell.json";
 
-fetch(DATASET)
+async function load(){
 
-.then(r=>r.json())
+    try{
 
-.then(loadDataset)
+        const res = await fetch(DATASET);
 
-.catch(err=>{
+        const json = await res.json();
 
-document.getElementById("status").textContent=
-"Unable to load dataset";
+        renderDataset(json);
 
-console.error(err);
+    }
 
-});
+    catch(err){
+
+        console.error(err);
+
+        document.getElementById("status").textContent =
+        "Unable to load dataset";
+
+    }
+
+}
+
+load();
 
 
 
-function loadDataset(json){
+// ==========================================
+// RENDER DATASET
+// ==========================================
 
-    console.log(json);
+function renderDataset(json){
 
-    document.getElementById("status").textContent=
+    //----------------------------------------------------
+    // JANUS FORMAT
+    //----------------------------------------------------
+
+    const info =
+    json.CELL_INFO;
+
+    const observations =
+    json.OBSERVATIONS || [];
+
+
+
+    //----------------------------------------------------
+    // SUMMARY
+    //----------------------------------------------------
+
+    document.getElementById("status").textContent =
     "Dataset loaded";
 
-
-
-    //------------------------------------------------
-    // Detect observations
-    //------------------------------------------------
-
-    let observations=[];
-
-
-
-    if(Array.isArray(json)){
-
-        observations=json;
-
-    }
-
-    else if(json.items){
-
-        observations=json.items;
-
-    }
-
-    else if(json.features){
-
-        observations=json.features;
-
-    }
-
-
-
-    document.getElementById("count").textContent=
+    document.getElementById("count").textContent =
     observations.length;
 
 
 
-    const container=
+    //----------------------------------------------------
+    // CELL INFO
+    //----------------------------------------------------
+
+    const summary =
+    document.getElementById("summary");
+
+
+
+    summary.innerHTML += `
+
+    <div class="row">
+        <div class="label">Cell ID</div>
+        <div class="value">${info.id}</div>
+    </div>
+
+    <div class="row">
+        <div class="label">Latitude</div>
+        <div class="value">${info.latRange}</div>
+    </div>
+
+    <div class="row">
+        <div class="label">Longitude</div>
+        <div class="value">${info.lonRange}</div>
+    </div>
+
+    <div class="row">
+        <div class="label">State</div>
+        <div class="value">${info.state}</div>
+    </div>
+
+    `;
+
+
+
+    //----------------------------------------------------
+    // OBSERVATIONS
+    //----------------------------------------------------
+
+    const container =
     document.getElementById("observations");
 
 
 
     observations.forEach((obs,index)=>{
 
-        const card=
+        const card =
         document.createElement("div");
 
-        card.className="card observation";
+        card.className="card";
 
 
 
         card.innerHTML=`
 
-        <h2>Observation ${index+1}</h2>
+        <h2>
+
+            Observation ${index+1}
+
+        </h2>
+
 
         <div class="row">
             <div class="label">ID</div>
-            <div class="value">${obs.id||""}</div>
+            <div class="value">${obs.id}</div>
         </div>
+
 
         <div class="row">
             <div class="label">Collection</div>
-            <div class="value">${obs.collection||""}</div>
+            <div class="value">${obs.collection}</div>
         </div>
+
 
         <div class="row">
             <div class="label">Datetime</div>
-            <div class="value">${obs.properties?.datetime||""}</div>
+            <div class="value">
+
+                ${obs.properties?.datetime || ""}
+
+            </div>
         </div>
 
-        <button onclick='toggleRaw(${index})'>
-        RAW JSON
+
+        <div class="row">
+            <div class="label">Assets</div>
+            <div class="value">
+
+                ${Object.keys(obs.assets||{}).length}
+
+            </div>
+        </div>
+
+
+        <div id="assets${index}"></div>
+
+
+        <button onclick="toggleRaw(${index})">
+
+            RAW JSON
+
         </button>
 
-        <pre id="raw${index}" style="display:none"></pre>
+
+        <pre
+            id="raw${index}"
+            style="display:none"
+        ></pre>
 
         `;
 
@@ -292,25 +360,130 @@ function loadDataset(json){
 
 
 
-        document.getElementById("raw"+index).textContent=
-        JSON.stringify(obs,null,2);
+        document.getElementById(
+
+            "raw"+index
+
+        ).textContent=
+
+        JSON.stringify(
+
+            obs,
+
+            null,
+
+            2
+
+        );
+
+
+
+        renderAssets(
+
+            obs,
+
+            index
+
+        );
+
+
 
     });
+
+
 
 }
 
 
 
+// ==========================================
+// RENDER ASSETS
+// ==========================================
+
+function renderAssets(obs,index){
+
+    const box =
+    document.getElementById("assets"+index);
+
+
+
+    if(!obs.assets)
+        return;
+
+
+
+    Object.entries(obs.assets)
+
+    .forEach(([name,asset])=>{
+
+        const div =
+        document.createElement("div");
+
+        div.className="asset";
+
+
+
+        div.innerHTML=`
+
+            <b>${name}</b>
+
+            <br>
+
+            ${asset.type || "unknown"}
+
+            <br><br>
+
+            <a
+                href="${asset.href}"
+                target="_blank"
+            >
+
+                Open
+
+            </a>
+
+        `;
+
+
+
+        box.appendChild(div);
+
+
+
+    });
+
+
+
+}
+
+
+
+// ==========================================
+// RAW
+// ==========================================
+
 function toggleRaw(i){
 
-const pre=document.getElementById("raw"+i);
+    const pre =
+    document.getElementById(
 
-pre.style.display=
-pre.style.display==="none"
-?
-"block"
-:
-"none";
+        "raw"+i
+
+    );
+
+
+
+    pre.style.display=
+
+    pre.style.display==="none"
+
+    ?
+
+    "block"
+
+    :
+
+    "none";
 
 }
 
