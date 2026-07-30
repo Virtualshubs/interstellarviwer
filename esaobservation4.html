@@ -384,11 +384,12 @@ overflow:auto;
       <h2>Select a collection</h2>
       <div id="meta"></div>
       <div id="queryBox"></div>
-
-      <details>
-        <button id="expandMapBtn" onclick="expandObservationMap()">
+              <button id="expandMapBtn" onclick="expandObservationMap()">
 REDISCOVER MAP
 </button>
+
+      <details>
+
         <summary>Raw JSON</summary>
         <pre id="raw"></pre>
       </details>
@@ -1504,7 +1505,7 @@ async function inspectCell(cell){
 
     `${activeDataset.items}`+
 
-    `?limit=1500`+
+    `?limit=2000`+
 
     `&datetime=../${datetime}`+
 
