@@ -456,26 +456,173 @@ font-size:30px;
 
 }
 
+
+    .assetPreview{
+
+display:block;
+
+width:100%;
+
+max-width:320px;
+
+max-height:220px;
+
+margin-top:12px;
+
+object-fit:cover;
+
+border-radius:8px;
+
+border:1px solid var(--border);
+
+background:#0d1117;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.assetPreview:hover{
+
+transform:scale(1.02);
+
+}
+
 </style>
 </head>
 
-<body>
+<body><h1>JANUS</h1>
 
-<h1>JANUS Reader</h1>
+<p class="subtitle">
+Scientific Observation Reader
+</p>
 
 <div id="summary" class="card">
 
-<h2>Dataset</h2>
+    <h2>Dataset Overview</h2>
 
-<div class="row">
-<div class="label">Status</div>
-<div class="value" id="status">Loading...</div>
-</div>
+    <div class="stats">
 
-<div class="row">
-<div class="label">Observations</div>
-<div class="value" id="count">-</div>
-</div>
+        <div class="stat">
+
+            <div class="statTitle">
+                STATUS
+            </div>
+
+            <div
+                class="statValue"
+                id="status"
+            >
+                Loading...
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="statTitle">
+                OBSERVATIONS
+            </div>
+
+            <div
+                class="statValue"
+                id="count"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="statTitle">
+                CELL
+            </div>
+
+            <div
+                class="statValue"
+                id="cellId"
+            >
+                -
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="statTitle">
+                ASSETS
+            </div>
+
+            <div
+                class="statValue"
+                id="assetCount"
+            >
+                -
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="details">
+
+        <div class="row">
+
+            <div class="label">
+                Latitude
+            </div>
+
+            <div
+                class="value"
+                id="latRange"
+            >
+                -
+            </div>
+
+        </div>
+
+
+
+        <div class="row">
+
+            <div class="label">
+                Longitude
+            </div>
+
+            <div
+                class="value"
+                id="lonRange"
+            >
+                -
+            </div>
+
+        </div>
+
+
+
+        <div class="row">
+
+            <div class="label">
+                State
+            </div>
+
+            <div
+                class="value"
+                id="cellState"
+            >
+                -
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -484,42 +631,37 @@ font-size:30px;
 <div id="observations"></div>
 
 
-
 <script>
 
-const DATASET = "https://3d.staratlas.es/renderdata.json";
+const DATASET="https://3d.staratlas.es/renderdata.json";
 
 async function load(){
 
-    const res = await fetch(DATASET);
+try{
 
-    const text = await res.text();
+const res=await fetch(DATASET);
+const text=await res.text();
+const json=JSON.parse(text);
 
-    console.log(text);
+console.log("JSON OK");
 
-    try{
+renderDataset(json);
 
-        const json = JSON.parse(text);
+}
 
-        console.log("JSON OK");
+catch(e){
 
-        renderDataset(json);
+console.error(e);
 
-    }
+document.getElementById("status").textContent=
+"Unable to load dataset";
 
-    catch(e){
-
-        console.error(e);
-
-        console.log("---------------");
-        console.log(text);
-        console.log("---------------");
-
-    }
+}
 
 }
 
 load();
+
 
 
 // ==========================================
@@ -528,178 +670,108 @@ load();
 
 function renderDataset(json){
 
-    //----------------------------------------------------
-    // JANUS FORMAT
-    //----------------------------------------------------
+const info=json.CELL_INFO||{};
+const observations=json.OBSERVATIONS||[];
 
-    const info =
-    json.CELL_INFO;
 
-    const observations =
-    json.OBSERVATIONS || [];
 
+document.getElementById("status").textContent=
+"Dataset Loaded";
 
+document.getElementById("count").textContent=
+observations.length;
 
-    //----------------------------------------------------
-    // SUMMARY
-    //----------------------------------------------------
+document.getElementById("cellId").textContent=
+info.id||"-";
 
-    document.getElementById("status").textContent =
-    "Dataset loaded";
+document.getElementById("latRange").textContent=
+info.latRange||"-";
 
-    document.getElementById("count").textContent =
-    observations.length;
+document.getElementById("lonRange").textContent=
+info.lonRange||"-";
 
+document.getElementById("cellState").textContent=
+info.state??"-";
 
 
-    //----------------------------------------------------
-    // CELL INFO
-    //----------------------------------------------------
 
-    const summary =
-    document.getElementById("summary");
+const totalAssets=
+observations.reduce((t,o)=>{
 
+return t+Object.keys(o.assets||{}).length;
 
+},0);
 
-    summary.innerHTML += `
 
-    <div class="row">
-        <div class="label">Cell ID</div>
-        <div class="value">${info.id}</div>
-    </div>
 
-    <div class="row">
-        <div class="label">Latitude</div>
-        <div class="value">${info.latRange}</div>
-    </div>
+document.getElementById("assetCount").textContent=
+totalAssets;
 
-    <div class="row">
-        <div class="label">Longitude</div>
-        <div class="value">${info.lonRange}</div>
-    </div>
 
-    <div class="row">
-        <div class="label">State</div>
-        <div class="value">${info.state}</div>
-    </div>
 
-    `;
+const container=
+document.getElementById("observations");
 
+container.innerHTML="";
 
 
-    //----------------------------------------------------
-    // OBSERVATIONS
-    //----------------------------------------------------
 
-    const container =
-    document.getElementById("observations");
+observations.forEach((obs,index)=>{
 
+const assets=
+Object.keys(obs.assets||{}).length;
 
 
-    observations.forEach((obs,index)=>{
 
-        const card =
-        document.createElement("div");
+const card=
+document.createElement("div");
 
-        card.className="card";
+card.className="card";
 
 
 
-        card.innerHTML=`
+card.innerHTML=`
 
-        <h2>
+<h2>Observation ${index+1}</h2>
 
-            Observation ${index+1}
+<div class="row">
+<div class="label">ID</div>
+<div class="value">${obs.id||"-"}</div>
+</div>
 
-        </h2>
+<div class="row">
+<div class="label">Collection</div>
+<div class="value">${obs.collection||"-"}</div>
+</div>
 
+<div class="row">
+<div class="label">Datetime</div>
+<div class="value">${obs.properties?.datetime||"-"}</div>
+</div>
 
-        <div class="row">
-            <div class="label">ID</div>
-            <div class="value">${obs.id}</div>
-        </div>
+<div class="row">
+<div class="label">Assets</div>
+<div class="value">${assets}</div>
+</div>
 
+<div id="assets${index}"></div>
 
-        <div class="row">
-            <div class="label">Collection</div>
-            <div class="value">${obs.collection}</div>
-        </div>
+<button onclick="toggleRaw(${index})">
+RAW JSON
+</button>
 
+<pre id="raw${index}" style="display:none"></pre>
 
-        <div class="row">
-            <div class="label">Datetime</div>
-            <div class="value">
+`;
 
-                ${obs.properties?.datetime || ""}
+container.appendChild(card);
 
-            </div>
-        </div>
+document.getElementById("raw"+index).textContent=
+JSON.stringify(obs,null,2);
 
+renderAssets(obs,index);
 
-        <div class="row">
-            <div class="label">Assets</div>
-            <div class="value">
-
-                ${Object.keys(obs.assets||{}).length}
-
-            </div>
-        </div>
-
-
-        <div id="assets${index}"></div>
-
-
-        <button onclick="toggleRaw(${index})">
-
-            RAW JSON
-
-        </button>
-
-
-        <pre
-            id="raw${index}"
-            style="display:none"
-        ></pre>
-
-        `;
-
-
-
-        container.appendChild(card);
-
-
-
-        document.getElementById(
-
-            "raw"+index
-
-        ).textContent=
-
-        JSON.stringify(
-
-            obs,
-
-            null,
-
-            2
-
-        );
-
-
-
-        renderAssets(
-
-            obs,
-
-            index
-
-        );
-
-
-
-    });
-
-
+});
 
 }
 
@@ -711,57 +783,68 @@ function renderDataset(json){
 
 function renderAssets(obs,index){
 
-    const box =
-    document.getElementById("assets"+index);
+const box=
+document.getElementById("assets"+index);
+
+if(!obs.assets)
+return;
 
 
 
-    if(!obs.assets)
-        return;
+Object.entries(obs.assets).forEach(([name,asset])=>{
+
+const div=
+document.createElement("div");
+
+div.className="asset";
+
+const type=asset.type||"Unknown";
+
+let html=`
+
+<div class="assetHeader">
+
+<div>
+
+<div class="assetName">${name}</div>
+
+<div class="assetType">${type}</div>
+
+</div>
+
+<a href="${asset.href}" target="_blank">
+Open
+</a>
+
+</div>
+
+`;
 
 
 
-    Object.entries(obs.assets)
+if(type.startsWith("image/")){
 
-    .forEach(([name,asset])=>{
+html+=`
 
-        const div =
-        document.createElement("div");
+<img
+class="assetPreview"
+src="${asset.href}"
+loading="lazy"
+onclick="window.open('${asset.href}','_blank')"
+onerror="this.style.display='none';"
+>
 
-        div.className="asset";
+`;
 
-
-
-        div.innerHTML=`
-
-            <b>${name}</b>
-
-            <br>
-
-            ${asset.type || "unknown"}
-
-            <br><br>
-
-            <a
-                href="${asset.href}"
-                target="_blank"
-            >
-
-                Open
-
-            </a>
-
-        `;
+}
 
 
 
-        box.appendChild(div);
+div.innerHTML=html;
 
+box.appendChild(div);
 
-
-    });
-
-
+});
 
 }
 
@@ -773,26 +856,15 @@ function renderAssets(obs,index){
 
 function toggleRaw(i){
 
-    const pre =
-    document.getElementById(
+const pre=
+document.getElementById("raw"+i);
 
-        "raw"+i
-
-    );
-
-
-
-    pre.style.display=
-
-    pre.style.display==="none"
-
-    ?
-
-    "block"
-
-    :
-
-    "none";
+pre.style.display=
+pre.style.display==="none"
+?
+"block"
+:
+"none";
 
 }
 
