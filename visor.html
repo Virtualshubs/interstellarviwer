@@ -188,29 +188,35 @@ const DATASET = "https://3d.staratlas.es/renderdata.json";
 
 async function load(){
 
+    const res = await fetch(DATASET);
+
+    const text = await res.text();
+
+    console.log(text);
+
     try{
 
-        const res = await fetch(DATASET);
+        const json = JSON.parse(text);
 
-        const json = await res.json();
+        console.log("JSON OK");
 
         renderDataset(json);
 
     }
 
-    catch(err){
+    catch(e){
 
-        console.error(err);
+        console.error(e);
 
-        document.getElementById("status").textContent =
-        "Unable to load dataset";
+        console.log("---------------");
+        console.log(text);
+        console.log("---------------");
 
     }
 
 }
 
 load();
-
 
 
 // ==========================================
