@@ -1202,86 +1202,87 @@ updateGrid();
 
 
 
-
 // ===============================
 // UPDATE VISUAL STATES
 // ===============================
 
 function updateGrid(){
 
-
-const cells=
-document.querySelectorAll(".dataCell");
-
+    const cells =
+    document.querySelectorAll(".dataCell");
 
 
-cells.forEach((div,index)=>{
+    cells.forEach((div,index)=>{
+
+        const cell =
+        observationGrid[index];
 
 
-const cell=
-observationGrid[index];
+        // ==========================
+        // NUEVA CELDA DESCUBIERTA
+        // ==========================
+
+        if(cell.discovered){
+
+            div.style.background="#ff66cc";
+
+            div.textContent=
+            `${cell.items.length}`;
+
+            return;
+
+        }
 
 
+        // ==========================
+        // SIN OBSERVACIONES
+        // ==========================
 
-if(cell.state===-1){
+        if(cell.state===-1){
+
+            div.style.background="#222";
+
+            div.textContent="";
+
+            return;
+
+        }
 
 
-div.style.background="#222";
+        // ==========================
+        // OBSERVACIÓN
+        // ==========================
 
-div.textContent="";
+        if(cell.state===0){
 
+            div.style.background="#16803c";
+
+            div.textContent=
+            `${cell.items.length}`;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // CELDA SELECCIONADA
+        // ==========================
+
+        if(cell.state===1){
+
+            div.style.background="#ff8c00";
+
+            div.textContent=
+            `${cell.items.length}`;
+
+            return;
+
+        }
+
+    });
 
 }
-
-
-
-if(cell.state===0){
-
-
-div.style.background="#16803c";
-
-
-div.textContent=
-`${cell.items.length}`;
-
-
-}
-
-
-
-if(cell.state===1){
-
-
-div.style.background="#ff8c00";
-
-
-div.textContent=
-`${cell.items.length}`;
-
-
-}
-
-
-  if(cell.discovered){
-
-    div.style.background="#ff66cc";
-
-    div.textContent=
-    `${cell.items.length}`;
-
-    return;
-
-}
-
-
-
-});
-
-
-
-}
-
-
 
 
 
@@ -1518,23 +1519,15 @@ async function discoverNeighbourCells(){
             if(found){
 
                 discovered++;
-
-                n.discovered=true;
-
                 queue.push(n);
 
             }
 
-
-
             updateGrid();
-
 
         }
 
-
     }
-
 
 
     return discovered;
@@ -1775,10 +1768,28 @@ function appendSpatialData(items){
             if(!exists){
 
 
+                // comprobar si era una celda vacía
+
+                const wasEmpty =
+                cell.items.length===0;
+
+
+
                 cell.items.push(item);
 
 
+
                 cell.state=0;
+
+
+
+                // nueva cobertura descubierta
+
+                if(wasEmpty){
+
+                    cell.discovered=true;
+
+                }
 
 
             }
