@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JANUS Reader</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Arial,Helvetica,sans-serif;
+
+    background:#0f1117;
+
+    color:#eee;
+
+    padding:30px;
+
+}
+
+h1{
+
+    color:#58c8ff;
+    margin-bottom:25px;
+
+}
+
+h2{
+
+    margin-bottom:10px;
+
+    color:#ffb14d;
+
+}
+
+.card{
+
+    background:#1b1e27;
+
+    border-radius:10px;
+
+    padding:18px;
+
+    margin-bottom:20px;
+
+    border:1px solid #2b3040;
+
+}
+
+.row{
+
+    display:flex;
+
+    gap:15px;
+
+    margin:6px 0;
+
+    flex-wrap:wrap;
+
+}
+
+.label{
+
+    width:170px;
+
+    color:#8ebfff;
+
+    font-weight:bold;
+
+}
+
+.value{
+
+    flex:1;
+
+    word-break:break-word;
+
+}
+
+.observation{
+
+    margin-top:25px;
+
+}
+
+.asset{
+
+    padding:10px;
+
+    margin-top:8px;
+
+    background:#262c38;
+
+    border-radius:6px;
+
+}
+
+button{
+
+    padding:8px 14px;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    background:#3a8cff;
+
+    color:white;
+
+}
+
+button:hover{
+
+    background:#57a0ff;
+
+}
+
+img{
+
+    max-width:100%;
+
+    margin-top:10px;
+
+    border-radius:6px;
+
+}
+
+pre{
+
+    background:#111;
+
+    padding:15px;
+
+    overflow:auto;
+
+    border-radius:6px;
+
+    margin-top:10px;
+
+    max-height:400px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>JANUS Reader</h1>
+
+<div id="summary" class="card">
+
+<h2>Dataset</h2>
+
+<div class="row">
+<div class="label">Status</div>
+<div class="value" id="status">Loading...</div>
+</div>
+
+<div class="row">
+<div class="label">Observations</div>
+<div class="value" id="count">-</div>
+</div>
+
+</div>
+
+
+
+<div id="observations"></div>
+
+
+
+<script>
+
+const DATASET="https://3d.staratlas.es/renderdata.json";
+
+fetch(DATASET)
+
+.then(r=>r.json())
+
+.then(loadDataset)
+
+.catch(err=>{
+
+document.getElementById("status").textContent=
+"Unable to load dataset";
+
+console.error(err);
+
+});
+
+
+
+function loadDataset(json){
+
+    console.log(json);
+
+    document.getElementById("status").textContent=
+    "Dataset loaded";
+
+
+
+    //------------------------------------------------
+    // Detect observations
+    //------------------------------------------------
+
+    let observations=[];
+
+
+
+    if(Array.isArray(json)){
+
+        observations=json;
+
+    }
+
+    else if(json.items){
+
+        observations=json.items;
+
+    }
+
+    else if(json.features){
+
+        observations=json.features;
+
+    }
+
+
+
+    document.getElementById("count").textContent=
+    observations.length;
+
+
+
+    const container=
+    document.getElementById("observations");
+
+
+
+    observations.forEach((obs,index)=>{
+
+        const card=
+        document.createElement("div");
+
+        card.className="card observation";
+
+
+
+        card.innerHTML=`
+
+        <h2>Observation ${index+1}</h2>
+
+        <div class="row">
+            <div class="label">ID</div>
+            <div class="value">${obs.id||""}</div>
+        </div>
+
+        <div class="row">
+            <div class="label">Collection</div>
+            <div class="value">${obs.collection||""}</div>
+        </div>
+
+        <div class="row">
+            <div class="label">Datetime</div>
+            <div class="value">${obs.properties?.datetime||""}</div>
+        </div>
+
+        <button onclick='toggleRaw(${index})'>
+        RAW JSON
+        </button>
+
+        <pre id="raw${index}" style="display:none"></pre>
+
+        `;
+
+
+
+        container.appendChild(card);
+
+
+
+        document.getElementById("raw"+index).textContent=
+        JSON.stringify(obs,null,2);
+
+    });
+
+}
+
+
+
+function toggleRaw(i){
+
+const pre=document.getElementById("raw"+i);
+
+pre.style.display=
+pre.style.display==="none"
+?
+"block"
+:
+"none";
+
+}
+
+</script>
+
+</body>
+
+</html>
