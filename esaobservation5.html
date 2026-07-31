@@ -422,12 +422,12 @@ REDISCOVER MAP
                 STATUS
             </div>
 
-            <div
-                class="statValue"
-                id="status"
-            >
-                Loading...
-            </div>
+         <div
+class="statValue"
+id="janusStatus"
+>
+Loading...
+</div>
 
         </div>
 
@@ -1922,8 +1922,7 @@ const info=json.CELL_INFO||{};
 const observations=json.OBSERVATIONS||[];
 
 
-
-document.getElementById("status").textContent=
+document.getElementById("janusStatus").textContent=
 "Dataset Loaded";
 
 document.getElementById("count").textContent=
