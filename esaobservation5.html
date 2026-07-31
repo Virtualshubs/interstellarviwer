@@ -1449,60 +1449,32 @@ function updateGrid(){
 
 function showCellData(cell){
 
-
-document.getElementById("raw").textContent=
-
-
-JSON.stringify(
-
-{
+const dataset={
 
 CELL_INFO:{
 
-
 id:cell.id,
 
+latRange:`${cell.latMin} / ${cell.latMax}`,
 
-latRange:
-
-`${cell.latMin} / ${cell.latMax}`,
-
-
-lonRange:
-
-`${cell.lonMin} / ${cell.lonMax}`,
-
+lonRange:`${cell.lonMin} / ${cell.lonMax}`,
 
 state:cell.state,
 
-
-observations:
-cell.items.length
-
+observations:cell.items.length
 
 },
 
+OBSERVATIONS:cell.items
 
-OBSERVATIONS:
+};
 
-cell.items
+document.getElementById("raw").textContent=
+JSON.stringify(dataset,null,2);
 
-
-},
-
-null,
-
-2
-
-
-);
-
+loadJanusDataset(dataset);
 
 }
-
-
-
-
 
 // ===============================
 // ADD ROW
@@ -1928,17 +1900,13 @@ function appendSpatialData(items){
 
   <script>
 
-const DATASET="https://3d.staratlas.es/renderdata.json";
+// ==========================================
+// LOAD JANUS DATASET
+// ==========================================
 
-async function load(){
+function loadJanusDataset(json){
 
 try{
-
-const res=await fetch(DATASET);
-const text=await res.text();
-const json=JSON.parse(text);
-
-console.log("JSON OK");
 
 renderDataset(json);
 
@@ -1954,8 +1922,6 @@ document.getElementById("status").textContent=
 }
 
 }
-
-load();
 
 
 
