@@ -992,12 +992,10 @@ const grid=document.getElementById("dataGrid");
 
 grid.innerHTML="";
 
-
 observationGrid=[];
 
 
 // resolución inicial del mapa
-// 18 bandas latitud x 36 bandas longitud
 
 const rows=18;
 const cols=36;
@@ -1006,79 +1004,42 @@ const cols=36;
 
 for(let y=0;y<rows;y++){
 
-
 for(let x=0;x<cols;x++){
-
-
 
 const cell={
 
-
 id:y*cols+x,
-
 
 x,
 y,
 
-
-// estados JANUS
-// -1 = sin observaciones
-// 0 = contiene datos
-// 1 = resultado búsqueda
-
-
 state:-1,
 
+latMin:-90+y*(180/rows),
+latMax:-90+(y+1)*(180/rows),
 
-latMin:
--90 + y*(180/rows),
-
-
-latMax:
--90 +(y+1)*(180/rows),
-
-
-lonMin:
--180+x*(360/cols),
-
-
-lonMax:
--180+(x+1)*(360/cols),
-
+lonMin:-180+x*(360/cols),
+lonMax:-180+(x+1)*(360/cols),
 
 items:[]
 
 };
 
-
-
 observationGrid.push(cell);
-
-
 
 const div=document.createElement("div");
 
 div.className="dataCell";
 
+div.textContent="";
 
-div.textContent=
-"";
-
-
-div.onclick=
-()=>showCellData(cell);
-
-
+div.onclick=()=>showCellData(cell);
 
 grid.appendChild(div);
 
-
-
 }
 
 }
-
-
 
 
 
@@ -1088,16 +1049,15 @@ grid.appendChild(div);
 
 items.forEach(item=>{
 
-
 let coords=null;
-
-
 
 const geom=item.geometry;
 
 
 
-// punto directo STAC
+// ------------------------------------------------
+// 1. POINT (STAC)
+// ------------------------------------------------
 
 if(geom && geom.type==="Point"){
 
@@ -1107,7 +1067,47 @@ coords=geom.coordinates;
 
 
 
-// si no hay punto usamos bbox
+// ------------------------------------------------
+// 2. LAT/LON EN PROPERTIES
+// ------------------------------------------------
+
+if(!coords &&
+item.properties &&
+item.properties.latitude!==undefined &&
+item.properties.longitude!==undefined){
+
+coords=[
+
+item.properties.longitude,
+
+item.properties.latitude
+
+];
+
+}
+
+
+
+if(!coords &&
+item.properties &&
+item.properties.lat!==undefined &&
+item.properties.lon!==undefined){
+
+coords=[
+
+item.properties.lon,
+
+item.properties.lat
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 3. BBOX
+// ------------------------------------------------
 
 if(!coords && item.bbox){
 
@@ -1123,21 +1123,98 @@ coords=[
 
 
 
-if(!coords)
+// ------------------------------------------------
+// 4. POLYGON
+// ------------------------------------------------
+
+if(!coords &&
+geom &&
+geom.type==="Polygon"){
+
+const ring=geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+coords=[
+
+lon/ring.length,
+
+lat/ring.length
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 5. MULTIPOLYGON
+// ------------------------------------------------
+
+if(!coords &&
+geom &&
+geom.type==="MultiPolygon"){
+
+const ring=geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+coords=[
+
+lon/ring.length,
+
+lat/ring.length
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 6. SIN SOPORTE
+// ------------------------------------------------
+
+if(!coords){
+
+console.log(
+
+"Unsupported geometry:",
+
+geom?.type,
+
+item
+
+);
+
 return;
+
+}
 
 
 
 const lon=coords[0];
-
 const lat=coords[1];
 
 
 
-
-
 const cell=observationGrid.find(c=>
-
 
 lat>=c.latMin &&
 lat<c.latMax &&
@@ -1145,21 +1222,17 @@ lat<c.latMax &&
 lon>=c.lonMin &&
 lon<c.lonMax
 
-
 );
 
 
 
 if(cell){
 
-
 cell.state=0;
 
 cell.items.push(item);
 
-
 }
-
 
 });
 
@@ -1167,14 +1240,9 @@ cell.items.push(item);
 
 updateGrid();
 
-
 createGridSearch();
 
-
 }
-
-
-
 
 
 // ===============================
