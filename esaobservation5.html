@@ -1902,26 +1902,11 @@ function appendSpatialData(items){
 
   <script>
 
-// ==========================================
-// LOAD JANUS DATASET
-// ==========================================
-
 function loadJanusDataset(json){
 
-try{
+    if(!json) return;
 
-renderDataset(json);
-
-}
-
-catch(e){
-
-console.error(e);
-
-document.getElementById("status").textContent=
-"Unable to load dataset";
-
-}
+    renderDataset(json);
 
 }
 
