@@ -19,12 +19,18 @@ align-items:center;
 }
 
 #panel{
-display:grid;
-grid-template-columns:1fr 430px;
 width:100vw;
 height:100vh;
-overflow:hidden;
+display:flex;
+flex-direction:column;
 background:#141b25;
+overflow:hidden;
+}
+
+  #workspace{
+flex:1;
+display:flex;
+overflow:hidden;
 }
 
 #header{
@@ -66,9 +72,9 @@ color:#8fb8ff;
 }
 
 #content{
+flex:1;
 display:grid;
 grid-template-columns:380px 1fr;
-flex:1;
 overflow:hidden;
 }
 
@@ -188,13 +194,14 @@ overflow:auto;
 /* JANUS READER */
 /* ========================= */
 #janusReader{
+width:430px;
 height:100%;
-background:#fff;
+flex-shrink:0;
 display:flex;
 flex-direction:column;
-border-left:1px solid #d9dee6;
 overflow-y:auto;
-overflow-x:hidden;
+background:#fff;
+border-left:1px solid #d9dee6;
 }
 
 #janusSummary{
@@ -379,178 +386,100 @@ white-space:pre-wrap;
 <body>
 
 <div id="panel">
-  <div id="header">
-      <div id="status">Ready</div>
-    <input id="search" value="Biomass">
-    <button id="load">SEARCH</button>
-  </div>
 
-  <div id="content">
-    <div id="cards"></div>
-
-    <div id="detail">
-      <h2>Select a collection</h2>
-      <div id="meta"></div>
-      <div id="queryBox"></div>
-              <button id="expandMapBtn" onclick="expandObservationMap()">
-REDISCOVER MAP
-</button>
-
-      <details>
-
-        <summary>Raw JSON</summary>
-        <pre id="raw"></pre>
-      </details>
-
-    </div>
-  </div>
-
-
-
-  <div id="janusReader">
-
-
-<div id="summary" class="card">
-
-    <h2>Dataset Overview</h2>
-
-    <div class="stats">
-
-        <div class="stat">
-
-            <div class="statTitle">
-                STATUS
-            </div>
-
-         <div
-class="statValue"
-id="janusStatus"
->
-Loading...
-</div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="statTitle">
-                OBSERVATIONS
-            </div>
-
-            <div
-                class="statValue"
-                id="count"
-            >
-                -
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="statTitle">
-                CELL
-            </div>
-
-            <div
-                class="statValue"
-                id="cellId"
-            >
-                -
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="statTitle">
-                ASSETS
-            </div>
-
-            <div
-                class="statValue"
-                id="assetCount"
-            >
-                -
-            </div>
-
-        </div>
-
-      
-
+    <div id="header">
+        <div id="status">Ready</div>
+        <input id="search" value="Biomass">
+        <button id="load">SEARCH</button>
     </div>
 
+    <div id="workspace">
 
+        <div id="content">
 
-    <div class="details">
+            <div id="cards"></div>
 
-        <div class="row">
+            <div id="detail">
 
-            <div class="label">
-                Latitude
-            </div>
+                <h2>Select a collection</h2>
 
-            <div
-                class="value"
-                id="latRange"
-            >
-                -
-            </div>
+                <div id="meta"></div>
 
-        </div>
+                <div id="queryBox"></div>
 
+                <button id="expandMapBtn" onclick="expandObservationMap()">
+                    REDISCOVER MAP
+                </button>
 
+                <details>
+                    <summary>Raw JSON</summary>
+                    <pre id="raw"></pre>
+                </details>
 
-        <div class="row">
-
-            <div class="label">
-                Longitude
-            </div>
-
-            <div
-                class="value"
-                id="lonRange"
-            >
-                -
             </div>
 
         </div>
 
+        <div id="janusReader">
 
+            <div id="summary" class="card">
 
-        <div class="row">
+                <h2>Dataset Overview</h2>
 
-            <div class="label">
-                State
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="statTitle">STATUS</div>
+                        <div class="statValue" id="janusStatus">
+                            Loading...
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">OBSERVATIONS</div>
+                        <div class="statValue" id="count">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">CELL</div>
+                        <div class="statValue" id="cellId">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">ASSETS</div>
+                        <div class="statValue" id="assetCount">-</div>
+                    </div>
+
+                </div>
+
+                <div class="details">
+
+                    <div class="row">
+                        <div class="label">Latitude</div>
+                        <div class="value" id="latRange">-</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">Longitude</div>
+                        <div class="value" id="lonRange">-</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">State</div>
+                        <div class="value" id="cellState">-</div>
+                    </div>
+
+                </div>
+
             </div>
 
-            <div
-                class="value"
-                id="cellState"
-            >
-                -
-            </div>
+            <div id="observations"></div>
 
         </div>
 
     </div>
 
 </div>
-
-
-
-<div id="observations"></div>
-
-</div>
-
-
-  
-</div>
-
-  
 
 
 
