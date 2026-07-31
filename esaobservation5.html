@@ -1469,10 +1469,12 @@ OBSERVATIONS:cell.items
 
 };
 
+// Mantener exactamente el RAW como siempre
 document.getElementById("raw").textContent=
 JSON.stringify(dataset,null,2);
 
-loadJanusDataset(dataset);
+// Actualizar el panel JANUS
+renderDataset(dataset);
 
 }
 
