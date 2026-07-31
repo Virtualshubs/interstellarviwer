@@ -187,13 +187,14 @@ overflow:auto;
 /* ========================= */
 /* JANUS READER */
 /* ========================= */
-
 #janusReader{
 height:100%;
 background:#fff;
 display:flex;
 flex-direction:column;
 border-left:1px solid #d9dee6;
+overflow-y:auto;
+overflow-x:hidden;
 }
 
 #janusSummary{
@@ -379,11 +380,10 @@ white-space:pre-wrap;
 
 <div id="panel">
   <div id="header">
+      <div id="status">Ready</div>
     <input id="search" value="Biomass">
     <button id="load">SEARCH</button>
   </div>
-
-  <div id="status">Ready</div>
 
   <div id="content">
     <div id="cards"></div>
