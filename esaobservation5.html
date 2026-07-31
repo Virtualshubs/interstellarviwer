@@ -982,6 +982,41 @@ createSpatialGrid(json.features);
 
 }
 
+
+
+
+
+
+//test collection a item
+function prepareSTACData(response){
+
+if(response.type==="Collection"){
+
+    return searchSTACItems(response);
+
+}
+
+
+if(response.type==="FeatureCollection"){
+
+    return response.features;
+
+}
+
+
+if(response.type==="Feature"){
+
+    return [response];
+
+}
+
+
+return [];
+
+}
+
+  
+
 // ===============================
 // CREATE SPATIAL GRID
 // ===============================
