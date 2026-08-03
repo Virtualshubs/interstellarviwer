@@ -5,379 +5,1144 @@
 <title>ESA DATA v0.3</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 
-body{
-background: radial-gradient(circle at 50% 30%, #05070d, #000 70%);
-color:#fff;
-width:100vw;
-height:100vh;
-overflow:hidden;
-display:flex;
-justify-content:center;
-align-items:center;
+  /* =======================================================
+   JANUS v2
+   Layout principal
+   Compatible 100% con el HTML actual
+=======================================================*/
+
+:root{
+
+--bg:#0b1017;
+--surface:#141b24;
+--surface2:#1a2330;
+--surface3:#202c3b;
+
+--border:#2b3948;
+--border-light:#3d4e61;
+
+--text:#edf2f8;
+--text-soft:#c8d2de;
+--text-muted:#8ea1b6;
+
+--blue:#3b82f6;
+--blue2:#60a5fa;
+
+--orange:#ff9d3d;
+--green:#2fbf71;
+--red:#ef4444;
+
+--radius:8px;
+--transition:.18s;
+
 }
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+html,
+body{
+
+width:100%;
+height:100%;
+
+background:var(--bg);
+
+color:var(--text);
+
+overflow:hidden;
+
+}
+
+
+/* =======================================================
+   PANEL
+=======================================================*/
 
 #panel{
+
 width:100vw;
 height:100vh;
+
 display:flex;
 flex-direction:column;
-background: radial-gradient(circle at 50% 30%, #05070d, #000 70%);
+
+background:var(--bg);
+
 overflow:hidden;
+
 }
 
-  #workspace{
-flex:1;
-display:flex;
-overflow:hidden;
-}
+
+/* =======================================================
+   HEADER
+=======================================================*/
 
 #header{
-background:#182230;
-padding:14px 18px;
+
+height:58px;
+
 display:flex;
-gap:10px;
+
 align-items:center;
+
+gap:14px;
+
+padding:0 18px;
+
+background:var(--surface);
+
+border-bottom:1px solid var(--border);
+
+flex-shrink:0;
+
 }
+
+
+/* =======================================================
+   SEARCH
+=======================================================*/
 
 #search{
+
 flex:1;
-padding:10px;
-background:#0f1622;
-color:#fff;
-border:1px solid #33435b;
+
+height:38px;
+
+padding:0 14px;
+
+background:#0f151e;
+
+color:var(--text);
+
+border:1px solid var(--border);
+
 border-radius:6px;
+
+transition:var(--transition);
+
+font-size:13px;
+
 }
 
+#search:focus{
+
+outline:none;
+
+border-color:var(--blue);
+
+box-shadow:0 0 0 3px rgba(59,130,246,.15);
+
+}
+
+
+/* =======================================================
+   BUTTONS
+=======================================================*/
+
 button{
-background:#ff8c00;
-color:#fff;
+
+height:38px;
+
+padding:0 16px;
+
+background:var(--blue);
+
+color:white;
+
 border:none;
-padding:10px 16px;
+
 border-radius:6px;
+
 cursor:pointer;
-font-weight:bold;
-transition:.2s;
+
+font-size:13px;
+
+font-weight:600;
+
+transition:var(--transition);
+
 }
 
 button:hover{
-background:#ff9d27;
+
+background:#4b91ff;
+
 }
+
+button:active{
+
+transform:translateY(1px);
+
+}
+
+
+/* =======================================================
+   STATUS BAR
+=======================================================*/
 
 #status{
-padding:8px 18px;
-border-bottom:1px solid #263240;
-color:#8fb8ff;
+
+height:42px;
+
+display:flex;
+
+align-items:center;
+
+padding:0 18px;
+
+background:#101722;
+
+border-bottom:1px solid var(--border);
+
+font-size:13px;
+
+color:var(--text-muted);
+
 }
+
+
+/* =======================================================
+   WORKSPACE
+=======================================================*/
+
+#workspace{
+
+flex:1;
+
+display:flex;
+
+overflow:hidden;
+
+}
+
+
+/* =======================================================
+   CONTENT
+=======================================================*/
 
 #content{
+
 flex:1;
+
 display:grid;
+
 grid-template-columns:380px 1fr;
+
 overflow:hidden;
+
+background:var(--bg);
+
 }
 
-  #main{
+
+/* =======================================================
+   MAIN
+=======================================================*/
+
+#main{
+
 display:flex;
+
 flex-direction:column;
+
 overflow:hidden;
+
 }
 
-#cards,#detail{
+
+/* =======================================================
+   SCROLL AREA
+=======================================================*/
+
+#cards,
+#detail{
+
 overflow:auto;
-padding:16px;
+
+padding:18px;
+
 }
+
+
+/* =======================================================
+   CARDS
+=======================================================*/
 
 .card{
-background:#1a2432;
-border:1px solid #2d3d52;
-border-radius:8px;
-padding:14px;
-margin-bottom:12px;
+
+background:var(--surface);
+
+border:1px solid var(--border);
+
+border-radius:var(--radius);
+
+padding:16px;
+
+margin-bottom:14px;
+
+transition:var(--transition);
+
+}
+
+.card:hover{
+
+border-color:var(--border-light);
+
 }
 
 .card h3{
-color:#ffb04d;
-margin-bottom:8px;
+
+font-size:16px;
+
+font-weight:600;
+
+margin-bottom:12px;
+
+color:var(--orange);
+
 }
 
 .card p{
+
 font-size:13px;
-color:#cfd8e6;
-margin:4px 0;
+
+line-height:1.6;
+
+color:var(--text-soft);
+
+margin:5px 0;
+
 }
 
-.open{
-margin-top:10px;
-}
+
+/* =======================================================
+   ROWS
+=======================================================*/
 
 .row{
+
 display:flex;
-padding:7px 0;
-border-bottom:1px solid rgba(255,255,255,.08);
+
+align-items:flex-start;
+
+gap:18px;
+
+padding:9px 0;
+
+border-bottom:1px solid rgba(255,255,255,.05);
+
 }
 
 .key{
-width:170px;
-color:#7bc3ff;
-font-weight:bold;
+
+width:180px;
+
+font-weight:600;
+
+font-size:13px;
+
+color:var(--blue2);
+
 }
 
 .value{
+
 flex:1;
+
+font-size:13px;
+
+line-height:1.5;
+
+color:var(--text-soft);
+
 word-break:break-word;
+
 }
+
+
+/* =======================================================
+   INPUTS
+=======================================================*/
 
 input{
-background:#0f1622;
-border:1px solid #33435b;
-color:#fff;
-padding:6px;
-border-radius:5px;
+
+height:36px;
+
+padding:0 10px;
+
+background:#0f151e;
+
+border:1px solid var(--border);
+
+border-radius:6px;
+
+color:white;
+
+transition:var(--transition);
+
 width:180px;
+
 }
+
+input:focus{
+
+outline:none;
+
+border-color:var(--blue);
+
+}
+
+
+/* =======================================================
+   DETAILS
+=======================================================*/
 
 details{
+
 margin-top:18px;
+
 }
+
+summary{
+
+cursor:pointer;
+
+color:var(--blue2);
+
+font-weight:600;
+
+}
+
+
+/* =======================================================
+   PRE
+=======================================================*/
 
 pre{
+
 white-space:pre-wrap;
+
 font-size:12px;
+
+line-height:1.55;
+
+font-family:Consolas,Menlo,monospace;
+
 }
+
+
+/* =======================================================
+   QUERY BOX
+=======================================================*/
 
 #queryBox{
-margin-top:20px;
-padding:12px;
-border:1px solid #2d3d52;
-border-radius:8px;
-background:#111923;
+
+margin-top:22px;
+
+padding:16px;
+
+background:var(--surface);
+
+border:1px solid var(--border);
+
+border-radius:var(--radius);
+
 }
+
+
+/* =======================================================
+   GRID
+=======================================================*/
 
 #dataGrid{
+
 display:grid;
+
 grid-template-columns:repeat(36,1fr);
+
 grid-template-rows:repeat(18,1fr);
+
 aspect-ratio:2/1;
+
 width:100%;
-max-width:1000px;
-margin:20px auto;
+
+max-width:1100px;
+
+margin:24px auto;
+
 gap:1px;
+
+background:#0d131b;
+
+border:1px solid var(--border);
+
 }
 
+
+/* =======================================================
+   DATA CELLS
+=======================================================*/
+
 .dataCell{
-aspect-ratio:1;
+
 display:flex;
+
 align-items:center;
+
 justify-content:center;
+
+aspect-ratio:1;
+
+background:#17202b;
+
+border:1px solid rgba(255,255,255,.04);
+
 font-size:10px;
+
+color:#dbe6f5;
+
 cursor:pointer;
-color:#fff;
-background:#222;
-border:1px solid rgba(255,255,255,.1);
-transition:.2s;
+
+transition:background .15s,border-color .15s;
+
 overflow:hidden;
+
 }
 
 .dataCell:hover{
-transform:scale(1.08);
-z-index:2;
+
+border-color:var(--blue2);
+
+background:#233245;
+
+transform:none;
+
+z-index:1;
+
 }
+
+
+/* =======================================================
+   RAW JSON
+=======================================================*/
 
 #raw{
+
 max-height:60vh;
+
 overflow:auto;
+
+padding:14px;
+
+background:#101720;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
 }
 
-/* ========================= */
-/* JANUS READER */
-/* ========================= */
+
+/* =======================================================
+   SCROLLBAR
+=======================================================*/
+
+::-webkit-scrollbar{
+
+width:10px;
+
+height:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+background:#0f141c;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+background:#2f3e51;
+
+border-radius:30px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+background:#42566f;
+
+}
+
+  /* =======================================================
+   JANUS READER v2
+   Compatible 100%
+=======================================================*/
+
 #janusReader{
+
 width:430px;
 height:100%;
-flex-shrink:0;
+
 display:flex;
 flex-direction:column;
-overflow-y:auto;
-background:#fff;
-border-left:1px solid #d9dee6;
+
+flex-shrink:0;
+
+background:var(--surface);
+
+border-left:1px solid var(--border);
+
+overflow:hidden;
+
 }
 
+
+/* =======================================================
+   HEADER
+=======================================================*/
+
 #janusSummary{
+
 padding:22px;
-background:#fafbfc;
-border-bottom:1px solid #eceff3;
+
+background:var(--surface2);
+
+border-bottom:1px solid var(--border);
+
 flex-shrink:0;
+
 }
 
 #janusReader h2{
-font-size:19px;
+
+font-size:18px;
+
 font-weight:600;
-color:#202733;
+
+letter-spacing:.02em;
+
 margin-bottom:18px;
+
+color:var(--text);
+
 }
 
+
+/* =======================================================
+   STATS
+=======================================================*/
+
 #janusReader .stats{
+
 display:grid;
+
 grid-template-columns:repeat(2,1fr);
+
 gap:12px;
+
 margin-bottom:18px;
+
 }
 
 #janusReader .stat{
-background:#fff;
-border:1px solid #e6ebf2;
-border-radius:10px;
-padding:14px;
+
+padding:16px;
+
+background:var(--surface3);
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+transition:.15s;
+
+}
+
+#janusReader .stat:hover{
+
+border-color:var(--border-light);
+
 }
 
 #janusReader .statTitle{
-font-size:11px;
-font-weight:600;
-letter-spacing:.08em;
+
+font-size:10px;
+
 text-transform:uppercase;
-color:#7d8795;
-margin-bottom:6px;
+
+letter-spacing:.12em;
+
+font-weight:700;
+
+color:var(--text-muted);
+
+margin-bottom:8px;
+
 }
 
 #janusReader .statValue{
-font-size:25px;
+
+font-size:26px;
+
 font-weight:700;
-color:#202733;
+
+color:white;
+
 }
 
+
+/* =======================================================
+   DATA INFO
+=======================================================*/
+
 #janusReader .details{
+
 display:flex;
+
 flex-direction:column;
-gap:10px;
-padding-top:16px;
-border-top:1px solid #eceff3;
+
+gap:6px;
+
+padding-top:18px;
+
+border-top:1px solid rgba(255,255,255,.06);
+
 }
 
 #janusReader .row{
+
 display:flex;
+
 justify-content:space-between;
-align-items:center;
-padding:6px 0;
-border:none;
-gap:20px;
+
+align-items:flex-start;
+
+gap:18px;
+
+padding:8px 0;
+
+border-bottom:1px solid rgba(255,255,255,.04);
+
 }
 
 #janusReader .label{
-font-size:13px;
+
+font-size:12px;
+
 font-weight:600;
-color:#7a8595;
+
+color:var(--text-muted);
+
 }
 
 #janusReader .value{
+
 flex:1;
+
 text-align:right;
+
 font-size:13px;
-color:#202733;
+
+line-height:1.45;
+
+color:var(--text-soft);
+
 word-break:break-word;
+
 }
+
+
+/* =======================================================
+   OBSERVATIONS
+=======================================================*/
 
 #janusObservations{
+
 flex:1;
+
 overflow-y:auto;
+
 padding:18px;
-background:#f5f7fa;
+
+background:var(--bg);
+
 }
 
-#janusObservations::-webkit-scrollbar{
-width:8px;
-}
 
-#janusObservations::-webkit-scrollbar-thumb{
-background:#cbd3dd;
-border-radius:20px;
-}
+/* =======================================================
+   CARDS
+=======================================================*/
 
 #janusReader .card{
-background:#fff;
-border:1px solid #e7ebf0;
-border-radius:12px;
+
+background:var(--surface2);
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
 padding:18px;
+
 margin-bottom:16px;
-box-shadow:0 2px 8px rgba(0,0,0,.04);
+
+box-shadow:none;
+
+transition:.15s;
+
+}
+
+#janusReader .card:hover{
+
+border-color:var(--border-light);
+
 }
 
 #janusReader .card h2{
-font-size:16px;
+
+font-size:15px;
+
+font-weight:600;
+
 margin-bottom:16px;
-color:#202733;
+
+color:white;
+
 }
 
+
+/* =======================================================
+   ASSETS
+=======================================================*/
+
 #janusReader .asset{
-margin-top:12px;
+
+margin-top:14px;
+
 padding:14px;
-background:#f8fafc;
-border:1px solid #e6ebf2;
-border-radius:10px;
+
+background:#101720;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
 }
 
 #janusReader .assetHeader{
+
 display:flex;
+
 justify-content:space-between;
+
 align-items:center;
+
 margin-bottom:10px;
+
+gap:10px;
+
 }
 
 #janusReader .assetName{
+
+font-size:13px;
+
 font-weight:600;
-color:#202733;
+
+color:white;
+
+word-break:break-word;
+
 }
 
 #janusReader .assetType{
-font-size:12px;
-color:#7d8795;
-margin-top:4px;
+
+font-size:11px;
+
+color:var(--text-muted);
+
+text-transform:uppercase;
+
+letter-spacing:.08em;
+
 }
 
+
+/* =======================================================
+   PREVIEW
+=======================================================*/
+
 #janusReader .assetPreview{
+
 display:block;
+
 width:100%;
+
 max-height:180px;
+
 object-fit:cover;
-border-radius:8px;
-border:1px solid #dce3ec;
-margin-top:12px;
+
+border-radius:6px;
+
+border:1px solid var(--border);
+
 cursor:pointer;
-transition:.2s;
+
+margin-top:12px;
+
+transition:.15s;
+
 }
 
 #janusReader .assetPreview:hover{
-transform:scale(1.02);
+
+border-color:var(--blue);
+
 }
 
+
+/* =======================================================
+   BUTTONS
+=======================================================*/
+
 #janusReader button{
+
 width:100%;
+
+height:38px;
+
 margin-top:16px;
-padding:10px;
-background:#2563eb;
+
+background:var(--blue);
+
 border:none;
-border-radius:8px;
-color:#fff;
+
+border-radius:6px;
+
+font-size:13px;
+
 font-weight:600;
+
+color:white;
+
 cursor:pointer;
-transition:.2s;
+
+transition:.15s;
+
 }
 
 #janusReader button:hover{
-background:#3b82f6;
+
+background:#4c90ff;
+
 }
 
+
+/* =======================================================
+   JSON
+=======================================================*/
+
 #janusReader pre{
-margin-top:14px;
-padding:14px;
-background:#0f172a;
-color:#d7e3ff;
+
+margin-top:16px;
+
+padding:16px;
+
+background:#0b1017;
+
+border:1px solid var(--border);
+
 border-radius:8px;
+
+max-height:320px;
+
 overflow:auto;
-max-height:300px;
+
 font-size:12px;
-white-space:pre-wrap;
+
+line-height:1.55;
+
+color:#d7e4f4;
+
+font-family:Consolas,Menlo,monospace;
+
+}
+
+
+/* =======================================================
+   SCROLL
+=======================================================*/
+
+#janusObservations::-webkit-scrollbar{
+
+width:8px;
+
+}
+
+#janusObservations::-webkit-scrollbar-track{
+
+background:#0f151d;
+
+}
+
+#janusObservations::-webkit-scrollbar-thumb{
+
+background:#334455;
+
+border-radius:20px;
+
+}
+
+#janusObservations::-webkit-scrollbar-thumb:hover{
+
+background:#4d6177;
+
+}
+
+
+/* =======================================================
+   LINKS
+=======================================================*/
+
+#janusReader a{
+
+color:var(--blue2);
+
+text-decoration:none;
+
+}
+
+#janusReader a:hover{
+
+text-decoration:underline;
+
+}
+
+
+/* =======================================================
+   BADGES
+=======================================================*/
+
+.badge{
+
+display:inline-flex;
+
+align-items:center;
+
+padding:4px 10px;
+
+background:#182230;
+
+border:1px solid var(--border);
+
+border-radius:20px;
+
+font-size:11px;
+
+font-weight:600;
+
+color:var(--text-soft);
+
+}
+
+.badge.green{
+
+background:rgba(47,191,113,.12);
+
+border-color:rgba(47,191,113,.35);
+
+color:#7ee2a8;
+
+}
+
+.badge.orange{
+
+background:rgba(255,157,61,.12);
+
+border-color:rgba(255,157,61,.35);
+
+color:#ffc278;
+
+}
+
+.badge.red{
+
+background:rgba(239,68,68,.12);
+
+border-color:rgba(239,68,68,.35);
+
+color:#ff9b9b;
+
+}
+
+.badge.blue{
+
+background:rgba(59,130,246,.12);
+
+border-color:rgba(59,130,246,.35);
+
+color:#8ec5ff;
+
+}
+
+
+/* =======================================================
+   SMALL ANIMATIONS
+=======================================================*/
+
+.card,
+.asset,
+.stat,
+button,
+.dataCell,
+input{
+
+transition:all .18s ease;
+
+}
+
+
+/* =======================================================
+   RESPONSIVE
+=======================================================*/
+
+@media (max-width:1500px){
+
+#content{
+
+grid-template-columns:320px 1fr;
+
+}
+
+#janusReader{
+
+width:360px;
+
+}
+
+}
+
+@media (max-width:1200px){
+
+#content{
+
+grid-template-columns:1fr;
+
+}
+
+#janusReader{
+
+display:none;
+
+}
+
 }
 
 </style>
