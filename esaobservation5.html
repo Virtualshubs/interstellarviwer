@@ -12,62 +12,47 @@
    Compatible 100% con el HTML actual
 =======================================================*/
 
-:root{
+:root[data-theme="lunar"]{
 
-/* ======================================================
-   CORE
-======================================================*/
+    --bg:#2b3036;
+    --surface:#343941;
+    --surface2:#40464f;
+    --surface3:#4c545f;
 
---bg:#25292f;
---surface:#2d3239;
---surface2:#353b43;
---surface3:#404854;
+    --border:#67727f;
 
---panel:#313740;
---panel-light:#3b434d;
+    --text:#edf1f5;
+    --text-soft:#cfd6de;
+    --text-muted:#98a4b2;
 
-/* ======================================================
-   BORDERS
-======================================================*/
-
---border:#4b5563;
---border-light:#667180;
---border-dark:#39424d;
-
-/* ======================================================
-   TEXT
-======================================================*/
-
---text:#eef2f5;
---text-soft:#d2d8de;
---text-muted:#9ca8b5;
-
-/* ======================================================
-   NASA BLUE
-======================================================*/
-
---blue:#355c7d;
---blue-dark:#294861;
---blue-light:#4f789c;
-
---navy:#233547;
-
-/* ======================================================
-   STATUS
-======================================================*/
-
---green:#5c8a62;
---orange:#b88442;
---red:#a85656;
-
-/* ======================================================
-   UI
-======================================================*/
-
---radius:4px;
---transition:.15s;
+    --accent:#486b89;
 
 }
+
+
+  :root[data-theme="terra"]{
+
+    --bg:#ece8e1;
+
+    --surface:#f5f2ed;
+
+    --surface2:#ffffff;
+
+    --surface3:#e7e1d8;
+
+    --border:#d3cbc0;
+
+    --text:#2e3338;
+
+    --text-soft:#555d65;
+
+    --text-muted:#7d858c;
+
+    --accent:#5b7387;
+
+}
+
+  
 
 *{
 margin:0;
@@ -90,7 +75,29 @@ overflow:hidden;
 
 }
 
+#themeToggle{
 
+min-width:110px;
+
+font-size:12px;
+
+letter-spacing:.08em;
+
+text-transform:uppercase;
+
+background:var(--surface3);
+
+border:1px solid var(--border);
+
+color:var(--text);
+
+}
+
+#themeToggle:hover{
+
+background:var(--surface2);
+
+}
 /* =======================================================
    PANEL
 =======================================================*/
@@ -1185,6 +1192,7 @@ display:none;
         <div id="status">Ready</div>
         <input id="search" value="Biomass">
         <button id="load">SEARCH</button>
+      <button id="themeToggle">🌙 LUNAR</button>
     </div>
 
     <div id="workspace">
@@ -2913,6 +2921,32 @@ pre.style.display==="none"
 "none";
 
 }
+
+
+    // ===============================
+// THEME TOGGLE
+// ===============================
+
+const themes = ["lunar", "terra"];
+
+let currentTheme = 0;
+
+document.documentElement.setAttribute("data-theme", themes[currentTheme]);
+
+document.getElementById("themeToggle").addEventListener("click", () => {
+
+    currentTheme = (currentTheme + 1) % themes.length;
+
+    const theme = themes[currentTheme];
+
+    document.documentElement.setAttribute("data-theme", theme);
+
+    document.getElementById("themeToggle").textContent =
+        theme === "lunar"
+            ? "🌙 LUNAR"
+            : "☀ TERRA";
+
+});
 
 </script>
   
