@@ -600,7 +600,8 @@ background:var(--surface);
 
 border-left:1px solid var(--border);
 
-overflow:hidden;
+overflow-y:auto;
+overflow-x:hidden;
 
 }
 
@@ -763,19 +764,16 @@ word-break:break-word;
 /* =======================================================
    OBSERVATIONS
 =======================================================*/
-
 #janusObservations{
 
-flex:1;
-
-overflow-y:auto;
+display:flex;
+flex-direction:column;
 
 padding:18px;
 
 background:var(--bg);
 
 }
-
 
 /* =======================================================
    CARDS
