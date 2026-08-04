@@ -668,6 +668,8 @@ border:1px solid var(--border);
 
 display:flex;
 
+flex-direction:column;
+
 align-items:center;
 
 justify-content:center;
@@ -688,6 +690,8 @@ transition:background .15s,border-color .15s;
 
 overflow:hidden;
 
+line-height:1.05;
+
 }
 
 .dataCell:hover{
@@ -701,7 +705,6 @@ transform:none;
 z-index:1;
 
 }
-
 
 /* =======================================================
    RAW JSON
@@ -1699,7 +1702,7 @@ referenceDate
 
 
 const url =
-`${data.items}?limit=1500&datetime=../${referenceDate}`;
+`${data.items}?limit=2000&datetime=../${referenceDate}`;
 
 
 
@@ -2302,90 +2305,55 @@ updateGrid();
 
 
 
-
 // ===============================
 // UPDATE VISUAL STATES
 // ===============================
 
 function updateGrid(){
 
-    const cells =
-    document.querySelectorAll(".dataCell");
+const cells=document.querySelectorAll(".dataCell");
 
+cells.forEach((div,index)=>{
 
-    cells.forEach((div,index)=>{
+const cell=observationGrid[index];
 
-        const cell =
-        observationGrid[index];
+const label=`<div style="font-size:9px;opacity:.6;">${cell.id}</div><div>${cell.items.length}</div>`;
 
+if(cell.discovered){
 
-        // ==========================
-        // NUEVA CELDA DESCUBIERTA
-        // ==========================
-
-        if(cell.discovered){
-
-            div.style.background="#ff66cc";
-
-            div.textContent=
-            `${cell.items.length}`;
-
-            return;
-
-        }
-
-
-        // ==========================
-        // SIN OBSERVACIONES
-        // ==========================
-
-        if(cell.state===-1){
-
-            div.style.background="#222";
-
-            div.textContent="";
-
-            return;
-
-        }
-
-
-        // ==========================
-        // OBSERVACIÓN
-        // ==========================
-
-        if(cell.state===0){
-
-            div.style.background="#16803c";
-
-            div.textContent=
-            `${cell.items.length}`;
-
-            return;
-
-        }
-
-
-        // ==========================
-        // CELDA SELECCIONADA
-        // ==========================
-
-        if(cell.state===1){
-
-            div.style.background="#ff8c00";
-
-            div.textContent=
-            `${cell.items.length}`;
-
-            return;
-
-        }
-
-    });
+div.style.background="#ff66cc";
+div.innerHTML=label;
+return;
 
 }
 
+if(cell.state===-1){
 
+div.style.background="#222";
+div.textContent="";
+return;
+
+}
+
+if(cell.state===0){
+
+div.style.background="#16803c";
+div.innerHTML=label;
+return;
+
+}
+
+if(cell.state===1){
+
+div.style.background="#ff8c00";
+div.innerHTML=label;
+return;
+
+}
+
+});
+
+}
 
 // ===============================
 // SHOW CELL DATA
