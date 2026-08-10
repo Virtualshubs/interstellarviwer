@@ -6105,6 +6105,131 @@ function getMoonPosition(date){
     };
 }
 
+
+
+
+// ======================================================
+// ☀️ SUN EPHEMERIS
+// Geocentric solar position
+// Same ecliptic reference used by Moon
+// ======================================================
+
+function getSunPosition(date){
+
+    // --------------------------------------------------
+    // Julian Date
+    // --------------------------------------------------
+
+    const JD =
+        date.getTime() / 86400000 + 2440587.5;
+
+    const T =
+        (JD - 2451545.0) / 36525.0;
+
+
+    // --------------------------------------------------
+    // Solar orbital elements
+    // --------------------------------------------------
+
+    const L0 =
+        280.46646 +
+        36000.76983 * T +
+        0.0003032 * T * T;
+
+    const M =
+        357.52911 +
+        35999.05029 * T -
+        0.0001537 * T * T;
+
+
+    function norm360(a){
+        return ((a % 360) + 360) % 360;
+    }
+
+
+    const L0r =
+        THREE.MathUtils.degToRad(norm360(L0));
+
+    const Mr =
+        THREE.MathUtils.degToRad(norm360(M));
+
+
+    // --------------------------------------------------
+    // Equation of center
+    // --------------------------------------------------
+
+    const C =
+          (1.914602 - 0.004817 * T - 0.000014 * T * T)
+            * Math.sin(Mr)
+
+        + (0.019993 - 0.000101 * T)
+            * Math.sin(2 * Mr)
+
+        + 0.000289
+            * Math.sin(3 * Mr);
+
+
+    // True longitude of the Sun
+    const trueLongitude =
+        norm360(L0 + C);
+
+    const lambda =
+        THREE.MathUtils.degToRad(trueLongitude);
+
+
+    // --------------------------------------------------
+    // Obliquity of the ecliptic
+    // --------------------------------------------------
+
+    const epsilon =
+        THREE.MathUtils.degToRad(
+            23.439291
+            - 0.0130042 * T
+        );
+
+
+    // --------------------------------------------------
+    // Ecliptic → equatorial / Three.js
+    //
+    // Same convention as Moon:
+    //
+    // X = cos(lambda)
+    // Y = sin(latitude)
+    // Z = sin(lambda)
+    //
+    // For the Sun latitude ≈ 0
+    // --------------------------------------------------
+
+    const x =
+        Math.cos(lambda);
+
+    const y =
+        Math.sin(lambda) *
+        Math.sin(epsilon);
+
+    const z =
+        Math.sin(lambda) *
+        Math.cos(epsilon);
+
+
+    return new THREE.Vector3(
+        x,
+        y,
+        z
+    ).normalize();
+
+}
+
+
+
+
+
+  
+
+
+
+
+
   
   
 // ======================================================
@@ -6139,32 +6264,17 @@ if(moon){
 
     earthGroup.rotation.y = rotation;
 
-    // ======================================================
-    // SUN
-    // ======================================================
+// ======================================================
+// ☀️ SUN
+// ======================================================
 
-    const dayOfYear = Math.floor(
-        (now - new Date(now.getFullYear(),0,0)) / 86400000
-    );
+const sunDir = getSunPosition(now);
 
-    const decl = THREE.MathUtils.degToRad(
-        23.44 * Math.sin((2*Math.PI/365) * (dayOfYear - 81))
-    );
+sunLight.position.copy(
+    sunDir.clone().multiplyScalar(50)
+);
 
-    const frac = (now.getTime() % 86400000) / 86400000;
-    const angle = frac * Math.PI * 2;
-
-    const sunDir = new THREE.Vector3(
-        Math.cos(angle),
-        Math.sin(decl),
-        Math.sin(angle)
-    ).normalize();
-
-    sunLight.position.copy(
-        sunDir.clone().multiplyScalar(50)
-    );
-
-    sunLight.target.position.set(0,0,0);
+sunLight.target.position.set(0,0,0);
 
     // ======================================================
     // SATELLITES
