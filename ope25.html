@@ -27,68 +27,50 @@ body {
   }
   
   #logo{
-
-    position:fixed;
-
-    bottom:20px;
-    right:20px;     /* cambia a left:20px si lo quieres a la izquierda */
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    overflow:hidden;
-    z-index:1000;
+position:fixed;
+top:25px;
+right:20px;     
+width:40px;
+height:40px;
+border-radius:50%;
+overflow:hidden;
+z-index:3000;
 background:rgba(255,255,255,.04);
 backdrop-filter:blur(8px);
 border:1px solid rgba(255,255,255,.15);
 padding:6px;
-    pointer-events:none;
+pointer-events:none;
 }
+  
 
 #logo img{
-
-    width:100%;
-    height:100%;
-    object-fit:cover;
-
+width:100%;
+height:100%;
+object-fit:cover;
 }
 
 
 #dock{
-
     position:absolute;
-
     left:16px;
     right:16px;
     bottom:24px;
-
     display:flex;
     align-items:center;
     justify-content:space-evenly;
     flex-wrap:wrap;
     gap:8px;
-
     padding:12px 16px;
-
     border-radius:14px;
-
     background:transparent;
-
     backdrop-filter:blur(18px);
-
     border:1px solid rgba(120,180,255,.22);
-
     box-shadow:
     0 10px 40px rgba(0,0,0,.55),
     inset 0 0 20px rgba(80,160,255,.08);
-
     z-index:1000;
-
 }
 
-
-/* ===================================================== */
-/* BOTONES */
-/* ===================================================== */
 
 .dockButton,
 #earthViewBtn,
@@ -97,58 +79,36 @@ padding:6px;
 #togglePanel,
 #dock .btn,
 #dock button{
-
     position:relative;
-
     display:flex;
     align-items:center;
     justify-content:center;
     gap:8px;
-
     flex:1;
-
     height:44px;
-
     min-width:155px;
-
     padding:0 14px;
-
     border:1px solid rgba(120,180,255,.12);
-
     border-radius:10px;
-
     background:rgba(255,255,255,.04);
-
     color:white;
-
     cursor:pointer;
-
     transition:
     transform .25s ease,
     background .25s ease,
     border-color .25s ease,
     box-shadow .25s ease;
-
     white-space:nowrap;
-
 }
 
 
-/* ===================================================== */
-/* BOTÓN SOLO ICONO */
-/* ===================================================== */
 
 #compassBtn{
-
     flex:0 0 44px;
-
     width:44px;
     min-width:44px;
-
     padding:0;
-
     justify-content:center;
-
 }
 
 
@@ -157,20 +117,14 @@ padding:6px;
 /* ===================================================== */
 
 #togglePanel{
-
     justify-content:space-between;
-
     min-width:180px;
-
 }
 
 
 #togglePanelIcon{
-
     font-size:18px;
-
     margin-left:8px;
-
 }
 
 
@@ -179,15 +133,10 @@ padding:6px;
 /* ===================================================== */
 
 #dock button:hover{
-
     transform:translateY(-3px);
-
     background:rgba(80,160,255,.18);
-
     border-color:rgba(120,180,255,.45);
-
     box-shadow:0 0 18px rgba(80,160,255,.35);
-
 }
 
 
@@ -197,91 +146,50 @@ padding:6px;
 
 .camera-active,
 .dockButton.active{
-
     background:rgba(80,160,255,.25);
-
     border-color:rgba(120,180,255,.55);
-
     box-shadow:0 0 18px rgba(80,160,255,.45);
-
 }
 
 
 .camera-active::after,
 .dockButton.active::after{
-
     content:"";
-
     position:absolute;
-
     left:50%;
     bottom:-6px;
-
     transform:translateX(-50%);
-
     width:6px;
     height:6px;
-
     border-radius:50%;
-
     background:#FE9A37;
-
     box-shadow:0 0 10px rgba(254,154,55,.8);
-
 }
 
-
-/* ===================================================== */
-/* ICONOS */
-/* ===================================================== */
 
 .material-symbols-rounded{
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     font-size:20px;
-
     color:#d9ecff;
-
     flex-shrink:0;
-
     user-select:none;
-
     pointer-events:none;
-
 }
 
 
-/* ===================================================== */
-/* TÍTULO SUPERIOR */
-/* ===================================================== */
-
 #dock::before{
-
     content:"ORBITAL CONTROL SYSTEM";
-
     position:absolute;
-
     top:-22px;
-
     left:50%;
-
     transform:translateX(-50%);
-
     font-family:"Roboto Mono",monospace;
-
     font-size:9px;
-
     letter-spacing:3px;
-
     color:#7da8d8;
-
     white-space:nowrap;
-
 }
 
 
@@ -290,7 +198,6 @@ padding:6px;
 /* ===================================================== */
 
 #trackingControl{
-
     background:linear-gradient(
         145deg,
         rgba(20,30,45,.92),
@@ -298,45 +205,28 @@ padding:6px;
     );
 
     border:1px solid rgba(120,180,255,.2);
-
     border-radius:12px;
-
     padding:18px;
-
     width:260px;
-
     font-family:"Roboto Mono",monospace;
-
     box-shadow:0 10px 35px rgba(0,0,0,.45);
-
 }
 
 
 .control-title{
-
     font-size:11px;
-
     letter-spacing:3px;
-
     color:#7da8d8;
-
     text-align:center;
-
     margin:0 0 18px;
-
 }
 
 
 #trackingControl label{
-
     display:block;
-
     font-size:10px;
-
     letter-spacing:2px;
-
     color:#7890aa;
-
     margin:14px 0 6px;
 
 }
@@ -345,63 +235,42 @@ padding:6px;
 #trackingControl select{
 
     width:100%;
-
     height:40px;
-
     padding:0 12px;
-
     border-radius:8px;
-
     border:1px solid rgba(120,180,255,.2);
-
     background:rgba(255,255,255,.05);
-
     color:white;
-
     font-family:inherit;
-
     cursor:pointer;
-
     transition:
     border-color .25s ease,
     background .25s ease,
     box-shadow .25s ease;
-
 }
 
 
 #trackingControl select:hover{
-
     border-color:rgba(120,180,255,.5);
-
     background:rgba(255,255,255,.07);
-
 }
 
 
 #trackingControl select:focus{
-
     outline:none;
-
     border-color:rgba(120,180,255,.75);
-
     box-shadow:0 0 10px rgba(80,160,255,.25);
-
 }
 
 
 #trackingControl select option{
-
     background:#101722;
-
     color:white;
-
 }
 
 
 
 #calcBtn{
-  
     width:100%;
     margin: 0px;
     height:42px;
@@ -422,7 +291,6 @@ padding:6px;
 
 
 #calcBtn:hover{
-
     background:
     rgba(80,160,255,.35);
     box-shadow:  0 0 20px rgba(80,160,255,.3);
@@ -534,7 +402,7 @@ button:active {
 }
   
 
-/* left accent bar (HUD feel) */
+
 .insightBlock::before {
   content: "";
   position: absolute;
@@ -742,7 +610,6 @@ pre {
   justify-content: center;
   overflow: hidden;
   z-index: 50;
-  /* pequeño “peso HUD” */
   backdrop-filter: blur(10px);
 }
   
@@ -838,7 +705,6 @@ pre {
   border-radius:20px;
   box-shadow:
     0 0 40px rgba(120,180,255,0.25);
-
   color:white;
   z-index:9999;
   overflow:hidden;
@@ -885,8 +751,6 @@ pre {
 }
 
 
-/* HEADER */
-
 .mission-header{
     border-bottom:1px solid rgba(255,255,255,.12);
     padding-bottom:16px;
@@ -920,8 +784,6 @@ pre {
 
 
 
-/* INFO */
-
 .mission-details{
 
     display:grid;
@@ -950,8 +812,6 @@ pre {
 
 }
 
-
-/* TELEMETRY */
 
 .telemetry-title{
     font-size:11px;
