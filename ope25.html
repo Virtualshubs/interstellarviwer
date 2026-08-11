@@ -6092,28 +6092,32 @@ function openWindy(){
 
 // ======================================================
 // 🌙 MOON EPHEMERIS
-// Low-precision analytical lunar position
+// Enhanced analytical lunar model
+//
+// Reference:
+//   Meeus-style truncated lunar theory
 //
 // Output:
-//   position = OPE units
-//   distanceKm = real Earth-Moon distance
+//   position     = OPE units
+//   distanceKm   = Earth-Moon distance
+//   distanceOPE  = distance in OPE units
 //
 // OPE spatial scale:
-//   1.0 = Earth's equatorial radius
+//   1.0 = Earth's WGS84 equatorial radius
 //   6378.137 km
 // ======================================================
 
 function getMoonPosition(date){
 
     // --------------------------------------------------
-    // OPE SCALE
+    // OPE SCALE — WGS84
     // --------------------------------------------------
 
     const EARTH_RADIUS_KM = 6378.137;
 
 
     // --------------------------------------------------
-    // Julian Date
+    // JULIAN DATE
     // --------------------------------------------------
 
     const JD =
@@ -6124,33 +6128,38 @@ function getMoonPosition(date){
 
 
     // --------------------------------------------------
-    // Fundamental lunar arguments
+    // FUNDAMENTAL LUNAR ARGUMENTS
     // degrees
     // --------------------------------------------------
 
     const Lp =
         218.3164477 +
-        481267.88123421 * T;
+        481267.88123421 * T -
+        0.0015786 * T * T;
 
     const D =
         297.8501921 +
-        445267.1114034 * T;
+        445267.1114034 * T -
+        0.0018819 * T * T;
 
     const M =
         357.5291092 +
-        35999.0502909 * T;
+        35999.0502909 * T -
+        0.0001536 * T * T;
 
     const Mp =
         134.9633964 +
-        477198.8675055 * T;
+        477198.8675055 * T +
+        0.0087414 * T * T;
 
     const F =
         93.2720950 +
-        483202.0175233 * T;
+        483202.0175233 * T -
+        0.0036539 * T * T;
 
 
     // --------------------------------------------------
-    // Normalize angle
+    // NORMALIZE
     // --------------------------------------------------
 
     function norm360(a){
@@ -6182,8 +6191,21 @@ function getMoonPosition(date){
 
 
     // --------------------------------------------------
-    // Main periodic longitude terms
+    // ADDITIONAL CORRECTION
+    //
+    // Earth's orbital eccentricity introduces a small
+    // correction to the lunar theory.
     // --------------------------------------------------
+
+    const E =
+        1
+        - 0.002516 * T
+        - 0.0000074 * T * T;
+
+
+    // ==================================================
+    // 🌙 ECLIPTIC LONGITUDE
+    // ==================================================
 
     const lon =
 
@@ -6195,53 +6217,113 @@ function getMoonPosition(date){
 
         + 0.214 * Math.sin(2 * Mpr)
 
-        - 0.186 * Math.sin(Mr)
+        - 0.186 * E * Math.sin(Mr)
 
         - 0.059 * Math.sin(2 * Dr - 2 * Mpr)
 
-        - 0.057 * Math.sin(2 * Dr - Mr - Mpr)
+        - 0.057 * E *
+          Math.sin(2 * Dr - Mr - Mpr)
 
         + 0.053 * Math.sin(2 * Dr + Mpr)
 
-        + 0.046 * Math.sin(2 * Dr - Mr)
+        + 0.046 * E *
+          Math.sin(2 * Dr - Mr)
 
-        + 0.041 * Math.sin(Mr - Mpr)
+        + 0.041 *
+          Math.sin(Mr - Mpr)
 
-        - 0.035 * Math.sin(Dr)
+        - 0.035 *
+          Math.sin(Dr)
 
-        - 0.031 * Math.sin(Mr + Mpr)
+        - 0.031 *
+          Math.sin(Mr + Mpr)
 
-        - 0.015 * Math.sin(2 * Fr - 2 * Dr)
+        - 0.015 *
+          Math.sin(2 * Fr - 2 * Dr)
 
-        + 0.011 * Math.sin(2 * Fr - Mpr);
+        + 0.011 *
+          Math.sin(2 * Fr - Mpr)
+
+        + 0.008 *
+          Math.sin(2 * Dr + Mr - Mpr)
+
+        + 0.007 *
+          Math.sin(2 * Dr + Mr)
+
+        - 0.006 *
+          Math.sin(2 * Dr - Mr + Mpr)
+
+        - 0.005 *
+          Math.sin(Mr + 2 * Mpr)
+
+        + 0.005 *
+          Math.sin(2 * Dr - 2 * Mpr + Mr)
+
+        + 0.004 *
+          Math.sin(2 * Dr + Mpr - Mr)
+
+        + 0.004 *
+          Math.sin(2 * Dr - Mpr - Mr)
+
+        - 0.004 *
+          Math.sin(2 * Mpr - Mr);
 
 
-    // --------------------------------------------------
-    // Main periodic latitude terms
-    // --------------------------------------------------
+    // ==================================================
+    // 🌙 ECLIPTIC LATITUDE
+    // ==================================================
 
     const lat =
 
-          5.128 * Math.sin(Fr)
+          5.128 *
+          Math.sin(Fr)
 
-        + 0.280 * Math.sin(Mpr + Fr)
+        + 0.280 *
+          Math.sin(Mpr + Fr)
 
-        + 0.277 * Math.sin(Mpr - Fr)
+        + 0.277 *
+          Math.sin(Mpr - Fr)
 
-        + 0.173 * Math.sin(2 * Dr - Fr)
+        + 0.173 *
+          Math.sin(2 * Dr - Fr)
 
-        + 0.055 * Math.sin(2 * Dr - Mpr + Fr)
+        + 0.055 *
+          Math.sin(2 * Dr - Mpr + Fr)
 
-        + 0.046 * Math.sin(2 * Dr - Mpr - Fr)
+        + 0.046 *
+          Math.sin(2 * Dr - Mpr - Fr)
 
-        + 0.033 * Math.sin(2 * Dr + Fr)
+        + 0.033 *
+          Math.sin(2 * Dr + Fr)
 
-        + 0.017 * Math.sin(2 * Mpr + Fr);
+        + 0.017 *
+          Math.sin(2 * Mpr + Fr)
 
+        + 0.009 *
+          Math.sin(2 * Dr + Mpr - Fr)
 
-    // --------------------------------------------------
-    // Geocentric ecliptic longitude / latitude
-    // --------------------------------------------------
+        + 0.009 *
+          Math.sin(2 * Dr - Mpr - Fr)
+
+        + 0.008 *
+          Math.sin(2 * Dr + Fr)
+
+        + 0.007 *
+          Math.sin(Mpr + Fr - 2 * Dr)
+
+        - 0.006 *
+          Math.sin(Mpr + Fr)
+
+        - 0.005 *
+          Math.sin(Mpr - Fr)
+
+        + 0.005 *
+          Math.sin(2 * Dr - Fr);
+
+    
+    // ==================================================
+    // 🌙 GEOCENTRIC ECLIPTIC COORDINATES
+    // ==================================================
 
     const lambda =
         THREE.MathUtils.degToRad(
@@ -6254,10 +6336,9 @@ function getMoonPosition(date){
         );
 
 
-    // --------------------------------------------------
-    // Earth → Moon distance
-    // km
-    // --------------------------------------------------
+    // ==================================================
+    // 🌙 EARTH → MOON DISTANCE
+    // ==================================================
 
     const distanceKm =
 
@@ -6265,26 +6346,49 @@ function getMoonPosition(date){
 
         - 20905.355 * Math.cos(Mpr)
 
-        - 3699.111 * Math.cos(2 * Dr - Mpr)
+        - 3699.111 *
+          Math.cos(2 * Dr - Mpr)
 
-        - 2955.968 * Math.cos(2 * Dr)
+        - 2955.968 *
+          Math.cos(2 * Dr)
 
-        - 569.925 * Math.cos(2 * Mpr)
+        - 569.925 *
+          Math.cos(2 * Mpr)
 
-        + 246.158 * Math.cos(2 * Mpr - 2 * Dr)
+        + 246.158 *
+          Math.cos(2 * Mpr - 2 * Dr)
 
-        - 205.435 * Math.cos(Mr - 2 * Dr)
+        - 205.435 * E *
+          Math.cos(Mr - 2 * Dr)
 
-        - 171.996 * Math.cos(Mpr + 2 * Dr)
+        - 171.996 *
+          Math.cos(Mpr + 2 * Dr)
 
-        - 152.138 * Math.cos(Mpr + Mr - 2 * Dr);
+        - 152.138 *
+          Math.cos(Mpr + Mr - 2 * Dr)
+
+        - 170.733 *
+          Math.cos(Mpr + Mr)
+
+        - 204.586 * E *
+          Math.cos(Mr - 2 * Dr)
+
+        - 129.620 *
+          Math.cos(2 * Dr - Mpr)
+
+        + 108.743 *
+          Math.cos(2 * Dr + Mpr)
+
+        + 104.755 *
+          Math.cos(2 * Mpr)
+
+        + 103.738 *
+          Math.cos(2 * Dr);
 
 
-    // --------------------------------------------------
+    // ==================================================
     // ECLIPTIC → OPE COORDINATES
-    //
-    // Current OPE convention preserved.
-    // --------------------------------------------------
+    // ==================================================
 
     const cosBeta =
         Math.cos(beta);
@@ -6301,9 +6405,9 @@ function getMoonPosition(date){
         cosBeta;
 
 
-    // --------------------------------------------------
-    // Direction
-    // --------------------------------------------------
+    // ==================================================
+    // NORMALIZED DIRECTION
+    // ==================================================
 
     const direction =
         new THREE.Vector3(
@@ -6313,14 +6417,16 @@ function getMoonPosition(date){
         ).normalize();
 
 
-    // --------------------------------------------------
+    // ==================================================
     // REAL DISTANCE → OPE DISTANCE
     //
+    // WGS84:
     // 1 OPE unit = 6378.137 km
-    // --------------------------------------------------
+    // ==================================================
 
     const distanceOPE =
-        distanceKm / EARTH_RADIUS_KM;
+        distanceKm /
+        EARTH_RADIUS_KM;
 
 
     const position =
@@ -6329,9 +6435,9 @@ function getMoonPosition(date){
         );
 
 
-    // --------------------------------------------------
+    // ==================================================
     // RETURN
-    // --------------------------------------------------
+    // ==================================================
 
     return {
 
