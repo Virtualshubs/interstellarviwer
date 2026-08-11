@@ -6891,11 +6891,13 @@ function getSunPosition(date){
 // ======================================================
 // LOOP
 // ======================================================
+
 function animate(){
 
     requestAnimationFrame(animate);
 
     const now = new Date();
+
 
     // ======================================================
     // 🌙 MOON
@@ -6958,6 +6960,7 @@ function animate(){
     // CAMERA
     // ======================================================
 
+
     // ======================================================
     // 🌙 MOON CAMERA
     // ======================================================
@@ -6967,59 +6970,74 @@ function animate(){
         if(moon){
 
             // --------------------------------------------------
-            // Posición actual de la Luna
+            // SUAVIZAR CONTROLES
+            //
+            // Reutilizamos exactamente los controles
+            // existentes de la cámara terrestre.
+            // --------------------------------------------------
+
+            rotY +=
+                (targetRotY - rotY) * 0.08;
+
+            rotX +=
+                (targetRotX - rotX) * 0.08;
+
+            distance +=
+                (targetDistance - distance) * 0.08;
+
+
+            // --------------------------------------------------
+            // POSICIÓN DE LA LUNA
             // --------------------------------------------------
 
             const moonPosition =
-                moon.position.clone();
+                moon.position;
 
 
             // --------------------------------------------------
-            // Centro de la Tierra
-            // --------------------------------------------------
-
-            const earthPosition =
-                earthGroup.position.clone();
-
-
-            // --------------------------------------------------
-            // Dirección Luna → Tierra
-            // --------------------------------------------------
-
-            const dir =
-                earthPosition
-                    .sub(moonPosition)
-                    .normalize();
-
-
-            // --------------------------------------------------
-            // Distancia de cámara respecto a la Luna
+            // RADIO VISUAL DE LA LUNA
             //
-            // La Luna tiene radio ≈ 0.2727 OPE
+            // Tierra = 1
+            // Luna   ≈ 0.2727
             // --------------------------------------------------
 
-            const cameraDistance = 2.5;
+            const moonRadius =
+                0.2727;
 
 
             // --------------------------------------------------
-            // Posición deseada
+            // POSICIÓN ORBITAL DE LA CÁMARA
             //
-            // Cámara situada detrás de la Luna,
-            // mirando hacia la Tierra.
+            // Exactamente la misma lógica que usamos
+            // alrededor de la Tierra, pero tomando la Luna
+            // como centro.
             // --------------------------------------------------
+
+            const offset =
+                new THREE.Vector3(
+
+                    distance *
+                    Math.cos(rotX) *
+                    Math.sin(rotY),
+
+                    distance *
+                    Math.sin(rotX),
+
+                    distance *
+                    Math.cos(rotX) *
+                    Math.cos(rotY)
+
+                );
+
 
             const desired =
-                moonPosition.clone();
-
-            desired.sub(
-                dir
+                moonPosition
                     .clone()
-                    .multiplyScalar(cameraDistance)
-            );
+                    .add(offset);
 
 
             // --------------------------------------------------
-            // Movimiento suave
+            // MOVIMIENTO SUAVE
             // --------------------------------------------------
 
             camera.position.lerp(
@@ -7029,11 +7047,81 @@ function animate(){
 
 
             // --------------------------------------------------
-            // Mirar siempre hacia la Tierra
+            // 🌍 TIERRA
+            // --------------------------------------------------
+
+            const earthPosition =
+                earthGroup.position.clone();
+
+
+            // --------------------------------------------------
+            // TRANSICIÓN LUNA → TIERRA
+            //
+            // Lejos:
+            //     target = Luna
+            //
+            // Cerca:
+            //     target = Tierra
+            // --------------------------------------------------
+
+            const transitionStart =
+                moonRadius * 5.0;
+
+            const transitionEnd =
+                moonRadius * 1.5;
+
+
+            let moonObserverBlend =
+                THREE.MathUtils.mapLinear(
+                    distance,
+                    transitionStart,
+                    transitionEnd,
+                    0,
+                    1
+                );
+
+
+            moonObserverBlend =
+                THREE.MathUtils.clamp(
+                    moonObserverBlend,
+                    0,
+                    1
+                );
+
+
+            // Suavizamos la transición
+
+            moonObserverBlend =
+                moonObserverBlend *
+                moonObserverBlend *
+                (
+                    3 -
+                    2 * moonObserverBlend
+                );
+
+
+            // --------------------------------------------------
+            // TARGET FINAL
+            //
+            // 0 → Luna
+            // 1 → Tierra
+            // --------------------------------------------------
+
+            const cameraTarget =
+                moonPosition
+                    .clone()
+                    .lerp(
+                        earthPosition,
+                        moonObserverBlend
+                    );
+
+
+            // --------------------------------------------------
+            // MIRAR AL TARGET
             // --------------------------------------------------
 
             camera.lookAt(
-                earthGroup.position
+                cameraTarget
             );
 
         }
@@ -7045,7 +7133,7 @@ function animate(){
     // 🌍 EARTH CAMERA
     // ======================================================
 
-    else if(cameraMode==="earth"){
+    else if(cameraMode === "earth"){
 
         rotY +=
             (targetRotY - rotY) * 0.08;
@@ -7089,6 +7177,7 @@ function animate(){
 
         const mesh =
             satMeshes[currentSat];
+
 
         if(mesh){
 
@@ -7153,7 +7242,8 @@ function animate(){
                 dir
                     .clone()
                     .multiplyScalar(
-                        radius * followDistance
+                        radius *
+                        followDistance
                     )
             );
 
@@ -7194,8 +7284,6 @@ function animate(){
     );
 
 }
-  
-
 function onResize(){
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
