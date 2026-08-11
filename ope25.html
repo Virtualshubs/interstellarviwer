@@ -3767,8 +3767,11 @@ const moonTexture = new THREE.TextureLoader().load(
 moonTexture.colorSpace = THREE.SRGBColorSpace;
 moonTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
+const MOON_RADIUS_OPE =
+    1737.4 / 6378.137;
+
 const moonGeometry = new THREE.SphereGeometry(
-    0.2727,
+    MOON_RADIUS_OPE,
     96,
     96
 );
@@ -5946,13 +5949,27 @@ function openWindy(){
 
 
 
-
 // ======================================================
 // 🌙 MOON EPHEMERIS
 // Low-precision analytical lunar position
+//
+// Output:
+//   position = OPE units
+//   distanceKm = real Earth-Moon distance
+//
+// OPE spatial scale:
+//   1.0 = Earth's equatorial radius
+//   6378.137 km
 // ======================================================
 
 function getMoonPosition(date){
+
+    // --------------------------------------------------
+    // OPE SCALE
+    // --------------------------------------------------
+
+    const EARTH_RADIUS_KM = 6378.137;
+
 
     // --------------------------------------------------
     // Julian Date
@@ -5991,85 +6008,145 @@ function getMoonPosition(date){
         483202.0175233 * T;
 
 
+    // --------------------------------------------------
     // Normalize angle
+    // --------------------------------------------------
+
     function norm360(a){
+
         return ((a % 360) + 360) % 360;
+
     }
 
 
-    const L = THREE.MathUtils.degToRad(norm360(Lp));
-    const Dr = THREE.MathUtils.degToRad(norm360(D));
-    const Mr = THREE.MathUtils.degToRad(norm360(M));
-    const Mpr = THREE.MathUtils.degToRad(norm360(Mp));
-    const Fr = THREE.MathUtils.degToRad(norm360(F));
+    const Dr =
+        THREE.MathUtils.degToRad(
+            norm360(D)
+        );
+
+    const Mr =
+        THREE.MathUtils.degToRad(
+            norm360(M)
+        );
+
+    const Mpr =
+        THREE.MathUtils.degToRad(
+            norm360(Mp)
+        );
+
+    const Fr =
+        THREE.MathUtils.degToRad(
+            norm360(F)
+        );
 
 
     // --------------------------------------------------
-    // Main periodic terms
+    // Main periodic longitude terms
     // --------------------------------------------------
 
     const lon =
+
           6.289 * Math.sin(Mpr)
+
         + 1.274 * Math.sin(2 * Dr - Mpr)
+
         + 0.658 * Math.sin(2 * Dr)
+
         + 0.214 * Math.sin(2 * Mpr)
+
         - 0.186 * Math.sin(Mr)
+
         - 0.059 * Math.sin(2 * Dr - 2 * Mpr)
+
         - 0.057 * Math.sin(2 * Dr - Mr - Mpr)
+
         + 0.053 * Math.sin(2 * Dr + Mpr)
+
         + 0.046 * Math.sin(2 * Dr - Mr)
+
         + 0.041 * Math.sin(Mr - Mpr)
+
         - 0.035 * Math.sin(Dr)
+
         - 0.031 * Math.sin(Mr + Mpr)
+
         - 0.015 * Math.sin(2 * Fr - 2 * Dr)
+
         + 0.011 * Math.sin(2 * Fr - Mpr);
 
 
+    // --------------------------------------------------
+    // Main periodic latitude terms
+    // --------------------------------------------------
+
     const lat =
+
           5.128 * Math.sin(Fr)
+
         + 0.280 * Math.sin(Mpr + Fr)
+
         + 0.277 * Math.sin(Mpr - Fr)
+
         + 0.173 * Math.sin(2 * Dr - Fr)
+
         + 0.055 * Math.sin(2 * Dr - Mpr + Fr)
+
         + 0.046 * Math.sin(2 * Dr - Mpr - Fr)
+
         + 0.033 * Math.sin(2 * Dr + Fr)
+
         + 0.017 * Math.sin(2 * Mpr + Fr);
 
 
+    // --------------------------------------------------
     // Geocentric ecliptic longitude / latitude
+    // --------------------------------------------------
+
     const lambda =
-        THREE.MathUtils.degToRad(norm360(Lp + lon));
+        THREE.MathUtils.degToRad(
+            norm360(Lp + lon)
+        );
 
     const beta =
-        THREE.MathUtils.degToRad(lat);
+        THREE.MathUtils.degToRad(
+            lat
+        );
 
 
     // --------------------------------------------------
-    // Distance Earth → Moon
+    // Earth → Moon distance
     // km
     // --------------------------------------------------
 
     const distanceKm =
-        385000.56
+
+          385000.56
+
         - 20905.355 * Math.cos(Mpr)
+
         - 3699.111 * Math.cos(2 * Dr - Mpr)
+
         - 2955.968 * Math.cos(2 * Dr)
+
         - 569.925 * Math.cos(2 * Mpr)
+
         + 246.158 * Math.cos(2 * Mpr - 2 * Dr)
+
         - 205.435 * Math.cos(Mr - 2 * Dr)
+
         - 171.996 * Math.cos(Mpr + 2 * Dr)
+
         - 152.138 * Math.cos(Mpr + Mr - 2 * Dr);
 
 
     // --------------------------------------------------
-    // Ecliptic → Three.js coordinates
+    // ECLIPTIC → OPE COORDINATES
     //
-    // x = ecliptic X
-    // y = ecliptic latitude
-    // z = ecliptic Y
+    // Current OPE convention preserved.
     // --------------------------------------------------
 
-    const cosBeta = Math.cos(beta);
+    const cosBeta =
+        Math.cos(beta);
 
     const x =
         Math.cos(lambda) *
@@ -6083,28 +6160,59 @@ function getMoonPosition(date){
         cosBeta;
 
 
-    // Normalize and apply visual distance
-    const direction = new THREE.Vector3(
-        x,
-        y,
-        z
-    ).normalize();
+    // --------------------------------------------------
+    // Direction
+    // --------------------------------------------------
+
+    const direction =
+        new THREE.Vector3(
+            x,
+            y,
+            z
+        ).normalize();
+
+
+    // --------------------------------------------------
+    // REAL DISTANCE → OPE DISTANCE
+    //
+    // 1 OPE unit = 6378.137 km
+    // --------------------------------------------------
+
+    const distanceOPE =
+        distanceKm / EARTH_RADIUS_KM;
 
 
     const position =
         direction.multiplyScalar(
-            distanceKm / 6371
+            distanceOPE
         );
 
 
-    return {
-        position,
-        distanceKm,
-        longitude: THREE.MathUtils.radToDeg(lambda),
-        latitude: THREE.MathUtils.radToDeg(beta)
-    };
-}
+    // --------------------------------------------------
+    // RETURN
+    // --------------------------------------------------
 
+    return {
+
+        position,
+
+        distanceKm,
+
+        distanceOPE,
+
+        longitude:
+            THREE.MathUtils.radToDeg(
+                lambda
+            ),
+
+        latitude:
+            THREE.MathUtils.radToDeg(
+                beta
+            )
+
+    };
+
+}
 
 
 
