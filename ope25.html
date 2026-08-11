@@ -3646,7 +3646,7 @@ function init(){
     60,
     window.innerWidth/window.innerHeight,
     0.1,
-    1000
+    3000
   );
 
   renderer = new THREE.WebGLRenderer({ antialias:true });
@@ -6114,15 +6114,20 @@ function getMoonPosition(date){
 // Calculates:
 //   - Solar declination
 //   - Equation of time
+//   - Earth → Sun distance
 //
-// Then converts them into the SAME vector convention
-// already used by OPE:
+// Coordinate convention preserved:
 //
 //   X = cos(angle)
 //   Y = sin(declination)
 //   Z = sin(angle)
 //
-// This preserves the existing OPE coordinate system.
+// OPE SCALE:
+//
+//   Earth radius = 1
+//   Sun distance ≈ 23,400 Earth radii
+//
+// The original OPE angular convention is NOT changed.
 // ======================================================
 
 function getSunPosition(date){
@@ -6158,6 +6163,10 @@ function getSunPosition(date){
         0.0001537 * T * T;
 
 
+    // --------------------------------------------------
+    // Normalize angle
+    // --------------------------------------------------
+
     function norm360(a){
 
         return ((a % 360) + 360) % 360;
@@ -6169,6 +6178,17 @@ function getSunPosition(date){
         THREE.MathUtils.degToRad(
             norm360(M)
         );
+
+
+    // --------------------------------------------------
+    // Earth's orbital eccentricity
+    // --------------------------------------------------
+
+    const eccentricity =
+
+        0.016708634
+        - 0.000042037 * T
+        - 0.0000001267 * T * T;
 
 
     // --------------------------------------------------
@@ -6198,6 +6218,12 @@ function getSunPosition(date){
         norm360(L0 + C);
 
 
+    const lambda =
+        THREE.MathUtils.degToRad(
+            trueLongitude
+        );
+
+
     // --------------------------------------------------
     // OBLIQUITY OF THE ECLIPTIC
     // --------------------------------------------------
@@ -6207,11 +6233,6 @@ function getSunPosition(date){
         23.439291
         - 0.0130042 * T;
 
-
-    const lambda =
-        THREE.MathUtils.degToRad(
-            trueLongitude
-        );
 
     const epsilonRad =
         THREE.MathUtils.degToRad(
@@ -6228,24 +6249,26 @@ function getSunPosition(date){
     const declination =
 
         Math.asin(
+
             Math.sin(epsilonRad) *
             Math.sin(lambda)
+
         );
 
 
     // --------------------------------------------------
     // EQUATION OF TIME
-    //
-    // Gives the difference between mean solar time
-    // and apparent solar time.
     // --------------------------------------------------
 
     const y =
-        Math.tan(epsilonRad / 2) *
-        Math.tan(epsilonRad / 2);
+
+        Math.tan(
+            epsilonRad / 2
+        ) ** 2;
 
 
     const L0rad =
+
         THREE.MathUtils.degToRad(
             norm360(L0)
         );
@@ -6253,25 +6276,34 @@ function getSunPosition(date){
 
     const equationOfTimeRad =
 
-          y * Math.sin(2 * L0rad)
+          y *
+          Math.sin(2 * L0rad)
 
-        - 2 * 0.016708634 *
+        - 2 *
+          eccentricity *
           Math.sin(Mr)
 
-        + 4 * 0.016708634 * y *
+        + 4 *
+          eccentricity *
+          y *
           Math.sin(Mr) *
           Math.cos(2 * L0rad)
 
-        - 0.5 * y * y *
+        - 0.5 *
+          y *
+          y *
           Math.sin(4 * L0rad)
 
         - 1.25 *
-          0.016708634 *
-          0.016708634 *
+          eccentricity *
+          eccentricity *
           Math.sin(2 * Mr);
 
 
+    // --------------------------------------------------
     // Convert radians → minutes
+    // --------------------------------------------------
+
     const equationOfTimeMinutes =
 
         THREE.MathUtils.radToDeg(
@@ -6282,19 +6314,20 @@ function getSunPosition(date){
     // --------------------------------------------------
     // CURRENT FRACTION OF DAY
     //
-    // We deliberately keep the original OPE
-    // time → angle convention.
+    // Keep original OPE time convention.
     // --------------------------------------------------
 
     const millisecondsInDay =
         86400000;
+
 
     const frac =
 
         (
             date.getTime() %
             millisecondsInDay
-        ) / millisecondsInDay;
+        ) /
+        millisecondsInDay;
 
 
     // --------------------------------------------------
@@ -6304,43 +6337,164 @@ function getSunPosition(date){
     //
     // angle = frac * 2π
     //
-    // Now we add the real Equation of Time correction.
+    // We only add Equation of Time correction.
     // --------------------------------------------------
 
     const solarTimeCorrection =
 
         equationOfTimeMinutes /
         1440 *
-        Math.PI * 2;
+        Math.PI *
+        2;
 
 
     const angle =
 
-        frac * Math.PI * 2
+        frac *
+        Math.PI *
+        2
         +
         solarTimeCorrection;
 
 
-    // --------------------------------------------------
-    // OPE VECTOR
+    // ==================================================
+    // OPE DIRECTION
     //
+    // IMPORTANT:
     // DO NOT CHANGE THIS CONVENTION.
-    // This is the original coordinate system
-    // already calibrated in OPE.
+    // ==================================================
+
+    const sunDir =
+
+        new THREE.Vector3(
+
+            Math.cos(angle),
+
+            Math.sin(declination),
+
+            Math.sin(angle)
+
+        ).normalize();
+
+
+    // ==================================================
+    // ☀️ EARTH → SUN DISTANCE
+    // ==================================================
+
+    // True anomaly
+    const trueAnomaly =
+
+        THREE.MathUtils.degToRad(
+
+            norm360(
+                M + C
+            )
+
+        );
+
+
+    // --------------------------------------------------
+    // Distance in Astronomical Units
     // --------------------------------------------------
 
-    const sunDir = new THREE.Vector3(
+    const distanceAU =
 
-        Math.cos(angle),
+        (
+            1.000001018 *
+            (
+                1 -
+                eccentricity *
+                eccentricity
+            )
+        )
+        /
+        (
+            1 +
+            eccentricity *
+            Math.cos(trueAnomaly)
+        );
 
-        Math.sin(declination),
 
-        Math.sin(angle)
+    // --------------------------------------------------
+    // Astronomical Unit → kilometres
+    // --------------------------------------------------
 
-    ).normalize();
+    const AU_KM =
+        149597870.7;
 
 
-    return sunDir;
+    const distanceKm =
+        distanceAU *
+        AU_KM;
+
+
+    // ==================================================
+    // 🌍 OPE SCALE
+    //
+    // Earth geometry:
+    //
+    // SphereGeometry radius = 1
+    //
+    // Therefore:
+    //
+    // 1 OPE unit = 1 Earth radius
+    // ==================================================
+
+    const EARTH_RADIUS_KM =
+        6378.137;
+
+
+    const distanceEarthRadii =
+
+        distanceKm /
+        EARTH_RADIUS_KM;
+
+
+    // ==================================================
+    // ☀️ PHYSICAL SUN POSITION
+    // ==================================================
+
+    const position =
+
+        sunDir.clone()
+            .multiplyScalar(
+                distanceEarthRadii
+            );
+
+
+    // ==================================================
+    // RETURN
+    // ==================================================
+
+    return {
+
+        // Original OPE direction
+        direction: sunDir,
+
+        // Physical position in OPE units
+        position: position,
+
+        // Physical data
+        distanceKm: distanceKm,
+
+        distanceAU: distanceAU,
+
+        distanceEarthRadii:
+            distanceEarthRadii,
+
+        // Astronomical information
+        declination:
+            THREE.MathUtils.radToDeg(
+                declination
+            ),
+
+        longitude:
+            trueLongitude,
+
+        equationOfTimeMinutes:
+            equationOfTimeMinutes
+
+    };
 
 }
   
@@ -6381,14 +6535,22 @@ if(moon){
 // ☀️ SUN
 // ======================================================
 
-const sunDir = getSunPosition(now);
+const sunData =
+    getSunPosition(now);
 
 sunLight.position.copy(
-    sunDir.clone().multiplyScalar(50)
+    sunData.direction
+        .clone()
+        .multiplyScalar(50)
 );
 
-sunLight.target.position.set(0,0,0);
-    // ======================================================
+sunLight.target.position.set(
+    0,
+    0,
+    0
+);
+  
+
     // SATELLITES
     // ======================================================
 
