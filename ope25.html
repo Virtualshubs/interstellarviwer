@@ -1503,6 +1503,10 @@ color:#7fe28f;
 
     </button>
 
+  <button id="moonCameraBtn">
+    🌙 MOON
+</button>
+
     <button id="followViewBtn">
 
         <span class="material-symbols-rounded">satellite_alt</span>
@@ -1832,6 +1836,7 @@ const savedCamera = {
 
 let moon;
 let moonGroup;
+  let moonCameraMode = false;
 
 
 // ======================================================
@@ -4122,6 +4127,35 @@ window.addEventListener("mousemove",(e)=>{
 
 
 
+  
+
+// ======================================================
+// 🌙 MOON CAMERA
+// ======================================================
+
+function toggleMoonCamera(){
+
+    moonCameraMode = !moonCameraMode;
+
+    if(moonCameraMode){
+
+        console.log("🌙 MOON VIEW");
+
+    }else{
+
+        console.log("🌍 EARTH VIEW");
+
+    }
+
+}
+
+
+  document
+    .getElementById("moonCameraBtn")
+    .addEventListener(
+        "click",
+        toggleMoonCamera
+    );
 
 // ======================================================
 // LOAD EARTH LAYERS
@@ -6861,141 +6895,303 @@ function animate(){
 
     requestAnimationFrame(animate);
 
-const now = new Date();
-
-  // ======================================================
-// MOON
-// ======================================================
-
-if(moon){
-
-    const moonData = getMoonPosition(now);
-
-    moon.position.copy(
-        moonData.position
-    );
-
-}
+    const now = new Date();
 
     // ======================================================
-    // EARTH ROTATION
+    // 🌙 MOON
     // ======================================================
 
-    const elapsedSeconds = (Date.now() - startTime) / 1000;
-    const rotation = (elapsedSeconds / 86400) * (2 * Math.PI);
+    if(moon){
+
+        const moonData =
+            getMoonPosition(now);
+
+        moon.position.copy(
+            moonData.position
+        );
+
+    }
+
+
+    // ======================================================
+    // 🌍 EARTH ROTATION
+    // ======================================================
+
+    const elapsedSeconds =
+        (Date.now() - startTime) / 1000;
+
+    const rotation =
+        (elapsedSeconds / 86400) * (2 * Math.PI);
 
     earthGroup.rotation.y = rotation;
 
-// ======================================================
-// ☀️ SUN
-// ======================================================
 
-const sunData =
-    getSunPosition(now);
+    // ======================================================
+    // ☀️ SUN
+    // ======================================================
 
-sunLight.position.copy(
-    sunData.direction
-        .clone()
-        .multiplyScalar(50)
-);
+    const sunData =
+        getSunPosition(now);
 
-sunLight.target.position.set(
-    0,
-    0,
-    0
-);
-  
+    sunLight.position.copy(
+        sunData.direction
+            .clone()
+            .multiplyScalar(50)
+    );
 
-    // SATELLITES
+    sunLight.target.position.set(
+        0,
+        0,
+        0
+    );
+
+
+    // ======================================================
+    // 🛰️ SATELLITES
     // ======================================================
 
     updateSatellites();
     updateUI();
 
-// ======================================================
-// CAMERA
-// ======================================================
 
-if(cameraMode==="earth"){
+    // ======================================================
+    // CAMERA
+    // ======================================================
 
-    rotY += (targetRotY-rotY)*0.08;
-    rotX += (targetRotX-rotX)*0.08;
-    distance += (targetDistance-distance)*0.08;
+    // ======================================================
+    // 🌙 MOON CAMERA
+    // ======================================================
 
-    camera.position.x =
-        distance * Math.cos(rotX) * Math.sin(rotY);
+    if(moonCameraMode){
 
-    camera.position.y =
-        distance * Math.sin(rotX);
+        if(moon){
 
-    camera.position.z =
-        distance * Math.cos(rotX) * Math.cos(rotY);
+            // --------------------------------------------------
+            // Posición actual de la Luna
+            // --------------------------------------------------
 
-    camera.lookAt(0,0,0);
+            const moonPosition =
+                moon.position.clone();
 
-}
-else{
 
-    const mesh = satMeshes[currentSat];
+            // --------------------------------------------------
+            // Centro de la Tierra
+            // --------------------------------------------------
 
-    if(mesh){
+            const earthPosition =
+                earthGroup.position.clone();
 
-        // Si existe un modelo GLB usamos ese.
-        // Si no, seguimos la esfera.
-        const target = mesh.userData.model || mesh;
 
-        // ======================================================
-        // CALCULAR TAMAÑO SOLO LA PRIMERA VEZ
-        // ======================================================
+            // --------------------------------------------------
+            // Dirección Luna → Tierra
+            // --------------------------------------------------
 
-        if(target.userData.radius === undefined){
-            const bounds = new THREE.Box3().setFromObject(target);
-            const sphere = new THREE.Sphere();
-            bounds.getBoundingSphere(sphere);
-            target.userData.radius = sphere.radius;
+            const dir =
+                earthPosition
+                    .sub(moonPosition)
+                    .normalize();
+
+
+            // --------------------------------------------------
+            // Distancia de cámara respecto a la Luna
+            //
+            // La Luna tiene radio ≈ 0.2727 OPE
+            // --------------------------------------------------
+
+            const cameraDistance = 2.5;
+
+
+            // --------------------------------------------------
+            // Posición deseada
+            //
+            // Cámara situada detrás de la Luna,
+            // mirando hacia la Tierra.
+            // --------------------------------------------------
+
+            const desired =
+                moonPosition.clone();
+
+            desired.sub(
+                dir
+                    .clone()
+                    .multiplyScalar(cameraDistance)
+            );
+
+
+            // --------------------------------------------------
+            // Movimiento suave
+            // --------------------------------------------------
+
+            camera.position.lerp(
+                desired,
+                0.08
+            );
+
+
+            // --------------------------------------------------
+            // Mirar siempre hacia la Tierra
+            // --------------------------------------------------
+
+            camera.lookAt(
+                earthGroup.position
+            );
+
         }
 
-        const radius = target.userData.radius;
+    }
 
-        // ======================================================
-        // DIRECCIÓN SATÉLITE -> TIERRA
-        // ======================================================
 
-        const dir = earthGroup.position
-            .clone()
-            .sub(target.position)
-            .normalize();
+    // ======================================================
+    // 🌍 EARTH CAMERA
+    // ======================================================
 
-        // ======================================================
-        // POSICIÓN DE LA CÁMARA
-        // ======================================================
+    else if(cameraMode==="earth"){
 
-        const desired = target.position.clone();
+        rotY +=
+            (targetRotY - rotY) * 0.08;
 
-        // Distancia variable detrás del satélite
-        desired.sub(
-            dir.clone().multiplyScalar(radius * followDistance)
-        );
+        rotX +=
+            (targetRotX - rotX) * 0.08;
 
-        // Altura proporcional al zoom
-        desired.y += radius * (followDistance * 0.15);
+        distance +=
+            (targetDistance - distance) * 0.08;
 
-        // Movimiento suave
-        camera.position.lerp(
-            desired,
-            0.08
-        );
 
-        // La cámara mira siempre al satélite
+        camera.position.x =
+            distance *
+            Math.cos(rotX) *
+            Math.sin(rotY);
+
+        camera.position.y =
+            distance *
+            Math.sin(rotX);
+
+        camera.position.z =
+            distance *
+            Math.cos(rotX) *
+            Math.cos(rotY);
+
+
         camera.lookAt(
-            target.position
+            0,
+            0,
+            0
         );
 
     }
 
-}
 
-  renderer.render(scene,camera);
+    // ======================================================
+    // 🛰️ SATELLITE CAMERA
+    // ======================================================
+
+    else{
+
+        const mesh =
+            satMeshes[currentSat];
+
+        if(mesh){
+
+            // --------------------------------------------------
+            // Si existe un modelo GLB usamos ese.
+            // Si no, seguimos la esfera.
+            // --------------------------------------------------
+
+            const target =
+                mesh.userData.model || mesh;
+
+
+            // ==================================================
+            // CALCULAR TAMAÑO SOLO LA PRIMERA VEZ
+            // ==================================================
+
+            if(target.userData.radius === undefined){
+
+                const bounds =
+                    new THREE.Box3()
+                        .setFromObject(target);
+
+                const sphere =
+                    new THREE.Sphere();
+
+                bounds.getBoundingSphere(
+                    sphere
+                );
+
+                target.userData.radius =
+                    sphere.radius;
+
+            }
+
+
+            const radius =
+                target.userData.radius;
+
+
+            // ==================================================
+            // DIRECCIÓN SATÉLITE → TIERRA
+            // ==================================================
+
+            const dir =
+                earthGroup.position
+                    .clone()
+                    .sub(target.position)
+                    .normalize();
+
+
+            // ==================================================
+            // POSICIÓN DE LA CÁMARA
+            // ==================================================
+
+            const desired =
+                target.position.clone();
+
+
+            // Distancia variable detrás del satélite
+
+            desired.sub(
+                dir
+                    .clone()
+                    .multiplyScalar(
+                        radius * followDistance
+                    )
+            );
+
+
+            // Altura proporcional al zoom
+
+            desired.y +=
+                radius *
+                (followDistance * 0.15);
+
+
+            // Movimiento suave
+
+            camera.position.lerp(
+                desired,
+                0.08
+            );
+
+
+            // La cámara mira siempre al satélite
+
+            camera.lookAt(
+                target.position
+            );
+
+        }
+
+    }
+
+
+    // ======================================================
+    // 🎨 RENDER
+    // ======================================================
+
+    renderer.render(
+        scene,
+        camera
+    );
 
 }
   
