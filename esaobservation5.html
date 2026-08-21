@@ -696,6 +696,27 @@ z-index:1;
 
 }
 
+
+#blueMarble {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: fill;
+
+    z-index: 0;
+
+    opacity: 0.35;
+
+    pointer-events: none;
+}
+
+
+   
 /* =======================================================
    RAW JSON
 =======================================================*/
@@ -1313,23 +1334,6 @@ display:none;
 
 
 
-#blueMarble {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: fill;
-
-    z-index: 0;
-
-    opacity: 0.35;
-
-    pointer-events: none;
-}
 
 
   
@@ -2216,24 +2220,6 @@ function createBlueMarble(){
         return;
     }
 
-    // Crear contenedor específico del mapa
-    let container = document.getElementById("gridContainer");
-
-    if(!container){
-
-        container = document.createElement("div");
-
-        container.id = "gridContainer";
-
-        // Insertarlo donde estaba el grid
-        grid.parentNode.insertBefore(container, grid);
-
-        // Mover el grid dentro del nuevo contenedor
-        container.appendChild(grid);
-
-    }
-
-    // Crear Blue Marble
     let marble = document.getElementById("blueMarble");
 
     if(!marble){
@@ -2246,12 +2232,14 @@ function createBlueMarble(){
 
         marble.alt = "";
 
-        container.insertBefore(marble, grid);
+        grid.insertBefore(marble, grid.firstChild);
 
     }
 
 }
 
+
+   
 // ===============================
 // SEARCH LAT LON
 // ===============================
