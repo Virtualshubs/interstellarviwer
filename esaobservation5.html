@@ -2,19 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ESA DATA v0.3</title>
+<title>3D SAC</title>
 
 <style>
-
-  /* =======================================================
-   JANUS v2
-   Layout principal
-   Compatible 100% con el HTML actual
-=======================================================*/
-
-/* =======================================================
-   TERRA
-=======================================================*/
 
 :root[data-theme="terra"]{
 
@@ -1321,6 +1311,44 @@ display:none;
 
 }
 
+
+#gridContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+}
+
+#blueMarble {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: fill;
+
+    z-index: 0;
+
+    opacity: 0.35;
+
+    pointer-events: none;
+}
+
+#dataGrid {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 1;
+}
+  
 </style>
 </head>
 
@@ -2190,8 +2218,45 @@ updateGrid();
 
 createGridSearch();
 
+      createBlueMarble();
+
 }
 
+
+
+// ===============================
+// CREATE BLUE MARBLE
+// ===============================
+
+function createBlueMarble(){
+
+    const container = document.getElementById("gridContainer");
+    const grid = document.getElementById("dataGrid");
+
+    if(!container || !grid){
+        console.warn("Blue Marble: container or grid not found");
+        return;
+    }
+
+    let marble = document.getElementById("blueMarble");
+
+    if(!marble){
+
+        marble = document.createElement("img");
+
+        marble.id = "blueMarble";
+
+        marble.src = "https://3d.staratlas.es/bluemarble.jpg";
+
+        marble.alt = "";
+
+        container.insertBefore(marble, grid);
+
+    }
+
+}
+
+  
 
 // ===============================
 // SEARCH LAT LON
