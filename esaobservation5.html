@@ -538,27 +538,18 @@ word-break:break-word;
 input{
 
 height:36px;
-
 padding:0 10px;
-
 background:#0f151e;
-
 border:1px solid var(--border);
-
 border-radius:6px;
-
 color:white;
-
 transition:var(--transition);
-
 width:180px;
 
 }
 
 input:focus{
-
 outline:none;
-
 border-color:var(--blue);
 
 }
@@ -569,17 +560,12 @@ border-color:var(--blue);
 =======================================================*/
 
 details{
-
 margin-top:18px;
-
 }
 
 summary{
-
 cursor:pointer;
-
 color:var(--blue2);
-
 font-weight:600;
 
 }
@@ -590,13 +576,9 @@ font-weight:600;
 =======================================================*/
 
 pre{
-
 white-space:pre-wrap;
-
 font-size:12px;
-
 line-height:1.55;
-
 font-family:Consolas,Menlo,monospace;
 
 }
@@ -607,17 +589,11 @@ font-family:Consolas,Menlo,monospace;
 =======================================================*/
 
 #queryBox{
-
 margin-top:22px;
-
 padding:16px;
-
 background:var(--surface);
-
 border:1px solid var(--border);
-
 border-radius:var(--radius);
-
 }
 
 
@@ -626,27 +602,17 @@ border-radius:var(--radius);
 =======================================================*/
 
 #dataGrid{
-
+position: relative;
 display:grid;
-
 grid-template-columns:repeat(36,1fr);
-
 grid-template-rows:repeat(18,1fr);
-
 aspect-ratio:2/1;
-
 width:100%;
-
 max-width:1100px;
-
 margin:24px auto;
-
 gap:1px;
-
 background: transparent;
-
 border:1px solid var(--border);
-
 }
 
 
@@ -655,43 +621,26 @@ border:1px solid var(--border);
 =======================================================*/
 
 .dataCell{
-
 display:flex;
-
 flex-direction:column;
-
 align-items:center;
-
 justify-content:center;
-
 aspect-ratio:1;
-
 background:#17202b;
-
 border:1px solid rgba(255,255,255,.04);
-
 font-size:10px;
-
 color:#dbe6f5;
-
 cursor:pointer;
-
 transition:background .15s,border-color .15s;
-
 overflow:hidden;
-
 line-height:1.05;
 
 }
 
 .dataCell:hover{
-
 border-color:var(--blue2);
-
 background:#233245;
-
 transform:none;
-
 z-index:1;
 
 }
@@ -699,22 +648,15 @@ z-index:1;
 
 #blueMarble {
     position: absolute;
-
     top: 0;
     left: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: fill;
-
     z-index: 0;
-
     opacity: 0.35;
-
     pointer-events: none;
 }
-
 
    
 /* =======================================================
