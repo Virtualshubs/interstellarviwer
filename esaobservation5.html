@@ -597,6 +597,77 @@ border-radius:var(--radius);
 }
 
 
+
+.availableHeader{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    cursor:pointer;
+
+    padding:10px 0;
+
+}
+
+
+.availableHeader h3{
+
+    margin:0;
+
+    color:#ffb04d;
+
+    font-size:14px;
+
+}
+
+
+.availableToggle{
+
+    background:none;
+
+    border:none;
+
+    color:#ffb04d;
+
+    cursor:pointer;
+
+    font-size:12px;
+
+}
+
+
+.availableContent{
+
+    max-height:0;
+
+    overflow:hidden;
+
+    opacity:0;
+
+    transition:
+        max-height .25s ease,
+        opacity .2s ease;
+
+}
+
+
+.availableContent.open{
+
+    max-height:400px;
+
+    overflow-y:auto;
+
+    opacity:1;
+
+}
+
+
+
+
+   
 /* =======================================================
    GRID
 =======================================================*/
@@ -1753,99 +1824,124 @@ document.getElementById("status").textContent=
 
 }
 
-// ===============================
+
+   
+   
+   
+   
+   // ===============================
 // AVAILABLE DATA + SPATIAL GRID
 // ===============================
 
 function renderAvailableData(json){
 
-const box=document.getElementById("queryBox");
+    const box = document.getElementById("queryBox");
+
+    box.innerHTML = `
+
+        <div class="availableHeader">
+
+            <h3>
+                AVAILABLE DATA
+            </h3>
+
+            <button
+                class="availableToggle"
+                onclick="toggleAvailableData()"
+                type="button"
+            >
+                <span id="availableArrow">▼</span>
+            </button>
+
+        </div>
+
+        <div id="availableContent" class="availableContent">
+
+        </div>
+
+    `;
 
 
-box.innerHTML=`
-
-<h3 style="color:#ffb04d;margin-bottom:12px">
-AVAILABLE DATA
-</h3>
-
-`;
+    const content = document.getElementById("availableContent");
 
 
+    if(!json.features || json.features.length === 0){
 
-if(!json.features||json.features.length===0){
+        content.innerHTML = `
+            <p>No products found</p>
+        `;
 
-box.innerHTML+=`
-<p>No products found</p>
-`;
+        return;
 
-return;
+    }
+
+
+    currentItems = json.features;
+
+
+    // ===============================
+    // RESUMEN FECHAS
+    // ===============================
+
+    const dates = {};
+
+
+    json.features.forEach(item => {
+
+        const dt = item.properties?.datetime;
+
+        if(!dt)
+            return;
+
+        const day = dt.split("T")[0];
+
+        if(!dates[day])
+            dates[day] = 0;
+
+        dates[day]++;
+
+    });
+
+
+    Object.keys(dates)
+        .sort()
+        .forEach(date => {
+
+            const r = document.createElement("div");
+
+            r.className = "row";
+
+            r.innerHTML = `
+
+                <div class="key">
+                    ${date}
+                </div>
+
+                <div class="value">
+                    ${dates[date]} observations
+                </div>
+
+            `;
+
+            content.appendChild(r);
+
+        });
 
 }
 
+   function toggleAvailableData(){
 
+    const content = document.getElementById("availableContent");
+    const arrow = document.getElementById("availableArrow");
 
-currentItems=json.features;
+    if(!content)
+        return;
 
+    const isOpen = content.classList.toggle("open");
 
+    arrow.textContent = isOpen ? "▲" : "▼";
 
-// resumen fechas
-
-const dates={};
-
-
-
-json.features.forEach(item=>{
-
-
-const dt=item.properties?.datetime;
-
-
-if(!dt)
-return;
-
-
-const day=dt.split("T")[0];
-
-
-if(!dates[day])
-dates[day]=0;
-
-
-dates[day]++;
-
-
-});
-
-
-
-Object.keys(dates)
-.sort()
-.forEach(date=>{
-
-
-const r=document.createElement("div");
-
-
-r.className="row";
-
-
-r.innerHTML=`
-
-<div class="key">
-${date}
-</div>
-
-<div class="value">
-${dates[date]} observations
-</div>
-
-`;
-
-
-box.appendChild(r);
-
-
-});
+}
 
 
 
