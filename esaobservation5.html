@@ -2208,19 +2208,16 @@ createGridSearch();
 
 
 
-// ===============================
-// CREATE BLUE MARBLE
-// ===============================
-
 function createBlueMarble(){
 
-    const container = document.getElementById("gridContainer");
     const grid = document.getElementById("dataGrid");
 
-    if(!container || !grid){
-        console.warn("Blue Marble: container or grid not found");
+    if(!grid){
+        console.warn("Blue Marble: dataGrid not found");
         return;
     }
+
+    const container = grid.parentElement;
 
     let marble = document.getElementById("blueMarble");
 
@@ -2239,7 +2236,6 @@ function createBlueMarble(){
     }
 
 }
-
   
 
 // ===============================
