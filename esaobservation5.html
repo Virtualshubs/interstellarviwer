@@ -2207,7 +2207,6 @@ createGridSearch();
 }
 
 
-
 function createBlueMarble(){
 
     const grid = document.getElementById("dataGrid");
@@ -2217,8 +2216,24 @@ function createBlueMarble(){
         return;
     }
 
-    const container = grid.parentElement;
+    // Crear contenedor específico del mapa
+    let container = document.getElementById("gridContainer");
 
+    if(!container){
+
+        container = document.createElement("div");
+
+        container.id = "gridContainer";
+
+        // Insertarlo donde estaba el grid
+        grid.parentNode.insertBefore(container, grid);
+
+        // Mover el grid dentro del nuevo contenedor
+        container.appendChild(grid);
+
+    }
+
+    // Crear Blue Marble
     let marble = document.getElementById("blueMarble");
 
     if(!marble){
@@ -2236,7 +2251,6 @@ function createBlueMarble(){
     }
 
 }
-  
 
 // ===============================
 // SEARCH LAT LON
