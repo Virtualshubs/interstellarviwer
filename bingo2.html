@@ -706,7 +706,7 @@ function resetMarks(){
 
 
 
-    document.getElementById('startBingo')
+ document.getElementById('startBingo')
     .addEventListener('click',()=>{
 
         document.getElementById('bingoWelcomeModal')
@@ -714,14 +714,20 @@ function resetMarks(){
 
     });
 
-    
+
 /* =========================
    INIT
 ========================= */
 
 window.addEventListener('load',()=>{
 
+    const welcomeModal =
+        document.getElementById('bingoWelcomeModal');
+
     if(location.hash){
+
+        // Bingo creado → ocultar bienvenida
+        welcomeModal.style.display='none';
 
         const data=JSON.parse(
 
@@ -735,6 +741,9 @@ window.addEventListener('load',()=>{
         loadPlayer(data);
 
     }else{
+
+        // Entrada inicial → mostrar bienvenida
+        welcomeModal.style.display='flex';
 
         generateEditor();
     }
