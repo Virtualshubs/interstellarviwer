@@ -342,10 +342,19 @@ select, textarea{
 
 <div id="backgroundSelector">
 
-    <img src="assets/bg-1.webp" data-bg="https://3d.staratlas.es/bluemarble.jpg">
-    <img src="assets/bg-2.webp" data-bg="https://3d.staratlas.es/nubes">
-    <img src="assets/bg-3.webp" data-bg="https://3d.staratlas.es/bluemarble.jpg">
-    <img src="assets/bg-4.webp" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+ <div data-color="#f5f5f5"></div>
+<div data-color="#101114"></div>
+<div data-color="#dff7f5"></div>
+<div data-color="#fff1d6"></div>
+
+<button id="resetBackground">
+    ORIGINAL
+</button>
+
+    <img src="https://3d.staratlas.es/bluemarble.jpg" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+    <img src="https://3d.staratlas.es/bluemarble.jpg" data-bg="https://3d.staratlas.es/nubes">
+    <img src="https://3d.staratlas.es/bluemarble.jpg" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+    <img src="https://3d.staratlas.es/bluemarble.jpg" data-bg="https://3d.staratlas.es/bluemarble.jpg">
 
 </div>
 
@@ -356,7 +365,7 @@ select, textarea{
 
 <div id="editor">
 
-<h1>🎮 Turbo Bingo</h1>
+<h1>Stream Bingo</h1>
 
 <div class="controls">
 <select id="gridSize">
@@ -377,7 +386,7 @@ select, textarea{
 <div id="bingoMessage">
 
     <div class="bingo-box">
-        <h2>🎉 BINGO COMPLETADO 🎉</h2>
+        <h2> BINGO COMPLETADO </h2>
 
         <p>
             ¡Has completado todas las casillas!
@@ -394,7 +403,7 @@ select, textarea{
 <div id="player" class="hidden">
 
 <div class="topbar">
-<h1>🎯Turbo Bingo</h1>
+<h1>Stream Bingo</h1>
 <button onclick="resetMarks()">Reiniciar</button>
 <button onclick="toggleWidget()">⤵ Minimizar</button>
 </div>
@@ -423,18 +432,23 @@ let bingoCompleted = false;
 
 
 
-
 const backgroundButton =
     document.getElementById('backgroundButton');
 
 const backgroundSelector =
     document.getElementById('backgroundSelector');
 
+
 backgroundButton.addEventListener('click',()=>{
 
     backgroundSelector.classList.toggle('open');
 
 });
+
+
+/* =========================
+   IMAGE BACKGROUNDS
+========================= */
 
 document.querySelectorAll('[data-bg]')
     .forEach(slot=>{
@@ -444,6 +458,15 @@ document.querySelectorAll('[data-bg]')
             document.body.style.backgroundImage =
                 `url("${slot.dataset.bg}")`;
 
+            document.body.style.backgroundSize =
+                'cover';
+
+            document.body.style.backgroundPosition =
+                'center';
+
+            document.body.style.backgroundRepeat =
+                'no-repeat';
+
             backgroundSelector.classList.remove('open');
 
         });
@@ -451,6 +474,53 @@ document.querySelectorAll('[data-bg]')
     });
 
 
+/* =========================
+   COLOR BACKGROUNDS
+========================= */
+
+document.querySelectorAll('[data-color]')
+    .forEach(slot=>{
+
+        slot.addEventListener('click',()=>{
+
+            document.body.style.backgroundImage =
+                'none';
+
+            document.body.style.background =
+                slot.dataset.color;
+
+            backgroundSelector.classList.remove('open');
+
+        });
+
+    });
+
+
+/* =========================
+   ORIGINAL BACKGROUND
+========================= */
+
+document.getElementById('resetBackground')
+    .addEventListener('click',()=>{
+
+        document.body.style.backgroundImage =
+            '';
+
+        document.body.style.background =
+            '';
+
+        document.body.style.backgroundSize =
+            '';
+
+        document.body.style.backgroundPosition =
+            '';
+
+        document.body.style.backgroundRepeat =
+            '';
+
+        backgroundSelector.classList.remove('open');
+
+    });
     
 
 function toggleWidget(){
