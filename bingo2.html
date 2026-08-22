@@ -320,8 +320,19 @@ select, textarea{
 }
 
 .colorSlot{
+    width:60px;
+    height:60px;
+    border-radius:8px;
+    cursor:pointer;
+
+    background:var(--color);
+
     border:2px solid rgba(255,255,255,.35);
+    box-sizing:border-box;
 }
+
+
+    
     #resetBackground{
     grid-column:1 / -1;
 
@@ -373,11 +384,11 @@ select, textarea{
 
 <div id="backgroundSelector">
 
- <div data-color="#f5f5f5"></div>
-<div data-color="#101114"></div>
-<div data-color="#dff7f5"></div>
-<div data-color="#fff1d6"></div>
-
+<div class="colorSlot" data-color="#f5f5f5" style="--color:#f5f5f5;"></div>
+<div class="colorSlot" data-color="#101114" style="--color:#101114;"></div>
+<div class="colorSlot" data-color="#dff7f5" style="--color:#dff7f5;"></div>
+<div class="colorSlot" data-color="#fff1d6" style="--color:#fff1d6;"></div>
+    
 <button id="resetBackground">
     ORIGINAL
 </button>
