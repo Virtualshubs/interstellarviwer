@@ -433,9 +433,12 @@ function exportBingo(){
 
     document.getElementById('generatedUrl').value=url;
 
-    window.location.href=url;
-}
+    // Añadir el Bingo a la URL
+    window.location.hash = encoded;
 
+    // Recargar la misma página para que INIT lo detecte
+    window.location.reload();
+}
 /* =========================
    PROGRESS
 ========================= */
