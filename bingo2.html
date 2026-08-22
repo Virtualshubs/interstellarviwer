@@ -295,18 +295,49 @@ select, textarea{
 
 #backgroundSelector.open{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(4, 60px);
     gap:8px;
+
+    width:max-content;
+    padding:10px;
+
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
 }
 
-#backgroundSelector img{
+#backgroundSelector img,
+.colorSlot{
     width:60px;
     height:60px;
-    object-fit:cover;
+
+    box-sizing:border-box;
+
     border-radius:8px;
     cursor:pointer;
+
+    object-fit:cover;
 }
-    
+
+.colorSlot{
+    border:2px solid rgba(255,255,255,.35);
+}
+    #resetBackground{
+    grid-column:1 / -1;
+
+    width:100%;
+    padding:8px 12px;
+
+    border:1px solid var(--border);
+    border-radius:8px;
+
+    background:transparent;
+    color:inherit;
+
+    cursor:pointer;
+
+    font-size:12px;
+}
 </style>
 </head>
 
