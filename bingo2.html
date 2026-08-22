@@ -289,6 +289,23 @@ select, textarea{
     font-size:15px;
 }
 
+    #backgroundSelector{
+    display:none;
+}
+
+#backgroundSelector.open{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+#backgroundSelector img{
+    width:60px;
+    height:60px;
+    object-fit:cover;
+    border-radius:8px;
+    cursor:pointer;
+}
     
 </style>
 </head>
@@ -316,6 +333,24 @@ select, textarea{
     <span>🎮 TurboBingo</span>
     <button onclick="toggleWidget()">↔ Expandir</button>
 </div>
+
+
+
+<button id="backgroundButton" aria-label="Cambiar fondo">
+    Edit
+</button>
+
+<div id="backgroundSelector">
+
+    <img src="assets/bg-1.webp" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+    <img src="assets/bg-2.webp" data-bg="https://3d.staratlas.es/nubes">
+    <img src="assets/bg-3.webp" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+    <img src="assets/bg-4.webp" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+
+</div>
+
+
+    
 
 <div class="container">
 
@@ -386,6 +421,37 @@ const activatedLines = new Set();
 let isMinimized = false;
 let bingoCompleted = false;
 
+
+
+
+const backgroundButton =
+    document.getElementById('backgroundButton');
+
+const backgroundSelector =
+    document.getElementById('backgroundSelector');
+
+backgroundButton.addEventListener('click',()=>{
+
+    backgroundSelector.classList.toggle('open');
+
+});
+
+document.querySelectorAll('[data-bg]')
+    .forEach(slot=>{
+
+        slot.addEventListener('click',()=>{
+
+            document.body.style.backgroundImage =
+                `url("${slot.dataset.bg}")`;
+
+            backgroundSelector.classList.remove('open');
+
+        });
+
+    });
+
+
+    
 
 function toggleWidget(){
 
