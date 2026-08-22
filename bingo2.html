@@ -333,22 +333,26 @@ function toggleWidget(){
     const player = document.getElementById('player');
     const bar = document.getElementById('widgetBar');
 
-    if(isMinimized){
+   if(isMinimized){
 
-        editor.style.display = 'none';
-        player.style.display = 'none';
-        bar.style.display = 'flex';
+    editor.style.display = 'none';
+    player.style.display = 'none';
+    bar.style.display = 'flex';
 
+    document.body.style.background = 'transparent';
+
+}else{
+
+    bar.style.display = 'none';
+
+    document.body.style.background = '';
+
+    if(document.querySelector('.bingo-cell')){
+        player.style.display = 'block';
     }else{
-
-        bar.style.display = 'none';
-
-        if(document.querySelector('.bingo-cell')){
-            player.style.display = 'block';
-        }else{
-            editor.style.display = 'block';
-        }
+        editor.style.display = 'block';
     }
+}
 }
 
 
