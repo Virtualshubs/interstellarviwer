@@ -413,7 +413,7 @@ function generateEditor(){
         grid.appendChild(input);
     }
 }
-
+    
 function exportBingo(){
 
     const size = +document.getElementById('gridSize').value;
@@ -432,8 +432,9 @@ function exportBingo(){
     const url=location.origin+location.pathname+'#'+encoded;
 
     document.getElementById('generatedUrl').value=url;
-}
 
+    window.location.href=url;
+}
 
 /* =========================
    PROGRESS
