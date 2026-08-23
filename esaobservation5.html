@@ -1914,23 +1914,23 @@ for(let x=0;x<cols;x++){
 
 const cell={
 
-id:y*cols+x,
+    id:y*cols+x,
 
-x,
-y,
+    x,
+    y,
 
-state:-1,
+    state:-1,
 
-latMin:-90+y*(180/rows),
-latMax:-90+(y+1)*(180/rows),
+    latMin:90-(y+1)*(180/rows),
+    latMax:90-y*(180/rows),
 
-lonMin:-180+x*(360/cols),
-lonMax:-180+(x+1)*(360/cols),
+    lonMin:-180+x*(360/cols),
+    lonMax:-180+(x+1)*(360/cols),
 
-items:[]
+    items:[]
 
 };
-
+   
 observationGrid.push(cell);
 
 const div=document.createElement("div");
