@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Stream Bingo</title>
+
+<style>
+
+:root{
+    --bg:#09090f;
+    --surface:#141420;
+    --surface-soft:rgba(255,255,255,.045);
+    --border:rgba(255,255,255,.10);
+    --border-hover:rgba(139,92,246,.45);
+    --text:#f5f5f7;
+    --text-soft:rgba(245,245,247,.68);
+    --purple:#8b5cf6;
+    --purple-dark:#6366f1;
+    --green:#22c55e;
+    --green-light:#4ade80;
+    --radius:14px;
+}
+
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    min-height:100%;
+}
+
+body{
+
+    font-family:'Arial',sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            #292341 0%,
+            #151522 42%,
+            #09090f 100%
+        );
+
+    color:var(--text);
+    margin:0;
+    padding:20px;
+    min-height:100vh;
+}
+
+  #presetSelector{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin:15px 0;
+}
+.presetSlot{
+    padding:9px 14px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+    width:100%;
+    max-width:1100px;
+    margin:auto;
+}
+
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+
+    text-align:center;
+    margin-bottom:20px;
+}
+
+
+/* =========================
+   HEADINGS
+========================= */
+
+h1{
+    text-align:center;
+    font-size:70px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--text);
+    margin:60px;
+}
+
+    #bingoWelcomeModal{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(5,5,10,.94);
+    backdrop-filter:blur(16px);
+}
+
+#bingoWelcomeCard h1{
+    margin:0 0 10px;
+    font-size:32px;
+    color:var(--text);
+}
+
+
+/* =========================
+   WELCOME LOGO
+========================= */
+
+.bingoLogo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    line-height:.85;
+    margin-bottom:20px;
+}
+
+.bingoLogo span{
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:4px;
+    color:#a78bfa;
+    margin-bottom:6px;
+}
+
+.bingoLogo strong{
+    font-size:52px;
+    font-weight:900;
+    letter-spacing:-2px;
+    color:#fff;
+    text-shadow:
+        0 4px 0 #6d28d9,
+        0 8px 20px rgba(139,92,246,.35);
+}
+
+
+/* =========================
+   WELCOME DECORATION
+========================= */
+
+.welcomeDecor{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    margin-bottom:12px;
+}
+
+.welcomeDecor span{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    color:#facc15;
+    animation:floatDecor 2s ease-in-out infinite;
+}
+
+.welcomeDecor span:nth-child(2){
+    width:42px;
+    height:42px;
+    font-size:22px;
+    color:#8b5cf6;
+    background:#f5f3ff;
+    border-radius:50%;
+    box-shadow:0 6px 20px rgba(139,92,246,.3);
+    animation-delay:.3s;
+}
+
+.welcomeDecor span:nth-child(3){
+    animation-delay:.6s;
+}
+
+@keyframes floatDecor{
+    0%,100%{
+        transform:translateY(0) rotate(0deg);
+    }
+    50%{
+        transform:translateY(-5px) rotate(8deg);
+    }
+}
+
+
+/* =========================
+   WELCOME TEXT
+========================= */
+
+#bingoWelcomeCard p{
+    margin:0 0 25px;
+    color:var(--text-soft);
+    font-size:15px;
+    line-height:1.5;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+button{
+    cursor:pointer;
+    background:linear-gradient(135deg,var(--purple),var(--purple-dark));
+    color:white;
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    font-weight:700;
+    letter-spacing:.5px;
+    box-shadow:0 6px 20px rgba(99,102,241,.25);
+    transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(99,102,241,.35);
+    filter:brightness(1.08);
+}
+
+button:active{
+    transform:translateY(0);
+}
+
+
+/* =========================
+   START BUTTON
+========================= */
+
+#startBingo{
+    padding:13px 30px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:1px;
+    box-shadow:0 8px 25px rgba(124,58,237,.35);
+}
+
+#startBingo:hover{
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 12px 30px rgba(124,58,237,.45);
+}
+
+
+/* =========================
+   WELCOME HINT
+========================= */
+
+.welcomeHint{
+    margin-top:16px;
+    font-size:11px;
+    color:var(--text-soft);
+    opacity:.55;
+}
+
+/* =========================
+   SELECT / TEXTAREA
+========================= */
+
+select,
+textarea{
+
+    background:#11111b;
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:8px;
+    outline:none;
+}
+
+select:focus,
+textarea:focus{
+
+    border-color:var(--purple);
+
+}
+
+
+/* =========================
+   EDITOR GRID
+========================= */
+
+.grid-editor,
+.grid-play{
+
+    display:grid;
+    gap:7px;
+    margin-top:20px;
+}
+
+
+/* =========================
+   EDITOR CELL
+========================= */
+
+.cell-input{
+    width:100%;
+    min-height:70px;
+    resize:none;
+    background:#0f0f1a;
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:10px;
+    padding:8px;
+    font-family:inherit;
+    outline:none;
+    transition:
+        border-color .15s ease,
+        background .15s ease;
+}
+
+.cell-input:focus{
+    border-color:var(--purple);
+    background:#12121f;
+}
+
+
+/* =========================
+   BINGO CELLS
+========================= */
+
+.bingo-cell{
+
+    min-height:80px;
+    background:var(--surface-soft);
+    border:1px solid var(--border);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8px;
+    cursor:pointer;
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+
+    user-select:none;
+    position:relative;
+    overflow:hidden;
+    word-break:break-word;
+}
+
+
+/* =========================
+   CELL HOVER
+========================= */
+
+.bingo-cell:hover{
+    transform:translateY(-2px);
+    background:
+        rgba(139,92,246,.12);
+    border-color:
+        var(--border-hover);
+}
+
+
+/* =========================
+   MARKED CELL
+========================= */
+
+.marked{
+    background:
+        linear-gradient(
+            145deg,
+            #16a34a,
+            #22c55e
+        );
+
+    border-color:
+        var(--green-light);
+    color:white;
+    transform:scale(.97);
+    box-shadow:
+        0 5px 18px rgba(34,197,94,.20);
+}
+
+
+/* =========================
+   WIN LINE
+========================= */
+
+.win-line{
+
+    box-shadow:
+        0 0 15px rgba(34,197,94,.35);
+    border-color:
+        var(--green-light) !important;
+}
+
+
+/* =========================
+   WIN ANIMATION
+========================= */
+
+.win-animate{
+    animation:
+        winPulse .8s ease;
+}
+
+@keyframes winPulse{
+
+    0%{
+
+        transform:scale(1);
+        filter:brightness(1);
+    }
+
+    50%{
+
+        transform:scale(1.07);
+        box-shadow:
+            0 0 30px rgba(34,197,94,.65),
+            0 0 55px rgba(124,58,237,.35);
+
+        filter:brightness(1.3);
+    }
+
+    100%{
+
+        transform:scale(1.03);
+        filter:brightness(1);
+    }
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.progress-wrap{
+
+    width:100%;
+    max-width:600px;
+    margin:0 auto 18px;
+}
+
+.progress-top{
+
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    color:var(--text-soft);
+    margin-bottom:6px;
+}
+
+.progress-bar-bg{
+
+    width:100%;
+    height:10px;
+    background:
+        rgba(255,255,255,.08);
+    border-radius:20px;
+    overflow:hidden;
+    border:
+        1px solid rgba(255,255,255,.08);
+}
+
+.progress-bar-fill{
+
+    height:100%;
+    width:0%;
+    background:
+        linear-gradient(
+            90deg,
+            var(--purple),
+            var(--purple-dark)
+        );
+
+    transition:
+        width .25s ease;
+}
+
+
+/* =========================
+   URL BOX
+========================= */
+
+.url-box{
+
+    width:100%;
+    margin-top:15px;
+    background:#0f0f1a;
+    color:#a78bfa;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px;
+    outline:none;
+}
+
+
+/* =========================
+   BINGO FINAL MESSAGE
+========================= */
+
+#bingoMessage{
+    position:fixed;
+    inset:0;
+    background:
+        rgba(0,0,0,.72);
+
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:10000;
+    backdrop-filter:blur(8px);
+}
+
+
+/* =========================
+   BINGO FINAL CARD
+========================= */
+
+.bingo-box{
+
+    width:min(420px,90%);
+    background:
+        rgba(20,20,32,.94);
+
+    border:
+        1px solid rgba(34,197,94,.45);
+
+    border-radius:20px;
+    padding:40px;
+    text-align:center;
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.45),
+        0 0 35px rgba(34,197,94,.18);
+
+    animation:
+        bingoAppear .45s ease;
+
+    backdrop-filter:
+        blur(20px);
+}
+
+
+/* =========================
+   FINAL TITLE
+========================= */
+
+.bingo-box h2{
+    margin-top:0;
+    font-size:32px;
+    color:var(--green-light);
+    text-shadow:
+        0 0 18px rgba(34,197,94,.35);
+}
+
+
+/* =========================
+   FINAL TEXT
+========================= */
+
+.bingo-box p{
+    font-size:16px;
+    color:var(--text-soft);
+    margin:18px 0 24px;
+}
+
+
+/* =========================
+   FINAL ANIMATION
+========================= */
+
+@keyframes bingoAppear{
+
+    from{
+        transform:
+            scale(.85)
+            translateY(10px);
+
+        opacity:0;
+    }
+
+    to{
+
+        transform:
+            scale(1)
+            translateY(0);
+
+        opacity:1;
+    }
+}
+
+
+/* =========================
+   WIDGET BAR
+========================= */
+
+#widgetBar{
+    position:fixed;
+    top:10px;
+    left:10px;
+    right:10px;
+    z-index:9999;
+    background:
+        rgba(15,15,26,.94);
+
+    border:
+        1px solid var(--border);
+
+    border-radius:12px;
+    padding:10px 14px;
+    display:none;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25);
+
+    backdrop-filter:
+        blur(12px);
+}
+
+#widgetBar button{
+    padding:6px 10px;
+    font-size:12px;
+}
+
+
+/* =========================
+   WELCOME MODAL
+========================= */
+
+#bingoWelcomeModal{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        rgba(0,0,0,.68);
+
+    backdrop-filter:
+        blur(10px);
+}
+
+
+/* =========================
+   WELCOME CARD
+========================= */
+
+#bingoWelcomeCard{
+
+    width:min(380px,90%);
+    padding:36px 32px;
+    text-align:center;
+    background:
+        rgba(20,20,32,.92);
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    border-radius:20px;
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.45);
+
+    backdrop-filter:
+        blur(20px);
+
+    animation:
+        welcomeAppear .4s ease;
+}
+
+@keyframes welcomeAppear{
+    from{
+        opacity:0;
+        transform:
+            translateY(10px)
+            scale(.97);
+    }
+    to{
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* =========================
+   BACKGROUND SELECTOR
+========================= */
+
+#backgroundSelector{
+    display:none;
+}
+
+    
+#backgroundSelector.open{
+    display:grid;
+    grid-template-columns:repeat(4,60px);
+    gap:8px;
+    width:max-content;
+    padding:10px;
+    background:rgba(20,20,32,.96);
+    border:1px solid var(--border);
+    border-radius:12px;
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+    backdrop-filter:blur(15px);
+}
+/* =========================
+   IMAGE SLOTS
+========================= */
+
+#backgroundSelector img{
+    width:40px;
+    height:40px;
+    object-fit:cover;
+    border-radius:12px;
+    cursor:pointer;
+    display:block;
+    border:1px solid transparent;
+    transition: transform .15s ease, 
+    border-color .15s ease;
+}
+
+    
+#backgroundSelector img:hover{
+    transform:scale(1.05);
+    border-color: rgba(255,255,255,.65);
+}
+
+
+/* =========================
+   COLOR SLOTS
+========================= */
+
+.colorSlot{
+    width:60px;
+    height:60px;
+    border-radius:8px;
+    cursor:pointer;
+    background:var(--color);
+    border:2px solid rgba(0,0,0,.12);
+    box-sizing:border-box;
+    transition:
+        transform .15s ease,
+        border-color .15s ease;
+}
+
+.colorSlot:hover{
+    transform:scale(1.05);
+    border-color:
+        rgba(255,255,255,.8);
+}
+
+
+/* =========================
+   RESET BACKGROUND
+========================= */
+
+#resetBackground{
+    grid-column:
+        1 / -1;
+
+    width:100%;
+    padding:8px 12px;
+    border:
+        1px solid var(--border);
+
+    border-radius:8px;
+    background:
+        rgba(255,255,255,.04);
+
+    color:
+        var(--text-soft);
+
+    cursor:pointer;
+    font-size:12px;
+    box-shadow:none;
+    transition:
+        background .15s ease,
+        color .15s ease;
+}
+
+#resetBackground:hover{
+
+    background:
+        rgba(255,255,255,.08);
+    color:
+        var(--text);
+}
+
+
+/* =========================
+   HIDDEN
+========================= */
+
+.hidden{
+    display:none !important;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:700px){
+
+    body{
+        padding:12px;
+    }
+
+    .bingo-cell{
+        min-height:65px;
+        padding:6px;
+        font-size:13px;
+    }
+
+    .grid-editor,
+    .grid-play{
+
+        gap:5px;
+    }
+
+    #bingoWelcomeCard{
+        padding:30px 24px;
+    }
+
+    #bingoWelcomeCard h1{
+        font-size:27px;
+    }
+
+}
+
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+<div id="bingoWelcomeModal">
+    <div id="bingoWelcomeCard">
+        <div class="welcomeDecor">
+            <span>✦</span>
+            <span>●</span>
+            <span>✦</span>
+        </div>
+        <div class="bingoLogo">
+            <span>STREAM</span>
+            <strong>BINGO</strong>
+        </div>
+        <p>Create your board.<br>Start your stream. Get BINGO!</p>
+        <button id="startBingo">LET'S PLAY!</button>
+        <div class="welcomeHint">🎉 Ready when you are</div>
+    </div>
+</div>
+
+
+    
+<div id="widgetBar">
+    <span>Stream Bingo</span>
+    <button onclick="toggleWidget()">↔ Expandir</button>
+</div>
+
+   
+
+<div id="backgroundSelector">
+<button id="resetBackground">
+    ORIGINAL
+</button>
+
+<div class="colorSlot" data-color="#C6CCC9" style="--color:#C6CCC9;"></div>
+<div class="colorSlot" data-color="#8E379E" style="--color:#8E379E;"></div>
+<div class="colorSlot" data-color="#1C071F" style="--color:#1C071F;"></div>
+<div class="colorSlot" data-color="#8EC979" style="--color:#8EC979;"></div>
+   
+<img src="https://3d.staratlas.es/bluemarble.jpg" data-bg="https://3d.staratlas.es/bluemarble.jpg">
+<img src="https://3d.staratlas.es/fondouniverso.jpeg" data-bg="https://3d.staratlas.es/fondouniverso.jpeg">
+
+</div>
+
+
+<div class="container">
+
+<div id="editor">
+
+<h1>Stream Bingo</h1>
+
+  <div id="presetSelector">
+    <button class="presetSlot" data-preset="streamer">
+        🎙️ STREAMER BINGO
+    </button>
+</div>
+
+<div class="controls">
+<select id="gridSize">
+<option value="4">4 x 4</option>
+<option value="5">5 x 5</option>
+<option value="6">6 x 6</option>
+<option value="9">9 x 9</option>
+</select>
+
+<button onclick="generateEditor()">Generar Cuadrícula</button>
+<button onclick="exportBingo()">Crear bingo</button>
+<button onclick="toggleWidget()">⤵ Minimizar</button>
+   <button id="backgroundButton" aria-label="Cambiar fondo">
+    Edit
+</button>
+</div>
+
+<div id="editorGrid" class="grid-editor"></div>
+
+<textarea id="generatedUrl" class="url-box" rows="4" hidden></textarea>
+
+   
+<div id="bingoMessage">
+
+    <div class="bingo-box">
+        <h2> BINGO COMPLETADO </h2>
+
+        <p>
+            ¡Has completado todas las casillas!
+        </p>
+
+        <button onclick="closeBingoMessage()">
+            Seguir jugando
+        </button>
+    </div>
+
+</div>
+</div>
+
+<div id="player" class="hidden">
+
+<div class="topbar">
+<h1>Stream Bingo</h1>
+<button onclick="resetMarks()">Reiniciar</button>
+<button onclick="toggleWidget()">⤵ Minimizar</button>
+</div>
+
+<div class="progress-wrap">
+<div class="progress-top">
+<span>Progreso</span>
+<span id="progressText">0%</span>
+</div>
+<div class="progress-bar-bg">
+<div id="progressBar" class="progress-bar-fill"></div>
+</div>
+</div>
+
+<div id="playGrid" class="grid-play"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const activatedLines = new Set();
+let isMinimized = false;
+let bingoCompleted = false;
+
+
+
+const backgroundButton =
+    document.getElementById('backgroundButton');
+
+const backgroundSelector =
+    document.getElementById('backgroundSelector');
+
+
+backgroundButton.addEventListener('click',()=>{
+
+    backgroundSelector.classList.toggle('open');
+
+});
+
+
+/* =========================
+   IMAGE BACKGROUNDS
+========================= */
+
+document.querySelectorAll('[data-bg]')
+    .forEach(slot=>{
+
+        slot.addEventListener('click',()=>{
+
+            document.body.style.backgroundImage =
+                `url("${slot.dataset.bg}")`;
+
+            document.body.style.backgroundSize =
+                'cover';
+
+            document.body.style.backgroundPosition =
+                'center';
+
+            document.body.style.backgroundRepeat =
+                'no-repeat';
+
+            backgroundSelector.classList.remove('open');
+
+        });
+
+    });
+
+
+/* =========================
+   COLOR BACKGROUNDS
+========================= */
+
+document.querySelectorAll('[data-color]')
+    .forEach(slot=>{
+
+        slot.addEventListener('click',()=>{
+
+            document.body.style.backgroundImage =
+                'none';
+
+            document.body.style.background =
+                slot.dataset.color;
+
+            backgroundSelector.classList.remove('open');
+
+        });
+
+    });
+
+
+/* =========================
+   ORIGINAL BACKGROUND
+========================= */
+
+document.getElementById('resetBackground')
+    .addEventListener('click',()=>{
+
+        document.body.style.backgroundImage =
+            '';
+
+        document.body.style.background =
+            '';
+
+        document.body.style.backgroundSize =
+            '';
+
+        document.body.style.backgroundPosition =
+            '';
+
+        document.body.style.backgroundRepeat =
+            '';
+
+        backgroundSelector.classList.remove('open');
+
+    });
+    
+
+function toggleWidget(){
+
+    isMinimized = !isMinimized;
+
+    const editor = document.getElementById('editor');
+    const player = document.getElementById('player');
+    const bar = document.getElementById('widgetBar');
+
+   if(isMinimized){
+
+    editor.style.display = 'none';
+    player.style.display = 'none';
+    bar.style.display = 'flex';
+
+    document.body.style.background = 'transparent';
+
+}else{
+
+    bar.style.display = 'none';
+
+    document.body.style.background = '';
+
+    if(document.querySelector('.bingo-cell')){
+        player.style.display = 'block';
+    }else{
+        editor.style.display = 'block';
+    }
+}
+}
+
+
+/* =========================
+   FINAL BINGO MESSAGE
+========================= */
+
+function showBingoMessage(){
+
+    if(bingoCompleted) return;
+
+    bingoCompleted = true;
+
+    const messages = [
+
+        "🎉 ¡BINGO COMPLETADO!",
+        "🔥 ¡Evento desbloqueado!",
+        "👑 ¡El chat reclama su premio!",
+        "⭐ ¡Victoria legendaria!",
+        "🎲 ¡Reto completado!",
+        "🚀 ¡Turbo Bingo conseguido!",
+        "🏆 ¡Tablero completado!"
+
+    ];
+
+    const title = document.querySelector('#bingoMessage h2');
+
+    if(title){
+
+        title.textContent =
+            messages[Math.floor(Math.random()*messages.length)];
+    }
+
+    document.getElementById("bingoMessage").style.display = "flex";
+}
+
+function closeBingoMessage(){
+
+    document.getElementById("bingoMessage").style.display = "none";
+}
+
+
+/* =========================
+   EDITOR
+========================= */
+
+function generateEditor(){
+
+    const size = +document.getElementById('gridSize').value;
+    const grid = document.getElementById('editorGrid');
+
+    grid.innerHTML='';
+    grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
+
+    for(let i=0;i<size*size;i++){
+
+        const input=document.createElement('textarea');
+
+        input.className='cell-input';
+        input.placeholder=`Casilla ${i+1}`;
+
+        grid.appendChild(input);
+    }
+}
+    
+function exportBingo(){
+
+    const size = +document.getElementById('gridSize').value;
+
+    const cells=[...document.querySelectorAll('.cell-input')]
+        .map(e=>e.value.trim());
+
+    const data={size,cells};
+
+    const encoded=btoa(
+        encodeURIComponent(
+            JSON.stringify(data)
+        )
+    );
+
+    const url=location.origin+location.pathname+'#'+encoded;
+
+    document.getElementById('generatedUrl').value=url;
+
+    // Añadir el Bingo a la URL
+    window.location.hash = encoded;
+
+    // Recargar la misma página para que INIT lo detecte
+    window.location.reload();
+}
+/* =========================
+   PROGRESS
+========================= */
+
+function updateProgress(){
+
+    const cells=document.querySelectorAll('.bingo-cell');
+    const marked=document.querySelectorAll('.bingo-cell.marked');
+
+    const percent=Math.round((marked.length/cells.length)*100);
+
+    document.getElementById('progressBar').style.width=percent+'%';
+    document.getElementById('progressText').textContent=percent+'%';
+
+    if(percent === 100){
+
+        showBingoMessage();
+    }
+}
+
+function getLineId(type,index){
+
+    return type+"-"+index;
+}
+
+
+/* =========================
+   CHECK BINGO
+========================= */
+
+function checkBingo(){
+
+    const cells=[...document.querySelectorAll('.bingo-cell')];
+    const size=Math.sqrt(cells.length);
+
+    const grid=[];
+
+    for(let i=0;i<size;i++){
+
+        grid.push(
+            cells.slice(i*size,(i+1)*size)
+        );
+    }
+
+    let winLines=[];
+
+    for(let r=0;r<size;r++){
+
+        const id=getLineId("row",r);
+
+        if(
+            grid[r].every(c=>c.classList.contains('marked'))
+            &&
+            !activatedLines.has(id)
+        ){
+            activatedLines.add(id);
+            winLines.push(grid[r]);
+        }
+    }
+
+    for(let c=0;c<size;c++){
+
+        let col=[];
+
+        for(let r=0;r<size;r++){
+
+            col.push(grid[r][c]);
+        }
+
+        const id=getLineId("col",c);
+
+        if(
+            col.every(c=>c.classList.contains('marked'))
+            &&
+            !activatedLines.has(id)
+        ){
+            activatedLines.add(id);
+            winLines.push(col);
+        }
+    }
+
+    let d1=[], d2=[];
+
+    for(let i=0;i<size;i++){
+
+        d1.push(grid[i][i]);
+        d2.push(grid[i][size-1-i]);
+    }
+
+    if(
+        d1.every(c=>c.classList.contains('marked'))
+        &&
+        !activatedLines.has("diag-1")
+    ){
+        activatedLines.add("diag-1");
+        winLines.push(d1);
+    }
+
+    if(
+        d2.every(c=>c.classList.contains('marked'))
+        &&
+        !activatedLines.has("diag-2")
+    ){
+        activatedLines.add("diag-2");
+        winLines.push(d2);
+    }
+
+    winLines.forEach(line=>{
+
+        line.forEach(cell=>{
+
+            cell.classList.add('win-line');
+            cell.classList.add('win-animate');
+
+            setTimeout(()=>{
+
+                cell.classList.remove('win-animate');
+
+            },800);
+
+        });
+
+    });
+}
+
+
+/* =========================
+   PLAYER
+========================= */
+
+function loadPlayer(data){
+
+    document.getElementById('editor')
+        .classList.add('hidden');
+
+    document.getElementById('player')
+        .classList.remove('hidden');
+
+    const grid=document.getElementById('playGrid');
+
+    grid.style.gridTemplateColumns=
+        `repeat(${data.size},1fr)`;
+
+    data.cells.forEach(text=>{
+
+        const cell=document.createElement('div');
+
+        cell.className='bingo-cell';
+        cell.textContent=text||'—';
+
+        cell.addEventListener('click',()=>{
+
+            cell.classList.toggle('marked');
+
+            updateProgress();
+            checkBingo();
+        });
+
+        grid.appendChild(cell);
+
+    });
+
+    updateProgress();
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetMarks(){
+
+    activatedLines.clear();
+
+    bingoCompleted = false;
+
+    const popup =
+        document.getElementById("bingoMessage");
+
+    if(popup){
+
+        popup.style.display = "none";
+    }
+
+    document.querySelectorAll('.bingo-cell')
+        .forEach(c=>{
+
+            c.classList.remove(
+                'marked',
+                'win-line',
+                'win-animate'
+            );
+
+        });
+
+    updateProgress();
+}
+
+
+
+
+ document.getElementById('startBingo')
+    .addEventListener('click',()=>{
+
+        document.getElementById('bingoWelcomeModal')
+            .style.display='none';
+
+    });
+
+
+
+let bingoPresets={};
+
+async function applyBingoPreset(presetName){
+    try{
+        const response=await fetch('bingo-presets.json');
+        if(!response.ok) throw new Error('Preset file not found');
+        bingoPresets=await response.json();
+
+        const preset=bingoPresets[presetName];
+        if(!preset) return;
+
+        const inputs=document.querySelectorAll('.cell-input');
+
+        inputs.forEach((input,index)=>{
+            input.value=preset.cells[index]||'';
+        });
+
+    }catch(error){
+        console.error('Error loading Bingo preset:',error);
+    }
+}
+
+  document.querySelectorAll('[data-preset]').forEach(slot=>{
+    slot.addEventListener('click',()=>{
+        applyBingoPreset(slot.dataset.preset);
+    });
+});
+
+  
+
+/* =========================
+   INIT
+========================= */
+
+window.addEventListener('load',()=>{
+
+    const welcomeModal =
+        document.getElementById('bingoWelcomeModal');
+
+    if(location.hash){
+
+        // Bingo creado → ocultar bienvenida
+        welcomeModal.style.display='none';
+
+        const data=JSON.parse(
+
+            decodeURIComponent(
+                atob(
+                    location.hash.substring(1)
+                )
+            )
+        );
+
+        loadPlayer(data);
+
+    }else{
+
+        // Entrada inicial → mostrar bienvenida
+        welcomeModal.style.display='flex';
+
+        generateEditor();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
