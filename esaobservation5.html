@@ -1949,7 +1949,13 @@ div.className="dataCell";
 
 div.textContent="";
 
-div.onclick=()=>showCellData(cell);
+div.onclick=()=>{
+
+    clearGridSearch();
+
+    showCellData(cell);
+
+};
 
 grid.appendChild(div);
 
@@ -2163,6 +2169,28 @@ createGridSearch();
 }
 
 
+
+function clearGridSearch(){
+
+    document
+        .querySelectorAll(".dataCell.searchMatch")
+        .forEach(div => {
+
+            div.classList.remove("searchMatch");
+
+        });
+
+    observationGrid.forEach(cell => {
+
+        cell.searchMatch = false;
+
+    });
+
+}
+
+
+
+   
 function createBlueMarble(){
 
     const grid = document.getElementById("dataGrid");
