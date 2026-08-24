@@ -50,19 +50,132 @@ body{
     min-height:100vh;
 }
 
-  #presetSelector{
-    display:flex;
-    justify-content:center;
-    gap:8px;
-    margin:15px 0;
-}
-.presetSlot{
-    padding:9px 14px;
-    border-radius:10px;
-    font-size:12px;
-}
 
 
+    #presetSelector {
+    display: grid;
+    grid-template-columns: repeat(4, 130px);
+    justify-content: center;
+    gap: 35px 45px;
+    padding: 40px;
+}
+
+/* =========================
+   ORACLE SPHERES
+   ========================= */
+
+.oracleOrb {
+    width: 130px;
+    height: 130px;
+
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.22);
+
+    background:
+        radial-gradient(
+            circle at 35% 28%,
+            rgba(255,255,255,0.45) 0%,
+            rgba(255,255,255,0.12) 12%,
+            rgba(100,70,180,0.35) 38%,
+            rgba(20,15,45,0.95) 78%
+        );
+
+    box-shadow:
+        inset -12px -15px 25px rgba(0,0,0,0.45),
+        inset 8px 8px 20px rgba(255,255,255,0.08),
+        0 0 25px rgba(120,90,255,0.25);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    cursor: pointer;
+
+    position: relative;
+    overflow: hidden;
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+/* brillo de la esfera */
+
+.oracleOrb::before {
+    content: "";
+    position: absolute;
+
+    width: 55px;
+    height: 25px;
+
+    top: 18px;
+    left: 28px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.18);
+
+    filter: blur(8px);
+
+    transform: rotate(-25deg);
+}
+
+/* halo */
+
+.oracleOrb::after {
+    content: "";
+
+    position: absolute;
+    inset: -4px;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(160,120,255,0.15);
+
+    pointer-events: none;
+}
+
+.oracleOrb:hover {
+    transform: translateY(-8px) scale(1.08);
+
+    box-shadow:
+        inset -12px -15px 25px rgba(0,0,0,0.35),
+        inset 8px 8px 20px rgba(255,255,255,0.12),
+        0 0 45px rgba(140,100,255,0.65);
+}
+
+.oracleOrb:active {
+    transform: scale(0.96);
+}
+
+.orbIcon {
+    font-size: 32px;
+    line-height: 1;
+
+    margin-bottom: 10px;
+
+    position: relative;
+    z-index: 2;
+
+    filter:
+        drop-shadow(0 0 8px rgba(255,255,255,0.35));
+}
+
+.orbTitle {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+
+    text-align: center;
+
+    position: relative;
+    z-index: 2;
+
+    text-shadow:
+        0 2px 5px rgba(0,0,0,0.8);
+}
 
 
 /* =========================
@@ -909,36 +1022,44 @@ textarea:focus{
 
 <div id="presetSelector">
 
-    <button class="presetSlot" data-preset="streamer">
-        STREAMER BINGO
+    <button class="presetSlot oracleOrb" data-preset="streamer">
+        <span class="orbIcon">🎙️</span>
+        <span class="orbTitle">STREAMER</span>
     </button>
 
-    <button class="presetSlot" data-preset="romance">
-        ROMANCE MOVIE
+    <button class="presetSlot oracleOrb" data-preset="romance">
+        <span class="orbIcon">❤️</span>
+        <span class="orbTitle">ROMANCE</span>
     </button>
 
-    <button class="presetSlot" data-preset="scary_movies">
-        SCARY MOVIE
+    <button class="presetSlot oracleOrb" data-preset="scary_movies">
+        <span class="orbIcon">👻</span>
+        <span class="orbTitle">SCARY MOVIE</span>
     </button>
 
-    <button class="presetSlot" data-preset="horror_games">
-        HORROR GAME
+    <button class="presetSlot oracleOrb" data-preset="horror_games">
+        <span class="orbIcon">🎮</span>
+        <span class="orbTitle">HORROR GAME</span>
     </button>
 
-    <button class="presetSlot" data-preset="crime_series">
-        CRIME SERIES
+    <button class="presetSlot oracleOrb" data-preset="crime_series">
+        <span class="orbIcon">🔎</span>
+        <span class="orbTitle">CRIME SERIES</span>
     </button>
 
-    <button class="presetSlot" data-preset="design_critique">
-        DESIGN CRITIC
+    <button class="presetSlot oracleOrb" data-preset="design_critique">
+        <span class="orbIcon">🎨</span>
+        <span class="orbTitle">DESIGN CRITIC</span>
     </button>
 
-    <button class="presetSlot" data-preset="survival_games">
-        SURVIVAL GAME
+    <button class="presetSlot oracleOrb" data-preset="survival_games">
+        <span class="orbIcon">🪓</span>
+        <span class="orbTitle">SURVIVAL GAME</span>
     </button>
 
-    <button class="presetSlot" data-preset="reality_shows">
-        REALITY SHOW
+    <button class="presetSlot oracleOrb" data-preset="reality_shows">
+        <span class="orbIcon">📺</span>
+        <span class="orbTitle">REALITY SHOW</span>
     </button>
 
 </div>
