@@ -50,40 +50,25 @@ body{
     min-height:100vh;
 }
 
-
-
-    #presetSelector {
+#presetSelector {
     display: grid;
     grid-template-columns: repeat(4, 130px);
     justify-content: center;
+    align-items: center;
     gap: 35px 45px;
     padding: 40px;
     margin: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
-
-/* =========================
-   ORACLE SPHERES
-   ========================= */
 
 .oracleOrb {
     width: 70px;
     height: 70px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.22);
-    background:
-        radial-gradient(
-            circle at 35% 28%,
-            rgba(255,255,255,0.45) 0%,
-            rgba(255,255,255,0.12) 12%,
-            rgba(100,70,180,0.35) 38%,
-            rgba(20,15,45,0.95) 78%
-        );
-
-    box-shadow:
-        inset -12px -15px 25px rgba(0,0,0,0.45),
-        inset 8px 8px 20px rgba(255,255,255,0.08),
-        0 0 25px rgba(120,90,255,0.25);
-
+    background: radial-gradient(circle at 35% 28%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.12) 12%, rgba(100,70,180,0.35) 38%, rgba(20,15,45,0.95) 78%);
+    box-shadow: inset -12px -15px 25px rgba(0,0,0,0.45), inset 8px 8px 20px rgba(255,255,255,0.08), 0 0 25px rgba(120,90,255,0.25);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -92,27 +77,21 @@ body{
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
-/* brillo de la esfera */
 
 .oracleOrb::before {
     content: "";
     position: absolute;
-    width: 55px;
-    height: 25px;
-    top: 18px;
-    left: 28px;
+    width: 55%;
+    height: 25%;
+    top: 14%;
+    left: 20%;
     border-radius: 50%;
     background: rgba(255,255,255,0.18);
-    filter: blur(8px);
+    filter: blur(6px);
     transform: rotate(-25deg);
 }
-
-/* halo */
 
 .oracleOrb::after {
     content: "";
@@ -125,11 +104,7 @@ body{
 
 .oracleOrb:hover {
     transform: translateY(-8px) scale(1.08);
-
-    box-shadow:
-        inset -12px -15px 25px rgba(0,0,0,0.35),
-        inset 8px 8px 20px rgba(255,255,255,0.12),
-        0 0 45px rgba(140,100,255,0.65);
+    box-shadow: inset -12px -15px 25px rgba(0,0,0,0.35), inset 8px 8px 20px rgba(255,255,255,0.12), 0 0 45px rgba(140,100,255,0.65);
 }
 
 .oracleOrb:active {
@@ -142,8 +117,7 @@ body{
     margin-bottom: 10px;
     position: relative;
     z-index: 2;
-    filter:
-        drop-shadow(0 0 8px rgba(255,255,255,0.35));
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.35));
 }
 
 .orbTitle {
@@ -153,11 +127,10 @@ body{
     text-align: center;
     position: relative;
     z-index: 2;
-    text-shadow:
-        0 2px 5px rgba(0,0,0,0.8);
+    text-shadow: 0 2px 5px rgba(0,0,0,0.8);
 }
 
-    .oracleOrb:nth-child(1) {
+.oracleOrb:nth-child(1) {
     animation: oracleFloat 4.2s ease-in-out infinite;
 }
 
@@ -190,15 +163,62 @@ body{
 }
 
 @keyframes oracleFloat {
-
     0%, 100% {
         transform: translateY(0);
     }
-
     50% {
         transform: translateY(-9px);
     }
+}
 
+@media (max-width: 800px) {
+    #presetSelector {
+        grid-template-columns: repeat(4, 70px);
+        gap: 28px 28px;
+        padding: 25px;
+        margin: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    #presetSelector {
+        grid-template-columns: repeat(4, 60px);
+        gap: 22px 18px;
+        padding: 20px 10px;
+        margin: 0;
+    }
+    .oracleOrb {
+        width: 60px;
+        height: 60px;
+    }
+    .orbIcon {
+        font-size: 21px;
+        margin-bottom: 6px;
+    }
+    .orbTitle {
+        font-size: 7px;
+        letter-spacing: 1px;
+    }
+}
+
+@media (max-width: 380px) {
+    #presetSelector {
+        grid-template-columns: repeat(4, 52px);
+        gap: 18px 12px;
+        padding: 15px 5px;
+    }
+    .oracleOrb {
+        width: 52px;
+        height: 52px;
+    }
+    .orbIcon {
+        font-size: 18px;
+        margin-bottom: 4px;
+    }
+    .orbTitle {
+        font-size: 6px;
+        letter-spacing: 0.7px;
+    }
 }
 
 /* =========================
