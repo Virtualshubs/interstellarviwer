@@ -573,17 +573,13 @@ textarea:focus{
 }
 
 @keyframes welcomeAppear{
-
     from{
-
         opacity:0;
         transform:
             translateY(10px)
             scale(.97);
     }
-
     to{
-
         opacity:1;
         transform:
             translateY(0)
@@ -597,27 +593,23 @@ textarea:focus{
 ========================= */
 
 #backgroundSelector{
-
     display:none;
 }
 
 #backgroundSelector.open{
-
+    position:absolute;
+    right:0;
+    top:calc(100% + 8px);
     display:grid;
-    grid-template-columns:
-        repeat(4,60px);
+    grid-template-columns:repeat(4,60px);
     gap:8px;
     width:max-content;
     padding:10px;
-    background:
-        rgba(20,20,32,.96);
-    border:
-        1px solid var(--border);
+    background:rgba(20,20,32,.96);
+    border:1px solid var(--border);
     border-radius:12px;
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.35);
-    backdrop-filter:
-        blur(15px);
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+    backdrop-filter:blur(15px);
 }
 
 
@@ -626,25 +618,21 @@ textarea:focus{
 ========================= */
 
 #backgroundSelector img{
-
-    width:60px;
-    height:60px;
+    width:40px;
+    height:40px;
     object-fit:cover;
-    border-radius:8px;
+    border-radius:12px;
     cursor:pointer;
     display:block;
-    border:
-        2px solid transparent;
-
-    transition:
-        transform .15s ease,
-        border-color .15s ease;
+    border:1px solid transparent;
+    transition: transform .15s ease, 
+    border-color .15s ease;
 }
 
+    
 #backgroundSelector img:hover{
     transform:scale(1.05);
-    border-color:
-        rgba(255,255,255,.65);
+    border-color: rgba(255,255,255,.65);
 }
 
 
