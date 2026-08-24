@@ -658,7 +658,17 @@ z-index:1;
     pointer-events: none;
 }
 
-   
+ .dataCell.searchMatch{
+
+    outline:2px solid #ffffff;
+
+    box-shadow:
+        0 0 0 2px rgba(80,190,255,.8),
+        0 0 18px rgba(80,190,255,.6);
+
+    z-index:5;
+
+}  
 /* =======================================================
    RAW JSON
 =======================================================*/
@@ -2232,66 +2242,95 @@ box.appendChild(div);
 
 
 
+// ===============================
+// SEARCH LAT LON
+// ===============================
+
 function searchGrid(){
 
+    const lat =
+        Number(document.getElementById("gridLat").value);
 
-const lat=
-Number(document.getElementById("gridLat").value);
-
-
-const lon=
-Number(document.getElementById("gridLon").value);
+    const lon =
+        Number(document.getElementById("gridLon").value);
 
 
+    // ===============================
+    // LIMPIAR BÚSQUEDA ANTERIOR
+    // ===============================
+
+    observationGrid.forEach(cell => {
+
+        cell.searchMatch = false;
+
+    });
 
 
-observationGrid.forEach(cell=>{
+    // ===============================
+    // BUSCAR CELDA
+    // ===============================
+
+    const targetCell = observationGrid.find(cell =>
+
+        lat >= cell.latMin &&
+        lat < cell.latMax &&
+
+        lon >= cell.lonMin &&
+        lon < cell.lonMax
+
+    );
 
 
-if(
+    // ===============================
+    // MARCAR CELDA
+    // ===============================
 
-lat>=cell.latMin &&
-lat<cell.latMax &&
+    if(targetCell){
 
-lon>=cell.lonMin &&
-lon<cell.lonMax &&
+        targetCell.searchMatch = true;
 
-cell.items.length>0
+        console.log(
+            "Grid position:",
+            targetCell.latMin,
+            targetCell.latMax,
+            targetCell.lonMin,
+            targetCell.lonMax
+        );
 
-){
+    }
 
 
-cell.state=1;
+    updateGrid();
 
+
+    // ===============================
+    // APLICAR HIGHLIGHT VISUAL
+    // ===============================
+
+    const cells =
+        document.querySelectorAll(".dataCell");
+
+
+    cells.forEach((div, index) => {
+
+        div.classList.remove("searchMatch");
+
+    });
+
+
+    if(targetCell){
+
+        const div = cells[targetCell.id];
+
+        if(div){
+
+            div.classList.add("searchMatch");
+
+        }
+
+    }
 
 }
-
-else if(cell.items.length>0){
-
-
-cell.state=0;
-
-
-}
-
-else{
-
-
-cell.state=-1;
-
-
-}
-
-
-});
-
-
-
-updateGrid();
-
-
-}
-
 
 
 // ===============================
