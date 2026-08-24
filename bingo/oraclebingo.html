@@ -52,6 +52,50 @@ body{
     padding:20px;
     box-sizing:border-box;
 }
+
+    #bingoMessage{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+#bingoMessage .bingo-box{
+    width:min(420px,90vw);
+    padding:40px 30px;
+    text-align:center;
+    background:#080808;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:24px;
+    box-shadow:0 20px 80px rgba(0,0,0,.7);
+    color:#fff;
+}
+
+#bingoMessage h2{
+    margin:0 0 12px;
+    font-size:32px;
+    font-weight:900;
+}
+
+#bingoMessage p{
+    margin:0 0 25px;
+    color:rgba(255,255,255,.65);
+}
+
+#bingoMessage button{
+    border:0;
+    padding:13px 25px;
+    border-radius:12px;
+    background:#fff;
+    color:#000;
+    font-weight:800;
+    cursor:pointer;
+}
 #presetSelector {
     display: grid;
     grid-template-columns: repeat(4, 130px);
@@ -1139,7 +1183,6 @@ textarea:focus{
 
    
 <div id="bingoMessage">
-
     <div class="bingo-box">
         <h2> BINGO COMPLETADO </h2>
 
@@ -1151,8 +1194,8 @@ textarea:focus{
             Seguir jugando
         </button>
     </div>
-
 </div>
+    
 </div>
 
 <div id="player" class="hidden">
