@@ -414,28 +414,60 @@ h1{
 ========================= */
 
 button{
+    position:relative;
     cursor:pointer;
-    background:linear-gradient(135deg,var(--purple),var(--purple-dark));
-    color:white;
-    padding:10px 16px;
-    border:none;
-    border-radius:10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(52, 42, 75, 0.95),
+            rgba(25, 22, 38, 0.98)
+        );
+
+    color:#f5f2ff;
+
+    padding:12px 22px;
+
+    border:1px solid rgba(190,170,255,.28);
+    border-radius:8px;
+
     font-weight:700;
-    letter-spacing:.5px;
-    box-shadow:0 6px 20px rgba(99,102,241,.25);
-    transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,.02),
+        0 8px 24px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.06);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 }
 
 button:hover{
     transform:translateY(-2px);
-    box-shadow:0 8px 24px rgba(99,102,241,.35);
-    filter:brightness(1.08);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(72, 57, 100, 0.98),
+            rgba(30, 26, 46, 0.98)
+        );
+
+    border-color:rgba(210,190,255,.55);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.4),
+        0 0 22px rgba(170,140,255,.12),
+        inset 0 1px 0 rgba(255,255,255,.08);
 }
 
 button:active{
     transform:translateY(0);
 }
-
 
 /* =========================
    START BUTTON
@@ -1072,7 +1104,7 @@ textarea:focus{
             <strong>BINGO</strong>
         </div>
         <p>Create your board.<br>Start your stream. Get BINGO!</p>
-        <button id="startBingo">LET'S PLAY!</button>
+        <button id="startBingo">✦ LET'S PLAY ✦</button>
 
         <div class="welcomeHint">Ready when you are</div>
     </div>
@@ -1218,7 +1250,7 @@ textarea:focus{
 <div id="playGrid" class="grid-play"></div>
 
     <button class="presetSlot" onclick="window.location.href='https://3d.staratlas.es/bingo/'">
-    CREATE NEW BINGO
+   ✦ CREATE NEW BINGO ✦
 </button>
 
     <div id="bingoMessage">
@@ -1226,7 +1258,7 @@ textarea:focus{
         <h2>BINGO COMPLETADO</h2>
         <p>¡Has completado todas las casillas!</p>
         <button onclick="closeBingoMessage()">
-            Seguir jugando
+           ✦ Seguir jugando ✦
         </button>
     </div>
 </div>
