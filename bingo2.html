@@ -78,7 +78,6 @@ body{
 ========================= */
 
 h1{
-
     text-align:center;
     font-size:70px;
     letter-spacing:1px;
@@ -88,7 +87,6 @@ h1{
 }
 
 #bingoWelcomeCard h1{
-
     margin:0 0 10px;
     font-size:32px;
     color:var(--text);
@@ -96,11 +94,87 @@ h1{
 
 
 /* =========================
-   TEXT
+   WELCOME LOGO
+========================= */
+
+.bingoLogo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    line-height:.85;
+    margin-bottom:20px;
+}
+
+.bingoLogo span{
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:4px;
+    color:#a78bfa;
+    margin-bottom:6px;
+}
+
+.bingoLogo strong{
+    font-size:52px;
+    font-weight:900;
+    letter-spacing:-2px;
+    color:#fff;
+    text-shadow:
+        0 4px 0 #6d28d9,
+        0 8px 20px rgba(139,92,246,.35);
+}
+
+
+/* =========================
+   WELCOME DECORATION
+========================= */
+
+.welcomeDecor{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    margin-bottom:12px;
+}
+
+.welcomeDecor span{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    color:#facc15;
+    animation:floatDecor 2s ease-in-out infinite;
+}
+
+.welcomeDecor span:nth-child(2){
+    width:42px;
+    height:42px;
+    font-size:22px;
+    color:#8b5cf6;
+    background:#f5f3ff;
+    border-radius:50%;
+    box-shadow:0 6px 20px rgba(139,92,246,.3);
+    animation-delay:.3s;
+}
+
+.welcomeDecor span:nth-child(3){
+    animation-delay:.6s;
+}
+
+@keyframes floatDecor{
+    0%,100%{
+        transform:translateY(0) rotate(0deg);
+    }
+    50%{
+        transform:translateY(-5px) rotate(8deg);
+    }
+}
+
+
+/* =========================
+   WELCOME TEXT
 ========================= */
 
 #bingoWelcomeCard p{
-
     margin:0 0 25px;
     color:var(--text-soft);
     font-size:15px;
@@ -113,34 +187,21 @@ h1{
 ========================= */
 
 button{
-
     cursor:pointer;
-    background:
-        linear-gradient(
-            135deg,
-            var(--purple),
-            var(--purple-dark)
-        );
-
+    background:linear-gradient(135deg,var(--purple),var(--purple-dark));
     color:white;
     padding:10px 16px;
     border:none;
     border-radius:10px;
     font-weight:700;
     letter-spacing:.5px;
-    box-shadow:
-        0 6px 20px rgba(99,102,241,.25);
-
-    transition:
-        transform .15s ease,
-        box-shadow .15s ease,
-        filter .15s ease;
+    box-shadow:0 6px 20px rgba(99,102,241,.25);
+    transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
 }
 
 button:hover{
-    transform:translateY(-1px);
-    box-shadow:
-        0 8px 24px rgba(99,102,241,.35);
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(99,102,241,.35);
     filter:brightness(1.08);
 }
 
@@ -154,12 +215,30 @@ button:active{
 ========================= */
 
 #startBingo{
-    padding:12px 26px;
-    border-radius:11px;
-    font-size:14px;
-    letter-spacing:.8px;
+    padding:13px 30px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:1px;
+    box-shadow:0 8px 25px rgba(124,58,237,.35);
 }
 
+#startBingo:hover{
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 12px 30px rgba(124,58,237,.45);
+}
+
+
+/* =========================
+   WELCOME HINT
+========================= */
+
+.welcomeHint{
+    margin-top:16px;
+    font-size:11px;
+    color:var(--text-soft);
+    opacity:.55;
+}
 
 /* =========================
    SELECT / TEXTAREA
@@ -754,24 +833,25 @@ textarea:focus{
 </head>
 
 <body>
-    <div id="bingoWelcomeModal">
-
+<div id="bingoWelcomeModal">
     <div id="bingoWelcomeCard">
-
-        <h1>Stream Bingo</h1>
-
-        <p>
-            Crea tu bingo y empieza a jugar.
-        </p>
-
-        <button id="startBingo">
-            START BINGO
-        </button>
-
+        <div class="welcomeDecor">
+            <span>✦</span>
+            <span>●</span>
+            <span>✦</span>
+        </div>
+        <div class="bingoLogo">
+            <span>STREAM</span>
+            <strong>BINGO</strong>
+        </div>
+        <p>Create your board.<br>Start your stream. Get BINGO!</p>
+        <button id="startBingo">LET'S PLAY!</button>
+        <div class="welcomeHint">🎉 Ready when you are</div>
     </div>
-
 </div>
 
+
+    
 <div id="widgetBar">
     <span>Stream Bingo</span>
     <button onclick="toggleWidget()">↔ Expandir</button>
