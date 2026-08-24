@@ -58,6 +58,7 @@ body{
     justify-content: center;
     gap: 35px 45px;
     padding: 40px;
+    margin: 20px;
 }
 
 /* =========================
@@ -65,11 +66,10 @@ body{
    ========================= */
 
 .oracleOrb {
-    width: 90px;
-    height: 90px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.22);
-
     background:
         radial-gradient(
             circle at 35% 28%,
@@ -88,13 +88,10 @@ body{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     color: white;
     cursor: pointer;
-
     position: relative;
     overflow: hidden;
-
     transition:
         transform 0.3s ease,
         box-shadow 0.3s ease;
@@ -105,19 +102,13 @@ body{
 .oracleOrb::before {
     content: "";
     position: absolute;
-
     width: 55px;
     height: 25px;
-
     top: 18px;
     left: 28px;
-
     border-radius: 50%;
-
     background: rgba(255,255,255,0.18);
-
     filter: blur(8px);
-
     transform: rotate(-25deg);
 }
 
@@ -125,14 +116,10 @@ body{
 
 .oracleOrb::after {
     content: "";
-
     position: absolute;
     inset: -4px;
-
     border-radius: 50%;
-
     border: 1px solid rgba(160,120,255,0.15);
-
     pointer-events: none;
 }
 
@@ -150,28 +137,22 @@ body{
 }
 
 .orbIcon {
-    font-size: 32px;
+    font-size: 26px;
     line-height: 1;
-
     margin-bottom: 10px;
-
     position: relative;
     z-index: 2;
-
     filter:
         drop-shadow(0 0 8px rgba(255,255,255,0.35));
 }
 
 .orbTitle {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 1.5px;
-
     text-align: center;
-
     position: relative;
     z-index: 2;
-
     text-shadow:
         0 2px 5px rgba(0,0,0,0.8);
 }
