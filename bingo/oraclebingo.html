@@ -1182,22 +1182,11 @@ textarea:focus{
 <textarea id="generatedUrl" class="url-box" rows="4" hidden></textarea>
 
    
-<div id="bingoMessage">
-    <div class="bingo-box">
-        <h2> BINGO COMPLETADO </h2>
-
-        <p>
-            ¡Has completado todas las casillas!
-        </p>
-
-        <button onclick="closeBingoMessage()">
-            Seguir jugando
-        </button>
-    </div>
-</div>
     
 </div>
 
+
+    
 <div id="player" class="hidden">
 
 <div class="topbar">
@@ -1229,6 +1218,16 @@ textarea:focus{
     <button class="presetSlot" onclick="window.location.href='https://3d.staratlas.es/bingo/'">
     CREATE NEW BINGO
 </button>
+
+    <div id="bingoMessage">
+    <div class="bingo-box">
+        <h2>BINGO COMPLETADO</h2>
+        <p>¡Has completado todas las casillas!</p>
+        <button onclick="closeBingoMessage()">
+            Seguir jugando
+        </button>
+    </div>
+</div>
 
 </div>
 
