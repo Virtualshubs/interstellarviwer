@@ -1143,6 +1143,70 @@ textarea:focus{
         transition-duration:.01ms !important;
     }
 }
+
+    .controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#gridSize{
+    appearance:none;
+    -webkit-appearance:none;
+
+    min-width:110px;
+    padding:11px 38px 11px 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(38,34,55,.96),
+            rgba(15,15,25,.98)
+        );
+
+    color:#f3efff;
+
+    border:1px solid rgba(190,170,255,.20);
+    border-radius:8px;
+
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.8px;
+
+    cursor:pointer;
+    outline:none;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 5px 16px rgba(0,0,0,.25);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+#gridSize:hover{
+    border-color:rgba(200,180,255,.42);
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.32),
+        0 0 16px rgba(160,130,255,.08);
+}
+
+#gridSize:focus{
+    border-color:rgba(200,180,255,.55);
+
+    box-shadow:
+        0 0 0 2px rgba(170,140,255,.08),
+        0 0 20px rgba(160,130,255,.10);
+}
+
+#gridSize option{
+    background:#15131f;
+    color:#f3efff;
+}
 </style>
 </head>
 
@@ -1252,6 +1316,7 @@ textarea:focus{
 
 <div class="controls">
 <select id="gridSize">
+<option value="3">3 x 3</option>
 <option value="4">4 x 4</option>
 <option value="5">5 x 5</option>
 <option value="6">6 x 6</option>
