@@ -2022,15 +2022,18 @@ function resetMarks(){
 }
 
 
+/* =========================
+modal de inicio play button start
+========================= */
 
- document.getElementById('startBingo')
+document.getElementById('startBingo')
     .addEventListener('click',()=>{
-
+        playStartSound();
         document.getElementById('bingoWelcomeModal')
             .style.display='none';
-
     });
 
+    
 
 
 let bingoPresets={};
@@ -2131,6 +2134,29 @@ function playClickSound(){
 
         osc.start(now+note.time);
         osc.stop(now+note.time+.5);
+    });
+}
+
+    function playStartSound(){
+    initAudio();
+    const now=audioCtx.currentTime;
+    const notes=[
+        {freq:392,time:0},
+        {freq:523.25,time:.10},
+        {freq:659.25,time:.20}
+    ];
+    notes.forEach(note=>{
+        const osc=audioCtx.createOscillator();
+        const gain=audioCtx.createGain();
+        osc.type="sine";
+        osc.frequency.setValueAtTime(note.freq,now+note.time);
+        gain.gain.setValueAtTime(.0001,now+note.time);
+        gain.gain.exponentialRampToValueAtTime(.08,now+note.time+.025);
+        gain.gain.exponentialRampToValueAtTime(.0001,now+note.time+.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now+note.time);
+        osc.stop(now+note.time+.4);
     });
 }
     
