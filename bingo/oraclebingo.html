@@ -1584,10 +1584,13 @@ textarea:focus{
            
 <button onclick="generateEditor()">Create Bingo</button>
 <button onclick="toggleWidget()">⤵ </button>
-    <div class="ambient-control">
-    <button id="ambientToggle" onclick="toggleAmbient()">AMBIENT ON</button>
-    <input id="ambientVolume" type="range" min="0" max="30" value="12">
+ 
+<div class="ambient-control">
+    <button id="ambientToggle">AMBIENT ON</button>
+    <input id="ambientVolume" type="range" min="0" max="100" value="12">
 </div>
+
+      
    <button id="backgroundButton" aria-label="Cambiar fondo" hidden>
     Edit
 </button>
@@ -1679,7 +1682,13 @@ textarea:focus{
 ✦ NEW BINGO ✦
 </button>
 
-<button onclick="toggleWidget()">⤵ </button>
+<div class="ambient-control">
+    <button id="ambientTogglePlayer">AMBIENT ON</button>
+    <input id="ambientVolumePlayer" type="range" min="0" max="100" value="12">
+</div>
+
+    
+<button onclick="toggleWidget()"> - </button>
 </div>
 
 <div class="progress-wrap">
@@ -2284,8 +2293,15 @@ function startAmbient(){
     if(!ambientEnabled||ambientTimer)return;
     if(!ambientGain){
         ambientGain=audioCtx.createGain();
-        ambientGain.gain.value=1;
+        ambientGain.gain.value=ambientVolume;
         ambientGain.connect(audioCtx.destination);
+    }else{
+        ambientGain.gain.cancelScheduledValues(audioCtx.currentTime);
+        ambientGain.gain.setTargetAtTime(
+            ambientVolume,
+            audioCtx.currentTime,
+            .08
+        );
     }
     const now=audioCtx.currentTime;
     const notes=[
@@ -2298,14 +2314,8 @@ function startAmbient(){
         const osc=audioCtx.createOscillator();
         const gain=audioCtx.createGain();
         osc.type="sine";
-        osc.frequency.setValueAtTime(
-            note.freq,
-            now+note.time
-        );
-        gain.gain.setValueAtTime(
-            0,
-            now+note.time
-        );
+        osc.frequency.setValueAtTime(note.freq,now+note.time);
+        gain.gain.setValueAtTime(0,now+note.time);
         gain.gain.linearRampToValueAtTime(
             note.volume,
             now+note.time+2
@@ -2326,8 +2336,6 @@ function startAmbient(){
         startAmbient();
     },8500);
 }
-
-    
 
 function stopAmbient(){
     if(ambientTimer){
@@ -2361,9 +2369,8 @@ function toggleAmbient(){
     }
 }
 
-
-    document.getElementById('ambientVolume').addEventListener('input',e=>{
-    ambientVolume=e.target.value/100;
+function setAmbientVolume(value){
+    ambientVolume=Number(value)/100;
     if(ambientGain){
         ambientGain.gain.setTargetAtTime(
             ambientVolume,
@@ -2371,9 +2378,25 @@ function toggleAmbient(){
             .08
         );
     }
-});
-    
+}
 
+document.getElementById('ambientVolume')
+?.addEventListener('input',e=>{
+    setAmbientVolume(e.target.value);
+});
+
+document.getElementById('ambientVolumePlayer')
+?.addEventListener('input',e=>{
+    setAmbientVolume(e.target.value);
+});
+
+document.getElementById('ambientToggle')
+?.addEventListener('click',toggleAmbient);
+
+document.getElementById('ambientTogglePlayer')
+?.addEventListener('click',toggleAmbient);
+
+    
 /* =========================
    INIT
 ========================= */
