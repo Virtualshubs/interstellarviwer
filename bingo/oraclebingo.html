@@ -608,13 +608,10 @@ textarea:focus{
 
 .grid-editor{
     position:relative;
-
     display:grid;
     gap:7px;
-
     margin:28px auto 20px;
     padding:20px;
-
     background:
         radial-gradient(
             ellipse at 30% 20%,
@@ -634,7 +631,6 @@ textarea:focus{
 
     border:1px solid rgba(72,45,20,.65);
     border-radius:4px;
-
     box-shadow:
         0 18px 40px rgba(0,0,0,.45),
         inset 0 0 35px rgba(80,45,15,.18),
@@ -646,27 +642,23 @@ textarea:focus{
     .grid-editor::before{
     content:"✦";
     position:absolute;
-
     top:8px;
     left:10px;
-
     font-size:12px;
     color:rgba(70,42,18,.55);
-
     pointer-events:none;
+        
 }
 
 .grid-editor::after{
     content:"✦";
     position:absolute;
-
     bottom:8px;
     right:10px;
-
     font-size:12px;
-    color:rgba(70,42,18,.55);
-
+    color:rgba(70,42,18,.95);
     pointer-events:none;
+
 }
 
 /* =========================
@@ -682,7 +674,9 @@ textarea:focus{
     color:var(--text);
     border-radius:8px;
     padding:10px;
-    font-family:inherit;
+    font-family:Georgia,'Times New Roman',serif;
+    font-weight:700;
+    line-height:1.2;
     outline:none;
     transition:
         border-color .2s ease,
@@ -704,7 +698,6 @@ textarea:focus{
 
 .bingo-cell{
     min-height:80px;
-
     background:
         linear-gradient(
             145deg,
@@ -714,20 +707,15 @@ textarea:focus{
 
     border:1px solid rgba(82,52,24,.38);
     border-radius:3px;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
     text-align:center;
     padding:10px;
-
     color:#332315;
-
     font-family:Georgia,'Times New Roman',serif;
     font-weight:700;
     line-height:1.2;
-
     text-shadow:
         0 1px 0 rgba(255,240,210,.35);
 
