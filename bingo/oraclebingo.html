@@ -2109,38 +2109,39 @@ function playClickSound(){
 
     
 
-    function playWinSound(){
+  function playWinSound(){
     initAudio();
-
     const now=audioCtx.currentTime;
-
     const notes=[
-        {freq:392,time:0},
-        {freq:523.25,time:.12},
-        {freq:659.25,time:.24}
+        {freq:523.25,time:0},
+        {freq:659.25,time:.10},
+        {freq:783.99,time:.20},
+        {freq:1046.50,time:.32},
+        {freq:1318.51,time:.46},
+        {freq:1567.98,time:.62}
     ];
-
-    notes.forEach(note=>{
+    notes.forEach((note,i)=>{
         const osc=audioCtx.createOscillator();
         const gain=audioCtx.createGain();
-
-        osc.type="sine";
+        osc.type=i>=4?"sine":"triangle";
         osc.frequency.setValueAtTime(note.freq,now+note.time);
-
         gain.gain.setValueAtTime(.0001,now+note.time);
-        gain.gain.exponentialRampToValueAtTime(.16,now+note.time+.025);
-        gain.gain.exponentialRampToValueAtTime(.0001,now+note.time+.45);
-
+        gain.gain.exponentialRampToValueAtTime(
+            i===5?.2:.12,
+            now+note.time+.02
+        );
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            now+note.time+(i===5?1:.3)
+        );
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         osc.start(now+note.time);
-        osc.stop(now+note.time+.5);
+        osc.stop(now+note.time+(i===5?1.1:.4));
     });
 }
 
-
-
+    
     
     function playStartSound(){
     initAudio();
