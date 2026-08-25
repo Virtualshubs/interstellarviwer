@@ -605,7 +605,6 @@ textarea:focus{
 /* =========================
    EDITOR GRID
 ========================= */
-
 .grid-editor{
     position:relative;
     display:grid;
@@ -613,66 +612,47 @@ textarea:focus{
     margin:28px auto 20px;
     padding:20px;
     background:
-        radial-gradient(
-            ellipse at 30% 20%,
-            rgba(255,245,215,.18),
-            transparent 45%
-        ),
-        radial-gradient(
-            ellipse at 80% 75%,
-            rgba(100,55,20,.12),
-            transparent 50%
-        ),
-        linear-gradient(
-            145deg,
-            #c9a978,
-            #b99562
-        );
-
+        radial-gradient(ellipse at 25% 15%,rgba(255,248,225,.28),transparent 45%),
+        radial-gradient(ellipse at 80% 80%,rgba(75,45,20,.14),transparent 50%),
+        linear-gradient(145deg,#c2a274,#aa895c);
     border:1px solid rgba(72,45,20,.65);
-    border-radius:4px;
+    border-radius:5px;
     box-shadow:
         0 18px 40px rgba(0,0,0,.45),
-        inset 0 0 35px rgba(80,45,15,.18),
-        inset 0 1px 0 rgba(255,245,220,.35);
-
+        inset 0 0 35px rgba(80,45,15,.16),
+        inset 0 1px 0 rgba(255,245,220,.38);
     overflow:hidden;
 }
-
-    .grid-editor::before{
+.grid-editor::before{
     content:"✦";
     position:absolute;
     top:8px;
     left:10px;
-    font-size:12px;
-    color:rgba(70,42,18,.55);
+    font-size:11px;
+    color:rgba(70,42,18,.48);
     pointer-events:none;
-        
 }
-
 .grid-editor::after{
     content:"✦";
     position:absolute;
     bottom:8px;
     right:10px;
-    font-size:12px;
-    color:rgba(70,42,18,.95);
+    font-size:11px;
+    color:rgba(70,42,18,.65);
     pointer-events:none;
-
 }
-
 /* =========================
    EDITOR CELL
 ========================= */
-
 .cell-input{
     width:100%;
     min-height:70px;
     resize:none;
-    background:rgba(0,0,0,.78);
-    border:1px solid rgba(190,170,255,.16);
-    color:var(--text);
-    border-radius:8px;
+    box-sizing:border-box;
+    background:rgba(27,19,12,.82);
+    border:1px solid rgba(245,220,175,.18);
+    color:#f5ead8;
+    border-radius:5px;
     padding:10px;
     font-family:Georgia,'Times New Roman',serif;
     font-weight:700;
@@ -683,180 +663,115 @@ textarea:focus{
         background .2s ease,
         box-shadow .2s ease;
 }
-
 .cell-input:focus{
-    border-color:rgba(190,170,255,.45);
-    background:rgba(18,16,30,.95);
+    border-color:rgba(245,220,175,.55);
+    background:rgba(34,24,15,.94);
     box-shadow:
-        0 0 18px rgba(160,130,255,.08),
-        inset 0 1px 0 rgba(255,255,255,.04);
+        0 0 18px rgba(100,60,25,.12),
+        inset 0 1px 0 rgba(255,245,220,.08);
 }
-
 /* =========================
    BINGO CELLS
 ========================= */
-
 .bingo-cell{
     min-height:80px;
     background:
-        linear-gradient(
-            145deg,
-            rgba(245,225,185,.72),
-            rgba(205,170,115,.58)
-        );
-
-    border:1px solid rgba(82,52,24,.38);
-    border-radius:3px;
+        radial-gradient(circle at 25% 15%,rgba(255,248,225,.20),transparent 45%),
+        linear-gradient(145deg,rgba(238,218,181,.88),rgba(207,177,132,.76));
+    border:1px solid rgba(75,47,24,.38);
+    border-radius:4px;
     display:flex;
     align-items:center;
     justify-content:center;
     text-align:center;
     padding:10px;
-    color:#332315;
+    color:#302216;
     font-family:Georgia,'Times New Roman',serif;
     font-weight:700;
     line-height:1.2;
-    text-shadow:
-        0 1px 0 rgba(255,240,210,.35);
-
+    text-shadow:0 1px 0 rgba(255,240,210,.4);
     cursor:pointer;
-
     transition:
         transform .2s ease,
         background .2s ease,
         border-color .2s ease,
         box-shadow .2s ease;
-
     user-select:none;
     position:relative;
     overflow:hidden;
     word-break:break-word;
-
     box-shadow:
-        inset 0 1px 0 rgba(255,245,220,.35),
-        0 2px 5px rgba(60,35,15,.15);
+        inset 0 1px 0 rgba(255,248,225,.4),
+        0 2px 6px rgba(55,32,12,.16);
 }
-
-    
-    
 .bingo-cell::before{
     content:"";
     position:absolute;
     inset:0;
-
     background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.045),
-            transparent 45%
-        );
-
-    opacity:.5;
+        linear-gradient(135deg,rgba(255,255,255,.08),transparent 42%),
+        radial-gradient(circle at 80% 85%,rgba(85,50,20,.05),transparent 45%);
+    opacity:.7;
     pointer-events:none;
 }
-
 .bingo-cell:hover{
     transform:translateY(-2px);
-
-    border-color:rgba(200,180,255,.38);
-
     background:
-        linear-gradient(
-            145deg,
-            rgba(48,44,68,.98),
-            rgba(17,17,27,.98)
-        );
-
+        radial-gradient(circle at 25% 15%,rgba(255,250,230,.26),transparent 45%),
+        linear-gradient(145deg,#f0dbb5,#d4b37f);
+    border-color:rgba(75,47,24,.62);
     box-shadow:
-        0 8px 22px rgba(0,0,0,.35),
-        0 0 18px rgba(160,130,255,.08),
-        inset 0 1px 0 rgba(255,255,255,.06);
+        0 7px 16px rgba(55,32,12,.22),
+        0 0 12px rgba(230,195,135,.18),
+        inset 0 1px 0 rgba(255,250,230,.55);
 }
-    
 /* =========================
    MARKED CELL
 ========================= */
 .marked{
     background:
-        radial-gradient(
-            circle at 50% 50%,
-            rgba(38,105,75,.18),
-            transparent 70%
-        ),
-        linear-gradient(
-            145deg,
-            #9fbc8d,
-            #789a70
-        );
-
-    border-color:rgba(39,75,48,.65);
-
-    color:#17291c;
-
+        radial-gradient(circle at 50% 50%,rgba(70,120,75,.16),transparent 70%),
+        linear-gradient(145deg,#a9bd91,#78966e);
+    border-color:rgba(43,75,47,.72);
+    color:#18271a;
     transform:scale(.97);
-
     box-shadow:
         0 4px 14px rgba(30,65,40,.25),
-        inset 0 1px 0 rgba(235,255,235,.35);
+        inset 0 1px 0 rgba(235,255,235,.38);
 }
-    
-.marked::after{
-    color:rgba(120,255,225,.9);
-}
-
-    .marked::before{
+.marked::before{
     background:
-        radial-gradient(
-            circle at 50% 50%,
-            rgba(100,255,220,.14),
-            transparent 65%
-        );
+        radial-gradient(circle at 50% 50%,rgba(220,255,220,.16),transparent 65%);
     opacity:1;
 }
-
-
 /* =========================
    WIN LINE
 ========================= */
-
 .win-line{
-
     box-shadow:
-        0 0 15px rgba(34,197,94,.35);
-    border-color:
-        var(--green-light) !important;
+        0 0 15px rgba(50,110,65,.38),
+        inset 0 0 12px rgba(210,255,210,.10);
+    border-color:rgba(180,225,170,.8)!important;
 }
-
-
 /* =========================
    WIN ANIMATION
 ========================= */
-
 .win-animate{
-    animation:
-        winPulse .8s ease;
+    animation:winPulse .8s ease;
 }
-
 @keyframes winPulse{
-
     0%{
-
         transform:scale(1);
         filter:brightness(1);
     }
-
     50%{
-
         transform:scale(1.07);
         box-shadow:
-            0 0 30px rgba(34,197,94,.65),
-            0 0 55px rgba(124,58,237,.35);
-
-        filter:brightness(1.3);
+            0 0 30px rgba(100,170,100,.55),
+            0 0 45px rgba(210,180,100,.25);
+        filter:brightness(1.18);
     }
-
     100%{
-
         transform:scale(1.03);
         filter:brightness(1);
     }
