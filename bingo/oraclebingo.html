@@ -2022,40 +2022,31 @@ function checkBingo(){
 ========================= */
 
 function loadPlayer(data){
-
     document.getElementById('editor')
         .classList.add('hidden');
-
     document.getElementById('player')
         .classList.remove('hidden');
-
+    startAmbient();
     const grid=document.getElementById('playGrid');
-
-    grid.style.gridTemplateColumns=
-        `repeat(${data.size},1fr)`;
-
+    grid.style.gridTemplateColumns=`repeat(${data.size},1fr)`;
     data.cells.forEach(text=>{
         const cell=document.createElement('div');
         cell.className='bingo-cell';
         cell.textContent=text||'—';
-
-       cell.addEventListener('click',()=>{
-    const wasMarked=cell.classList.contains('marked');
-    cell.classList.toggle('marked');
-    if(!wasMarked){
-        playClickSound();
-    }
-    updateProgress();
-    checkBingo();
-});
-
+        cell.addEventListener('click',()=>{
+            const wasMarked=cell.classList.contains('marked');
+            cell.classList.toggle('marked');
+            if(!wasMarked){
+                playClickSound();
+            }
+            updateProgress();
+            checkBingo();
+        });
         grid.appendChild(cell);
-
     });
-
     updateProgress();
 }
-
+    
 
 /* =========================
    RESET
