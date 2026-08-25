@@ -500,7 +500,6 @@ h1{
 button{
     position:relative;
     cursor:pointer;
-
     background:
         linear-gradient(
             135deg,
@@ -509,16 +508,12 @@ button{
         );
 
     color:#f5f2ff;
-
     padding:12px 22px;
-
     border:1px solid rgba(190,170,255,.28);
     border-radius:8px;
-
     font-weight:700;
     letter-spacing:1.5px;
     text-transform:uppercase;
-
     box-shadow:
         0 0 0 1px rgba(255,255,255,.02),
         0 8px 24px rgba(0,0,0,.35),
@@ -609,15 +604,42 @@ textarea:focus{
    EDITOR GRID
 ========================= */
 
-.grid-editor,
-.grid-play{
-  background:#11111b;
+.grid-editor{
+    position:relative;
     display:grid;
-    gap:7px;
-    margin-top:20px;
+    gap:8px;
+    margin:28px auto 20px;
+    padding:14px;
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(115,85,170,.10),
+            transparent 58%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(10,9,17,.97),
+            rgba(18,16,27,.98)
+        );
+
+    border:1px solid rgba(190,170,255,.16);
+    border-radius:18px;
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.045),
+        inset 0 0 45px rgba(120,90,180,.05);
+
+    overflow:hidden;
 }
 
-
+    .grid-editor::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px solid rgba(210,190,255,.055);
+    border-radius:13px;
+    pointer-events:none;
+}
 /* =========================
    EDITOR CELL
 ========================= */
