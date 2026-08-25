@@ -1516,6 +1516,10 @@ textarea:focus{
            
 <button onclick="generateEditor()">Create Bingo</button>
 <button onclick="toggleWidget()">⤵ </button>
+      <div class="ambient-control">
+    <button id="ambientToggle" onclick="toggleAmbient()">AMBIENT ON</button>
+    <input id="ambientVolume" type="range" min="0" max="30" value="12">
+</div>
    <button id="backgroundButton" aria-label="Cambiar fondo" hidden>
     Edit
 </button>
@@ -2020,12 +2024,11 @@ modal de inicio play button start
 ========================= */
 
 document.getElementById('startBingo')
-    .addEventListener('click',()=>{
-        playStartSound();
-        document.getElementById('bingoWelcomeModal')
-            .style.display='none';
-    });
-
+.addEventListener('click',()=>{
+    playStartSound();
+    startAmbient();
+    document.getElementById('bingoWelcomeModal').style.display='none';
+});
     
 
 
@@ -2208,6 +2211,109 @@ function playClickSound(){
     osc2.start(now+.08);
     osc2.stop(now+.34);
 }
+
+
+
+let ambientGain=null;
+let ambientNodes=[];
+let ambientTimer=null;
+let ambientEnabled=true;
+let ambientVolume=.12;
+
+function startAmbient(){
+    initAudio();
+    if(!ambientEnabled||ambientTimer)return;
+    if(!ambientGain){
+        ambientGain=audioCtx.createGain();
+        ambientGain.gain.value=0;
+        ambientGain.connect(audioCtx.destination);
+    }
+    const now=audioCtx.currentTime;
+    const notes=[
+        {freq:110,time:0,duration:9,volume:.035},
+        {freq:164.81,time:1.5,duration:8,volume:.018},
+        {freq:220,time:3,duration:7,volume:.014},
+        {freq:329.63,time:5,duration:5,volume:.009}
+    ];
+    notes.forEach(note=>{
+        const osc=audioCtx.createOscillator();
+        const gain=audioCtx.createGain();
+        osc.type="sine";
+        osc.frequency.setValueAtTime(note.freq,now+note.time);
+        gain.gain.setValueAtTime(0,now+note.time);
+        gain.gain.linearRampToValueAtTime(
+            note.volume,
+            now+note.time+2
+        );
+        gain.gain.linearRampToValueAtTime(
+            0,
+            now+note.time+note.duration
+        );
+        osc.connect(gain);
+        gain.connect(ambientGain);
+        osc.start(now+note.time);
+        osc.stop(now+note.time+note.duration+.1);
+        ambientNodes.push(osc);
+    });
+    ambientGain.gain.cancelScheduledValues(now);
+    ambientGain.gain.setValueAtTime(
+        ambientGain.gain.value,
+        now
+    );
+    ambientGain.gain.linearRampToValueAtTime(
+        ambientVolume,
+        now+3
+    );
+    ambientTimer=setTimeout(()=>{
+        ambientTimer=null;
+        ambientNodes=[];
+        startAmbient();
+    },8500);
+}
+
+function stopAmbient(){
+    if(ambientTimer){
+        clearTimeout(ambientTimer);
+        ambientTimer=null;
+    }
+    ambientNodes.forEach(osc=>{
+        try{osc.stop();}catch(e){}
+    });
+    ambientNodes=[];
+    if(ambientGain){
+        const now=audioCtx.currentTime;
+        ambientGain.gain.cancelScheduledValues(now);
+        ambientGain.gain.setValueAtTime(
+            ambientGain.gain.value,
+            now
+        );
+        ambientGain.gain.linearRampToValueAtTime(
+            0,
+            now+.8
+        );
+    }
+}
+
+function toggleAmbient(){
+    ambientEnabled=!ambientEnabled;
+    if(ambientEnabled){
+        startAmbient();
+    }else{
+        stopAmbient();
+    }
+}
+
+
+    document.getElementById('ambientVolume').addEventListener('input',e=>{
+    ambientVolume=e.target.value/100;
+    if(ambientGain){
+        ambientGain.gain.setTargetAtTime(
+            ambientVolume,
+            audioCtx.currentTime,
+            .08
+        );
+    }
+});
     
 
 /* =========================
