@@ -1773,36 +1773,27 @@ function toggleWidget(){
 ========================= */
 
 function showBingoMessage(){
-
     if(bingoCompleted) return;
-
-    bingoCompleted = true;
-
-const messages = [
-    "BINGO COMPLETE!",
-    "THE PREDICTION CAME TRUE!",
-    "THE CHAT NAILED IT!",
-    "PREDICTION FULFILLED!",
-    "YOU CALLED IT!",
-    "THE BINGO HAS SPOKEN!",
-    "ALL PREDICTIONS COMPLETE!"
-];
-
-    const title = document.querySelector('#bingoMessage h2');
-
+    bingoCompleted=true;
+    playWinSound();
+    const messages=[
+        "BINGO COMPLETE!",
+        "THE PREDICTION CAME TRUE!",
+        "THE CHAT NAILED IT!",
+        "PREDICTION FULFILLED!",
+        "YOU CALLED IT!",
+        "THE BINGO HAS SPOKEN!",
+        "ALL PREDICTIONS COMPLETE!"
+    ];
+    const title=document.querySelector('#bingoMessage h2');
     if(title){
-
-        title.textContent =
-            messages[Math.floor(Math.random()*messages.length)];
+        title.textContent=messages[Math.floor(Math.random()*messages.length)];
     }
-
-    document.getElementById("bingoMessage").style.display = "flex";
+    document.getElementById("bingoMessage").style.display="flex";
 }
-
 function closeBingoMessage(){
-    document.getElementById("bingoMessage").style.display = "none";
+    document.getElementById("bingoMessage").style.display="none";
 }
-
     
 /* =========================
    EDITOR
@@ -1983,13 +1974,15 @@ function loadPlayer(data){
         cell.className='bingo-cell';
         cell.textContent=text||'—';
 
-        cell.addEventListener('click',()=>{
-
-            cell.classList.toggle('marked');
-
-            updateProgress();
-            checkBingo();
-        });
+       cell.addEventListener('click',()=>{
+    const wasMarked=cell.classList.contains('marked');
+    cell.classList.toggle('marked');
+    if(!wasMarked){
+        playClickSound();
+    }
+    updateProgress();
+    checkBingo();
+});
 
         grid.appendChild(cell);
 
@@ -2042,6 +2035,8 @@ function resetMarks(){
 
 let bingoPresets={};
 
+    
+
 async function applyBingoPreset(presetName){
     try{
         const response=await fetch('bingo-presets.json');
@@ -2068,7 +2063,77 @@ async function applyBingoPreset(presetName){
     });
 });
 
-  
+
+    
+/* =========================
+sonido
+========================= */
+
+  let audioCtx=null;
+
+function initAudio(){
+    if(!audioCtx){
+        audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    }
+
+    if(audioCtx.state==="suspended"){
+        audioCtx.resume();
+    }
+}
+
+function playClickSound(){
+    initAudio();
+
+    const now=audioCtx.currentTime;
+
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+
+    osc.type="sine";
+    osc.frequency.setValueAtTime(520,now);
+    osc.frequency.exponentialRampToValueAtTime(760,now+.08);
+
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(.10,now+.008);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+.13);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(now);
+    osc.stop(now+.14);
+}
+
+    function playWinSound(){
+    initAudio();
+
+    const now=audioCtx.currentTime;
+
+    const notes=[
+        {freq:392,time:0},
+        {freq:523.25,time:.12},
+        {freq:659.25,time:.24}
+    ];
+
+    notes.forEach(note=>{
+        const osc=audioCtx.createOscillator();
+        const gain=audioCtx.createGain();
+
+        osc.type="sine";
+        osc.frequency.setValueAtTime(note.freq,now+note.time);
+
+        gain.gain.setValueAtTime(.0001,now+note.time);
+        gain.gain.exponentialRampToValueAtTime(.16,now+note.time+.025);
+        gain.gain.exponentialRampToValueAtTime(.0001,now+note.time+.45);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now+note.time);
+        osc.stop(now+note.time+.5);
+    });
+}
+    
 
 /* =========================
    INIT
