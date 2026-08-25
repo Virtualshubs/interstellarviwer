@@ -2298,11 +2298,10 @@ function startAmbient(){
     }
     const now=audioCtx.currentTime;
     const notes=[
-        {freq:146.83,time:0,volume:.022},
-        {freq:196,time:1.4,volume:.015},
-        {freq:246.94,time:2.8,volume:.012},
-        {freq:329.63,time:4.2,volume:.008},
-        {freq:493.88,time:6,volume:.004}
+        {freq:130.81,time:0,duration:9,volume:.025},
+        {freq:164.81,time:1.8,duration:8,volume:.014},
+        {freq:220,time:3.5,duration:7,volume:.009},
+        {freq:293.66,time:5.5,duration:6,volume:.005}
     ];
     notes.forEach(note=>{
         const osc=audioCtx.createOscillator();
@@ -2318,24 +2317,26 @@ function startAmbient(){
         );
         gain.gain.linearRampToValueAtTime(
             note.volume,
-            now+note.time+1.2
+            now+note.time+2
         );
-        gain.gain.exponentialRampToValueAtTime(
-            .0001,
-            now+note.time+4
+        gain.gain.linearRampToValueAtTime(
+            0,
+            now+note.time+note.duration
         );
         osc.connect(gain);
         gain.connect(ambientGain);
         osc.start(now+note.time);
-        osc.stop(now+note.time+4.2);
+        osc.stop(now+note.time+0.1+note.duration);
         ambientNodes.push(osc);
     });
     ambientTimer=setTimeout(()=>{
         ambientTimer=null;
         ambientNodes=[];
         startAmbient();
-    },9500);
+    },8500);
 }
+
+    
 
 function stopAmbient(){
     if(ambientTimer){
