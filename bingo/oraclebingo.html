@@ -1817,25 +1817,18 @@ function generateEditor(){
     
     
 function exportBingo(){
-
-    const size = +document.getElementById('gridSize').value;
-    const cells=[...document.querySelectorAll('.cell-input')]
-        .map(e=>e.value.trim());
-
+    playStartSound();
+    const size=+document.getElementById('gridSize').value;
+    const cells=[...document.querySelectorAll('.cell-input')].map(e=>e.value.trim());
     const data={size,cells};
-    const encoded=btoa(
-        encodeURIComponent(
-            JSON.stringify(data)
-        )
-    );
-
+    const encoded=btoa(encodeURIComponent(JSON.stringify(data)));
     const url=location.origin+location.pathname+'#'+encoded;
     document.getElementById('generatedUrl').value=url;
-    window.location.hash = encoded;
-    window.location.reload();
+    window.location.hash=encoded;
+    setTimeout(()=>{
+        window.location.reload();
+    },300);
 }
-
-
     
 /* =========================
    PROGRESS
