@@ -2225,15 +2225,16 @@ function startAmbient(){
     if(!ambientEnabled||ambientTimer)return;
     if(!ambientGain){
         ambientGain=audioCtx.createGain();
-        ambientGain.gain.value=0;
+        ambientGain.gain.value=1;
         ambientGain.connect(audioCtx.destination);
     }
     const now=audioCtx.currentTime;
     const notes=[
-        {freq:110,time:0,duration:9,volume:.035},
-        {freq:164.81,time:1.5,duration:8,volume:.018},
-        {freq:220,time:3,duration:7,volume:.014},
-        {freq:329.63,time:5,duration:5,volume:.009}
+        {freq:523.25,time:0,volume:.035},
+        {freq:659.25,time:1.8,volume:.025},
+        {freq:783.99,time:3.7,volume:.022},
+        {freq:659.25,time:5.8,volume:.018},
+        {freq:987.77,time:7.4,volume:.014}
     ];
     notes.forEach(note=>{
         const osc=audioCtx.createOscillator();
@@ -2243,32 +2244,23 @@ function startAmbient(){
         gain.gain.setValueAtTime(0,now+note.time);
         gain.gain.linearRampToValueAtTime(
             note.volume,
-            now+note.time+2
+            now+note.time+.35
         );
-        gain.gain.linearRampToValueAtTime(
-            0,
-            now+note.time+note.duration
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            now+note.time+2.2
         );
         osc.connect(gain);
         gain.connect(ambientGain);
         osc.start(now+note.time);
-        osc.stop(now+note.time+note.duration+.1);
+        osc.stop(now+note.time+2.4);
         ambientNodes.push(osc);
     });
-    ambientGain.gain.cancelScheduledValues(now);
-    ambientGain.gain.setValueAtTime(
-        ambientGain.gain.value,
-        now
-    );
-    ambientGain.gain.linearRampToValueAtTime(
-        ambientVolume,
-        now+3
-    );
     ambientTimer=setTimeout(()=>{
         ambientTimer=null;
         ambientNodes=[];
         startAmbient();
-    },8500);
+    },9000);
 }
 
 function stopAmbient(){
