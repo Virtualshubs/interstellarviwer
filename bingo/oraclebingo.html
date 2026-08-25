@@ -159,6 +159,38 @@ body{
     pointer-events:none;
 }
 
+
+    .presetHeading{
+    grid-column:1 / -1;
+    text-align:center;
+    margin-bottom:4px;
+    position:relative;
+    z-index:2;
+}
+
+.presetHeading h3{
+    margin:0;
+    color:#f3efff;
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    text-shadow:0 2px 12px rgba(150,120,255,.18);
+}
+
+.presetHeading p{
+    margin:7px 0 0;
+    color:rgba(230,225,245,.52);
+    font-size:11px;
+    letter-spacing:.6px;
+}
+
+.presetHeadingGlyph{
+    display:block;
+    margin-bottom:6px;
+    color:rgba(210,185,255,.55);
+    font-size:11px;
+}
     
 .oracleOrb {
     width: 100px;
@@ -1323,6 +1355,12 @@ textarea:focus{
 
 <div id="presetSelector">
 
+<div class="presetHeading">
+    <span class="presetHeadingGlyph">✦</span>
+    <h3>SELECT YOUR REALITY</h3>
+    <p>Choose a theme to begin your prediction.</p>
+</div>
+    
     <button class="presetSlot oracleOrb" data-preset="streamer">
         <span class="orbIcon">🎙️</span>
         <span class="orbTitle">STREAMER</span>
