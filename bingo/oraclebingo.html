@@ -790,25 +790,28 @@ textarea:focus{
 ========================= */
 .marked{
     background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(38,105,75,.18),
+            transparent 70%
+        ),
         linear-gradient(
             145deg,
-            rgba(32,72,65,.98),
-            rgba(17,43,39,.98)
+            #9fbc8d,
+            #789a70
         );
 
-    border-color:
-        rgba(94,234,212,.65);
+    border-color:rgba(39,75,48,.65);
 
-    color:#ecfffb;
+    color:#17291c;
 
     transform:scale(.97);
 
     box-shadow:
-        0 5px 20px rgba(45,212,191,.16),
-        0 0 18px rgba(45,212,191,.10),
-        inset 0 1px 0 rgba(255,255,255,.08);
+        0 4px 14px rgba(30,65,40,.25),
+        inset 0 1px 0 rgba(235,255,235,.35);
 }
-
+    
 .marked::after{
     color:rgba(120,255,225,.9);
 }
