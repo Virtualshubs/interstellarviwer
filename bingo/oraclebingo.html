@@ -646,110 +646,219 @@ h1{
     margin:60px;
 }
 
-    #bingoWelcomeModal{
+  #bingoWelcomeModal{
     position:fixed;
     inset:0;
     z-index:10000;
     display:flex;
     align-items:center;
     justify-content:center;
-    background:rgba(5,5,10,.94);
-    backdrop-filter:blur(16px);
+    padding:20px;
+    background:
+        radial-gradient(circle at 50% 42%,rgba(91,55,170,.18),transparent 38%),
+        radial-gradient(circle at 20% 80%,rgba(42,190,210,.08),transparent 30%),
+        rgba(5,5,10,.94);
+    backdrop-filter:blur(18px);
+    overflow:hidden;
 }
 
-#bingoWelcomeCard h1{
-    margin:0 0 10px;
-    font-size:32px;
-    color:var(--text);
+#bingoWelcomeCard{
+    position:relative;
+    width:min(92vw,420px);
+    max-height:94vh;
+    padding:28px 28px 24px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    overflow:hidden;
 }
 
-
-/* =========================
-   WELCOME LOGO
-========================= */
+#bingoWelcomeCard::before{
+    content:"";
+    position:absolute;
+    width:500px;
+    height:500px;
+    top:25%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,rgba(139,92,246,.13),transparent 65%);
+    pointer-events:none;
+    animation:welcomePulse 5s ease-in-out infinite;
+}
 
 .bingoLogo{
+    position:relative;
+    z-index:3;
     display:flex;
     flex-direction:column;
     align-items:center;
     line-height:.85;
-    margin-bottom:20px;
+    margin-bottom:10px;
 }
 
 .bingoLogo span{
-    font-size:14px;
+    font-size:13px;
     font-weight:900;
-    letter-spacing:4px;
-    color:#a78bfa;
-    margin-bottom:6px;
+    letter-spacing:5px;
+    color:#b8a1ff;
+    margin-bottom:7px;
+    text-transform:uppercase;
+    text-shadow:0 0 14px rgba(167,139,250,.35);
 }
 
 .bingoLogo strong{
-    font-size:52px;
+    font-size:48px;
     font-weight:900;
     letter-spacing:-2px;
     color:#fff;
     text-shadow:
-        0 4px 0 #6d28d9,
-        0 8px 20px rgba(139,92,246,.35);
+        0 3px 0 #6d28d9,
+        0 7px 18px rgba(139,92,246,.35);
 }
 
+.tarotCard{
+    position:relative;
+    z-index:2;
+    width:min(42vw,170px);
+    margin:12px auto 18px;
+    animation:tarotFloat 4s ease-in-out infinite;
+}
 
-/* =========================
-   WELCOME DECORATION
-========================= */
+.tarotCard::before{
+    content:"";
+    position:absolute;
+    inset:-35%;
+    z-index:-1;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(139,92,246,.30),rgba(45,212,191,.08) 38%,transparent 70%);
+    filter:blur(18px);
+    animation:tarotAura 4s ease-in-out infinite;
+}
+
+.tarotCard img{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:9px;
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.55),
+        0 0 22px rgba(139,92,246,.2);
+    animation:tarotGlow 4s ease-in-out infinite;
+}
+
+#bingoWelcomeCard p{
+    position:relative;
+    z-index:3;
+    margin:0 0 20px;
+    color:var(--text-soft);
+    font-size:14px;
+    line-height:1.5;
+}
+
+#startBingo{
+    position:relative;
+    z-index:3;
+}
 
 .welcomeDecor{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:18px;
-    margin-bottom:12px;
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
 }
 
 .welcomeDecor span{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:22px;
+    position:absolute;
     color:#facc15;
-    animation:floatDecor 2s ease-in-out infinite;
+    font-size:18px;
+    opacity:.65;
+    animation:magicParticle 4s ease-in-out infinite;
+}
+
+.welcomeDecor span:nth-child(1){
+    top:23%;
+    left:14%;
 }
 
 .welcomeDecor span:nth-child(2){
-    width:42px;
-    height:42px;
-    font-size:22px;
-    color:#8b5cf6;
-    background:#f5f3ff;
+    top:48%;
+    right:12%;
+    width:8px;
+    height:8px;
+    font-size:0;
+    background:#8b5cf6;
     border-radius:50%;
-    box-shadow:0 6px 20px rgba(139,92,246,.3);
-    animation-delay:.3s;
+    box-shadow:0 0 14px rgba(139,92,246,.8);
+    animation-delay:1s;
 }
 
 .welcomeDecor span:nth-child(3){
-    animation-delay:.6s;
+    top:62%;
+    left:11%;
+    animation-delay:2s;
 }
 
-@keyframes floatDecor{
+.welcomeHint{
+    position:relative;
+    z-index:3;
+    margin-top:12px;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.35);
+}
+
+@keyframes tarotFloat{
     0%,100%{
-        transform:translateY(0) rotate(0deg);
+        transform:translateY(0) rotate(-1deg);
     }
     50%{
-        transform:translateY(-5px) rotate(8deg);
+        transform:translateY(-9px) rotate(1deg);
     }
 }
 
+@keyframes tarotAura{
+    0%,100%{
+        transform:scale(.9);
+        opacity:.45;
+    }
+    50%{
+        transform:scale(1.08);
+        opacity:.8;
+    }
+}
 
-/* =========================
-   WELCOME TEXT
-========================= */
+@keyframes tarotGlow{
+    0%,100%{
+        filter:brightness(1);
+    }
+    50%{
+        filter:brightness(1.08);
+    }
+}
 
-#bingoWelcomeCard p{
-    margin:0 0 25px;
-    color:var(--text-soft);
-    font-size:15px;
-    line-height:1.5;
+@keyframes magicParticle{
+    0%,100%{
+        opacity:.25;
+        transform:translateY(8px) scale(.8) rotate(0);
+    }
+    50%{
+        opacity:1;
+        transform:translateY(-10px) scale(1.15) rotate(15deg);
+    }
+}
+
+@keyframes welcomePulse{
+    0%,100%{
+        opacity:.45;
+        transform:translate(-50%,-50%) scale(.9);
+    }
+    50%{
+        opacity:.8;
+        transform:translate(-50%,-50%) scale(1.08);
+    }
 }
 
 
@@ -1518,65 +1627,7 @@ textarea:focus{
     color:#f3efff;
 }
 
-    .tarotCard{
-    width:min(58vw,220px);
-    margin:18px auto 16px;
-    position:relative;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    animation:tarotFloat 4s ease-in-out infinite;
-}
-.tarotCard::before{
-    content:"";
-    position:absolute;
-    width:135%;
-    height:135%;
-    border-radius:50%;
-    background:radial-gradient(circle,rgba(90,210,220,.28) 0%,rgba(120,90,255,.16) 35%,transparent 70%);
-    filter:blur(18px);
-    animation:tarotAura 3.5s ease-in-out infinite;
-    z-index:0;
-}
-.tarotCard::after{
-    content:"✦";
-    position:absolute;
-    top:-12%;
-    right:-15%;
-    color:rgba(255,255,255,.8);
-    font-size:14px;
-    text-shadow:0 0 12px rgba(120,220,255,.9);
-    animation:tarotSparkle 2.8s ease-in-out infinite;
-    z-index:3;
-}
-.tarotCard img{
-    width:100%;
-    height:auto;
-    display:block;
-    position:relative;
-    z-index:2;
-    border-radius:8px;
-    box-shadow:0 18px 45px rgba(0,0,0,.5),0 0 25px rgba(90,210,220,.18);
-    animation:tarotGlow 3.5s ease-in-out infinite;
-}
-@keyframes tarotFloat{
-    0%,100%{transform:translateY(0) rotate(-1deg);}
-    50%{transform:translateY(-10px) rotate(1deg);}
-}
-@keyframes tarotAura{
-    0%,100%{transform:scale(.9);opacity:.45;}
-    50%{transform:scale(1.08);opacity:.8;}
-}
-@keyframes tarotGlow{
-    0%,100%{filter:brightness(1);}
-    50%{filter:brightness(1.08);}
-}
-@keyframes tarotSparkle{
-    0%,100%{opacity:0;transform:translate(0,8px) scale(.7) rotate(0deg);}
-    35%{opacity:1;}
-    65%{opacity:.7;}
-    100%{opacity:0;transform:translate(8px,-12px) scale(1.2) rotate(90deg);}
-}
+ 
 </style>
 </head>
 
