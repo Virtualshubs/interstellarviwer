@@ -1679,6 +1679,22 @@ textarea:focus{
     transform:scale(1.15) rotate(5deg);
     text-shadow:0 0 18px currentColor;
 }
+
+    .bingoLogo{
+    position:relative;
+    z-index:3;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:0 0 16px;
+}
+
+.bingoLogo img{
+    display:block;
+    width:min(70vw,300px);
+    height:auto;
+    object-fit:contain;
+}
  
 </style>
 </head>
@@ -1723,16 +1739,15 @@ textarea:focus{
 
 <div id="editor">
 
-  <div class="welcomeDecor">
-            <span>✦</span>
-            <span>●</span>
-            <span>✦</span>
-        </div>
-        <div class="bingoLogo">
-               <span>Arcana Stream</span>
-            <strong>BINGO</strong>
-        
-        </div>
+<div class="welcomeDecor">
+    <span>✦</span>
+    <span>●</span>
+    <span>✦</span>
+</div>
+
+<div class="bingoLogo">
+    <img src="https://3d.staratlas.es/bingo/logoarcana.png" alt="Arcana Stream Bingo">
+</div>
 
   <div class="controls">
 <select id="gridSize">
