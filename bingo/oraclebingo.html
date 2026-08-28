@@ -231,8 +231,10 @@ body{
 }
 
 
-    
-    
+  /* =========================================================
+   PRESET SELECTOR
+========================================================= */
+
 #presetSelector{
     display:grid;
     grid-template-columns:repeat(4,130px);
@@ -254,9 +256,8 @@ body{
             rgba(16,14,25,.72),
             rgba(7,8,14,.72)
         );
-
     border:1px solid rgba(190,170,255,.12);
-    border-radius: 22px;
+    border-radius:22px;
     box-shadow:
         0 18px 45px rgba(0,0,0,.38),
         inset 0 1px 0 rgba(255,255,255,.035),
@@ -264,7 +265,6 @@ body{
     position:relative;
     overflow:hidden;
 }
-
 
 #presetSelector::before{
     content:"";
@@ -279,7 +279,6 @@ body{
         rgba(150,110,255,.10),
         transparent 70%
     );
-
     filter:blur(10px);
     pointer-events:none;
 }
@@ -295,8 +294,11 @@ body{
     pointer-events:none;
 }
 
+/* =========================================================
+   HEADING
+========================================================= */
 
-    .presetHeading{
+.presetHeading{
     grid-column:1 / -1;
     text-align:center;
     margin-bottom:4px;
@@ -327,167 +329,245 @@ body{
     color:rgba(210,185,255,.55);
     font-size:11px;
 }
-    
-.oracleOrb {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.22);
-    background: radial-gradient(circle at 35% 28%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.12) 12%, rgba(100,70,180,0.35) 38%, rgba(20,15,45,0.95) 78%);
-    box-shadow: inset -12px -15px 25px rgba(0,0,0,0.45), inset 8px 8px 20px rgba(255,255,255,0.08), 0 0 25px rgba(120,90,255,0.25);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+/* =========================================================
+   ORACLE ORBS
+========================================================= */
+
+.oracleOrb{
+    width:130px;
+    height:auto;
+    min-height:130px;
+    padding:0;
+    margin:0;
+    border:0;
+    border-radius:0;
+    background:none;
+    box-shadow:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    color:white;
+    cursor:pointer;
+    position:relative;
+    overflow:visible;
+    transition:transform .3s ease;
 }
 
-.oracleOrb::before {
-    content: "";
-    position: absolute;
-    width: 55%;
-    height: 25%;
-    top: 14%;
-    left: 20%;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.18);
-    filter: blur(6px);
-    transform: rotate(-25deg);
+.oracleOrb::before,
+.oracleOrb::after{
+    display:none;
 }
 
-.oracleOrb::after {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 1px solid rgba(160,120,255,0.15);
-    pointer-events: none;
+/* =========================================================
+   ORB IMAGE
+========================================================= */
+
+.oracleOrb .orbIcon{
+    position:relative;
+    width:100px;
+    height:100px;
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    margin:0;
+    z-index:2;
 }
 
-.oracleOrb:hover {
-    transform: translateY(-8px) scale(1.08);
-    box-shadow: inset -12px -15px 25px rgba(0,0,0,0.35), inset 8px 8px 20px rgba(255,255,255,0.12), 0 0 45px rgba(140,100,255,0.65);
+.oracleOrb .orbIcon img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center;
+    margin:0;
+    padding:0;
+    pointer-events:none;
+    user-select:none;
+    filter:drop-shadow(0 0 10px rgba(120,90,255,.25));
+    transition:
+        filter .3s ease,
+        transform .3s ease;
 }
 
-.oracleOrb:active {
-    transform: scale(0.96);
+/* =========================================================
+   TITLE
+========================================================= */
+
+.oracleOrb .orbTitle{
+    position:relative;
+    z-index:3;
+    margin-top:10px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    line-height:1.2;
+    text-align:center;
+    color:white;
+    text-shadow:0 2px 5px rgba(0,0,0,.8);
 }
 
-.orbIcon {
-    font-size: 26px;
-    line-height: 1;
-    margin-bottom: 10px;
-    position: relative;
-    z-index: 2;
-    filter: drop-shadow(0 0 8px rgba(255,255,255,0.35));
+/* =========================================================
+   HOVER
+========================================================= */
+
+.oracleOrb:hover{
+    transform:translateY(-8px) scale(1.08);
 }
 
-.orbTitle {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-align: center;
-    position: relative;
-    z-index: 2;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+.oracleOrb:hover .orbIcon img{
+    filter:drop-shadow(0 0 17px rgba(140,100,255,.65));
 }
 
-.oracleOrb:nth-child(1) {
-    animation: oracleFloat 4.2s ease-in-out infinite;
+.oracleOrb:hover .orbTitle{
+    text-shadow:
+        0 0 8px rgba(180,150,255,.35),
+        0 2px 5px rgba(0,0,0,.8);
 }
 
-.oracleOrb:nth-child(2) {
-    animation: oracleFloat 5s ease-in-out infinite -1s;
+/* =========================================================
+   ACTIVE
+========================================================= */
+
+.oracleOrb:active{
+    transform:scale(.96);
 }
 
-.oracleOrb:nth-child(3) {
-    animation: oracleFloat 4.6s ease-in-out infinite -2s;
+/* =========================================================
+   FLOATING ANIMATION
+========================================================= */
+
+.oracleOrb:nth-child(1){
+    animation:oracleFloat 4.2s ease-in-out infinite;
 }
 
-.oracleOrb:nth-child(4) {
-    animation: oracleFloat 5.3s ease-in-out infinite -0.5s;
+.oracleOrb:nth-child(2){
+    animation:oracleFloat 5s ease-in-out infinite -1s;
 }
 
-.oracleOrb:nth-child(5) {
-    animation: oracleFloat 4.8s ease-in-out infinite -2.5s;
+.oracleOrb:nth-child(3){
+    animation:oracleFloat 4.6s ease-in-out infinite -2s;
 }
 
-.oracleOrb:nth-child(6) {
-    animation: oracleFloat 5.2s ease-in-out infinite -1.5s;
+.oracleOrb:nth-child(4){
+    animation:oracleFloat 5.3s ease-in-out infinite -.5s;
 }
 
-.oracleOrb:nth-child(7) {
-    animation: oracleFloat 4.5s ease-in-out infinite -3s;
+.oracleOrb:nth-child(5){
+    animation:oracleFloat 4.8s ease-in-out infinite -2.5s;
 }
 
-.oracleOrb:nth-child(8) {
-    animation: oracleFloat 5.5s ease-in-out infinite -2s;
+.oracleOrb:nth-child(6){
+    animation:oracleFloat 5.2s ease-in-out infinite -1.5s;
 }
 
-@keyframes oracleFloat {
-    0%, 100% {
-        transform: translateY(0);
+.oracleOrb:nth-child(7){
+    animation:oracleFloat 4.5s ease-in-out infinite -3s;
+}
+
+.oracleOrb:nth-child(8){
+    animation:oracleFloat 5.5s ease-in-out infinite -2s;
+}
+
+@keyframes oracleFloat{
+    0%,100%{
+        transform:translateY(0);
     }
-    50% {
-        transform: translateY(-9px);
-    }
-}
-
-@media (max-width: 800px) {
-    #presetSelector {
-        grid-template-columns: repeat(4, 70px);
-        gap: 28px 28px;
-        padding: 25px;
-        margin: 10px;
-    }
-}
-
-@media (max-width: 600px) {
-    #presetSelector {
-        grid-template-columns: repeat(4, 60px);
-        gap: 22px 18px;
-        padding: 20px 10px;
-        margin: 0;
-    }
-    .oracleOrb {
-        width: 60px;
-        height: 60px;
-    }
-    .orbIcon {
-        font-size: 21px;
-        margin-bottom: 6px;
-    }
-    .orbTitle {
-        font-size: 7px;
-        letter-spacing: 1px;
-    }
-}
-
-@media (max-width: 380px) {
-    #presetSelector {
-        grid-template-columns: repeat(4, 52px);
-        gap: 18px 12px;
-        padding: 15px 5px;
-    }
-    .oracleOrb {
-        width: 52px;
-        height: 52px;
-    }
-    .orbIcon {
-        font-size: 18px;
-        margin-bottom: 4px;
-    }
-    .orbTitle {
-        font-size: 6px;
-        letter-spacing: 0.7px;
+    50%{
+        transform:translateY(-9px);
     }
 }
 
+/* =========================================================
+   TABLET
+========================================================= */
 
+@media(max-width:800px){
+
+    #presetSelector{
+        grid-template-columns:repeat(4,80px);
+        gap:28px 28px;
+        padding:25px;
+        margin:10px;
+    }
+
+    .oracleOrb{
+        width:80px;
+        min-height:100px;
+    }
+
+    .oracleOrb .orbIcon{
+        width:80px;
+        height:80px;
+    }
+
+    .oracleOrb .orbTitle{
+        font-size:7px;
+        letter-spacing:1px;
+    }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px){
+
+    #presetSelector{
+        grid-template-columns:repeat(4,65px);
+        gap:22px 18px;
+        padding:20px 10px;
+        margin:0;
+    }
+
+    .oracleOrb{
+        width:65px;
+        min-height:82px;
+    }
+
+    .oracleOrb .orbIcon{
+        width:65px;
+        height:65px;
+    }
+
+    .oracleOrb .orbTitle{
+        font-size:6px;
+        letter-spacing:.8px;
+        margin-top:7px;
+    }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media(max-width:380px){
+
+    #presetSelector{
+        grid-template-columns:repeat(4,56px);
+        gap:18px 12px;
+        padding:15px 5px;
+    }
+
+    .oracleOrb{
+        width:56px;
+        min-height:72px;
+    }
+
+    .oracleOrb .orbIcon{
+        width:56px;
+        height:56px;
+    }
+
+    .oracleOrb .orbTitle{
+        font-size:5.5px;
+        letter-spacing:.6px;
+        margin-top:6px;
+    }
+}
 
 .controls{
     width:calc(100% - 100px);
@@ -1697,25 +1777,6 @@ textarea:focus{
     object-fit:contain;
 }
 
-.oracleOrb .orbIcon{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    height:100%;
-    padding:0;
-}
-
-.oracleOrb .orbIcon img{
-    display:block;
-    width:125%;
-    height:125%;
-    object-fit:contain;
-    pointer-events:none;
-    user-select:none;
-}
 
     
 </style>
