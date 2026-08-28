@@ -358,21 +358,22 @@ body{
 .oracleOrb::before{
     content:"";
     position:absolute;
-    width:28px;
-    height:28px;
-    top:18px;
+    width:30px;
+    height:30px;
+    top:17px;
     left:50%;
     transform:translateX(-50%);
     border-radius:50%;
     background:radial-gradient(
         circle,
         rgba(255,255,255,1) 0%,
-        rgba(220,200,255,.9) 18%,
-        rgba(160,120,255,.45) 42%,
-        transparent 72%
+        rgba(255,248,210,.98) 15%,
+        rgba(250,205,90,.8) 32%,
+        rgba(180,130,255,.35) 55%,
+        transparent 74%
     );
     filter:blur(2px);
-    opacity:.85;
+    opacity:.9;
     z-index:3;
     pointer-events:none;
     animation:orbLightPulse 3s ease-in-out infinite;
@@ -380,7 +381,7 @@ body{
 
 @keyframes orbLightPulse{
     0%,100%{
-        opacity:.65;
+        opacity:.7;
         transform:translateX(-50%) scale(.85);
     }
     50%{
