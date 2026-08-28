@@ -355,7 +355,40 @@ body{
     transition:transform .3s ease;
 }
 
-.oracleOrb::before,
+.oracleOrb::before{
+    content:"";
+    position:absolute;
+    width:28px;
+    height:28px;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    border-radius:50%;
+    background:radial-gradient(
+        circle,
+        rgba(255,255,255,1) 0%,
+        rgba(220,200,255,.9) 18%,
+        rgba(160,120,255,.45) 42%,
+        transparent 72%
+    );
+    filter:blur(2px);
+    opacity:.85;
+    z-index:3;
+    pointer-events:none;
+    animation:orbLightPulse 3s ease-in-out infinite;
+}
+
+@keyframes orbLightPulse{
+    0%,100%{
+        opacity:.65;
+        transform:translateX(-50%) scale(.85);
+    }
+    50%{
+        opacity:1;
+        transform:translateX(-50%) scale(1.15);
+    }
+}
+    
 .oracleOrb::after{
     display:none;
 }
