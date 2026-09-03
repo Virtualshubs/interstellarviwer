@@ -1351,26 +1351,29 @@ display:none;
                     REDISCOVER MAP
                 </button>
 
-              
-                <div id="queryBox"></div>
-
-               
 <div id="spatialCoverage" class="spatialCoverage">
-
     <div class="spatialCoverageTitle">
         SPATIAL COVERAGE
     </div>
-
     <div class="spatialCoverageValue">
         <span id="spatialCoveragePercentage">0.0%</span>
     </div>
-
     <div class="spatialCoverageDetails">
         <span id="spatialCoverageCells">0 / 0</span>
         <span>cells discovered</span>
     </div>
-
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageObservations">0</span>
+        <span>observations explored</span>
+    </div>
 </div>
+
+               
+              
+                <div id="queryBox"></div>
+
+               
+
 
                 <details>
                     <summary>Raw JSON</summary>
@@ -2211,8 +2214,14 @@ function updateSpatialCoverage(){
         ? (discoveredCells/totalCells)*100
         : 0;
 
+    const totalObservations=observationGrid.reduce(
+        (total,cell)=>total+cell.items.length,
+        0
+    );
+
     const discoveredElement=document.getElementById("spatialCoverageCells");
     const percentageElement=document.getElementById("spatialCoveragePercentage");
+    const observationsElement=document.getElementById("spatialCoverageObservations");
 
     if(discoveredElement){
         discoveredElement.textContent=`${discoveredCells} / ${totalCells}`;
@@ -2222,6 +2231,11 @@ function updateSpatialCoverage(){
         percentageElement.textContent=`${coveragePercentage.toFixed(1)}%`;
     }
 
+    if(observationsElement){
+        observationsElement.textContent=
+            totalObservations.toLocaleString();
+    }
+
     const container=document.getElementById("spatialCoverage");
 
     if(container){
@@ -2229,7 +2243,6 @@ function updateSpatialCoverage(){
     }
 
 }
-
 
 
 
