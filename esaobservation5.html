@@ -1286,6 +1286,38 @@ display:none;
 
 
 
+   .spatialCoverage{
+    display:none;
+    margin:12px 0;
+    padding:12px 14px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;
+    background:rgba(255,255,255,.04);
+    text-align:center;
+}
+
+.spatialCoverageTitle{
+    font-size:10px;
+    letter-spacing:1.5px;
+    opacity:.6;
+    margin-bottom:4px;
+}
+
+.spatialCoverageValue{
+    font-size:24px;
+    font-weight:600;
+    line-height:1.1;
+}
+
+.spatialCoverageDetails{
+    display:flex;
+    justify-content:center;
+    gap:5px;
+    margin-top:4px;
+    font-size:10px;
+    opacity:.55;
+}
+
 
 
   
@@ -1322,6 +1354,23 @@ display:none;
               
                 <div id="queryBox"></div>
 
+               
+<div id="spatialCoverage" class="spatialCoverage">
+
+    <div class="spatialCoverageTitle">
+        SPATIAL COVERAGE
+    </div>
+
+    <div class="spatialCoverageValue">
+        <span id="spatialCoveragePercentage">0.0%</span>
+    </div>
+
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageCells">0 / 0</span>
+        <span>cells discovered</span>
+    </div>
+
+</div>
 
                 <details>
                     <summary>Raw JSON</summary>
@@ -1793,9 +1842,7 @@ return;
 }
 
 
-
 currentItems=json.features;
-
 
 
 // resumen fechas
@@ -1827,7 +1874,6 @@ dates[day]++;
 });
 
 
-
 Object.keys(dates)
 .sort()
 .forEach(date=>{
@@ -1837,7 +1883,6 @@ const r=document.createElement("div");
 
 
 r.className="row";
-
 
 r.innerHTML=`
 
@@ -1876,16 +1921,11 @@ title.textContent=
 
 box.appendChild(title);
 
-
-
 const grid=document.createElement("div");
 
 grid.id="dataGrid";
 
-
 box.appendChild(grid);
-
-
 
 createSpatialGrid(json.features);
 
@@ -1915,7 +1955,6 @@ observationGrid=[];
 
 const rows=18;
 const cols=36;
-
 
 
 for(let y=0;y<rows;y++){
@@ -1950,19 +1989,14 @@ div.className="dataCell";
 div.textContent="";
 
 div.onclick=()=>{
-
     clearGridSearch();
-
     showCellData(cell);
-
 };
 
 grid.appendChild(div);
 
 }
-
 }
-
 
 
 // ===============================
@@ -1970,21 +2004,15 @@ grid.appendChild(div);
 // ===============================
 
 items.forEach(item=>{
-
 let coords=null;
-
 const geom=item.geometry;
-
-
 
 // ------------------------------------------------
 // 1. POINT (STAC)
 // ------------------------------------------------
 
 if(geom && geom.type==="Point"){
-
 coords=geom.coordinates;
-
 }
 
 
@@ -2001,7 +2029,6 @@ item.properties.longitude!==undefined){
 coords=[
 
 item.properties.longitude,
-
 item.properties.latitude
 
 ];
@@ -2108,7 +2135,6 @@ lat/ring.length
 }
 
 
-
 // ------------------------------------------------
 // 6. SIN SOPORTE
 // ------------------------------------------------
@@ -2159,42 +2185,71 @@ cell.items.push(item);
 });
 
 
-
 updateGrid();
-
+updateSpatialCoverage();
 createGridSearch();
-
-      createBlueMarble();
+createBlueMarble();
 
 }
 
 
 
-function clearGridSearch(){
 
+// ===============================
+// UPDATE SPATIAL COVERAGE contador janus 
+// ===============================
+
+function updateSpatialCoverage(){
+
+    const discoveredCells=observationGrid.filter(
+        cell=>cell.state===0
+    ).length;
+
+    const totalCells=observationGrid.length;
+
+    const coveragePercentage=totalCells>0
+        ? (discoveredCells/totalCells)*100
+        : 0;
+
+    const discoveredElement=document.getElementById("spatialCoverageCells");
+    const percentageElement=document.getElementById("spatialCoveragePercentage");
+
+    if(discoveredElement){
+        discoveredElement.textContent=`${discoveredCells} / ${totalCells}`;
+    }
+
+    if(percentageElement){
+        percentageElement.textContent=`${coveragePercentage.toFixed(1)}%`;
+    }
+
+    const container=document.getElementById("spatialCoverage");
+
+    if(container){
+        container.style.display="block";
+    }
+
+}
+
+
+
+
+function clearGridSearch(){
     document
         .querySelectorAll(".dataCell.searchMatch")
         .forEach(div => {
-
             div.classList.remove("searchMatch");
-
         });
 
     observationGrid.forEach(cell => {
-
         cell.searchMatch = false;
-
     });
-
 }
 
 
 
    
 function createBlueMarble(){
-
     const grid = document.getElementById("dataGrid");
-
     if(!grid){
         console.warn("Blue Marble: dataGrid not found");
         return;
@@ -2203,19 +2258,12 @@ function createBlueMarble(){
     let marble = document.getElementById("blueMarble");
 
     if(!marble){
-
         marble = document.createElement("img");
-
         marble.id = "blueMarble";
-
         marble.src = "https://3d.staratlas.es/bluemarble.jpg";
-
         marble.alt = "";
-
         grid.insertBefore(marble, grid.firstChild);
-
     }
-
 }
 
 
@@ -2225,28 +2273,19 @@ function createBlueMarble(){
 // ===============================
 
 function createGridSearch(){
-
-
 const box=document.getElementById("queryBox");
-
-
 const div=document.createElement("div");
-
-
 div.innerHTML=`
 
 <div style="margin-top:15px">
-
 
 Lat:
 
 <input id="gridLat" value="0">
 
-
 Lon:
 
 <input id="gridLon" value="0">
-
 
 <button onclick="searchGrid()">
 
@@ -2254,16 +2293,11 @@ SEARCH POSITION
 
 </button>
 
-
 </div>
 
 `;
 
-
-
 box.appendChild(div);
-
-
 
 }
 
@@ -2275,10 +2309,8 @@ box.appendChild(div);
 // ===============================
 
 function searchGrid(){
-
     const lat =
         Number(document.getElementById("gridLat").value);
-
     const lon =
         Number(document.getElementById("gridLon").value);
 
@@ -2288,9 +2320,7 @@ function searchGrid(){
     // ===============================
 
     observationGrid.forEach(cell => {
-
         cell.searchMatch = false;
-
     });
 
 
@@ -2299,24 +2329,19 @@ function searchGrid(){
     // ===============================
 
     const targetCell = observationGrid.find(cell =>
-
         lat >= cell.latMin &&
         lat < cell.latMax &&
-
         lon >= cell.lonMin &&
         lon < cell.lonMax
 
     );
-
 
     // ===============================
     // MARCAR CELDA
     // ===============================
 
     if(targetCell){
-
         targetCell.searchMatch = true;
-
         console.log(
             "Grid position:",
             targetCell.latMin,
@@ -2324,9 +2349,7 @@ function searchGrid(){
             targetCell.lonMin,
             targetCell.lonMax
         );
-
     }
-
 
     updateGrid();
 
@@ -2338,20 +2361,14 @@ function searchGrid(){
     const cells =
         document.querySelectorAll(".dataCell");
 
-
     cells.forEach((div, index) => {
-
         div.classList.remove("searchMatch");
 
     });
 
-
     if(targetCell){
-
         const div = cells[targetCell.id];
-
         if(div){
-
             div.classList.add("searchMatch");
 
         }
@@ -2366,17 +2383,12 @@ function searchGrid(){
 // ===============================
 
 function updateGrid(){
-
 const cells=document.querySelectorAll(".dataCell");
-
 cells.forEach((div,index)=>{
-
 const cell=observationGrid[index];
-
 const label=`<div style="font-size:9px;opacity:.6;">${cell.id}</div><div>${cell.items.length}</div>`;
-
+   
 if(cell.discovered){
-
 div.style.background="#ff66cc";
 div.innerHTML=label;
 return;
@@ -2384,7 +2396,6 @@ return;
 }
 
 if(cell.state===-1){
-
 div.style.background="#222";
 div.textContent="";
 return;
@@ -2392,7 +2403,6 @@ return;
 }
 
 if(cell.state===0){
-
 div.style.background="#16803c";
 div.innerHTML=label;
 return;
@@ -2400,7 +2410,6 @@ return;
 }
 
 if(cell.state===1){
-
 div.style.background="#ff8c00";
 div.innerHTML=label;
 return;
@@ -2416,21 +2425,15 @@ return;
 // ===============================
 
 function showCellData(cell){
-
+   
 const dataset={
 
 CELL_INFO:{
-
 id:cell.id,
-
 latRange:`${cell.latMin} / ${cell.latMax}`,
-
 lonRange:`${cell.lonMin} / ${cell.lonMax}`,
-
 state:cell.state,
-
 observations:cell.items.length
-
 },
 
 OBSERVATIONS:cell.items
@@ -2451,29 +2454,21 @@ renderDataset(dataset);
 // ===============================
 
 function add(container,key,value){
-
-
+   
 if(value===undefined)
 return;
-
-
 const r=document.createElement("div");
 
-
 r.className="row";
-
 
 r.innerHTML=`
 
 <div class="key">${key}</div>
-
 <div class="value">${value}</div>
 
 `;
 
-
 container.appendChild(r);
-
 
 }
 
@@ -2484,25 +2479,15 @@ container.appendChild(r);
 // ===================================
 
 async function expandObservationMap(){
-
-
     const seeds =
     observationGrid.filter(c=>c.state===0);
 
-
-
     if(seeds.length===0){
-
         console.log("No reference cells.");
-
         return;
-
     }
 
-
-
     if(!activeDataset.nextPage){
-
         console.log(
             "No more catalog pages."
         );
@@ -2515,26 +2500,18 @@ async function expandObservationMap(){
     }
 
 
-
     document.getElementById("status").textContent =
     "Expanding observation map...";
-
-
 
     const discovered =
     await discoverNeighbourCells();
 
-
-
     updateGrid();
-
-
 
     console.log(
         "NEW CELLS:",
         discovered
     );
-
 
 
     document.getElementById("status").textContent =
@@ -2550,22 +2527,13 @@ async function expandObservationMap(){
 // ===================================
 
 async function discoverNeighbourCells(){
-
-
     const visited=new Set();
-
-
     const queue=[];
 
     observationGrid.forEach(cell=>{
-
-
         if(cell.state===0){
-
             queue.push(cell);
-
             visited.add(cell.id);
-
         }
 
 
@@ -2574,8 +2542,6 @@ async function discoverNeighbourCells(){
 
 
     let discovered=0;
-
-
     while(queue.length){
 
         const cell =
@@ -2584,9 +2550,6 @@ async function discoverNeighbourCells(){
         getNeighbours(cell);
 
         for(const n of neighbours){
-
-
-
             if(visited.has(n.id))
                 continue;
 
@@ -2611,7 +2574,6 @@ async function discoverNeighbourCells(){
 
     }
 
-
     return discovered;
 
 }
@@ -2624,10 +2586,7 @@ async function discoverNeighbourCells(){
 // ===================================
 
 function getNeighbours(cell){
-
-
     const result=[];
-
 
     const dirs=[
 
@@ -2641,23 +2600,15 @@ function getNeighbours(cell){
 
     dirs.forEach(d=>{
 
+        const x = cell.x+d[0];
 
-        const x =
-        cell.x+d[0];
-
-
-        const y =
-        cell.y+d[1];
-
-
+        const y = cell.y+d[1];
 
         const neighbour =
         observationGrid.find(c=>
             c.x===x &&
             c.y===y
         );
-
-
 
         if(neighbour)
             result.push(neighbour);
@@ -2667,8 +2618,6 @@ function getNeighbours(cell){
     return result;
 
 }
-
-
 
 
 
@@ -2682,26 +2631,17 @@ async function inspectCell(cell){
     if(!activeDataset.nextPage)
         return false;
 
-
-
-    try{
-
-
-        console.log(
+    try{ console.log(
             "READING NEXT PAGE:",
             activeDataset.nextPage
         );
 
 
-
         const res =
         await fetch(activeDataset.nextPage);
 
-
-
         const json =
         await res.json();
-
 
 
         // guardar siguiente página
@@ -2710,8 +2650,6 @@ async function inspectCell(cell){
         json.links?.find(
             l=>l.rel==="next"
         )?.href || null;
-
-
 
         if(
             !json.features ||
@@ -2722,17 +2660,12 @@ async function inspectCell(cell){
 
         }
 
-
-
         const before =
         cell.items.length;
-
-
 
         appendSpatialData(
             json.features
         );
-
 
 
         return (
@@ -2744,16 +2677,12 @@ async function inspectCell(cell){
 
 
     catch(e){
-
-
         console.log(
             "PAGE ERROR",
             e
         );
 
-
         return false;
-
 
     }
 
@@ -2767,7 +2696,6 @@ async function inspectCell(cell){
 function appendSpatialData(items){
 
     items.forEach(item=>{
-
         let coords=null;
 
 
@@ -2775,41 +2703,30 @@ function appendSpatialData(items){
             item.geometry &&
             item.geometry.type==="Point"
         ){
-
             coords =
             item.geometry.coordinates;
 
         }
 
-
         if(
             !coords &&
             item.bbox
         ){
-
             coords=[
 
                 (item.bbox[0]+item.bbox[2])/2,
-
                 (item.bbox[1]+item.bbox[3])/2
 
             ];
-
         }
 
 
 
-        if(!coords)
-            return;
+        if(!coords) return;
 
-        const lon =
-        coords[0];
+        const lon = coords[0];
 
-
-        const lat =
-        coords[1];
-
-
+        const lat = coords[1];
 
         const cell =
         observationGrid.find(c=>
@@ -2827,7 +2744,6 @@ function appendSpatialData(items){
 
         if(cell){
 
-
             const exists =
             cell.items.some(
                 x=>x.id===item.id
@@ -2840,26 +2756,19 @@ function appendSpatialData(items){
 
                 const wasEmpty =
                 cell.items.length===0;
-
                 cell.items.push(item);
-
                 cell.state=0;
 
 
                 // nueva cobertura descubierta
 
                 if(wasEmpty){
-
                     cell.discovered=true;
-
                 }
-
 
             }
 
-
         }
-
 
     });
 
@@ -2871,13 +2780,9 @@ function appendSpatialData(items){
   <script>
 
 function loadJanusDataset(json){
-
     if(!json) return;
-
     renderDataset(json);
-
 }
-
 
 
 // ==========================================
@@ -2918,17 +2823,14 @@ return t+Object.keys(o.assets||{}).length;
 },0);
 
 
-
 document.getElementById("assetCount").textContent=
 totalAssets;
-
 
 
 const container=
 document.getElementById("observations");
 
 container.innerHTML="";
-
 
 
 observations.forEach((obs,index)=>{
@@ -3018,11 +2920,9 @@ const type=asset.type||"Unknown";
 let html=`
 
 <div class="assetHeader">
-
 <div>
 
 <div class="assetName">${name}</div>
-
 <div class="assetType">${type}</div>
 
 </div>
@@ -3054,9 +2954,7 @@ onerror="this.style.display='none';"
 }
 
 
-
 div.innerHTML=html;
-
 box.appendChild(div);
 
 });
@@ -3093,20 +2991,14 @@ const themes = ["lunar", "terra"];
 let currentTheme = 0;
 
 document.documentElement.setAttribute("data-theme", themes[currentTheme]);
-
 document.getElementById("themeToggle").addEventListener("click", () => {
-
     currentTheme = (currentTheme + 1) % themes.length;
-
     const theme = themes[currentTheme];
-
     document.documentElement.setAttribute("data-theme", theme);
-
     document.getElementById("themeToggle").textContent =
         theme === "lunar"
             ? "🌙 LUNAR"
             : "☀ TERRA";
-
 });
 
 </script>
