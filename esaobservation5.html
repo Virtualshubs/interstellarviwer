@@ -2005,6 +2005,12 @@ box.appendChild(grid);
 
 createSpatialGrid(json.features);
 
+//test exploracion espacial
+   const explorationContainer=document.createElement("div");
+explorationContainer.id="explorationContainer";
+explorationContainer.style.marginTop="25px";
+box.appendChild(explorationContainer);
+
 
 }
 
@@ -2506,14 +2512,16 @@ return;
 
 }
 
-// ===============================
+
+
+
+   // ===============================
 // SHOW CELL DATA
 // ===============================
 
 function showCellData(cell){
-   
-const dataset={
 
+const dataset={
 CELL_INFO:{
 id:cell.id,
 latRange:`${cell.latMin} / ${cell.latMax}`,
@@ -2521,19 +2529,535 @@ lonRange:`${cell.lonMin} / ${cell.lonMax}`,
 state:cell.state,
 observations:cell.items.length
 },
-
 OBSERVATIONS:cell.items
-
 };
 
-// Mantener exactamente el RAW como siempre
 document.getElementById("raw").textContent=
 JSON.stringify(dataset,null,2);
 
-// Actualizar el panel JANUS
 renderDataset(dataset);
 
+// ===============================
+// EXPLORE SPACE
+// ===============================
+
+const observations=
+document.getElementById("observations");
+
+if(!observations)
+return;
+
+const oldButton=
+document.getElementById("exploreCellButton");
+
+if(oldButton)
+oldButton.remove();
+
+if(cell.state===0 && cell.items.length>0){
+
+const button=document.createElement("button");
+
+button.id="exploreCellButton";
+button.textContent="EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background="rgba(102,204,255,.08)";
+button.style.border="1px solid rgba(102,204,255,.35)";
+button.style.borderRadius="6px";
+button.style.color="#66ccff";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+exploreCell(cell);
+};
+
+observations.insertBefore(
+button,
+observations.firstChild
+);
+
 }
+
+}
+
+   // ===============================
+// EXPLORE CELL
+// ===============================
+
+async function exploreCell(cell){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+container.innerHTML=`
+
+<h3 style="color:#66ccff;margin-bottom:8px">
+SPACE EXPLORATION · CELL ${cell.id}
+</h3>
+
+<div style="font-size:11px;color:#999;margin-bottom:12px">
+LAT ${cell.latMin.toFixed(6)} → ${cell.latMax.toFixed(6)}
+<br>
+LON ${cell.lonMin.toFixed(6)} → ${cell.lonMax.toFixed(6)}
+</div>
+
+<div style="color:#ffb04d">
+QUERYING STAC...
+</div>
+
+`;
+
+try{
+
+let referenceDate=
+activeDataset.endDate;
+
+
+// =================================
+// SI NO HAY FECHA FINAL
+// =================================
+
+if(!referenceDate){
+
+const latestURL=
+`${activeDataset.items}?limit=1&sortby=-datetime`;
+
+const latestRes=
+await fetch(latestURL);
+
+const latestJSON=
+await latestRes.json();
+
+if(
+!latestJSON.features||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+referenceDate=
+latestJSON.features[0]
+.properties
+.datetime;
+
+}
+
+
+// =================================
+// CONSULTA ESPACIAL
+// =================================
+
+const url=
+`${activeDataset.items}?limit=2000`+
+`&datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${cell.lonMin},${cell.latMin},`+
+`${cell.lonMax},${cell.latMax}`;
+
+console.log(
+"SPACE QUERY:",
+url
+);
+
+
+const res=
+await fetch(url);
+
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+
+const json=
+await res.json();
+
+
+console.log(
+"SPACE RESULT:",
+json
+);
+
+
+if(
+!json.features||
+json.features.length===0
+){
+
+container.innerHTML=`
+
+<h3 style="color:#66ccff">
+SPACE EXPLORATION · CELL ${cell.id}
+</h3>
+
+<div style="color:#ff7777">
+No products found in this spatial area.
+</div>
+
+`;
+
+return;
+
+}
+
+
+// =================================
+// CREAR NUEVO GRID
+// =================================
+
+createExplorationGrid(
+json.features,
+cell
+);
+
+
+}catch(error){
+
+console.error(
+"SPACE EXPLORATION ERROR:",
+error
+);
+
+container.innerHTML+=`
+
+<div style="color:#ff7777;margin-top:10px">
+Spatial query error: ${error.message}
+</div>
+
+`;
+
+}
+
+}
+
+
+// ===============================
+// CREATE EXPLORATION GRID
+// ===============================
+
+function createExplorationGrid(items,parentCell){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+container.innerHTML="";
+
+const title=document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginBottom="12px";
+
+title.textContent=
+`SPATIAL DATA · CELL ${parentCell.id}`;
+
+container.appendChild(title);
+
+
+const grid=document.createElement("div");
+
+grid.id="explorationGrid";
+
+grid.style.display="grid";
+grid.style.gridTemplateColumns="repeat(36,1fr)";
+grid.style.aspectRatio="2/1";
+grid.style.width="100%";
+grid.style.gap="2px";
+
+container.appendChild(grid);
+
+
+const rows=18;
+const cols=36;
+
+
+const latStep=
+(parentCell.latMax-parentCell.latMin)/rows;
+
+const lonStep=
+(parentCell.lonMax-parentCell.lonMin)/cols;
+
+
+const cells=[];
+
+
+// =================================
+// CREAR CELDAS
+// =================================
+
+for(let y=0;y<rows;y++){
+
+for(let x=0;x<cols;x++){
+
+const cell={
+
+id:y*cols+x,
+
+x,
+y,
+
+state:-1,
+
+latMin:
+parentCell.latMin+y*latStep,
+
+latMax:
+parentCell.latMin+(y+1)*latStep,
+
+lonMin:
+parentCell.lonMin+x*lonStep,
+
+lonMax:
+parentCell.lonMin+(x+1)*lonStep,
+
+items:[]
+
+};
+
+
+cells.push(cell);
+
+
+const div=document.createElement("div");
+
+div.className="dataCell";
+
+div.onclick=()=>{
+
+clearGridSearch();
+
+showCellData(cell);
+
+};
+
+grid.appendChild(div);
+
+}
+
+}
+
+
+// =================================
+// DISTRIBUIR ITEMS
+// =================================
+
+items.forEach(item=>{
+
+let coords=null;
+
+const geom=item.geometry;
+
+
+// POINT
+
+if(
+geom &&
+geom.type==="Point"
+){
+
+coords=geom.coordinates;
+
+}
+
+
+// LAT / LON
+
+if(
+!coords &&
+item.properties &&
+item.properties.latitude!==undefined &&
+item.properties.longitude!==undefined
+){
+
+coords=[
+item.properties.longitude,
+item.properties.latitude
+];
+
+}
+
+
+// LAT / LON ALTERNATIVOS
+
+if(
+!coords &&
+item.properties &&
+item.properties.lat!==undefined &&
+item.properties.lon!==undefined
+){
+
+coords=[
+item.properties.lon,
+item.properties.lat
+];
+
+}
+
+
+// BBOX
+
+if(
+!coords &&
+item.bbox
+){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
+
+
+// POLYGON
+
+if(
+!coords &&
+geom &&
+geom.type==="Polygon"
+){
+
+const ring=
+geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+lon+=c[0];
+lat+=c[1];
+});
+
+coords=[
+lon/ring.length,
+lat/ring.length
+];
+
+}
+
+
+// MULTIPOLYGON
+
+if(
+!coords &&
+geom &&
+geom.type==="MultiPolygon"
+){
+
+const ring=
+geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+lon+=c[0];
+lat+=c[1];
+});
+
+coords=[
+lon/ring.length,
+lat/ring.length
+];
+
+}
+
+
+if(!coords)
+return;
+
+
+const lon=coords[0];
+const lat=coords[1];
+
+
+const target=cells.find(c=>
+
+lat>=c.latMin &&
+lat<c.latMax &&
+
+lon>=c.lonMin &&
+lon<c.lonMax
+
+);
+
+
+if(target){
+
+target.state=0;
+target.items.push(item);
+
+}
+
+});
+
+
+// =================================
+// ACTUALIZAR VISUAL
+// =================================
+
+cells.forEach((cell,index)=>{
+
+const div=
+grid.children[index];
+
+if(cell.state===0){
+
+div.style.background="#16803c";
+
+div.innerHTML=
+`
+<div style="font-size:9px;opacity:.6">
+${cell.id}
+</div>
+<div>
+${cell.items.length}
+</div>
+`;
+
+}else{
+
+div.style.background="#222";
+div.textContent="";
+
+}
+
+});
+
+
+console.log(
+"EXPLORATION GRID:",
+cells
+);
+
+}
+
+
+
+
+
+   
+
+
+   
 
 // ===============================
 // ADD ROW
