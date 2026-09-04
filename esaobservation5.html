@@ -1333,6 +1333,11 @@ display:none;
         <input id="search" value="Biomass">
         <button id="load">SEARCH</button>
       <button id="themeToggle">🌙 LUNAR</button>
+
+       <select id="collectionSelector">
+<option value="">Select collection...</option>
+</select>
+       
     </div>
 
     <div id="workspace">
@@ -1492,6 +1497,39 @@ document.getElementById("status").textContent=
 }
 
 
+   
+// LOAD COLLECTION
+
+async function loadCollections(){
+try{
+const res=await fetch(`${BASE}/collections?limit=1000`);
+const data=await res.json();
+collections=data.collections||[];
+renderCollectionSelector();
+}catch(error){
+console.error("Error loading collections:",error);
+}
+}
+
+function renderCollectionSelector(){
+const select=document.getElementById("collectionSelector");
+if(!select)return;
+select.innerHTML=`<option value="">Select collection...</option>`;
+collections.forEach(collection=>{
+const option=document.createElement("option");
+option.value=collection.id;
+option.textContent=collection.title||collection.id;
+select.appendChild(option);
+});
+}
+
+document.getElementById("collectionSelector").onchange=function(){
+document.getElementById("search").value=this.value;
+};
+
+loadCollections();
+
+   
 
 // ===============================
 // RENDER COLLECTION CARDS
