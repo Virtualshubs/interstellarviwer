@@ -1532,16 +1532,20 @@ document.getElementById("status").textContent=
 // LOAD COLLECTION
 
 async function loadCollections(){
+const status=document.getElementById("status");
+if(status)status.textContent="LOADING EO PRODUCTS...";
 try{
 const res=await fetch(`${BASE}/collections?limit=1000`);
 const data=await res.json();
 collections=data.collections||[];
 renderCollectionSelector();
+if(status)status.textContent=`✓ EO PRODUCTS READY · ${collections.length} COLLECTIONS`;
 }catch(error){
 console.error("Error loading collections:",error);
+if(status)status.textContent="⚠ EO CATALOG UNAVAILABLE";
 }
 }
-
+   
 function renderCollectionSelector(){
 const select=document.getElementById("collectionSelector");
 if(!select)return;
