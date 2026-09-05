@@ -4291,6 +4291,7 @@ function createExplorationBlueMarble(grid,parentCell){
 
     grid.style.position="relative";
     grid.style.overflow="hidden";
+    grid.style.isolation="isolate";
 
     const marble=document.createElement("img");
     marble.className="explorationBlueMarble";
@@ -4298,8 +4299,6 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.alt="";
 
     const lonSpan=parentCell.lonMax-parentCell.lonMin;
-    const latSpan=parentCell.latMax-parentCell.latMin;
-
     const scale=360/lonSpan;
 
     marble.style.position="absolute";
@@ -4310,7 +4309,7 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.style.left=`${-((parentCell.lonMin+180)/360)*scale*100}%`;
     marble.style.top=`${-((90-parentCell.latMax)/180)*scale*100}%`;
     marble.style.pointerEvents="none";
-    marble.style.zIndex="0";
+    marble.style.zIndex="-1";
 
     grid.insertBefore(marble,grid.firstChild);
 
@@ -4319,7 +4318,6 @@ function createExplorationBlueMarble(grid,parentCell){
         cell.style.zIndex="1";
     });
 }
-
    
 
 // fin bloque observacion fase 2 espacial
