@@ -2991,6 +2991,8 @@ for(let y=0;y<rows;y++){
 
 for(let x=0;x<cols;x++){
 
+const geographicY=rows-1-y;
+
 const cell={
 
 id:y*cols+x,
@@ -3002,11 +3004,11 @@ state:-1,
 
 latMin:
 parentCell.latMin+
-y*latStep,
+geographicY*latStep,
 
 latMax:
 parentCell.latMin+
-(y+1)*latStep,
+(geographicY+1)*latStep,
 
 lonMin:
 parentCell.lonMin+
@@ -3021,7 +3023,6 @@ items:[]
 };
 
 cells.push(cell);
-
 
 const div=
 document.createElement("div");
