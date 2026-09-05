@@ -4307,33 +4307,39 @@ function createExplorationBlueMarble(grid,parentCell){
     grid.style.position="relative";
     grid.style.overflow="hidden";
 
-    const bbox=[
-        parentCell.latMin,
-        parentCell.lonMin,
-        parentCell.latMax,
-        parentCell.lonMax
-    ].join(",");
+    const getDateUTC=offset=>{
+        const d=new Date();
+        d.setUTCDate(d.getUTCDate()+offset);
+        return d.toISOString().split("T")[0];
+    };
 
-    const url=
-        "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
+    const createURL=date=>{
+        const bbox=[
+            parentCell.latMin,
+            parentCell.lonMin,
+            parentCell.latMax,
+            parentCell.lonMax
+        ].join(",");
+
+        return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
         "?REQUEST=GetSnapshot"+
         "&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
         "&CRS=EPSG:4326"+
-        "&TIME=2026-09-05"+
+        `&TIME=${date}`+
         "&WRAP=DAY,X"+
         `&BBOX=${bbox}`+
         "&FORMAT=image/jpeg"+
-        "&WIDTH=253"+
-        "&HEIGHT=253"+
+        "&WIDTH=1024"+
+        "&HEIGHT=1024"+
         "&AUTOSCALE=TRUE";
+    };
 
-    console.log("NASA SNAPSHOT:",url);
+    const today=getDateUTC(0);
+    const yesterday=getDateUTC(-1);
 
     const marble=document.createElement("img");
     marble.className="explorationBlueMarble";
-    marble.src=url;
     marble.alt="";
-
     marble.style.position="absolute";
     marble.style.left="0";
     marble.style.top="0";
@@ -4343,10 +4349,28 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.style.pointerEvents="none";
     marble.style.zIndex="0";
 
+    let usingDate=today;
+
+    marble.onerror=()=>{
+        if(usingDate===today){
+            usingDate=yesterday;
+            console.log("NASA SNAPSHOT: today unavailable, trying previous day:",yesterday);
+            marble.src=createURL(yesterday);
+        }else{
+            console.error("NASA SNAPSHOT: today and previous day unavailable");
+        }
+    };
+
+    marble.onload=()=>{
+        console.log("NASA SNAPSHOT LOADED:",usingDate);
+    };
+
+    marble.src=createURL(today);
+
+    console.log("NASA SNAPSHOT TODAY:",createURL(today));
+
     grid.insertBefore(marble,grid.firstChild);
 }
-
-
    
 // fin bloque observacion fase 2 espacial
    
