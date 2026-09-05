@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Orbital Pass Engine — Virtuals Hubs</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:#020409;color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+section{position:relative;min-height:100vh}
+.hero{height:100vh;display:flex;align-items:center;overflow:hidden;background:radial-gradient(circle at 50% 55%,#101a29 0,#050913 32%,#020409 68%)}
+.hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:90px 90px;opacity:.08}
+.nav{position:absolute;top:0;left:0;width:100%;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;z-index:10}
+.logo{font-size:14px;font-weight:700;letter-spacing:.18em}
+.nav-links{display:flex;gap:34px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#aeb7c7}
+.nav-links a:hover{color:#fff}
+.hero-content{position:relative;z-index:3;width:100%;padding:0 8vw}
+.eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8c9aaf;margin-bottom:25px}
+h1{font-size:clamp(60px,9vw,145px);line-height:.88;letter-spacing:-.07em;font-weight:500;margin:0;max-width:900px}
+.hero-sub{font-size:clamp(18px,2vw,25px);line-height:1.4;color:#aeb7c7;max-width:620px;margin-top:40px}
+.cta{display:inline-flex;margin-top:42px;padding:15px 22px;border:1px solid #394355;font-size:11px;letter-spacing:.18em;text-transform:uppercase;transition:.3s}
+.cta:hover{background:#fff;color:#020409}
+.earth{position:absolute;width:min(62vw,850px);height:min(62vw,850px);right:-8%;top:50%;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle at 38% 35%,#3d6580 0,#183147 20%,#071522 48%,#020409 70%);box-shadow:-30px 0 100px rgba(44,104,145,.18),inset 35px -20px 80px rgba(0,0,0,.75);opacity:.95}
+.earth:before{content:"";position:absolute;inset:8%;border-radius:50%;background:repeating-radial-gradient(circle at 40% 40%,transparent 0 50px,rgba(255,255,255,.025) 51px 52px);opacity:.7}
+.orbit{position:absolute;width:120%;height:38%;left:-10%;top:31%;border:1px solid rgba(135,180,210,.18);border-radius:50%;transform:rotate(-22deg)}
+.satellite{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 18px 5px rgba(255,255,255,.5);top:15%;left:73%}
+.hero-grid{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100px 100px;mask-image:linear-gradient(to right,transparent,#000 25%,#000 75%,transparent)}
+.intro{display:flex;align-items:center;padding:12vw 10vw;background:#f3f4f3;color:#080b10}
+.intro-inner{max-width:1100px}
+.intro .eyebrow{color:#707a86}
+.intro h2{font-size:clamp(42px,6vw,90px);font-weight:400;line-height:.95;letter-spacing:-.05em;max-width:950px;margin:0}
+.intro p{font-size:20px;line-height:1.6;color:#59616c;max-width:650px;margin-top:45px}
+.statement{min-height:80vh;display:flex;align-items:center;padding:10vw;background:#050912}
+.statement h2{font-size:clamp(50px,8vw,120px);font-weight:400;letter-spacing:-.06em;line-height:.9;max-width:1100px;margin:0}
+.statement span{color:#71869b}
+.ope{background:#020409;display:flex;align-items:center;padding:8vw}
+.ope-copy{width:45%;position:relative;z-index:2}
+.ope h2{font-size:clamp(50px,7vw,105px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0}
+.ope p{font-size:18px;line-height:1.6;color:#8d98a8;max-width:500px;margin:35px 0}
+.simulation{position:absolute;right:5%;width:55vw;height:55vw;max-width:750px;max-height:750px;border-radius:50%;border:1px solid rgba(130,160,190,.15)}
+.simulation:before,.simulation:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(130,160,190,.1)}
+.simulation:before{inset:10%}
+.simulation:after{inset:25%}
+.data-point{position:absolute;width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 15px #fff}
+.data-point:nth-child(1){top:22%;left:38%}
+.data-point:nth-child(2){top:58%;left:70%}
+.data-point:nth-child(3){top:72%;left:27%}
+.modules{background:#eef0ef;color:#080b10;padding:10vw}
+.modules-header{max-width:800px;margin-bottom:80px}
+.modules h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0}
+.modules-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #c5c9cc}
+.module{padding:40px 30px 50px 0;border-bottom:1px solid #c5c9cc}
+.module:not(:last-child){border-right:1px solid #c5c9cc;padding-right:40px}
+.module:not(:first-child){padding-left:40px}
+.module-number{font-size:11px;color:#858d96;letter-spacing:.15em}
+.module h3{font-size:30px;font-weight:400;margin:55px 0 20px}
+.module p{font-size:15px;line-height:1.6;color:#626a73;max-width:320px}
+.applications{background:#020409;padding:10vw}
+.applications h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0 0 90px}
+.application-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#29303a}
+.application{background:#020409;padding:45px;min-height:240px}
+.application span{font-size:11px;color:#7f8b9c;letter-spacing:.18em}
+.application h3{font-size:30px;font-weight:400;margin:70px 0 0}
+.final{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at center,#101a27,#020409 60%)}
+.final h2{font-size:clamp(55px,9vw,140px);font-weight:400;letter-spacing:-.07em;line-height:.88;max-width:1000px;margin:0 auto}
+.final p{color:#8792a2;font-size:18px;margin-top:40px}
+footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-top:1px solid #151b23}
+@media(max-width:800px){
+.nav-links{display:none}
+.earth{width:90vw;height:90vw;right:-30%;top:62%;opacity:.55}
+.hero-content{padding:0 7vw}
+.intro,.statement,.ope,.modules,.applications{padding:18vw 7vw}
+.intro{min-height:90vh}
+.ope{display:block}
+.ope-copy{width:100%}
+.simulation{position:relative;width:90vw;height:90vw;right:auto;margin:80px auto 0}
+.modules-grid{grid-template-columns:1fr}
+.module:not(:last-child){border-right:0}
+.module:not(:first-child){padding-left:0}
+.application-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+<nav class="nav">
+<div class="logo">VIRTUALS HUBS</div>
+<div class="nav-links">
+<a href="#ope">OPE</a>
+<a href="#technology">Technology</a>
+<a href="#applications">Applications</a>
+</div>
+</nav>
+<div class="hero-grid"></div>
+<div class="hero-content">
+<div class="eyebrow">Orbital Pass Engine / Virtuals Hubs</div>
+<h1>Simulate<br>the future<br>of space.</h1>
+<div class="hero-sub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.</div>
+<a href="#ope" class="cta">Explore OPE</a>
+</div>
+<div class="earth"><div class="orbit"></div><div class="satellite"></div></div>
+</section>
+
+<section class="intro">
+<div class="intro-inner">
+<div class="eyebrow">01 / The challenge</div>
+<h2>Space systems are becoming increasingly complex.</h2>
+<p>Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. Understanding that data requires more than numbers. It requires spatial context.</p>
+</div>
+</section>
+
+<section class="statement">
+<h2>We are building the computational layer between <span>orbital data</span> and spatial understanding.</h2>
+</section>
+
+<section class="ope" id="ope">
+<div class="ope-copy">
+<div class="eyebrow">02 / Orbital Pass Engine</div>
+<h2>From orbital data to operational intelligence.</h2>
+<p>OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.</p>
+<a href="#technology" class="cta">Discover the engine</a>
+</div>
+<div class="simulation">
+<div class="data-point"></div>
+<div class="data-point"></div>
+<div class="data-point"></div>
+</div>
+</section>
+
+<section class="modules" id="technology">
+<div class="modules-header">
+<div class="eyebrow">03 / Technology</div>
+<h2>One spatial computing layer.</h2>
+</div>
+<div class="modules-grid">
+<div class="module">
+<div class="module-number">01</div>
+<h3>Orbital simulation</h3>
+<p>Model satellite trajectories, orbital passes, observation windows and mission scenarios.</p>
+</div>
+<div class="module">
+<div class="module-number">02</div>
+<h3>Earth observation</h3>
+<p>Connect orbital operations with spatial and temporal Earth observation datasets.</p>
+</div>
+<div class="module">
+<div class="module-number">03</div>
+<h3>3D Aerospace</h3>
+<p>Turn complex aerospace systems into interactive digital environments and simulations.</p>
+</div>
+</div>
+</section>
+
+<section class="applications" id="applications">
+<div class="eyebrow">04 / Applications</div>
+<h2>Built for the<br>new space.</h2>
+<div class="application-grid">
+<div class="application"><span>01 / SPACE OPERATIONS</span><h3>Mission planning</h3></div>
+<div class="application"><span>02 / EARTH OBSERVATION</span><h3>Observation intelligence</h3></div>
+<div class="application"><span>03 / CLIMATE</span><h3>Environmental analysis</h3></div>
+<div class="application"><span>04 / RESEARCH</span><h3>Spatial simulation</h3></div>
+</div>
+</section>
+
+<section class="final">
+<div>
+<div class="eyebrow">Virtuals Hubs</div>
+<h2>The next generation of space systems will be spatial.</h2>
+<p>We are building the infrastructure to simulate them.</p>
+<a href="#ope" class="cta">Explore Orbital Pass Engine</a>
+</div>
+</section>
+
+<footer>
+<span>Virtuals Hubs</span>
+<span>Orbital Pass Engine</span>
+<span>© 2026</span>
+</footer>
+
+</body>
+</html>
