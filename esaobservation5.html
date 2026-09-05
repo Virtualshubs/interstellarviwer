@@ -4304,16 +4304,17 @@ grid.appendChild(div);
 
 
 
+
+
+
    
 
+   
 function createExplorationBlueMarble(grid,parentCell){
     if(!grid||!parentCell)return;
 
     grid.style.position="relative";
     grid.style.overflow="hidden";
-
-    const rows=18;
-    const cols=18;
 
     const getDateUTC=offset=>{
         const d=new Date();
@@ -4329,101 +4330,59 @@ function createExplorationBlueMarble(grid,parentCell){
             parentCell.lonMax
         ].join(",");
 
-        // =================================
-        // ESCALA GEOGRÁFICA DEL BBOX
-        // =================================
-
-        const latCenter=
-            (parentCell.latMin+parentCell.latMax)/2;
-
-        const latSpan=
-            parentCell.latMax-parentCell.latMin;
-
-        const lonSpan=
-            parentCell.lonMax-parentCell.lonMin;
+        const latCenter=(parentCell.latMin+parentCell.latMax)/2;
 
         const latKm=
-            latSpan*111.32;
+            (parentCell.latMax-parentCell.latMin)*111.32;
 
         const lonKm=
-            lonSpan*111.32*
+            (parentCell.lonMax-parentCell.lonMin)*
+            111.32*
             Math.cos(latCenter*Math.PI/180);
 
-        // =================================
-        // TAMAÑO DE UNA CELDA DEL GRID
-        // =================================
-
-        const cellLatKm=
-            latKm/rows;
-
-        const cellLonKm=
-            lonKm/cols;
-
-        const cellKm=
-            Math.max(cellLatKm,cellLonKm);
+        const areaKm=Math.max(latKm,lonKm);
 
         // =================================
-        // PIXELES POR CELDA
+        // ESCALA DEL GRID 18 × 18
+        // =================================
+
+        const gridCellKm=areaKm/18;
+
+        // =================================
+        // RESOLUCIÓN VISUAL
         // =================================
         //
-        // Queremos que cada celda tenga
-        // varios píxeles de imagen detrás.
+        // Mantenemos una relación fija
+        // entre la imagen y las 18 celdas.
         //
-        // 8 px por celda = 144 px de imagen
-        // por cada dimensión del grid.
+        // 32 píxeles de imagen por celda.
         //
 
-        const pixelsPerCell=8;
+        const pixelsPerCell=32;
 
         let resolution=
-            Math.ceil(
-                Math.max(
-                    rows*pixelsPerCell,
-                    cols*pixelsPerCell
-                )
-            );
-
-        // =================================
-        // NO SUPERAR EL LÍMITE NASA
-        // =================================
+            18*pixelsPerCell;
 
         resolution=
-            Math.min(
-                resolution,
-                8200
-            );
+            Math.min(resolution,8200);
 
         // =================================
-        // INFORMACIÓN DE ESCALA
+        // ESCALA RESULTANTE
         // =================================
 
-        const requestedPixelKm=
-            Math.max(latKm,lonKm)/
-            resolution;
+        const pixelSizeKm=
+            areaKm/resolution;
 
-        console.log(
-            "NASA MAP SCALE:",
-            {
-                bboxKm:{
-                    width:lonKm.toFixed(3),
-                    height:latKm.toFixed(3)
-                },
-                grid:{
-                    rows:rows,
-                    cols:cols
-                },
-                gridCellKm:{
-                    lat:cellLatKm.toFixed(3),
-                    lon:cellLonKm.toFixed(3)
-                },
-                pixelsPerCell:
-                    pixelsPerCell,
-                resolution:
-                    resolution,
-                requestedPixelKm:
-                    requestedPixelKm.toFixed(4)
-            }
-        );
+        const pixelsPerGridCell=
+            gridCellKm/pixelSizeKm;
+
+        console.log("NASA MAP SCALE:",{
+            bboxKm:areaKm.toFixed(3),
+            gridCellKm:gridCellKm.toFixed(4),
+            resolution:resolution,
+            pixelSizeKm:pixelSizeKm.toFixed(4),
+            pixelsPerGridCell:pixelsPerGridCell.toFixed(2)
+        });
 
         return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
         "?REQUEST=GetSnapshot"+
@@ -4433,8 +4392,8 @@ function createExplorationBlueMarble(grid,parentCell){
         "&WRAP=DAY,X"+
         `&BBOX=${bbox}`+
         "&FORMAT=image/jpeg"+
-        `&WIDTH=${resolution}"+
-        `&HEIGHT=${resolution}"+
+        `&WIDTH=${resolution}`+
+        `&HEIGHT=${resolution}`+
         "&AUTOSCALE=TRUE";
     };
 
@@ -4460,10 +4419,12 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.onerror=()=>{
         if(usingDate===today){
             usingDate=yesterday;
+
             console.log(
                 "NASA SNAPSHOT: today unavailable, trying previous day:",
                 yesterday
             );
+
             marble.src=createURL(yesterday);
         }else{
             console.error(
@@ -4498,6 +4459,14 @@ function createExplorationBlueMarble(grid,parentCell){
 
 
 
+
+
+
+
+
+
+
+   
 
 
 
