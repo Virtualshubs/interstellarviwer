@@ -4244,25 +4244,31 @@ showCellData(cell);
 
 
    
-
 if(cell.state===0){
     div.style.background=cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)";
-}else{
-    div.style.background="transparent";
-}
-div.style.color="#000";
-div.style.opacity="1";
-div.style.border="1px solid rgba(255,255,255,.12)";
-div.style.boxSizing="border-box";
-div.innerHTML=`
-<div style="font-size:9px;color:#000;font-weight:bold;opacity:1">
+    div.innerHTML=`
+<div style="font-size:9px;opacity:.6">
 ${cell.id}
 </div>
-<div style="font-size:11px;color:#000;font-weight:bold;opacity:1">
+<div>
 ${cell.items.length}
 </div>
 `;
+}else{
+    div.style.background="transparent";
+    div.textContent="";
+}
+
+div.style.border="1px solid rgba(255,255,255,.12)";
+div.style.boxSizing="border-box";
+
+   
 grid.appendChild(div);
+
+});
+
+}
+
 
    
 
