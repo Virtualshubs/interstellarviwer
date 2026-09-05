@@ -3109,7 +3109,7 @@ nextPage:nextPage
 function updateExplorationGridVisual(cells,grid){
     if(!grid)return;
     cells.forEach((cell,index)=>{
-        const div=grid.children[index];
+        const div=grid.querySelectorAll(".dataCell")[index];
         if(!div)return;
         div.style.border="1px solid rgba(255,255,255,.12)";
         div.style.boxSizing="border-box";
