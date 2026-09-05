@@ -3138,299 +3138,192 @@ nextPage:nextPage
 
 async function reExploreSpace(exploration){
 
-if(!exploration)
-return;
+    if(!exploration)
+        return;
 
-const grid=
-exploration.grid;
+    const seeds =
+    exploration.grid.filter(c=>c.state===0);
 
-const seeds=
-grid.filter(c=>c.state===0);
+    if(seeds.length===0){
 
-if(seeds.length===0){
+        console.log(
+            "No reference cells in exploration."
+        );
 
-console.log(
-"No reference cells in exploration."
-);
+        document.getElementById("status").textContent =
+        "No reference cells.";
 
-document.getElementById("status").textContent=
-"No reference cells.";
+        return;
 
-return;
+    }
+
+    if(!exploration.nextPage){
+
+        console.log(
+            "No more local catalog pages."
+        );
+
+        document.getElementById("status").textContent =
+        "No more data pages.";
+
+        return;
+
+    }
+
+    const button =
+    document.getElementById(
+        "reExploreSpaceButton"
+    );
+
+    if(button){
+
+        button.disabled=true;
+        button.textContent=
+        "RE-EXPLORING SPACE...";
+
+    }
+
+    document.getElementById("status").textContent =
+    "Expanding local observation map...";
+
+    try{
+
+        const discovered =
+        await discoverExplorationNeighbourCells(
+            exploration
+        );
+
+        renderSavedExploration(
+            exploration
+        );
+
+        renderExplorationNavigation();
+
+        console.log(
+            "LOCAL NEW CELLS:",
+            discovered
+        );
+
+        document.getElementById("status").textContent =
+        `Local expansion complete. ${discovered} new cells`;
+
+        if(button){
+
+            button.disabled =
+            !exploration.nextPage;
+
+            button.textContent =
+            exploration.nextPage
+            ? "RE-EXPLORE SPACE"
+            : "NO MORE DATA";
+
+        }
+
+    }catch(e){
+
+        console.error(
+            "LOCAL REDISCOVERY ERROR:",
+            e
+        );
+
+        document.getElementById("status").textContent =
+        `Local expansion error: ${e.message}`;
+
+        if(button){
+
+            button.disabled=false;
+            button.textContent=
+            "RE-EXPLORE SPACE";
+
+        }
+
+    }
 
 }
 
-if(!exploration.nextPage){
 
-console.log(
-"No more local catalog pages."
-);
+// ===============================
+// DISCOVER EXPLORATION NEIGHBOUR CELLS
+// ===============================
 
-document.getElementById("status").textContent=
-"No more data pages.";
-
-return;
-
-}
-
-const button=
-document.getElementById(
-"reExploreSpaceButton"
-);
-
-if(button){
-
-button.disabled=true;
-button.textContent=
-"RE-EXPLORING SPACE...";
-
-}
-
-const initialObservations=
-grid.reduce(
-(total,cell)=>
-total+cell.items.length,
-0
-);
-
-let discovered=0;
-let pages=0;
-
-const visited=new Set();
-const queue=[];
-
-seeds.forEach(cell=>{
-
-queue.push(cell);
-visited.add(cell.id);
-
-});
-
-try{
-
-while(
-exploration.nextPage
+async function discoverExplorationNeighbourCells(
+    exploration
 ){
 
-let cell=null;
+    const grid =
+    exploration.grid;
 
-// ---------------------------------
-// BUSCAR SIGUIENTE CELDA A EXPLORAR
-// ---------------------------------
+    const visited =
+    new Set();
 
-while(queue.length){
+    const queue =
+    [];
 
-const candidate=
-queue.shift();
+    grid.forEach(cell=>{
 
-const neighbours=
-getExplorationNeighbours(
-candidate,
-grid
-);
+        if(cell.state===0){
 
-for(const neighbour of neighbours){
+            queue.push(cell);
+            visited.add(cell.id);
 
-if(visited.has(neighbour.id))
-continue;
+        }
 
-visited.add(neighbour.id);
+    });
 
-if(neighbour.state!==-1)
-continue;
+    let discovered=0;
 
-cell=neighbour;
-break;
+    while(queue.length){
 
-}
+        const cell =
+        queue.shift();
 
-if(cell)
-break;
+        const neighbours =
+        getExplorationNeighbours(
+            cell,
+            grid
+        );
 
-}
+        for(const n of neighbours){
 
-// ---------------------------------
-// SI NO HAY CELDA NUEVA,
-// USAMOS UNA CELDA POSITIVA COMO
-// PUNTO DE CONTINUIDAD DEL REDISCOVERY
-// ---------------------------------
+            if(visited.has(n.id))
+                continue;
 
-if(!cell){
+            visited.add(n.id);
 
-const fallback=
-grid.find(c=>
-c.state===0 &&
-!c.rediscoveryProbe
-);
+            if(n.state!==-1)
+                continue;
 
-if(fallback){
+            const found =
+            await inspectExplorationCell(
+                n,
+                exploration
+            );
 
-fallback.rediscoveryProbe=true;
-cell=fallback;
+            if(found){
 
-}else{
+                discovered++;
+                queue.push(n);
 
-// Todas las celdas ya han sido visitadas.
-// Seguimos consumiendo las páginas restantes
-// para redistribuir toda la información.
+            }
 
-cell=
-grid.find(c=>c.state===0);
+            // Actualizar el grid local
+            renderSavedExploration(
+                exploration
+            );
 
-}
+            renderExplorationNavigation();
 
-}
+            if(!exploration.nextPage)
+                break;
 
-// ---------------------------------
-// NO QUEDAN CELDAS NI SEMILLAS
-// ---------------------------------
+        }
 
-if(!cell){
+        if(!exploration.nextPage)
+            break;
 
-console.log(
-"No cells available for local rediscovery."
-);
+    }
 
-break;
-
-}
-
-// ---------------------------------
-// LEER SIGUIENTE PAGE STAC
-// ---------------------------------
-
-document.getElementById("status").textContent=
-`Exploring local space... PAGE ${pages+1}`;
-
-const result=
-await inspectExplorationCell(
-cell,
-exploration
-);
-
-pages++;
-
-if(result){
-
-result.newCells.forEach(newCell=>{
-
-if(!visited.has(newCell.id)){
-
-visited.add(newCell.id);
-queue.push(newCell);
-
-}
-
-});
-
-discovered+=
-result.newCells.length;
-
-}
-
-}
-
-// ---------------------------------
-// LIMPIAR MARCAS TEMPORALES
-// ---------------------------------
-
-grid.forEach(cell=>{
-delete cell.rediscoveryProbe;
-});
-
-// ---------------------------------
-// MÉTRICAS
-// ---------------------------------
-
-const finalObservations=
-grid.reduce(
-(total,cell)=>
-total+cell.items.length,
-0
-);
-
-const addedObservations=
-finalObservations-
-initialObservations;
-
-// ---------------------------------
-// REDIBUJAR
-// ---------------------------------
-
-renderSavedExploration(
-exploration
-);
-
-renderExplorationNavigation();
-
-// ---------------------------------
-// RESULTADO
-// ---------------------------------
-
-console.log(
-"LOCAL REDISCOVERY COMPLETE"
-);
-
-console.log(
-"PAGES:",
-pages
-);
-
-console.log(
-"NEW CELLS:",
-discovered
-);
-
-console.log(
-"NEW OBSERVATIONS:",
-addedObservations
-);
-
-if(!exploration.nextPage){
-
-document.getElementById("status").textContent=
-`Local rediscovery complete · +${addedObservations.toLocaleString()} observations · +${discovered} cells · ${pages} pages`;
-
-}else{
-
-document.getElementById("status").textContent=
-`Local rediscovery stopped · +${addedObservations.toLocaleString()} observations · +${discovered} cells · ${pages} pages`;
-
-}
-
-if(button){
-
-button.disabled=
-!exploration.nextPage;
-
-button.textContent=
-exploration.nextPage
-?"RE-EXPLORE SPACE"
-:"NO MORE DATA";
-
-}
-
-}catch(error){
-
-console.error(
-"LOCAL REDISCOVERY ERROR:",
-error
-);
-
-document.getElementById("status").textContent=
-`Local rediscovery error · ${error.message}`;
-
-if(button){
-
-button.disabled=
-false;
-
-button.textContent=
-"RE-EXPLORE SPACE";
-
-}
-
-}
+    return discovered;
 
 }
 
@@ -3440,355 +3333,314 @@ button.textContent=
 // ===============================
 
 function getExplorationNeighbours(
-cell,
-grid
+    cell,
+    grid
 ){
 
-const result=[];
+    const result=[];
 
-const dirs=[
-[-1,-1],[0,-1],[1,-1],
-[-1,0],[1,0],
-[-1,1],[0,1],[1,1]
-];
+    const dirs=[
 
-dirs.forEach(d=>{
+        [-1,-1],[0,-1],[1,-1],
 
-const x=
-cell.x+d[0];
+        [-1,0],[1,0],
 
-const y=
-cell.y+d[1];
+        [-1,1],[0,1],[1,1]
 
-const neighbour=
-grid.find(c=>
-c.x===x &&
-c.y===y
-);
+    ];
 
-if(neighbour)
-result.push(neighbour);
+    dirs.forEach(d=>{
 
-});
+        const x =
+        cell.x+d[0];
 
-return result;
+        const y =
+        cell.y+d[1];
+
+        const neighbour =
+        grid.find(c=>
+            c.x===x &&
+            c.y===y
+        );
+
+        if(neighbour)
+            result.push(neighbour);
+
+    });
+
+    return result;
 
 }
 
 
 // ===============================
-// INSPECT EXPLORATION PAGE
+// INSPECT NEXT EXPLORATION PAGE
 // ===============================
 
 async function inspectExplorationCell(
-cell,
-exploration
+    cell,
+    exploration
 ){
 
-if(!exploration.nextPage)
-return null;
+    if(!exploration.nextPage)
+        return false;
 
-try{
+    try{
 
-console.log(
-"READING LOCAL PAGE:",
-exploration.nextPage
-);
+        console.log(
+            "READING NEXT LOCAL PAGE:",
+            exploration.nextPage
+        );
 
-const res=
-await fetch(
-exploration.nextPage
-);
+        const res =
+        await fetch(
+            exploration.nextPage
+        );
 
-if(!res.ok){
+        if(!res.ok){
 
-throw new Error(
-`STAC HTTP ${res.status}`
-);
+            throw new Error(
+                `STAC HTTP ${res.status}`
+            );
 
-}
+        }
 
-const json=
-await res.json();
+        const json =
+        await res.json();
 
-exploration.nextPage=
-json.links?.find(
-l=>l.rel==="next"
-)?.href || null;
+        // Guardar siguiente página
+        exploration.nextPage =
+        json.links?.find(
+            l=>l.rel==="next"
+        )?.href || null;
 
-if(
-!json.features ||
-json.features.length===0
-){
+        if(
+            !json.features ||
+            json.features.length===0
+        ){
 
-return{
-newCells:[]
-};
+            return false;
 
-}
+        }
 
-const beforeStates=
-new Map();
+        const before =
+        cell.items.length;
 
-exploration.grid.forEach(gridCell=>{
+        // IMPORTANTE:
+        // La página completa se redistribuye
+        // por TODO el grid local.
+        appendExplorationSpatialData(
+            json.features,
+            exploration
+        );
 
-beforeStates.set(
-gridCell.id,
-gridCell.state
-);
+        return (
+            cell.items.length > before
+        );
 
-});
+    }catch(e){
 
-appendExplorationSpatialData(
-json.features,
-exploration
-);
+        console.log(
+            "LOCAL PAGE ERROR",
+            e
+        );
 
-const newCells=
-exploration.grid.filter(gridCell=>
-beforeStates.get(gridCell.id)===-1 &&
-gridCell.state===0
-);
+        return false;
 
-return{
-newCells:newCells
-};
-
-}catch(e){
-
-console.error(
-"LOCAL PAGE ERROR:",
-e
-);
-
-throw e;
-
-}
+    }
 
 }
 
 
 // ===============================
-// APPEND EXPLORATION DATA
+// APPEND EXPLORATION SPATIAL DATA
 // ===============================
 
 function appendExplorationSpatialData(
-items,
-exploration
+    items,
+    exploration
 ){
 
-const grid=
-exploration.grid;
+    const grid =
+    exploration.grid;
 
-items.forEach(item=>{
+    items.forEach(item=>{
 
-let coords=null;
+        let coords=null;
 
-const geom=
-item.geometry;
+        // POINT
 
+        if(
+            item.geometry &&
+            item.geometry.type==="Point"
+        ){
 
-// ---------------------------------
-// POINT
-// ---------------------------------
+            coords =
+            item.geometry.coordinates;
 
-if(
-geom &&
-geom.type==="Point"
-){
+        }
 
-coords=
-geom.coordinates;
+        // LAT / LON
 
-}
+        if(
+            !coords &&
+            item.properties &&
+            item.properties.latitude!==undefined &&
+            item.properties.longitude!==undefined
+        ){
 
+            coords=[
+                item.properties.longitude,
+                item.properties.latitude
+            ];
 
-// ---------------------------------
-// LAT / LON
-// ---------------------------------
+        }
 
-if(
-!coords &&
-item.properties &&
-item.properties.latitude!==undefined &&
-item.properties.longitude!==undefined
-){
+        // LAT / LON ALTERNATIVOS
 
-coords=[
-item.properties.longitude,
-item.properties.latitude
-];
+        if(
+            !coords &&
+            item.properties &&
+            item.properties.lat!==undefined &&
+            item.properties.lon!==undefined
+        ){
 
-}
+            coords=[
+                item.properties.lon,
+                item.properties.lat
+            ];
 
+        }
 
-// ---------------------------------
-// LAT / LON ALTERNATIVOS
-// ---------------------------------
+        // BBOX
 
-if(
-!coords &&
-item.properties &&
-item.properties.lat!==undefined &&
-item.properties.lon!==undefined
-){
+        if(
+            !coords &&
+            item.bbox
+        ){
 
-coords=[
-item.properties.lon,
-item.properties.lat
-];
+            coords=[
 
-}
+                (item.bbox[0]+item.bbox[2])/2,
+                (item.bbox[1]+item.bbox[3])/2
 
+            ];
 
-// ---------------------------------
-// BBOX
-// ---------------------------------
+        }
 
-if(
-!coords &&
-item.bbox
-){
+        // POLYGON
 
-coords=[
-(item.bbox[0]+item.bbox[2])/2,
-(item.bbox[1]+item.bbox[3])/2
-];
+        if(
+            !coords &&
+            item.geometry &&
+            item.geometry.type==="Polygon"
+        ){
 
-}
+            const ring =
+            item.geometry.coordinates[0];
 
+            let lon=0;
+            let lat=0;
 
-// ---------------------------------
-// POLYGON
-// ---------------------------------
+            ring.forEach(c=>{
 
-if(
-!coords &&
-geom &&
-geom.type==="Polygon"
-){
+                lon+=c[0];
+                lat+=c[1];
 
-const ring=
-geom.coordinates[0];
+            });
 
-let lon=0;
-let lat=0;
+            coords=[
 
-ring.forEach(c=>{
+                lon/ring.length,
+                lat/ring.length
 
-lon+=c[0];
-lat+=c[1];
+            ];
 
-});
+        }
 
-coords=[
-lon/ring.length,
-lat/ring.length
-];
+        // MULTIPOLYGON
 
-}
+        if(
+            !coords &&
+            item.geometry &&
+            item.geometry.type==="MultiPolygon"
+        ){
 
+            const ring =
+            item.geometry.coordinates[0][0];
 
-// ---------------------------------
-// MULTIPOLYGON
-// ---------------------------------
+            let lon=0;
+            let lat=0;
 
-if(
-!coords &&
-geom &&
-geom.type==="MultiPolygon"
-){
+            ring.forEach(c=>{
 
-const ring=
-geom.coordinates[0][0];
+                lon+=c[0];
+                lat+=c[1];
 
-let lon=0;
-let lat=0;
+            });
 
-ring.forEach(c=>{
+            coords=[
 
-lon+=c[0];
-lat+=c[1];
+                lon/ring.length,
+                lat/ring.length
 
-});
+            ];
 
-coords=[
-lon/ring.length,
-lat/ring.length
-];
+        }
 
-}
+        if(!coords)
+            return;
 
+        const lon =
+        coords[0];
 
-// ---------------------------------
-// SIN POSICIÓN
-// ---------------------------------
+        const lat =
+        coords[1];
 
-if(!coords)
-return;
+        // BUSCAR CELDA LOCAL
 
-const lon=
-coords[0];
+        const cell =
+        grid.find(c=>
 
-const lat=
-coords[1];
+            lat>=c.latMin &&
+            lat<c.latMax &&
 
+            lon>=c.lonMin &&
+            lon<c.lonMax
 
-// ---------------------------------
-// BUSCAR CELDA LOCAL
-// ---------------------------------
+        );
 
-const cell=
-grid.find(c=>
+        if(!cell)
+            return;
 
-lat>=c.latMin &&
-lat<c.latMax &&
+        // EVITAR DUPLICADOS
 
-lon>=c.lonMin &&
-lon<c.lonMax
+        const exists =
+        cell.items.some(
+            x=>x.id===item.id
+        );
 
-);
+        if(exists)
+            return;
 
-if(!cell)
-return;
+        // INSERTAR OBSERVACIÓN
 
+        const wasEmpty =
+        cell.items.length===0;
 
-// ---------------------------------
-// EVITAR DUPLICADOS
-// ---------------------------------
+        cell.items.push(item);
 
-const exists=
-cell.items.some(
-x=>x.id===item.id
-);
+        cell.state=0;
 
-if(exists)
-return;
+        // NUEVA COBERTURA
 
+        if(wasEmpty){
 
-// ---------------------------------
-// INSERTAR OBSERVACIÓN
-// ---------------------------------
+            cell.discovered=true;
 
-const wasEmpty=
-cell.items.length===0;
+        }
 
-cell.items.push(item);
-
-cell.state=0;
-
-
-// ---------------------------------
-// NUEVA CELDA DESCUBIERTA
-// ---------------------------------
-
-if(wasEmpty){
-
-cell.discovered=true;
-
-}
-
-});
+    });
 
 }
 
