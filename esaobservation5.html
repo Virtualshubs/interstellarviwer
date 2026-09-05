@@ -4321,16 +4321,34 @@ function createExplorationBlueMarble(grid,parentCell){
             parentCell.lonMax
         ].join(",");
 
+        const latCenter=(parentCell.latMin+parentCell.latMax)/2;
+        const latKm=(parentCell.latMax-parentCell.latMin)*111.32;
+        const lonKm=(parentCell.lonMax-parentCell.lonMin)*111.32*Math.cos(latCenter*Math.PI/180);
+        const areaKm=Math.max(latKm,lonKm);
+
+        let resolution=1024;
+        if(areaKm<100)resolution=2048;
+        if(areaKm<25)resolution=4096;
+        if(areaKm<10)resolution=8192;
+
+        resolution=Math.min(resolution,8200);
+
+        console.log("NASA MAP SCALE:",{
+            areaKm:areaKm.toFixed(2),
+            resolution:resolution,
+            pixelSizeKm:(areaKm/resolution).toFixed(4)
+        });
+
         return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
         "?REQUEST=GetSnapshot"+
-        "&LAYERS=HLS_S30_Nadir_BRDF_Adjusted_Reflectance,Reference_Features_15m"+
+        "&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
         "&CRS=EPSG:4326"+
         `&TIME=${date}`+
         "&WRAP=DAY,X"+
         `&BBOX=${bbox}`+
         "&FORMAT=image/jpeg"+
-        "&WIDTH=1024"+
-        "&HEIGHT=1024"+
+        `&WIDTH=${resolution}`+
+        `&HEIGHT=${resolution}`+
         "&AUTOSCALE=TRUE";
     };
 
@@ -4345,29 +4363,29 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.style.top="0";
     marble.style.width="100%";
     marble.style.height="100%";
-    marble.style.objectFit="fill";
     marble.style.pointerEvents="none";
     marble.style.zIndex="0";
+    marble.style.imageRendering="auto";
 
     let usingDate=today;
 
     marble.onerror=()=>{
         if(usingDate===today){
             usingDate=yesterday;
-            console.log("NASA SENTINEL-2: today unavailable, trying previous day:",yesterday);
+            console.log("NASA SNAPSHOT: today unavailable, trying previous day:",yesterday);
             marble.src=createURL(yesterday);
         }else{
-            console.error("NASA SENTINEL-2: today and previous day unavailable");
+            console.error("NASA SNAPSHOT: today and previous day unavailable");
         }
     };
 
     marble.onload=()=>{
-        console.log("NASA SENTINEL-2 LOADED:",usingDate);
+        console.log("NASA SNAPSHOT LOADED:",usingDate);
     };
 
     marble.src=createURL(today);
 
-    console.log("NASA SENTINEL-2 TODAY:",createURL(today));
+    console.log("NASA SNAPSHOT TODAY:",createURL(today));
 
     grid.insertBefore(marble,grid.firstChild);
 }
