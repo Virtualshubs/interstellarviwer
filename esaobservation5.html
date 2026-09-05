@@ -2518,7 +2518,7 @@ return;
 
 
    // ===============================
-// SHOW CELL DATA
+// SHOW CELL DATA generico
 // ===============================
 
 function showCellData(cell){
@@ -2539,8 +2539,12 @@ JSON.stringify(dataset,null,2);
 
 renderDataset(dataset);
 
+   
+
+
+   
 // ===============================
-// EXPLORE SPACE
+// EXPLORE SPACE fase 2 de observacion espacial
 // ===============================
 
 const observations=
@@ -2748,7 +2752,10 @@ explorationIndex+1
 const exploration=
 createExplorationGrid(
 json.features,
-cell
+cell,
+json.links?.find(
+l=>l.rel==="next"
+)?.href || null
 );
 
 
@@ -2790,7 +2797,7 @@ Spatial query error: ${error.message}
 // CREATE EXPLORATION GRID
 // ===============================
 
-function createExplorationGrid(items,parentCell){
+function createExplorationGrid(items,parentCell,nextPage){
 
 const container=
 document.getElementById("explorationContainer");
@@ -2810,6 +2817,27 @@ title.textContent=
 `SPATIAL DATA · CELL ${parentCell.id}`;
 
 container.appendChild(title);
+
+
+
+   const button=document.createElement("button");
+button.id="reExploreSpaceButton";
+button.textContent="RE-EXPLORE SPACE";
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background="rgba(255,176,77,.08)";
+button.style.border="1px solid rgba(255,176,77,.35)";
+button.style.borderRadius="6px";
+button.style.color="#ffb04d";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+button.onclick=()=>{
+reExploreSpace(
+explorationHistory[explorationIndex]
+);
+};
+container.appendChild(button);
 
 
 const grid=document.createElement("div");
@@ -3095,20 +3123,442 @@ div.textContent="";
 // =================================
 
 return{
-
 parentCell:parentCell,
-
 grid:cells,
-
-items:items
-
+items:items,
+nextPage:nextPage
 };
 
 }
 
 
+
+
+// ===============================
+// RE-EXPLORE SPACE fase 2 de rediscovery maps 
+// ===============================
+
+async function reExploreSpace(exploration){
+
+if(!exploration)
+return;
+
+const grid=
+exploration.grid;
+
+const seeds=
+grid.filter(c=>c.state===0);
+
+if(seeds.length===0){
+
+console.log(
+"No reference cells in exploration."
+);
+
+return;
+
+}
+
+if(!exploration.nextPage){
+
+console.log(
+"No more local catalog pages."
+);
+
+return;
+
+}
+
+const button=
+document.getElementById(
+"reExploreSpaceButton"
+);
+
+if(button){
+
+button.disabled=true;
+button.textContent=
+"RE-EXPLORING SPACE...";
+
+}
+
+let discovered=0;
+
+const visited=new Set();
+const queue=[];
+
+seeds.forEach(cell=>{
+
+queue.push(cell);
+visited.add(cell.id);
+
+});
+
+while(queue.length){
+
+const cell=
+queue.shift();
+
+const neighbours=
+getExplorationNeighbours(
+cell,
+grid
+);
+
+for(const neighbour of neighbours){
+
+if(visited.has(neighbour.id))
+continue;
+
+visited.add(neighbour.id);
+
+if(neighbour.state!==-1)
+continue;
+
+const found=
+await inspectExplorationCell(
+neighbour,
+exploration
+);
+
+if(found){
+
+discovered++;
+
+queue.push(neighbour);
+
+}
+
+}
+
+}
+
+renderSavedExploration(
+exploration
+);
+
+renderExplorationNavigation();
+
+console.log(
+"LOCAL REDISCOVERY COMPLETE:",
+discovered
+);
+
+if(button){
+
+button.disabled=
+!exploration.nextPage;
+
+button.textContent=
+exploration.nextPage
+?"RE-EXPLORE SPACE"
+:"NO MORE DATA";
+
+}
+
+}
+
+
    // ===============================
-// EXPLORATION NAVIGATION
+// GET EXPLORATION NEIGHBOURS
+// ===============================
+
+function getExplorationNeighbours(
+cell,
+grid
+){
+
+const result=[];
+
+const dirs=[
+[-1,-1],[0,-1],[1,-1],
+[-1,0],[1,0],
+[-1,1],[0,1],[1,1]
+];
+
+dirs.forEach(d=>{
+
+const x=
+cell.x+d[0];
+
+const y=
+cell.y+d[1];
+
+const neighbour=
+grid.find(c=>
+c.x===x &&
+c.y===y
+);
+
+if(neighbour)
+result.push(neighbour);
+
+});
+
+return result;
+
+}
+
+
+   // ===============================
+// INSPECT EXPLORATION PAGE
+// ===============================
+
+async function inspectExplorationCell(
+cell,
+exploration
+){
+
+if(!exploration.nextPage)
+return false;
+
+try{
+
+console.log(
+"READING LOCAL PAGE:",
+exploration.nextPage
+);
+
+const res=
+await fetch(
+exploration.nextPage
+);
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+const json=
+await res.json();
+
+exploration.nextPage=
+json.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+if(
+!json.features ||
+json.features.length===0
+){
+
+return false;
+
+}
+
+const before=
+cell.items.length;
+
+appendExplorationSpatialData(
+json.features,
+exploration
+);
+
+return(
+cell.items.length>before
+);
+
+}catch(e){
+
+console.error(
+"LOCAL PAGE ERROR:",
+e
+);
+
+return false;
+
+}
+
+}
+
+
+   // ===============================
+// APPEND EXPLORATION DATA
+// ===============================
+
+function appendExplorationSpatialData(
+items,
+exploration
+){
+
+const grid=
+exploration.grid;
+
+items.forEach(item=>{
+
+let coords=null;
+
+const geom=
+item.geometry;
+
+
+// POINT
+
+if(
+geom &&
+geom.type==="Point"
+){
+
+coords=
+geom.coordinates;
+
+}
+
+
+// LAT / LON
+
+if(
+!coords &&
+item.properties &&
+item.properties.latitude!==undefined &&
+item.properties.longitude!==undefined
+){
+
+coords=[
+item.properties.longitude,
+item.properties.latitude
+];
+
+}
+
+
+// LAT / LON ALTERNATIVOS
+
+if(
+!coords &&
+item.properties &&
+item.properties.lat!==undefined &&
+item.properties.lon!==undefined
+){
+
+coords=[
+item.properties.lon,
+item.properties.lat
+];
+
+}
+
+
+// BBOX
+
+if(
+!coords &&
+item.bbox
+){
+
+coords=[
+(item.bbox[0]+item.bbox[2])/2,
+(item.bbox[1]+item.bbox[3])/2
+];
+
+}
+
+
+// POLYGON
+
+if(
+!coords &&
+geom &&
+geom.type==="Polygon"
+){
+
+const ring=
+geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+lon+=c[0];
+lat+=c[1];
+});
+
+coords=[
+lon/ring.length,
+lat/ring.length
+];
+
+}
+
+
+// MULTIPOLYGON
+
+if(
+!coords &&
+geom &&
+geom.type==="MultiPolygon"
+){
+
+const ring=
+geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+lon+=c[0];
+lat+=c[1];
+});
+
+coords=[
+lon/ring.length,
+lat/ring.length
+];
+
+}
+
+if(!coords)
+return;
+
+const lon=coords[0];
+const lat=coords[1];
+
+const cell=
+grid.find(c=>
+
+lat>=c.latMin &&
+lat<c.latMax &&
+
+lon>=c.lonMin &&
+lon<c.lonMax
+
+);
+
+if(!cell)
+return;
+
+const exists=
+cell.items.some(
+x=>x.id===item.id
+);
+
+if(exists)
+return;
+
+const wasEmpty=
+cell.items.length===0;
+
+cell.items.push(item);
+cell.state=0;
+
+if(wasEmpty){
+
+cell.discovered=true;
+
+}
+
+});
+
+}
+
+
+   
+
+   // ===============================
+// EXPLORATION NAVIGATION adelante y atras en el estado
 // ===============================
 
 function renderExplorationNavigation(){
@@ -3326,7 +3776,7 @@ grid.appendChild(div);
 
    
 
-
+// fin bloque observacion fase 2 espacial
    
 
 // ===============================
@@ -3355,7 +3805,7 @@ container.appendChild(r);
 
 
 // ===================================
-// REDISCOVER MAP
+// REDISCOVER MAP fase 1
 // ===================================
 
 async function expandObservationMap(){
