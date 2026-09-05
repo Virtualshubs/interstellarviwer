@@ -4286,7 +4286,6 @@ grid.appendChild(div);
 }
 
 
-
 function createExplorationBlueMarble(grid,parentCell){
     if(!grid||!parentCell)return;
 
@@ -4301,19 +4300,15 @@ function createExplorationBlueMarble(grid,parentCell){
     const lonSpan=parentCell.lonMax-parentCell.lonMin;
     const latSpan=parentCell.latMax-parentCell.latMin;
 
-    const widthPercent=(360/lonSpan)*100;
-    const heightPercent=(180/latSpan)*100;
-
-    const leftPercent=-((parentCell.lonMin+180)/lonSpan)*100;
-    const topPercent=-((90-parentCell.latMax)/latSpan)*100;
+    const scale=360/lonSpan;
 
     marble.style.position="absolute";
-    marble.style.width=`${widthPercent}%`;
-    marble.style.height=`${heightPercent}%`;
-    marble.style.left=`${leftPercent}%`;
-    marble.style.top=`${topPercent}%`;
+    marble.style.width=`${scale*100}%`;
+    marble.style.height=`${scale*100}%`;
     marble.style.maxWidth="none";
     marble.style.maxHeight="none";
+    marble.style.left=`${-((parentCell.lonMin+180)/360)*scale*100}%`;
+    marble.style.top=`${-((90-parentCell.latMax)/180)*scale*100}%`;
     marble.style.pointerEvents="none";
     marble.style.zIndex="0";
 
@@ -4324,8 +4319,6 @@ function createExplorationBlueMarble(grid,parentCell){
         cell.style.zIndex="1";
     });
 }
-
-
 
    
 
