@@ -3112,28 +3112,22 @@ function updateExplorationGridVisual(cells,grid){
     cells.forEach((cell,index)=>{
         const div=cellDivs[index];
         if(!div)return;
-        div.style.border="1px solid rgba(255,255,255,.12)";
-        div.style.boxSizing="border-box";
-        div.style.color="#000";
-        div.style.opacity="1";
-        div.style.textShadow="none";
-        div.style.fontWeight="bold";
-        if(cell.state===0){
-            div.style.background=cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)";
-        }else{
-            div.style.background="transparent";
-        }
+        div.style.setProperty("border","1px solid rgba(255,255,255,.12)","important");
+        div.style.setProperty("box-sizing","border-box","important");
+        div.style.setProperty("color","#000","important");
+        div.style.setProperty("opacity","1","important");
+        div.style.setProperty("visibility","visible","important");
+        div.style.setProperty("background",cell.state===0?(cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)"):"transparent","important");
         div.innerHTML=`
-<div style="font-size:9px;color:#000;font-weight:bold;opacity:1">
+<div style="font-size:9px;color:#000;font-weight:bold;opacity:1!important;visibility:visible!important">
 ${cell.id}
 </div>
-<div style="font-size:11px;color:#000;font-weight:bold;opacity:1">
+<div style="font-size:11px;color:#000;font-weight:bold;opacity:1!important;visibility:visible!important">
 ${cell.items.length}
 </div>
 `;
     });
 }
-
 
 // ===============================
 // RE-EXPLORE SPACE
