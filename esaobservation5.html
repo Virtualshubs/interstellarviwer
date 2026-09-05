@@ -4307,35 +4307,47 @@ function createExplorationBlueMarble(grid,parentCell){
     grid.style.position="relative";
     grid.style.overflow="hidden";
 
+    const lonMin=parentCell.lonMin;
+    const latMin=parentCell.latMin;
+    const lonMax=parentCell.lonMax;
+    const latMax=parentCell.latMax;
+
+    const width=1200;
+    const height=1200;
+
+    const params=new URLSearchParams({
+        REQUEST:"GetSnapshot",
+        TIME:new Date().toISOString(),
+        BBOX:`${lonMin},${latMin},${lonMax},${latMax}`,
+        CRS:"EPSG:4326",
+        LAYERS:"MODIS_Terra_CorrectedReflectance_TrueColor,Coastlines_15m,Reference_Labels_15m",
+        WRAP:"day,x,x",
+        FORMAT:"image/jpeg",
+        WIDTH:String(width),
+        HEIGHT:String(height),
+        colormaps:",,",
+        OPACITIES:",0.8,1",
+        AUTO_SCALE:"true"
+    });
+
     const marble=document.createElement("img");
     marble.className="explorationBlueMarble";
-    marble.src="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
     marble.alt="";
-
-    const lonSpan=parentCell.lonMax-parentCell.lonMin;
-    const latSpan=parentCell.latMax-parentCell.latMin;
-
-    const widthScale=360/lonSpan;
-    const heightScale=180/latSpan;
+    marble.src=
+        `https://wvs.earthdata.nasa.gov/api/v1/snapshot?${params.toString()}`;
 
     marble.style.position="absolute";
-    marble.style.width=`${widthScale*100}%`;
-    marble.style.height=`${heightScale*100}%`;
-    marble.style.maxWidth="none";
-    marble.style.maxHeight="none";
-
-    marble.style.left=
-    `${-((parentCell.lonMin+180)/360)*widthScale*100}%`;
-
-    marble.style.top=
-    `${-((90-parentCell.latMax)/180)*heightScale*100}%`;
-
+    marble.style.left="0";
+    marble.style.top="0";
+    marble.style.width="100%";
+    marble.style.height="100%";
+    marble.style.objectFit="fill";
     marble.style.pointerEvents="none";
     marble.style.zIndex="0";
+    marble.style.opacity="0.85";
 
     grid.insertBefore(marble,grid.firstChild);
 }
-
 // fin bloque observacion fase 2 espacial
    
 
