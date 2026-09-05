@@ -1494,6 +1494,8 @@ let activeDataset=null;
 let observationGrid=[];
 let currentItems=[];
 
+let explorationHistory=[];
+let explorationIndex=-1;
 
 // ===============================
 // LOAD CATALOG
@@ -2583,7 +2585,10 @@ observations.firstChild
 
 }
 
-   // ===============================
+
+   
+   
+// ===============================
 // EXPLORE CELL
 // ===============================
 
@@ -2716,14 +2721,50 @@ return;
 
 
 // =================================
-// CREAR NUEVO GRID
+// GUARDAR HISTORIAL
 // =================================
 
+// si hemos vuelto atrás y exploramos
+// desde ese punto, eliminamos FORWARD
+
+if(
+explorationIndex<
+explorationHistory.length-1
+){
+
+explorationHistory=
+explorationHistory.slice(
+0,
+explorationIndex+1
+);
+
+}
+
+
+// =================================
+// CREAR NUEVA EXPLORACIÓN
+// =================================
+
+const exploration=
 createExplorationGrid(
 json.features,
 cell
 );
 
+
+// =================================
+// GUARDAR EXPLORACIÓN
+// =================================
+
+explorationHistory.push(
+exploration
+);
+
+explorationIndex=
+explorationHistory.length-1;
+
+
+renderExplorationNavigation();
 
 }catch(error){
 
@@ -2755,9 +2796,10 @@ const container=
 document.getElementById("explorationContainer");
 
 if(!container)
-return;
+return null;
 
 container.innerHTML="";
+
 
 const title=document.createElement("h3");
 
@@ -2834,9 +2876,11 @@ items:[]
 cells.push(cell);
 
 
-const div=document.createElement("div");
+const div=
+document.createElement("div");
 
 div.className="dataCell";
+
 
 div.onclick=()=>{
 
@@ -2845,6 +2889,7 @@ clearGridSearch();
 showCellData(cell);
 
 };
+
 
 grid.appendChild(div);
 
@@ -2871,7 +2916,8 @@ geom &&
 geom.type==="Point"
 ){
 
-coords=geom.coordinates;
+coords=
+geom.coordinates;
 
 }
 
@@ -2989,7 +3035,8 @@ const lon=coords[0];
 const lat=coords[1];
 
 
-const target=cells.find(c=>
+const target=
+cells.find(c=>
 
 lat>=c.latMin &&
 lat<c.latMax &&
@@ -3043,14 +3090,237 @@ div.textContent="";
 });
 
 
-console.log(
-"EXPLORATION GRID:",
-cells
-);
+// =================================
+// DEVOLVER ESTADO
+// =================================
+
+return{
+
+parentCell:parentCell,
+
+grid:cells,
+
+items:items
+
+};
 
 }
 
 
+   // ===============================
+// EXPLORATION NAVIGATION
+// ===============================
+
+function renderExplorationNavigation(){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+
+const old=
+document.getElementById(
+"explorationNavigation"
+);
+
+if(old)
+old.remove();
+
+
+const nav=
+document.createElement("div");
+
+nav.id=
+"explorationNavigation";
+
+nav.style.display="flex";
+nav.style.gap="8px";
+nav.style.marginBottom="12px";
+
+
+const back=
+document.createElement("button");
+
+back.textContent="← BACK";
+
+back.disabled=
+explorationIndex<=0;
+
+back.onclick=()=>{
+goBackExploration();
+};
+
+
+const forward=
+document.createElement("button");
+
+forward.textContent="FORWARD →";
+
+forward.disabled=
+explorationIndex>=
+explorationHistory.length-1;
+
+forward.onclick=()=>{
+goForwardExploration();
+};
+
+
+nav.appendChild(back);
+nav.appendChild(forward);
+
+
+container.insertBefore(
+nav,
+container.firstChild
+);
+
+}
+
+   // ===============================
+// BACK
+// ===============================
+
+function goBackExploration(){
+
+if(explorationIndex<=0)
+return;
+
+explorationIndex--;
+
+renderSavedExploration(
+explorationHistory[
+explorationIndex
+]
+);
+
+renderExplorationNavigation();
+
+}
+
+   // ===============================
+// FORWARD
+// ===============================
+
+function goForwardExploration(){
+
+if(
+explorationIndex>=
+explorationHistory.length-1
+)
+return;
+
+explorationIndex++;
+
+renderSavedExploration(
+explorationHistory[
+explorationIndex
+]
+);
+
+renderExplorationNavigation();
+
+}
+
+   // ===============================
+// RESTORE SAVED EXPLORATION
+// ===============================
+
+function renderSavedExploration(
+exploration
+){
+
+const container=
+document.getElementById(
+"explorationContainer"
+);
+
+if(!container)
+return;
+
+
+container.innerHTML="";
+
+
+const title=
+document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginBottom="12px";
+
+title.textContent=
+`SPATIAL DATA · CELL ${
+exploration.parentCell.id
+}`;
+
+container.appendChild(title);
+
+
+// =================================
+// CREAR GRID VISUAL
+// =================================
+
+const grid=
+document.createElement("div");
+
+grid.id="explorationGrid";
+
+grid.style.display="grid";
+grid.style.gridTemplateColumns=
+"repeat(36,1fr)";
+grid.style.aspectRatio="2/1";
+grid.style.width="100%";
+grid.style.gap="2px";
+
+container.appendChild(grid);
+
+
+// =================================
+// RESTAURAR CELDAS
+// =================================
+
+exploration.grid.forEach(cell=>{
+
+const div=
+document.createElement("div");
+
+div.className="dataCell";
+
+div.onclick=()=>{
+
+clearGridSearch();
+
+showCellData(cell);
+
+};
+
+if(cell.state===0){
+
+div.style.background="#16803c";
+
+div.innerHTML=
+`
+<div style="font-size:9px;opacity:.6">
+${cell.id}
+</div>
+<div>
+${cell.items.length}
+</div>
+`;
+
+}else{
+
+div.style.background="#222";
+div.textContent="";
+
+}
+
+grid.appendChild(div);
+
+});
+
+}
 
 
 
