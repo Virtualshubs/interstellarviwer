@@ -4271,21 +4271,28 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.alt="";
 
     const lonSpan=parentCell.lonMax-parentCell.lonMin;
-    const scale=360/lonSpan;
+    const latSpan=parentCell.latMax-parentCell.latMin;
+
+    const widthScale=360/lonSpan;
+    const heightScale=180/latSpan;
 
     marble.style.position="absolute";
-    marble.style.width=`${scale*100}%`;
-    marble.style.height=`${scale*100}%`;
+    marble.style.width=`${widthScale*100}%`;
+    marble.style.height=`${heightScale*100}%`;
     marble.style.maxWidth="none";
     marble.style.maxHeight="none";
-    marble.style.left=`${-((parentCell.lonMin+180)/360)*scale*100}%`;
-    marble.style.top=`${-((90-parentCell.latMax)/180)*scale*100}%`;
+
+    marble.style.left=
+    `${-((parentCell.lonMin+180)/360)*widthScale*100}%`;
+
+    marble.style.top=
+    `${-((90-parentCell.latMax)/180)*heightScale*100}%`;
+
     marble.style.pointerEvents="none";
     marble.style.zIndex="0";
 
     grid.insertBefore(marble,grid.firstChild);
 }
-   
 
 // fin bloque observacion fase 2 espacial
    
