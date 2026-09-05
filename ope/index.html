@@ -49,7 +49,7 @@ h1{font-size:clamp(60px,9vw,145px);line-height:.88;letter-spacing:-.07em;font-we
 .simulation:before,.simulation:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(130,160,190,.1)}
 .simulation:before{inset:10%}
 .simulation:after{inset:25%}
-.simulation-orbit{position:absolute;width:115%;height:42%;left:-7%;top:29%;border:1px solid rgba(130,160,190,.12);border-radius:50%;transform:rotate(-25deg)}
+.simulation-orbit{position:absolute;width:115%;height:42%;left:-7%;top:29%;border:1px solid rgba(130,170,200,.12);border-radius:50%;transform:rotate(-25deg)}
 @keyframes simulationRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .data-point{position:absolute;width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 15px #fff;animation:dataPulse 2.5s ease-in-out infinite}
 .data-point:nth-child(2){top:22%;left:38%;animation-delay:0s}
@@ -68,6 +68,36 @@ h1{font-size:clamp(60px,9vw,145px);line-height:.88;letter-spacing:-.07em;font-we
 .video-status{position:absolute;right:35px;top:30px;z-index:2;font-size:9px;letter-spacing:.18em;color:#8e9aab;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .video-status:before{content:"";width:5px;height:5px;border-radius:50%;background:#a9c7d9;box-shadow:0 0 10px #a9c7d9;animation:statusPulse 2s infinite}
 @keyframes statusPulse{0%,100%{opacity:.3}50%{opacity:1}}
+.gallery{background:#020409;padding:12vw 0;overflow:hidden}
+.gallery-header{padding:0 8vw;margin-bottom:65px;display:flex;justify-content:space-between;align-items:flex-end}
+.gallery-title{max-width:850px}
+.gallery-title h2{font-size:clamp(55px,8vw,115px);font-weight:400;letter-spacing:-.07em;line-height:.88;margin:0}
+.gallery-title p{font-size:17px;line-height:1.6;color:#7f8a9b;max-width:520px;margin:30px 0 0}
+.gallery-meta{text-align:right;color:#657184;font-size:10px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
+.gallery-stage{position:relative;width:100%;overflow:hidden}
+.gallery-track{display:flex;gap:24px;transition:transform .8s cubic-bezier(.2,.7,.2,1);will-change:transform;cursor:grab;padding-left:8vw}
+.gallery-track.dragging{cursor:grabbing;transition:none}
+.gallery-slide{flex:0 0 min(76vw,1100px);position:relative;aspect-ratio:16/9;background:#0b1119;border:1px solid #202936;overflow:hidden}
+.gallery-image{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1s ease,filter 1s ease}
+.gallery-slide:hover .gallery-image{transform:scale(1.025)}
+.gallery-image:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,4,9,.05) 45%,rgba(2,4,9,.8) 100%)}
+.gallery-slide:nth-child(1) .gallery-image{background:radial-gradient(circle at 58% 48%,#3d6580 0,#183147 18%,#071522 48%,#020409 72%)}
+.gallery-slide:nth-child(2) .gallery-image{background:linear-gradient(135deg,#17283a,#05080e 65%),radial-gradient(circle,#52758b,#08121c)}
+.gallery-slide:nth-child(3) .gallery-image{background:linear-gradient(125deg,#101d2b,#03060a 65%),repeating-linear-gradient(90deg,transparent 0 80px,rgba(130,170,200,.08) 81px 82px)}
+.gallery-slide:nth-child(4) .gallery-image{background:radial-gradient(circle at 35% 40%,#536e7d,#182c3a 20%,#050a10 65%)}
+.gallery-slide:nth-child(5) .gallery-image{background:linear-gradient(140deg,#1d2936,#04070b 65%),radial-gradient(circle at 70% 35%,#416274,transparent 30%)}
+.gallery-info{position:absolute;left:35px;right:35px;bottom:30px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:30px}
+.gallery-caption span{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#9ca8b7;margin-bottom:12px}
+.gallery-caption h3{font-size:clamp(24px,3vw,42px);font-weight:400;letter-spacing:-.04em;margin:0}
+.gallery-caption p{font-size:13px;color:#a1acb9;line-height:1.5;max-width:420px;margin:10px 0 0}
+.gallery-index{font-size:11px;letter-spacing:.15em;color:#c0c9d3;white-space:nowrap}
+.gallery-controls{padding:40px 8vw 0;display:flex;justify-content:space-between;align-items:center}
+.gallery-progress{display:flex;gap:7px;align-items:center}
+.gallery-dot{width:28px;height:1px;background:#394452;cursor:pointer;transition:width .4s ease,background .4s ease}
+.gallery-dot.active{width:55px;background:#fff}
+.gallery-arrows{display:flex;gap:8px}
+.gallery-btn{width:48px;height:48px;border:1px solid #303946;background:transparent;color:#fff;font-size:17px;cursor:pointer;transition:.3s}
+.gallery-btn:hover{background:#fff;color:#020409}
 .collage{margin-top:90px;display:grid;grid-template-columns:1.15fr .85fr;gap:20px;min-height:600px}
 .collage-main{position:relative;min-height:600px;overflow:hidden;background:linear-gradient(145deg,#142435,#05080e 65%);border:1px solid #202936}
 .collage-main:before{content:"EARTH / ORBIT";position:absolute;top:25px;left:25px;font-size:9px;letter-spacing:.2em;color:#a5b0be;z-index:2}
@@ -118,6 +148,10 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 .earth{width:90vw;height:90vw;right:-30%;top:62%;opacity:.55}
 .hero-content{padding:0 7vw}
 .intro,.statement,.ope,.modules,.applications,.visual-section{padding:18vw 7vw}
+.gallery{padding:18vw 0}
+.gallery-header{padding:0 7vw;display:block}
+.gallery-title p{margin-top:25px}
+.gallery-meta{text-align:left;margin-top:30px}
 .intro{min-height:90vh}
 .ope{display:block}
 .ope-copy{width:100%}
@@ -132,6 +166,12 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 .collage{grid-template-columns:1fr;min-height:auto}
 .collage-main{min-height:400px}
 .collage-side{min-height:600px}
+.gallery-track{padding-left:7vw;gap:15px}
+.gallery-slide{flex-basis:86vw}
+.gallery-info{left:22px;right:22px;bottom:22px}
+.gallery-controls{padding:30px 7vw 0}
+.gallery-btn{width:42px;height:42px}
+.gallery-caption p{display:none}
 }
 @media(prefers-reduced-motion:reduce){
 *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
@@ -204,27 +244,102 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="video-status">System visualization</div>
 <div class="video-label">Orbital environment / Simulation</div>
 </div>
+</section>
 
-<div class="collage">
-<div class="collage-main reveal parallax">
-<div class="collage-label">Earth / Orbital environment</div>
+<section class="gallery" id="gallery">
+<div class="gallery-header reveal">
+<div class="gallery-title">
+<div class="eyebrow">04 / OPE Gallery</div>
+<h2>Captured from<br>the engine.</h2>
+<p>A selection of spatial environments, orbital scenarios and Earth observation views generated with Orbital Pass Engine.</p>
 </div>
-<div class="collage-side">
-<div class="collage-card reveal reveal-delay-1">
-<div class="collage-art art-orbit"></div>
-<div class="collage-label">Satellite trajectories</div>
+<div class="gallery-meta">OPE / VISUAL ARCHIVE</div>
 </div>
-<div class="collage-card reveal reveal-delay-2">
-<div class="collage-art art-grid"></div>
-<div class="collage-label">3D aerospace systems</div>
+
+<div class="gallery-stage">
+<div class="gallery-track" id="galleryTrack">
+
+<div class="gallery-slide">
+<div class="gallery-image"></div>
+<div class="gallery-info">
+<div class="gallery-caption">
+<span>01 / Earth observation</span>
+<h3>Earth from orbit</h3>
+<p>Spatial representation of an Earth observation scenario.</p>
 </div>
+<div class="gallery-index">01 / 05</div>
+</div>
+</div>
+
+<div class="gallery-slide">
+<div class="gallery-image"></div>
+<div class="gallery-info">
+<div class="gallery-caption">
+<span>02 / Orbital simulation</span>
+<h3>Satellite pass</h3>
+<p>Orbital trajectory and observation geometry visualized in real time.</p>
+</div>
+<div class="gallery-index">02 / 05</div>
+</div>
+</div>
+
+<div class="gallery-slide">
+<div class="gallery-image"></div>
+<div class="gallery-info">
+<div class="gallery-caption">
+<span>03 / Data environment</span>
+<h3>Spatial intelligence</h3>
+<p>Geospatial information transformed into an interactive spatial layer.</p>
+</div>
+<div class="gallery-index">03 / 05</div>
+</div>
+</div>
+
+<div class="gallery-slide">
+<div class="gallery-image"></div>
+<div class="gallery-info">
+<div class="gallery-caption">
+<span>04 / Mission scenario</span>
+<h3>Observation window</h3>
+<p>Understanding when and where a satellite can observe the Earth.</p>
+</div>
+<div class="gallery-index">04 / 05</div>
+</div>
+</div>
+
+<div class="gallery-slide">
+<div class="gallery-image"></div>
+<div class="gallery-info">
+<div class="gallery-caption">
+<span>05 / 3D aerospace</span>
+<h3>Digital mission environment</h3>
+<p>Interactive 3D representation of complex aerospace systems.</p>
+</div>
+<div class="gallery-index">05 / 05</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="gallery-controls reveal">
+<div class="gallery-progress" id="galleryProgress">
+<div class="gallery-dot active"></div>
+<div class="gallery-dot"></div>
+<div class="gallery-dot"></div>
+<div class="gallery-dot"></div>
+<div class="gallery-dot"></div>
+</div>
+<div class="gallery-arrows">
+<button class="gallery-btn" id="galleryPrev" aria-label="Previous image">←</button>
+<button class="gallery-btn" id="galleryNext" aria-label="Next image">→</button>
 </div>
 </div>
 </section>
 
 <section class="modules" id="technology">
 <div class="modules-header reveal">
-<div class="eyebrow">04 / Technology</div>
+<div class="eyebrow">05 / Technology</div>
 <h2>One spatial computing layer.</h2>
 </div>
 <div class="modules-grid">
@@ -247,7 +362,7 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 </section>
 
 <section class="applications" id="applications">
-<div class="eyebrow reveal">05 / Applications</div>
+<div class="eyebrow reveal">06 / Applications</div>
 <h2 class="reveal">Built for the<br>new space.</h2>
 <div class="application-grid">
 <div class="application reveal"><span>01 / SPACE OPERATIONS</span><h3>Mission planning</h3></div>
@@ -313,6 +428,100 @@ target.scrollIntoView({behavior:"smooth"});
 }
 });
 });
+
+const track=document.getElementById("galleryTrack");
+const slides=[...document.querySelectorAll(".gallery-slide")];
+const dots=[...document.querySelectorAll(".gallery-dot")];
+const prev=document.getElementById("galleryPrev");
+const next=document.getElementById("galleryNext");
+let currentSlide=0;
+let autoTimer;
+let dragStartX=0;
+let dragDelta=0;
+let dragging=false;
+
+function getSlideOffset(){
+if(!slides.length)return 0;
+const first=slides[0];
+const style=getComputedStyle(track);
+const gap=parseFloat(style.gap)||0;
+return first.offsetWidth+gap;
+}
+
+function updateGallery(index,animate=true){
+currentSlide=(index+slides.length)%slides.length;
+const offset=getSlideOffset()*currentSlide;
+track.style.transition=animate?"transform .8s cubic-bezier(.2,.7,.2,1)":"none";
+track.style.transform=`translateX(-${offset}px)`;
+dots.forEach((dot,i)=>dot.classList.toggle("active",i===currentSlide));
+}
+
+function startGalleryAuto(){
+clearInterval(autoTimer);
+autoTimer=setInterval(()=>updateGallery(currentSlide+1),6500);
+}
+
+prev.addEventListener("click",()=>{
+updateGallery(currentSlide-1);
+startGalleryAuto();
+});
+
+next.addEventListener("click",()=>{
+updateGallery(currentSlide+1);
+startGalleryAuto();
+});
+
+dots.forEach((dot,i)=>{
+dot.addEventListener("click",()=>{
+updateGallery(i);
+startGalleryAuto();
+});
+});
+
+track.addEventListener("pointerdown",e=>{
+dragging=true;
+dragStartX=e.clientX;
+dragDelta=0;
+track.classList.add("dragging");
+track.setPointerCapture(e.pointerId);
+clearInterval(autoTimer);
+});
+
+track.addEventListener("pointermove",e=>{
+if(!dragging)return;
+dragDelta=e.clientX-dragStartX;
+const offset=getSlideOffset()*currentSlide-dragDelta;
+track.style.transform=`translateX(-${offset}px)`;
+});
+
+track.addEventListener("pointerup",()=>{
+if(!dragging)return;
+dragging=false;
+track.classList.remove("dragging");
+if(Math.abs(dragDelta)>70){
+updateGallery(currentSlide+(dragDelta<0?1:-1));
+}else{
+updateGallery(currentSlide);
+}
+startGalleryAuto();
+});
+
+track.addEventListener("pointercancel",()=>{
+dragging=false;
+track.classList.remove("dragging");
+updateGallery(currentSlide);
+startGalleryAuto();
+});
+
+window.addEventListener("resize",()=>updateGallery(currentSlide,false));
+
+document.addEventListener("keydown",e=>{
+if(e.key==="ArrowRight")updateGallery(currentSlide+1);
+if(e.key==="ArrowLeft")updateGallery(currentSlide-1);
+});
+
+updateGallery(0,false);
+startGalleryAuto();
 </script>
 
 </body>
