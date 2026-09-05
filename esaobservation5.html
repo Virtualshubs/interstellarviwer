@@ -3106,30 +3106,16 @@ nextPage:nextPage
 // UPDATE EXPLORATION GRID VISUAL
 // ===============================
 
-function updateExplorationGridVisual(
-cells,
-grid
-){
-
-if(!grid)
-return;
-
-cells.forEach(
-(cell,index)=>{
-
-const div=
-grid.children[index];
-
-if(!div)
-return;
-
-if(cell.state===0){
-
-div.style.background=
-"#16803c";
-
-div.innerHTML=
-`
+function updateExplorationGridVisual(cells,grid){
+    if(!grid)return;
+    cells.forEach((cell,index)=>{
+        const div=grid.children[index];
+        if(!div)return;
+        div.style.border="1px solid rgba(255,255,255,.12)";
+        div.style.boxSizing="border-box";
+        if(cell.state===0){
+            div.style.background=cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)";
+            div.innerHTML=`
 <div style="font-size:9px;opacity:.6">
 ${cell.id}
 </div>
@@ -3137,17 +3123,11 @@ ${cell.id}
 ${cell.items.length}
 </div>
 `;
-
-}else{
-
-div.style.background="transparent";
-
-div.textContent="";
-
-}
-
-});
-
+        }else{
+            div.style.background="transparent";
+            div.textContent="";
+        }
+    });
 }
 
 
@@ -4259,10 +4239,8 @@ showCellData(cell);
 };
 
 if(cell.state===0){
-
-div.style.background=cell.discovered?"#ff4fa3":"#16803c";
-
-div.innerHTML=`
+    div.style.background=cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)";
+    div.innerHTML=`
 <div style="font-size:9px;opacity:.6">
 ${cell.id}
 </div>
@@ -4270,14 +4248,15 @@ ${cell.id}
 ${cell.items.length}
 </div>
 `;
-
 }else{
-
-div.style.background="#222";
-div.textContent="";
-
+    div.style.background="transparent";
+    div.textContent="";
 }
 
+div.style.border="1px solid rgba(255,255,255,.12)";
+div.style.boxSizing="border-box";
+
+   
 grid.appendChild(div);
 
 });
@@ -4316,6 +4295,19 @@ function createExplorationBlueMarble(grid,parentCell){
 // fin bloque observacion fase 2 espacial
    
 
+
+
+
+
+
+
+
+
+
+
+
+
+   
 // ===============================
 // ADD ROW
 // ===============================
