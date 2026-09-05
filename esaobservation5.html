@@ -4137,6 +4137,12 @@ container.firstChild
 
 }
 
+
+
+
+
+   
+
    // ===============================
 // BACK
 // ===============================
@@ -4227,9 +4233,7 @@ container.appendChild(button);
 // =================================
 
 const grid=document.createElement("div");
-
 grid.id="explorationGrid";
-
 grid.style.display="grid";
 grid.style.gridTemplateColumns="repeat(36,1fr)";
 grid.style.aspectRatio="2/1";
@@ -4237,6 +4241,8 @@ grid.style.width="100%";
 grid.style.gap="2px";
 
 container.appendChild(grid);
+
+createExplorationBlueMarble(grid,exploration.parentCell);
 
 // =================================
 // RESTAURAR CELDAS
@@ -4278,6 +4284,48 @@ grid.appendChild(div);
 });
 
 }
+
+
+
+function createExplorationBlueMarble(grid,parentCell){
+    if(!grid||!parentCell)return;
+
+    grid.style.position="relative";
+    grid.style.overflow="hidden";
+
+    const marble=document.createElement("img");
+    marble.className="explorationBlueMarble";
+    marble.src="https://3d.staratlas.es/bluemarble.jpg";
+    marble.alt="";
+
+    const lonSpan=parentCell.lonMax-parentCell.lonMin;
+    const latSpan=parentCell.latMax-parentCell.latMin;
+
+    const widthPercent=(360/lonSpan)*100;
+    const heightPercent=(180/latSpan)*100;
+
+    const leftPercent=-((parentCell.lonMin+180)/lonSpan)*100;
+    const topPercent=-((90-parentCell.latMax)/latSpan)*100;
+
+    marble.style.position="absolute";
+    marble.style.width=`${widthPercent}%`;
+    marble.style.height=`${heightPercent}%`;
+    marble.style.left=`${leftPercent}%`;
+    marble.style.top=`${topPercent}%`;
+    marble.style.maxWidth="none";
+    marble.style.maxHeight="none";
+    marble.style.pointerEvents="none";
+    marble.style.zIndex="0";
+
+    grid.insertBefore(marble,grid.firstChild);
+
+    grid.querySelectorAll(".dataCell").forEach(cell=>{
+        cell.style.position="relative";
+        cell.style.zIndex="1";
+    });
+}
+
+
 
    
 
