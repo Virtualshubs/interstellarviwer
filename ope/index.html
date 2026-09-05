@@ -10,6 +10,7 @@
 html,body{margin:0;width:100%;min-height:100%;background:#020409;color:#fff;font-family:Arial,Helvetica,sans-serif}
 body{overflow-x:hidden}
 a{text-decoration:none;color:inherit}
+button{font-family:inherit}
 section{position:relative;min-height:100vh}
 .hero{height:100vh;display:flex;align-items:center;overflow:hidden;background:radial-gradient(circle at 50% 55%,#101a29 0,#050913 32%,#020409 68%)}
 .hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:90px 90px;opacity:.08}
@@ -98,23 +99,37 @@ h1{font-size:clamp(60px,9vw,145px);line-height:.88;letter-spacing:-.07em;font-we
 .gallery-arrows{display:flex;gap:8px}
 .gallery-btn{width:48px;height:48px;border:1px solid #303946;background:transparent;color:#fff;font-size:17px;cursor:pointer;transition:.3s}
 .gallery-btn:hover{background:#fff;color:#020409}
-.collage{margin-top:90px;display:grid;grid-template-columns:1.15fr .85fr;gap:20px;min-height:600px}
-.collage-main{position:relative;min-height:600px;overflow:hidden;background:linear-gradient(145deg,#142435,#05080e 65%);border:1px solid #202936}
-.collage-main:before{content:"EARTH / ORBIT";position:absolute;top:25px;left:25px;font-size:9px;letter-spacing:.2em;color:#a5b0be;z-index:2}
-.collage-main:after{content:"";position:absolute;width:65%;height:65%;border-radius:50%;right:-15%;bottom:-15%;background:radial-gradient(circle at 35% 30%,#496c7f,#142b3b 45%,#020409 72%);box-shadow:-20px 0 70px rgba(70,120,150,.16)}
-.collage-side{display:grid;grid-template-rows:1fr 1fr;gap:20px}
-.collage-card{position:relative;overflow:hidden;border:1px solid #202936;background:#0c121b;min-height:290px}
-.collage-card:nth-child(1){background:linear-gradient(135deg,#1b2737,#060a11 70%)}
-.collage-card:nth-child(2){background:linear-gradient(135deg,#111b29,#05070c 70%)}
-.collage-card:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.06) 50%,transparent 80%);transform:translateX(-100%);transition:transform 1s ease}
-.collage-card:hover:before{transform:translateX(100%)}
-.collage-art{position:absolute;inset:12%;border:1px solid rgba(150,180,200,.18);transform:rotate(-8deg);transition:transform .8s ease}
-.collage-card:hover .collage-art{transform:rotate(-3deg) scale(1.03)}
-.art-orbit:before,.art-orbit:after{content:"";position:absolute;border:1px solid rgba(130,170,200,.2);border-radius:50%}
-.art-orbit:before{inset:15%}
-.art-orbit:after{inset:32%}
-.art-grid{background:linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px);background-size:35px 35px}
-.collage-label{position:absolute;left:22px;bottom:20px;font-size:9px;letter-spacing:.18em;color:#9ba7b7;text-transform:uppercase}
+.aero-collage{background:#080c13;padding:10vw 8vw;overflow:hidden}
+.aero-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:75px}
+.aero-header h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0;max-width:800px}
+.aero-header p{color:#778294;font-size:14px;line-height:1.6;max-width:300px;margin:0}
+.collage-carousel{position:relative;overflow:hidden}
+.collage-track{display:flex;gap:20px;transition:transform .9s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.collage-item{position:relative;flex:0 0 72%;height:570px;overflow:hidden;border:1px solid #202936;background:#0c121b}
+.collage-item:nth-child(1){background:linear-gradient(145deg,#142435,#05080e 65%)}
+.collage-item:nth-child(2){background:linear-gradient(135deg,#1b2737,#060a11 70%)}
+.collage-item:nth-child(3){background:linear-gradient(135deg,#111b29,#05070c 70%)}
+.collage-item:nth-child(4){background:linear-gradient(135deg,#172735,#04070c 70%)}
+.collage-item:nth-child(5){background:linear-gradient(135deg,#101c2b,#03060a 70%)}
+.collage-visual{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1s ease}
+.collage-item:hover .collage-visual{transform:scale(1.035)}
+.collage-visual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(2,4,9,.85))}
+.collage-earth .collage-visual:before{content:"";position:absolute;width:65%;height:65%;border-radius:50%;right:-10%;bottom:-15%;background:radial-gradient(circle at 35% 30%,#496c7f,#142b3b 45%,#020409 72%);box-shadow:-20px 0 70px rgba(70,120,150,.16)}
+.collage-orbit .collage-visual:before,.collage-orbit .collage-visual:after{content:"";position:absolute;border:1px solid rgba(130,170,200,.25);border-radius:50%}
+.collage-orbit .collage-visual:before{width:75%;height:38%;left:12%;top:30%;transform:rotate(-15deg)}
+.collage-orbit .collage-visual:after{width:45%;height:22%;left:28%;top:39%;transform:rotate(-15deg)}
+.collage-grid .collage-visual{background-image:linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:45px 45px}
+.collage-system .collage-visual:before{content:"";position:absolute;width:55%;height:55%;left:22%;top:20%;border:1px solid rgba(150,180,200,.2);transform:rotate(-8deg);box-shadow:0 0 0 35px rgba(130,170,200,.025),0 0 0 70px rgba(130,170,200,.02)}
+.collage-data .collage-visual:before{content:"";position:absolute;inset:15%;background:repeating-linear-gradient(90deg,transparent 0 35px,rgba(150,190,210,.08) 36px 37px),repeating-linear-gradient(0deg,transparent 0 35px,rgba(150,190,210,.08) 36px 37px);transform:perspective(400px) rotateX(55deg) rotateZ(-10deg)}
+.collage-info{position:absolute;left:30px;right:30px;bottom:28px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
+.collage-info span{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#9ca8b7}
+.collage-info h3{font-size:clamp(25px,3vw,40px);font-weight:400;letter-spacing:-.04em;margin:12px 0 0}
+.collage-index{font-size:10px;letter-spacing:.16em;color:#c0c9d3}
+.collage-controls{display:flex;justify-content:space-between;align-items:center;margin-top:30px}
+.collage-progress{font-size:10px;letter-spacing:.18em;color:#788596}
+.collage-buttons{display:flex;gap:8px}
+.collage-btn{width:44px;height:44px;border:1px solid #303946;background:transparent;color:#fff;cursor:pointer;transition:.3s}
+.collage-btn:hover{background:#fff;color:#020409}
 .modules{background:#eef0ef;color:#080b10;padding:10vw}
 .modules-header{max-width:800px;margin-bottom:80px}
 .modules h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0}
@@ -142,12 +157,11 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 .reveal-delay-1{transition-delay:.12s}
 .reveal-delay-2{transition-delay:.24s}
 .reveal-delay-3{transition-delay:.36s}
-.parallax{transition:transform .15s linear}
 @media(max-width:800px){
 .nav-links{display:none}
 .earth{width:90vw;height:90vw;right:-30%;top:62%;opacity:.55}
 .hero-content{padding:0 7vw}
-.intro,.statement,.ope,.modules,.applications,.visual-section{padding:18vw 7vw}
+.intro,.statement,.ope,.modules,.applications,.visual-section,.aero-collage{padding:18vw 7vw}
 .gallery{padding:18vw 0}
 .gallery-header{padding:0 7vw;display:block}
 .gallery-title p{margin-top:25px}
@@ -156,22 +170,21 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 .ope{display:block}
 .ope-copy{width:100%}
 .simulation{position:relative;width:90vw;height:90vw;right:auto;margin:80px auto 0}
-.modules-grid{grid-template-columns:1fr}
-.module:not(:last-child){border-right:0}
-.module:not(:first-child){padding-left:0}
-.application-grid{grid-template-columns:1fr}
-.visual-header{display:block}
-.visual-header p{margin-top:30px}
+.visual-header,.aero-header{display:block}
+.visual-header p,.aero-header p{margin-top:30px}
 .video-wrap{height:60vw;min-height:300px}
-.collage{grid-template-columns:1fr;min-height:auto}
-.collage-main{min-height:400px}
-.collage-side{min-height:600px}
 .gallery-track{padding-left:7vw;gap:15px}
 .gallery-slide{flex-basis:86vw}
 .gallery-info{left:22px;right:22px;bottom:22px}
 .gallery-controls{padding:30px 7vw 0}
 .gallery-btn{width:42px;height:42px}
 .gallery-caption p{display:none}
+.collage-item{flex-basis:86vw;height:450px}
+.collage-info{left:22px;right:22px;bottom:22px}
+.modules-grid{grid-template-columns:1fr}
+.module:not(:last-child){border-right:0}
+.module:not(:first-child){padding-left:0}
+.application-grid{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){
 *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
@@ -196,7 +209,7 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="hero-sub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.</div>
 <a href="#ope" class="cta">Explore OPE</a>
 </div>
-<div class="earth parallax"><div class="orbit"></div><div class="satellite"></div></div>
+<div class="earth"><div class="orbit"></div><div class="satellite"></div></div>
 <div class="scroll-indicator"><span class="scroll-line"></span>Scroll to explore</div>
 </section>
 
@@ -217,7 +230,7 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="eyebrow">02 / Orbital Pass Engine</div>
 <h2>From orbital data to operational intelligence.</h2>
 <p>OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.</p>
-<a href="#technology" class="cta">Discover the engine</a>
+<a href="#gallery" class="cta">Explore the engine</a>
 </div>
 <div class="simulation reveal reveal-delay-1">
 <div class="simulation-orbit"></div>
@@ -337,9 +350,88 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 </div>
 </section>
 
+<section class="aero-collage">
+<div class="aero-header reveal">
+<div>
+<div class="eyebrow">05 / Aerospace visual archive</div>
+<h2>Beyond the<br>orbital view.</h2>
+</div>
+<p>Digital twins, mission environments, spatial models and aerospace systems represented through interactive 3D.</p>
+</div>
+
+<div class="collage-carousel">
+<div class="collage-track" id="collageTrack">
+
+<div class="collage-item collage-earth">
+<div class="collage-visual"></div>
+<div class="collage-info">
+<div>
+<span>01 / Earth systems</span>
+<h3>Planetary context</h3>
+</div>
+<div class="collage-index">01 / 05</div>
+</div>
+</div>
+
+<div class="collage-item collage-orbit">
+<div class="collage-visual"></div>
+<div class="collage-info">
+<div>
+<span>02 / Orbital mechanics</span>
+<h3>Trajectory architecture</h3>
+</div>
+<div class="collage-index">02 / 05</div>
+</div>
+</div>
+
+<div class="collage-item collage-grid">
+<div class="collage-visual"></div>
+<div class="collage-info">
+<div>
+<span>03 / Spatial computing</span>
+<h3>Data as geometry</h3>
+</div>
+<div class="collage-index">03 / 05</div>
+</div>
+</div>
+
+<div class="collage-item collage-system">
+<div class="collage-visual"></div>
+<div class="collage-info">
+<div>
+<span>04 / Digital twins</span>
+<h3>Systems in 3D</h3>
+</div>
+<div class="collage-index">04 / 05</div>
+</div>
+</div>
+
+<div class="collage-item collage-data">
+<div class="collage-visual"></div>
+<div class="collage-info">
+<div>
+<span>05 / Mission environments</span>
+<h3>Operational space</h3>
+</div>
+<div class="collage-index">05 / 05</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="collage-controls">
+<div class="collage-progress" id="collageCounter">01 / 05</div>
+<div class="collage-buttons">
+<button class="collage-btn" id="collagePrev" aria-label="Previous visual">←</button>
+<button class="collage-btn" id="collageNext" aria-label="Next visual">→</button>
+</div>
+</div>
+</section>
+
 <section class="modules" id="technology">
 <div class="modules-header reveal">
-<div class="eyebrow">05 / Technology</div>
+<div class="eyebrow">06 / Technology</div>
 <h2>One spatial computing layer.</h2>
 </div>
 <div class="modules-grid">
@@ -362,7 +454,7 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 </section>
 
 <section class="applications" id="applications">
-<div class="eyebrow reveal">06 / Applications</div>
+<div class="eyebrow reveal">07 / Applications</div>
 <h2 class="reveal">Built for the<br>new space.</h2>
 <div class="application-grid">
 <div class="application reveal"><span>01 / SPACE OPERATIONS</span><h3>Mission planning</h3></div>
@@ -396,7 +488,6 @@ revealObserver.unobserve(entry.target);
 }
 });
 },{threshold:.12});
-
 document.querySelectorAll(".reveal").forEach(el=>revealObserver.observe(el));
 
 let ticking=false;
@@ -405,14 +496,7 @@ if(!ticking){
 requestAnimationFrame(()=>{
 const y=window.scrollY;
 const earth=document.querySelector(".earth");
-if(earth&&window.innerWidth>800){
-earth.style.transform=`translateY(calc(-50% + ${y*.035}px))`;
-}
-document.querySelectorAll(".collage .parallax").forEach(el=>{
-const rect=el.getBoundingClientRect();
-const offset=(window.innerHeight/2-rect.top)*.025;
-el.style.transform=`translateY(${offset}px)`;
-});
+if(earth&&window.innerWidth>800)earth.style.transform=`translateY(calc(-50% + ${y*.035}px))`;
 ticking=false;
 });
 ticking=true;
@@ -429,99 +513,103 @@ target.scrollIntoView({behavior:"smooth"});
 });
 });
 
-const track=document.getElementById("galleryTrack");
-const slides=[...document.querySelectorAll(".gallery-slide")];
-const dots=[...document.querySelectorAll(".gallery-dot")];
-const prev=document.getElementById("galleryPrev");
-const next=document.getElementById("galleryNext");
-let currentSlide=0;
-let autoTimer;
-let dragStartX=0;
-let dragDelta=0;
-let dragging=false;
+const galleryTrack=document.getElementById("galleryTrack");
+const gallerySlides=[...document.querySelectorAll(".gallery-slide")];
+const galleryDots=[...document.querySelectorAll(".gallery-dot")];
+const galleryPrev=document.getElementById("galleryPrev");
+const galleryNext=document.getElementById("galleryNext");
+let galleryCurrent=0;
+let galleryTimer;
+let galleryDragStart=0;
+let galleryDragDelta=0;
+let galleryDragging=false;
 
-function getSlideOffset(){
-if(!slides.length)return 0;
-const first=slides[0];
-const style=getComputedStyle(track);
-const gap=parseFloat(style.gap)||0;
-return first.offsetWidth+gap;
+function galleryOffset(){
+if(!gallerySlides.length)return 0;
+const gap=parseFloat(getComputedStyle(galleryTrack).gap)||0;
+return gallerySlides[0].offsetWidth+gap;
 }
-
 function updateGallery(index,animate=true){
-currentSlide=(index+slides.length)%slides.length;
-const offset=getSlideOffset()*currentSlide;
-track.style.transition=animate?"transform .8s cubic-bezier(.2,.7,.2,1)":"none";
-track.style.transform=`translateX(-${offset}px)`;
-dots.forEach((dot,i)=>dot.classList.toggle("active",i===currentSlide));
+galleryCurrent=(index+gallerySlides.length)%gallerySlides.length;
+const offset=galleryOffset()*galleryCurrent;
+galleryTrack.style.transition=animate?"transform .8s cubic-bezier(.2,.7,.2,1)":"none";
+galleryTrack.style.transform=`translateX(-${offset}px)`;
+galleryDots.forEach((dot,i)=>dot.classList.toggle("active",i===galleryCurrent));
 }
-
-function startGalleryAuto(){
-clearInterval(autoTimer);
-autoTimer=setInterval(()=>updateGallery(currentSlide+1),6500);
+function restartGallery(){
+clearInterval(galleryTimer);
+galleryTimer=setInterval(()=>updateGallery(galleryCurrent+1),6500);
 }
-
-prev.addEventListener("click",()=>{
-updateGallery(currentSlide-1);
-startGalleryAuto();
+galleryPrev.addEventListener("click",()=>{updateGallery(galleryCurrent-1);restartGallery()});
+galleryNext.addEventListener("click",()=>{updateGallery(galleryCurrent+1);restartGallery()});
+galleryDots.forEach((dot,i)=>dot.addEventListener("click",()=>{updateGallery(i);restartGallery()}));
+galleryTrack.addEventListener("pointerdown",e=>{
+galleryDragging=true;
+galleryDragStart=e.clientX;
+galleryDragDelta=0;
+galleryTrack.classList.add("dragging");
+galleryTrack.setPointerCapture(e.pointerId);
+clearInterval(galleryTimer);
 });
-
-next.addEventListener("click",()=>{
-updateGallery(currentSlide+1);
-startGalleryAuto();
+galleryTrack.addEventListener("pointermove",e=>{
+if(!galleryDragging)return;
+galleryDragDelta=e.clientX-galleryDragStart;
+const offset=galleryOffset()*galleryCurrent-galleryDragDelta;
+galleryTrack.style.transform=`translateX(-${offset}px)`;
 });
-
-dots.forEach((dot,i)=>{
-dot.addEventListener("click",()=>{
-updateGallery(i);
-startGalleryAuto();
+galleryTrack.addEventListener("pointerup",()=>{
+if(!galleryDragging)return;
+galleryDragging=false;
+galleryTrack.classList.remove("dragging");
+if(Math.abs(galleryDragDelta)>70)updateGallery(galleryCurrent+(galleryDragDelta<0?1:-1));
+else updateGallery(galleryCurrent);
+restartGallery();
 });
+galleryTrack.addEventListener("pointercancel",()=>{
+galleryDragging=false;
+galleryTrack.classList.remove("dragging");
+updateGallery(galleryCurrent);
+restartGallery();
 });
+window.addEventListener("resize",()=>updateGallery(galleryCurrent,false));
 
-track.addEventListener("pointerdown",e=>{
-dragging=true;
-dragStartX=e.clientX;
-dragDelta=0;
-track.classList.add("dragging");
-track.setPointerCapture(e.pointerId);
-clearInterval(autoTimer);
-});
+const collageTrack=document.getElementById("collageTrack");
+const collageItems=[...document.querySelectorAll(".collage-item")];
+const collagePrev=document.getElementById("collagePrev");
+const collageNext=document.getElementById("collageNext");
+const collageCounter=document.getElementById("collageCounter");
+let collageCurrent=0;
+let collageTimer;
 
-track.addEventListener("pointermove",e=>{
-if(!dragging)return;
-dragDelta=e.clientX-dragStartX;
-const offset=getSlideOffset()*currentSlide-dragDelta;
-track.style.transform=`translateX(-${offset}px)`;
-});
-
-track.addEventListener("pointerup",()=>{
-if(!dragging)return;
-dragging=false;
-track.classList.remove("dragging");
-if(Math.abs(dragDelta)>70){
-updateGallery(currentSlide+(dragDelta<0?1:-1));
-}else{
-updateGallery(currentSlide);
+function collageOffset(){
+if(!collageItems.length)return 0;
+const gap=parseFloat(getComputedStyle(collageTrack).gap)||0;
+return collageItems[0].offsetWidth+gap;
 }
-startGalleryAuto();
-});
-
-track.addEventListener("pointercancel",()=>{
-dragging=false;
-track.classList.remove("dragging");
-updateGallery(currentSlide);
-startGalleryAuto();
-});
-
-window.addEventListener("resize",()=>updateGallery(currentSlide,false));
+function updateCollage(index,animate=true){
+collageCurrent=(index+collageItems.length)%collageItems.length;
+const offset=collageOffset()*collageCurrent;
+collageTrack.style.transition=animate?"transform .9s cubic-bezier(.2,.7,.2,1)":"none";
+collageTrack.style.transform=`translateX(-${offset}px)`;
+collageCounter.textContent=`${String(collageCurrent+1).padStart(2,"0")} / ${String(collageItems.length).padStart(2,"0")}`;
+}
+function restartCollage(){
+clearInterval(collageTimer);
+collageTimer=setInterval(()=>updateCollage(collageCurrent+1),7000);
+}
+collagePrev.addEventListener("click",()=>{updateCollage(collageCurrent-1);restartCollage()});
+collageNext.addEventListener("click",()=>{updateCollage(collageCurrent+1);restartCollage()});
+window.addEventListener("resize",()=>updateCollage(collageCurrent,false));
 
 document.addEventListener("keydown",e=>{
-if(e.key==="ArrowRight")updateGallery(currentSlide+1);
-if(e.key==="ArrowLeft")updateGallery(currentSlide-1);
+if(e.key==="ArrowRight")updateGallery(galleryCurrent+1);
+if(e.key==="ArrowLeft")updateGallery(galleryCurrent-1);
 });
 
 updateGallery(0,false);
-startGalleryAuto();
+restartGallery();
+updateCollage(0,false);
+restartCollage();
 </script>
 
 </body>
