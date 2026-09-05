@@ -1374,6 +1374,8 @@ background:transparent;
 color:#000!important;
 opacity:1!important;
 visibility:visible!important;
+   filter:none!important;
+   backdrop-filter:none!important;
 }
 
 #explorationGrid .dataCell div{
@@ -1387,6 +1389,8 @@ color:#000!important;
 opacity:1!important;
 visibility:visible!important;
 }
+
+
   
 </style>
 </head>
@@ -4305,7 +4309,7 @@ function createExplorationBlueMarble(grid,parentCell){
 
     const marble=document.createElement("img");
     marble.className="explorationBlueMarble";
-    marble.src="https://3d.staratlas.es/bluemarble.jpg";
+    marble.src="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
     marble.alt="";
 
     const lonSpan=parentCell.lonMax-parentCell.lonMin;
