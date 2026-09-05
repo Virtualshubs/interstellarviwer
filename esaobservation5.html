@@ -2589,9 +2589,6 @@ observations.firstChild
 
 }
 
-
-   
-   
 // ===============================
 // EXPLORE CELL
 // ===============================
@@ -2640,6 +2637,14 @@ const latestURL=
 const latestRes=
 await fetch(latestURL);
 
+if(!latestRes.ok){
+
+throw new Error(
+`STAC HTTP ${latestRes.status}`
+);
+
+}
+
 const latestJSON=
 await latestRes.json();
 
@@ -2663,7 +2668,7 @@ latestJSON.features[0]
 
 
 // =================================
-// CONSULTA ESPACIAL
+// CONSULTA ESPACIAL INICIAL
 // =================================
 
 const url=
@@ -2674,14 +2679,38 @@ const url=
 `${cell.lonMax},${cell.latMax}`;
 
 console.log(
+"==================================="
+);
+
+console.log(
+"SPACE EXPLORATION START"
+);
+
+console.log(
+"PARENT CELL:",
+cell.id
+);
+
+console.log(
+"BBOX:",
+cell.lonMin,
+cell.latMin,
+cell.lonMax,
+cell.latMax
+);
+
+console.log(
+"INITIAL LIMIT:",
+2000
+);
+
+console.log(
 "SPACE QUERY:",
 url
 );
 
-
 const res=
 await fetch(url);
-
 
 if(!res.ok){
 
@@ -2691,16 +2720,43 @@ throw new Error(
 
 }
 
-
 const json=
 await res.json();
 
+const received=
+json.features?.length||0;
+
+const matched=
+json.numberMatched??"unknown";
+
+const nextPage=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||null;
 
 console.log(
-"SPACE RESULT:",
-json
+"SPACE RESULT"
 );
 
+console.log(
+"MATCHED:",
+matched
+);
+
+console.log(
+"RECEIVED:",
+received
+);
+
+console.log(
+"NEXT PAGE:",
+nextPage
+);
+
+
+// =================================
+// SIN RESULTADOS
+// =================================
 
 if(
 !json.features||
@@ -2753,9 +2809,7 @@ const exploration=
 createExplorationGrid(
 json.features,
 cell,
-json.links?.find(
-l=>l.rel==="next"
-)?.href || null
+nextPage
 );
 
 
@@ -2771,7 +2825,36 @@ explorationIndex=
 explorationHistory.length-1;
 
 
+// =================================
+// MOSTRAR RESULTADO
+// =================================
+
+renderSavedExploration(
+exploration
+);
+
 renderExplorationNavigation();
+
+console.log(
+"INITIAL LOCAL GRID CREATED"
+);
+
+console.log(
+"OBSERVATIONS:",
+received
+);
+
+console.log(
+"NEXT PAGE AVAILABLE:",
+!!nextPage
+);
+
+console.log(
+"==================================="
+);
+
+document.getElementById("status").textContent=
+`Space exploration ready · ${received.toLocaleString()} observations`;
 
 }catch(error){
 
@@ -2797,10 +2880,16 @@ Spatial query error: ${error.message}
 // CREATE EXPLORATION GRID
 // ===============================
 
-function createExplorationGrid(items,parentCell,nextPage){
+function createExplorationGrid(
+items,
+parentCell,
+nextPage
+){
 
 const container=
-document.getElementById("explorationContainer");
+document.getElementById(
+"explorationContainer"
+);
 
 if(!container)
 return null;
@@ -2808,7 +2897,8 @@ return null;
 container.innerHTML="";
 
 
-const title=document.createElement("h3");
+const title=
+document.createElement("h3");
 
 title.style.color="#66ccff";
 title.style.marginBottom="12px";
@@ -2819,33 +2909,57 @@ title.textContent=
 container.appendChild(title);
 
 
+// =================================
+// RE-EXPLORE BUTTON
+// =================================
 
-   const button=document.createElement("button");
-button.id="reExploreSpaceButton";
-button.textContent="RE-EXPLORE SPACE";
+const button=
+document.createElement("button");
+
+button.id=
+"reExploreSpaceButton";
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
 button.style.marginBottom="15px";
 button.style.width="100%";
 button.style.padding="10px";
-button.style.background="rgba(255,176,77,.08)";
-button.style.border="1px solid rgba(255,176,77,.35)";
+button.style.background=
+"rgba(255,176,77,.08)";
+button.style.border=
+"1px solid rgba(255,176,77,.35)";
 button.style.borderRadius="6px";
 button.style.color="#ffb04d";
 button.style.cursor="pointer";
 button.style.fontSize="11px";
+
 button.onclick=()=>{
+
 reExploreSpace(
-explorationHistory[explorationIndex]
+explorationHistory[
+explorationIndex
+]
 );
+
 };
+
 container.appendChild(button);
 
 
-const grid=document.createElement("div");
+// =================================
+// GRID
+// =================================
 
-grid.id="explorationGrid";
+const grid=
+document.createElement("div");
+
+grid.id=
+"explorationGrid";
 
 grid.style.display="grid";
-grid.style.gridTemplateColumns="repeat(36,1fr)";
+grid.style.gridTemplateColumns=
+"repeat(36,1fr)";
 grid.style.aspectRatio="2/1";
 grid.style.width="100%";
 grid.style.gap="2px";
@@ -2858,10 +2972,12 @@ const cols=36;
 
 
 const latStep=
-(parentCell.latMax-parentCell.latMin)/rows;
+(parentCell.latMax-parentCell.latMin)/
+rows;
 
 const lonStep=
-(parentCell.lonMax-parentCell.lonMin)/cols;
+(parentCell.lonMax-parentCell.lonMin)/
+cols;
 
 
 const cells=[];
@@ -2885,21 +3001,24 @@ y,
 state:-1,
 
 latMin:
-parentCell.latMin+y*latStep,
+parentCell.latMin+
+y*latStep,
 
 latMax:
-parentCell.latMin+(y+1)*latStep,
+parentCell.latMin+
+(y+1)*latStep,
 
 lonMin:
-parentCell.lonMin+x*lonStep,
+parentCell.lonMin+
+x*lonStep,
 
 lonMax:
-parentCell.lonMin+(x+1)*lonStep,
+parentCell.lonMin+
+(x+1)*lonStep,
 
 items:[]
 
 };
-
 
 cells.push(cell);
 
@@ -2907,8 +3026,8 @@ cells.push(cell);
 const div=
 document.createElement("div");
 
-div.className="dataCell";
-
+div.className=
+"dataCell";
 
 div.onclick=()=>{
 
@@ -2918,7 +3037,6 @@ showCellData(cell);
 
 };
 
-
 grid.appendChild(div);
 
 }
@@ -2927,176 +3045,87 @@ grid.appendChild(div);
 
 
 // =================================
-// DISTRIBUIR ITEMS
+// DISTRIBUIR ITEMS INICIALES
 // =================================
 
-items.forEach(item=>{
-
-let coords=null;
-
-const geom=item.geometry;
-
-
-// POINT
-
-if(
-geom &&
-geom.type==="Point"
-){
-
-coords=
-geom.coordinates;
-
+appendExplorationSpatialData(
+items,
+{
+grid:cells
 }
-
-
-// LAT / LON
-
-if(
-!coords &&
-item.properties &&
-item.properties.latitude!==undefined &&
-item.properties.longitude!==undefined
-){
-
-coords=[
-item.properties.longitude,
-item.properties.latitude
-];
-
-}
-
-
-// LAT / LON ALTERNATIVOS
-
-if(
-!coords &&
-item.properties &&
-item.properties.lat!==undefined &&
-item.properties.lon!==undefined
-){
-
-coords=[
-item.properties.lon,
-item.properties.lat
-];
-
-}
-
-
-// BBOX
-
-if(
-!coords &&
-item.bbox
-){
-
-coords=[
-
-(item.bbox[0]+item.bbox[2])/2,
-(item.bbox[1]+item.bbox[3])/2
-
-];
-
-}
-
-
-// POLYGON
-
-if(
-!coords &&
-geom &&
-geom.type==="Polygon"
-){
-
-const ring=
-geom.coordinates[0];
-
-let lon=0;
-let lat=0;
-
-ring.forEach(c=>{
-lon+=c[0];
-lat+=c[1];
-});
-
-coords=[
-lon/ring.length,
-lat/ring.length
-];
-
-}
-
-
-// MULTIPOLYGON
-
-if(
-!coords &&
-geom &&
-geom.type==="MultiPolygon"
-){
-
-const ring=
-geom.coordinates[0][0];
-
-let lon=0;
-let lat=0;
-
-ring.forEach(c=>{
-lon+=c[0];
-lat+=c[1];
-});
-
-coords=[
-lon/ring.length,
-lat/ring.length
-];
-
-}
-
-
-if(!coords)
-return;
-
-
-const lon=coords[0];
-const lat=coords[1];
-
-
-const target=
-cells.find(c=>
-
-lat>=c.latMin &&
-lat<c.latMax &&
-
-lon>=c.lonMin &&
-lon<c.lonMax
-
 );
-
-
-if(target){
-
-target.state=0;
-target.items.push(item);
-
-}
-
-});
 
 
 // =================================
 // ACTUALIZAR VISUAL
 // =================================
 
-cells.forEach((cell,index)=>{
+updateExplorationGridVisual(
+cells,
+grid
+);
+
+
+// =================================
+// DEVOLVER ESTADO
+// =================================
+
+return{
+
+parentCell:parentCell,
+
+grid:cells,
+
+items:items,
+
+bbox:{
+
+latMin:
+parentCell.latMin,
+
+latMax:
+parentCell.latMax,
+
+lonMin:
+parentCell.lonMin,
+
+lonMax:
+parentCell.lonMax
+
+},
+
+nextPage:nextPage
+
+};
+
+}
+
+
+// ===============================
+// UPDATE EXPLORATION GRID VISUAL
+// ===============================
+
+function updateExplorationGridVisual(
+cells,
+grid
+){
+
+if(!grid)
+return;
+
+cells.forEach(
+(cell,index)=>{
 
 const div=
 grid.children[index];
 
+if(!div)
+return;
+
 if(cell.state===0){
 
-div.style.background="#16803c";
+div.style.background=
+"#16803c";
 
 div.innerHTML=
 `
@@ -3110,8 +3139,412 @@ ${cell.items.length}
 
 }else{
 
-div.style.background="#222";
+div.style.background=
+"#222";
+
 div.textContent="";
+
+}
+
+});
+
+}
+
+
+// ===============================
+// RE-EXPLORE SPACE
+// ===============================
+
+async function reExploreSpace(
+exploration
+){
+
+if(!exploration)
+return;
+
+
+const grid=
+exploration.grid;
+
+
+// =================================
+// COMPROBAR REFERENCIAS
+// =================================
+
+const seeds=
+grid.filter(
+c=>c.state===0
+);
+
+
+if(seeds.length===0){
+
+console.log(
+"LOCAL REDISCOVERY:"
+);
+
+console.log(
+"No reference cells in exploration."
+);
+
+document.getElementById(
+"status"
+).textContent=
+"No reference cells.";
+
+return;
+
+}
+
+
+// =================================
+// CREAR BBOX SI NO EXISTE
+// =================================
+
+if(!exploration.bbox){
+
+exploration.bbox={
+
+latMin:
+exploration.parentCell.latMin,
+
+latMax:
+exploration.parentCell.latMax,
+
+lonMin:
+exploration.parentCell.lonMin,
+
+lonMax:
+exploration.parentCell.lonMax
+
+};
+
+}
+
+
+// =================================
+// BOTÓN
+// =================================
+
+const button=
+document.getElementById(
+"reExploreSpaceButton"
+);
+
+if(button){
+
+button.disabled=true;
+
+button.textContent=
+"RE-EXPLORING SPACE...";
+
+}
+
+
+// =================================
+// CONTADORES
+// =================================
+
+let pages=0;
+
+let receivedTotal=0;
+
+let newObservations=0;
+
+let updatedCells=0;
+
+let newCells=0;
+
+
+// =================================
+// ESTADO ANTERIOR
+// =================================
+
+const initialCounts=
+new Map();
+
+grid.forEach(cell=>{
+
+initialCounts.set(
+cell.id,
+cell.items.length
+);
+
+});
+
+
+// =================================
+// PRIMERA NUEVA BÚSQUEDA
+// =================================
+
+// IMPORTANTE:
+//
+// RE-EXPLORE NO DEPENDE DE QUE
+// EL EXPLORE INICIAL TUVIESE NEXT.
+//
+// Si no tenemos cursor,
+// hacemos una nueva consulta sobre
+// el mismo BBOX.
+//
+// Si ya tenemos cursor,
+// continuamos desde él.
+//
+
+let pageURL=
+exploration.rediscoveryNextPage||
+null;
+
+
+// =================================
+// FECHA
+// =================================
+
+let referenceDate=
+activeDataset.endDate;
+
+
+try{
+
+if(!referenceDate){
+
+const latestURL=
+`${activeDataset.items}?limit=1&sortby=-datetime`;
+
+const latestRes=
+await fetch(latestURL);
+
+if(!latestRes.ok){
+
+throw new Error(
+`STAC HTTP ${latestRes.status}`
+);
+
+}
+
+const latestJSON=
+await latestRes.json();
+
+if(
+!latestJSON.features||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+referenceDate=
+latestJSON.features[0]
+.properties
+.datetime;
+
+}
+
+
+// =================================
+// NUEVA CONSULTA SI NO TENEMOS CURSOR
+// =================================
+
+if(!pageURL){
+
+const bbox=
+exploration.bbox;
+
+pageURL=
+`${activeDataset.items}?limit=1500`+
+`&datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${bbox.lonMin},${bbox.latMin},`+
+`${bbox.lonMax},${bbox.latMax}`;
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY NEW SEARCH"
+);
+
+console.log(
+"BBOX:",
+bbox.lonMin,
+bbox.latMin,
+bbox.lonMax,
+bbox.latMax
+);
+
+console.log(
+"LIMIT:",
+1500
+);
+
+console.log(
+"QUERY:",
+pageURL
+);
+
+}else{
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY CONTINUE"
+);
+
+console.log(
+"NEXT PAGE:",
+pageURL
+);
+
+}
+
+
+// =================================
+// CONSUMIR PÁGINAS
+// =================================
+
+while(pageURL){
+
+pages++;
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · PAGE ${pages} · querying...`;
+
+console.log(
+"-----------------------------------"
+);
+
+console.log(
+"LOCAL REDISCOVERY PAGE:",
+pages
+);
+
+console.log(
+"URL:",
+pageURL
+);
+
+
+const res=
+await fetch(pageURL);
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+
+const json=
+await res.json();
+
+
+const pageItems=
+json.features||[];
+
+const pageReceived=
+pageItems.length;
+
+const pageMatched=
+json.numberMatched??
+"unknown";
+
+
+const next=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||
+null;
+
+
+console.log(
+"PAGE MATCHED:",
+pageMatched
+);
+
+console.log(
+"PAGE RECEIVED:",
+pageReceived
+);
+
+console.log(
+"PAGE NEXT:",
+next
+);
+
+
+// =================================
+// GUARDAR ITEMS ANTES
+// =================================
+
+const beforeCounts=
+new Map();
+
+grid.forEach(cell=>{
+
+beforeCounts.set(
+cell.id,
+cell.items.length
+);
+
+});
+
+
+// =================================
+// DISTRIBUIR PÁGINA COMPLETA
+// =================================
+
+appendExplorationSpatialData(
+pageItems,
+exploration
+);
+
+
+// =================================
+// MEDIR CAMBIOS
+// =================================
+
+let pageNewObservations=0;
+
+let pageUpdatedCells=0;
+
+let pageNewCells=0;
+
+
+grid.forEach(cell=>{
+
+const before=
+beforeCounts.get(
+cell.id
+)||0;
+
+const after=
+cell.items.length;
+
+const added=
+after-before;
+
+
+if(added>0){
+
+pageNewObservations+=
+added;
+
+pageUpdatedCells++;
+
+if(before===0){
+
+pageNewCells++;
+
+}
 
 }
 
@@ -3119,211 +3552,226 @@ div.textContent="";
 
 
 // =================================
-// DEVOLVER ESTADO
+// ACUMULAR
 // =================================
 
-return{
-parentCell:parentCell,
-grid:cells,
-items:items,
-nextPage:nextPage
-};
+receivedTotal+=
+pageReceived;
+
+newObservations+=
+pageNewObservations;
+
+updatedCells+=
+pageUpdatedCells;
+
+newCells+=
+pageNewCells;
+
+
+// =================================
+// GUARDAR CURSOR
+// =================================
+
+exploration.rediscoveryNextPage=
+next;
+
+
+// =================================
+// ACTUALIZAR VISUAL
+// =================================
+
+const visualGrid=
+document.getElementById(
+"explorationGrid"
+);
+
+updateExplorationGridVisual(
+grid,
+visualGrid
+);
+
+renderExplorationNavigation();
+
+
+// =================================
+// LOG
+// =================================
+
+console.log(
+"PAGE NEW OBSERVATIONS:",
+pageNewObservations
+);
+
+console.log(
+"PAGE UPDATED CELLS:",
+pageUpdatedCells
+);
+
+console.log(
+"PAGE NEW CELLS:",
+pageNewCells
+);
+
+console.log(
+"PAGE REMAINING:",
+!!next
+);
+
+
+// =================================
+// STATUS
+// =================================
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · PAGE ${pages} · ${pageReceived.toLocaleString()} received · +${pageNewObservations.toLocaleString()} observations`;
+
+
+// =================================
+// SIGUIENTE
+// =================================
+
+pageURL=
+next;
 
 }
 
 
-// ===============================
-// RE-EXPLORE SPACE · FASE 2 REDISCOVERY MAPS
-// ===============================
+// =================================
+// RESULTADO FINAL
+// =================================
 
-async function reExploreSpace(exploration){
+let finalObservations=0;
 
-    if(!exploration)
-        return;
+grid.forEach(cell=>{
 
-    const seeds =
-    exploration.grid.filter(c=>c.state===0);
+finalObservations+=
+cell.items.length;
 
-    if(seeds.length===0){
-
-        console.log(
-            "No reference cells in exploration."
-        );
-
-        document.getElementById("status").textContent =
-        "No reference cells.";
-
-        return;
-
-    }
-
-    if(!exploration.nextPage){
-
-        console.log(
-            "No more local catalog pages."
-        );
-
-        document.getElementById("status").textContent =
-        "No more data pages.";
-
-        return;
-
-    }
-
-    const button =
-    document.getElementById(
-        "reExploreSpaceButton"
-    );
-
-    if(button){
-
-        button.disabled=true;
-        button.textContent=
-        "RE-EXPLORING SPACE...";
-
-    }
-
-    document.getElementById("status").textContent =
-    "Expanding local observation map...";
-
-    try{
-
-        const discovered =
-        await discoverExplorationNeighbourCells(
-            exploration
-        );
-
-        renderSavedExploration(
-            exploration
-        );
-
-        renderExplorationNavigation();
-
-        console.log(
-            "LOCAL NEW CELLS:",
-            discovered
-        );
-
-        document.getElementById("status").textContent =
-        `Local expansion complete. ${discovered} new cells`;
-
-        if(button){
-
-            button.disabled =
-            !exploration.nextPage;
-
-            button.textContent =
-            exploration.nextPage
-            ? "RE-EXPLORE SPACE"
-            : "NO MORE DATA";
-
-        }
-
-    }catch(e){
-
-        console.error(
-            "LOCAL REDISCOVERY ERROR:",
-            e
-        );
-
-        document.getElementById("status").textContent =
-        `Local expansion error: ${e.message}`;
-
-        if(button){
-
-            button.disabled=false;
-            button.textContent=
-            "RE-EXPLORE SPACE";
-
-        }
-
-    }
-
-}
+});
 
 
-// ===============================
-// DISCOVER EXPLORATION NEIGHBOUR CELLS
-// ===============================
+console.log(
+"==================================="
+);
 
-async function discoverExplorationNeighbourCells(
-    exploration
+console.log(
+"LOCAL REDISCOVERY FINISHED"
+);
+
+console.log(
+"PAGES:",
+pages
+);
+
+console.log(
+"RECEIVED TOTAL:",
+receivedTotal
+);
+
+console.log(
+"NEW OBSERVATIONS:",
+newObservations
+);
+
+console.log(
+"UPDATED CELLS:",
+updatedCells
+);
+
+console.log(
+"NEW CELLS:",
+newCells
+);
+
+console.log(
+"FINAL OBSERVATIONS IN GRID:",
+finalObservations
+);
+
+console.log(
+"NEXT PAGE:",
+exploration.rediscoveryNextPage
+);
+
+console.log(
+"==================================="
+);
+
+
+// =================================
+// ESTADO DEL BOTÓN
+// =================================
+
+if(button){
+
+if(
+exploration.rediscoveryNextPage
 ){
 
-    const grid =
-    exploration.grid;
+button.disabled=false;
 
-    const visited =
-    new Set();
+button.textContent=
+"RE-EXPLORE SPACE";
 
-    const queue =
-    [];
+}else{
 
-    grid.forEach(cell=>{
+button.disabled=true;
 
-        if(cell.state===0){
+button.textContent=
+"NO MORE DATA";
 
-            queue.push(cell);
-            visited.add(cell.id);
+}
 
-        }
+}
 
-    });
 
-    let discovered=0;
+// =================================
+// STATUS FINAL
+// =================================
 
-    while(queue.length){
+if(
+exploration.rediscoveryNextPage
+){
 
-        const cell =
-        queue.shift();
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · +${newObservations.toLocaleString()} observations · +${newCells} cells · ${pages} pages · MORE DATA AVAILABLE`;
 
-        const neighbours =
-        getExplorationNeighbours(
-            cell,
-            grid
-        );
+}else{
 
-        for(const n of neighbours){
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery complete · +${newObservations.toLocaleString()} observations · +${newCells} cells · ${pages} pages`;
 
-            if(visited.has(n.id))
-                continue;
+}
 
-            visited.add(n.id);
 
-            if(n.state!==-1)
-                continue;
+}catch(e){
 
-            const found =
-            await inspectExplorationCell(
-                n,
-                exploration
-            );
+console.error(
+"LOCAL REDISCOVERY ERROR:",
+e
+);
 
-            if(found){
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery error: ${e.message}`;
 
-                discovered++;
-                queue.push(n);
+if(button){
 
-            }
+button.disabled=false;
 
-            // Actualizar el grid local
-            renderSavedExploration(
-                exploration
-            );
+button.textContent=
+"RE-EXPLORE SPACE";
 
-            renderExplorationNavigation();
+}
 
-            if(!exploration.nextPage)
-                break;
-
-        }
-
-        if(!exploration.nextPage)
-            break;
-
-    }
-
-    return discovered;
+}
 
 }
 
@@ -3333,121 +3781,46 @@ async function discoverExplorationNeighbourCells(
 // ===============================
 
 function getExplorationNeighbours(
-    cell,
-    grid
+cell,
+grid
 ){
 
-    const result=[];
+const result=[];
 
-    const dirs=[
+const dirs=[
 
-        [-1,-1],[0,-1],[1,-1],
+[-1,-1],[0,-1],[1,-1],
 
-        [-1,0],[1,0],
+[-1,0],[1,0],
 
-        [-1,1],[0,1],[1,1]
+[-1,1],[0,1],[1,1]
 
-    ];
-
-    dirs.forEach(d=>{
-
-        const x =
-        cell.x+d[0];
-
-        const y =
-        cell.y+d[1];
-
-        const neighbour =
-        grid.find(c=>
-            c.x===x &&
-            c.y===y
-        );
-
-        if(neighbour)
-            result.push(neighbour);
-
-    });
-
-    return result;
-
-}
+];
 
 
-// ===============================
-// INSPECT NEXT EXPLORATION PAGE
-// ===============================
+dirs.forEach(d=>{
 
-async function inspectExplorationCell(
-    cell,
-    exploration
-){
+const x=
+cell.x+d[0];
 
-    if(!exploration.nextPage)
-        return false;
+const y=
+cell.y+d[1];
 
-    try{
 
-        console.log(
-            "READING NEXT LOCAL PAGE:",
-            exploration.nextPage
-        );
+const neighbour=
+grid.find(c=>
+c.x===x&&
+c.y===y
+);
 
-        const res =
-        await fetch(
-            exploration.nextPage
-        );
 
-        if(!res.ok){
+if(neighbour)
+result.push(neighbour);
 
-            throw new Error(
-                `STAC HTTP ${res.status}`
-            );
+});
 
-        }
 
-        const json =
-        await res.json();
-
-        // Guardar siguiente página
-        exploration.nextPage =
-        json.links?.find(
-            l=>l.rel==="next"
-        )?.href || null;
-
-        if(
-            !json.features ||
-            json.features.length===0
-        ){
-
-            return false;
-
-        }
-
-        const before =
-        cell.items.length;
-
-        // IMPORTANTE:
-        // La página completa se redistribuye
-        // por TODO el grid local.
-        appendExplorationSpatialData(
-            json.features,
-            exploration
-        );
-
-        return (
-            cell.items.length > before
-        );
-
-    }catch(e){
-
-        console.log(
-            "LOCAL PAGE ERROR",
-            e
-        );
-
-        return false;
-
-    }
+return result;
 
 }
 
@@ -3457,190 +3830,238 @@ async function inspectExplorationCell(
 // ===============================
 
 function appendExplorationSpatialData(
-    items,
-    exploration
+items,
+exploration
 ){
 
-    const grid =
-    exploration.grid;
+const grid=
+exploration.grid;
 
-    items.forEach(item=>{
 
-        let coords=null;
+items.forEach(item=>{
 
-        // POINT
+let coords=null;
 
-        if(
-            item.geometry &&
-            item.geometry.type==="Point"
-        ){
+const geom=
+item.geometry;
 
-            coords =
-            item.geometry.coordinates;
 
-        }
+// =================================
+// POINT
+// =================================
 
-        // LAT / LON
+if(
+geom&&
+geom.type==="Point"
+){
 
-        if(
-            !coords &&
-            item.properties &&
-            item.properties.latitude!==undefined &&
-            item.properties.longitude!==undefined
-        ){
+coords=
+geom.coordinates;
 
-            coords=[
-                item.properties.longitude,
-                item.properties.latitude
-            ];
+}
 
-        }
 
-        // LAT / LON ALTERNATIVOS
+// =================================
+// LAT / LON
+// =================================
 
-        if(
-            !coords &&
-            item.properties &&
-            item.properties.lat!==undefined &&
-            item.properties.lon!==undefined
-        ){
+if(
+!coords&&
+item.properties&&
+item.properties.latitude!==undefined&&
+item.properties.longitude!==undefined
+){
 
-            coords=[
-                item.properties.lon,
-                item.properties.lat
-            ];
+coords=[
 
-        }
+item.properties.longitude,
+item.properties.latitude
 
-        // BBOX
+];
 
-        if(
-            !coords &&
-            item.bbox
-        ){
+}
 
-            coords=[
 
-                (item.bbox[0]+item.bbox[2])/2,
-                (item.bbox[1]+item.bbox[3])/2
+// =================================
+// LAT / LON ALTERNATIVOS
+// =================================
 
-            ];
+if(
+!coords&&
+item.properties&&
+item.properties.lat!==undefined&&
+item.properties.lon!==undefined
+){
 
-        }
+coords=[
 
-        // POLYGON
+item.properties.lon,
+item.properties.lat
 
-        if(
-            !coords &&
-            item.geometry &&
-            item.geometry.type==="Polygon"
-        ){
+];
 
-            const ring =
-            item.geometry.coordinates[0];
+}
 
-            let lon=0;
-            let lat=0;
 
-            ring.forEach(c=>{
+// =================================
+// BBOX
+// =================================
 
-                lon+=c[0];
-                lat+=c[1];
+if(
+!coords&&
+item.bbox
+){
 
-            });
+coords=[
 
-            coords=[
+(item.bbox[0]+item.bbox[2])/2,
 
-                lon/ring.length,
-                lat/ring.length
+(item.bbox[1]+item.bbox[3])/2
 
-            ];
+];
 
-        }
+}
 
-        // MULTIPOLYGON
 
-        if(
-            !coords &&
-            item.geometry &&
-            item.geometry.type==="MultiPolygon"
-        ){
+// =================================
+// POLYGON
+// =================================
 
-            const ring =
-            item.geometry.coordinates[0][0];
+if(
+!coords&&
+geom&&
+geom.type==="Polygon"
+){
 
-            let lon=0;
-            let lat=0;
+const ring=
+geom.coordinates[0];
 
-            ring.forEach(c=>{
+let lon=0;
+let lat=0;
 
-                lon+=c[0];
-                lat+=c[1];
 
-            });
+ring.forEach(c=>{
 
-            coords=[
+lon+=c[0];
+lat+=c[1];
 
-                lon/ring.length,
-                lat/ring.length
+});
 
-            ];
 
-        }
+coords=[
 
-        if(!coords)
-            return;
+lon/ring.length,
+lat/ring.length
 
-        const lon =
-        coords[0];
+];
 
-        const lat =
-        coords[1];
+}
 
-        // BUSCAR CELDA LOCAL
 
-        const cell =
-        grid.find(c=>
+// =================================
+// MULTIPOLYGON
+// =================================
 
-            lat>=c.latMin &&
-            lat<c.latMax &&
+if(
+!coords&&
+geom&&
+geom.type==="MultiPolygon"
+){
 
-            lon>=c.lonMin &&
-            lon<c.lonMax
+const ring=
+geom.coordinates[0][0];
 
-        );
+let lon=0;
+let lat=0;
 
-        if(!cell)
-            return;
 
-        // EVITAR DUPLICADOS
+ring.forEach(c=>{
 
-        const exists =
-        cell.items.some(
-            x=>x.id===item.id
-        );
+lon+=c[0];
+lat+=c[1];
 
-        if(exists)
-            return;
+});
 
-        // INSERTAR OBSERVACIÓN
 
-        const wasEmpty =
-        cell.items.length===0;
+coords=[
 
-        cell.items.push(item);
+lon/ring.length,
+lat/ring.length
 
-        cell.state=0;
+];
 
-        // NUEVA COBERTURA
+}
 
-        if(wasEmpty){
 
-            cell.discovered=true;
+if(!coords)
+return;
 
-        }
 
-    });
+const lon=
+coords[0];
+
+const lat=
+coords[1];
+
+
+// =================================
+// BUSCAR CELDA LOCAL
+// =================================
+
+const cell=
+grid.find(c=>
+
+lat>=c.latMin&&
+lat<c.latMax&&
+
+lon>=c.lonMin&&
+lon<c.lonMax
+
+);
+
+
+if(!cell)
+return;
+
+
+// =================================
+// EVITAR DUPLICADOS
+// =================================
+
+const exists=
+cell.items.some(
+x=>x.id===item.id
+);
+
+
+if(exists)
+return;
+
+
+// =================================
+// INSERTAR OBSERVACIÓN
+// =================================
+
+const wasEmpty=
+cell.items.length===0;
+
+
+cell.items.push(item);
+
+cell.state=0;
+
+
+// =================================
+// MARCAR NUEVA COBERTURA
+// =================================
+
+if(wasEmpty){
+
+cell.discovered=true;
+
+}
+
+});
 
 }
 
