@@ -4160,6 +4160,8 @@ renderExplorationNavigation();
 
 }
 
+
+   
    // ===============================
 // RESTORE SAVED EXPLORATION
 // ===============================
@@ -4207,16 +4209,14 @@ container.appendChild(button);
 const grid=document.createElement("div");
 grid.id="explorationGrid";
 grid.style.display="grid";
-grid.style.gridTemplateColumns="repeat(36,1fr)";
-grid.style.aspectRatio="2/1";
+grid.style.gridTemplateColumns="repeat(18,1fr)";
+grid.style.aspectRatio="1/1";
 grid.style.width="100%";
 grid.style.gap="2px";
 
 container.appendChild(grid);
 
 createExplorationBlueMarble(grid,exploration.parentCell);
-
-
 
 // =================================
 // RESTAURAR CELDAS
@@ -4257,8 +4257,6 @@ grid.appendChild(div);
 });
 
 }
-
-
    
 
 function createExplorationBlueMarble(grid,parentCell){
