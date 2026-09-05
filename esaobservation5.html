@@ -4323,7 +4323,7 @@ function createExplorationBlueMarble(grid,parentCell){
 
         return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
         "?REQUEST=GetSnapshot"+
-        "&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
+        "&LAYERS=HLS_S30_Nadir_BRDF_Adjusted_Reflectance,Reference_Features_15m"+
         "&CRS=EPSG:4326"+
         `&TIME=${date}`+
         "&WRAP=DAY,X"+
@@ -4354,20 +4354,20 @@ function createExplorationBlueMarble(grid,parentCell){
     marble.onerror=()=>{
         if(usingDate===today){
             usingDate=yesterday;
-            console.log("NASA SNAPSHOT: today unavailable, trying previous day:",yesterday);
+            console.log("NASA SENTINEL-2: today unavailable, trying previous day:",yesterday);
             marble.src=createURL(yesterday);
         }else{
-            console.error("NASA SNAPSHOT: today and previous day unavailable");
+            console.error("NASA SENTINEL-2: today and previous day unavailable");
         }
     };
 
     marble.onload=()=>{
-        console.log("NASA SNAPSHOT LOADED:",usingDate);
+        console.log("NASA SENTINEL-2 LOADED:",usingDate);
     };
 
     marble.src=createURL(today);
 
-    console.log("NASA SNAPSHOT TODAY:",createURL(today));
+    console.log("NASA SENTINEL-2 TODAY:",createURL(today));
 
     grid.insertBefore(marble,grid.firstChild);
 }
