@@ -3,709 +3,821 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#05070b">
 <title>OPE — Orbital Pass Engine</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#03050a;color:#fff;font-family:Arial,Helvetica,sans-serif}
-body{overflow-x:hidden}
+html{scroll-behavior:smooth}
+body{margin:0;background:#05070b;color:#f4f7fb;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:999;background:radial-gradient(circle at 50% 0%,rgba(40,100,180,.07),transparent 38%)}
 a{color:inherit;text-decoration:none}
 button{font:inherit}
-:root{--blue:#6fb7ff;--line:rgba(255,255,255,.12);--muted:rgba(255,255,255,.58);--dark:#03050a}
-.nav{position:fixed;top:0;left:0;width:100%;height:76px;padding:0 42px;display:flex;align-items:center;justify-content:space-between;z-index:100;background:linear-gradient(to bottom,rgba(3,5,10,.9),transparent)}
-.logo{font-size:14px;letter-spacing:.16em;font-weight:700}
-.nav-right{display:flex;align-items:center;gap:32px}
-.nav-links{display:flex;gap:26px;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-.nav-links a{opacity:.65;transition:.25s}
-.nav-links a:hover{opacity:1}
-.language-switch{display:flex;gap:8px;font-size:10px;letter-spacing:.12em}
-.language-switch button{border:0;background:none;color:#fff;opacity:.35;cursor:pointer;padding:4px}
-.language-switch button.active{opacity:1}
+:root{--bg:#05070b;--panel:#0a0e15;--line:rgba(255,255,255,.12);--muted:#87909e;--blue:#69a9ff;--max:1380px}
+.container{width:min(calc(100% - 80px),var(--max));margin:auto}
+.nav{height:76px;position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(5,7,11,.72);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
+.nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;width:min(calc(100% - 80px),var(--max));margin:auto}
+.logo{font-size:12px;letter-spacing:.18em;font-weight:700;line-height:1.15}
+.logo span{display:block;color:#75808e;font-size:9px;margin-top:4px;letter-spacing:.22em}
+.nav-links{display:flex;align-items:center;gap:34px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#9da5b0}
+.nav-links a{transition:color .25s}
+.nav-links a:hover{color:#fff}
+.lang{display:flex;gap:5px;margin-left:22px}
+.lang button{border:0;background:none;color:#69717d;cursor:pointer;font-size:10px;letter-spacing:.12em;padding:4px}
+.lang button.active{color:#fff}
+.hero{min-height:100vh;padding-top:76px;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:700px;height:700px;right:-220px;top:50%;transform:translateY(-50%);background:radial-gradient(circle,rgba(43,104,177,.09),transparent 67%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:100px 100px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent 80%);opacity:.22;animation:gridDrift 30s linear infinite}
+.hero-inner{width:min(calc(100% - 80px),var(--max));margin:auto;display:grid;grid-template-columns:1fr 1.08fr;gap:70px;align-items:center;position:relative;z-index:2;padding:70px 0}
+.hero-copy{max-width:690px}
+.kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#738091;margin-bottom:25px}
+.hero h1{font-size:clamp(52px,6.4vw,102px);line-height:.94;letter-spacing:-.055em;font-weight:500;margin:0 0 32px}
+.hero h1 em{font-style:normal;color:#8db9ef}
+.hero-sub{font-size:18px;line-height:1.6;color:#8d97a5;max-width:600px;margin:0 0 38px}
+.cta{display:inline-flex;align-items:center;gap:18px;padding:14px 18px;border:1px solid rgba(255,255,255,.2);font-size:10px;letter-spacing:.16em;text-transform:uppercase;transition:.3s;background:rgba(255,255,255,.025)}
+.cta:after{content:"→";font-size:15px}
+.cta:hover{background:#fff;color:#05070b;border-color:#fff}
+.hero-media{height:min(64vh,680px);min-height:440px;position:relative;display:flex;align-items:center;justify-content:center}
+.gif-frame{width:100%;height:100%;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:#070b12 url("https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1800&q=80") center/cover no-repeat}
+.gif-frame:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,7,11,.82),rgba(5,12,22,.42),rgba(5,7,11,.78));z-index:1}
+.gif-frame:after{content:"";position:absolute;width:80%;height:80%;left:10%;top:10%;background:radial-gradient(circle,rgba(76,144,226,.14),transparent 68%);filter:blur(20px);z-index:1}
+.ope-gif{position:absolute;inset:30px;width:calc(100% - 60px);height:calc(100% - 60px);object-fit:contain;z-index:2;display:block}
+.gif-placeholder{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.gif-placeholder span{font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.32);text-transform:uppercase}
+.media-corner{position:absolute;z-index:4;width:16px;height:16px;border-color:rgba(130,180,240,.7)}
+.media-corner.tl{top:15px;left:15px;border-top:1px solid;border-left:1px solid}
+.media-corner.tr{top:15px;right:15px;border-top:1px solid;border-right:1px solid}
+.media-corner.bl{bottom:15px;left:15px;border-bottom:1px solid;border-left:1px solid}
+.media-corner.br{bottom:15px;right:15px;border-bottom:1px solid;border-right:1px solid}
+.media-label{position:absolute;left:20px;bottom:18px;z-index:5;font-size:8px;letter-spacing:.18em;color:rgba(255,255,255,.38)}
 section{position:relative}
-.hero{height:100vh;min-height:720px;overflow:hidden;display:flex;align-items:flex-end;padding:0 6vw 9vh}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:80px 80px;mask-image:linear-gradient(to bottom,transparent,black 30%,black 80%,transparent)}
-.hero-glow{position:absolute;width:70vw;height:70vw;max-width:900px;max-height:900px;border-radius:50%;right:-12vw;top:8%;background:radial-gradient(circle,rgba(44,104,170,.24),transparent 65%)}
-.earth{position:absolute;width:min(62vw,820px);height:min(62vw,820px);right:-8vw;top:14%;border-radius:50%;background:radial-gradient(circle at 36% 34%,#315f84 0,#102b43 27%,#07131f 55%,#02060b 74%);box-shadow:0 0 80px rgba(61,139,208,.16),inset -70px -40px 120px #000;overflow:hidden}
-.earth:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 21px,rgba(126,193,255,.09) 22px,transparent 23px),repeating-linear-gradient(90deg,transparent 0 27px,rgba(126,193,255,.07) 28px,transparent 29px);border-radius:50%;transform:rotate(-16deg) scale(1.08)}
-.earth:after{content:"";position:absolute;inset:-5%;border:1px solid rgba(130,200,255,.16);border-radius:50%;box-shadow:0 0 30px rgba(86,162,224,.12)}
-.orbit{position:absolute;width:min(88vw,1200px);height:min(30vw,410px);right:-11vw;top:37%;border:1px solid rgba(124,184,235,.3);border-radius:50%;transform:rotate(-18deg)}
-.satellite{position:absolute;right:21%;top:29%;width:34px;height:9px;border:1px solid rgba(255,255,255,.7);transform:rotate(-18deg)}
-.satellite:before,.satellite:after{content:"";position:absolute;width:16px;height:7px;border:1px solid rgba(120,190,255,.7);top:0}
-.satellite:before{right:34px}.satellite:after{left:34px}
-.hero-content{position:relative;z-index:5;max-width:800px}
-.hero-kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:24px}
-.hero h1{font-size:clamp(62px,9vw,142px);line-height:.82;letter-spacing:-.065em;font-weight:500;margin:0;max-width:900px}
-.hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-top:44px}
-.hero-sub{max-width:480px;color:var(--muted);font-size:16px;line-height:1.55}
-.hero-code{font:10px/1.7 monospace;color:rgba(255,255,255,.42);text-align:right}
-.intro{padding:17vh 7vw 15vh;min-height:90vh}
-.intro-top{display:grid;grid-template-columns:1fr 1fr;gap:8vw;align-items:start}
-.intro-number{font:11px monospace;color:var(--blue)}
-.intro h2{font-size:clamp(48px,6.5vw,100px);line-height:.9;letter-spacing:-.055em;font-weight:400;margin:0;max-width:800px}
-.intro-copy{margin-top:18vh;max-width:470px;color:var(--muted);font-size:17px;line-height:1.65}
-.statement{min-height:75vh;padding:15vh 7vw;display:flex;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.statement-inner{max-width:1200px}
-.statement-label{font:10px monospace;color:rgba(255,255,255,.4);margin-bottom:35px}
-.statement h2{font-size:clamp(48px,7.4vw,118px);line-height:.9;letter-spacing:-.06em;font-weight:400;margin:0}
-.statement h2 span{color:var(--blue)}
-.digital{padding:16vh 7vw;min-height:95vh}
-.digital-layout{display:grid;grid-template-columns:42% 58%;align-items:center;gap:5vw}
-.digital-title{font-size:clamp(54px,7vw,110px);line-height:.86;letter-spacing:-.06em;font-weight:400;margin:0}
-.digital-copy{max-width:460px;color:var(--muted);font-size:16px;line-height:1.65;margin-top:45px}
-.digital-visual{height:min(62vw,680px);position:relative;display:flex;align-items:center;justify-content:center}
-.digital-earth{width:min(42vw,540px);height:min(42vw,540px);border-radius:50%;background:radial-gradient(circle at 35% 32%,#396f95,#122f46 38%,#06101b 68%,#010307 78%);box-shadow:0 0 100px rgba(68,147,214,.12)}
-.digital-ring{position:absolute;width:100%;height:30%;border:1px solid rgba(116,186,241,.32);border-radius:50%;transform:rotate(-24deg)}
-.digital-ring.r2{width:115%;height:37%;transform:rotate(48deg);opacity:.5}
-.data-points{position:absolute;inset:0;font:9px monospace;color:rgba(170,215,255,.65)}
-.data-points span{position:absolute}
-.data-points span:nth-child(1){top:18%;left:9%}.data-points span:nth-child(2){top:32%;right:3%}.data-points span:nth-child(3){bottom:20%;left:18%}.data-points span:nth-child(4){bottom:13%;right:16%}
-.observation{padding:13vh 7vw;background:#f5f6f7;color:#07090c;min-height:85vh}
-.observation-head{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:90px}
-.observation h2{font-size:clamp(52px,7vw,105px);line-height:.86;letter-spacing:-.06em;font-weight:400;margin:0;max-width:800px}
-.observation-intro{max-width:350px;font-size:15px;line-height:1.6;color:#555}
-.data-flow{display:grid;grid-template-columns:1fr .4fr 1fr .4fr 1fr;align-items:center;border-top:1px solid #bbb;border-bottom:1px solid #bbb}
-.flow-item{padding:42px 22px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
-.flow-item strong{font-size:12px;letter-spacing:.13em}
-.flow-item span{font:10px monospace;color:#777}
-.flow-arrow{font-size:24px;text-align:center;color:#888}
-.observation-foot{margin-top:55px;display:flex;justify-content:flex-end}
-.observation-foot p{max-width:520px;color:#555;font-size:14px;line-height:1.6}
-.passes{padding:16vh 7vw 14vh;min-height:95vh}
-.passes-top{display:grid;grid-template-columns:1fr 1fr;gap:8vw}
-.passes-label{font:10px monospace;color:var(--blue)}
-.passes h2{font-size:clamp(50px,6.5vw,100px);line-height:.87;letter-spacing:-.06em;font-weight:400;margin:0}
-.passes-copy{max-width:430px;margin-top:25vh;color:var(--muted);font-size:16px;line-height:1.65}
-.timeline{margin-top:12vh;border-top:1px solid var(--line)}
-.pass-row{display:grid;grid-template-columns:160px 1fr 150px;align-items:center;min-height:92px;border-bottom:1px solid var(--line);font:11px monospace}
-.pass-name{color:#fff}.pass-track{height:1px;background:rgba(255,255,255,.15);position:relative}.pass-line{position:absolute;height:1px;background:var(--blue);top:0}.pass-row:nth-child(1) .pass-line{left:12%;width:29%}.pass-row:nth-child(2) .pass-line{left:43%;width:21%}.pass-row:nth-child(3) .pass-line{left:68%;width:25%}.pass-row:nth-child(4) .pass-line{left:23%;width:17%}.pass-time{text-align:right;color:rgba(255,255,255,.42)}
-.engine{padding:15vh 7vw;min-height:100vh;background:#05080d}
-.engine-header{display:flex;justify-content:space-between;align-items:flex-end;gap:50px;margin-bottom:100px}
-.engine-title{font-size:clamp(55px,7vw,110px);line-height:.84;letter-spacing:-.06em;font-weight:400;margin:0}
-.engine-side{max-width:350px;color:var(--muted);font-size:15px;line-height:1.6}
-.engine-core{display:grid;grid-template-columns:1fr 1.4fr 1fr;grid-template-rows:180px 180px;gap:1px;background:var(--line);border:1px solid var(--line)}
-.engine-node{background:#05080d;padding:28px;display:flex;flex-direction:column;justify-content:space-between}
-.engine-node strong{font-size:11px;letter-spacing:.14em}
-.engine-node small{font:10px monospace;color:rgba(255,255,255,.4)}
-.engine-center{grid-column:2;grid-row:1/3;background:radial-gradient(circle,#102a40,#05080d 65%);display:flex;align-items:center;justify-content:center;font-size:42px;letter-spacing:-.05em}
-.engine-node:nth-child(1){grid-column:1;grid-row:1}.engine-node:nth-child(2){grid-column:3;grid-row:1}.engine-node:nth-child(3){grid-column:1;grid-row:2}.engine-node:nth-child(5){grid-column:3;grid-row:2}
-.video-section{min-height:100vh;padding:0;overflow:hidden;background:#000}
-.video-frame{position:relative;width:100%;height:100vh;min-height:650px;background:radial-gradient(circle at 50% 50%,#122b42,#03070c 55%);display:flex;align-items:flex-end}
-.video-frame:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:60px 60px}
-.video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.video-orbit{width:70vw;height:25vw;border:1px solid rgba(122,193,255,.25);border-radius:50%;transform:rotate(-17deg)}
-.video-copy{position:relative;z-index:3;padding:7vw;max-width:900px}
-.video-copy h2{font-size:clamp(48px,7vw,108px);line-height:.88;letter-spacing:-.06em;font-weight:400;margin:0 0 28px}
-.video-copy p{max-width:430px;color:var(--muted);font-size:15px;line-height:1.6}
-.gallery{padding:15vh 0 12vh;background:#020409}
-.gallery-head{padding:0 7vw;display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px}
-.gallery-title{font-size:clamp(50px,7vw,100px);line-height:.85;letter-spacing:-.06em;font-weight:400;margin:0}
-.gallery-meta{font:10px monospace;color:rgba(255,255,255,.4)}
-.carousel{position:relative;overflow:hidden}
-.carousel-track{display:flex;gap:24px;padding:0 7vw;transition:transform .65s cubic-bezier(.2,.7,.2,1);cursor:grab;touch-action:pan-y}
-.carousel-track.dragging{cursor:grabbing;transition:none}
-.slide{flex:0 0 min(78vw,1100px);height:min(54vw,650px);background:#0a1018;border:1px solid var(--line);position:relative;overflow:hidden}
-.slide:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(53,113,164,.2),transparent 60%)}
-.slide-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:50px 50px}
-.slide-earth{position:absolute;width:52%;aspect-ratio:1;border-radius:50%;left:24%;top:15%;background:radial-gradient(circle at 35% 30%,#417b9f,#102d44 40%,#03080e 74%);box-shadow:0 0 70px rgba(62,142,204,.13)}
-.slide-orbit{position:absolute;width:80%;height:35%;left:10%;top:32%;border:1px solid rgba(130,200,255,.35);border-radius:50%;transform:rotate(-18deg)}
-.slide-label{position:absolute;left:25px;bottom:22px;font:10px monospace;color:rgba(255,255,255,.48)}
-.carousel-controls{padding:35px 7vw 0;display:flex;justify-content:space-between;align-items:center}
-.carousel-buttons{display:flex;gap:8px}
-.carousel-buttons button{width:42px;height:42px;border:1px solid var(--line);background:none;color:#fff;cursor:pointer;transition:.25s}
-.carousel-buttons button:hover{border-color:var(--blue);color:var(--blue)}
-.carousel-dots{display:flex;gap:7px}.carousel-dot{width:28px;height:1px;background:rgba(255,255,255,.2);cursor:pointer;transition:.3s}.carousel-dot.active{background:var(--blue)}
-.archive{padding:15vh 0 13vh;background:#07090d;overflow:hidden}
-.archive-head{padding:0 7vw;display:grid;grid-template-columns:1fr 1fr;gap:8vw;margin-bottom:80px}
-.archive h2{font-size:clamp(55px,7vw,105px);line-height:.84;letter-spacing:-.06em;font-weight:400;margin:0}
-.archive-copy{align-self:end;max-width:400px;color:var(--muted);font-size:15px;line-height:1.6}
-.collage{position:relative;height:780px}
-.collage-track{position:absolute;left:0;top:0;display:flex;gap:24px;padding-left:7vw;transition:transform .7s cubic-bezier(.2,.7,.2,1);touch-action:pan-y}
-.collage-card{flex:0 0 430px;height:570px;border:1px solid var(--line);position:relative;overflow:hidden;background:#0a1017;cursor:grab}
-.collage-card:active{cursor:grabbing}
-.collage-card:nth-child(2){margin-top:130px}.collage-card:nth-child(3){margin-top:40px}.collage-card:nth-child(4){margin-top:190px}.collage-card:nth-child(5){margin-top:70px}
-.collage-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(49,104,151,.24),transparent 58%)}
-.collage-earth{position:absolute;width:65%;aspect-ratio:1;border-radius:50%;left:17%;top:17%;background:radial-gradient(circle at 35% 30%,#3d7597,#102c42 42%,#02060b 75%)}
-.collage-orbit{position:absolute;width:130%;height:38%;left:-15%;top:36%;border:1px solid rgba(128,194,255,.35);border-radius:50%;transform:rotate(-25deg)}
-.collage-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px}
-.collage-caption{position:absolute;left:20px;bottom:20px;font:10px monospace;color:rgba(255,255,255,.5)}
-.archive-controls{padding:35px 7vw 0;display:flex;justify-content:flex-end;gap:8px}
-.archive-controls button{width:42px;height:42px;border:1px solid var(--line);background:none;color:#fff;cursor:pointer;transition:.25s}
-.archive-controls button:hover{border-color:var(--blue);color:var(--blue)}
-.stack{background:#f3f4f5;color:#080a0d;padding:15vh 7vw;min-height:100vh}
-.stack-head{display:grid;grid-template-columns:1fr 1fr;gap:8vw;margin-bottom:90px}
-.stack h2{font-size:clamp(55px,7vw,105px);line-height:.85;letter-spacing:-.06em;font-weight:400;margin:0}
-.stack-intro{max-width:420px;align-self:end;color:#555;font-size:15px;line-height:1.6}
-.stack-list{border-top:1px solid #bbb}
-.stack-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:30px;padding:38px 0;border-bottom:1px solid #bbb;align-items:start}
-.stack-num{font:10px monospace;color:#777}.stack-name{font-size:25px;letter-spacing:-.03em}.stack-desc{max-width:390px;color:#666;font-size:14px;line-height:1.55}
-.applications{padding:15vh 7vw 13vh;min-height:100vh}
-.apps-head{display:flex;justify-content:space-between;gap:60px;align-items:flex-end;margin-bottom:100px}
-.apps-head h2{font-size:clamp(55px,7vw,105px);line-height:.84;letter-spacing:-.06em;font-weight:400;margin:0}
-.apps-head p{max-width:390px;color:var(--muted);font-size:15px;line-height:1.6}
-.apps-list{border-top:1px solid var(--line)}
-.app{display:grid;grid-template-columns:80px 1fr 1fr;gap:30px;padding:38px 0;border-bottom:1px solid var(--line);align-items:start}
-.app-num{font:10px monospace;color:var(--blue)}
-.app h3{font-size:30px;letter-spacing:-.03em;font-weight:400;margin:0}
-.app p{max-width:430px;color:var(--muted);font-size:14px;line-height:1.55;margin:0}
-.final{min-height:90vh;padding:15vh 7vw 10vh;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid var(--line)}
-.final-label{font:10px monospace;color:var(--blue)}
-.final h2{font-size:clamp(55px,8.2vw,130px);line-height:.84;letter-spacing:-.065em;font-weight:400;margin:12vh 0 0;max-width:1100px}
-.final h2 span{color:var(--blue)}
-.final-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-top:12vh}
-.final-bottom p{max-width:420px;color:var(--muted);font-size:15px;line-height:1.6}
-.footer{padding:35px 42px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:rgba(255,255,255,.42);font:10px monospace}
-
-/* MOTION */
-.reveal{opacity:0;transform:translateY(45px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.hero-content{opacity:0;transform:translateY(35px);animation:heroIn 1.2s .25s cubic-bezier(.2,.7,.2,1) forwards}
-.hero-kicker{opacity:0;transform:translateY(15px);animation:heroSmallIn .8s .45s ease forwards}
-.hero h1{opacity:0;transform:translateY(30px);animation:heroTitleIn 1.1s .6s cubic-bezier(.2,.7,.2,1) forwards}
-.hero-bottom{opacity:0;transform:translateY(20px);animation:heroSmallIn .9s 1s ease forwards}
-.earth{animation:earthFloat 14s ease-in-out infinite}
-.digital-earth{animation:digitalFloat 10s ease-in-out infinite}
-.orbit{animation:orbitDrift 18s ease-in-out infinite}
-.digital-ring{animation:ringRotate 18s linear infinite}
-.digital-ring.r2{animation-duration:26s;animation-direction:reverse}
-.video-orbit{animation:videoOrbit 14s ease-in-out infinite}
-.slide-earth{animation:slideEarth 9s ease-in-out infinite}
-.collage-earth{animation:collageEarth 10s ease-in-out infinite}
-.pass-line{animation:passPulse 3s ease-in-out infinite}
-.satellite{animation:satelliteMove 8s ease-in-out infinite}
-@keyframes heroIn{to{opacity:1;transform:translateY(0)}}
-@keyframes heroSmallIn{to{opacity:1;transform:translateY(0)}}
-@keyframes heroTitleIn{to{opacity:1;transform:translateY(0)}}
-@keyframes earthFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-12px,-10px,0)}}
-@keyframes digitalFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(1deg)}}
-@keyframes orbitDrift{0%,100%{transform:rotate(-18deg) translate(0,0)}50%{transform:rotate(-16deg) translate(-10px,8px)}}
-@keyframes ringRotate{0%{transform:rotate(-24deg)}50%{transform:rotate(-20deg)}100%{transform:rotate(-24deg)}}
-@keyframes videoOrbit{0%,100%{transform:rotate(-17deg) scale(1)}50%{transform:rotate(-13deg) scale(1.04)}}
-@keyframes slideEarth{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
-@keyframes collageEarth{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
-@keyframes passPulse{0%,100%{opacity:.55}50%{opacity:1;box-shadow:0 0 12px rgba(111,183,255,.35)}}
-@keyframes satelliteMove{0%,100%{transform:translate(0,0) rotate(-18deg)}50%{transform:translate(-25px,12px) rotate(-14deg)}}
-
-@media(max-width:800px){
-.nav{padding:0 20px}.nav-links{display:none}.nav-right{gap:10px}
-.hero{padding:0 6vw 7vh}.earth{width:90vw;height:90vw;right:-35vw;top:20%}.orbit{width:130vw;right:-45vw}.hero h1{font-size:17vw}.hero-bottom{display:block}.hero-code{display:none}
-.intro-top,.digital-layout,.passes-top,.stack-head,.archive-head{grid-template-columns:1fr}.intro-copy,.passes-copy{margin-top:8vh}.digital-visual{height:100vw}.digital-earth{width:70vw;height:70vw}
-.observation-head,.engine-header,.apps-head{display:block}.observation-intro,.engine-side,.apps-head p{margin-top:40px}.data-flow{grid-template-columns:1fr}.flow-arrow{padding:10px}.flow-item{min-height:100px}
-.engine-core{grid-template-columns:1fr 1fr;grid-template-rows:130px 180px 130px}.engine-center{grid-column:1/3;grid-row:2}.engine-node:nth-child(1),.engine-node:nth-child(2),.engine-node:nth-child(3),.engine-node:nth-child(5){grid-column:auto;grid-row:auto}
-.pass-row{grid-template-columns:100px 1fr 90px}
-.slide{flex-basis:86vw;height:60vw}.collage{height:650px}.collage-card{flex-basis:280px;height:410px}.collage-card:nth-child(2){margin-top:80px}.collage-card:nth-child(4){margin-top:100px}
-.stack-row,.app{grid-template-columns:45px 1fr}.stack-desc,.app p{grid-column:2}.footer{padding:25px 20px;display:block}.footer span{display:block;margin-top:10px}
+.intro{padding:150px 0 110px}
+.intro-top{display:grid;grid-template-columns:1fr 2fr;gap:60px}
+.intro-index{font-size:10px;letter-spacing:.2em;color:#596372}
+.intro-copy{max-width:830px}
+.intro-copy p{font-size:26px;line-height:1.35;letter-spacing:-.025em;margin:0;color:#dce1e8}
+.statement{padding:150px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.statement-inner{display:grid;grid-template-columns:1fr 2fr;gap:60px}
+.statement-label{font-size:10px;letter-spacing:.2em;color:#596372;text-transform:uppercase}
+.statement h2{font-size:clamp(42px,6vw,82px);line-height:.98;letter-spacing:-.05em;font-weight:400;margin:0;max-width:1000px}
+.digital{padding:150px 0}
+.section-num{font-size:10px;letter-spacing:.2em;color:#596372;margin-bottom:20px}
+.digital-layout{display:grid;grid-template-columns:1fr 1.2fr;gap:90px;align-items:center}
+.digital-copy h2,.observation-head h2,.passes-top h2,.engine-header h2,.gallery-head h2,.archive-head h2,.stack-head h2,.apps-head h2{font-size:clamp(42px,5.3vw,76px);line-height:.98;letter-spacing:-.05em;font-weight:400;margin:0 0 28px}
+.digital-copy p,.observation-foot p{font-size:16px;line-height:1.7;color:#7f8997;max-width:620px}
+.digital-visual{height:600px;position:relative;display:flex;align-items:center;justify-content:center}
+.digital-earth{width:390px;height:390px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#6d9bd0 0%,#315277 22%,#172a40 46%,#08101b 73%,#03060a 100%);box-shadow:0 0 100px rgba(57,113,175,.2),inset -50px -30px 90px rgba(0,0,0,.65);position:relative}
+.digital-earth:before{content:"";position:absolute;inset:-25px;border:1px solid rgba(100,166,230,.2);border-radius:50%;transform:rotate(18deg)}
+.digital-earth:after{content:"";position:absolute;inset:-58px;border:1px dashed rgba(100,166,230,.12);border-radius:50%;transform:rotate(-20deg)}
+.data-points{position:absolute;inset:0}
+.data-points span{position:absolute;width:5px;height:5px;border-radius:50%;background:#8ec3ff;box-shadow:0 0 15px #5b9ce9;animation:dataBlink 3s infinite}
+.data-points span:nth-child(1){left:27%;top:30%}
+.data-points span:nth-child(2){left:58%;top:24%;animation-delay:.6s}
+.data-points span:nth-child(3){left:69%;top:51%;animation-delay:1.1s}
+.data-points span:nth-child(4){left:39%;top:67%;animation-delay:1.7s}
+.data-points span:nth-child(5){left:23%;top:53%;animation-delay:2.2s}
+.observation{padding:150px 0;border-top:1px solid var(--line)}
+.observation-head{display:grid;grid-template-columns:1fr 1.4fr;gap:80px;align-items:end}
+.observation-head p{color:#7f8997;line-height:1.7;max-width:540px;margin:0}
+.data-flow{margin-top:100px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.flow-item{font-size:10px;letter-spacing:.15em;color:#9ca6b2;text-align:center;min-width:130px}
+.flow-item strong{display:block;color:#e9edf2;font-size:11px;margin-top:9px}
+.flow-arrow{color:#4e78a4;font-size:20px}
+.observation-foot{display:flex;justify-content:flex-end;margin-top:60px}
+.passes{padding:150px 0}
+.passes-top{display:grid;grid-template-columns:1.1fr 1fr;gap:80px}
+.passes-top p{color:#7f8997;line-height:1.7;max-width:550px;margin-top:20px}
+.timeline{margin-top:100px;border-top:1px solid rgba(255,255,255,.12);position:relative;height:220px}
+.timeline-axis{position:absolute;top:65px;left:0;right:0;height:1px;background:rgba(255,255,255,.13)}
+.pass{position:absolute;top:35px}
+.pass-line{height:2px;background:#6caaf0;transform-origin:left;transform:scaleX(0);box-shadow:0 0 18px rgba(88,157,229,.45)}
+.pass-dot{width:8px;height:8px;border-radius:50%;background:#8cc4ff;box-shadow:0 0 18px #5597df;margin-top:-5px}
+.pass-label{font-size:9px;letter-spacing:.14em;color:#687585;margin-top:17px}
+.pass.p1{left:4%;width:21%}
+.pass.p2{left:29%;width:13%}
+.pass.p3{left:48%;width:26%}
+.pass.p4{left:82%;width:11%}
+.timeline.active .pass-line{animation:passGrow 1.2s cubic-bezier(.22,.61,.36,1) forwards}
+.pass.p2 .pass-line{animation-delay:.18s}
+.pass.p3 .pass-line{animation-delay:.36s}
+.pass.p4 .pass-line{animation-delay:.54s}
+.engine{padding:150px 0;border-top:1px solid var(--line)}
+.engine-header{display:grid;grid-template-columns:1fr 1.2fr;gap:80px}
+.engine-header p{color:#7f8997;line-height:1.7;max-width:560px}
+.engine-core{margin:100px auto 0;max-width:1100px;min-height:440px;border:1px solid rgba(255,255,255,.1);position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,rgba(46,92,144,.12),transparent 50%)}
+.engine-center{width:190px;height:190px;border:1px solid rgba(115,172,230,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 80px rgba(68,130,196,.12)}
+.engine-center:before,.engine-center:after{content:"";position:absolute;border:1px solid rgba(110,167,225,.2);border-radius:50%}
+.engine-center:before{inset:-25px}
+.engine-center:after{inset:-55px;border-style:dashed}
+.engine-center span{font-size:12px;letter-spacing:.2em;color:#dceaff}
+.engine-node{position:absolute;font-size:9px;letter-spacing:.15em;color:#7c8998;text-align:center}
+.engine-node:after{content:"";position:absolute;height:1px;background:rgba(102,157,215,.3);transform-origin:left}
+.node1{top:70px;left:13%}
+.node1:after{width:140px;left:100%;top:4px;transform:rotate(18deg)}
+.node2{top:70px;right:12%}
+.node2:after{width:140px;right:100%;top:4px;transform:rotate(162deg)}
+.node3{bottom:72px;left:14%}
+.node3:after{width:145px;left:100%;top:-2px;transform:rotate(-18deg)}
+.node4{bottom:72px;right:13%}
+.node4:after{width:145px;right:100%;top:-2px;transform:rotate(198deg)}
+.video{padding:150px 0}
+.video-wrap{height:min(72vh,760px);min-height:480px;border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;background:#060a11}
+.video-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(65,117,174,.14),transparent 40%),linear-gradient(120deg,#05070b,#0a1019,#05070b)}
+.video-scan{position:absolute;left:0;right:0;height:1px;background:rgba(125,187,244,.4);box-shadow:0 0 20px rgba(90,160,230,.6);animation:scan 6s linear infinite}
+.video-orbit{position:absolute;width:70%;height:38%;left:15%;top:31%;border:1px solid rgba(112,171,228,.25);border-radius:50%;transform:rotate(-18deg);animation:videoOrbit 9s ease-in-out infinite alternate}
+.video-orbit:before{content:"";position:absolute;width:8px;height:8px;background:#8bc4ff;border-radius:50%;left:17%;top:4%;box-shadow:0 0 20px #6eaff0}
+.video-title{position:absolute;left:45px;bottom:40px;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.45)}
+.gallery{padding:150px 0;border-top:1px solid var(--line)}
+.gallery-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:60px}
+.carousel-controls{display:flex;gap:8px}
+.carousel-btn{width:42px;height:42px;background:none;border:1px solid rgba(255,255,255,.14);color:#aab4c0;cursor:pointer;transition:.25s}
+.carousel-btn:hover{background:#fff;color:#05070b}
+.carousel-viewport{overflow:hidden}
+.carousel-track{display:flex;gap:24px;will-change:transform;transition:transform .7s cubic-bezier(.22,.61,.36,1)}
+.slide{min-width:100%;height:650px;border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;background:#070b11}
+.slide.one{background:radial-gradient(circle at 50% 45%,rgba(55,115,180,.2),transparent 40%),#070b11}
+.slide.two{background:linear-gradient(120deg,#060a10,#101a27,#05070b)}
+.slide.three{background:radial-gradient(circle at 60% 40%,rgba(89,139,197,.18),transparent 35%),#060a10}
+.slide-earth{position:absolute;width:390px;height:390px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 30%,#547da9,#142638 55%,#03070b);box-shadow:0 0 100px rgba(68,126,190,.2)}
+.slide-ring{position:absolute;width:650px;height:190px;border:1px solid rgba(120,181,237,.25);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-18deg)}
+.slide-label{position:absolute;left:35px;bottom:30px;font-size:9px;letter-spacing:.2em;color:#687687}
+.slide-code{position:absolute;right:35px;top:30px;font-size:9px;letter-spacing:.15em;color:#5d6b7b}
+.dots{display:flex;gap:7px;margin-top:20px}
+.dot{width:24px;height:2px;border:0;background:#343c46;cursor:pointer;padding:0}
+.dot.active{background:#9abce0}
+.archive{padding:150px 0}
+.archive-head{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;margin-bottom:70px}
+.archive-head p{color:#7f8997;line-height:1.7;max-width:550px}
+.collage-viewport{overflow:hidden}
+.collage{display:flex;gap:20px;will-change:transform;transition:transform .8s cubic-bezier(.22,.61,.36,1);cursor:grab}
+.collage.dragging{cursor:grabbing;transition:none}
+.collage-card{flex:0 0 430px;height:540px;border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;background:#090d13}
+.collage-card:nth-child(2){margin-top:70px}
+.collage-card:nth-child(3){margin-top:25px}
+.collage-card:nth-child(4){margin-top:90px}
+.collage-card:nth-child(5){margin-top:35px}
+.card-earth{position:absolute;width:300px;height:300px;border-radius:50%;left:50%;top:45%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 28%,#6088b0,#182b3e 48%,#03070c 78%);box-shadow:0 0 80px rgba(70,128,188,.18)}
+.card-orbit{position:absolute;width:480px;height:150px;border:1px solid rgba(110,170,227,.22);border-radius:50%;left:50%;top:45%;transform:translate(-50%,-50%) rotate(-18deg)}
+.card-label{position:absolute;left:24px;bottom:22px;font-size:8px;letter-spacing:.17em;color:#697686}
+.card-number{position:absolute;right:24px;top:22px;font-size:8px;color:#526071}
+.stack{padding:150px 0;border-top:1px solid var(--line)}
+.stack-head{margin-bottom:70px}
+.stack-list{border-top:1px solid rgba(255,255,255,.12)}
+.stack-row{display:grid;grid-template-columns:100px 1fr 1.5fr;gap:40px;padding:30px 0;border-bottom:1px solid rgba(255,255,255,.1);align-items:center}
+.stack-num{font-size:9px;letter-spacing:.15em;color:#566271}
+.stack-name{font-size:19px;color:#dce1e8}
+.stack-desc{font-size:13px;line-height:1.6;color:#6f7b89}
+.apps{padding:150px 0}
+.apps-head{display:grid;grid-template-columns:1fr 1.2fr;gap:80px;margin-bottom:70px}
+.apps-head p{color:#7f8997;line-height:1.7;max-width:550px}
+.apps-list{border-top:1px solid rgba(255,255,255,.12)}
+.app-row{display:grid;grid-template-columns:80px 1fr auto;gap:30px;padding:31px 0;border-bottom:1px solid rgba(255,255,255,.1);align-items:center}
+.app-index{font-size:9px;letter-spacing:.15em;color:#596575}
+.app-name{font-size:22px;color:#dce2e9}
+.app-arrow{font-size:20px;color:#536274}
+.final{padding:190px 0;border-top:1px solid var(--line)}
+.final-label{font-size:10px;letter-spacing:.2em;color:#596372;margin-bottom:30px}
+.final h2{font-size:clamp(48px,7vw,104px);line-height:.93;letter-spacing:-.06em;font-weight:400;max-width:1200px;margin:0}
+.final-bottom{margin-top:60px;display:flex;justify-content:space-between;align-items:end;gap:50px}
+.final-bottom p{color:#7f8997;line-height:1.7;max-width:620px}
+.footer{padding:60px 0 35px;border-top:1px solid var(--line);color:#626d7a}
+.footer-top{display:flex;justify-content:space-between;gap:40px}
+.footer-brand{font-size:12px;letter-spacing:.18em;color:#dce1e7}
+.footer-brand span{display:block;font-size:9px;color:#596474;margin-top:6px}
+.footer-links{display:flex;gap:25px;font-size:9px;letter-spacing:.13em;text-transform:uppercase}
+.footer-bottom{display:flex;justify-content:space-between;margin-top:80px;font-size:8px;letter-spacing:.12em}
+.reveal{opacity:0;transform:translateY(42px);transition:opacity .9s cubic-bezier(.22,.61,.36,1),transform .9s cubic-bezier(.22,.61,.36,1);transition-delay:var(--delay,0ms)}
+.reveal.in{opacity:1;transform:none}
+@keyframes gridDrift{from{background-position:0 0}to{background-position:100px 100px}}
+@keyframes dataBlink{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1.5)}}
+@keyframes passGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes scan{0%{top:-2px;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes videoOrbit{from{transform:rotate(-18deg) scale(.96)}to{transform:rotate(-14deg) scale(1.03)}}
+@media(max-width:900px){
+.container,.nav-inner,.hero-inner{width:min(calc(100% - 40px),var(--max))}
+.nav-links{display:none}
+.hero-inner{grid-template-columns:1fr;gap:55px;padding:60px 0 80px}
+.hero{min-height:auto}
+.hero h1{font-size:clamp(48px,13vw,76px)}
+.hero-media{height:65vh;min-height:400px}
+.intro-top,.statement-inner,.digital-layout,.observation-head,.passes-top,.engine-header,.archive-head,.apps-head{grid-template-columns:1fr;gap:35px}
+.digital-visual{height:500px}
+.data-flow{flex-wrap:wrap;justify-content:center}
+.flow-arrow{display:none}
+.engine-core{min-height:500px}
+.engine-node:after{display:none}
+.stack-row{grid-template-columns:60px 1fr}
+.stack-desc{grid-column:2}
+.app-row{grid-template-columns:50px 1fr 20px}
+.slide{height:520px}
+.collage-card{flex-basis:330px;height:440px}
+.final-bottom,.footer-top,.footer-bottom{flex-direction:column;align-items:flex-start}
 }
-
+@media(max-width:560px){
+.container,.nav-inner,.hero-inner{width:calc(100% - 28px)}
+.nav{height:64px}
+.hero{padding-top:64px}
+.hero-inner{padding-top:45px}
+.hero-media{height:52vh;min-height:330px}
+.ope-gif{inset:15px;width:calc(100% - 30px);height:calc(100% - 30px)}
+.gif-frame{min-height:330px}
+.intro,.statement,.digital,.observation,.passes,.engine,.video,.gallery,.archive,.stack,.apps{padding:95px 0}
+.statement h2,.digital-copy h2,.observation-head h2,.passes-top h2,.engine-header h2,.gallery-head h2,.archive-head h2,.stack-head h2,.apps-head h2{font-size:42px}
+.digital-earth{width:280px;height:280px}
+.timeline{overflow:hidden}
+.slide{height:430px}
+.slide-earth{width:260px;height:260px}
+.slide-ring{width:450px}
+.collage-card{flex-basis:285px;height:390px}
+.card-earth{width:220px;height:220px}
+.card-orbit{width:360px}
+.engine-center{width:150px;height:150px}
+.engine-node{font-size:8px}
+.node1{top:40px;left:8%}.node2{top:40px;right:8%}.node3{bottom:40px;left:8%}.node4{bottom:40px;right:8%}
+}
 @media(prefers-reduced-motion:reduce){
-*,*:before,*:after{animation:none!important;transition:none!important}
+*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 .reveal{opacity:1;transform:none}
-.hero-content,.hero-kicker,.hero h1,.hero-bottom{opacity:1;transform:none}
 }
 </style>
 </head>
 <body>
-
 <nav class="nav">
-<div class="logo">VIRTUALS HUBS / OPE</div>
-<div class="nav-right">
+<div class="nav-inner">
+<a href="#home" class="logo">VIRTUALS HUBS<span>OPE / ORBITAL PASS ENGINE</span></a>
 <div class="nav-links">
-<a href="#ope" data-i18n="navOpe">OPE</a>
-<a href="#observation" data-i18n="navObservation">Observation</a>
-<a href="#technology" data-i18n="navTechnology">Technology</a>
-<a href="#applications" data-i18n="navApplications">Applications</a>
-</div>
-<div class="language-switch">
-<button id="enBtn" class="active">EN</button><span>/</span><button id="esBtn">ES</button>
+<a href="#earth" data-en="Earth" data-es="Tierra">Earth</a>
+<a href="#observation" data-en="Observation" data-es="Observación">Observation</a>
+<a href="#engine" data-en="Engine" data-es="Engine">Engine</a>
+<a href="#applications" data-en="Applications" data-es="Aplicaciones">Applications</a>
+<div class="lang"><button id="enBtn" class="active">EN</button><button id="esBtn">ES</button></div>
 </div>
 </div>
 </nav>
 
-<section class="hero" id="ope">
+<main>
+<section class="hero" id="home">
 <div class="hero-grid"></div>
-<div class="hero-glow"></div>
-<div class="earth"></div>
-<div class="orbit"></div>
-<div class="satellite"></div>
-<div class="hero-content">
-<div class="hero-kicker" data-i18n="heroKicker">Orbital Pass Engine / OPE</div>
-<h1 data-i18n="heroTitle">A computational<br>model of Earth<br>and orbit.</h1>
-<div class="hero-bottom">
-<div class="hero-sub" data-i18n="heroSub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulation.</div>
-<div class="hero-code">EARTH / ORBIT / DATA<br>SIMULATION / OBSERVATION</div>
+<div class="hero-inner">
+<div class="hero-copy">
+<div class="kicker" data-en="01 / OPE" data-es="01 / OPE">01 / OPE</div>
+<h1 data-en="A computational model of <em>Earth and orbit.</em>" data-es="Un modelo computacional de la <em>Tierra y la órbita.</em>">A computational model of <em>Earth and orbit.</em></h1>
+<p class="hero-sub" data-en="A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations." data-es="Un entorno de computación espacial para operaciones orbitales, observación de la Tierra y simulaciones aeroespaciales 3D.">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.</p>
+<a class="cta" href="#earth" data-en="Explore OPE" data-es="Explorar OPE">Explore OPE</a>
+</div>
+<div class="hero-media">
+<div class="gif-frame">
+<!-- AQUÍ IRÁ EL GIF REAL DE OPE -->
+<img class="ope-gif" src="" alt="OPE orbital simulation">
+<div class="gif-placeholder"><span>OPE / VISUALIZATION</span></div>
+<div class="media-corner tl"></div><div class="media-corner tr"></div><div class="media-corner bl"></div><div class="media-corner br"></div>
+<div class="media-label">01 / OPE RUNTIME</div>
+</div>
 </div>
 </div>
 </section>
 
 <section class="intro">
+<div class="container">
 <div class="intro-top">
-<div class="intro-number">01 / OPE</div>
-<div><h2 data-i18n="introTitle">Space systems<br>generate data.<br>We make it<br>computable.</h2></div>
+<div class="intro-index reveal">02 / DIGITAL TWIN</div>
+<div class="intro-copy reveal">
+<p data-en="OPE represents Earth as a computational spatial system — connecting orbital mechanics, Earth data and observation geometry in one environment." data-es="OPE representa la Tierra como un sistema espacial computacional, conectando mecánica orbital, datos terrestres y geometría de observación en un mismo entorno.">OPE represents Earth as a computational spatial system — connecting orbital mechanics, Earth data and observation geometry in one environment.</p>
 </div>
-<div class="intro-copy" data-i18n="introCopy">Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. OPE brings that information into a computational environment where Earth, orbit and observation can be understood together.</div>
+</div>
+</div>
 </section>
 
 <section class="statement">
+<div class="container">
 <div class="statement-inner">
-<div class="statement-label">VIRTUALS HUBS / COMPUTATIONAL LAYER</div>
-<h2 data-i18n="statementTitle">From <span>orbital data</span><br>to spatial understanding.</h2>
+<div class="statement-label reveal" data-en="THE PROBLEM" data-es="EL PROBLEMA">THE PROBLEM</div>
+<h2 class="reveal" data-en="Space systems are becoming increasingly complex." data-es="Los sistemas espaciales son cada vez más complejos.">Space systems are becoming increasingly complex.</h2>
+</div>
 </div>
 </section>
 
-<section class="digital">
+<section class="digital" id="earth">
+<div class="container">
 <div class="digital-layout">
-<div>
-<h2 class="digital-title" data-i18n="digitalTitle">A digital<br>twin of Earth.</h2>
-<div class="digital-copy" data-i18n="digitalCopy">OPE represents Earth as a computational spatial system, combining geographic, orbital and observation data in a single environment. The result is not simply a 3D representation, but a model that can be explored, connected and simulated.</div>
+<div class="digital-copy reveal">
+<div class="section-num">03 / EARTH DIGITAL TWIN</div>
+<h2 data-en="A digital twin of Earth." data-es="Un gemelo digital de la Tierra.">A digital twin of Earth.</h2>
+<p data-en="OPE turns Earth into a computational spatial model where geographic position, orbital position and observation data can be represented together." data-es="OPE convierte la Tierra en un modelo espacial computacional donde la posición geográfica, la posición orbital y los datos de observación pueden representarse conjuntamente.">OPE turns Earth into a computational spatial model where geographic position, orbital position and observation data can be represented together.</p>
 </div>
-<div class="digital-visual">
+<div class="digital-visual reveal">
 <div class="digital-earth"></div>
-<div class="digital-ring"></div>
-<div class="digital-ring r2"></div>
-<div class="data-points">
-<span>LAT 39.214 / LON -0.732</span>
-<span>ORBITAL FRAME</span>
-<span>EARTH OBSERVATION</span>
-<span>SPATIAL MODEL</span>
+<div class="data-points"><span></span><span></span><span></span><span></span><span></span></div>
 </div>
 </div>
 </div>
 </section>
 
 <section class="observation" id="observation">
+<div class="container">
 <div class="observation-head">
-<h2 data-i18n="observationTitle">Connect observation<br>data with where<br>and when it happens.</h2>
-<div class="observation-intro" data-i18n="observationIntro">OPE connects Earth observation datasets with geographic and orbital context, allowing spatial and temporal relationships to be explored inside the same environment.</div>
+<div class="reveal">
+<div class="section-num">04 / EARTH OBSERVATION</div>
+<h2 data-en="Connect observation data with where and when it happens." data-es="Conecta los datos de observación con dónde y cuándo ocurren.">Connect observation data with where and when it happens.</h2>
 </div>
-<div class="data-flow">
-<div class="flow-item"><strong>ESA EO CATALOGUE</strong><span data-i18n="flow1">Earth observation data</span></div>
-<div class="flow-arrow">→</div>
-<div class="flow-item"><strong>OPE</strong><span data-i18n="flow2">Spatial processing</span></div>
-<div class="flow-arrow">→</div>
-<div class="flow-item"><strong>OBSERVATION SCENARIO</strong><span data-i18n="flow3">Where / when / what</span></div>
+<p class="reveal" data-en="OPE connects Earth observation catalogues with orbital and spatial context, turning datasets into observable scenarios." data-es="OPE conecta catálogos de observación de la Tierra con contexto orbital y espacial, convirtiendo datasets en escenarios observables.">OPE connects Earth observation catalogues with orbital and spatial context, turning datasets into observable scenarios.</p>
 </div>
-<div class="observation-foot">
-<p data-i18n="observationFoot">Multiple data sources can be brought into the same spatial model, connecting observations with the orbital conditions under which they occur.</p>
+<div class="data-flow reveal">
+<div class="flow-item">01<strong>ESA EO CATALOGUE</strong></div>
+<div class="flow-arrow">→</div>
+<div class="flow-item">02<strong>DATA</strong></div>
+<div class="flow-arrow">→</div>
+<div class="flow-item">03<strong>OPE</strong></div>
+<div class="flow-arrow">→</div>
+<div class="flow-item">04<strong>EARTH / ORBIT</strong></div>
+<div class="flow-arrow">→</div>
+<div class="flow-item">05<strong>OBSERVATION</strong></div>
+</div>
+<div class="observation-foot reveal">
+<p data-en="The objective is not only to access the data, but to understand its spatial and temporal relationship with the system observing it." data-es="El objetivo no es solo acceder al dato, sino comprender su relación espacial y temporal con el sistema que lo observa.">The objective is not only to access the data, but to understand its spatial and temporal relationship with the system observing it.</p>
+</div>
 </div>
 </section>
 
 <section class="passes">
+<div class="container">
 <div class="passes-top">
-<div>
-<div class="passes-label">04 / ORBITAL OPERATIONS</div>
-<h2 data-i18n="passesTitle">Know when an orbit<br>becomes an<br>observation opportunity.</h2>
+<div class="reveal">
+<div class="section-num">05 / ORBITAL PASS MONITORING</div>
+<h2 data-en="Know when an orbit becomes an observation opportunity." data-es="Saber cuándo una órbita se convierte en una oportunidad de observación.">Know when an orbit becomes an observation opportunity.</h2>
 </div>
-<div class="passes-copy" data-i18n="passesCopy">OPE monitors orbital passes and observation windows in spatial context, connecting satellite trajectories with locations and observation scenarios. The objective is simple: understand not only where a satellite is, but when it can observe.</div>
+<p class="reveal" data-en="OPE monitors orbital passes and observation windows, connecting satellite trajectories with the regions and moments they can observe." data-es="OPE monitoriza pasos orbitales y ventanas de observación, conectando trayectorias de satélites con las regiones y momentos que pueden observar.">OPE monitors orbital passes and observation windows, connecting satellite trajectories with the regions and moments they can observe.</p>
 </div>
-<div class="timeline">
-<div class="pass-row"><div class="pass-name">SAT-01 / LEO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">10:42 — 10:49</div></div>
-<div class="pass-row"><div class="pass-name">SAT-02 / SSO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">11:18 — 11:26</div></div>
-<div class="pass-row"><div class="pass-name">SAT-03 / LEO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">12:04 — 12:11</div></div>
-<div class="pass-row"><div class="pass-name">SAT-04 / SSO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">13:27 — 13:34</div></div>
+<div class="timeline reveal" id="timeline">
+<div class="timeline-axis"></div>
+<div class="pass p1"><div class="pass-line"></div><div class="pass-dot"></div><div class="pass-label">PASS / 01</div></div>
+<div class="pass p2"><div class="pass-line"></div><div class="pass-dot"></div><div class="pass-label">PASS / 02</div></div>
+<div class="pass p3"><div class="pass-line"></div><div class="pass-dot"></div><div class="pass-label">OBSERVATION WINDOW</div></div>
+<div class="pass p4"><div class="pass-line"></div><div class="pass-dot"></div><div class="pass-label">PASS / 04</div></div>
+</div>
 </div>
 </section>
 
-<section class="engine">
+<section class="engine" id="engine">
+<div class="container">
 <div class="engine-header">
-<h2 class="engine-title" data-i18n="engineTitle">Orbit.<br>Earth.<br>Observation.<br>Simulation.</h2>
-<div class="engine-side" data-i18n="engineSide">OPE brings these components together inside one computational environment, turning different spatial systems into something that can be explored and simulated as a whole.</div>
+<div class="reveal">
+<div class="section-num">06 / THE OPE ENGINE</div>
+<h2>Orbit.<br>Earth.<br>Observation.<br>Simulation.</h2>
+</div>
+<p class="reveal" data-en="One computational environment brings together the systems required to understand and simulate the relationship between orbit and Earth." data-es="Un único entorno computacional reúne los sistemas necesarios para comprender y simular la relación entre la órbita y la Tierra.">One computational environment brings together the systems required to understand and simulate the relationship between orbit and Earth.</p>
 </div>
 <div class="engine-core">
-<div class="engine-node"><strong>ORBITAL MECHANICS</strong><small>TRAJECTORIES / PASSES</small></div>
-<div class="engine-node"><strong>EARTH DATA</strong><small>GEOGRAPHY / TERRAIN / EO</small></div>
-<div class="engine-center">OPE</div>
-<div class="engine-node"><strong>OBSERVATION GEOMETRY</strong><small>WINDOWS / TARGETS</small></div>
-<div class="engine-node"><strong>3D SIMULATION</strong><small>SCENARIOS / DIGITAL TWINS</small></div>
+<div class="engine-center"><span>OPE</span></div>
+<div class="engine-node node1">ORBITAL<br>MECHANICS</div>
+<div class="engine-node node2">EARTH<br>DATA</div>
+<div class="engine-node node3">OBSERVATION<br>GEOMETRY</div>
+<div class="engine-node node4">3D<br>SIMULATION</div>
+</div>
 </div>
 </section>
 
-<section class="video-section">
-<div class="video-frame">
-<div class="video-overlay"><div class="video-orbit"></div></div>
-<div class="video-copy">
-<h2 data-i18n="videoTitle">Data becomes spatial<br>when you can see<br>the system.</h2>
-<p data-i18n="videoCopy">OPE combines computation and 3D representation to make complex orbital and Earth observation systems easier to inspect, understand and simulate.</p>
+<section class="video">
+<div class="container">
+<div class="video-wrap reveal">
+<div class="video-bg"></div>
+<div class="video-scan"></div>
+<div class="video-orbit"></div>
+<div class="video-title" data-en="OPE / SPATIAL SIMULATION" data-es="OPE / SIMULACIÓN ESPACIAL">OPE / SPATIAL SIMULATION</div>
 </div>
 </div>
 </section>
 
 <section class="gallery">
+<div class="container">
 <div class="gallery-head">
-<h2 class="gallery-title" data-i18n="galleryTitle">Inside OPE.</h2>
-<div class="gallery-meta" data-i18n="galleryMeta">ORBITAL PASS ENGINE / RUNTIME</div>
+<div class="reveal">
+<div class="section-num">07 / INSIDE OPE</div>
+<h2>OPE / RUNTIME</h2>
 </div>
-<div class="carousel" id="galleryCarousel">
+<div class="carousel-controls reveal">
+<button class="carousel-btn" id="galleryPrev" aria-label="Previous">←</button>
+<button class="carousel-btn" id="galleryNext" aria-label="Next">→</button>
+</div>
+</div>
+<div class="carousel-viewport reveal" id="galleryCarousel">
 <div class="carousel-track">
-<div class="slide">
-<div class="slide-grid"></div>
+<div class="slide one">
 <div class="slide-earth"></div>
-<div class="slide-orbit"></div>
-<div class="slide-label">OPE / EARTH OBSERVATION</div>
+<div class="slide-ring"></div>
+<div class="slide-code">ORBIT / EARTH / 3D</div>
+<div class="slide-label">ORBITAL SCENARIO</div>
 </div>
-<div class="slide">
-<div class="slide-grid"></div>
-<div class="slide-earth" style="transform:scale(.78);left:11%;top:9%"></div>
-<div class="slide-orbit" style="transform:rotate(27deg);top:42%"></div>
-<div class="slide-label">OPE / ORBITAL PASS</div>
+<div class="slide two">
+<div class="slide-ring" style="transform:translate(-50%,-50%) rotate(12deg);width:780px"></div>
+<div class="slide-code">EO / DATA / SPATIAL</div>
+<div class="slide-label">EARTH OBSERVATION</div>
 </div>
-<div class="slide">
-<div class="slide-grid"></div>
-<div class="slide-earth" style="transform:scale(.65);left:30%;top:22%"></div>
-<div class="slide-orbit" style="width:100%;left:0;transform:rotate(-8deg)"></div>
-<div class="slide-label">OPE / SPATIAL SCENARIO</div>
-</div>
+<div class="slide three">
+<div class="slide-earth" style="transform:translate(-50%,-50%) scale(.72)"></div>
+<div class="slide-ring" style="transform:translate(-50%,-50%) rotate(-35deg);width:800px"></div>
+<div class="slide-code">PASS / MONITORING / OPE</div>
+<div class="slide-label">ORBITAL PASS</div>
 </div>
 </div>
-<div class="carousel-controls">
-<div class="carousel-dots" id="galleryDots"></div>
-<div class="carousel-buttons">
-<button id="galleryPrev">←</button>
-<button id="galleryNext">→</button>
 </div>
+<div class="dots" id="galleryDots"></div>
 </div>
 </section>
 
 <section class="archive">
+<div class="container">
 <div class="archive-head">
-<h2 data-i18n="archiveTitle">Built<br>in 3D.</h2>
-<div class="archive-copy" data-i18n="archiveCopy">Digital twins, aerospace systems, mission environments and spatial models represented through interactive 3D.</div>
+<div class="reveal">
+<div class="section-num">08 / BUILT IN 3D</div>
+<h2>Built in 3D.</h2>
 </div>
-<div class="collage">
-<div class="collage-track" id="collageTrack">
-<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth"></div><div class="collage-orbit"></div><div class="collage-caption">EARTH / DIGITAL TWIN</div></div>
-<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.6);top:25%"></div><div class="collage-orbit"></div><div class="collage-caption">ORBIT / SATELLITE</div></div>
-<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.78);left:7%"></div><div class="collage-orbit" style="transform:rotate(32deg)"></div><div class="collage-caption">MISSION / SCENARIO</div></div>
-<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.52);left:34%;top:29%"></div><div class="collage-orbit" style="transform:rotate(-42deg)"></div><div class="collage-caption">3D / AEROSPACE SYSTEM</div></div>
-<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.7);top:12%"></div><div class="collage-orbit" style="transform:rotate(10deg)"></div><div class="collage-caption">SPATIAL MODEL</div></div>
+<p class="reveal" data-en="Digital twins, aerospace systems, mission environments and spatial models built inside the same visual computing layer." data-es="Gemelos digitales, sistemas aeroespaciales, entornos de misión y modelos espaciales construidos dentro de la misma capa de computación visual.">Digital twins, aerospace systems, mission environments and spatial models built inside the same visual computing layer.</p>
+</div>
+<div class="collage-viewport reveal">
+<div class="collage" id="collage">
+<div class="collage-card"><div class="card-earth"></div><div class="card-orbit"></div><div class="card-number">01</div><div class="card-label">EARTH DIGITAL TWIN</div></div>
+<div class="collage-card"><div class="card-earth" style="transform:translate(-50%,-50%) scale(.75)"></div><div class="card-orbit"></div><div class="card-number">02</div><div class="card-label">ORBITAL SYSTEM</div></div>
+<div class="collage-card"><div class="card-earth" style="transform:translate(-50%,-50%) scale(.9)"></div><div class="card-orbit" style="transform:translate(-50%,-50%) rotate(28deg)"></div><div class="card-number">03</div><div class="card-label">MISSION ENVIRONMENT</div></div>
+<div class="collage-card"><div class="card-earth" style="transform:translate(-50%,-50%) scale(.65)"></div><div class="card-orbit" style="transform:translate(-50%,-50%) rotate(-40deg)"></div><div class="card-number">04</div><div class="card-label">OBSERVATION SYSTEM</div></div>
+<div class="collage-card"><div class="card-earth"></div><div class="card-orbit" style="transform:translate(-50%,-50%) rotate(8deg)"></div><div class="card-number">05</div><div class="card-label">SPATIAL SIMULATION</div></div>
 </div>
 </div>
-<div class="archive-controls">
-<button id="collagePrev">←</button>
-<button id="collageNext">→</button>
 </div>
 </section>
 
-<section class="stack" id="technology">
-<div class="stack-head">
-<h2 data-i18n="stackTitle">The technology<br>behind the<br>environment.</h2>
-<div class="stack-intro" data-i18n="stackIntro">OPE is built around a set of computational capabilities that connect orbital systems, Earth data and 3D simulation.</div>
+<section class="stack">
+<div class="container">
+<div class="stack-head reveal">
+<div class="section-num">09 / TECHNOLOGY STACK</div>
+<h2 data-en="The technology behind the environment." data-es="La tecnología detrás del entorno.">The technology behind the environment.</h2>
 </div>
 <div class="stack-list">
-<div class="stack-row"><div class="stack-num">01</div><div class="stack-name">Spatial Computing</div><div class="stack-desc" data-i18n="stack1">A spatial representation layer for working with geographic, orbital and 3D information together.</div></div>
-<div class="stack-row"><div class="stack-num">02</div><div class="stack-name">Orbital Mechanics</div><div class="stack-desc" data-i18n="stack2">Trajectory and pass computation for understanding satellite movement around Earth.</div></div>
-<div class="stack-row"><div class="stack-num">03</div><div class="stack-name">Earth Observation</div><div class="stack-desc" data-i18n="stack3">Integration and contextualization of observation datasets within geographic and orbital scenarios.</div></div>
-<div class="stack-row"><div class="stack-num">04</div><div class="stack-name">3D Simulation</div><div class="stack-desc" data-i18n="stack4">Interactive 3D environments for digital twins, mission scenarios and aerospace systems.</div></div>
+<div class="stack-row reveal"><div class="stack-num">01</div><div class="stack-name">Spatial Computing</div><div class="stack-desc" data-en="A spatial representation layer for Earth, orbit and operational systems." data-es="Una capa de representación espacial para la Tierra, la órbita y los sistemas operativos.">A spatial representation layer for Earth, orbit and operational systems.</div></div>
+<div class="stack-row reveal"><div class="stack-num">02</div><div class="stack-name">Orbital Mechanics</div><div class="stack-desc" data-en="Orbital position, trajectories, passes and observation windows." data-es="Posición orbital, trayectorias, pasos y ventanas de observación.">Orbital position, trajectories, passes and observation windows.</div></div>
+<div class="stack-row reveal"><div class="stack-num">03</div><div class="stack-name">Earth Observation</div><div class="stack-desc" data-en="Connection between observation datasets and their geographic and temporal context." data-es="Conexión entre datasets de observación y su contexto geográfico y temporal.">Connection between observation datasets and their geographic and temporal context.</div></div>
+<div class="stack-row reveal"><div class="stack-num">04</div><div class="stack-name">3D Simulation</div><div class="stack-desc" data-en="Interactive 3D environments for analysing and communicating complex aerospace systems." data-es="Entornos 3D interactivos para analizar y comunicar sistemas aeroespaciales complejos.">Interactive 3D environments for analysing and communicating complex aerospace systems.</div></div>
+</div>
 </div>
 </section>
 
-<section class="applications" id="applications">
+<section class="apps" id="applications">
+<div class="container">
 <div class="apps-head">
-<h2 data-i18n="appsTitle">Built for real<br>aerospace workflows.</h2>
-<p data-i18n="appsIntro">OPE is designed as a computational environment that can support different ways of working with orbital and Earth observation systems.</p>
+<div class="reveal">
+<div class="section-num">10 / APPLICATIONS</div>
+<h2 data-en="Built for real aerospace workflows." data-es="Construido para flujos de trabajo aeroespaciales reales.">Built for real aerospace workflows.</h2>
+</div>
+<p class="reveal" data-en="OPE is designed as a computational foundation for applications where Earth, orbit, data and simulation need to work together." data-es="OPE está diseñado como una base computacional para aplicaciones donde Tierra, órbita, datos y simulación necesitan trabajar conjuntamente.">OPE is designed as a computational foundation for applications where Earth, orbit, data and simulation need to work together.</p>
 </div>
 <div class="apps-list">
-<div class="app"><div class="app-num">01</div><h3>Earth Observation</h3><p data-i18n="app1">Explore observation data together with geographic and orbital conditions.</p></div>
-<div class="app"><div class="app-num">02</div><h3>Mission Planning</h3><p data-i18n="app2">Explore orbital scenarios, passes and observation opportunities.</p></div>
-<div class="app"><div class="app-num">03</div><h3>Digital Twins</h3><p data-i18n="app3">Represent complex aerospace systems and environments in interactive 3D.</p></div>
-<div class="app"><div class="app-num">04</div><h3>Research &amp; Simulation</h3><p data-i18n="app4">Test spatial, orbital and observation scenarios inside a computational environment.</p></div>
+<div class="app-row reveal"><div class="app-index">01</div><div class="app-name">Earth Observation</div><div class="app-arrow">→</div></div>
+<div class="app-row reveal"><div class="app-index">02</div><div class="app-name">Mission Planning</div><div class="app-arrow">→</div></div>
+<div class="app-row reveal"><div class="app-index">03</div><div class="app-name">Digital Twins</div><div class="app-arrow">→</div></div>
+<div class="app-row reveal"><div class="app-index">04</div><div class="app-name">Research & Simulation</div><div class="app-arrow">→</div></div>
+</div>
 </div>
 </section>
 
 <section class="final">
-<div class="final-label">VIRTUALS HUBS / OPE</div>
-<h2 data-i18n="finalTitle">Earth is complex.<br>Orbit is complex.<br><span>OPE connects the two.</span></h2>
+<div class="container">
+<div class="final-label reveal">11 / OPE</div>
+<h2 class="reveal" data-en="Earth is complex. Orbit is complex. OPE connects the two." data-es="La Tierra es compleja. La órbita es compleja. OPE conecta ambas.">Earth is complex. Orbit is complex. OPE connects the two.</h2>
 <div class="final-bottom">
-<p data-i18n="finalCopy">A computational environment for understanding, monitoring and simulating the systems between Earth and orbit.</p>
-<div class="hero-code">EARTH / ORBIT / OBSERVATION<br>VIRTUALS HUBS / OPE</div>
+<p class="reveal" data-en="A computational environment for understanding, monitoring and simulating the systems between Earth and orbit." data-es="Un entorno computacional para comprender, monitorizar y simular los sistemas entre la Tierra y la órbita.">A computational environment for understanding, monitoring and simulating the systems between Earth and orbit.</p>
+<a href="#home" class="cta reveal" data-en="Back to top" data-es="Volver arriba">Back to top</a>
+</div>
 </div>
 </section>
+</main>
 
 <footer class="footer">
-<div>VIRTUALS HUBS</div>
-<span>OPE / ORBITAL PASS ENGINE</span>
-<span>© 2026</span>
+<div class="container">
+<div class="footer-top">
+<div class="footer-brand">VIRTUALS HUBS<span>OPE / ORBITAL PASS ENGINE</span></div>
+<div class="footer-links">
+<a href="#earth">OPE</a>
+<a href="#applications">Applications</a>
+<a href="#home">Top</a>
+</div>
+</div>
+<div class="footer-bottom">
+<span>© 2026 VIRTUALS HUBS</span>
+<span>EARTH / ORBIT / DATA / SIMULATION</span>
+</div>
+</div>
 </footer>
 
 <script>
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+
 const translations={
 en:{
-navOpe:"OPE",navObservation:"Observation",navTechnology:"Technology",navApplications:"Applications",
-heroKicker:"Orbital Pass Engine / OPE",heroTitle:"A computational<br>model of Earth<br>and orbit.",heroSub:"A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulation.",
-introTitle:"Space systems<br>generate data.<br>We make it<br>computable.",introCopy:"Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. OPE brings that information into a computational environment where Earth, orbit and observation can be understood together.",
-statementTitle:"From <span>orbital data</span><br>to spatial understanding.",
-digitalTitle:"A digital<br>twin of Earth.",digitalCopy:"OPE represents Earth as a computational spatial system, combining geographic, orbital and observation data in a single environment. The result is not simply a 3D representation, but a model that can be explored, connected and simulated.",
-observationTitle:"Connect observation<br>data with where<br>and when it happens.",observationIntro:"OPE connects Earth observation datasets with geographic and orbital context, allowing spatial and temporal relationships to be explored inside the same environment.",flow1:"Earth observation data",flow2:"Spatial processing",flow3:"Where / when / what",observationFoot:"Multiple data sources can be brought into the same spatial model, connecting observations with the orbital conditions under which they occur.",
-passesTitle:"Know when an orbit<br>becomes an<br>observation opportunity.",passesCopy:"OPE monitors orbital passes and observation windows in spatial context, connecting satellite trajectories with locations and observation scenarios. The objective is simple: understand not only where a satellite is, but when it can observe.",
-engineTitle:"Orbit.<br>Earth.<br>Observation.<br>Simulation.",engineSide:"OPE brings these components together inside one computational environment, turning different spatial systems into something that can be explored and simulated as a whole.",
-videoTitle:"Data becomes spatial<br>when you can see<br>the system.",videoCopy:"OPE combines computation and 3D representation to make complex orbital and Earth observation systems easier to inspect, understand and simulate.",
-galleryTitle:"Inside OPE.",galleryMeta:"ORBITAL PASS ENGINE / RUNTIME",archiveTitle:"Built<br>in 3D.",archiveCopy:"Digital twins, aerospace systems, mission environments and spatial models represented through interactive 3D.",
-stackTitle:"The technology<br>behind the<br>environment.",stackIntro:"OPE is built around a set of computational capabilities that connect orbital systems, Earth data and 3D simulation.",stack1:"A spatial representation layer for working with geographic, orbital and 3D information together.",stack2:"Trajectory and pass computation for understanding satellite movement around Earth.",stack3:"Integration and contextualization of observation datasets within geographic and orbital scenarios.",stack4:"Interactive 3D environments for digital twins, mission scenarios and aerospace systems.",
-appsTitle:"Built for real<br>aerospace workflows.",appsIntro:"OPE is designed as a computational environment that can support different ways of working with orbital and Earth observation systems.",app1:"Explore observation data together with geographic and orbital conditions.",app2:"Explore orbital scenarios, passes and observation opportunities.",app3:"Represent complex aerospace systems and environments in interactive 3D.",app4:"Test spatial, orbital and observation scenarios inside a computational environment.",
-finalTitle:"Earth is complex.<br>Orbit is complex.<br><span>OPE connects the two.</span>",finalCopy:"A computational environment for understanding, monitoring and simulating the systems between Earth and orbit."
+"Explore OPE":"Explore OPE",
+"Earth":"Earth",
+"Observation":"Observation",
+"Engine":"Engine",
+"Applications":"Applications"
 },
 es:{
-navOpe:"OPE",navObservation:"Observación",navTechnology:"Tecnología",navApplications:"Aplicaciones",
-heroKicker:"Orbital Pass Engine / OPE",heroTitle:"Un modelo<br>computacional de<br>la Tierra y la órbita.",heroSub:"Un entorno de computación espacial para operaciones orbitales, observación de la Tierra y simulación aeroespacial 3D.",
-introTitle:"Los sistemas espaciales<br>generan datos.<br>Nosotros los hacemos<br>computables.",introCopy:"Los satélites, las constelaciones y los sistemas de observación de la Tierra generan enormes cantidades de datos espaciales y temporales. OPE integra esa información en un entorno computacional donde Tierra, órbita y observación pueden entenderse conjuntamente.",
-statementTitle:"Del <span>dato orbital</span><br>a la comprensión espacial.",
-digitalTitle:"Un gemelo<br>digital de la Tierra.",digitalCopy:"OPE representa la Tierra como un sistema espacial computacional, combinando datos geográficos, orbitales y de observación en un único entorno. No es simplemente una representación 3D, sino un modelo que puede explorarse, conectarse y simularse.",
-observationTitle:"Conecta los datos<br>de observación con<br>dónde y cuándo ocurren.",observationIntro:"OPE conecta datasets de observación de la Tierra con contexto geográfico y orbital, permitiendo explorar relaciones espaciales y temporales dentro del mismo entorno.",flow1:"Datos de observación",flow2:"Procesamiento espacial",flow3:"Dónde / cuándo / qué",observationFoot:"Diferentes fuentes de datos pueden integrarse en un mismo modelo espacial, conectando las observaciones con las condiciones orbitales en las que tienen lugar.",
-passesTitle:"Convierte cada órbita<br>en una oportunidad<br>de observación.",passesCopy:"OPE monitoriza pasos orbitales y ventanas de observación en contexto espacial, conectando las trayectorias de los satélites con localizaciones y escenarios de observación. El objetivo es entender no solo dónde está un satélite, sino cuándo puede observar.",
-engineTitle:"Órbita.<br>Tierra.<br>Observación.<br>Simulación.",engineSide:"OPE integra estos componentes en un único entorno computacional, convirtiendo diferentes sistemas espaciales en algo que puede explorarse y simularse conjuntamente.",
-videoTitle:"Los datos se vuelven espaciales<br>cuando puedes ver<br>el sistema.",videoCopy:"OPE combina computación y representación 3D para facilitar la inspección, comprensión y simulación de sistemas orbitales y de observación de la Tierra.",
-galleryTitle:"Dentro de OPE.",galleryMeta:"ORBITAL PASS ENGINE / RUNTIME",archiveTitle:"Construido<br>en 3D.",archiveCopy:"Gemelos digitales, sistemas aeroespaciales, entornos de misión y modelos espaciales representados mediante 3D interactivo.",
-stackTitle:"La tecnología<br>detrás del<br>entorno.",stackIntro:"OPE se construye sobre un conjunto de capacidades computacionales que conectan sistemas orbitales, datos de la Tierra y simulación 3D.",stack1:"Una capa de representación espacial para trabajar conjuntamente con información geográfica, orbital y 3D.",stack2:"Cálculo de trayectorias y pasos orbitales para comprender el movimiento de los satélites alrededor de la Tierra.",stack3:"Integración y contextualización de datasets de observación dentro de escenarios geográficos y orbitales.",stack4:"Entornos 3D interactivos para gemelos digitales, escenarios de misión y sistemas aeroespaciales.",
-appsTitle:"Diseñado para<br>flujos aeroespaciales reales.",appsIntro:"OPE está diseñado como un entorno computacional capaz de soportar diferentes formas de trabajar con sistemas orbitales y de observación de la Tierra.",app1:"Explorar datos de observación junto con las condiciones geográficas y orbitales.",app2:"Explorar escenarios orbitales, pasos y oportunidades de observación.",app3:"Representar sistemas y entornos aeroespaciales complejos mediante 3D interactivo.",app4:"Probar escenarios espaciales, orbitales y de observación dentro de un entorno computacional.",
-finalTitle:"La Tierra es compleja.<br>La órbita es compleja.<br><span>OPE conecta ambas.</span>",finalCopy:"Un entorno computacional para comprender, monitorizar y simular los sistemas entre la Tierra y la órbita."
-}};
-
-function setLanguage(lang){
-document.documentElement.lang=lang;
-document.querySelectorAll("[data-i18n]").forEach(el=>{
-const key=el.dataset.i18n;
-if(translations[lang][key]!=null)el.innerHTML=translations[lang][key];
-});
-document.getElementById("enBtn").classList.toggle("active",lang==="en");
-document.getElementById("esBtn").classList.toggle("active",lang==="es");
-localStorage.setItem("ope-language",lang);
+"Explore OPE":"Explorar OPE",
+"Earth":"Tierra",
+"Observation":"Observación",
+"Engine":"Engine",
+"Applications":"Aplicaciones"
 }
+};
 
-document.getElementById("enBtn").onclick=()=>setLanguage("en");
-document.getElementById("esBtn").onclick=()=>setLanguage("es");
-setLanguage(localStorage.getItem("ope-language")||"en");
-
-/* SCROLL REVEAL */
-const revealSelectors=[
-".intro-number",".intro h2",".intro-copy",
-".statement-label",".statement h2",
-".digital-title",".digital-copy",".digital-visual",
-".observation-head",".data-flow",".observation-foot",
-".passes-label",".passes h2",".passes-copy",".timeline",
-".engine-header",".engine-core",
-".video-copy",
-".gallery-head",".carousel",
-".archive-head",".collage",
-".stack-head",".stack-row",
-".apps-head",".app",
-".final-label",".final h2",".final-bottom"
-];
-
-revealSelectors.forEach(selector=>{
-document.querySelectorAll(selector).forEach(el=>el.classList.add("reveal"));
+let currentLang="en";
+function setLanguage(lang){
+currentLang=lang;
+document.documentElement.lang=lang;
+$$("[data-en]").forEach(el=>{
+const value=el.dataset[lang];
+if(value!==undefined)el.innerHTML=value;
 });
+$("#enBtn").classList.toggle("active",lang==="en");
+$("#esBtn").classList.toggle("active",lang==="es");
+try{localStorage.setItem("ope-lang",lang)}catch(e){}
+}
+$("#enBtn").onclick=()=>setLanguage("en");
+$("#esBtn").onclick=()=>setLanguage("es");
+try{
+const saved=localStorage.getItem("ope-lang");
+if(saved==="es")setLanguage("es");
+}catch(e){}
 
-const revealObserver=new IntersectionObserver(entries=>{
+const observer=new IntersectionObserver(entries=>{
 entries.forEach(entry=>{
 if(entry.isIntersecting){
-entry.target.classList.add("visible");
-revealObserver.unobserve(entry.target);
+entry.target.classList.add("in");
+observer.unobserve(entry.target);
 }
 });
-},{threshold:.12,rootMargin:"0px 0px -60px 0px"});
+},{threshold:.12,rootMargin:"0px 0px -7% 0px"});
 
-document.querySelectorAll(".reveal").forEach(el=>revealObserver.observe(el));
-
-/* STAGGER */
-document.querySelectorAll(".stack-row,.app,.pass-row").forEach((el,i)=>{
-el.style.transitionDelay=`${i*90}ms`;
+$$(".reveal").forEach((el,i)=>{
+el.style.setProperty("--delay",`${Math.min(i%5,4)*80}ms`);
+observer.observe(el);
 });
 
-/* HERO PARALLAX */
-const hero=document.querySelector(".hero");
-const heroEarth=document.querySelector(".hero .earth");
-const heroOrbit=document.querySelector(".hero .orbit");
-const heroGlow=document.querySelector(".hero-glow");
-const satellite=document.querySelector(".satellite");
-
-window.addEventListener("scroll",()=>{
-const y=window.scrollY;
-if(y<window.innerHeight){
-heroEarth.style.transform=`translate3d(${y*.035}px,${y*.06}px,0)`;
-heroOrbit.style.transform=`rotate(-18deg) translate3d(${-y*.025}px,${y*.035}px,0)`;
-heroGlow.style.transform=`translateY(${y*.025}px)`;
-satellite.style.transform=`translate3d(${-y*.05}px,${y*.04}px,0) rotate(-18deg)`;
+const timeline=$("#timeline");
+const timelineObserver=new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+timeline.classList.add("active");
+timelineObserver.disconnect();
 }
-},{passive:true});
+});
+},{threshold:.3});
+timelineObserver.observe(timeline);
 
-/* GALLERY CAROUSEL */
-function setupCarousel(containerId,prevId,nextId,dotsId){
-const container=document.getElementById(containerId);
-const track=container.querySelector(".carousel-track");
-const prev=document.getElementById(prevId);
-const next=document.getElementById(nextId);
-const dots=dotsId?document.getElementById(dotsId):null;
-let index=0,startX=0,startOffset=0,dragging=false;
+function createCarousel(root,track,prev,next,dots,interval){
 const slides=[...track.children];
+let index=0;
+let timer=null;
+let dragging=false;
+let startX=0;
+let currentX=0;
+let startOffset=0;
+let moved=false;
 
-if(dots){
-dots.innerHTML="";
 slides.forEach((_,i)=>{
-const d=document.createElement("span");
-d.className="carousel-dot"+(i===0?" active":"");
-dots.appendChild(d);
+const dot=document.createElement("button");
+dot.className="dot"+(i===0?" active":"");
+dot.setAttribute("aria-label",`Slide ${i+1}`);
+dot.onclick=()=>go(i);
+dots.appendChild(dot);
 });
+
+function gap(){
+return parseFloat(getComputedStyle(track).gap)||0;
 }
 
-function step(){
-return slides[0].getBoundingClientRect().width+24;
+function slideWidth(){
+return root.clientWidth+gap();
 }
 
-function update(){
-const max=Math.max(0,slides.length-1);
-index=Math.max(0,Math.min(index,max));
-track.style.transform=`translateX(${-index*step()}px)`;
-if(dots)[...dots.children].forEach((d,i)=>d.classList.toggle("active",i===index));
+function update(animate=true,offsetOverride=null){
+track.style.transition=animate?"transform .7s cubic-bezier(.22,.61,.36,1)":"none";
+const offset=offsetOverride!==null?offsetOverride:index*slideWidth();
+track.style.transform=`translate3d(${-offset}px,0,0)`;
+[...dots.children].forEach((d,i)=>d.classList.toggle("active",i===index));
 }
 
-prev.onclick=()=>{
-index--;
-update();
-resetAuto();
-};
-
-next.onclick=()=>{
-index++;
-update();
-resetAuto();
-};
-
-if(dots){
-[...dots.children].forEach((dot,i)=>{
-dot.onclick=()=>{
-index=i;
-update();
-resetAuto();
-};
-});
+function go(i){
+index=Math.max(0,Math.min(slides.length-1,i));
+update(true);
 }
 
-track.addEventListener("pointerdown",e=>{
+function nextSlide(){
+if(index>=slides.length-1){
+index=0;
+update(false);
+requestAnimationFrame(()=>requestAnimationFrame(()=>update(true)));
+}else go(index+1);
+}
+
+function prevSlide(){
+if(index<=0){
+index=slides.length-1;
+update(false);
+requestAnimationFrame(()=>requestAnimationFrame(()=>update(true)));
+}else go(index-1);
+}
+
+prev.onclick=prevSlide;
+next.onclick=nextSlide;
+
+function pause(){if(timer){clearInterval(timer);timer=null}}
+function resume(){pause();if(interval)timer=setInterval(nextSlide,interval)}
+root.addEventListener("mouseenter",pause);
+root.addEventListener("mouseleave",resume);
+
+root.addEventListener("pointerdown",e=>{
 dragging=true;
+moved=false;
 startX=e.clientX;
-startOffset=-index*step();
-track.classList.add("dragging");
-track.setPointerCapture(e.pointerId);
+currentX=e.clientX;
+startOffset=index*slideWidth();
+track.style.transition="none";
+root.setPointerCapture?.(e.pointerId);
+pause();
 });
 
-track.addEventListener("pointermove",e=>{
+root.addEventListener("pointermove",e=>{
 if(!dragging)return;
-track.style.transform=`translateX(${startOffset+e.clientX-startX}px)`;
+currentX=e.clientX;
+const dx=currentX-startX;
+if(Math.abs(dx)>6)moved=true;
+let offset=startOffset-dx;
+const max=(slides.length-1)*slideWidth();
+offset=Math.max(0,Math.min(max,offset));
+update(false,offset);
 });
 
-track.addEventListener("pointerup",e=>{
+root.addEventListener("pointerup",e=>{
 if(!dragging)return;
 dragging=false;
-track.classList.remove("dragging");
-const dx=e.clientX-startX;
-if(Math.abs(dx)>60)index+=dx<0?1:-1;
-update();
-resetAuto();
+const dx=currentX-startX;
+if(Math.abs(dx)>60)dx<0?nextSlide():prevSlide();
+else update(true);
+resume();
 });
 
-track.addEventListener("pointercancel",()=>{
+root.addEventListener("pointercancel",()=>{
 dragging=false;
-track.classList.remove("dragging");
-update();
+update(true);
+resume();
 });
 
-let autoTimer;
+root.addEventListener("click",e=>{
+if(moved){
+e.preventDefault();
+e.stopPropagation();
+}
+},true);
 
-function auto(){
-index++;
-if(index>=slides.length)index=0;
-update();
+window.addEventListener("resize",()=>update(false));
+resume();
+return{go,nextSlide,prevSlide};
 }
 
-function resetAuto(){
-clearInterval(autoTimer);
-autoTimer=setInterval(auto,5000);
-}
+const galleryRoot=$("#galleryCarousel");
+const galleryTrack=galleryRoot.querySelector(".carousel-track");
+createCarousel(galleryRoot,galleryTrack,$("#galleryPrev"),$("#galleryNext"),$("#galleryDots"),5000);
 
-autoTimer=setInterval(auto,5000);
-
-return{update};
-}
-
-setupCarousel("galleryCarousel","galleryPrev","galleryNext","galleryDots");
-
-/* COLLAGE */
-const collage=document.getElementById("collageTrack");
-const collagePrev=document.getElementById("collagePrev");
-const collageNext=document.getElementById("collageNext");
+const collageViewport=document.querySelector(".collage-viewport");
+const collage=$("#collage");
+const cards=[...collage.children];
 let collageIndex=0;
+let collageTimer=null;
+let collageDragging=false;
+let collageStartX=0;
+let collageCurrentX=0;
+let collageStartOffset=0;
+let collageMoved=false;
 
-function collageOffset(){
-return collage.children[0].getBoundingClientRect().width+24;
+function collageGap(){
+return parseFloat(getComputedStyle(collage).gap)||20;
 }
-
-function updateCollage(){
-const max=Math.max(0,collage.children.length-1);
-collageIndex=Math.max(0,Math.min(max,collageIndex));
-collage.style.transform=`translateX(${-collageIndex*collageOffset()}px)`;
+function collageStep(){
+return cards[0].getBoundingClientRect().width+collageGap();
 }
-
-collagePrev.onclick=()=>{
+function collageMax(){
+return Math.max(0,collage.scrollWidth-collageViewport.clientWidth);
+}
+function updateCollage(animate=true,override=null){
+collage.style.transition=animate?"transform .8s cubic-bezier(.22,.61,.36,1)":"none";
+let offset=override!==null?override:Math.min(collageIndex*collageStep(),collageMax());
+collage.style.transform=`translate3d(${-offset}px,0,0)`;
+}
+function nextCollage(){
+if(collageIndex>=cards.length-1){
+collageIndex=0;
+updateCollage(false);
+requestAnimationFrame(()=>requestAnimationFrame(()=>updateCollage(true)));
+}else{
+collageIndex++;
+updateCollage(true);
+}
+}
+function prevCollage(){
+if(collageIndex<=0){
+collageIndex=cards.length-1;
+updateCollage(true);
+}else{
 collageIndex--;
-updateCollage();
-resetCollageAuto();
-};
-
-collageNext.onclick=()=>{
-collageIndex++;
-updateCollage();
-resetCollageAuto();
-};
-
-let collageTimer;
-
-function autoCollage(){
-collageIndex++;
-if(collageIndex>=collage.children.length)collageIndex=0;
-updateCollage();
+updateCollage(true);
 }
-
-function resetCollageAuto(){
-clearInterval(collageTimer);
-collageTimer=setInterval(autoCollage,4500);
 }
-
-collageTimer=setInterval(autoCollage,4500);
-
-/* COLLAGE DRAG */
-let collageDragging=false,collageStartX=0,collageStartOffset=0;
-
+function pauseCollage(){
+if(collageTimer){clearInterval(collageTimer);collageTimer=null}
+}
+function resumeCollage(){
+pauseCollage();
+collageTimer=setInterval(nextCollage,4500);
+}
+collageViewport.addEventListener("mouseenter",pauseCollage);
+collageViewport.addEventListener("mouseleave",resumeCollage);
 collage.addEventListener("pointerdown",e=>{
 collageDragging=true;
+collageMoved=false;
 collageStartX=e.clientX;
-collageStartOffset=-collageIndex*collageOffset();
-collage.setPointerCapture(e.pointerId);
-collage.style.transition="none";
+collageCurrentX=e.clientX;
+collageStartOffset=Math.min(collageIndex*collageStep(),collageMax());
+collage.classList.add("dragging");
+pauseCollage();
+collage.setPointerCapture?.(e.pointerId);
 });
-
 collage.addEventListener("pointermove",e=>{
 if(!collageDragging)return;
-collage.style.transform=`translateX(${collageStartOffset+e.clientX-collageStartX}px)`;
+collageCurrentX=e.clientX;
+const dx=collageCurrentX-collageStartX;
+if(Math.abs(dx)>6)collageMoved=true;
+let offset=collageStartOffset-dx;
+offset=Math.max(0,Math.min(collageMax(),offset));
+updateCollage(false,offset);
 });
-
-collage.addEventListener("pointerup",e=>{
+collage.addEventListener("pointerup",()=>{
 if(!collageDragging)return;
 collageDragging=false;
-collage.style.transition="transform .7s cubic-bezier(.2,.7,.2,1)";
-const dx=e.clientX-collageStartX;
-if(Math.abs(dx)>60)collageIndex+=dx<0?1:-1;
-updateCollage();
-resetCollageAuto();
+collage.classList.remove("dragging");
+const dx=collageCurrentX-collageStartX;
+if(Math.abs(dx)>70)dx<0?nextCollage():prevCollage();
+else updateCollage(true);
+resumeCollage();
 });
-
 collage.addEventListener("pointercancel",()=>{
 collageDragging=false;
-collage.style.transition="transform .7s cubic-bezier(.2,.7,.2,1)";
-updateCollage();
+collage.classList.remove("dragging");
+updateCollage(true);
+resumeCollage();
+});
+window.addEventListener("resize",()=>updateCollage(false));
+resumeCollage();
+
+let pointerX=.5,pointerY=.5;
+const hero=document.querySelector(".hero");
+const media=document.querySelector(".hero-media");
+window.addEventListener("pointermove",e=>{
+pointerX=e.clientX/window.innerWidth;
+pointerY=e.clientY/window.innerHeight;
+const x=(pointerX-.5)*12;
+const y=(pointerY-.5)*8;
+if(media)media.style.transform=`translate3d(${x}px,${y}px,0)`;
+},{passive:true});
+
+window.addEventListener("scroll",()=>{
+const y=Math.min(window.scrollY,window.innerHeight)*.035;
+if(hero)hero.style.setProperty("--hero-y",`${y}px`);
+},{passive:true});
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+a.addEventListener("click",e=>{
+const target=document.querySelector(a.getAttribute("href"));
+if(target){
+e.preventDefault();
+target.scrollIntoView({behavior:"smooth",block:"start"});
+}
+});
 });
 
-/* RESIZE */
-window.addEventListener("resize",()=>{
-collageIndex=Math.min(collageIndex,collage.children.length-1);
-updateCollage();
+window.addEventListener("load",()=>{
+document.body.classList.add("loaded");
+setTimeout(()=>{
+document.querySelectorAll(".hero-copy,.hero-media").forEach((el,i)=>{
+el.style.opacity="1";
+el.style.transform="none";
+el.style.transition=`opacity 1s ease ${i*.15}s,transform 1s cubic-bezier(.22,.61,.36,1) ${i*.15}s`;
 });
+},80);
+});
+
+document.querySelector(".hero-copy").style.opacity="0";
+document.querySelector(".hero-copy").style.transform="translateY(28px)";
+document.querySelector(".hero-media").style.opacity="0";
+document.querySelector(".hero-media").style.transform="translateY(28px)";
 </script>
 </body>
 </html>
