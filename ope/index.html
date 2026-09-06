@@ -1,819 +1,366 @@
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Orbital Pass Engine — Virtuals Hubs</title>
+<title>OPE — Orbital Pass Engine</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;min-height:100%;background:#020409;color:#fff;font-family:Arial,Helvetica,sans-serif}
+html,body{margin:0;padding:0;background:#03050a;color:#fff;font-family:Arial,Helvetica,sans-serif}
 body{overflow-x:hidden}
-a{text-decoration:none;color:inherit}
-button{font-family:inherit}
-section{position:relative;min-height:100vh}
-.hero{height:100vh;display:flex;align-items:center;overflow:hidden;background:radial-gradient(circle at 50% 55%,#101a29 0,#050913 32%,#020409 68%)}
-.hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:90px 90px;opacity:.08}
-.nav{position:absolute;top:0;left:0;width:100%;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;z-index:20}
-.logo{font-size:14px;font-weight:700;letter-spacing:.18em}
-.nav-right{display:flex;align-items:center;gap:38px}
-.nav-links{display:flex;gap:34px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#aeb7c7}
-.nav-links a{transition:color .3s ease}
-.nav-links a:hover{color:#fff}
-.language-switch{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.16em;color:#657184}
-.lang-btn{border:0;background:none;padding:0;color:#657184;font-size:10px;letter-spacing:.16em;cursor:pointer;transition:color .3s ease}
-.lang-btn:hover,.lang-btn.active{color:#fff}
-.hero-content{position:relative;z-index:3;width:100%;padding:0 8vw}
-.eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8c9aaf;margin-bottom:25px}
-h1{font-size:clamp(60px,9vw,145px);line-height:.88;letter-spacing:-.07em;font-weight:500;margin:0;max-width:900px}
-.hero-sub{font-size:clamp(18px,2vw,25px);line-height:1.4;color:#aeb7c7;max-width:620px;margin-top:40px}
-.cta{display:inline-flex;margin-top:42px;padding:15px 22px;border:1px solid #394355;font-size:11px;letter-spacing:.18em;text-transform:uppercase;transition:.3s}
-.cta:hover{background:#fff;color:#020409}
-.earth{position:absolute;width:min(62vw,850px);height:min(62vw,850px);right:-8%;top:50%;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle at 38% 35%,#3d6580 0,#183147 20%,#071522 48%,#020409 70%);box-shadow:-30px 0 100px rgba(44,104,145,.18),inset 35px -20px 80px rgba(0,0,0,.75);opacity:.95;transition:transform .2s ease-out}
-.earth:before{content:"";position:absolute;inset:8%;border-radius:50%;background:repeating-radial-gradient(circle at 40% 40%,transparent 0 50px,rgba(255,255,255,.025) 51px 52px);opacity:.7}
-.orbit{position:absolute;width:120%;height:38%;left:-10%;top:31%;border:1px solid rgba(135,180,210,.18);border-radius:50%;transform:rotate(-22deg)}
-.satellite{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 18px 5px rgba(255,255,255,.5);top:15%;left:73%;animation:satelliteFloat 7s ease-in-out infinite}
-@keyframes satelliteFloat{0%,100%{transform:translate(0,0);opacity:.8}50%{transform:translate(-20px,15px);opacity:1}}
-.hero-grid{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100px 100px;mask-image:linear-gradient(to right,transparent,#000 25%,#000 75%,transparent)}
-.scroll-indicator{position:absolute;bottom:35px;left:8vw;z-index:5;font-size:9px;letter-spacing:.2em;color:#657184;text-transform:uppercase;display:flex;align-items:center;gap:12px}
-.scroll-line{width:45px;height:1px;background:#657184;animation:scrollPulse 2s ease-in-out infinite}
-@keyframes scrollPulse{0%,100%{opacity:.3;width:30px}50%{opacity:1;width:55px}}
-.intro{display:flex;align-items:center;padding:12vw 10vw;background:#f3f4f3;color:#080b10}
-.intro-inner{max-width:1100px}
-.intro .eyebrow{color:#707a86}
-.intro h2{font-size:clamp(42px,6vw,90px);font-weight:400;line-height:.95;letter-spacing:-.05em;max-width:950px;margin:0}
-.intro p{font-size:20px;line-height:1.6;color:#59616c;max-width:650px;margin-top:45px}
-.statement{min-height:80vh;display:flex;align-items:center;padding:10vw;background:#050912}
-.statement h2{font-size:clamp(50px,8vw,120px);font-weight:400;letter-spacing:-.06em;line-height:.9;max-width:1100px;margin:0}
-.statement span{color:#71869b}
-.ope{background:#020409;display:flex;align-items:center;padding:8vw;overflow:hidden}
-.ope-copy{width:45%;position:relative;z-index:2}
-.ope h2{font-size:clamp(50px,7vw,105px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0}
-.ope p{font-size:18px;line-height:1.6;color:#8d98a8;max-width:500px;margin:35px 0}
-.simulation{position:absolute;right:5%;width:55vw;height:55vw;max-width:750px;max-height:750px;border-radius:50%;border:1px solid rgba(130,160,190,.15);animation:simulationRotate 35s linear infinite}
-.simulation:before,.simulation:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(130,160,190,.1)}
-.simulation:before{inset:10%}
-.simulation:after{inset:25%}
-.simulation-orbit{position:absolute;width:115%;height:42%;left:-7%;top:29%;border:1px solid rgba(130,170,200,.12);border-radius:50%;transform:rotate(-25deg)}
-@keyframes simulationRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.data-point{position:absolute;width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 15px #fff;animation:dataPulse 2.5s ease-in-out infinite}
-.data-point:nth-child(2){top:22%;left:38%;animation-delay:0s}
-.data-point:nth-child(3){top:58%;left:70%;animation-delay:.8s}
-.data-point:nth-child(4){top:72%;left:27%;animation-delay:1.5s}
-@keyframes dataPulse{0%,100%{transform:scale(.7);opacity:.35}50%{transform:scale(1.7);opacity:1}}
-.visual-section{background:#080c13;padding:9vw 8vw;overflow:hidden}
-.visual-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:70px}
-.visual-header h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0;max-width:800px}
-.visual-header p{color:#778294;font-size:14px;line-height:1.6;max-width:300px;margin:0}
-.video-wrap{position:relative;width:100%;height:min(65vw,720px);overflow:hidden;background:#020409;border:1px solid #202936}
-.video-wrap video{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.65) contrast(1.08);opacity:.82;transform:scale(1.01);transition:transform 1.2s ease,opacity .8s ease}
-.video-wrap:hover video{transform:scale(1.035);opacity:1}
-.video-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,4,9,.65),transparent 60%),linear-gradient(0deg,rgba(2,4,9,.4),transparent 40%);pointer-events:none}
-.video-label{position:absolute;left:35px;bottom:30px;z-index:2;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#c1cad5}
-.video-status{position:absolute;right:35px;top:30px;z-index:2;font-size:9px;letter-spacing:.18em;color:#8e9aab;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.video-status:before{content:"";width:5px;height:5px;border-radius:50%;background:#a9c7d9;box-shadow:0 0 10px #a9c7d9;animation:statusPulse 2s infinite}
-@keyframes statusPulse{0%,100%{opacity:.3}50%{opacity:1}}
-.gallery{background:#020409;padding:12vw 0;overflow:hidden}
-.gallery-header{padding:0 8vw;margin-bottom:65px;display:flex;justify-content:space-between;align-items:flex-end}
-.gallery-title{max-width:850px}
-.gallery-title h2{font-size:clamp(55px,8vw,115px);font-weight:400;letter-spacing:-.07em;line-height:.88;margin:0}
-.gallery-title p{font-size:17px;line-height:1.6;color:#7f8a9b;max-width:520px;margin:30px 0 0}
-.gallery-meta{text-align:right;color:#657184;font-size:10px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
-.gallery-stage{position:relative;width:100%;overflow:hidden}
-.gallery-track{display:flex;gap:24px;transition:transform .8s cubic-bezier(.2,.7,.2,1);will-change:transform;cursor:grab;padding-left:8vw}
-.gallery-track.dragging{cursor:grabbing;transition:none}
-.gallery-slide{flex:0 0 min(76vw,1100px);position:relative;aspect-ratio:16/9;background:#0b1119;border:1px solid #202936;overflow:hidden}
-.gallery-image{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1s ease,filter 1s ease}
-.gallery-slide:hover .gallery-image{transform:scale(1.025)}
-.gallery-image:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,4,9,.05) 45%,rgba(2,4,9,.8) 100%)}
-.gallery-slide:nth-child(1) .gallery-image{background:radial-gradient(circle at 58% 48%,#3d6580 0,#183147 18%,#071522 48%,#020409 72%)}
-.gallery-slide:nth-child(2) .gallery-image{background:linear-gradient(135deg,#17283a,#05080e 65%),radial-gradient(circle,#52758b,#08121c)}
-.gallery-slide:nth-child(3) .gallery-image{background:linear-gradient(125deg,#101d2b,#03060a 65%),repeating-linear-gradient(90deg,transparent 0 80px,rgba(130,170,200,.08) 81px 82px)}
-.gallery-slide:nth-child(4) .gallery-image{background:radial-gradient(circle at 35% 40%,#536e7d,#182c3a 20%,#050a10 65%)}
-.gallery-slide:nth-child(5) .gallery-image{background:linear-gradient(140deg,#1d2936,#04070b 65%),radial-gradient(circle at 70% 35%,#416274,transparent 30%)}
-.gallery-info{position:absolute;left:35px;right:35px;bottom:30px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;gap:30px}
-.gallery-caption span{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#9ca8b7;margin-bottom:12px}
-.gallery-caption h3{font-size:clamp(24px,3vw,42px);font-weight:400;letter-spacing:-.04em;margin:0}
-.gallery-caption p{font-size:13px;color:#a1acb9;line-height:1.5;max-width:420px;margin:10px 0 0}
-.gallery-index{font-size:11px;letter-spacing:.15em;color:#c0c9d3;white-space:nowrap}
-.gallery-controls{padding:40px 8vw 0;display:flex;justify-content:space-between;align-items:center}
-.gallery-progress{display:flex;gap:7px;align-items:center}
-.gallery-dot{width:28px;height:1px;background:#394452;cursor:pointer;transition:width .4s ease,background .4s ease}
-.gallery-dot.active{width:55px;background:#fff}
-.gallery-arrows{display:flex;gap:8px}
-.gallery-btn{width:48px;height:48px;border:1px solid #303946;background:transparent;color:#fff;font-size:17px;cursor:pointer;transition:.3s}
-.gallery-btn:hover{background:#fff;color:#020409}
-.aero-collage{background:#080c13;padding:10vw 8vw;overflow:hidden}
-.aero-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:75px}
-.aero-header h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0;max-width:800px}
-.aero-header p{color:#778294;font-size:14px;line-height:1.6;max-width:300px;margin:0}
-.collage-carousel{position:relative;overflow:hidden}
-.collage-track{display:flex;gap:20px;transition:transform .9s cubic-bezier(.2,.7,.2,1);will-change:transform}
-.collage-item{position:relative;flex:0 0 72%;height:570px;overflow:hidden;border:1px solid #202936;background:#0c121b}
-.collage-item:nth-child(1){background:linear-gradient(145deg,#142435,#05080e 65%)}
-.collage-item:nth-child(2){background:linear-gradient(135deg,#1b2737,#060a11 70%)}
-.collage-item:nth-child(3){background:linear-gradient(135deg,#111b29,#05070c 70%)}
-.collage-item:nth-child(4){background:linear-gradient(135deg,#172735,#04070c 70%)}
-.collage-item:nth-child(5){background:linear-gradient(135deg,#101c2b,#03060a 70%)}
-.collage-visual{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1s ease}
-.collage-item:hover .collage-visual{transform:scale(1.035)}
-.collage-visual:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(2,4,9,.85))}
-.collage-earth .collage-visual:before{content:"";position:absolute;width:65%;height:65%;border-radius:50%;right:-10%;bottom:-15%;background:radial-gradient(circle at 35% 30%,#496c7f,#142b3b 45%,#020409 72%);box-shadow:-20px 0 70px rgba(70,120,150,.16)}
-.collage-orbit .collage-visual:before,.collage-orbit .collage-visual:after{content:"";position:absolute;border:1px solid rgba(130,170,200,.25);border-radius:50%}
-.collage-orbit .collage-visual:before{width:75%;height:38%;left:12%;top:30%;transform:rotate(-15deg)}
-.collage-orbit .collage-visual:after{width:45%;height:22%;left:28%;top:39%;transform:rotate(-15deg)}
-.collage-grid .collage-visual{background-image:linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:45px 45px}
-.collage-system .collage-visual:before{content:"";position:absolute;width:55%;height:55%;left:22%;top:20%;border:1px solid rgba(150,180,200,.2);transform:rotate(-8deg);box-shadow:0 0 0 35px rgba(130,170,200,.025),0 0 0 70px rgba(130,170,200,.02)}
-.collage-data .collage-visual:before{content:"";position:absolute;inset:15%;background:repeating-linear-gradient(90deg,transparent 0 35px,rgba(150,190,210,.08) 36px 37px),repeating-linear-gradient(0deg,transparent 0 35px,rgba(150,190,210,.08) 36px 37px);transform:perspective(400px) rotateX(55deg) rotateZ(-10deg)}
-.collage-info{position:absolute;left:30px;right:30px;bottom:28px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
-.collage-info span{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#9ca8b7}
-.collage-info h3{font-size:clamp(25px,3vw,40px);font-weight:400;letter-spacing:-.04em;margin:12px 0 0}
-.collage-index{font-size:10px;letter-spacing:.16em;color:#c0c9d3}
-.collage-controls{display:flex;justify-content:space-between;align-items:center;margin-top:30px}
-.collage-progress{font-size:10px;letter-spacing:.18em;color:#788596}
-.collage-buttons{display:flex;gap:8px}
-.collage-btn{width:44px;height:44px;border:1px solid #303946;background:transparent;color:#fff;cursor:pointer;transition:.3s}
-.collage-btn:hover{background:#fff;color:#020409}
-.modules{background:#eef0ef;color:#080b10;padding:10vw}
-.modules-header{max-width:800px;margin-bottom:80px}
-.modules h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0}
-.modules-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #c5c9cc}
-.module{padding:40px 30px 50px 0;border-bottom:1px solid #c5c9cc;transition:transform .6s ease,opacity .6s ease}
-.module:not(:last-child){border-right:1px solid #c5c9cc;padding-right:40px}
-.module:not(:first-child){padding-left:40px}
-.module-number{font-size:11px;color:#858d96;letter-spacing:.15em}
-.module h3{font-size:30px;font-weight:400;margin:55px 0 20px}
-.module p{font-size:15px;line-height:1.6;color:#626a73;max-width:320px}
-.module:hover{transform:translateY(-6px)}
-.applications{background:#020409;padding:10vw}
-.applications h2{font-size:clamp(50px,7vw,100px);font-weight:400;letter-spacing:-.06em;line-height:.9;margin:0 0 90px}
-.application-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#29303a}
-.application{background:#020409;padding:45px;min-height:240px;transition:background .5s ease,transform .5s ease}
-.application:hover{background:#080d15;transform:translateY(-3px)}
-.application span{font-size:11px;color:#7f8b9c;letter-spacing:.18em}
-.application h3{font-size:30px;font-weight:400;margin:70px 0 0}
-.final{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at center,#101a27,#020409 60%)}
-.final h2{font-size:clamp(55px,9vw,140px);font-weight:400;letter-spacing:-.07em;line-height:.88;max-width:1000px;margin:0 auto}
-.final p{color:#8792a2;font-size:18px;margin-top:40px}
-footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border-top:1px solid #151b23}
-.reveal{opacity:0;transform:translateY(45px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:.12s}
-.reveal-delay-2{transition-delay:.24s}
-.reveal-delay-3{transition-delay:.36s}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+:root{--blue:#6fb7ff;--line:rgba(255,255,255,.12);--muted:rgba(255,255,255,.58);--dark:#03050a}
+.nav{position:fixed;top:0;left:0;width:100%;height:76px;padding:0 42px;display:flex;align-items:center;justify-content:space-between;z-index:100;background:linear-gradient(to bottom,rgba(3,5,10,.9),transparent)}
+.logo{font-size:14px;letter-spacing:.16em;font-weight:700}
+.nav-right{display:flex;align-items:center;gap:32px}
+.nav-links{display:flex;gap:26px;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.nav-links a{opacity:.65;transition:.25s}
+.nav-links a:hover{opacity:1}
+.language-switch{display:flex;gap:8px;font-size:10px;letter-spacing:.12em}
+.language-switch button{border:0;background:none;color:#fff;opacity:.35;cursor:pointer;padding:4px}
+.language-switch button.active{opacity:1}
+section{position:relative}
+.hero{height:100vh;min-height:720px;overflow:hidden;display:flex;align-items:flex-end;padding:0 6vw 9vh}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:80px 80px;mask-image:linear-gradient(to bottom,transparent,black 30%,black 80%,transparent)}
+.hero-glow{position:absolute;width:70vw;height:70vw;max-width:900px;max-height:900px;border-radius:50%;right:-12vw;top:8%;background:radial-gradient(circle,rgba(44,104,170,.24),transparent 65%)}
+.earth{position:absolute;width:min(62vw,820px);height:min(62vw,820px);right:-8vw;top:14%;border-radius:50%;background:radial-gradient(circle at 36% 34%,#315f84 0,#102b43 27%,#07131f 55%,#02060b 74%);box-shadow:0 0 80px rgba(61,139,208,.16),inset -70px -40px 120px #000;overflow:hidden}
+.earth:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 21px,rgba(126,193,255,.09) 22px,transparent 23px),repeating-linear-gradient(90deg,transparent 0 27px,rgba(126,193,255,.07) 28px,transparent 29px);border-radius:50%;transform:rotate(-16deg) scale(1.08)}
+.earth:after{content:"";position:absolute;inset:-5%;border:1px solid rgba(130,200,255,.16);border-radius:50%;box-shadow:0 0 30px rgba(86,162,224,.12)}
+.orbit{position:absolute;width:min(88vw,1200px);height:min(30vw,410px);right:-11vw;top:37%;border:1px solid rgba(124,184,235,.3);border-radius:50%;transform:rotate(-18deg)}
+.satellite{position:absolute;right:21%;top:29%;width:34px;height:9px;border:1px solid rgba(255,255,255,.7);transform:rotate(-18deg)}
+.satellite:before,.satellite:after{content:"";position:absolute;width:16px;height:7px;border:1px solid rgba(120,190,255,.7);top:0}
+.satellite:before{right:34px}.satellite:after{left:34px}
+.hero-content{position:relative;z-index:5;max-width:800px}
+.hero-kicker{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--blue);margin-bottom:24px}
+.hero h1{font-size:clamp(62px,9vw,142px);line-height:.82;letter-spacing:-.065em;font-weight:500;margin:0;max-width:900px}
+.hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-top:44px}
+.hero-sub{max-width:480px;color:var(--muted);font-size:16px;line-height:1.55}
+.hero-code{font:10px/1.7 monospace;color:rgba(255,255,255,.42);text-align:right}
+.intro{padding:17vh 7vw 15vh;min-height:90vh}
+.intro-top{display:grid;grid-template-columns:1fr 1fr;gap:8vw;align-items:start}
+.intro-number{font:11px monospace;color:var(--blue)}
+.intro h2{font-size:clamp(48px,6.5vw,100px);line-height:.9;letter-spacing:-.055em;font-weight:400;margin:0;max-width:800px}
+.intro-copy{margin-top:18vh;max-width:470px;color:var(--muted);font-size:17px;line-height:1.65}
+.statement{min-height:75vh;padding:15vh 7vw;display:flex;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.statement-inner{max-width:1200px}
+.statement-label{font:10px monospace;color:rgba(255,255,255,.4);margin-bottom:35px}
+.statement h2{font-size:clamp(48px,7.4vw,118px);line-height:.9;letter-spacing:-.06em;font-weight:400;margin:0}
+.statement h2 span{color:var(--blue)}
+.digital{padding:16vh 7vw;min-height:95vh}
+.digital-layout{display:grid;grid-template-columns:42% 58%;align-items:center;gap:5vw}
+.digital-title{font-size:clamp(54px,7vw,110px);line-height:.86;letter-spacing:-.06em;font-weight:400;margin:0}
+.digital-copy{max-width:460px;color:var(--muted);font-size:16px;line-height:1.65;margin-top:45px}
+.digital-visual{height:min(62vw,680px);position:relative;display:flex;align-items:center;justify-content:center}
+.digital-earth{width:min(42vw,540px);height:min(42vw,540px);border-radius:50%;background:radial-gradient(circle at 35% 32%,#396f95,#122f46 38%,#06101b 68%,#010307 78%);box-shadow:0 0 100px rgba(68,147,214,.12)}
+.digital-ring{position:absolute;width:100%;height:30%;border:1px solid rgba(116,186,241,.32);border-radius:50%;transform:rotate(-24deg)}
+.digital-ring.r2{width:115%;height:37%;transform:rotate(48deg);opacity:.5}
+.data-points{position:absolute;inset:0;font:9px monospace;color:rgba(170,215,255,.65)}
+.data-points span{position:absolute}
+.data-points span:nth-child(1){top:18%;left:9%}.data-points span:nth-child(2){top:32%;right:3%}.data-points span:nth-child(3){bottom:20%;left:18%}.data-points span:nth-child(4){bottom:13%;right:16%}
+.observation{padding:13vh 7vw;background:#f5f6f7;color:#07090c;min-height:85vh}
+.observation-head{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;margin-bottom:90px}
+.observation h2{font-size:clamp(52px,7vw,105px);line-height:.86;letter-spacing:-.06em;font-weight:400;margin:0;max-width:800px}
+.observation-intro{max-width:350px;font-size:15px;line-height:1.6;color:#555}
+.data-flow{display:grid;grid-template-columns:1fr .4fr 1fr .4fr 1fr;align-items:center;border-top:1px solid #bbb;border-bottom:1px solid #bbb}
+.flow-item{padding:42px 22px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
+.flow-item strong{font-size:12px;letter-spacing:.13em}
+.flow-item span{font:10px monospace;color:#777}
+.flow-arrow{font-size:24px;text-align:center;color:#888}
+.observation-foot{margin-top:55px;display:flex;justify-content:flex-end}
+.observation-foot p{max-width:520px;color:#555;font-size:14px;line-height:1.6}
+.passes{padding:16vh 7vw 14vh;min-height:95vh}
+.passes-top{display:grid;grid-template-columns:1fr 1fr;gap:8vw}
+.passes-label{font:10px monospace;color:var(--blue)}
+.passes h2{font-size:clamp(50px,6.5vw,100px);line-height:.87;letter-spacing:-.06em;font-weight:400;margin:0}
+.passes-copy{max-width:430px;margin-top:25vh;color:var(--muted);font-size:16px;line-height:1.65}
+.timeline{margin-top:12vh;border-top:1px solid var(--line)}
+.pass-row{display:grid;grid-template-columns:160px 1fr 150px;align-items:center;min-height:92px;border-bottom:1px solid var(--line);font:11px monospace}
+.pass-name{color:#fff}.pass-track{height:1px;background:rgba(255,255,255,.15);position:relative}.pass-line{position:absolute;height:1px;background:var(--blue);top:0}.pass-row:nth-child(1) .pass-line{left:12%;width:29%}.pass-row:nth-child(2) .pass-line{left:43%;width:21%}.pass-row:nth-child(3) .pass-line{left:68%;width:25%}.pass-row:nth-child(4) .pass-line{left:23%;width:17%}.pass-time{text-align:right;color:rgba(255,255,255,.42)}
+.engine{padding:15vh 7vw;min-height:100vh;background:#05080d}
+.engine-header{display:flex;justify-content:space-between;align-items:flex-end;gap:50px;margin-bottom:100px}
+.engine-title{font-size:clamp(55px,7vw,110px);line-height:.84;letter-spacing:-.06em;font-weight:400;margin:0}
+.engine-side{max-width:350px;color:var(--muted);font-size:15px;line-height:1.6}
+.engine-core{display:grid;grid-template-columns:1fr 1.4fr 1fr;grid-template-rows:180px 180px;gap:1px;background:var(--line);border:1px solid var(--line)}
+.engine-node{background:#05080d;padding:28px;display:flex;flex-direction:column;justify-content:space-between}
+.engine-node strong{font-size:11px;letter-spacing:.14em}
+.engine-node small{font:10px monospace;color:rgba(255,255,255,.4)}
+.engine-center{grid-column:2;grid-row:1/3;background:radial-gradient(circle,#102a40,#05080d 65%);display:flex;align-items:center;justify-content:center;font-size:42px;letter-spacing:-.05em}
+.engine-node:nth-child(1){grid-column:1;grid-row:1}.engine-node:nth-child(2){grid-column:3;grid-row:1}.engine-node:nth-child(3){grid-column:1;grid-row:2}.engine-node:nth-child(5){grid-column:3;grid-row:2}
+.video-section{min-height:100vh;padding:0;overflow:hidden;background:#000}
+.video-frame{position:relative;width:100%;height:100vh;min-height:650px;background:radial-gradient(circle at 50% 50%,#122b42,#03070c 55%);display:flex;align-items:flex-end}
+.video-frame:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:60px 60px}
+.video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.video-orbit{width:70vw;height:25vw;border:1px solid rgba(122,193,255,.25);border-radius:50%;transform:rotate(-17deg)}
+.video-copy{position:relative;z-index:3;padding:7vw;max-width:900px}
+.video-copy h2{font-size:clamp(48px,7vw,108px);line-height:.88;letter-spacing:-.06em;font-weight:400;margin:0 0 28px}
+.video-copy p{max-width:430px;color:var(--muted);font-size:15px;line-height:1.6}
+.gallery{padding:15vh 0 12vh;background:#020409}
+.gallery-head{padding:0 7vw;display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px}
+.gallery-title{font-size:clamp(50px,7vw,100px);line-height:.85;letter-spacing:-.06em;font-weight:400;margin:0}
+.gallery-meta{font:10px monospace;color:rgba(255,255,255,.4)}
+.carousel{position:relative;overflow:hidden}
+.carousel-track{display:flex;gap:24px;padding:0 7vw;transition:transform .65s cubic-bezier(.2,.7,.2,1);cursor:grab}
+.carousel-track.dragging{cursor:grabbing;transition:none}
+.slide{flex:0 0 min(78vw,1100px);height:min(54vw,650px);background:#0a1018;border:1px solid var(--line);position:relative;overflow:hidden}
+.slide:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(53,113,164,.2),transparent 60%)}
+.slide-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:50px 50px}
+.slide-earth{position:absolute;width:52%;aspect-ratio:1;border-radius:50%;left:24%;top:15%;background:radial-gradient(circle at 35% 30%,#417b9f,#102d44 40%,#03080e 74%);box-shadow:0 0 70px rgba(62,142,204,.13)}
+.slide-orbit{position:absolute;width:80%;height:35%;left:10%;top:32%;border:1px solid rgba(130,200,255,.35);border-radius:50%;transform:rotate(-18deg)}
+.slide-label{position:absolute;left:25px;bottom:22px;font:10px monospace;color:rgba(255,255,255,.48)}
+.carousel-controls{padding:35px 7vw 0;display:flex;justify-content:space-between;align-items:center}
+.carousel-buttons{display:flex;gap:8px}
+.carousel-buttons button{width:42px;height:42px;border:1px solid var(--line);background:none;color:#fff;cursor:pointer}
+.carousel-dots{display:flex;gap:7px}.carousel-dot{width:28px;height:1px;background:rgba(255,255,255,.2)}.carousel-dot.active{background:var(--blue)}
+.archive{padding:15vh 0 13vh;background:#07090d;overflow:hidden}
+.archive-head{padding:0 7vw;display:grid;grid-template-columns:1fr 1fr;gap:8vw;margin-bottom:80px}
+.archive h2{font-size:clamp(55px,7vw,105px);line-height:.84;letter-spacing:-.06em;font-weight:400;margin:0}
+.archive-copy{align-self:end;max-width:400px;color:var(--muted);font-size:15px;line-height:1.6}
+.collage{position:relative;height:780px}
+.collage-track{position:absolute;left:0;top:0;display:flex;gap:24px;padding-left:7vw;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.collage-card{flex:0 0 430px;height:570px;border:1px solid var(--line);position:relative;overflow:hidden;background:#0a1017}
+.collage-card:nth-child(2){margin-top:130px}.collage-card:nth-child(3){margin-top:40px}.collage-card:nth-child(4){margin-top:190px}.collage-card:nth-child(5){margin-top:70px}
+.collage-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(49,104,151,.24),transparent 58%)}
+.collage-earth{position:absolute;width:65%;aspect-ratio:1;border-radius:50%;left:17%;top:17%;background:radial-gradient(circle at 35% 30%,#3d7597,#102c42 42%,#02060b 75%)}
+.collage-orbit{position:absolute;width:130%;height:38%;left:-15%;top:36%;border:1px solid rgba(128,194,255,.35);border-radius:50%;transform:rotate(-25deg)}
+.collage-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px}
+.collage-caption{position:absolute;left:20px;bottom:20px;font:10px monospace;color:rgba(255,255,255,.5)}
+.archive-controls{padding:35px 7vw 0;display:flex;justify-content:flex-end;gap:8px}
+.archive-controls button{width:42px;height:42px;border:1px solid var(--line);background:none;color:#fff;cursor:pointer}
+.stack{background:#f3f4f5;color:#080a0d;padding:15vh 7vw;min-height:100vh}
+.stack-head{display:grid;grid-template-columns:1fr 1fr;gap:8vw;margin-bottom:90px}
+.stack h2{font-size:clamp(55px,7vw,105px);line-height:.85;letter-spacing:-.06em;font-weight:400;margin:0}
+.stack-intro{max-width:420px;align-self:end;color:#555;font-size:15px;line-height:1.6}
+.stack-list{border-top:1px solid #bbb}
+.stack-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:30px;padding:38px 0;border-bottom:1px solid #bbb;align-items:start}
+.stack-num{font:10px monospace;color:#777}.stack-name{font-size:25px;letter-spacing:-.03em}.stack-desc{max-width:390px;color:#666;font-size:14px;line-height:1.55}
+.applications{padding:15vh 7vw 13vh;min-height:100vh}
+.apps-head{display:flex;justify-content:space-between;gap:60px;align-items:flex-end;margin-bottom:100px}
+.apps-head h2{font-size:clamp(55px,7vw,105px);line-height:.84;letter-spacing:-.06em;font-weight:400;margin:0}
+.apps-head p{max-width:390px;color:var(--muted);font-size:15px;line-height:1.6}
+.apps-list{border-top:1px solid var(--line)}
+.app{display:grid;grid-template-columns:80px 1fr 1fr;gap:30px;padding:38px 0;border-bottom:1px solid var(--line);align-items:start}
+.app-num{font:10px monospace;color:var(--blue)}
+.app h3{font-size:30px;letter-spacing:-.03em;font-weight:400;margin:0}
+.app p{max-width:430px;color:var(--muted);font-size:14px;line-height:1.55;margin:0}
+.final{min-height:90vh;padding:15vh 7vw 10vh;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid var(--line)}
+.final-label{font:10px monospace;color:var(--blue)}
+.final h2{font-size:clamp(55px,8.2vw,130px);line-height:.84;letter-spacing:-.065em;font-weight:400;margin:12vh 0 0;max-width:1100px}
+.final h2 span{color:var(--blue)}
+.final-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-top:12vh}
+.final-bottom p{max-width:420px;color:var(--muted);font-size:15px;line-height:1.6}
+.footer{padding:35px 42px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:rgba(255,255,255,.42);font:10px monospace}
 @media(max-width:800px){
-.nav-links{display:none}
-.nav-right{gap:0}
-.language-switch{margin-left:auto}
-.earth{width:90vw;height:90vw;right:-30%;top:62%;opacity:.55}
-.hero-content{padding:0 7vw}
-.intro,.statement,.ope,.modules,.applications,.visual-section,.aero-collage{padding:18vw 7vw}
-.gallery{padding:18vw 0}
-.gallery-header{padding:0 7vw;display:block}
-.gallery-title p{margin-top:25px}
-.gallery-meta{text-align:left;margin-top:30px}
-.intro{min-height:90vh}
-.ope{display:block}
-.ope-copy{width:100%}
-.simulation{position:relative;width:90vw;height:90vw;right:auto;margin:80px auto 0}
-.visual-header,.aero-header{display:block}
-.visual-header p,.aero-header p{margin-top:30px}
-.video-wrap{height:60vw;min-height:300px}
-.gallery-track{padding-left:7vw;gap:15px}
-.gallery-slide{flex-basis:86vw}
-.gallery-info{left:22px;right:22px;bottom:22px}
-.gallery-controls{padding:30px 7vw 0}
-.gallery-btn{width:42px;height:42px}
-.gallery-caption p{display:none}
-.collage-item{flex-basis:86vw;height:450px}
-.collage-info{left:22px;right:22px;bottom:22px}
-.modules-grid{grid-template-columns:1fr}
-.module:not(:last-child){border-right:0}
-.module:not(:first-child){padding-left:0}
-.application-grid{grid-template-columns:1fr}
-}
-@media(prefers-reduced-motion:reduce){
-*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+.nav{padding:0 20px}.nav-links{display:none}.nav-right{gap:10px}
+.hero{padding:0 6vw 7vh}.earth{width:90vw;height:90vw;right:-35vw;top:20%}.orbit{width:130vw;right:-45vw}.hero h1{font-size:17vw}.hero-bottom{display:block}.hero-code{display:none}
+.intro-top,.digital-layout,.passes-top,.stack-head,.archive-head{grid-template-columns:1fr}.intro-copy,.passes-copy{margin-top:8vh}.digital-visual{height:100vw}.digital-earth{width:70vw;height:70vw}
+.observation-head,.engine-header,.apps-head{display:block}.observation-intro,.engine-side,.apps-head p{margin-top:40px}.data-flow{grid-template-columns:1fr}.flow-arrow{padding:10px}.flow-item{min-height:100px}
+.engine-core{grid-template-columns:1fr 1fr;grid-template-rows:130px 180px 130px}.engine-center{grid-column:1/3;grid-row:2}.engine-node:nth-child(1),.engine-node:nth-child(2),.engine-node:nth-child(3),.engine-node:nth-child(5){grid-column:auto;grid-row:auto}
+.pass-row{grid-template-columns:100px 1fr 90px}
+.slide{flex-basis:86vw;height:60vw}.collage{height:650px}.collage-card{flex-basis:280px;height:410px}.collage-card:nth-child(2){margin-top:80px}.collage-card:nth-child(4){margin-top:100px}
+.stack-row,.app{grid-template-columns:45px 1fr}.stack-desc,.app p{grid-column:2}.footer{padding:25px 20px;display:block}.footer span{display:block;margin-top:10px}
 }
 </style>
 </head>
 <body>
-
-<section class="hero">
 <nav class="nav">
-<div class="logo">VIRTUALS HUBS</div>
+<div class="logo">VIRTUALS HUBS / OPE</div>
 <div class="nav-right">
-<div class="nav-links">
-<a href="#ope" data-i18n="nav.ope">OPE</a>
-<a href="#technology" data-i18n="nav.technology">Technology</a>
-<a href="#applications" data-i18n="nav.applications">Applications</a>
-</div>
-<div class="language-switch">
-<button class="lang-btn active" data-lang="en">EN</button>
-<span>/</span>
-<button class="lang-btn" data-lang="es">ES</button>
-</div>
+<div class="nav-links"><a href="#ope" data-i18n="navOpe">OPE</a><a href="#observation" data-i18n="navObservation">Observation</a><a href="#technology" data-i18n="navTechnology">Technology</a><a href="#applications" data-i18n="navApplications">Applications</a></div>
+<div class="language-switch"><button id="enBtn" class="active">EN</button><span>/</span><button id="esBtn">ES</button></div>
 </div>
 </nav>
-<div class="hero-grid"></div>
-<div class="hero-content reveal visible">
-<div class="eyebrow" data-i18n="hero.eyebrow">Orbital Pass Engine / Virtuals Hubs</div>
-<h1 data-i18n="hero.title">Simulate<br>the future<br>of space.</h1>
-<div class="hero-sub" data-i18n="hero.sub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.</div>
-<a href="#ope" class="cta" data-i18n="hero.cta">Explore OPE</a>
+
+<section class="hero" id="ope">
+<div class="hero-grid"></div><div class="hero-glow"></div><div class="earth"></div><div class="orbit"></div><div class="satellite"></div>
+<div class="hero-content">
+<div class="hero-kicker" data-i18n="heroKicker">Orbital Pass Engine / OPE</div>
+<h1 data-i18n="heroTitle">A computational<br>model of Earth<br>and orbit.</h1>
+<div class="hero-bottom"><div class="hero-sub" data-i18n="heroSub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulation.</div><div class="hero-code">EARTH / ORBIT / DATA<br>SIMULATION / OBSERVATION</div></div>
 </div>
-<div class="earth"><div class="orbit"></div><div class="satellite"></div></div>
-<div class="scroll-indicator"><span class="scroll-line"></span><span data-i18n="scroll">Scroll to explore</span></div>
 </section>
 
 <section class="intro">
-<div class="intro-inner reveal">
-<div class="eyebrow" data-i18n="challenge.eyebrow">01 / The challenge</div>
-<h2 data-i18n="challenge.title">Space systems are becoming increasingly complex.</h2>
-<p data-i18n="challenge.text">Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. Understanding that data requires more than numbers. It requires spatial context.</p>
+<div class="intro-top">
+<div class="intro-number">01 / OPE</div>
+<div><h2 data-i18n="introTitle">Space systems<br>generate data.<br>We make it<br>computable.</h2></div>
 </div>
+<div class="intro-copy" data-i18n="introCopy">Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. OPE brings that information into a computational environment where Earth, orbit and observation can be understood together.</div>
 </section>
 
 <section class="statement">
-<h2 class="reveal" data-i18n="statement.title">We are building the computational layer between <span>orbital data</span> and spatial understanding.</h2>
-</section>
-
-<section class="ope" id="ope">
-<div class="ope-copy reveal">
-<div class="eyebrow" data-i18n="ope.eyebrow">02 / Orbital Pass Engine</div>
-<h2 data-i18n="ope.title">From orbital data to operational intelligence.</h2>
-<p data-i18n="ope.text">OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.</p>
-<a href="#gallery" class="cta" data-i18n="ope.cta">Explore the engine</a>
-</div>
-<div class="simulation reveal reveal-delay-1">
-<div class="simulation-orbit"></div>
-<div class="data-point"></div>
-<div class="data-point"></div>
-<div class="data-point"></div>
+<div class="statement-inner">
+<div class="statement-label">VIRTUALS HUBS / COMPUTATIONAL LAYER</div>
+<h2 data-i18n="statementTitle">From <span>orbital data</span><br>to spatial understanding.</h2>
 </div>
 </section>
 
-<section class="visual-section">
-<div class="visual-header reveal">
-<div>
-<div class="eyebrow" data-i18n="spatial.eyebrow">03 / Spatial intelligence</div>
-<h2 data-i18n="spatial.title">See the systems<br>behind the data.</h2>
-</div>
-<p data-i18n="spatial.text">From orbital trajectories to Earth observation and 3D aerospace environments, spatial context changes how complex systems are understood.</p>
-</div>
-
-<div class="video-wrap reveal">
-<video autoplay muted loop playsinline preload="metadata">
-<source src="assets/aerospace.mp4" type="video/mp4">
-</video>
-<div class="video-overlay"></div>
-<div class="video-status" data-i18n="video.status">System visualization</div>
-<div class="video-label" data-i18n="video.label">Orbital environment / Simulation</div>
+<section class="digital">
+<div class="digital-layout">
+<div><h2 class="digital-title" data-i18n="digitalTitle">A digital<br>twin of Earth.</h2><div class="digital-copy" data-i18n="digitalCopy">OPE represents Earth as a computational spatial system, combining geographic, orbital and observation data in a single environment. The result is not simply a 3D representation, but a model that can be explored, connected and simulated.</div></div>
+<div class="digital-visual"><div class="digital-earth"></div><div class="digital-ring"></div><div class="digital-ring r2"></div><div class="data-points"><span>LAT 39.214 / LON -0.732</span><span>ORBITAL FRAME</span><span>EARTH OBSERVATION</span><span>SPATIAL MODEL</span></div></div>
 </div>
 </section>
 
-<section class="gallery" id="gallery">
-<div class="gallery-header reveal">
-<div class="gallery-title">
-<div class="eyebrow" data-i18n="gallery.eyebrow">04 / OPE Gallery</div>
-<h2 data-i18n="gallery.title">Captured from<br>the engine.</h2>
-<p data-i18n="gallery.text">A selection of spatial environments, orbital scenarios and Earth observation views generated with Orbital Pass Engine.</p>
+<section class="observation" id="observation">
+<div class="observation-head"><h2 data-i18n="observationTitle">Connect observation<br>data with where<br>and when it happens.</h2><div class="observation-intro" data-i18n="observationIntro">OPE connects Earth observation datasets with geographic and orbital context, allowing spatial and temporal relationships to be explored inside the same environment.</div></div>
+<div class="data-flow">
+<div class="flow-item"><strong>ESA EO CATALOGUE</strong><span data-i18n="flow1">Earth observation data</span></div><div class="flow-arrow">→</div>
+<div class="flow-item"><strong>OPE</strong><span data-i18n="flow2">Spatial processing</span></div><div class="flow-arrow">→</div>
+<div class="flow-item"><strong>OBSERVATION SCENARIO</strong><span data-i18n="flow3">Where / when / what</span></div>
 </div>
-<div class="gallery-meta" data-i18n="gallery.meta">OPE / VISUAL ARCHIVE</div>
-</div>
+<div class="observation-foot"><p data-i18n="observationFoot">Multiple data sources can be brought into the same spatial model, connecting observations with the orbital conditions under which they occur.</p></div>
+</section>
 
-<div class="gallery-stage">
-<div class="gallery-track" id="galleryTrack">
-
-<div class="gallery-slide">
-<div class="gallery-image"></div>
-<div class="gallery-info">
-<div class="gallery-caption">
-<span data-i18n="gallery.1.label">01 / Earth observation</span>
-<h3 data-i18n="gallery.1.title">Earth from orbit</h3>
-<p data-i18n="gallery.1.text">Spatial representation of an Earth observation scenario.</p>
+<section class="passes">
+<div class="passes-top">
+<div><div class="passes-label">04 / ORBITAL OPERATIONS</div><h2 data-i18n="passesTitle">Know when an orbit<br>becomes an<br>observation opportunity.</h2></div>
+<div class="passes-copy" data-i18n="passesCopy">OPE monitors orbital passes and observation windows in spatial context, connecting satellite trajectories with locations and observation scenarios. The objective is simple: understand not only where a satellite is, but when it can observe.</div>
 </div>
-<div class="gallery-index">01 / 05</div>
-</div>
-</div>
-
-<div class="gallery-slide">
-<div class="gallery-image"></div>
-<div class="gallery-info">
-<div class="gallery-caption">
-<span data-i18n="gallery.2.label">02 / Orbital simulation</span>
-<h3 data-i18n="gallery.2.title">Satellite pass</h3>
-<p data-i18n="gallery.2.text">Orbital trajectory and observation geometry visualized in real time.</p>
-</div>
-<div class="gallery-index">02 / 05</div>
-</div>
-</div>
-
-<div class="gallery-slide">
-<div class="gallery-image"></div>
-<div class="gallery-info">
-<div class="gallery-caption">
-<span data-i18n="gallery.3.label">03 / Data environment</span>
-<h3 data-i18n="gallery.3.title">Spatial intelligence</h3>
-<p data-i18n="gallery.3.text">Geospatial information transformed into an interactive spatial layer.</p>
-</div>
-<div class="gallery-index">03 / 05</div>
-</div>
-</div>
-
-<div class="gallery-slide">
-<div class="gallery-image"></div>
-<div class="gallery-info">
-<div class="gallery-caption">
-<span data-i18n="gallery.4.label">04 / Mission scenario</span>
-<h3 data-i18n="gallery.4.title">Observation window</h3>
-<p data-i18n="gallery.4.text">Understanding when and where a satellite can observe the Earth.</p>
-</div>
-<div class="gallery-index">04 / 05</div>
-</div>
-</div>
-
-<div class="gallery-slide">
-<div class="gallery-image"></div>
-<div class="gallery-info">
-<div class="gallery-caption">
-<span data-i18n="gallery.5.label">05 / 3D aerospace</span>
-<h3 data-i18n="gallery.5.title">Digital mission environment</h3>
-<p data-i18n="gallery.5.text">Interactive 3D representation of complex aerospace systems.</p>
-</div>
-<div class="gallery-index">05 / 05</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="gallery-controls reveal">
-<div class="gallery-progress" id="galleryProgress">
-<div class="gallery-dot active"></div>
-<div class="gallery-dot"></div>
-<div class="gallery-dot"></div>
-<div class="gallery-dot"></div>
-<div class="gallery-dot"></div>
-</div>
-<div class="gallery-arrows">
-<button class="gallery-btn" id="galleryPrev" aria-label="Previous image">←</button>
-<button class="gallery-btn" id="galleryNext" aria-label="Next image">→</button>
-</div>
+<div class="timeline">
+<div class="pass-row"><div class="pass-name">SAT-01 / LEO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">10:42 — 10:49</div></div>
+<div class="pass-row"><div class="pass-name">SAT-02 / SSO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">11:18 — 11:26</div></div>
+<div class="pass-row"><div class="pass-name">SAT-03 / LEO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">12:04 — 12:11</div></div>
+<div class="pass-row"><div class="pass-name">SAT-04 / SSO</div><div class="pass-track"><div class="pass-line"></div></div><div class="pass-time">13:27 — 13:34</div></div>
 </div>
 </section>
 
-<section class="aero-collage">
-<div class="aero-header reveal">
-<div>
-<div class="eyebrow" data-i18n="archive.eyebrow">05 / Aerospace visual archive</div>
-<h2 data-i18n="archive.title">Beyond the<br>orbital view.</h2>
-</div>
-<p data-i18n="archive.text">Digital twins, mission environments, spatial models and aerospace systems represented through interactive 3D.</p>
-</div>
-
-<div class="collage-carousel">
-<div class="collage-track" id="collageTrack">
-
-<div class="collage-item collage-earth">
-<div class="collage-visual"></div>
-<div class="collage-info">
-<div>
-<span data-i18n="archive.1.label">01 / Earth systems</span>
-<h3 data-i18n="archive.1.title">Planetary context</h3>
-</div>
-<div class="collage-index">01 / 05</div>
-</div>
-</div>
-
-<div class="collage-item collage-orbit">
-<div class="collage-visual"></div>
-<div class="collage-info">
-<div>
-<span data-i18n="archive.2.label">02 / Orbital mechanics</span>
-<h3 data-i18n="archive.2.title">Trajectory architecture</h3>
-</div>
-<div class="collage-index">02 / 05</div>
-</div>
-</div>
-
-<div class="collage-item collage-grid">
-<div class="collage-visual"></div>
-<div class="collage-info">
-<div>
-<span data-i18n="archive.3.label">03 / Spatial computing</span>
-<h3 data-i18n="archive.3.title">Data as geometry</h3>
-</div>
-<div class="collage-index">03 / 05</div>
-</div>
-</div>
-
-<div class="collage-item collage-system">
-<div class="collage-visual"></div>
-<div class="collage-info">
-<div>
-<span data-i18n="archive.4.label">04 / Digital twins</span>
-<h3 data-i18n="archive.4.title">Systems in 3D</h3>
-</div>
-<div class="collage-index">04 / 05</div>
-</div>
-</div>
-
-<div class="collage-item collage-data">
-<div class="collage-visual"></div>
-<div class="collage-info">
-<div>
-<span data-i18n="archive.5.label">05 / Mission environments</span>
-<h3 data-i18n="archive.5.title">Operational space</h3>
-</div>
-<div class="collage-index">05 / 05</div>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="collage-controls">
-<div class="collage-progress" id="collageCounter">01 / 05</div>
-<div class="collage-buttons">
-<button class="collage-btn" id="collagePrev" aria-label="Previous visual">←</button>
-<button class="collage-btn" id="collageNext" aria-label="Next visual">→</button>
-</div>
+<section class="engine">
+<div class="engine-header"><h2 class="engine-title" data-i18n="engineTitle">Orbit.<br>Earth.<br>Observation.<br>Simulation.</h2><div class="engine-side" data-i18n="engineSide">OPE brings these components together inside one computational environment, turning different spatial systems into something that can be explored and simulated as a whole.</div></div>
+<div class="engine-core">
+<div class="engine-node"><strong>ORBITAL MECHANICS</strong><small>TRAJECTORIES / PASSES</small></div>
+<div class="engine-node"><strong>EARTH DATA</strong><small>GEOGRAPHY / TERRAIN / EO</small></div>
+<div class="engine-center">OPE</div>
+<div class="engine-node"><strong>OBSERVATION GEOMETRY</strong><small>WINDOWS / TARGETS</small></div>
+<div class="engine-node"><strong>3D SIMULATION</strong><small>SCENARIOS / DIGITAL TWINS</small></div>
 </div>
 </section>
 
-<section class="modules" id="technology">
-<div class="modules-header reveal">
-<div class="eyebrow" data-i18n="technology.eyebrow">06 / Technology</div>
-<h2 data-i18n="technology.title">One spatial computing layer.</h2>
+<section class="video-section">
+<div class="video-frame">
+<div class="video-overlay"><div class="video-orbit"></div></div>
+<div class="video-copy"><h2 data-i18n="videoTitle">Data becomes spatial<br>when you can see<br>the system.</h2><p data-i18n="videoCopy">OPE combines computation and 3D representation to make complex orbital and Earth observation systems easier to inspect, understand and simulate.</p></div>
 </div>
-<div class="modules-grid">
-<div class="module reveal">
-<div class="module-number">01</div>
-<h3 data-i18n="technology.1.title">Orbital simulation</h3>
-<p data-i18n="technology.1.text">Model satellite trajectories, orbital passes, observation windows and mission scenarios.</p>
+</section>
+
+<section class="gallery">
+<div class="gallery-head"><h2 class="gallery-title" data-i18n="galleryTitle">Inside OPE.</h2><div class="gallery-meta" data-i18n="galleryMeta">ORBITAL PASS ENGINE / RUNTIME</div></div>
+<div class="carousel" id="galleryCarousel">
+<div class="carousel-track">
+<div class="slide"><div class="slide-grid"></div><div class="slide-earth"></div><div class="slide-orbit"></div><div class="slide-label">OPE / EARTH OBSERVATION</div></div>
+<div class="slide"><div class="slide-grid"></div><div class="slide-earth" style="transform:scale(.78);left:11%;top:9%"></div><div class="slide-orbit" style="transform:rotate(27deg);top:42%"></div><div class="slide-label">OPE / ORBITAL PASS</div></div>
+<div class="slide"><div class="slide-grid"></div><div class="slide-earth" style="transform:scale(.65);left:30%;top:22%"></div><div class="slide-orbit" style="width:100%;left:0;transform:rotate(-8deg)"></div><div class="slide-label">OPE / SPATIAL SCENARIO</div></div>
 </div>
-<div class="module reveal reveal-delay-1">
-<div class="module-number">02</div>
-<h3 data-i18n="technology.2.title">Earth observation</h3>
-<p data-i18n="technology.2.text">Connect orbital operations with spatial and temporal Earth observation datasets.</p>
 </div>
-<div class="module reveal reveal-delay-2">
-<div class="module-number">03</div>
-<h3 data-i18n="technology.3.title">3D Aerospace</h3>
-<p data-i18n="technology.3.text">Turn complex aerospace systems into interactive digital environments and simulations.</p>
-</div>
+<div class="carousel-controls"><div class="carousel-dots" id="galleryDots"></div><div class="carousel-buttons"><button id="galleryPrev">←</button><button id="galleryNext">→</button></div></div>
+</section>
+
+<section class="archive">
+<div class="archive-head"><h2 data-i18n="archiveTitle">Built<br>in 3D.</h2><div class="archive-copy" data-i18n="archiveCopy">Digital twins, aerospace systems, mission environments and spatial models represented through interactive 3D.</div></div>
+<div class="collage"><div class="collage-track" id="collageTrack">
+<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth"></div><div class="collage-orbit"></div><div class="collage-caption">EARTH / DIGITAL TWIN</div></div>
+<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.6);top:25%"></div><div class="collage-orbit"></div><div class="collage-caption">ORBIT / SATELLITE</div></div>
+<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.78);left:7%"></div><div class="collage-orbit" style="transform:rotate(32deg)"></div><div class="collage-caption">MISSION / SCENARIO</div></div>
+<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.52);left:34%;top:29%"></div><div class="collage-orbit" style="transform:rotate(-42deg)"></div><div class="collage-caption">3D / AEROSPACE SYSTEM</div></div>
+<div class="collage-card"><div class="collage-lines"></div><div class="collage-earth" style="transform:scale(.7);top:12%"></div><div class="collage-orbit" style="transform:rotate(10deg)"></div><div class="collage-caption">SPATIAL MODEL</div></div>
+</div></div>
+<div class="archive-controls"><button id="collagePrev">←</button><button id="collageNext">→</button></div>
+</section>
+
+<section class="stack" id="technology">
+<div class="stack-head"><h2 data-i18n="stackTitle">The technology<br>behind the<br>environment.</h2><div class="stack-intro" data-i18n="stackIntro">OPE is built around a set of computational capabilities that connect orbital systems, Earth data and 3D simulation.</div></div>
+<div class="stack-list">
+<div class="stack-row"><div class="stack-num">01</div><div class="stack-name">Spatial Computing</div><div class="stack-desc" data-i18n="stack1">A spatial representation layer for working with geographic, orbital and 3D information together.</div></div>
+<div class="stack-row"><div class="stack-num">02</div><div class="stack-name">Orbital Mechanics</div><div class="stack-desc" data-i18n="stack2">Trajectory and pass computation for understanding satellite movement around Earth.</div></div>
+<div class="stack-row"><div class="stack-num">03</div><div class="stack-name">Earth Observation</div><div class="stack-desc" data-i18n="stack3">Integration and contextualization of observation datasets within geographic and orbital scenarios.</div></div>
+<div class="stack-row"><div class="stack-num">04</div><div class="stack-name">3D Simulation</div><div class="stack-desc" data-i18n="stack4">Interactive 3D environments for digital twins, mission scenarios and aerospace systems.</div></div>
 </div>
 </section>
 
 <section class="applications" id="applications">
-<div class="eyebrow reveal" data-i18n="applications.eyebrow">07 / Applications</div>
-<h2 class="reveal" data-i18n="applications.title">Built for the<br>new space.</h2>
-<div class="application-grid">
-<div class="application reveal"><span data-i18n="applications.1.label">01 / SPACE OPERATIONS</span><h3 data-i18n="applications.1.title">Mission planning</h3></div>
-<div class="application reveal reveal-delay-1"><span data-i18n="applications.2.label">02 / EARTH OBSERVATION</span><h3 data-i18n="applications.2.title">Observation intelligence</h3></div>
-<div class="application reveal reveal-delay-2"><span data-i18n="applications.3.label">03 / CLIMATE</span><h3 data-i18n="applications.3.title">Environmental analysis</h3></div>
-<div class="application reveal reveal-delay-3"><span data-i18n="applications.4.label">04 / RESEARCH</span><h3 data-i18n="applications.4.title">Spatial simulation</h3></div>
+<div class="apps-head"><h2 data-i18n="appsTitle">Built for real<br>aerospace workflows.</h2><p data-i18n="appsIntro">OPE is designed as a computational environment that can support different ways of working with orbital and Earth observation systems.</p></div>
+<div class="apps-list">
+<div class="app"><div class="app-num">01</div><h3>Earth Observation</h3><p data-i18n="app1">Explore observation data together with geographic and orbital conditions.</p></div>
+<div class="app"><div class="app-num">02</div><h3>Mission Planning</h3><p data-i18n="app2">Explore orbital scenarios, passes and observation opportunities.</p></div>
+<div class="app"><div class="app-num">03</div><h3>Digital Twins</h3><p data-i18n="app3">Represent complex aerospace systems and environments in interactive 3D.</p></div>
+<div class="app"><div class="app-num">04</div><h3>Research &amp; Simulation</h3><p data-i18n="app4">Test spatial, orbital and observation scenarios inside a computational environment.</p></div>
 </div>
 </section>
 
 <section class="final">
-<div class="reveal">
-<div class="eyebrow" data-i18n="final.eyebrow">Virtuals Hubs</div>
-<h2 data-i18n="final.title">The next generation of space systems will be spatial.</h2>
-<p data-i18n="final.text">We are building the infrastructure to simulate them.</p>
-<a href="#ope" class="cta" data-i18n="final.cta">Explore Orbital Pass Engine</a>
-</div>
+<div class="final-label">VIRTUALS HUBS / OPE</div>
+<h2 data-i18n="finalTitle">Earth is complex.<br>Orbit is complex.<br><span>OPE connects the two.</span></h2>
+<div class="final-bottom"><p data-i18n="finalCopy">A computational environment for understanding, monitoring and simulating the systems between Earth and orbit.</p><div class="hero-code">EARTH / ORBIT / OBSERVATION<br>VIRTUALS HUBS / OPE</div></div>
 </section>
 
-<footer>
-<span>Virtuals Hubs</span>
-<span>Orbital Pass Engine</span>
-<span>© 2026</span>
-</footer>
+<footer class="footer"><div>VIRTUALS HUBS</div><span>OPE / ORBITAL PASS ENGINE</span><span>© 2026</span></footer>
 
 <script>
 const translations={
 en:{
-"nav.ope":"OPE",
-"nav.technology":"Technology",
-"nav.applications":"Applications",
-"hero.eyebrow":"Orbital Pass Engine / Virtuals Hubs",
-"hero.title":"Simulate<br>the future<br>of space.",
-"hero.sub":"A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.",
-"hero.cta":"Explore OPE",
-"scroll":"Scroll to explore",
-"challenge.eyebrow":"01 / The challenge",
-"challenge.title":"Space systems are becoming increasingly complex.",
-"challenge.text":"Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. Understanding that data requires more than numbers. It requires spatial context.",
-"statement.title":"We are building the computational layer between <span>orbital data</span> and spatial understanding.",
-"ope.eyebrow":"02 / Orbital Pass Engine",
-"ope.title":"From orbital data to operational intelligence.",
-"ope.text":"OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.",
-"ope.cta":"Explore the engine",
-"spatial.eyebrow":"03 / Spatial intelligence",
-"spatial.title":"See the systems<br>behind the data.",
-"spatial.text":"From orbital trajectories to Earth observation and 3D aerospace environments, spatial context changes how complex systems are understood.",
-"video.status":"System visualization",
-"video.label":"Orbital environment / Simulation",
-"gallery.eyebrow":"04 / OPE Gallery",
-"gallery.title":"Captured from<br>the engine.",
-"gallery.text":"A selection of spatial environments, orbital scenarios and Earth observation views generated with Orbital Pass Engine.",
-"gallery.meta":"OPE / VISUAL ARCHIVE",
-"gallery.1.label":"01 / Earth observation",
-"gallery.1.title":"Earth from orbit",
-"gallery.1.text":"Spatial representation of an Earth observation scenario.",
-"gallery.2.label":"02 / Orbital simulation",
-"gallery.2.title":"Satellite pass",
-"gallery.2.text":"Orbital trajectory and observation geometry visualized in real time.",
-"gallery.3.label":"03 / Data environment",
-"gallery.3.title":"Spatial intelligence",
-"gallery.3.text":"Geospatial information transformed into an interactive spatial layer.",
-"gallery.4.label":"04 / Mission scenario",
-"gallery.4.title":"Observation window",
-"gallery.4.text":"Understanding when and where a satellite can observe the Earth.",
-"gallery.5.label":"05 / 3D aerospace",
-"gallery.5.title":"Digital mission environment",
-"gallery.5.text":"Interactive 3D representation of complex aerospace systems.",
-"archive.eyebrow":"05 / Aerospace visual archive",
-"archive.title":"Beyond the<br>orbital view.",
-"archive.text":"Digital twins, mission environments, spatial models and aerospace systems represented through interactive 3D.",
-"archive.1.label":"01 / Earth systems",
-"archive.1.title":"Planetary context",
-"archive.2.label":"02 / Orbital mechanics",
-"archive.2.title":"Trajectory architecture",
-"archive.3.label":"03 / Spatial computing",
-"archive.3.title":"Data as geometry",
-"archive.4.label":"04 / Digital twins",
-"archive.4.title":"Systems in 3D",
-"archive.5.label":"05 / Mission environments",
-"archive.5.title":"Operational space",
-"technology.eyebrow":"06 / Technology",
-"technology.title":"One spatial computing layer.",
-"technology.1.title":"Orbital simulation",
-"technology.1.text":"Model satellite trajectories, orbital passes, observation windows and mission scenarios.",
-"technology.2.title":"Earth observation",
-"technology.2.text":"Connect orbital operations with spatial and temporal Earth observation datasets.",
-"technology.3.title":"3D Aerospace",
-"technology.3.text":"Turn complex aerospace systems into interactive digital environments and simulations.",
-"applications.eyebrow":"07 / Applications",
-"applications.title":"Built for the<br>new space.",
-"applications.1.label":"01 / SPACE OPERATIONS",
-"applications.1.title":"Mission planning",
-"applications.2.label":"02 / EARTH OBSERVATION",
-"applications.2.title":"Observation intelligence",
-"applications.3.label":"03 / CLIMATE",
-"applications.3.title":"Environmental analysis",
-"applications.4.label":"04 / RESEARCH",
-"applications.4.title":"Spatial simulation",
-"final.eyebrow":"Virtuals Hubs",
-"final.title":"The next generation of space systems will be spatial.",
-"final.text":"We are building the infrastructure to simulate them.",
-"final.cta":"Explore Orbital Pass Engine",
-"aria.prevImage":"Previous image",
-"aria.nextImage":"Next image",
-"aria.prevVisual":"Previous visual",
-"aria.nextVisual":"Next visual"
+navOpe:"OPE",navObservation:"Observation",navTechnology:"Technology",navApplications:"Applications",
+heroKicker:"Orbital Pass Engine / OPE",heroTitle:"A computational<br>model of Earth<br>and orbit.",heroSub:"A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulation.",
+introTitle:"Space systems<br>generate data.<br>We make it<br>computable.",introCopy:"Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. OPE brings that information into a computational environment where Earth, orbit and observation can be understood together.",
+statementTitle:"From <span>orbital data</span><br>to spatial understanding.",
+digitalTitle:"A digital<br>twin of Earth.",digitalCopy:"OPE represents Earth as a computational spatial system, combining geographic, orbital and observation data in a single environment. The result is not simply a 3D representation, but a model that can be explored, connected and simulated.",
+observationTitle:"Connect observation<br>data with where<br>and when it happens.",observationIntro:"OPE connects Earth observation datasets with geographic and orbital context, allowing spatial and temporal relationships to be explored inside the same environment.",flow1:"Earth observation data",flow2:"Spatial processing",flow3:"Where / when / what",observationFoot:"Multiple data sources can be brought into the same spatial model, connecting observations with the orbital conditions under which they occur.",
+passesTitle:"Know when an orbit<br>becomes an<br>observation opportunity.",passesCopy:"OPE monitors orbital passes and observation windows in spatial context, connecting satellite trajectories with locations and observation scenarios. The objective is simple: understand not only where a satellite is, but when it can observe.",
+engineTitle:"Orbit.<br>Earth.<br>Observation.<br>Simulation.",engineSide:"OPE brings these components together inside one computational environment, turning different spatial systems into something that can be explored and simulated as a whole.",
+videoTitle:"Data becomes spatial<br>when you can see<br>the system.",videoCopy:"OPE combines computation and 3D representation to make complex orbital and Earth observation systems easier to inspect, understand and simulate.",
+galleryTitle:"Inside OPE.",galleryMeta:"ORBITAL PASS ENGINE / RUNTIME",archiveTitle:"Built<br>in 3D.",archiveCopy:"Digital twins, aerospace systems, mission environments and spatial models represented through interactive 3D.",
+stackTitle:"The technology<br>behind the<br>environment.",stackIntro:"OPE is built around a set of computational capabilities that connect orbital systems, Earth data and 3D simulation.",stack1:"A spatial representation layer for working with geographic, orbital and 3D information together.",stack2:"Trajectory and pass computation for understanding satellite movement around Earth.",stack3:"Integration and contextualization of observation datasets within geographic and orbital scenarios.",stack4:"Interactive 3D environments for digital twins, mission scenarios and aerospace systems.",
+appsTitle:"Built for real<br>aerospace workflows.",appsIntro:"OPE is designed as a computational environment that can support different ways of working with orbital and Earth observation systems.",app1:"Explore observation data together with geographic and orbital conditions.",app2:"Explore orbital scenarios, passes and observation opportunities.",app3:"Represent complex aerospace systems and environments in interactive 3D.",app4:"Test spatial, orbital and observation scenarios inside a computational environment.",
+finalTitle:"Earth is complex.<br>Orbit is complex.<br><span>OPE connects the two.</span>",finalCopy:"A computational environment for understanding, monitoring and simulating the systems between Earth and orbit."
 },
 es:{
-"nav.ope":"OPE",
-"nav.technology":"Tecnología",
-"nav.applications":"Aplicaciones",
-"hero.eyebrow":"Orbital Pass Engine / Virtuals Hubs",
-"hero.title":"Simula<br>el futuro<br>del espacio.",
-"hero.sub":"Un entorno de computación espacial para operaciones orbitales, observación de la Tierra y simulaciones aeroespaciales 3D.",
-"hero.cta":"Explorar OPE",
-"scroll":"Desplázate para explorar",
-"challenge.eyebrow":"01 / El desafío",
-"challenge.title":"Los sistemas espaciales son cada vez más complejos.",
-"challenge.text":"Los satélites, las constelaciones y los sistemas de observación de la Tierra generan enormes cantidades de datos espaciales y temporales. Comprenderlos requiere algo más que números. Requiere contexto espacial.",
-"statement.title":"Estamos construyendo la capa computacional entre los <span>datos orbitales</span> y la comprensión espacial.",
-"ope.eyebrow":"02 / Orbital Pass Engine",
-"ope.title":"Del dato orbital a la inteligencia operacional.",
-"ope.text":"OPE integra mecánica orbital, datos de observación de la Tierra y visualización 3D en un único entorno computacional.",
-"ope.cta":"Explorar el motor",
-"spatial.eyebrow":"03 / Inteligencia espacial",
-"spatial.title":"Visualiza los sistemas<br>detrás de los datos.",
-"spatial.text":"Desde trayectorias orbitales hasta observación de la Tierra y entornos aeroespaciales 3D, el contexto espacial transforma la forma de comprender sistemas complejos.",
-"video.status":"Visualización del sistema",
-"video.label":"Entorno orbital / Simulación",
-"gallery.eyebrow":"04 / Galería OPE",
-"gallery.title":"Capturado desde<br>el motor.",
-"gallery.text":"Una selección de entornos espaciales, escenarios orbitales y vistas de observación de la Tierra generadas con Orbital Pass Engine.",
-"gallery.meta":"OPE / ARCHIVO VISUAL",
-"gallery.1.label":"01 / Observación de la Tierra",
-"gallery.1.title":"La Tierra desde la órbita",
-"gallery.1.text":"Representación espacial de un escenario de observación de la Tierra.",
-"gallery.2.label":"02 / Simulación orbital",
-"gallery.2.title":"Paso del satélite",
-"gallery.2.text":"Trayectoria orbital y geometría de observación visualizadas en tiempo real.",
-"gallery.3.label":"03 / Entorno de datos",
-"gallery.3.title":"Inteligencia espacial",
-"gallery.3.text":"Información geoespacial transformada en una capa espacial interactiva.",
-"gallery.4.label":"04 / Escenario de misión",
-"gallery.4.title":"Ventana de observación",
-"gallery.4.text":"Comprender cuándo y dónde un satélite puede observar la Tierra.",
-"gallery.5.label":"05 / Aeroespacial 3D",
-"gallery.5.title":"Entorno digital de misión",
-"gallery.5.text":"Representación 3D interactiva de sistemas aeroespaciales complejos.",
-"archive.eyebrow":"05 / Archivo visual aeroespacial",
-"archive.title":"Más allá<br>de la órbita.",
-"archive.text":"Gemelos digitales, entornos de misión, modelos espaciales y sistemas aeroespaciales representados mediante 3D interactivo.",
-"archive.1.label":"01 / Sistemas terrestres",
-"archive.1.title":"Contexto planetario",
-"archive.2.label":"02 / Mecánica orbital",
-"archive.2.title":"Arquitectura de trayectoria",
-"archive.3.label":"03 / Computación espacial",
-"archive.3.title":"Datos como geometría",
-"archive.4.label":"04 / Gemelos digitales",
-"archive.4.title":"Sistemas en 3D",
-"archive.5.label":"05 / Entornos de misión",
-"archive.5.title":"Espacio operacional",
-"technology.eyebrow":"06 / Tecnología",
-"technology.title":"Una única capa de computación espacial.",
-"technology.1.title":"Simulación orbital",
-"technology.1.text":"Modela trayectorias de satélites, pasos orbitales, ventanas de observación y escenarios de misión.",
-"technology.2.title":"Observación de la Tierra",
-"technology.2.text":"Conecta las operaciones orbitales con datasets espaciales y temporales de observación de la Tierra.",
-"technology.3.title":"Aeroespacial 3D",
-"technology.3.text":"Convierte sistemas aeroespaciales complejos en entornos digitales y simulaciones interactivas.",
-"applications.eyebrow":"07 / Aplicaciones",
-"applications.title":"Diseñado para<br>el nuevo espacio.",
-"applications.1.label":"01 / OPERACIONES ESPACIALES",
-"applications.1.title":"Planificación de misiones",
-"applications.2.label":"02 / OBSERVACIÓN DE LA TIERRA",
-"applications.2.title":"Inteligencia de observación",
-"applications.3.label":"03 / CLIMA",
-"applications.3.title":"Análisis ambiental",
-"applications.4.label":"04 / INVESTIGACIÓN",
-"applications.4.title":"Simulación espacial",
-"final.eyebrow":"Virtuals Hubs",
-"final.title":"La próxima generación de sistemas espaciales será espacial.",
-"final.text":"Estamos construyendo la infraestructura para simularlos.",
-"final.cta":"Explorar Orbital Pass Engine",
-"aria.prevImage":"Imagen anterior",
-"aria.nextImage":"Imagen siguiente",
-"aria.prevVisual":"Visual anterior",
-"aria.nextVisual":"Visual siguiente"
-}
-};
-
+navOpe:"OPE",navObservation:"Observación",navTechnology:"Tecnología",navApplications:"Aplicaciones",
+heroKicker:"Orbital Pass Engine / OPE",heroTitle:"Un modelo<br>computacional de<br>la Tierra y la órbita.",heroSub:"Un entorno de computación espacial para operaciones orbitales, observación de la Tierra y simulación aeroespacial 3D.",
+introTitle:"Los sistemas espaciales<br>generan datos.<br>Nosotros los hacemos<br>computables.",introCopy:"Los satélites, las constelaciones y los sistemas de observación de la Tierra generan enormes cantidades de datos espaciales y temporales. OPE integra esa información en un entorno computacional donde Tierra, órbita y observación pueden entenderse conjuntamente.",
+statementTitle:"Del <span>dato orbital</span><br>a la comprensión espacial.",
+digitalTitle:"Un gemelo<br>digital de la Tierra.",digitalCopy:"OPE representa la Tierra como un sistema espacial computacional, combinando datos geográficos, orbitales y de observación en un único entorno. No es simplemente una representación 3D, sino un modelo que puede explorarse, conectarse y simularse.",
+observationTitle:"Conecta los datos<br>de observación con<br>dónde y cuándo ocurren.",observationIntro:"OPE conecta datasets de observación de la Tierra con contexto geográfico y orbital, permitiendo explorar relaciones espaciales y temporales dentro del mismo entorno.",flow1:"Datos de observación",flow2:"Procesamiento espacial",flow3:"Dónde / cuándo / qué",observationFoot:"Diferentes fuentes de datos pueden integrarse en un mismo modelo espacial, conectando las observaciones con las condiciones orbitales en las que tienen lugar.",
+passesTitle:"Convierte cada órbita<br>en una oportunidad<br>de observación.",passesCopy:"OPE monitoriza pasos orbitales y ventanas de observación en contexto espacial, conectando las trayectorias de los satélites con localizaciones y escenarios de observación. El objetivo es entender no solo dónde está un satélite, sino cuándo puede observar.",
+engineTitle:"Órbita.<br>Tierra.<br>Observación.<br>Simulación.",engineSide:"OPE integra estos componentes en un único entorno computacional, convirtiendo diferentes sistemas espaciales en algo que puede explorarse y simularse conjuntamente.",
+videoTitle:"Los datos se vuelven espaciales<br>cuando puedes ver<br>el sistema.",videoCopy:"OPE combina computación y representación 3D para facilitar la inspección, comprensión y simulación de sistemas orbitales y de observación de la Tierra.",
+galleryTitle:"Dentro de OPE.",galleryMeta:"ORBITAL PASS ENGINE / RUNTIME",archiveTitle:"Construido<br>en 3D.",archiveCopy:"Gemelos digitales, sistemas aeroespaciales, entornos de misión y modelos espaciales representados mediante 3D interactivo.",
+stackTitle:"La tecnología<br>detrás del<br>entorno.",stackIntro:"OPE se construye sobre un conjunto de capacidades computacionales que conectan sistemas orbitales, datos de la Tierra y simulación 3D.",stack1:"Una capa de representación espacial para trabajar conjuntamente con información geográfica, orbital y 3D.",stack2:"Cálculo de trayectorias y pasos orbitales para comprender el movimiento de los satélites alrededor de la Tierra.",stack3:"Integración y contextualización de datasets de observación dentro de escenarios geográficos y orbitales.",stack4:"Entornos 3D interactivos para gemelos digitales, escenarios de misión y sistemas aeroespaciales.",
+appsTitle:"Diseñado para<br>flujos aeroespaciales reales.",appsIntro:"OPE está diseñado como un entorno computacional capaz de soportar diferentes formas de trabajar con sistemas orbitales y de observación de la Tierra.",app1:"Explorar datos de observación junto con las condiciones geográficas y orbitales.",app2:"Explorar escenarios orbitales, pasos y oportunidades de observación.",app3:"Representar sistemas y entornos aeroespaciales complejos mediante 3D interactivo.",app4:"Probar escenarios espaciales, orbitales y de observación dentro de un entorno computacional.",
+finalTitle:"La Tierra es compleja.<br>La órbita es compleja.<br><span>OPE conecta ambas.</span>",finalCopy:"Un entorno computacional para comprender, monitorizar y simular los sistemas entre la Tierra y la órbita."
+}};
 function setLanguage(lang){
-const dictionary=translations[lang]||translations.en;
 document.documentElement.lang=lang;
-document.querySelectorAll("[data-i18n]").forEach(el=>{
-const key=el.dataset.i18n;
-if(dictionary[key]!==undefined)el.innerHTML=dictionary[key];
-});
-document.querySelectorAll(".lang-btn").forEach(btn=>{
-btn.classList.toggle("active",btn.dataset.lang===lang);
-});
-document.getElementById("galleryPrev").setAttribute("aria-label",dictionary["aria.prevImage"]);
-document.getElementById("galleryNext").setAttribute("aria-label",dictionary["aria.nextImage"]);
-document.getElementById("collagePrev").setAttribute("aria-label",dictionary["aria.prevVisual"]);
-document.getElementById("collageNext").setAttribute("aria-label",dictionary["aria.nextVisual"]);
+document.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(translations[lang][key]!=null)el.innerHTML=translations[lang][key]});
+document.getElementById("enBtn").classList.toggle("active",lang==="en");
+document.getElementById("esBtn").classList.toggle("active",lang==="es");
 localStorage.setItem("ope-language",lang);
 }
+document.getElementById("enBtn").onclick=()=>setLanguage("en");
+document.getElementById("esBtn").onclick=()=>setLanguage("es");
+setLanguage(localStorage.getItem("ope-language")||"en");
 
-document.querySelectorAll(".lang-btn").forEach(btn=>{
-btn.addEventListener("click",()=>setLanguage(btn.dataset.lang));
-});
-
-const savedLanguage=localStorage.getItem("ope-language");
-setLanguage(savedLanguage==="es"?"es":"en");
-
-const revealObserver=new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){
-entry.target.classList.add("visible");
-revealObserver.unobserve(entry.target);
+function setupCarousel(trackId,prevId,nextId,dotsId){
+const track=document.getElementById(trackId),prev=document.getElementById(prevId),next=document.getElementById(nextId),dots=dotsId?document.getElementById(dotsId):null;
+let index=0,startX=0,startOffset=0,dragging=false;
+const slides=[...track.children];
+if(dots)slides.forEach((_,i)=>{const d=document.createElement("span");d.className="carousel-dot"+(i===0?" active":"");dots.appendChild(d)});
+function step(){return slides[0].getBoundingClientRect().width+24}
+function update(){const max=Math.max(0,slides.length-1);index=Math.max(0,Math.min(index,max));track.style.transform=`translateX(${-index*step()}px)`;if(dots)[...dots.children].forEach((d,i)=>d.classList.toggle("active",i===index))}
+prev.onclick=()=>{index--;update()};next.onclick=()=>{index++;update()};
+track.addEventListener("pointerdown",e=>{dragging=true;startX=e.clientX;startOffset=-index*step();track.classList.add("dragging");track.setPointerCapture(e.pointerId)});
+track.addEventListener("pointermove",e=>{if(!dragging)return;track.style.transform=`translateX(${startOffset+e.clientX-startX}px)`});
+track.addEventListener("pointerup",e=>{if(!dragging)return;dragging=false;track.classList.remove("dragging");const dx=e.clientX-startX;if(Math.abs(dx)>60)index+=dx<0?1:-1;update()});
+return{update}
 }
-});
-},{threshold:.12});
-document.querySelectorAll(".reveal").forEach(el=>revealObserver.observe(el));
-
-let ticking=false;
-window.addEventListener("scroll",()=>{
-if(!ticking){
-requestAnimationFrame(()=>{
-const y=window.scrollY;
-const earth=document.querySelector(".earth");
-if(earth&&window.innerWidth>800)earth.style.transform=`translateY(calc(-50% + ${y*.035}px))`;
-ticking=false;
-});
-ticking=true;
-}
-},{passive:true});
-
-document.querySelectorAll('a[href^="#"]').forEach(link=>{
-link.addEventListener("click",e=>{
-const target=document.querySelector(link.getAttribute("href"));
-if(target){
-e.preventDefault();
-target.scrollIntoView({behavior:"smooth"});
-}
-});
-});
-
-const galleryTrack=document.getElementById("galleryTrack");
-const gallerySlides=[...document.querySelectorAll(".gallery-slide")];
-const galleryDots=[...document.querySelectorAll(".gallery-dot")];
-const galleryPrev=document.getElementById("galleryPrev");
-const galleryNext=document.getElementById("galleryNext");
-let galleryCurrent=0;
-let galleryTimer;
-let galleryDragStart=0;
-let galleryDragDelta=0;
-let galleryDragging=false;
-
-function galleryOffset(){
-if(!gallerySlides.length)return 0;
-const gap=parseFloat(getComputedStyle(galleryTrack).gap)||0;
-return gallerySlides[0].offsetWidth+gap;
-}
-function updateGallery(index,animate=true){
-galleryCurrent=(index+gallerySlides.length)%gallerySlides.length;
-const offset=galleryOffset()*galleryCurrent;
-galleryTrack.style.transition=animate?"transform .8s cubic-bezier(.2,.7,.2,1)":"none";
-galleryTrack.style.transform=`translateX(-${offset}px)`;
-galleryDots.forEach((dot,i)=>dot.classList.toggle("active",i===galleryCurrent));
-}
-function restartGallery(){
-clearInterval(galleryTimer);
-galleryTimer=setInterval(()=>updateGallery(galleryCurrent+1),6500);
-}
-galleryPrev.addEventListener("click",()=>{updateGallery(galleryCurrent-1);restartGallery()});
-galleryNext.addEventListener("click",()=>{updateGallery(galleryCurrent+1);restartGallery()});
-galleryDots.forEach((dot,i)=>dot.addEventListener("click",()=>{updateGallery(i);restartGallery()}));
-galleryTrack.addEventListener("pointerdown",e=>{
-galleryDragging=true;
-galleryDragStart=e.clientX;
-galleryDragDelta=0;
-galleryTrack.classList.add("dragging");
-galleryTrack.setPointerCapture(e.pointerId);
-clearInterval(galleryTimer);
-});
-galleryTrack.addEventListener("pointermove",e=>{
-if(!galleryDragging)return;
-galleryDragDelta=e.clientX-galleryDragStart;
-const offset=galleryOffset()*galleryCurrent-galleryDragDelta;
-galleryTrack.style.transform=`translateX(-${offset}px)`;
-});
-galleryTrack.addEventListener("pointerup",()=>{
-if(!galleryDragging)return;
-galleryDragging=false;
-galleryTrack.classList.remove("dragging");
-if(Math.abs(galleryDragDelta)>70)updateGallery(galleryCurrent+(galleryDragDelta<0?1:-1));
-else updateGallery(galleryCurrent);
-restartGallery();
-});
-galleryTrack.addEventListener("pointercancel",()=>{
-galleryDragging=false;
-galleryTrack.classList.remove("dragging");
-updateGallery(galleryCurrent);
-restartGallery();
-});
-window.addEventListener("resize",()=>updateGallery(galleryCurrent,false));
-
-const collageTrack=document.getElementById("collageTrack");
-const collageItems=[...document.querySelectorAll(".collage-item")];
-const collagePrev=document.getElementById("collagePrev");
-const collageNext=document.getElementById("collageNext");
-const collageCounter=document.getElementById("collageCounter");
-let collageCurrent=0;
-let collageTimer;
-
-function collageOffset(){
-if(!collageItems.length)return 0;
-const gap=parseFloat(getComputedStyle(collageTrack).gap)||0;
-return collageItems[0].offsetWidth+gap;
-}
-function updateCollage(index,animate=true){
-collageCurrent=(index+collageItems.length)%collageItems.length;
-const offset=collageOffset()*collageCurrent;
-collageTrack.style.transition=animate?"transform .9s cubic-bezier(.2,.7,.2,1)":"none";
-collageTrack.style.transform=`translateX(-${offset}px)`;
-collageCounter.textContent=`${String(collageCurrent+1).padStart(2,"0")} / ${String(collageItems.length).padStart(2,"0")}`;
-}
-function restartCollage(){
-clearInterval(collageTimer);
-collageTimer=setInterval(()=>updateCollage(collageCurrent+1),7000);
-}
-collagePrev.addEventListener("click",()=>{updateCollage(collageCurrent-1);restartCollage()});
-collageNext.addEventListener("click",()=>{updateCollage(collageCurrent+1);restartCollage()});
-window.addEventListener("resize",()=>updateCollage(collageCurrent,false));
-
-document.addEventListener("keydown",e=>{
-if(e.key==="ArrowRight")updateGallery(galleryCurrent+1);
-if(e.key==="ArrowLeft")updateGallery(galleryCurrent-1);
-});
-
-updateGallery(0,false);
-restartGallery();
-updateCollage(0,false);
-restartCollage();
+setupCarousel("galleryCarousel".replace("Carousel","-track"),"galleryPrev","galleryNext","galleryDots");
+const collage=document.getElementById("collageTrack");let collageIndex=0;
+function collageOffset(){return collage.children[0].getBoundingClientRect().width+24}
+function updateCollage(){collageIndex=Math.max(0,Math.min(collage.children.length-1,collageIndex));collage.style.transform=`translateX(${-collageIndex*collageOffset()}px)`}
+document.getElementById("collagePrev").onclick=()=>{collageIndex--;updateCollage()};
+document.getElementById("collageNext").onclick=()=>{collageIndex++;updateCollage()};
+let auto=0;setInterval(()=>{auto++;if(auto%6===0){collageIndex++;updateCollage()}},1000);
 </script>
-
 </body>
 </html>
+
 
