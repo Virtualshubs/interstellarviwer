@@ -1431,13 +1431,19 @@ function updateObservationHex(){
 if(!observationHex||!observationSection)return;
 const rect=observationSection.getBoundingClientRect();
 const vh=window.innerHeight;
-const start=vh*0.95;
-const end=vh*0.05;
-const progress=Math.max(0,Math.min(1,(start-rect.top)/(start-end)));
+const sectionHeight=observationSection.offsetHeight;
+/* El movimiento empieza cuando la sección entra en el viewport */
+const start=vh*0.85;
+/* Y termina cuando estamos bastante avanzados dentro de la sección */
+const end=-(sectionHeight-vh*0.35);
+let progress=(start-rect.top)/(start-end);
+progress=Math.max(0,Math.min(1,progress));
+/* Mucho más lento */
 const screenDistance=window.innerWidth<560
-?window.innerWidth*0.95
-:window.innerWidth*1.15;
+?window.innerWidth*0.75
+:window.innerWidth*0.95;
 const x=progress*screenDistance;
+/* Rotación proporcional al recorrido */
 const radius=90;
 const rotation=(x/radius)*(180/Math.PI);
 observationHex.style.transform=
