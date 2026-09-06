@@ -156,8 +156,6 @@ section{position:relative}
 .video-orbit{position:absolute;width:70%;height:38%;left:15%;top:31%;border:1px solid rgba(112,171,228,.25);border-radius:50%;transform:rotate(-18deg);animation:videoOrbit 9s ease-in-out infinite alternate}
 .video-orbit:before{content:"";position:absolute;width:8px;height:8px;background:#8bc4ff;border-radius:50%;left:17%;top:4%;box-shadow:0 0 20px #6eaff0}
 .video-title{position:absolute;left:45px;bottom:40px;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.45)}
-
-/* GALLERY */
 .gallery{padding:150px 0;border-top:1px solid var(--line)}
 .gallery-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:60px}
 .carousel-controls{display:flex;gap:8px}
@@ -166,16 +164,16 @@ section{position:relative}
 .carousel-viewport{overflow:hidden}
 .carousel-track{display:flex;gap:24px;will-change:transform;transition:transform .7s cubic-bezier(.22,.61,.36,1)}
 .slide{min-width:100%;height:650px;border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;background:#070b11}
-.slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.slide:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,11,.06),rgba(5,7,11,.16) 55%,rgba(5,7,11,.72))}
-.slide-label,.slide-code{z-index:3}
-.slide-label{position:absolute;left:35px;bottom:30px;font-size:9px;letter-spacing:.2em;color:#e4e9ef}
-.slide-code{position:absolute;right:35px;top:30px;font-size:9px;letter-spacing:.15em;color:#d2dae4}
+.slide.one{background:radial-gradient(circle at 50% 45%,rgba(55,115,180,.2),transparent 40%),#070b11}
+.slide.two{background:linear-gradient(120deg,#060a10,#101a27,#05070b)}
+.slide.three{background:radial-gradient(circle at 60% 40%,rgba(89,139,197,.18),transparent 35%),#060a10}
+.slide-earth{position:absolute;width:390px;height:390px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 30%,#547da9,#142638 55%,#03070b);box-shadow:0 0 100px rgba(68,126,190,.2)}
+.slide-ring{position:absolute;width:650px;height:190px;border:1px solid rgba(120,181,237,.25);border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-18deg)}
+.slide-label{position:absolute;left:35px;bottom:30px;font-size:9px;letter-spacing:.2em;color:#687687}
+.slide-code{position:absolute;right:35px;top:30px;font-size:9px;letter-spacing:.15em;color:#5d6b7b}
 .dots{display:flex;gap:7px;margin-top:20px}
 .dot{width:24px;height:2px;border:0;background:#343c46;cursor:pointer;padding:0}
 .dot.active{background:#9abce0}
-
-/* ARCHIVE */
 .archive{padding:150px 0}
 .archive-head{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;margin-bottom:70px}
 .archive-head p{color:#7f8997;line-height:1.7;max-width:550px}
@@ -183,17 +181,14 @@ section{position:relative}
 .collage{display:flex;gap:20px;will-change:transform;transition:transform .8s cubic-bezier(.22,.61,.36,1);cursor:grab}
 .collage.dragging{cursor:grabbing;transition:none}
 .collage-card{flex:0 0 430px;height:540px;border:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;background:#090d13}
-.collage-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.collage-card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,11,.04),rgba(5,7,11,.12) 55%,rgba(5,7,11,.72))}
 .collage-card:nth-child(2){margin-top:70px}
 .collage-card:nth-child(3){margin-top:25px}
 .collage-card:nth-child(4){margin-top:90px}
 .collage-card:nth-child(5){margin-top:35px}
-.card-label,.card-number{z-index:3}
-.card-label{position:absolute;left:24px;bottom:22px;font-size:8px;letter-spacing:.17em;color:#e2e8ef}
-.card-number{position:absolute;right:24px;top:22px;font-size:8px;color:#d0d9e3}
-
-/* STACK */
+.card-earth{position:absolute;width:300px;height:300px;border-radius:50%;left:50%;top:45%;transform:translate(-50%,-50%);background:radial-gradient(circle at 35% 28%,#6088b0,#182b3e 48%,#03070c 78%);box-shadow:0 0 80px rgba(70,128,188,.18)}
+.card-orbit{position:absolute;width:480px;height:150px;border:1px solid rgba(110,170,227,.22);border-radius:50%;left:50%;top:45%;transform:translate(-50%,-50%) rotate(-18deg)}
+.card-label{position:absolute;left:24px;bottom:22px;font-size:8px;letter-spacing:.17em;color:#697686}
+.card-number{position:absolute;right:24px;top:22px;font-size:8px;color:#526071}
 .stack{padding:150px 0;border-top:1px solid var(--line)}
 .stack-head{margin-bottom:70px}
 .stack-list{border-top:1px solid rgba(255,255,255,.12)}
@@ -365,15 +360,21 @@ html[data-theme="light"] .gallery{border-top-color:var(--line)}
 html[data-theme="light"] .carousel-btn{border-color:rgba(25,42,58,.17);color:#5d6c79}
 html[data-theme="light"] .carousel-btn:hover{background:#17212b;color:#fff}
 html[data-theme="light"] .slide{border-color:rgba(25,42,58,.13);background:#e1e7eb}
-html[data-theme="light"] .slide:after{background:linear-gradient(180deg,rgba(245,248,250,.03),rgba(220,228,234,.16) 55%,rgba(30,44,55,.5))}
-html[data-theme="light"] .slide-label{color:#eef3f8}
-html[data-theme="light"] .slide-code{color:#e8edf2}
+html[data-theme="light"] .slide.one{background:radial-gradient(circle at 50% 45%,rgba(55,115,180,.15),transparent 40%),#e1e7eb}
+html[data-theme="light"] .slide.two{background:linear-gradient(120deg,#dfe6ea,#edf2f5,#dce3e8)}
+html[data-theme="light"] .slide.three{background:radial-gradient(circle at 60% 40%,rgba(89,139,197,.14),transparent 35%),#e0e6ea}
+html[data-theme="light"] .slide-earth{box-shadow:0 0 90px rgba(68,126,190,.16)}
+html[data-theme="light"] .slide-ring{border-color:rgba(82,143,200,.3)}
+html[data-theme="light"] .slide-label{color:#61707d}
+html[data-theme="light"] .slide-code{color:#647482}
 html[data-theme="light"] .dot{background:#aeb8c0}
 html[data-theme="light"] .dot.active{background:#5d91c1}
+html[data-theme="light"] .archive{}
 html[data-theme="light"] .collage-card{border-color:rgba(25,42,58,.13);background:#e2e8ec;box-shadow:0 18px 45px rgba(28,49,68,.06)}
-html[data-theme="light"] .collage-card:after{background:linear-gradient(180deg,rgba(245,248,250,.03),rgba(220,228,234,.16) 55%,rgba(30,44,55,.5))}
-html[data-theme="light"] .card-label{color:#eef3f8}
-html[data-theme="light"] .card-number{color:#e6edf3}
+html[data-theme="light"] .card-earth{box-shadow:0 0 75px rgba(70,128,188,.14)}
+html[data-theme="light"] .card-orbit{border-color:rgba(82,143,200,.27)}
+html[data-theme="light"] .card-label{color:#61717e}
+html[data-theme="light"] .card-number{color:#667582}
 html[data-theme="light"] .stack{border-top-color:var(--line)}
 html[data-theme="light"] .stack-list{border-top-color:rgba(25,42,58,.14)}
 html[data-theme="light"] .stack-row{border-bottom-color:rgba(25,42,58,.12)}
@@ -473,7 +474,11 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 .digital-earth{width:280px;height:280px}
 .timeline{overflow:hidden}
 .slide{height:430px}
+.slide-earth{width:260px;height:260px}
+.slide-ring{width:450px}
 .collage-card{flex-basis:285px;height:390px}
+.card-earth{width:220px;height:220px}
+.card-orbit{width:360px}
 .engine-system{min-height:650px}
 .engine-system-top{left:16px;right:16px}
 .engine-map{inset:80px 16px 55px}
@@ -721,7 +726,25 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </div>
 <div class="carousel-viewport reveal" id="galleryCarousel">
-<div class="carousel-track" id="galleryTrack"></div>
+<div class="carousel-track">
+<div class="slide one">
+<div class="slide-earth"></div>
+<div class="slide-ring"></div>
+<div class="slide-code">ORBIT / EARTH / 3D</div>
+<div class="slide-label">ORBITAL SCENARIO</div>
+</div>
+<div class="slide two">
+<div class="slide-ring" style="transform:translate(-50%,-50%) rotate(12deg);width:780px"></div>
+<div class="slide-code">EO / DATA / SPATIAL</div>
+<div class="slide-label">EARTH OBSERVATION</div>
+</div>
+<div class="slide three">
+<div class="slide-earth" style="transform:translate(-50%,-50%) scale(.72)"></div>
+<div class="slide-ring" style="transform:translate(-50%,-50%) rotate(-35deg);width:800px"></div>
+<div class="slide-code">PASS / MONITORING / OPE</div>
+<div class="slide-label">ORBITAL PASS</div>
+</div>
+</div>
 </div>
 <div class="dots" id="galleryDots"></div>
 </div>
@@ -737,7 +760,13 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <p class="reveal" data-en="Digital twins, aerospace systems, mission environments and spatial models built inside the same visual computing layer." data-es="Gemelos digitales, sistemas aeroespaciales, entornos de misión y modelos espaciales construidos dentro de la misma capa de computación visual.">Digital twins, aerospace systems, mission environments and spatial models built inside the same visual computing layer.</p>
 </div>
 <div class="collage-viewport reveal">
-<div class="collage" id="collage"></div>
+<div class="collage" id="collage">
+<div class="collage-card"><div class="card-earth"></div><div class="card-orbit"></div><div class="card-number">01</div><div class="card-label">EARTH DIGITAL TWIN</div></div>
+<div class="collage-card"><div class="card-earth" style="transform:translate(-50%,-50%) scale(.75)"></div><div class="card-orbit"></div><div class="card-number">02</div><div class="card-label">ORBITAL SYSTEM</div></div>
+<div class="collage-card"><div class="card-earth" style="transform:translate(-50%,-50%) scale(.9)"></div><div class="card-orbit" style="transform:translate(-50%,-50%) rotate(28deg)"></div><div class="card-number">03</div><div class="card-label">MISSION ENVIRONMENT</div></div>
+<div class="collage-card"><div class="card-earth" style="transform:translate(-50%,-50%) scale(.65)"></div><div class="card-orbit" style="transform:translate(-50%,-50%) rotate(-40deg)"></div><div class="card-number">04</div><div class="card-label">OBSERVATION SYSTEM</div></div>
+<div class="collage-card"><div class="card-earth"></div><div class="card-orbit" style="transform:translate(-50%,-50%) rotate(8deg)"></div><div class="card-number">05</div><div class="card-label">SPATIAL SIMULATION</div></div>
+</div>
 </div>
 </div>
 </section>
@@ -878,78 +907,6 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </footer>
 
 <script>
-
-/* =========================
-   OPE VISUALS
-========================= */
-
-const OPE_IMAGES=[
-"https://tpm-ds.eo.esa.int/oads/meta/JERS1-PRI/browse/JE1_RFUI_JSA_PRI_1P_19980614T111232_19980614T111245_034791_0320_0241_066E.ZIP_BID.PNG",
-"https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1800&q=80",
-"https://images.unsplash.com/photo-1517976547714-720226b864c1?auto=format&fit=crop&w=1800&q=80"
-];
-
-const THREE_D_IMAGES=[
-"https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?auto=format&fit=crop&w=1200&q=80",
-"https://images.unsplash.com/photo-1446776877081-d282a0f896e2?auto=format&fit=crop&w=1200&q=80",
-"https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1200&q=80",
-"https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=1200&q=80",
-"https://images.unsplash.com/photo-1534791547706-33e22770d2c9?auto=format&fit=crop&w=1200&q=80"
-];
-
-/* =========================
-   VISUAL BUILDERS
-========================= */
-
-function buildOpeGallery(){
-const track=$("#galleryTrack");
-OPE_IMAGES.forEach((src,i)=>{
-const slide=document.createElement("div");
-slide.className=`slide slide-${i+1}`;
-const img=document.createElement("img");
-img.src=src;
-img.alt=`OPE visualization ${i+1}`;
-slide.appendChild(img);
-track.appendChild(slide);
-});
-}
-
-function build3DCollage(){
-const collage=$("#collage");
-const labels=[
-"EARTH DIGITAL TWIN",
-"ORBITAL SYSTEM",
-"MISSION ENVIRONMENT",
-"OBSERVATION SYSTEM",
-"SPATIAL SIMULATION"
-];
-
-THREE_D_IMAGES.forEach((src,i)=>{
-const card=document.createElement("div");
-card.className="collage-card";
-
-const img=document.createElement("img");
-img.src=src;
-img.alt=labels[i]||`3D aerospace visualization ${i+1}`;
-
-const number=document.createElement("div");
-number.className="card-number";
-number.textContent=String(i+1).padStart(2,"0");
-
-const label=document.createElement("div");
-label.className="card-label";
-label.textContent=labels[i]||"3D AEROSPACE VISUALIZATION";
-
-card.appendChild(img);
-card.appendChild(number);
-card.appendChild(label);
-collage.appendChild(card);
-});
-}
-
-buildOpeGallery();
-build3DCollage();
-
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
 
@@ -1059,14 +1016,7 @@ function resume(){pause();if(interval)timer=setInterval(nextSlide,interval)}
 root.addEventListener("mouseenter",pause);
 root.addEventListener("mouseleave",resume);
 root.addEventListener("pointerdown",e=>{
-dragging=true;
-moved=false;
-startX=e.clientX;
-currentX=e.clientX;
-startOffset=index*slideWidth();
-track.style.transition="none";
-root.setPointerCapture?.(e.pointerId);
-pause();
+dragging=true;moved=false;startX=e.clientX;currentX=e.clientX;startOffset=index*slideWidth();track.style.transition="none";root.setPointerCapture?.(e.pointerId);pause();
 });
 root.addEventListener("pointermove",e=>{
 if(!dragging)return;
@@ -1086,94 +1036,48 @@ if(Math.abs(dx)>60)dx<0?nextSlide():prevSlide();else update(true);
 resume();
 });
 root.addEventListener("pointercancel",()=>{
-dragging=false;
-update(true);
-resume();
+dragging=false;update(true);resume();
 });
 root.addEventListener("click",e=>{
-if(moved){
-e.preventDefault();
-e.stopPropagation();
-}
+if(moved){e.preventDefault();e.stopPropagation()}
 },true);
 window.addEventListener("resize",()=>update(false));
 resume();
 }
 
 const galleryRoot=$("#galleryCarousel");
-const galleryTrack=$("#galleryTrack");
+const galleryTrack=galleryRoot.querySelector(".carousel-track");
 createCarousel(galleryRoot,galleryTrack,$("#galleryPrev"),$("#galleryNext"),$("#galleryDots"),5000);
 
 const collageViewport=document.querySelector(".collage-viewport");
 const collage=$("#collage");
 const cards=[...collage.children];
 let collageIndex=0,collageTimer=null,collageDragging=false,collageStartX=0,collageCurrentX=0,collageStartOffset=0,collageMoved=false;
-
-function collageGap(){
-return parseFloat(getComputedStyle(collage).gap)||20
-}
-
-function collageStep(){
-return cards[0].getBoundingClientRect().width+collageGap()
-}
-
-function collageMax(){
-return Math.max(0,collage.scrollWidth-collageViewport.clientWidth)
-}
-
+function collageGap(){return parseFloat(getComputedStyle(collage).gap)||20}
+function collageStep(){return cards[0].getBoundingClientRect().width+collageGap()}
+function collageMax(){return Math.max(0,collage.scrollWidth-collageViewport.clientWidth)}
 function updateCollage(animate=true,override=null){
 collage.style.transition=animate?"transform .8s cubic-bezier(.22,.61,.36,1)":"none";
 let offset=override!==null?override:Math.min(collageIndex*collageStep(),collageMax());
 collage.style.transform=`translate3d(${-offset}px,0,0)`;
 }
-
 function nextCollage(){
 if(collageIndex>=cards.length-1){
 collageIndex=0;
 updateCollage(false);
 requestAnimationFrame(()=>requestAnimationFrame(()=>updateCollage(true)));
-}else{
-collageIndex++;
-updateCollage(true);
+}else{collageIndex++;updateCollage(true)}
 }
-}
-
 function prevCollage(){
-if(collageIndex<=0){
-collageIndex=cards.length-1;
-updateCollage(true);
-}else{
-collageIndex--;
-updateCollage(true);
+if(collageIndex<=0){collageIndex=cards.length-1;updateCollage(true)}else{collageIndex--;updateCollage(true)}
 }
-}
-
-function pauseCollage(){
-if(collageTimer){
-clearInterval(collageTimer);
-collageTimer=null;
-}
-}
-
-function resumeCollage(){
-pauseCollage();
-collageTimer=setInterval(nextCollage,4500);
-}
-
+function pauseCollage(){if(collageTimer){clearInterval(collageTimer);collageTimer=null}}
+function resumeCollage(){pauseCollage();collageTimer=setInterval(nextCollage,4500)}
 collageViewport.addEventListener("mouseenter",pauseCollage);
 collageViewport.addEventListener("mouseleave",resumeCollage);
-
 collage.addEventListener("pointerdown",e=>{
-collageDragging=true;
-collageMoved=false;
-collageStartX=e.clientX;
-collageCurrentX=e.clientX;
-collageStartOffset=Math.min(collageIndex*collageStep(),collageMax());
-collage.classList.add("dragging");
-pauseCollage();
-collage.setPointerCapture?.(e.pointerId);
+collageDragging=true;collageMoved=false;collageStartX=e.clientX;collageCurrentX=e.clientX;collageStartOffset=Math.min(collageIndex*collageStep(),collageMax());collage.classList.add("dragging");pauseCollage();collage.setPointerCapture?.(e.pointerId);
 });
-
 collage.addEventListener("pointermove",e=>{
 if(!collageDragging)return;
 collageCurrentX=e.clientX;
@@ -1183,29 +1087,21 @@ let offset=collageStartOffset-dx;
 offset=Math.max(0,Math.min(collageMax(),offset));
 updateCollage(false,offset);
 });
-
 collage.addEventListener("pointerup",()=>{
 if(!collageDragging)return;
-collageDragging=false;
-collage.classList.remove("dragging");
+collageDragging=false;collage.classList.remove("dragging");
 const dx=collageCurrentX-collageStartX;
 if(Math.abs(dx)>70)dx<0?nextCollage():prevCollage();else updateCollage(true);
 resumeCollage();
 });
-
 collage.addEventListener("pointercancel",()=>{
-collageDragging=false;
-collage.classList.remove("dragging");
-updateCollage(true);
-resumeCollage();
+collageDragging=false;collage.classList.remove("dragging");updateCollage(true);resumeCollage();
 });
-
 window.addEventListener("resize",()=>updateCollage(false));
 resumeCollage();
 
 const hero=document.querySelector(".hero");
 const media=document.querySelector(".hero-media");
-
 window.addEventListener("pointermove",e=>{
 const x=(e.clientX/window.innerWidth-.5)*12;
 const y=(e.clientY/window.innerHeight-.5)*8;
@@ -1220,10 +1116,7 @@ if(hero)hero.style.setProperty("--hero-y",`${y}px`);
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
 a.addEventListener("click",e=>{
 const target=document.querySelector(a.getAttribute("href"));
-if(target){
-e.preventDefault();
-target.scrollIntoView({behavior:"smooth",block:"start"});
-}
+if(target){e.preventDefault();target.scrollIntoView({behavior:"smooth",block:"start"})}
 });
 });
 
