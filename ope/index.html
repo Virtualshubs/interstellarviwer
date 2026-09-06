@@ -90,6 +90,14 @@ section{position:relative}
 .observation-head{display:grid;grid-template-columns:1fr 1.4fr;gap:80px;align-items:end}
 .observation-head h2{margin-bottom:0}
 .observation-head p{color:#7f8997;line-height:1.7;max-width:540px;margin:0}
+.observation-copy{display:flex;flex-direction:column;align-items:flex-start}
+.observation-hex{width:180px;height:208px;position:relative;margin:0 0 32px;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:#0a0e15;overflow:hidden}
+.observation-hex:before{content:"";position:absolute;inset:0;background:rgba(100,150,190,.05);z-index:2;pointer-events:none}
+.observation-hex:after{content:"";position:absolute;inset:7px;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);border:1px solid rgba(255,255,255,.16);z-index:3;pointer-events:none}
+.observation-hex img{width:100%;height:100%;display:block;object-fit:cover}
+.observation-hex-label{position:absolute;left:20px;bottom:17px;z-index:5;font-size:6px;line-height:1;letter-spacing:.2em;color:rgba(255,255,255,.65)}
+.observation-hex-line{position:absolute;right:18px;top:18px;width:22px;height:22px;border-top:1px solid rgba(150,190,220,.5);border-right:1px solid rgba(150,190,220,.5);z-index:5}
+.observation-copy p{max-width:560px}
 .data-flow{margin-top:100px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .flow-item{font-size:10px;letter-spacing:.15em;color:#9ca6b2;text-align:center;min-width:130px}
 .flow-item strong{display:block;color:#e9edf2;font-size:11px;margin-top:9px}
@@ -576,6 +584,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 .location-mark{right:15px;bottom:48px;width:50px;height:50px}
 .location-mark:before{width:31px;height:31px}
 .location-mark:after{width:12px;height:12px}
+.observation-hex{width:145px;height:168px;margin-bottom:25px}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -686,8 +695,16 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <div class="section-num">04 / EARTH OBSERVATION</div>
 <h2 data-en="Connect observation data with where and when it happens." data-es="Conecta los datos de observación con dónde y cuándo ocurren.">Connect observation data with where and when it happens.</h2>
 </div>
-<p class="reveal" data-en="OPE connects Earth observation catalogues with orbital and spatial context, turning datasets into observable scenarios." data-es="OPE conecta catálogos de observación de la Tierra con contexto orbital y espacial, convirtiendo datasets en escenarios observables.">OPE connects Earth observation catalogues with orbital and spatial context, turning datasets into observable scenarios.</p>
+<div class="observation-copy reveal">
+<div class="observation-hex">
+<img src="https://3d.staratlas.es/ope/datamodel.png" alt="Earth observation">
+<div class="observation-hex-label">OBS / 004</div>
+<div class="observation-hex-line"></div>
 </div>
+<p data-en="OPE connects Earth observation catalogues with orbital and spatial context, turning datasets into observable scenarios." data-es="OPE conecta catálogos de observación de la Tierra con contexto orbital y espacial, convirtiendo datasets en escenarios observables.">OPE connects Earth observation catalogues with orbital and spatial context, turning datasets into observable scenarios.</p>
+</div>
+</div>
+
 <div class="data-flow reveal">
 <div class="flow-item">01<strong>ESA EO CATALOGUE</strong></div>
 <div class="flow-arrow">→</div>
@@ -699,12 +716,12 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <div class="flow-arrow">→</div>
 <div class="flow-item">05<strong>OBSERVATION</strong></div>
 </div>
+
 <div class="observation-foot reveal">
 <p data-en="The objective is not only to access the data, but to understand its spatial and temporal relationship with the system observing it." data-es="El objetivo no es solo acceder al dato, sino comprender su relación espacial y temporal con el sistema que lo observa.">The objective is not only to access the data, but to understand its spatial and temporal relationship with the system observing it.</p>
 </div>
 </div>
 </section>
-
 
 
 <section class="archive">
@@ -1044,8 +1061,7 @@ const OPE_IMAGES=[
 "https://3d.staratlas.es/ope/opehome.png",
 "https://3d.staratlas.es/ope/openasa.png",
 "https://3d.staratlas.es/ope/opeluna.png",
-"https://3d.staratlas.es/ope/opetwin.png",
-"https://3d.staratlas.es/ope/datamodel.png"
+"https://3d.staratlas.es/ope/opetwin.png"
 ];
 
 const THREE_D_IMAGES=[
