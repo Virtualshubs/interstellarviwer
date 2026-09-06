@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,9 +16,13 @@ section{position:relative;min-height:100vh}
 .hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:90px 90px;opacity:.08}
 .nav{position:absolute;top:0;left:0;width:100%;padding:28px 5vw;display:flex;align-items:center;justify-content:space-between;z-index:20}
 .logo{font-size:14px;font-weight:700;letter-spacing:.18em}
+.nav-right{display:flex;align-items:center;gap:38px}
 .nav-links{display:flex;gap:34px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#aeb7c7}
 .nav-links a{transition:color .3s ease}
 .nav-links a:hover{color:#fff}
+.language-switch{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.16em;color:#657184}
+.lang-btn{border:0;background:none;padding:0;color:#657184;font-size:10px;letter-spacing:.16em;cursor:pointer;transition:color .3s ease}
+.lang-btn:hover,.lang-btn.active{color:#fff}
 .hero-content{position:relative;z-index:3;width:100%;padding:0 8vw}
 .eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8c9aaf;margin-bottom:25px}
 h1{font-size:clamp(60px,9vw,145px);line-height:.88;letter-spacing:-.07em;font-weight:500;margin:0;max-width:900px}
@@ -158,6 +163,8 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 .reveal-delay-3{transition-delay:.36s}
 @media(max-width:800px){
 .nav-links{display:none}
+.nav-right{gap:0}
+.language-switch{margin-left:auto}
 .earth{width:90vw;height:90vw;right:-30%;top:62%;opacity:.55}
 .hero-content{padding:0 7vw}
 .intro,.statement,.ope,.modules,.applications,.visual-section,.aero-collage{padding:18vw 7vw}
@@ -195,41 +202,48 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <section class="hero">
 <nav class="nav">
 <div class="logo">VIRTUALS HUBS</div>
+<div class="nav-right">
 <div class="nav-links">
-<a href="#ope">OPE</a>
-<a href="#technology">Technology</a>
-<a href="#applications">Applications</a>
+<a href="#ope" data-i18n="nav.ope">OPE</a>
+<a href="#technology" data-i18n="nav.technology">Technology</a>
+<a href="#applications" data-i18n="nav.applications">Applications</a>
+</div>
+<div class="language-switch">
+<button class="lang-btn active" data-lang="en">EN</button>
+<span>/</span>
+<button class="lang-btn" data-lang="es">ES</button>
+</div>
 </div>
 </nav>
 <div class="hero-grid"></div>
 <div class="hero-content reveal visible">
-<div class="eyebrow">Orbital Pass Engine / Virtuals Hubs</div>
-<h1>Simulate<br>the future<br>of space.</h1>
-<div class="hero-sub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.</div>
-<a href="#ope" class="cta">Explore OPE</a>
+<div class="eyebrow" data-i18n="hero.eyebrow">Orbital Pass Engine / Virtuals Hubs</div>
+<h1 data-i18n="hero.title">Simulate<br>the future<br>of space.</h1>
+<div class="hero-sub" data-i18n="hero.sub">A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.</div>
+<a href="#ope" class="cta" data-i18n="hero.cta">Explore OPE</a>
 </div>
 <div class="earth"><div class="orbit"></div><div class="satellite"></div></div>
-<div class="scroll-indicator"><span class="scroll-line"></span>Scroll to explore</div>
+<div class="scroll-indicator"><span class="scroll-line"></span><span data-i18n="scroll">Scroll to explore</span></div>
 </section>
 
 <section class="intro">
 <div class="intro-inner reveal">
-<div class="eyebrow">01 / The challenge</div>
-<h2>Space systems are becoming increasingly complex.</h2>
-<p>Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. Understanding that data requires more than numbers. It requires spatial context.</p>
+<div class="eyebrow" data-i18n="challenge.eyebrow">01 / The challenge</div>
+<h2 data-i18n="challenge.title">Space systems are becoming increasingly complex.</h2>
+<p data-i18n="challenge.text">Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. Understanding that data requires more than numbers. It requires spatial context.</p>
 </div>
 </section>
 
 <section class="statement">
-<h2 class="reveal">We are building the computational layer between <span>orbital data</span> and spatial understanding.</h2>
+<h2 class="reveal" data-i18n="statement.title">We are building the computational layer between <span>orbital data</span> and spatial understanding.</h2>
 </section>
 
 <section class="ope" id="ope">
 <div class="ope-copy reveal">
-<div class="eyebrow">02 / Orbital Pass Engine</div>
-<h2>From orbital data to operational intelligence.</h2>
-<p>OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.</p>
-<a href="#gallery" class="cta">Explore the engine</a>
+<div class="eyebrow" data-i18n="ope.eyebrow">02 / Orbital Pass Engine</div>
+<h2 data-i18n="ope.title">From orbital data to operational intelligence.</h2>
+<p data-i18n="ope.text">OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.</p>
+<a href="#gallery" class="cta" data-i18n="ope.cta">Explore the engine</a>
 </div>
 <div class="simulation reveal reveal-delay-1">
 <div class="simulation-orbit"></div>
@@ -242,10 +256,10 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <section class="visual-section">
 <div class="visual-header reveal">
 <div>
-<div class="eyebrow">03 / Spatial intelligence</div>
-<h2>See the systems<br>behind the data.</h2>
+<div class="eyebrow" data-i18n="spatial.eyebrow">03 / Spatial intelligence</div>
+<h2 data-i18n="spatial.title">See the systems<br>behind the data.</h2>
 </div>
-<p>From orbital trajectories to Earth observation and 3D aerospace environments, spatial context changes how complex systems are understood.</p>
+<p data-i18n="spatial.text">From orbital trajectories to Earth observation and 3D aerospace environments, spatial context changes how complex systems are understood.</p>
 </div>
 
 <div class="video-wrap reveal">
@@ -253,19 +267,19 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <source src="assets/aerospace.mp4" type="video/mp4">
 </video>
 <div class="video-overlay"></div>
-<div class="video-status">System visualization</div>
-<div class="video-label">Orbital environment / Simulation</div>
+<div class="video-status" data-i18n="video.status">System visualization</div>
+<div class="video-label" data-i18n="video.label">Orbital environment / Simulation</div>
 </div>
 </section>
 
 <section class="gallery" id="gallery">
 <div class="gallery-header reveal">
 <div class="gallery-title">
-<div class="eyebrow">04 / OPE Gallery</div>
-<h2>Captured from<br>the engine.</h2>
-<p>A selection of spatial environments, orbital scenarios and Earth observation views generated with Orbital Pass Engine.</p>
+<div class="eyebrow" data-i18n="gallery.eyebrow">04 / OPE Gallery</div>
+<h2 data-i18n="gallery.title">Captured from<br>the engine.</h2>
+<p data-i18n="gallery.text">A selection of spatial environments, orbital scenarios and Earth observation views generated with Orbital Pass Engine.</p>
 </div>
-<div class="gallery-meta">OPE / VISUAL ARCHIVE</div>
+<div class="gallery-meta" data-i18n="gallery.meta">OPE / VISUAL ARCHIVE</div>
 </div>
 
 <div class="gallery-stage">
@@ -275,9 +289,9 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="gallery-image"></div>
 <div class="gallery-info">
 <div class="gallery-caption">
-<span>01 / Earth observation</span>
-<h3>Earth from orbit</h3>
-<p>Spatial representation of an Earth observation scenario.</p>
+<span data-i18n="gallery.1.label">01 / Earth observation</span>
+<h3 data-i18n="gallery.1.title">Earth from orbit</h3>
+<p data-i18n="gallery.1.text">Spatial representation of an Earth observation scenario.</p>
 </div>
 <div class="gallery-index">01 / 05</div>
 </div>
@@ -287,9 +301,9 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="gallery-image"></div>
 <div class="gallery-info">
 <div class="gallery-caption">
-<span>02 / Orbital simulation</span>
-<h3>Satellite pass</h3>
-<p>Orbital trajectory and observation geometry visualized in real time.</p>
+<span data-i18n="gallery.2.label">02 / Orbital simulation</span>
+<h3 data-i18n="gallery.2.title">Satellite pass</h3>
+<p data-i18n="gallery.2.text">Orbital trajectory and observation geometry visualized in real time.</p>
 </div>
 <div class="gallery-index">02 / 05</div>
 </div>
@@ -299,9 +313,9 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="gallery-image"></div>
 <div class="gallery-info">
 <div class="gallery-caption">
-<span>03 / Data environment</span>
-<h3>Spatial intelligence</h3>
-<p>Geospatial information transformed into an interactive spatial layer.</p>
+<span data-i18n="gallery.3.label">03 / Data environment</span>
+<h3 data-i18n="gallery.3.title">Spatial intelligence</h3>
+<p data-i18n="gallery.3.text">Geospatial information transformed into an interactive spatial layer.</p>
 </div>
 <div class="gallery-index">03 / 05</div>
 </div>
@@ -311,9 +325,9 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="gallery-image"></div>
 <div class="gallery-info">
 <div class="gallery-caption">
-<span>04 / Mission scenario</span>
-<h3>Observation window</h3>
-<p>Understanding when and where a satellite can observe the Earth.</p>
+<span data-i18n="gallery.4.label">04 / Mission scenario</span>
+<h3 data-i18n="gallery.4.title">Observation window</h3>
+<p data-i18n="gallery.4.text">Understanding when and where a satellite can observe the Earth.</p>
 </div>
 <div class="gallery-index">04 / 05</div>
 </div>
@@ -323,9 +337,9 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="gallery-image"></div>
 <div class="gallery-info">
 <div class="gallery-caption">
-<span>05 / 3D aerospace</span>
-<h3>Digital mission environment</h3>
-<p>Interactive 3D representation of complex aerospace systems.</p>
+<span data-i18n="gallery.5.label">05 / 3D aerospace</span>
+<h3 data-i18n="gallery.5.title">Digital mission environment</h3>
+<p data-i18n="gallery.5.text">Interactive 3D representation of complex aerospace systems.</p>
 </div>
 <div class="gallery-index">05 / 05</div>
 </div>
@@ -352,10 +366,10 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <section class="aero-collage">
 <div class="aero-header reveal">
 <div>
-<div class="eyebrow">05 / Aerospace visual archive</div>
-<h2>Beyond the<br>orbital view.</h2>
+<div class="eyebrow" data-i18n="archive.eyebrow">05 / Aerospace visual archive</div>
+<h2 data-i18n="archive.title">Beyond the<br>orbital view.</h2>
 </div>
-<p>Digital twins, mission environments, spatial models and aerospace systems represented through interactive 3D.</p>
+<p data-i18n="archive.text">Digital twins, mission environments, spatial models and aerospace systems represented through interactive 3D.</p>
 </div>
 
 <div class="collage-carousel">
@@ -365,8 +379,8 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="collage-visual"></div>
 <div class="collage-info">
 <div>
-<span>01 / Earth systems</span>
-<h3>Planetary context</h3>
+<span data-i18n="archive.1.label">01 / Earth systems</span>
+<h3 data-i18n="archive.1.title">Planetary context</h3>
 </div>
 <div class="collage-index">01 / 05</div>
 </div>
@@ -376,8 +390,8 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="collage-visual"></div>
 <div class="collage-info">
 <div>
-<span>02 / Orbital mechanics</span>
-<h3>Trajectory architecture</h3>
+<span data-i18n="archive.2.label">02 / Orbital mechanics</span>
+<h3 data-i18n="archive.2.title">Trajectory architecture</h3>
 </div>
 <div class="collage-index">02 / 05</div>
 </div>
@@ -387,8 +401,8 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="collage-visual"></div>
 <div class="collage-info">
 <div>
-<span>03 / Spatial computing</span>
-<h3>Data as geometry</h3>
+<span data-i18n="archive.3.label">03 / Spatial computing</span>
+<h3 data-i18n="archive.3.title">Data as geometry</h3>
 </div>
 <div class="collage-index">03 / 05</div>
 </div>
@@ -398,8 +412,8 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="collage-visual"></div>
 <div class="collage-info">
 <div>
-<span>04 / Digital twins</span>
-<h3>Systems in 3D</h3>
+<span data-i18n="archive.4.label">04 / Digital twins</span>
+<h3 data-i18n="archive.4.title">Systems in 3D</h3>
 </div>
 <div class="collage-index">04 / 05</div>
 </div>
@@ -409,8 +423,8 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 <div class="collage-visual"></div>
 <div class="collage-info">
 <div>
-<span>05 / Mission environments</span>
-<h3>Operational space</h3>
+<span data-i18n="archive.5.label">05 / Mission environments</span>
+<h3 data-i18n="archive.5.title">Operational space</h3>
 </div>
 <div class="collage-index">05 / 05</div>
 </div>
@@ -430,45 +444,45 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 
 <section class="modules" id="technology">
 <div class="modules-header reveal">
-<div class="eyebrow">06 / Technology</div>
-<h2>One spatial computing layer.</h2>
+<div class="eyebrow" data-i18n="technology.eyebrow">06 / Technology</div>
+<h2 data-i18n="technology.title">One spatial computing layer.</h2>
 </div>
 <div class="modules-grid">
 <div class="module reveal">
 <div class="module-number">01</div>
-<h3>Orbital simulation</h3>
-<p>Model satellite trajectories, orbital passes, observation windows and mission scenarios.</p>
+<h3 data-i18n="technology.1.title">Orbital simulation</h3>
+<p data-i18n="technology.1.text">Model satellite trajectories, orbital passes, observation windows and mission scenarios.</p>
 </div>
 <div class="module reveal reveal-delay-1">
 <div class="module-number">02</div>
-<h3>Earth observation</h3>
-<p>Connect orbital operations with spatial and temporal Earth observation datasets.</p>
+<h3 data-i18n="technology.2.title">Earth observation</h3>
+<p data-i18n="technology.2.text">Connect orbital operations with spatial and temporal Earth observation datasets.</p>
 </div>
 <div class="module reveal reveal-delay-2">
 <div class="module-number">03</div>
-<h3>3D Aerospace</h3>
-<p>Turn complex aerospace systems into interactive digital environments and simulations.</p>
+<h3 data-i18n="technology.3.title">3D Aerospace</h3>
+<p data-i18n="technology.3.text">Turn complex aerospace systems into interactive digital environments and simulations.</p>
 </div>
 </div>
 </section>
 
 <section class="applications" id="applications">
-<div class="eyebrow reveal">07 / Applications</div>
-<h2 class="reveal">Built for the<br>new space.</h2>
+<div class="eyebrow reveal" data-i18n="applications.eyebrow">07 / Applications</div>
+<h2 class="reveal" data-i18n="applications.title">Built for the<br>new space.</h2>
 <div class="application-grid">
-<div class="application reveal"><span>01 / SPACE OPERATIONS</span><h3>Mission planning</h3></div>
-<div class="application reveal reveal-delay-1"><span>02 / EARTH OBSERVATION</span><h3>Observation intelligence</h3></div>
-<div class="application reveal reveal-delay-2"><span>03 / CLIMATE</span><h3>Environmental analysis</h3></div>
-<div class="application reveal reveal-delay-3"><span>04 / RESEARCH</span><h3>Spatial simulation</h3></div>
+<div class="application reveal"><span data-i18n="applications.1.label">01 / SPACE OPERATIONS</span><h3 data-i18n="applications.1.title">Mission planning</h3></div>
+<div class="application reveal reveal-delay-1"><span data-i18n="applications.2.label">02 / EARTH OBSERVATION</span><h3 data-i18n="applications.2.title">Observation intelligence</h3></div>
+<div class="application reveal reveal-delay-2"><span data-i18n="applications.3.label">03 / CLIMATE</span><h3 data-i18n="applications.3.title">Environmental analysis</h3></div>
+<div class="application reveal reveal-delay-3"><span data-i18n="applications.4.label">04 / RESEARCH</span><h3 data-i18n="applications.4.title">Spatial simulation</h3></div>
 </div>
 </section>
 
 <section class="final">
 <div class="reveal">
-<div class="eyebrow">Virtuals Hubs</div>
-<h2>The next generation of space systems will be spatial.</h2>
-<p>We are building the infrastructure to simulate them.</p>
-<a href="#ope" class="cta">Explore Orbital Pass Engine</a>
+<div class="eyebrow" data-i18n="final.eyebrow">Virtuals Hubs</div>
+<h2 data-i18n="final.title">The next generation of space systems will be spatial.</h2>
+<p data-i18n="final.text">We are building the infrastructure to simulate them.</p>
+<a href="#ope" class="cta" data-i18n="final.cta">Explore Orbital Pass Engine</a>
 </div>
 </section>
 
@@ -479,6 +493,195 @@ footer{padding:35px 5vw;display:flex;justify-content:space-between;color:#697483
 </footer>
 
 <script>
+const translations={
+en:{
+"nav.ope":"OPE",
+"nav.technology":"Technology",
+"nav.applications":"Applications",
+"hero.eyebrow":"Orbital Pass Engine / Virtuals Hubs",
+"hero.title":"Simulate<br>the future<br>of space.",
+"hero.sub":"A spatial computing environment for orbital operations, Earth observation and 3D aerospace simulations.",
+"hero.cta":"Explore OPE",
+"scroll":"Scroll to explore",
+"challenge.eyebrow":"01 / The challenge",
+"challenge.title":"Space systems are becoming increasingly complex.",
+"challenge.text":"Satellites, constellations and Earth observation systems generate enormous amounts of spatial and temporal data. Understanding that data requires more than numbers. It requires spatial context.",
+"statement.title":"We are building the computational layer between <span>orbital data</span> and spatial understanding.",
+"ope.eyebrow":"02 / Orbital Pass Engine",
+"ope.title":"From orbital data to operational intelligence.",
+"ope.text":"OPE brings orbital mechanics, Earth observation data and 3D visualization into a single computational environment.",
+"ope.cta":"Explore the engine",
+"spatial.eyebrow":"03 / Spatial intelligence",
+"spatial.title":"See the systems<br>behind the data.",
+"spatial.text":"From orbital trajectories to Earth observation and 3D aerospace environments, spatial context changes how complex systems are understood.",
+"video.status":"System visualization",
+"video.label":"Orbital environment / Simulation",
+"gallery.eyebrow":"04 / OPE Gallery",
+"gallery.title":"Captured from<br>the engine.",
+"gallery.text":"A selection of spatial environments, orbital scenarios and Earth observation views generated with Orbital Pass Engine.",
+"gallery.meta":"OPE / VISUAL ARCHIVE",
+"gallery.1.label":"01 / Earth observation",
+"gallery.1.title":"Earth from orbit",
+"gallery.1.text":"Spatial representation of an Earth observation scenario.",
+"gallery.2.label":"02 / Orbital simulation",
+"gallery.2.title":"Satellite pass",
+"gallery.2.text":"Orbital trajectory and observation geometry visualized in real time.",
+"gallery.3.label":"03 / Data environment",
+"gallery.3.title":"Spatial intelligence",
+"gallery.3.text":"Geospatial information transformed into an interactive spatial layer.",
+"gallery.4.label":"04 / Mission scenario",
+"gallery.4.title":"Observation window",
+"gallery.4.text":"Understanding when and where a satellite can observe the Earth.",
+"gallery.5.label":"05 / 3D aerospace",
+"gallery.5.title":"Digital mission environment",
+"gallery.5.text":"Interactive 3D representation of complex aerospace systems.",
+"archive.eyebrow":"05 / Aerospace visual archive",
+"archive.title":"Beyond the<br>orbital view.",
+"archive.text":"Digital twins, mission environments, spatial models and aerospace systems represented through interactive 3D.",
+"archive.1.label":"01 / Earth systems",
+"archive.1.title":"Planetary context",
+"archive.2.label":"02 / Orbital mechanics",
+"archive.2.title":"Trajectory architecture",
+"archive.3.label":"03 / Spatial computing",
+"archive.3.title":"Data as geometry",
+"archive.4.label":"04 / Digital twins",
+"archive.4.title":"Systems in 3D",
+"archive.5.label":"05 / Mission environments",
+"archive.5.title":"Operational space",
+"technology.eyebrow":"06 / Technology",
+"technology.title":"One spatial computing layer.",
+"technology.1.title":"Orbital simulation",
+"technology.1.text":"Model satellite trajectories, orbital passes, observation windows and mission scenarios.",
+"technology.2.title":"Earth observation",
+"technology.2.text":"Connect orbital operations with spatial and temporal Earth observation datasets.",
+"technology.3.title":"3D Aerospace",
+"technology.3.text":"Turn complex aerospace systems into interactive digital environments and simulations.",
+"applications.eyebrow":"07 / Applications",
+"applications.title":"Built for the<br>new space.",
+"applications.1.label":"01 / SPACE OPERATIONS",
+"applications.1.title":"Mission planning",
+"applications.2.label":"02 / EARTH OBSERVATION",
+"applications.2.title":"Observation intelligence",
+"applications.3.label":"03 / CLIMATE",
+"applications.3.title":"Environmental analysis",
+"applications.4.label":"04 / RESEARCH",
+"applications.4.title":"Spatial simulation",
+"final.eyebrow":"Virtuals Hubs",
+"final.title":"The next generation of space systems will be spatial.",
+"final.text":"We are building the infrastructure to simulate them.",
+"final.cta":"Explore Orbital Pass Engine",
+"aria.prevImage":"Previous image",
+"aria.nextImage":"Next image",
+"aria.prevVisual":"Previous visual",
+"aria.nextVisual":"Next visual"
+},
+es:{
+"nav.ope":"OPE",
+"nav.technology":"Tecnología",
+"nav.applications":"Aplicaciones",
+"hero.eyebrow":"Orbital Pass Engine / Virtuals Hubs",
+"hero.title":"Simula<br>el futuro<br>del espacio.",
+"hero.sub":"Un entorno de computación espacial para operaciones orbitales, observación de la Tierra y simulaciones aeroespaciales 3D.",
+"hero.cta":"Explorar OPE",
+"scroll":"Desplázate para explorar",
+"challenge.eyebrow":"01 / El desafío",
+"challenge.title":"Los sistemas espaciales son cada vez más complejos.",
+"challenge.text":"Los satélites, las constelaciones y los sistemas de observación de la Tierra generan enormes cantidades de datos espaciales y temporales. Comprenderlos requiere algo más que números. Requiere contexto espacial.",
+"statement.title":"Estamos construyendo la capa computacional entre los <span>datos orbitales</span> y la comprensión espacial.",
+"ope.eyebrow":"02 / Orbital Pass Engine",
+"ope.title":"Del dato orbital a la inteligencia operacional.",
+"ope.text":"OPE integra mecánica orbital, datos de observación de la Tierra y visualización 3D en un único entorno computacional.",
+"ope.cta":"Explorar el motor",
+"spatial.eyebrow":"03 / Inteligencia espacial",
+"spatial.title":"Visualiza los sistemas<br>detrás de los datos.",
+"spatial.text":"Desde trayectorias orbitales hasta observación de la Tierra y entornos aeroespaciales 3D, el contexto espacial transforma la forma de comprender sistemas complejos.",
+"video.status":"Visualización del sistema",
+"video.label":"Entorno orbital / Simulación",
+"gallery.eyebrow":"04 / Galería OPE",
+"gallery.title":"Capturado desde<br>el motor.",
+"gallery.text":"Una selección de entornos espaciales, escenarios orbitales y vistas de observación de la Tierra generadas con Orbital Pass Engine.",
+"gallery.meta":"OPE / ARCHIVO VISUAL",
+"gallery.1.label":"01 / Observación de la Tierra",
+"gallery.1.title":"La Tierra desde la órbita",
+"gallery.1.text":"Representación espacial de un escenario de observación de la Tierra.",
+"gallery.2.label":"02 / Simulación orbital",
+"gallery.2.title":"Paso del satélite",
+"gallery.2.text":"Trayectoria orbital y geometría de observación visualizadas en tiempo real.",
+"gallery.3.label":"03 / Entorno de datos",
+"gallery.3.title":"Inteligencia espacial",
+"gallery.3.text":"Información geoespacial transformada en una capa espacial interactiva.",
+"gallery.4.label":"04 / Escenario de misión",
+"gallery.4.title":"Ventana de observación",
+"gallery.4.text":"Comprender cuándo y dónde un satélite puede observar la Tierra.",
+"gallery.5.label":"05 / Aeroespacial 3D",
+"gallery.5.title":"Entorno digital de misión",
+"gallery.5.text":"Representación 3D interactiva de sistemas aeroespaciales complejos.",
+"archive.eyebrow":"05 / Archivo visual aeroespacial",
+"archive.title":"Más allá<br>de la órbita.",
+"archive.text":"Gemelos digitales, entornos de misión, modelos espaciales y sistemas aeroespaciales representados mediante 3D interactivo.",
+"archive.1.label":"01 / Sistemas terrestres",
+"archive.1.title":"Contexto planetario",
+"archive.2.label":"02 / Mecánica orbital",
+"archive.2.title":"Arquitectura de trayectoria",
+"archive.3.label":"03 / Computación espacial",
+"archive.3.title":"Datos como geometría",
+"archive.4.label":"04 / Gemelos digitales",
+"archive.4.title":"Sistemas en 3D",
+"archive.5.label":"05 / Entornos de misión",
+"archive.5.title":"Espacio operacional",
+"technology.eyebrow":"06 / Tecnología",
+"technology.title":"Una única capa de computación espacial.",
+"technology.1.title":"Simulación orbital",
+"technology.1.text":"Modela trayectorias de satélites, pasos orbitales, ventanas de observación y escenarios de misión.",
+"technology.2.title":"Observación de la Tierra",
+"technology.2.text":"Conecta las operaciones orbitales con datasets espaciales y temporales de observación de la Tierra.",
+"technology.3.title":"Aeroespacial 3D",
+"technology.3.text":"Convierte sistemas aeroespaciales complejos en entornos digitales y simulaciones interactivas.",
+"applications.eyebrow":"07 / Aplicaciones",
+"applications.title":"Diseñado para<br>el nuevo espacio.",
+"applications.1.label":"01 / OPERACIONES ESPACIALES",
+"applications.1.title":"Planificación de misiones",
+"applications.2.label":"02 / OBSERVACIÓN DE LA TIERRA",
+"applications.2.title":"Inteligencia de observación",
+"applications.3.label":"03 / CLIMA",
+"applications.3.title":"Análisis ambiental",
+"applications.4.label":"04 / INVESTIGACIÓN",
+"applications.4.title":"Simulación espacial",
+"final.eyebrow":"Virtuals Hubs",
+"final.title":"La próxima generación de sistemas espaciales será espacial.",
+"final.text":"Estamos construyendo la infraestructura para simularlos.",
+"final.cta":"Explorar Orbital Pass Engine",
+"aria.prevImage":"Imagen anterior",
+"aria.nextImage":"Imagen siguiente",
+"aria.prevVisual":"Visual anterior",
+"aria.nextVisual":"Visual siguiente"
+}
+};
+
+function setLanguage(lang){
+const dictionary=translations[lang]||translations.en;
+document.documentElement.lang=lang;
+document.querySelectorAll("[data-i18n]").forEach(el=>{
+const key=el.dataset.i18n;
+if(dictionary[key]!==undefined)el.innerHTML=dictionary[key];
+});
+document.querySelectorAll(".lang-btn").forEach(btn=>{
+btn.classList.toggle("active",btn.dataset.lang===lang);
+});
+document.getElementById("galleryPrev").setAttribute("aria-label",dictionary["aria.prevImage"]);
+document.getElementById("galleryNext").setAttribute("aria-label",dictionary["aria.nextImage"]);
+document.getElementById("collagePrev").setAttribute("aria-label",dictionary["aria.prevVisual"]);
+document.getElementById("collageNext").setAttribute("aria-label",dictionary["aria.nextVisual"]);
+localStorage.setItem("ope-language",lang);
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn=>{
+btn.addEventListener("click",()=>setLanguage(btn.dataset.lang));
+});
+
+const savedLanguage=localStorage.getItem("ope-language");
+setLanguage(savedLanguage==="es"?"es":"en");
+
 const revealObserver=new IntersectionObserver(entries=>{
 entries.forEach(entry=>{
 if(entry.isIntersecting){
@@ -613,3 +816,4 @@ restartCollage();
 
 </body>
 </html>
+
