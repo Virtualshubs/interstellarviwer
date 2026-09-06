@@ -98,6 +98,7 @@ section{position:relative}
 .observation-hex-label{position:absolute;left:20px;bottom:17px;z-index:5;font-size:6px;line-height:1;letter-spacing:.2em;color:rgba(255,255,255,.65)}
 .observation-hex-line{position:absolute;right:18px;top:18px;width:22px;height:22px;border-top:1px solid rgba(150,190,220,.5);border-right:1px solid rgba(150,190,220,.5);z-index:5}
 .observation-copy p{max-width:560px}
+.observation-hex{transform:translateX(0);will-change:transform}
 .data-flow{margin-top:100px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .flow-item{font-size:10px;letter-spacing:.15em;color:#9ca6b2;text-align:center;min-width:130px}
 .flow-item strong{display:block;color:#e9edf2;font-size:11px;margin-top:9px}
@@ -1412,6 +1413,27 @@ document.querySelector(".hero-copy").style.opacity="0";
 document.querySelector(".hero-copy").style.transform="translateY(28px)";
 document.querySelector(".hero-media").style.opacity="0";
 document.querySelector(".hero-media").style.transform="translateY(28px)";
+
+
+
+const observationHex=document.querySelector(".observation-hex");
+function updateObservationHex(){
+if(!observationHex)return;
+const section=document.querySelector("#observation");
+const rect=section.getBoundingClientRect();
+const vh=window.innerHeight;
+const start=vh*0.9;
+const end=vh*0.15;
+const progress=1-Math.max(0,Math.min(1,(rect.top-end)/(start-end)));
+const distance=window.innerWidth<560?70:180;
+const x=progress*distance;
+observationHex.style.transform=`translate3d(${x}px,0,0) rotate(${progress*3}deg)`;
+}
+
+window.addEventListener("scroll",updateObservationHex,{passive:true});
+window.addEventListener("resize",updateObservationHex);
+updateObservationHex();   
+   
 </script>
 </body>
 </html>
