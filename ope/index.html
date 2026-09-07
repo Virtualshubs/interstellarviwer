@@ -1565,30 +1565,30 @@ const archiveSection=document.querySelector("#archiveSection");
 function updateOrbitalHex(){
 if(!orbitalHex||!archiveSection)return;
 
-const sectionTop=archiveSection.offsetTop;
-const sectionHeight=archiveSection.offsetHeight;
-const scrollY=window.scrollY;
-
+const rect=archiveSection.getBoundingClientRect();
+const vh=window.innerHeight;
+const vw=window.innerWidth;
 const hex=orbitalHex.querySelector(".observation-hex");
 const hexWidth=hex?hex.offsetWidth:180;
 
-/* El recorrido ocupa solo la parte final de DATA OBSERVATION */
-const startScroll=sectionTop+(sectionHeight*0.68);
-const endScroll=sectionTop+(sectionHeight*0.98);
+/* El movimiento empieza cuando el objeto entra por la parte inferior */
+const start=vh*0.95;
 
-let progress=(scrollY-startScroll)/(endScroll-startScroll);
+/* Termina cuando ya ha salido por la derecha */
+const end=-vh*0.15;
+
+const totalDistance=start-end;
+
+let progress=(start-rect.bottom)/totalDistance;
 progress=Math.max(0,Math.min(1,progress));
 
-/* Comienza completamente fuera por la izquierda */
-const startX=-hexWidth-60;
+/* De izquierda a derecha recorriendo TODO el viewport */
+const startX=-hexWidth-40;
+const endX=vw+hexWidth+40;
 
-/* Termina completamente fuera por la derecha */
-const endX=window.innerWidth+60;
-
-/* Recorrido completo del viewport */
 const x=startX+(progress*(endX-startX));
 
-/* Giro proporcional al recorrido */
+/* Rotación proporcional al recorrido */
 const radius=90;
 const travelled=x-startX;
 const rotation=(travelled/radius)*(180/Math.PI);
@@ -1600,7 +1600,7 @@ orbitalHex.style.transform=
 window.addEventListener("scroll",updateOrbitalHex,{passive:true});
 window.addEventListener("resize",updateOrbitalHex);
 updateOrbitalHex();
-
+   
 </script>
 </body>
 </html>
