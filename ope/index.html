@@ -108,6 +108,13 @@ background:#0a0e15;
 overflow:hidden;
 will-change:transform;
 }
+   .orbital-hex{
+position:absolute;
+left:0;
+top:50%;
+z-index:2;
+pointer-events:none;
+}
 .data-flow{margin-top:100px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .flow-item{font-size:10px;letter-spacing:.15em;color:#9ca6b2;text-align:center;min-width:130px}
 .flow-item strong{display:block;color:#e9edf2;font-size:11px;margin-top:9px}
@@ -768,6 +775,14 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </div>
 </section>
+
+
+   <div class="orbital-hex" id="orbitalHex">
+<div class="observation-hex">
+<img src="https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG" alt="Earth observation">
+<div class="observation-hex-line"></div>
+</div>
+</div>
 
 <section class="engine" id="engine">
 <div class="container">
@@ -1453,6 +1468,31 @@ observationHex.style.transform=
 window.addEventListener("scroll",updateObservationHex,{passive:true});
 window.addEventListener("resize",updateObservationHex);
 updateObservationHex();
+
+
+const orbitalHex=document.querySelector("#orbitalHex");
+const orbitalSection=document.querySelector("#orbitalSection");
+function updateOrbitalHex(){
+if(!orbitalHex||!orbitalSection)return;
+const rect=orbitalSection.getBoundingClientRect();
+const vh=window.innerHeight;
+const sectionHeight=orbitalSection.offsetHeight;
+const start=vh*0.25;
+const end=-(sectionHeight-vh*0.8);
+let progress=(start-rect.top)/(start-end);
+progress=Math.max(0,Math.min(1,progress));
+const screenDistance=window.innerWidth<560
+?window.innerWidth*1.4
+:window.innerWidth*1.8;
+const x=-window.innerWidth+(progress*screenDistance);
+const radius=90;
+const rotation=(x/radius)*(180/Math.PI);
+orbitalHex.style.transform=
+`translate3d(${x}px,0,0) rotate(${rotation}deg)`;
+}
+window.addEventListener("scroll",updateOrbitalHex,{passive:true});
+window.addEventListener("resize",updateOrbitalHex);
+updateOrbitalHex();
    
 </script>
 </body>
