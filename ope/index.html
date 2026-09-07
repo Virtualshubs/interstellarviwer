@@ -96,7 +96,7 @@ section{position:relative}
 .observation-hex:after{content:"";position:absolute;inset:7px;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);border:1px solid rgba(255,255,255,.16);z-index:3;pointer-events:none}
 .observation-hex img{width:100%;height:100%;display:block;object-fit:cover}
 .observation-hex-label{position:absolute;left:20px;bottom:17px;z-index:5;font-size:6px;line-height:1;letter-spacing:.2em;color:rgba(255,255,255,.65)}
-.observation-hex-line{position:absolute;right:18px;top:18px;width:22px;height:22px;border-top:1px solid rgba(150,190,220,.5);border-right:1px solid rgba(150,190,220,.5);z-index:5}
+.observation-hex-line{position:absolute;right:18px;top:18px;width:22px;height:22px;border-top:1px solid rgba(150,190,220,.5);border-right:1px solid rgba(150,190,220,.5)}
 .observation-copy p{max-width:560px}
 .observation-hex{
 width:180px;
@@ -108,12 +108,32 @@ background:#0a0e15;
 overflow:hidden;
 will-change:transform;
 }
-   .orbital-hex{
+
+/* SECOND HEXAGON / FULL WIDTH SCROLL LAYER */
+.archive{padding:150px 0}
+.archive{overflow:visible}
+.orbital-hex-layer{
 position:absolute;
 left:0;
-top:50%;
+top:0;
+width:100%;
+height:100%;
+z-index:6;
+pointer-events:none;
+overflow:visible;
+}
+.orbital-hex{
+position:absolute;
+left:0;
+top:78%;
+width:180px;
+height:208px;
 z-index:2;
 pointer-events:none;
+will-change:transform;
+}
+.orbital-hex .observation-hex{
+margin:0;
 }
 .data-flow{margin-top:100px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .flow-item{font-size:10px;letter-spacing:.15em;color:#9ca6b2;text-align:center;min-width:130px}
@@ -199,7 +219,7 @@ pointer-events:none;
 .dot.active{background:#9abce0}
 
 /* ARCHIVE */
-.archive{padding:150px 0}
+.archive{padding:150px 0;overflow:visible}
 .archive-head{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;margin-bottom:70px}
 .archive-head p{color:#7f8997;line-height:1.7;max-width:550px}
 .collage-viewport{overflow:hidden}
@@ -523,6 +543,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 .location-photo{min-height:300px}
 .location-bottom{left:32px;right:32px}
 .location-note{max-width:none}
+.orbital-hex{width:180px;height:208px;top:78%}
 }
 
 @media(max-width:560px){
@@ -602,6 +623,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 .location-mark:before{width:31px;height:31px}
 .location-mark:after{width:12px;height:12px}
 .observation-hex{width:145px;height:168px;margin-bottom:25px}
+.orbital-hex{width:145px;height:168px;top:80%}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -611,6 +633,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </style>
 </head>
 <body>
+
 <nav class="nav">
 <div class="nav-inner">
 <a href="#home" class="logo">OPE / ORBITAL PASS ENGINE<span>By VIRTUALSHUBS</span></a>
@@ -626,6 +649,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </nav>
 
 <main>
+
 <section class="hero" id="home">
 <div class="hero-grid"></div>
 <div class="hero-inner">
@@ -681,8 +705,6 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </section>
 
-
-
 <section class="gallery">
 <div class="container">
 <div class="gallery-head">
@@ -701,8 +723,6 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <div class="dots" id="galleryDots"></div>
 </div>
 </section>
-
-   
 
 <section class="observation" id="observation">
 <div class="container">
@@ -735,12 +755,23 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 
 <div class="observation-foot reveal">
 <p data-en="The objective is not only to access the data, but to understand its spatial and temporal relationship with the system observing it." data-es="El objetivo no es solo acceder al dato, sino comprender su relación espacial y temporal con el sistema que lo observa.">The objective is not only to access the data, but to understand its spatial and temporal relationship with the system observing it.</p>
-</div>   
+</div>
 </div>
 </section>
 
+<section class="archive" id="archiveSection">
 
-<section class="archive">
+<!-- SECOND HEXAGON: FULL WIDTH / SCROLL CONTROLLED -->
+<div class="orbital-hex-layer">
+<div class="orbital-hex" id="orbitalHex">
+<div class="observation-hex">
+<img src="https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG" alt="Earth observation">
+<div class="observation-hex-label">OBS / 004</div>
+<div class="observation-hex-line"></div>
+</div>
+</div>
+</div>
+
 <div class="container">
 <div class="archive-head">
 <div class="reveal">
@@ -750,22 +781,11 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <p class="reveal" data-en="Digital twins, aerospace systems, mission environments and spatial models built inside the same visual computing layer." data-es="Gemelos digitales, sistemas aeroespaciales, entornos de misión y modelos espaciales construidos dentro de la misma capa de computación visual.">Digital twins, aerospace systems, mission environments and spatial models built inside the same visual computing layer.</p>
 </div>
 
-<div class="observation-copy reveal">   
-<div class="orbital-hex" id="orbitalHex">
-<div class="observation-hex">
-<img src="https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG" alt="Earth observation">
-<div class="observation-hex-line"></div>
-</div>
-</div> 
-</div> 
-   
 <div class="collage-viewport reveal">
 <div class="collage" id="collage"></div>
-</div> 
-</div>   
+</div>
+</div>
 </section>
-
-   
 
 <section class="passes">
 <div class="container">
@@ -776,6 +796,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 <p class="reveal" data-en="OPE monitors orbital passes and observation windows, connecting satellite trajectories with the regions and moments they can observe." data-es="OPE monitoriza pasos orbitales y ventanas de observación, conectando trayectorias de satélites con las regiones y momentos que pueden observar.">OPE monitors orbital passes and observation windows, connecting satellite trajectories with the regions and moments they can observe.</p>
 </div>
+
 <div class="timeline reveal" id="timeline">
 <div class="timeline-axis"></div>
 <div class="pass p1"><div class="pass-line"></div><div class="pass-dot"></div><div class="pass-label">PASS / 01</div></div>
@@ -785,8 +806,6 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </div>
 </section>
-
-
 
 <section class="engine" id="engine">
 <div class="container">
@@ -849,9 +868,6 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </section>
 
-
-
-
 <section class="video">
 <div class="container">
 <div class="video-wrap reveal">
@@ -863,8 +879,6 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </section>
 
-
-   
 <section class="stack">
 <div class="container">
 <div class="stack-head reveal">
@@ -967,7 +981,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <span data-en="Let's talk about what you're building." data-es="Hablemos de lo que estás construyendo.">Let's talk about what you're building.</span>
 </div>
 <a href="mailto:info@VirtualsHubs.com?subject=OPE%20%E2%80%94%20Orbital%20Pass%20Engine&body=Hello%2C%0A%0AI%20would%20like%20to%20receive%20more%20information%20about%20Orbital%20Pass%20Engine%20(OPE)%20and%20explore%20its%20capabilities%20for%20our%20project.%0A%0ABest%20regards%2C" class="cta" data-en="Start a conversation" data-es="Iniciar conversación">Start a conversation</a>
-</div>   
+</div>
 </div>
 </section>
 
@@ -1042,9 +1056,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 <span data-en="Let's talk about what you're building." data-es="Hablemos de lo que estás construyendo.">Let's talk about what you're building.</span>
 </div>
 <a class="nav-cta" href="mailto:info@VirtualsHubs.com?subject=Solicitud%20de%20reunión%20OPE&body=Hola%2C%0A%0AMe%20gustaría%20agendar%20una%20reunión%20para%20conocer%20OPE.%0A%0APrefiero%20una%20reunión%20online%20%2F%20presencial.%0A%0AUn%20saludo.">Agendar reunión</a>
-</div>   
-
-   
+</div>
 </div>
 </section>
 
@@ -1058,6 +1070,7 @@ html[data-theme="light"] .human .reveal.in .typewriter{animation:typeName 1.6s s
 </div>
 </div>
 </section>
+
 </main>
 
 <footer class="footer">
@@ -1090,7 +1103,7 @@ const OPE_IMAGES=[
 "https://3d.staratlas.es/ope/openasa.png",
 "https://3d.staratlas.es/ope/opeluna.png",
 "https://3d.staratlas.es/ope/opetwin.png",
-"https://3d.staratlas.es/ope/datamodel.png"  
+"https://3d.staratlas.es/ope/datamodel.png"
 ];
 
 const THREE_D_IMAGES=[
@@ -1163,6 +1176,7 @@ $("#enBtn").classList.toggle("active",lang==="en");
 $("#esBtn").classList.toggle("active",lang==="es");
 try{localStorage.setItem("ope-lang",lang)}catch(e){}
 }
+
 $("#enBtn").onclick=()=>setLanguage("en");
 $("#esBtn").onclick=()=>setLanguage("es");
 try{if(localStorage.getItem("ope-lang")==="es")setLanguage("es")}catch(e){}
@@ -1189,6 +1203,7 @@ try{localStorage.setItem("ope-theme",theme)}catch(e){}
 
 const initialTheme=document.documentElement.dataset.theme||"dark";
 setTheme(initialTheme,false);
+
 themeBtn.onclick=()=>{
 const current=document.documentElement.dataset.theme==="light"?"light":"dark";
 setTheme(current==="light"?"dark":"light");
@@ -1209,6 +1224,7 @@ observer.observe(el);
 });
 
 const timeline=$("#timeline");
+
 const timelineObserver=new IntersectionObserver(entries=>{
 entries.forEach(entry=>{
 if(entry.isIntersecting){
@@ -1217,11 +1233,13 @@ timelineObserver.disconnect();
 }
 });
 },{threshold:.3});
+
 timelineObserver.observe(timeline);
 
 function createCarousel(root,track,prev,next,dots,interval){
 const slides=[...track.children];
 let index=0,timer=null,dragging=false,startX=0,currentX=0,startOffset=0,moved=false;
+
 slides.forEach((_,i)=>{
 const dot=document.createElement("button");
 dot.className="dot"+(i===0?" active":"");
@@ -1229,35 +1247,65 @@ dot.setAttribute("aria-label",`Slide ${i+1}`);
 dot.onclick=()=>go(i);
 dots.appendChild(dot);
 });
-function gap(){return parseFloat(getComputedStyle(track).gap)||0}
-function slideWidth(){return root.clientWidth+gap()}
+
+function gap(){
+return parseFloat(getComputedStyle(track).gap)||0
+}
+
+function slideWidth(){
+return root.clientWidth+gap()
+}
+
 function update(animate=true,offsetOverride=null){
 track.style.transition=animate?"transform .7s cubic-bezier(.22,.61,.36,1)":"none";
 const offset=offsetOverride!==null?offsetOverride:index*slideWidth();
 track.style.transform=`translate3d(${-offset}px,0,0)`;
 [...dots.children].forEach((d,i)=>d.classList.toggle("active",i===index));
 }
-function go(i){index=Math.max(0,Math.min(slides.length-1,i));update(true)}
+
+function go(i){
+index=Math.max(0,Math.min(slides.length-1,i));
+update(true)
+}
+
 function nextSlide(){
 if(index>=slides.length-1){
 index=0;
 update(false);
 requestAnimationFrame(()=>requestAnimationFrame(()=>update(true)));
-}else go(index+1);
+}else{
+go(index+1);
 }
+}
+
 function prevSlide(){
 if(index<=0){
 index=slides.length-1;
 update(false);
 requestAnimationFrame(()=>requestAnimationFrame(()=>update(true)));
-}else go(index-1);
+}else{
+go(index-1);
 }
+}
+
 prev.onclick=prevSlide;
 next.onclick=nextSlide;
-function pause(){if(timer){clearInterval(timer);timer=null}}
-function resume(){pause();if(interval)timer=setInterval(nextSlide,interval)}
+
+function pause(){
+if(timer){
+clearInterval(timer);
+timer=null;
+}
+}
+
+function resume(){
+pause();
+if(interval)timer=setInterval(nextSlide,interval);
+}
+
 root.addEventListener("mouseenter",pause);
 root.addEventListener("mouseleave",resume);
+
 root.addEventListener("pointerdown",e=>{
 dragging=true;
 moved=false;
@@ -1268,6 +1316,7 @@ track.style.transition="none";
 root.setPointerCapture?.(e.pointerId);
 pause();
 });
+
 root.addEventListener("pointermove",e=>{
 if(!dragging)return;
 currentX=e.clientX;
@@ -1278,36 +1327,56 @@ const max=(slides.length-1)*slideWidth();
 offset=Math.max(0,Math.min(max,offset));
 update(false,offset);
 });
+
 root.addEventListener("pointerup",()=>{
 if(!dragging)return;
 dragging=false;
 const dx=currentX-startX;
-if(Math.abs(dx)>60)dx<0?nextSlide():prevSlide();else update(true);
+if(Math.abs(dx)>60)dx<0?nextSlide():prevSlide();
+else update(true);
 resume();
 });
+
 root.addEventListener("pointercancel",()=>{
 dragging=false;
 update(true);
 resume();
 });
+
 root.addEventListener("click",e=>{
 if(moved){
 e.preventDefault();
 e.stopPropagation();
 }
 },true);
+
 window.addEventListener("resize",()=>update(false));
 resume();
 }
 
 const galleryRoot=$("#galleryCarousel");
 const galleryTrack=$("#galleryTrack");
-createCarousel(galleryRoot,galleryTrack,$("#galleryPrev"),$("#galleryNext"),$("#galleryDots"),5000);
+
+createCarousel(
+galleryRoot,
+galleryTrack,
+$("#galleryPrev"),
+$("#galleryNext"),
+$("#galleryDots"),
+5000
+);
 
 const collageViewport=document.querySelector(".collage-viewport");
 const collage=$("#collage");
 const cards=[...collage.children];
-let collageIndex=0,collageTimer=null,collageDragging=false,collageStartX=0,collageCurrentX=0,collageStartOffset=0,collageMoved=false;
+
+let collageIndex=0;
+let collageTimer=null;
+let collageDragging=false;
+let collageStartX=0;
+let collageCurrentX=0;
+let collageStartOffset=0;
+let collageMoved=false;
 
 function collageGap(){
 return parseFloat(getComputedStyle(collage).gap)||20
@@ -1389,7 +1458,8 @@ if(!collageDragging)return;
 collageDragging=false;
 collage.classList.remove("dragging");
 const dx=collageCurrentX-collageStartX;
-if(Math.abs(dx)>70)dx<0?nextCollage():prevCollage();else updateCollage(true);
+if(Math.abs(dx)>70)dx<0?nextCollage():prevCollage();
+else updateCollage(true);
 resumeCollage();
 });
 
@@ -1429,6 +1499,7 @@ target.scrollIntoView({behavior:"smooth",block:"start"});
 
 window.addEventListener("load",()=>{
 document.body.classList.add("loaded");
+
 setTimeout(()=>{
 document.querySelectorAll(".hero-copy,.hero-media").forEach((el,i)=>{
 el.style.opacity="1";
@@ -1444,60 +1515,92 @@ document.querySelector(".hero-media").style.opacity="0";
 document.querySelector(".hero-media").style.transform="translateY(28px)";
 
 
+/* =========================
+   HEXAGON / EARTH OBSERVATION
+========================= */
 
 const observationHex=document.querySelector(".observation-hex");
 const observationSection=document.querySelector("#observation");
+
 function updateObservationHex(){
 if(!observationHex||!observationSection)return;
+
 const rect=observationSection.getBoundingClientRect();
 const vh=window.innerHeight;
 const sectionHeight=observationSection.offsetHeight;
-/* El movimiento empieza cuando la sección entra en el viewport */
+
 const start=vh*0.85;
-/* Y termina cuando estamos bastante avanzados dentro de la sección */
 const end=-(sectionHeight-vh*0.35);
+
 let progress=(start-rect.top)/(start-end);
 progress=Math.max(0,Math.min(1,progress));
-/* Mucho más lento */
+
 const screenDistance=window.innerWidth<560
 ?window.innerWidth*0.75
 :window.innerWidth*0.95;
+
 const x=progress*screenDistance;
-/* Rotación proporcional al recorrido */
+
 const radius=90;
 const rotation=(x/radius)*(180/Math.PI);
+
 observationHex.style.transform=
 `translate3d(${x}px,0,0) rotate(${rotation}deg)`;
 }
+
 window.addEventListener("scroll",updateObservationHex,{passive:true});
 window.addEventListener("resize",updateObservationHex);
 updateObservationHex();
 
 
+/* =========================
+   SECOND HEXAGON
+   LEFT → RIGHT
+   ONLY AT END OF ARCHIVE
+========================= */
+
 const orbitalHex=document.querySelector("#orbitalHex");
-const orbitalSection=document.querySelector("#orbitalSection");
+const archiveSection=document.querySelector("#archiveSection");
+
 function updateOrbitalHex(){
-if(!orbitalHex||!orbitalSection)return;
-const rect=orbitalSection.getBoundingClientRect();
-const vh=window.innerHeight;
-const sectionHeight=orbitalSection.offsetHeight;
-const start=vh*0.25;
-const end=-(sectionHeight-vh*0.8);
-let progress=(start-rect.top)/(start-end);
+if(!orbitalHex||!archiveSection)return;
+
+const sectionTop=archiveSection.offsetTop;
+const sectionHeight=archiveSection.offsetHeight;
+const scrollY=window.scrollY;
+
+const hex=orbitalHex.querySelector(".observation-hex");
+const hexWidth=hex?hex.offsetWidth:180;
+
+/* El recorrido ocupa solo la parte final de DATA OBSERVATION */
+const startScroll=sectionTop+(sectionHeight*0.68);
+const endScroll=sectionTop+(sectionHeight*0.98);
+
+let progress=(scrollY-startScroll)/(endScroll-startScroll);
 progress=Math.max(0,Math.min(1,progress));
-const screenDistance=window.innerWidth<560
-?window.innerWidth*1.4
-:window.innerWidth*1.8;
-const x=-window.innerWidth+(progress*screenDistance);
+
+/* Comienza completamente fuera por la izquierda */
+const startX=-hexWidth-60;
+
+/* Termina completamente fuera por la derecha */
+const endX=window.innerWidth+60;
+
+/* Recorrido completo del viewport */
+const x=startX+(progress*(endX-startX));
+
+/* Giro proporcional al recorrido */
 const radius=90;
-const rotation=(x/radius)*(180/Math.PI);
+const travelled=x-startX;
+const rotation=(travelled/radius)*(180/Math.PI);
+
 orbitalHex.style.transform=
 `translate3d(${x}px,0,0) rotate(${rotation}deg)`;
 }
+
 window.addEventListener("scroll",updateOrbitalHex,{passive:true});
 window.addEventListener("resize",updateOrbitalHex);
 updateOrbitalHex();
-   
+
 </script>
 </body>
 </html>
