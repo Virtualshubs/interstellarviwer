@@ -78,8 +78,8 @@ section{position:relative}
 
 /* DIGITAL TWIN PHOTO */
 .digital-visual{height:600px;position:relative;display:flex;align-items:center;justify-content:center}
-.digital-photo{width:min(100%,520px);height:390px;position:relative;overflow:hidden;background:#080d14;border:1px solid rgba(255,255,255,.13);box-shadow:0 24px 65px rgba(0,0,0,.22)}
-.digital-photo img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+.digital-photo{width:min(100%,520px);height:auto;aspect-ratio:16/9;position:relative;overflow:hidden;background:#080d14;border:1px solid rgba(255,255,255,.13);box-shadow:0 24px 65px rgba(0,0,0,.22)}
+.digital-photo img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain}
 .digital-photo:before{content:"";position:absolute;inset:14px;border:1px solid rgba(255,255,255,.07);z-index:2;pointer-events:none}
 .digital-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,12,22,.08),transparent 45%,rgba(5,7,11,.3));z-index:1;pointer-events:none}
 .digital-photo-corner{position:absolute;width:18px;height:18px;border-color:rgba(126,174,220,.58);z-index:4}
@@ -89,6 +89,7 @@ section{position:relative}
 .digital-photo-corner.br{right:9px;bottom:9px;border-right:1px solid;border-bottom:1px solid}
 .digital-photo-label{position:absolute;left:22px;bottom:20px;z-index:5;font-size:7px;letter-spacing:.2em;color:rgba(255,255,255,.62)}
 .digital-photo-code{position:absolute;right:22px;top:20px;z-index:5;font-size:7px;letter-spacing:.16em;color:rgba(255,255,255,.4)}
+   
 
 .observation{padding:150px 0;border-top:1px solid var(--line)}
 .observation-head{display:grid;grid-template-columns:1fr 1.4fr;gap:80px;align-items:end}
