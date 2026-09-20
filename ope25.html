@@ -1482,24 +1482,27 @@ font-weight:600;
 }
 #stacURLRow{
 display:flex;
+flex-direction:column;
 gap:10px;
 width:100%;
 }
 #stacURL{
-flex:1;
-min-width:0;
+width:100%;
 height:42px;
 padding:0 13px;
 border:1px solid #cfcfcf;
 border-radius:7px;
 font-size:14px;
 outline:none;
+background:#fff;
+color:#111;
 }
 #stacURL:focus{
 border-color:#777;
 }
 #stacLoad,
 #stacOpen{
+width:100%;
 height:42px;
 padding:0 18px;
 border:0;
@@ -1525,9 +1528,11 @@ display:grid;
 grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
 gap:12px;
 margin-top:18px;
+width:100%;
 }
 .stacField{
 min-width:0;
+width:100%;
 }
 .stacField label{
 display:block;
@@ -1554,14 +1559,25 @@ border-color:#777;
 }
 #stacActions{
 margin-top:16px;
+width:100%;
 }
 #stacOpen:disabled{
 opacity:.35;
 cursor:not-allowed;
 }
+#stacStructureTitle{
+margin-top:20px;
+margin-bottom:7px;
+font-size:11px;
+font-weight:600;
+text-transform:uppercase;
+letter-spacing:.04em;
+color:#777;
+}
 #stacStructure{
-margin:20px 0 0;
+margin:0;
 padding:15px;
+width:100%;
 max-height:360px;
 overflow:auto;
 background:#f5f5f5;
@@ -1573,21 +1589,16 @@ line-height:1.55;
 white-space:pre-wrap;
 word-break:break-word;
 }
-#stacStructureTitle{
-margin-top:20px;
-margin-bottom:7px;
-font-size:11px;
-font-weight:600;
-text-transform:uppercase;
-letter-spacing:.04em;
-color:#777;
-}
 @media(max-width:650px){
-#stacURLRow{
-flex-direction:column;
+#stacExplorerTest{
+margin:15px auto;
+padding:18px;
 }
-#stacLoad{
-width:100%;
+#stacURLRow{
+gap:10px;
+}
+#stacMenu{
+grid-template-columns:1fr;
 }
 }
 
@@ -1694,46 +1705,32 @@ width:100%;
   
 <div id="earthLayersPanel">
 
-   <div id="stacExplorerTest">
 
-<h3>STAC Explorer Test</h3>
+
+  
+
+<div id="stacExplorerTest">
+<h3>STAC Explorer</h3>
 
 <div id="stacURLRow">
-
-<input
-id="stacURL"
-type="url"
-placeholder="https://example.com/stac/"
-autocomplete="off"
->
-
-<button id="stacLoad">
-Load STAC
-</button>
-
+<input id="stacURL" type="url" placeholder="https://example.com/stac/" autocomplete="off">
+<button id="stacLoad">Load STAC</button>
 </div>
 
-<div id="stacStatus">
-Enter a public STAC catalog URL.
-</div>
+<div id="stacStatus">Enter a public STAC catalog URL.</div>
 
 <div id="stacMenu"></div>
 
 <div id="stacActions">
-
-<button id="stacOpen" disabled>
-Open selected resource
-</button>
-
+<button id="stacOpen" disabled>Open selected resource</button>
 </div>
 
-<div id="stacStructureTitle">
-Detected STAC structure
-</div>
-
+<div id="stacStructureTitle">Detected STAC structure</div>
 <pre id="stacStructure">Waiting for STAC...</pre>
-
 </div>
+
+
+  
 
 
     <div id="earthLayers"></div>
@@ -8178,7 +8175,8 @@ const catalogs=[
 ];
 
 function createCatalogSelector(){
-    if(document.getElementById("stacCatalogSelect"))return;
+    const container=document.getElementById("contcatalogstac");
+    if(!container||document.getElementById("stacCatalogSelect"))return;
 
     const wrapper=document.createElement("div");
     wrapper.className="stacField";
@@ -8200,12 +8198,14 @@ function createCatalogSelector(){
             group=catalog.group;
             const optgroup=document.createElement("optgroup");
             optgroup.label=group;
+
             catalogs.filter(item=>item.group===group).forEach(item=>{
                 const option=document.createElement("option");
                 option.value=item.url;
                 option.textContent=item.name;
                 optgroup.appendChild(option);
             });
+
             select.appendChild(optgroup);
         }
     });
@@ -8214,7 +8214,8 @@ function createCatalogSelector(){
         if(select.value)urlInput.value=select.value;
     };
 
-    menu.parentNode.insertBefore(wrapper,menu);
+    wrapper.append(label,select);
+    container.appendChild(wrapper);
 }
 
 function ensurePreviewBox(){
@@ -8345,18 +8346,21 @@ async function exploreNode(node,base){
     }
 
     const searchLink=findLinks(node,["search"])[0];
+
     if(searchLink){
         await loadItemsURL(resolveURL(base,searchLink.href),"Items");
         return;
     }
 
     const itemsLink=findLink(node,"items");
+
     if(itemsLink){
         await loadItemsURL(resolveURL(base,itemsLink.href),"Items");
         return;
     }
 
     const childLink=findLink(node,"child");
+
     if(childLink){
         await loadChildCatalog(resolveURL(base,childLink.href));
         return;
@@ -8383,6 +8387,7 @@ async function loadCollection(collection){
         }
 
         const searchLink=findLinks(node,["search"])[0];
+
         if(searchLink){
             await loadItemsURL(resolveURL(collection.href,searchLink.href),"Items");
             return;
@@ -8557,8 +8562,9 @@ function renderItemInfo(item){
 
 function findThumbnail(item,assets){
     const direct=findLink(item,"thumbnail");
+
     if(direct?.href){
-        return {
+        return{
             id:"thumbnail",
             title:"Thumbnail",
             href:resolveURL(rootURL,direct.href),
@@ -8653,6 +8659,7 @@ function parsePVL(text){
 
     text.split(/\r?\n/).forEach(line=>{
         line=line.trim();
+
         if(!line||line==="End")return;
 
         const objectMatch=line.match(/^Object\s*=\s*(.+)$/i);
@@ -8674,6 +8681,7 @@ function parsePVL(text){
         }
 
         const match=line.match(/^([^=]+?)\s*=\s*(.*)$/);
+
         if(!match)return;
 
         const key=match[1].trim();
@@ -8694,7 +8702,7 @@ function parsePVL(text){
 function addDataRow(container,label,value){
     const row=document.createElement("div");
     row.style.display="grid";
-    row.style.gridTemplateColumns="minmax(130px,0.7fr) minmax(0,1.3fr)";
+    row.style.gridTemplateColumns="minmax(130px,.7fr) minmax(0,1.3fr)";
     row.style.gap="8px";
     row.style.padding="3px 0";
     row.style.borderBottom="1px solid rgba(128,128,128,.15)";
@@ -8728,11 +8736,11 @@ function renderISISLabel(asset,text){
     try{
         const data=parsePVL(text);
         const rows=flattenPVL(data);
-
         const table=document.createElement("div");
-        rows.forEach(([key,value])=>addDataRow(table,key,value));
-        section.appendChild(table);
 
+        rows.forEach(([key,value])=>addDataRow(table,key,value));
+
+        section.appendChild(table);
         section.appendChild(createRawToggle("View raw ISIS Label",text));
     }catch(error){
         section.appendChild(createRawToggle("View ISIS Label",text));
@@ -8743,7 +8751,6 @@ function renderISISLabel(asset,text){
 
 function parseProvenance(text){
     const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
-    const commands=lines.filter(line=>!line.startsWith("{")&&!line.startsWith('"')&&!line.startsWith("}"));
 
     const result={
         source:null,
@@ -8751,6 +8758,7 @@ function parseProvenance(text){
     };
 
     const processing=lines.find(line=>/^Processing file:/i.test(line));
+
     if(processing)result.source=processing.replace(/^Processing file:\s*/i,"").trim();
 
     lines.forEach(line=>{
@@ -8762,7 +8770,6 @@ function parseProvenance(text){
 
 function renderProvenance(asset,text){
     const section=createSection("Provenance");
-
     const data=parseProvenance(text);
 
     if(data.source)addDataRow(section,"Source",data.source);
@@ -8790,6 +8797,7 @@ function renderProvenance(asset,text){
 async function renderJSONAsset(asset,section){
     try{
         const response=await fetch(resolveURL(rootURL,asset.href));
+
         if(!response.ok)throw new Error("HTTP "+response.status);
 
         const data=await response.json();
@@ -8846,17 +8854,22 @@ async function renderObservation(item,assets){
     previewBox.style.display="block";
 
     const intro=createSection("Observation");
+
     addDataRow(intro,"ID",item.id||"");
     addDataRow(intro,"Datetime",item.properties?.datetime||"");
     addDataRow(intro,"Collection",item.collection||"");
+
     if(item.properties?.platform)addDataRow(intro,"Platform",item.properties.platform);
     if(item.properties?.instrument)addDataRow(intro,"Instrument",item.properties.instrument);
+
     previewBox.appendChild(intro);
 
     const thumbnail=findThumbnail(item,assets);
+
     if(thumbnail){
         const imageSection=createSection("Image");
         const image=document.createElement("img");
+
         image.src=resolveURL(rootURL,thumbnail.href);
         image.alt=thumbnail.title||"STAC image";
         image.loading="lazy";
@@ -8881,6 +8894,7 @@ async function renderObservation(item,assets){
         if(isISISLabel(asset)){
             try{
                 const response=await fetch(resolveURL(rootURL,asset.href));
+
                 if(response.ok)renderISISLabel(asset,await response.text());
                 else{
                     const section=createSection(asset.title||asset.id);
@@ -8894,12 +8908,14 @@ async function renderObservation(item,assets){
                 await renderGenericAsset(asset,section);
                 previewBox.appendChild(section);
             }
+
             continue;
         }
 
         if(isProvenance(asset)){
             try{
                 const response=await fetch(resolveURL(rootURL,asset.href));
+
                 if(response.ok)renderProvenance(asset,await response.text());
                 else{
                     const section=createSection(asset.title||asset.id);
@@ -8913,11 +8929,13 @@ async function renderObservation(item,assets){
                 await renderGenericAsset(asset,section);
                 previewBox.appendChild(section);
             }
+
             continue;
         }
 
         if(type==="json"){
             const section=createSection(asset.title||asset.id);
+
             addDataRow(section,"Type","JSON");
             await renderJSONAsset(asset,section);
 
@@ -8928,8 +8946,8 @@ async function renderObservation(item,assets){
             link.textContent="Open JSON";
             link.style.display="inline-block";
             link.style.marginTop="6px";
-            section.appendChild(link);
 
+            section.appendChild(link);
             previewBox.appendChild(section);
             continue;
         }
@@ -8937,6 +8955,7 @@ async function renderObservation(item,assets){
         if(type==="image"){
             const section=createSection(asset.title||asset.id);
             const image=document.createElement("img");
+
             image.src=resolveURL(rootURL,asset.href);
             image.alt=asset.title||asset.id;
             image.loading="lazy";
@@ -8944,15 +8963,19 @@ async function renderObservation(item,assets){
             image.style.maxWidth="100%";
             image.style.maxHeight="500px";
             image.style.objectFit="contain";
+
             section.appendChild(image);
             previewBox.appendChild(section);
             continue;
         }
 
         const section=createSection(asset.title||asset.id);
+
         addDataRow(section,"Type",asset.type||type);
+
         if(asset.roles?.length)addDataRow(section,"Roles",asset.roles.join(", "));
         if(asset.description)addDataRow(section,"Description",asset.description);
+
         await renderGenericAsset(asset,section);
         previewBox.appendChild(section);
     }
@@ -9044,13 +9067,11 @@ loadButton.onclick=loadSTAC;
 openButton.onclick=openSelectedResource;
 
 urlInput.addEventListener("keydown",event=>{
-    if(event.key==="Enter")loadSTAC;
+    if(event.key==="Enter")loadSTAC();
 });
 
 })();
 </script>
-
-
 
   
 </body>
