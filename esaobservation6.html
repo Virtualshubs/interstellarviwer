@@ -5052,8 +5052,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-
-
 let vectorQuadkey=null;
 let vectorScene=null;
 let vectorCamera=null;
@@ -5331,7 +5329,7 @@ function vectorGetAssetURL(){
     return vectorGetItemDataAsset()?.href||null;
 }
 
-async function vectorGetParquetURL(){
+async function vectorGetParquetInfo(){
     const asset=vectorGetItemDataAsset();
     const assetURL=asset?.href;
 
@@ -5339,7 +5337,12 @@ async function vectorGetParquetURL(){
         throw new Error("El Item no contiene assets.data.href.");
 
     if(!assetURL.startsWith("abfs://"))
-        return assetURL;
+        return{
+            files:[assetURL],
+            prefix:null,
+            storageAccount:null,
+            container:null
+        };
 
     const storageAccount=
         asset["table:storage_options"]?.account_name||
@@ -5356,15 +5359,13 @@ async function vectorGetParquetURL(){
         throw new Error("La ruta ABFS del GeoParquet no es válida.");
 
     const container=path.slice(0,slash);
-    const blobPath=path.slice(slash+1);
+    const prefix=path.slice(slash+1).replace(/\/$/,"");
 
-    const blobURL=
+    const containerURL=
         "https://"+
         storageAccount+
         ".blob.core.windows.net/"+
-        container+
-        "/"+
-        blobPath;
+        container;
 
     const selfLink=Array.isArray(vectorQuadkeyJSON.links)
         ?vectorQuadkeyJSON.links.find(link=>link.rel==="self"&&link.href)
@@ -5373,22 +5374,76 @@ async function vectorGetParquetURL(){
     if(!selfLink?.href)
         throw new Error("El Item no contiene su enlace self.");
 
-    const endpoint=
+    const signEndpoint=
         new URL(selfLink.href).origin+
         "/api/sas/v1/sign?href="+
-        encodeURIComponent(blobURL);
+        encodeURIComponent(containerURL);
 
-    const response=await fetch(endpoint);
+    vectorSetStatus("Obteniendo acceso a la partición GeoParquet...");
 
-    if(!response.ok)
-        throw new Error("No se ha podido firmar el GeoParquet. HTTP "+response.status);
+    const signResponse=await fetch(signEndpoint);
 
-    const signed=await response.json();
+    if(!signResponse.ok)
+        throw new Error("No se ha podido obtener acceso al almacenamiento. HTTP "+signResponse.status);
+
+    const signed=await signResponse.json();
 
     if(!signed.href)
-        throw new Error("La respuesta de firma no contiene una URL válida.");
+        throw new Error("La respuesta de acceso no contiene una URL válida.");
 
-    return signed.href;
+    const signedContainerURL=signed.href;
+
+    const separator=signedContainerURL.includes("?")?"&":"?";
+    const listURL=
+        signedContainerURL+
+        separator+
+        "restype=container&comp=list&prefix="+
+        encodeURIComponent(prefix+"/");
+
+    vectorSetStatus("Localizando los archivos GeoParquet de la partición...");
+
+    const listResponse=await fetch(listURL);
+
+    if(!listResponse.ok)
+        throw new Error("No se ha podido listar la partición GeoParquet. HTTP "+listResponse.status);
+
+    const xml=await listResponse.text();
+    const documentXML=new DOMParser().parseFromString(xml,"application/xml");
+
+    const errorNode=documentXML.querySelector("Error");
+    if(errorNode){
+        const code=errorNode.querySelector("Code")?.textContent||"";
+        const message=errorNode.querySelector("Message")?.textContent||"";
+        throw new Error(
+            "Microsoft Blob Storage: "+
+            code+
+            (message?" — "+message:"")
+        );
+    }
+
+    const names=[
+        ...documentXML.querySelectorAll("Blob > Name"),
+        ...documentXML.querySelectorAll("Blob\\:Name")
+    ].map(node=>node.textContent.trim());
+
+    const parquetNames=names.filter(
+        name=>/\.parquet$/i.test(name)
+    );
+
+    if(!parquetNames.length)
+        throw new Error("No se han encontrado archivos .parquet dentro de la partición.");
+
+    const signedFiles=parquetNames.map(name=>{
+        const filePath=name.split("/").map(encodeURIComponent).join("/");
+        return signedContainerURL.split("?")[0]+"/"+filePath+"?"+signedContainerURL.split("?")[1];
+    });
+
+    return{
+        files:signedFiles,
+        prefix,
+        storageAccount,
+        container
+    };
 }
 
 async function vectorGetDuckDB(){
@@ -5436,19 +5491,27 @@ async function vectorGetDuckDB(){
 }
 
 async function vectorLoadParquet(){
-    const parquetURL=await vectorGetParquetURL();
+    const parquetInfo=await vectorGetParquetInfo();
     const db=await vectorGetDuckDB();
 
-    vectorSetStatus("Leyendo GeoParquet de la Quadkey...");
+    vectorSetStatus(
+        "Leyendo "+
+        parquetInfo.files.length+
+        " archivo"+
+        (parquetInfo.files.length===1?"":"s")+
+        " GeoParquet..."
+    );
 
     const connection=await db.connect();
 
     try{
-        const escapedURL=parquetURL.replace(/'/g,"''");
+        const escapedURLs=parquetInfo.files.map(
+            url=>"'"+url.replace(/'/g,"''")+"'"
+        ).join(",");
 
         return await connection.query(`
             SELECT geometry, meanHeight
-            FROM read_parquet('${escapedURL}')
+            FROM read_parquet([${escapedURLs}])
         `);
     }finally{
         await connection.close();
@@ -5540,12 +5603,8 @@ function vectorReadWKB(value){
 
         type=type&0x0fffffff;
 
-        if(type>=1000){
-            const baseType=type%1000;
-            const dimension=Math.floor(type/1000);
-            type=baseType;
-            if(dimension===1||dimension===2){}
-        }
+        if(type>=1000)
+            type=type%1000;
 
         const skipExtraCoordinates=()=>{
             if(hasZ)readFloat64(little);
@@ -5607,18 +5666,6 @@ function vectorCoordinateToXY(lon,lat,bounds){
         x:(lon-centerLon)*111320*cosLat,
         y:(lat-centerLat)*110540
     };
-}
-
-function vectorRingArea(ring){
-    let area=0;
-
-    for(let i=0;i<ring.length-1;i++){
-        area+=
-            ring[i][0]*ring[i+1][1]-
-            ring[i+1][0]*ring[i][1];
-    }
-
-    return area/2;
 }
 
 function vectorGeometryToShapes(geometry,bounds){
@@ -5779,6 +5826,7 @@ async function vectorBuildModel(){
         vectorScene.add(built.group);
 
         vectorProductBox.innerHTML+=`
+            <div>Archivos GeoParquet leídos: ${vectorProductBox.dataset.parquetFiles||"varios"}</div>
             <div>Registros GeoParquet leídos: ${rows.length}</div>
             <div>Edificios reconstruidos: ${built.count}</div>
         `;
@@ -5877,7 +5925,7 @@ async function vectorSearchQuadkey(){
             <div>Item encontrado: ${item.id||"sin ID"}</div>
             <div>Página STAC: ${found.page}</div>
             <div>Región: ${item.properties?.["msbuildings:region"]||"no indicada"}</div>
-            <div>Processing date: ${item.properties?.["msbuildings:processing-date"]||"no indicada"}</div>
+            <div>Processing date: ${item.properties?.["msbuildings:processing-date"]||item.properties?.datetime||"no indicada"}</div>
             <div>Registros: ${item.properties?.["table:row_count"]||"no indicado"}</div>
         `;
 
@@ -5959,7 +6007,6 @@ vectorCreateRawBox();
 vectorSetStatus(
     "Introduce una posición geográfica."
 );
-     
 </script>
   
 </body>
