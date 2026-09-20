@@ -1599,8 +1599,9 @@ width:100%;
 <body>
   <div id="spacePanel"></div>
 
-<div id="dock">
 
+
+  
   <div id="stacExplorerTest">
 
 <h3>STAC Explorer Test</h3>
@@ -1645,9 +1646,8 @@ Detected STAC structure
 
 
 
-
-
-
+  
+<div id="dock">
   
 
     <button id="compassBtn" class="dockButton">
@@ -8149,7 +8149,6 @@ loadCapabilities();
 
 </script>
 
-
 <script>
 (function(){
 "use strict";
@@ -8162,11 +8161,13 @@ const structure=document.getElementById("stacStructure");
 const openButton=document.getElementById("stacOpen");
 
 let rootURL="";
-let currentNode=null;
 let currentResource=null;
+let controller=null;
 
 async function fetchJSON(url){
-    const response=await fetch(url);
+    if(controller)controller.abort();
+    controller=new AbortController();
+    const response=await fetch(url,{signal:controller.signal});
     if(!response.ok)throw new Error("HTTP "+response.status);
     return response.json();
 }
@@ -8180,6 +8181,15 @@ function findLinks(node,rels){
     return node?.links?.filter(link=>rels.includes(link.rel))||[];
 }
 
+function clearState(){
+    if(controller)controller.abort();
+    controller=null;
+    currentResource=null;
+    menu.innerHTML="";
+    structure.textContent="";
+    openButton.disabled=true;
+}
+
 async function loadSTAC(){
     const url=urlInput.value.trim();
     if(!url){
@@ -8189,16 +8199,15 @@ async function loadSTAC(){
 
     try{
         loadButton.disabled=true;
-        openButton.disabled=true;
-        menu.innerHTML="";
-        structure.textContent="Loading STAC catalog...";
-        status.textContent="Loading STAC catalog...";
+        clearState();
         rootURL=url;
-        currentNode=await fetchJSON(rootURL);
-        structure.textContent=JSON.stringify(currentNode,null,2);
-        await buildRootMenu();
+        status.textContent="Reading STAC catalog...";
+        const root=await fetchJSON(rootURL);
+        showStructure(root);
+        await buildRootMenu(root);
         status.textContent="STAC catalog loaded.";
     }catch(error){
+        if(error.name==="AbortError")return;
         console.error("STAC ERROR:",error);
         status.textContent="STAC error: "+error.message;
         structure.textContent=String(error);
@@ -8207,26 +8216,32 @@ async function loadSTAC(){
     }
 }
 
-async function buildRootMenu(){
-    menu.innerHTML="";
-    const root=currentNode;
-
+async function buildRootMenu(root){
     if(root.type==="Collection"){
-        createDynamicLevel("Collection",[root],loadCollection);
+        createDynamicLevel("Collection",[{id:root.id,title:root.title||root.id,href:rootURL}],loadCollection);
         return;
     }
 
     const link=findLinks(root,["data","collections"])[0];
 
     if(link){
-        try{
-            const data=await fetchJSON(resolveURL(rootURL,link.href));
-            if(Array.isArray(data.collections)){
-                createDynamicLevel("Collections",data.collections,loadCollection);
-                return;
-            }
-        }catch(error){
-            console.warn("Collections link failed:",error);
+        const url=resolveURL(rootURL,link.href);
+        const data=await fetchJSON(url);
+
+        if(Array.isArray(data.collections)){
+            const collections=data.collections.map(collection=>({
+                id:collection.id,
+                title:collection.title||collection.id,
+                href:resolveURL(url,collection.links?.find(l=>l.rel==="self")?.href||collection.id)
+            }));
+            createDynamicLevel("Collections",collections,loadCollection);
+            structure.textContent=JSON.stringify({
+                type:data.type,
+                id:data.id,
+                title:data.title,
+                collections:data.collections.length
+            },null,2);
+            return;
         }
     }
 
@@ -8242,18 +8257,21 @@ async function loadCollection(collection){
     currentResource=null;
     openButton.disabled=true;
     removeAfterLabel("Collections");
-    status.textContent="Loading collection: "+(collection.title||collection.id);
+    status.textContent="Reading collection: "+collection.title;
 
-    let itemsURL=findLinks(collection,["items"])[0]?.href;
+    let itemsURL=collection.itemsURL;
 
     if(!itemsURL){
-        itemsURL=resolveURL(rootURL,"collections/"+encodeURIComponent(collection.id)+"/items");
-    }else{
-        itemsURL=resolveURL(rootURL,itemsURL);
+        itemsURL=collection.href;
+        const node=await fetchJSON(itemsURL);
+        itemsURL=findLinks(node,["items"])[0]?.href;
+
+        if(!itemsURL)itemsURL=resolveURL(rootURL,"collections/"+encodeURIComponent(collection.id)+"/items");
+        else itemsURL=resolveURL(itemsURL,itemsURL);
     }
 
     try{
-        const data=await fetchJSON(itemsURL);
+        const data=await fetchJSON(addLimit(itemsURL,20));
 
         if(data.type==="FeatureCollection"||Array.isArray(data.features)){
             loadItemsFromData(data,"Items");
@@ -8261,14 +8279,30 @@ async function loadCollection(collection){
             return;
         }
     }catch(error){
+        if(error.name==="AbortError")return;
         console.warn("Items endpoint failed:",error);
     }
 
     status.textContent="No items found in collection.";
 }
 
+function addLimit(url,limit){
+    try{
+        const u=new URL(url);
+        if(!u.searchParams.has("limit"))u.searchParams.set("limit",limit);
+        return u.href;
+    }catch{
+        return url;
+    }
+}
+
 function loadItemsFromData(data,label){
-    const items=data.features||[];
+    const items=(data.features||[]).map(item=>({
+        id:item.id,
+        title:item.properties?.title||item.id,
+        href:item.links?.find(link=>link.rel==="self")?.href||null,
+        item
+    }));
 
     if(!items.length){
         status.textContent="No items found.";
@@ -8276,48 +8310,62 @@ function loadItemsFromData(data,label){
     }
 
     createDynamicLevel(label,items,loadItem);
-    structure.textContent=JSON.stringify(items[0],null,2);
+    structure.textContent=JSON.stringify({
+        type:data.type,
+        numberOfItems:items.length,
+        next:data.links?.find(link=>link.rel==="next")?.href||null
+    },null,2);
 }
 
-function loadItem(item){
+async function loadItem(entry){
     currentResource=null;
     openButton.disabled=true;
     removeAfterLabel("Items");
+    status.textContent="Reading item: "+entry.title;
 
-    const assets=Object.entries(item.assets||{});
+    try{
+        const item=entry.item||await fetchJSON(resolveURL(rootURL,entry.href));
+        showStructure(item);
 
-    structure.textContent=JSON.stringify(item,null,2);
+        const assets=Object.entries(item.assets||{}).map(([id,asset])=>({
+            id,
+            title:asset.title||id,
+            href:asset.href,
+            type:asset.type||"",
+            roles:asset.roles||[]
+        }));
 
-    if(!assets.length){
-        status.textContent="Item has no assets.";
-        return;
+        if(!assets.length){
+            status.textContent="Item has no assets.";
+            return;
+        }
+
+        createDynamicLevel("Assets",assets,selectAsset);
+        status.textContent="Item loaded: "+assets.length+" assets";
+    }catch(error){
+        if(error.name==="AbortError")return;
+        status.textContent="Item error: "+error.message;
     }
-
-    createDynamicLevel(
-        "Assets",
-        assets.map(([key,asset])=>({id:key,title:asset.title||key,asset})),
-        selectAsset
-    );
-
-    selectAsset({
-        id:assets[0][0],
-        title:assets[0][1].title||assets[0][0],
-        asset:assets[0][1]
-    });
 }
 
-function selectAsset(entry){
-    if(!entry?.asset?.href){
+function selectAsset(asset){
+    if(!asset?.href){
         currentResource=null;
         openButton.disabled=true;
         status.textContent="Selected asset has no URL.";
         return;
     }
 
-    currentResource=entry.asset.href;
+    currentResource=asset.href;
     openButton.disabled=false;
-    status.textContent="Asset ready: "+(entry.asset.title||entry.id);
-    structure.textContent=JSON.stringify(entry.asset,null,2);
+    status.textContent="Asset ready: "+asset.title;
+    structure.textContent=JSON.stringify({
+        id:asset.id,
+        title:asset.title,
+        type:asset.type,
+        roles:asset.roles,
+        href:asset.href
+    },null,2);
 }
 
 function createDynamicLevel(label,items,callback){
@@ -8339,10 +8387,10 @@ function createDynamicLevel(label,items,callback){
     });
 
     select.onchange=async()=>{
-        const selected=items[parseInt(select.value,10)];
-        try{
-            await callback(selected);
-        }catch(error){
+        const selected=items[select.value];
+        try{await callback(selected);}
+        catch(error){
+            if(error.name==="AbortError")return;
             console.error(error);
             status.textContent="Navigation error: "+error.message;
         }
@@ -8355,29 +8403,26 @@ function createDynamicLevel(label,items,callback){
 
 function removeLevel(label){
     [...menu.querySelectorAll(".stacField")].forEach(field=>{
-        if(field.querySelector("label")?.textContent===label){
-            field.remove();
-        }
+        if(field.querySelector("label")?.textContent===label)field.remove();
     });
 }
 
 function removeAfterLabel(label){
     const fields=[...menu.querySelectorAll(".stacField")];
     let found=false;
-
     fields.forEach(field=>{
         const fieldLabel=field.querySelector("label")?.textContent;
-        if(fieldLabel===label){
-            found=true;
-            return;
-        }
+        if(fieldLabel===label){found=true;return;}
         if(found)field.remove();
     });
 }
 
 function getDisplayName(item,index){
-    if(typeof item==="string")return item;
-    return item.title||item.properties?.title||item.id||item.name||item.collection||"Item "+(index+1);
+    return item.title||item.id||"Item "+(index+1);
+}
+
+function showStructure(node){
+    structure.textContent=JSON.stringify(node,null,2);
 }
 
 function openSelectedResource(){
