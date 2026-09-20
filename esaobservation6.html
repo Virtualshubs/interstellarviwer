@@ -5051,9 +5051,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-
-
-
 let vectorQuadkey=null;
 let vectorScene=null;
 let vectorCamera=null;
@@ -5357,206 +5354,118 @@ function vectorGetGenericProductJSON(){
     return null;
 }
 
-function vectorFindDeltaAsset(resource){
-    const found=[];
+async function vectorFindQuadkeyItem(quadkey){
+    const initial=
+        vectorGetGenericProductJSON();
 
-    function scan(node,path=""){
-        if(!node||typeof node!=="object")return;
+    if(
+        !initial||
+        initial.type!=="FeatureCollection"||
+        !Array.isArray(initial.features)
+    )
+        throw new Error(
+            "El Raw JSON inicial no contiene un FeatureCollection STAC válido."
+        );
 
-        if(
-            node.href&&
-            typeof node.href==="string"
-        ){
-            const href=node.href.toLowerCase();
-            const title=String(
-                node.title||
-                node.name||
-                ""
-            ).toLowerCase();
-            const description=String(
-                node.description||
-                ""
-            ).toLowerCase();
+    let current=initial;
+    let page=1;
 
-            let score=0;
+    while(current){
 
-            if(title.includes("delta"))score+=20;
-            if(title.includes("footprint"))score+=10;
-            if(description.includes("delta"))score+=10;
-            if(description.includes("footprint"))score+=10;
-            if(href.includes("ml-buildings.parquet"))score+=20;
-            if(href.includes("footprints"))score+=10;
-            if(node.roles?.includes("data"))score+=5;
+        const features=
+            Array.isArray(current.features)?
+            current.features:
+            [];
 
-            if(score>0){
-                found.push({
-                    href:node.href,
-                    title,
-                    description,
-                    score,
-                    path
-                });
-            }
+        const found=
+            features.find(item=>
+                String(
+                    item.properties?.["msbuildings:quadkey"]??
+                    ""
+                )===String(quadkey)
+            );
+
+        if(found){
+
+            vectorSetStatus(
+                "Quadkey encontrada en la página "+
+                page+
+                ": "+
+                quadkey
+            );
+
+            return{
+                item:found,
+                initial,
+                page
+            };
         }
 
-        Object.keys(node).forEach(key=>{
-            const value=node[key];
+        const next=
+            current.links?.find(
+                link=>
+                    link.rel==="next"&&
+                    link.href
+            );
 
-            if(
-                key==="assets"||
-                key==="links"||
-                key==="item_assets"
-            ){
-                if(Array.isArray(value)){
-                    value.forEach((item,index)=>{
-                        scan(
-                            item,
-                            path+"."+key+"["+index+"]"
-                        );
-                    });
-                }else if(
-                    value&&
-                    typeof value==="object"
-                ){
-                    Object.keys(value).forEach(name=>{
-                        scan(
-                            value[name],
-                            path+"."+key+"."+name
-                        );
-                    });
-                }
-            }
-        });
+        if(!next){
+            break;
+        }
+
+        page++;
+
+        vectorSetStatus(
+            "Buscando Quadkey "+
+            quadkey+
+            " — página "+
+            page+
+            "..."
+        );
+
+        const response=
+            await fetch(
+                next.href
+            );
+
+        if(!response.ok)
+            throw new Error(
+                "Error leyendo página STAC "+
+                page+
+                " HTTP "+
+                response.status
+            );
+
+        current=
+            await response.json();
     }
-
-    scan(resource);
-
-    found.sort((a,b)=>b.score-a.score);
-
-    return found[0]||null;
-}
-
-function vectorFindItemsLink(resource){
-    if(!resource?.links)return null;
-
-    const link=resource.links.find(
-        item=>item.rel==="items"&&item.href
-    );
-
-    return link?.href||null;
-}
-
-function vectorFindSearchLink(resource){
-    if(!resource?.links)return null;
-
-    const link=resource.links.find(
-        item=>(
-            item.rel==="search"&&
-            item.href
-        )
-    );
-
-    return link?.href||null;
-}
-
-async function vectorFindQuadkeyItem(product,quadkey){
-    const itemsURL=vectorFindItemsLink(product);
-
-    if(!itemsURL)
-        throw new Error(
-            "No se ha encontrado el enlace STAC de Items en el JSON del producto."
-        );
-
-    const url=new URL(itemsURL);
-
-    url.searchParams.set(
-        "limit",
-        "100"
-    );
-
-    url.searchParams.set(
-        "filter",
-        `msbuildings:quadkey='${quadkey}'`
-    );
-
-    url.searchParams.set(
-        "filter-lang",
-        "cql2-text"
-    );
-
-    vectorSetStatus(
-        "Buscando la Quadkey en la estructura STAC..."
-    );
-
-    let response=await fetch(url.toString());
-
-    if(!response.ok){
-        const fallback=new URL(itemsURL);
-
-        fallback.searchParams.set(
-            "limit",
-            "100"
-        );
-
-        response=await fetch(
-            fallback.toString()
-        );
-    }
-
-    if(!response.ok)
-        throw new Error(
-            "Error consultando Items HTTP "+
-            response.status
-        );
-
-    const json=await response.json();
-
-    const features=Array.isArray(json.features)?
-        json.features:
-        [];
-
-    const exact=features.find(item=>
-        String(
-            item.properties?.["msbuildings:quadkey"]||
-            ""
-        )===String(quadkey)
-    );
-
-    if(exact)return exact;
-
-    const matches=features.filter(item=>{
-        const value=
-            item.properties?.["msbuildings:quadkey"];
-
-        return String(value||"")===String(quadkey);
-    });
-
-    if(matches.length)return matches[0];
 
     throw new Error(
-        "No se ha encontrado un Item STAC para la Quadkey "+
-        quadkey
+        "No se ha encontrado la Quadkey "+
+        quadkey+
+        " en ninguna página STAC."
     );
 }
 
-async function vectorGetQuadkeyItem(product,quadkey){
-    const item=await vectorFindQuadkeyItem(
-        product,
-        quadkey
-    );
+async function vectorGetCollectionJSON(initial){
+    const collectionLink=
+        initial.links?.find(
+            link=>
+                link.rel==="collection"&&
+                link.href
+        );
 
-    const self=item.links?.find(
-        link=>link.rel==="self"&&link.href
-    );
+    if(!collectionLink?.href)
+        return null;
 
-    if(self?.href){
-        const response=await fetch(self.href);
+    const response=
+        await fetch(
+            collectionLink.href
+        );
 
-        if(response.ok)
-            return await response.json();
-    }
+    if(!response.ok)
+        return null;
 
-    return item;
+    return await response.json();
 }
 
 function vectorFindDataAsset(item){
@@ -5571,8 +5480,12 @@ function vectorFindDataAsset(item){
             asset?.href&&
             (
                 name.toLowerCase()==="data"||
-                String(asset.title||"").toLowerCase().includes("building footprints")||
-                String(asset.type||"").toLowerCase().includes("parquet")
+                String(asset.title||"")
+                    .toLowerCase()
+                    .includes("building footprints")||
+                String(asset.type||"")
+                    .toLowerCase()
+                    .includes("parquet")
             )
         ){
             return{
@@ -5586,10 +5499,23 @@ function vectorFindDataAsset(item){
 }
 
 async function vectorGetSASToken(account,container){
-    const url=
-        `https://planetarycomputer.microsoft.com/api/sas/v1/token/${encodeURIComponent(account)}/${encodeURIComponent(container)}`;
+    const tokenURL=
+        new URL(
+            "/api/sas/v1/token/"+
+            encodeURIComponent(account)+
+            "/"+
+            encodeURIComponent(container),
+            location.origin
+        );
 
-    const response=await fetch(url);
+    tokenURL.protocol="https:";
+    tokenURL.hostname="planetarycomputer.microsoft.com";
+    tokenURL.port="";
+
+    const response=
+        await fetch(
+            tokenURL.toString()
+        );
 
     if(!response.ok)
         throw new Error(
@@ -5597,7 +5523,8 @@ async function vectorGetSASToken(account,container){
             response.status
         );
 
-    const json=await response.json();
+    const json=
+        await response.json();
 
     if(!json.token)
         throw new Error(
@@ -5607,15 +5534,18 @@ async function vectorGetSASToken(account,container){
     return json.token;
 }
 
-function vectorBuildSignedBlobURL(href,account,container,token){
-    let path=href;
-
-    path=path
+function vectorBuildSignedBlobURL(
+    href,
+    account,
+    container,
+    token
+){
+    let path=href
         .replace(/^abfs:\/\//i,"")
         .replace(/^az:\/\//i,"");
 
     const prefix=
-        `${container}/`;
+        container+"/";
 
     if(path.startsWith(prefix))
         path=path.slice(prefix.length);
@@ -5681,33 +5611,14 @@ async function vectorLoadDuckDB(){
     URL.revokeObjectURL(workerURL);
 
     vectorDuckDB=db;
-    vectorDuckDBConn=await db.connect();
+    vectorDuckDBConn=
+        await db.connect();
 }
 
 async function vectorReadParquet(
     item,
-    product
+    collection
 ){
-    const deltaAsset=
-        vectorFindDeltaAsset(
-            product
-        );
-
-    if(!deltaAsset)
-        throw new Error(
-            "No se ha encontrado en el JSON el asset Delta de Footprints."
-        );
-
-    const collectionStorageAccount=
-        product.msft?.storage_account||
-        product["msft:storage_account"]||
-        deltaAsset["table:storage_options"]?.account_name;
-
-    const collectionContainer=
-        product.msft?.container||
-        product["msft:container"]||
-        "footprints";
-
     const itemData=
         vectorFindDataAsset(
             item
@@ -5718,18 +5629,36 @@ async function vectorReadParquet(
             "El Item de la Quadkey no contiene un asset de datos."
         );
 
-    const account=
-        itemData["table:storage_options"]?.account_name||
-        collectionStorageAccount||
-        product["msft:storage_account"];
+    const storageOptions=
+        itemData["table:storage_options"]||
+        {};
 
-    const container=
-        collectionContainer||
-        product["msft:container"];
+    const account=
+        storageOptions.account_name||
+        collection?.msft?.storage_account||
+        collection?.["msft:storage_account"];
+
+    let container=
+        storageOptions.container_name||
+        collection?.msft?.container||
+        collection?.["msft:container"];
+
+    const href=
+        itemData.href;
+
+    if(!container){
+        const match=
+            href.match(
+                /^(?:abfs|az):\/\/([^/]+)\//i
+            );
+
+        if(match)
+            container=match[1];
+    }
 
     if(!account||!container)
         throw new Error(
-            "No se ha podido determinar la cuenta y el contenedor del almacenamiento."
+            "No se ha podido determinar la cuenta y el contenedor del almacenamiento desde el STAC."
         );
 
     const sas=
@@ -5740,7 +5669,7 @@ async function vectorReadParquet(
 
     const signedURL=
         vectorBuildSignedBlobURL(
-            itemData.href,
+            href,
             account,
             container,
             sas
@@ -5778,12 +5707,7 @@ async function vectorReadParquet(
 
     return{
         rows,
-        item,
         source:{
-            deltaAsset:{
-                href:deltaAsset.href,
-                title:deltaAsset.title||null
-            },
             dataAsset:{
                 href:itemData.href,
                 type:itemData.type||null,
@@ -6117,34 +6041,13 @@ async function vectorReadQuadkey(){
             "No hay Quadkey localizada."
         );
 
-    const product=
-        vectorGetGenericProductJSON();
-
-    if(!product)
-        throw new Error(
-            "No se ha encontrado el JSON Raw del producto."
-        );
-
-    const deltaAsset=
-        vectorFindDeltaAsset(
-            product
-        );
-
-    if(!deltaAsset)
-        throw new Error(
-            "No se ha encontrado una ruta Delta de Footprints en el JSON Raw."
-        );
-
-    vectorProductBox.innerHTML+=`
-        <div>Delta localizada: ${deltaAsset.path}</div>
-        <div>Ruta: ${deltaAsset.href}</div>
-    `;
-
-    const item=
-        await vectorGetQuadkeyItem(
-            product,
+    const found=
+        await vectorFindQuadkeyItem(
             vectorQuadkey
         );
+
+    const item=
+        found.item;
 
     const properties=
         item.properties||{};
@@ -6156,13 +6059,35 @@ async function vectorReadQuadkey(){
 
     if(!dataAsset)
         throw new Error(
-            "El Item localizado no contiene el asset de datos."
+            "La Quadkey fue localizada pero su Item no contiene el asset de datos."
         );
+
+    const collection=
+        await vectorGetCollectionJSON(
+            found.initial
+        );
+
+    vectorProductBox.innerHTML+=`
+        <div>Item encontrado: ${item.id||"sin ID"}</div>
+        <div>Página STAC: ${found.page}</div>
+        <div>Quadkey: ${properties["msbuildings:quadkey"]||vectorQuadkey}</div>
+        <div>Región: ${properties["msbuildings:region"]||"no indicada"}</div>
+        <div>Processing date: ${properties["msbuildings:processing-date"]||"no indicada"}</div>
+        <div>Registros declarados: ${properties["table:row_count"]||"no indicado"}</div>
+        <div>Asset: ${dataAsset.href}</div>
+    `;
+
+    vectorSetStatus(
+        "Quadkey localizada. "+
+        "Página STAC: "+
+        found.page+
+        ". Leyendo datos..."
+    );
 
     const parquet=
         await vectorReadParquet(
             item,
-            product
+            collection
         );
 
     const rows=
@@ -6184,13 +6109,18 @@ async function vectorReadQuadkey(){
             type:item.type||null,
             properties,
             bbox:item.bbox||null,
-            geometry:item.geometry||null
+            geometry:item.geometry||null,
+            assets:item.assets||null,
+            links:item.links||null
         },
         region:
             properties["msbuildings:region"]||
             null,
         processingDate:
             properties["msbuildings:processing-date"]||
+            null,
+        declaredRowCount:
+            properties["table:row_count"]||
             null,
         source:parquet.source,
         featureCount:rows.length,
@@ -6276,9 +6206,9 @@ async function vectorSearchQuadkey(){
         vectorBuild.disabled=false;
 
         vectorSetStatus(
-            "Quadkey localizada: "+
+            "Quadkey calculada: "+
             vectorQuadkey+
-            ". Lista para explotar."
+            ". Lista para buscar en STAC."
         );
 
     }catch(error){
@@ -6302,7 +6232,7 @@ async function vectorBuildModel(){
     }
 
     vectorSetStatus(
-        "Explotando datos de la Quadkey..."
+        "Buscando y explotando datos de la Quadkey..."
     );
 
     try{
@@ -6437,7 +6367,6 @@ vectorCreateRawBox();
 vectorSetStatus(
     "Introduce una posición geográfica."
 );
-     
 </script>
   
 </body>
