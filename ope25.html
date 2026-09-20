@@ -8151,981 +8151,252 @@ loadCapabilities();
 
 
 <script>
-
 (function(){
-
 "use strict";
 
-
-/* =========================================================
-   STAC EXPLORER TEST
-   Independent from GIBS / existing OPE code
-   ========================================================= */
-
-const urlInput=
-document.getElementById("stacURL");
-
-const loadButton=
-document.getElementById("stacLoad");
-
-const menu=
-document.getElementById("stacMenu");
-
-const status=
-document.getElementById("stacStatus");
-
-const structure=
-document.getElementById("stacStructure");
-
-const openButton=
-document.getElementById("stacOpen");
-
+const urlInput=document.getElementById("stacURL");
+const loadButton=document.getElementById("stacLoad");
+const menu=document.getElementById("stacMenu");
+const status=document.getElementById("stacStatus");
+const structure=document.getElementById("stacStructure");
+const openButton=document.getElementById("stacOpen");
 
 let rootURL="";
-
 let currentNode=null;
-
 let currentResource=null;
 
-
-/* =========================================================
-   FETCH
-   ========================================================= */
-
 async function fetchJSON(url){
-
-const response=
-await fetch(url);
-
-if(!response.ok){
-
-throw new Error(
-"HTTP "+response.status
-);
-
+    const response=await fetch(url);
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    return response.json();
 }
-
-return await response.json();
-
-}
-
-
-/* =========================================================
-   URL RESOLUTION
-   ========================================================= */
 
 function resolveURL(base,href){
-
-try{
-
-return new URL(
-href,
-base
-).href;
-
-}catch{
-
-return href;
-
+    try{return new URL(href,base).href;}
+    catch{return href;}
 }
-
-}
-
-
-/* =========================================================
-   LINK FINDER
-   ========================================================= */
 
 function findLinks(node,rels){
-
-if(!node||!Array.isArray(node.links))
-return [];
-
-return node.links.filter(link=>
-rels.includes(link.rel)
-);
-
+    return node?.links?.filter(link=>rels.includes(link.rel))||[];
 }
-
-
-/* =========================================================
-   LOAD ROOT
-   ========================================================= */
 
 async function loadSTAC(){
+    const url=urlInput.value.trim();
+    if(!url){
+        status.textContent="Enter a STAC catalog URL.";
+        return;
+    }
 
-const url=
-urlInput.value.trim();
-
-if(!url){
-
-status.textContent=
-"Enter a STAC catalog URL.";
-
-return;
-
+    try{
+        loadButton.disabled=true;
+        openButton.disabled=true;
+        menu.innerHTML="";
+        structure.textContent="Loading STAC catalog...";
+        status.textContent="Loading STAC catalog...";
+        rootURL=url;
+        currentNode=await fetchJSON(rootURL);
+        structure.textContent=JSON.stringify(currentNode,null,2);
+        await buildRootMenu();
+        status.textContent="STAC catalog loaded.";
+    }catch(error){
+        console.error("STAC ERROR:",error);
+        status.textContent="STAC error: "+error.message;
+        structure.textContent=String(error);
+    }finally{
+        loadButton.disabled=false;
+    }
 }
-
-try{
-
-loadButton.disabled=true;
-
-openButton.disabled=true;
-
-menu.innerHTML="";
-
-structure.textContent=
-"Loading STAC catalog...";
-
-status.textContent=
-"Loading STAC catalog...";
-
-
-rootURL=url;
-
-currentNode=
-await fetchJSON(rootURL);
-
-console.log(
-"STAC ROOT:",
-currentNode
-);
-
-
-/* Show complete root */
-
-structure.textContent=
-JSON.stringify(
-currentNode,
-null,
-2
-);
-
-
-/* Build first level */
-
-await buildRootMenu();
-
-
-status.textContent=
-"STAC catalog loaded.";
-
-}catch(error){
-
-console.error(
-"STAC ERROR:",
-error
-);
-
-status.textContent=
-"STAC error: "+error.message;
-
-structure.textContent=
-String(error);
-
-}finally{
-
-loadButton.disabled=false;
-
-}
-
-}
-
-
-/* =========================================================
-   ROOT DISCOVERY
-   ========================================================= */
 
 async function buildRootMenu(){
+    menu.innerHTML="";
+    const root=currentNode;
 
-menu.innerHTML="";
+    if(root.type==="Collection"){
+        createDynamicLevel("Collection",[root],loadCollection);
+        return;
+    }
 
-const root=
-currentNode;
+    const link=findLinks(root,["data","collections"])[0];
 
+    if(link){
+        try{
+            const data=await fetchJSON(resolveURL(rootURL,link.href));
+            if(Array.isArray(data.collections)){
+                createDynamicLevel("Collections",data.collections,loadCollection);
+                return;
+            }
+        }catch(error){
+            console.warn("Collections link failed:",error);
+        }
+    }
 
-/*
-If the supplied URL is itself
-a Collection.
-*/
+    if(root.type==="FeatureCollection"){
+        loadItemsFromData(root,"Items");
+        return;
+    }
 
-if(root.type==="Collection"){
-
-createDynamicLevel(
-"Collection",
-[root],
-async()=>{
-
-await loadCollection(
-root
-);
-
+    status.textContent="Catalog loaded, but no navigable collections were found.";
 }
-);
-
-return;
-
-}
-
-
-/*
-Direct collections link
-*/
-
-let collectionsLink=
-findLinks(
-root,
-["data","collections"]
-)[0];
-
-
-if(collectionsLink){
-
-const collectionsURL=
-resolveURL(
-rootURL,
-collectionsLink.href
-);
-
-try{
-
-const data=
-await fetchJSON(
-collectionsURL
-);
-
-if(
-Array.isArray(data.collections)
-){
-
-createDynamicLevel(
-"Collections",
-data.collections,
-async collection=>{
-
-await loadCollection(
-collection
-);
-
-}
-);
-
-return;
-
-}
-
-}catch(error){
-
-console.warn(
-"Collections link failed:",
-error
-);
-
-}
-
-}
-
-
-/*
-Child collections
-*/
-
-const children=
-findLinks(
-root,
-["child"]
-);
-
-
-if(children.length){
-
-const collections=[];
-
-for(const link of children){
-
-try{
-
-const child=
-await fetchJSON(
-resolveURL(
-rootURL,
-link.href
-)
-);
-
-if(
-child.type==="Collection"
-){
-
-collections.push(
-child
-);
-
-}
-
-}catch(error){
-
-console.warn(
-"Child failed:",
-link.href
-);
-
-}
-
-}
-
-
-if(collections.length){
-
-createDynamicLevel(
-"Collections",
-collections,
-async collection=>{
-
-await loadCollection(
-collection
-);
-
-}
-);
-
-return;
-
-}
-
-}
-
-
-/*
-Root itself may expose Items
-*/
-
-if(
-root.type==="FeatureCollection"
-){
-
-loadItemsFromData(
-root,
-"Items"
-);
-
-return;
-
-}
-
-
-status.textContent=
-"Catalog loaded, but no navigable collections were found.";
-
-}
-
-
-/* =========================================================
-   COLLECTION
-   ========================================================= */
 
 async function loadCollection(collection){
+    currentResource=null;
+    openButton.disabled=true;
+    removeAfterLabel("Collections");
+    status.textContent="Loading collection: "+(collection.title||collection.id);
 
-currentResource=null;
+    let itemsURL=findLinks(collection,["items"])[0]?.href;
 
-openButton.disabled=true;
+    if(!itemsURL){
+        itemsURL=resolveURL(rootURL,"collections/"+encodeURIComponent(collection.id)+"/items");
+    }else{
+        itemsURL=resolveURL(rootURL,itemsURL);
+    }
 
-status.textContent=
-"Loading collection: "+
-(collection.title||collection.id);
+    try{
+        const data=await fetchJSON(itemsURL);
 
+        if(data.type==="FeatureCollection"||Array.isArray(data.features)){
+            loadItemsFromData(data,"Items");
+            status.textContent="Collection loaded: "+(data.features?.length||0)+" items";
+            return;
+        }
+    }catch(error){
+        console.warn("Items endpoint failed:",error);
+    }
 
-const links=
-findLinks(
-collection,
-["items"]
-);
-
-
-let itemsURL=
-links[0]?.href;
-
-
-/*
-Standard STAC API fallback
-*/
-
-if(!itemsURL){
-
-itemsURL=
-resolveURL(
-rootURL,
-"collections/"+
-encodeURIComponent(collection.id)+
-"/items"
-);
-
-}else{
-
-itemsURL=
-resolveURL(
-rootURL,
-itemsURL
-);
-
+    status.textContent="No items found in collection.";
 }
 
+function loadItemsFromData(data,label){
+    const items=data.features||[];
 
-try{
+    if(!items.length){
+        status.textContent="No items found.";
+        return;
+    }
 
-const data=
-await fetchJSON(
-itemsURL
-);
-
-if(
-data.type==="FeatureCollection"||
-Array.isArray(data.features)
-){
-
-loadItemsFromData(
-data,
-"Items"
-);
-
-status.textContent=
-"Collection loaded: "+
-(
-data.features?.length||0
-)+
-" items";
-
-return;
-
+    createDynamicLevel(label,items,loadItem);
+    structure.textContent=JSON.stringify(items[0],null,2);
 }
-
-}catch(error){
-
-console.warn(
-"Items endpoint failed:",
-error
-);
-
-}
-
-
-/*
-Collection may have child links
-instead of an items endpoint.
-*/
-
-const childLinks=
-findLinks(
-collection,
-["child"]
-);
-
-
-if(childLinks.length){
-
-const items=[];
-
-for(const link of childLinks){
-
-try{
-
-const child=
-await fetchJSON(
-resolveURL(
-rootURL,
-link.href
-)
-);
-
-if(
-child.type==="Feature"||
-child.properties
-){
-
-items.push(child);
-
-}
-
-}catch(error){
-
-console.warn(
-"Item child failed:",
-link.href
-);
-
-}
-
-}
-
-
-if(items.length){
-
-loadItemsFromData(
-{features:items},
-"Items"
-);
-
-return;
-
-}
-
-}
-
-
-status.textContent=
-"No items found in collection.";
-
-menu.innerHTML="";
-
-}
-
-
-/* =========================================================
-   ITEMS
-   ========================================================= */
-
-function loadItemsFromData(
-data,
-label
-){
-
-const items=
-data.features||[];
-
-if(!items.length){
-
-status.textContent=
-"No items found.";
-
-return;
-
-}
-
-
-createDynamicLevel(
-label,
-items,
-async item=>{
-
-loadItem(item);
-
-}
-);
-
-
-loadItem(items[0]);
-
-}
-
-
-/* =========================================================
-   ITEM
-   ========================================================= */
 
 function loadItem(item){
+    currentResource=null;
+    openButton.disabled=true;
+    removeAfterLabel("Items");
 
-currentResource=null;
+    const assets=Object.entries(item.assets||{});
 
-openButton.disabled=true;
+    structure.textContent=JSON.stringify(item,null,2);
 
+    if(!assets.length){
+        status.textContent="Item has no assets.";
+        return;
+    }
 
-const assets=
-Object.entries(
-item.assets||{}
-);
+    createDynamicLevel(
+        "Assets",
+        assets.map(([key,asset])=>({id:key,title:asset.title||key,asset})),
+        selectAsset
+    );
 
-
-if(!assets.length){
-
-status.textContent=
-"Item has no assets.";
-
-return;
-
+    selectAsset({
+        id:assets[0][0],
+        title:assets[0][1].title||assets[0][0],
+        asset:assets[0][1]
+    });
 }
-
-
-createDynamicLevel(
-"Assets",
-assets.map(
-([key,asset])=>({
-
-id:key,
-
-title:
-asset.title||
-key,
-
-asset:asset
-
-})
-),
-async entry=>{
-
-selectAsset(
-entry
-);
-
-}
-);
-
-
-selectAsset(
-{
-id:assets[0][0],
-title:
-assets[0][1].title||
-assets[0][0],
-asset:
-assets[0][1]
-}
-);
-
-}
-
-
-/* =========================================================
-   ASSET
-   ========================================================= */
 
 function selectAsset(entry){
+    if(!entry?.asset?.href){
+        currentResource=null;
+        openButton.disabled=true;
+        status.textContent="Selected asset has no URL.";
+        return;
+    }
 
-if(!entry?.asset?.href){
-
-currentResource=null;
-
-openButton.disabled=true;
-
-status.textContent=
-"Selected asset has no URL.";
-
-return;
-
+    currentResource=entry.asset.href;
+    openButton.disabled=false;
+    status.textContent="Asset ready: "+(entry.asset.title||entry.id);
+    structure.textContent=JSON.stringify(entry.asset,null,2);
 }
 
+function createDynamicLevel(label,items,callback){
+    removeLevel(label);
 
-currentResource=
-entry.asset.href;
+    const wrapper=document.createElement("div");
+    wrapper.className="stacField";
 
-openButton.disabled=false;
+    const title=document.createElement("label");
+    title.textContent=label;
 
-status.textContent=
-"Asset ready: "+
-(
-entry.asset.title||
-entry.id
-);
+    const select=document.createElement("select");
 
+    items.forEach((item,index)=>{
+        const option=document.createElement("option");
+        option.value=index;
+        option.textContent=getDisplayName(item,index);
+        select.appendChild(option);
+    });
 
-/*
-Show asset information in
-diagnostic panel.
-*/
+    select.onchange=async()=>{
+        const selected=items[parseInt(select.value,10)];
+        try{
+            await callback(selected);
+        }catch(error){
+            console.error(error);
+            status.textContent="Navigation error: "+error.message;
+        }
+    };
 
-structure.textContent=
-JSON.stringify(
-entry.asset,
-null,
-2
-);
-
+    wrapper.append(title,select);
+    menu.appendChild(wrapper);
+    return select;
 }
 
-
-/* =========================================================
-   DYNAMIC SELECTOR
-   ========================================================= */
-
-function createDynamicLevel(
-label,
-items,
-callback
-){
-
-/*
-Find existing selector with
-same logical level and replace
-everything after it.
-*/
-
-const wrapper=
-document.createElement("div");
-
-wrapper.className=
-"stacField";
-
-
-const title=
-document.createElement("label");
-
-title.textContent=
-label;
-
-
-const select=
-document.createElement("select");
-
-
-items.forEach(
-(item,index)=>{
-
-const option=
-document.createElement("option");
-
-option.value=index;
-
-option.textContent=
-getDisplayName(item,index);
-
-select.appendChild(
-option
-);
-
+function removeLevel(label){
+    [...menu.querySelectorAll(".stacField")].forEach(field=>{
+        if(field.querySelector("label")?.textContent===label){
+            field.remove();
+        }
+    });
 }
-);
-
-
-select.onchange=
-async function(){
-
-const selected=
-items[
-parseInt(
-this.value,
-10
-)
-];
-
-try{
-
-await callback(
-selected
-);
-
-}catch(error){
-
-console.error(error);
-
-status.textContent=
-"Navigation error: "+
-error.message;
-
-}
-
-};
-
-
-/*
-Remove levels after the
-current navigation point.
-*/
-
-const existing=
-menu.querySelectorAll(
-".stacField"
-);
-
-if(existing.length){
-
-const last=
-existing[existing.length-1];
-
-const lastLabel=
-last.querySelector("label");
-
-if(
-lastLabel&&
-lastLabel.textContent===
-label
-){
-
-/*
-Replace same level
-*/
-
-menu.removeChild(last);
-
-}else if(
-label==="Collections"
-){
-
-menu.innerHTML="";
-
-}else if(
-label==="Items"
-){
-
-removeAfterLabel(
-"Collections"
-);
-
-}else if(
-label==="Assets"
-){
-
-removeAfterLabel(
-"Items"
-);
-
-}
-
-}
-
-
-wrapper.appendChild(title);
-
-wrapper.appendChild(select);
-
-menu.appendChild(wrapper);
-
-return select;
-
-}
-
-
-/* =========================================================
-   REMOVE FOLLOWING LEVELS
-   ========================================================= */
 
 function removeAfterLabel(label){
+    const fields=[...menu.querySelectorAll(".stacField")];
+    let found=false;
 
-const fields=
-[
-...menu.querySelectorAll(
-".stacField"
-)
-];
-
-let found=false;
-
-fields.forEach(field=>{
-
-const fieldLabel=
-field.querySelector("label");
-
-if(
-fieldLabel?.textContent===label
-){
-
-found=true;
-
-return;
-
+    fields.forEach(field=>{
+        const fieldLabel=field.querySelector("label")?.textContent;
+        if(fieldLabel===label){
+            found=true;
+            return;
+        }
+        if(found)field.remove();
+    });
 }
 
-if(found){
-
-field.remove();
-
+function getDisplayName(item,index){
+    if(typeof item==="string")return item;
+    return item.title||item.properties?.title||item.id||item.name||item.collection||"Item "+(index+1);
 }
-
-});
-
-}
-
-
-/* =========================================================
-   DISPLAY NAME
-   ========================================================= */
-
-function getDisplayName(
-item,
-index
-){
-
-if(typeof item==="string")
-return item;
-
-
-return (
-item.title||
-item.properties?.title||
-item.id||
-item.name||
-item.collection||
-"Item "+(index+1)
-);
-
-}
-
-
-/* =========================================================
-   OPEN RESOURCE
-   ========================================================= */
 
 function openSelectedResource(){
+    if(!currentResource){
+        status.textContent="No resource selected.";
+        return;
+    }
 
-if(!currentResource){
-
-status.textContent=
-"No resource selected.";
-
-return;
-
+    const url=resolveURL(rootURL,currentResource);
+    console.log("Opening STAC resource:",url);
+    window.open(url,"_blank","noopener");
 }
 
+loadButton.onclick=loadSTAC;
+openButton.onclick=openSelectedResource;
 
-const url=
-resolveURL(
-rootURL,
-currentResource
-);
-
-
-console.log(
-"Opening STAC resource:",
-url
-);
-
-
-window.open(
-url,
-"_blank",
-"noopener"
-);
-
-}
-
-
-/* =========================================================
-   DEBUG
-   ========================================================= */
-
-function updateStructure(data){
-
-structure.textContent=
-JSON.stringify(
-data,
-null,
-2
-);
-
-}
-
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
-loadButton.onclick=
-loadSTAC;
-
-openButton.onclick=
-openSelectedResource;
-
-
-urlInput.addEventListener(
-"keydown",
-event=>{
-
-if(event.key==="Enter"){
-
-loadSTAC();
-
-}
-
+urlInput.addEventListener("keydown",event=>{
+    if(event.key==="Enter")loadSTAC();
 });
-
 
 })();
 </script>
