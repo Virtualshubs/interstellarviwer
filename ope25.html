@@ -8151,6 +8151,7 @@ loadCapabilities();
 
 </script>
 
+
 <script>
 (function(){
 "use strict";
@@ -8166,28 +8167,19 @@ let rootURL="";
 let currentResource=null;
 let controller=null;
 let currentPage=null;
-let nextPage=null;
+let previewBox=null;
 
 const catalogs=[
     {group:"NASA",name:"NASA CMR STAC",url:"https://cmr.earthdata.nasa.gov/stac/"},
     {group:"NASA",name:"NASA CloudSTAC",url:"https://cmr.earthdata.nasa.gov/cloudstac/"},
-    {group:"ESA",name:"ESA STAC",url:"https://catalogue.dataspace.copernicus.eu/stac/"},
-    {group:"Google",name:"Google Earth Engine / openEO",url:"https://earthengine.openeo.org/"},
-    {group:"Microsoft",name:"Planetary Computer",url:"https://planetarycomputer.microsoft.com/api/stac/v1"},
-    {group:"Planetary",name:"USGS Astrogeology",url:"https://stac.astrogeology.usgs.gov/api"},
-    {group:"Planetary",name:"Cassini VIMS-IR",url:"https://stac.astrogeology.usgs.gov/cassini-vims-ir/"},
-    {group:"Ocean",name:"HUB Ocean",url:"https://api.hubocean.earth/api/stac"},
-    {group:"Science",name:"EODC",url:"https://stac.eodc.eu/api/v1"},
-    {group:"Science",name:"OpenLandMap",url:"https://stac.openlandmap.org/"},
-    {group:"Science",name:"Paituli STAC",url:"https://stac.paituli.csc.fi/"},
-    {group:"Emergency",name:"GISTDA Flood Disaster",url:"https://stac.gistda.or.th/"},
-    {group:"USGS",name:"USGS 3DEP LiDAR",url:"https://landsatlook.usgs.gov/stac-server/"},
-    {group:"Other",name:"Earth Search",url:"https://earth-search.aws.element84.com/v1"}
+    {group:"ESA",name:"Copernicus Data Space STAC",url:"https://stac.dataspace.copernicus.eu/v1/"},
+    {group:"Google",name:"Google Earth Engine STAC",url:"https://storage.googleapis.com/earthengine-stac/catalog/catalog.json"},
+    {group:"Astronomy / Planetary",name:"USGS Astrogeology",url:"https://stac.astrogeology.usgs.gov/api"},
+    {group:"Astronomy / Planetary",name:"Cassini VIMS-IR",url:"https://stac.astrogeology.usgs.gov/cassini-vims-ir/"}
 ];
 
 function createCatalogSelector(){
-    const existing=document.getElementById("stacCatalogSelect");
-    if(existing)return;
+    if(document.getElementById("stacCatalogSelect"))return;
 
     const wrapper=document.createElement("div");
     wrapper.className="stacField";
@@ -8204,7 +8196,6 @@ function createCatalogSelector(){
     select.appendChild(first);
 
     let group="";
-
     catalogs.forEach(catalog=>{
         if(catalog.group!==group){
             group=catalog.group;
@@ -8225,13 +8216,33 @@ function createCatalogSelector(){
     };
 
     menu.parentNode.insertBefore(wrapper,menu);
-    wrapper.append(label,select);
+}
+
+function ensurePreviewBox(){
+    if(previewBox)return;
+
+    previewBox=document.createElement("div");
+    previewBox.id="stacPreview";
+    previewBox.style.marginTop="12px";
+    previewBox.style.display="none";
+    menu.parentNode.insertBefore(previewBox,structure);
+}
+
+function clearPreview(){
+    ensurePreviewBox();
+    previewBox.innerHTML="";
+    previewBox.style.display="none";
 }
 
 async function fetchJSON(url){
     if(controller)controller.abort();
     controller=new AbortController();
-    const response=await fetch(url,{signal:controller.signal});
+
+    const response=await fetch(url,{
+        signal:controller.signal,
+        headers:{Accept:"application/json"}
+    });
+
     if(!response.ok)throw new Error("HTTP "+response.status);
     return response.json();
 }
@@ -8245,15 +8256,19 @@ function findLinks(node,rels){
     return node?.links?.filter(link=>rels.includes(link.rel))||[];
 }
 
+function findLink(node,rel){
+    return node?.links?.find(link=>link.rel===rel)||null;
+}
+
 function clearState(){
     if(controller)controller.abort();
     controller=null;
     currentResource=null;
     currentPage=null;
-    nextPage=null;
-    menu.querySelectorAll(".stacField.dynamic").forEach(field=>field.remove());
-    structure.textContent="";
+    clearPreview();
     openButton.disabled=true;
+    menu.querySelectorAll(".stacDynamic").forEach(field=>field.remove());
+    structure.textContent="";
 }
 
 async function loadSTAC(){
@@ -8269,9 +8284,11 @@ async function loadSTAC(){
         clearState();
         rootURL=url;
         status.textContent="Reading STAC catalog...";
+
         const root=await fetchJSON(rootURL);
         showStructure(root);
-        await buildRootMenu(root);
+        await exploreNode(root,rootURL);
+
         status.textContent="STAC catalog loaded.";
     }catch(error){
         if(error.name==="AbortError")return;
@@ -8283,33 +8300,37 @@ async function loadSTAC(){
     }
 }
 
-async function buildRootMenu(root){
-    if(root.type==="Collection"){
-        createDynamicLevel("Collection",[{id:root.id,title:root.title||root.id,href:rootURL}],loadCollection);
+async function exploreNode(node,base){
+    if(node.type==="Feature"){
+        await loadItem({item:node,id:node.id,title:node.id});
         return;
     }
 
-    if(root.type==="Feature"){
-        await loadItem({item:root,id:root.id,title:root.id});
+    if(node.type==="FeatureCollection"){
+        loadItemsFromData(node,"Items");
         return;
     }
 
-    if(root.type==="FeatureCollection"){
-        loadItemsFromData(root,"Items");
+    if(node.type==="Collection"){
+        createDynamicLevel("Collection",[{
+            id:node.id,
+            title:node.title||node.id,
+            href:base
+        }],loadCollection);
         return;
     }
 
-    const collectionsLink=findLinks(root,["data","collections"])[0];
+    const collectionsLink=findLink(node,"data")||findLink(node,"collections");
 
     if(collectionsLink){
-        const url=resolveURL(rootURL,collectionsLink.href);
+        const url=resolveURL(base,collectionsLink.href);
         const data=await fetchJSON(url);
 
         if(Array.isArray(data.collections)){
             const collections=data.collections.map(collection=>({
                 id:collection.id,
                 title:collection.title||collection.id,
-                href:resolveURL(url,collection.links?.find(l=>l.rel==="self")?.href||collection.id)
+                href:resolveURL(url,findLink(collection,"self")?.href||collection.id)
             }));
 
             createDynamicLevel("Collections",collections,loadCollection);
@@ -8324,21 +8345,21 @@ async function buildRootMenu(root){
         }
     }
 
-    const searchLink=findLinks(root,["search"])[0];
+    const searchLink=findLinks(node,["search"])[0];
     if(searchLink){
-        await loadItemsURL(resolveURL(rootURL,searchLink.href),"Items");
+        await loadItemsURL(resolveURL(base,searchLink.href),"Items");
         return;
     }
 
-    const itemsLink=findLinks(root,["items"])[0];
+    const itemsLink=findLink(node,"items");
     if(itemsLink){
-        await loadItemsURL(resolveURL(rootURL,itemsLink.href),"Items");
+        await loadItemsURL(resolveURL(base,itemsLink.href),"Items");
         return;
     }
 
-    const childLink=findLinks(root,["child"])[0];
+    const childLink=findLink(node,"child");
     if(childLink){
-        await loadChildCatalog(resolveURL(rootURL,childLink.href));
+        await loadChildCatalog(resolveURL(base,childLink.href));
         return;
     }
 
@@ -8348,14 +8369,28 @@ async function buildRootMenu(root){
 async function loadCollection(collection){
     currentResource=null;
     openButton.disabled=true;
+    clearPreview();
     removeAfterLabel("Collections");
+
     status.textContent="Reading collection: "+collection.title;
 
     try{
         const node=await fetchJSON(collection.href);
-        const itemsLink=findLinks(node,["items"])[0];
-        const itemsURL=itemsLink?resolveURL(collection.href,itemsLink.href):resolveURL(collection.href,"items");
-        await loadItemsURL(itemsURL,"Items");
+        const itemsLink=findLink(node,"items");
+
+        if(itemsLink){
+            await loadItemsURL(resolveURL(collection.href,itemsLink.href),"Items");
+            return;
+        }
+
+        const searchLink=findLinks(node,["search"])[0];
+        if(searchLink){
+            await loadItemsURL(resolveURL(collection.href,searchLink.href),"Items");
+            return;
+        }
+
+        const fallback=resolveURL(collection.href,"items");
+        await loadItemsURL(fallback,"Items");
     }catch(error){
         if(error.name==="AbortError")return;
         console.warn("Collection error:",error);
@@ -8372,7 +8407,7 @@ async function loadItemsURL(url,label){
             return;
         }
 
-        status.textContent="Resource is not a FeatureCollection.";
+        await exploreNode(data,url);
     }catch(error){
         if(error.name==="AbortError")return;
         throw error;
@@ -8382,29 +8417,34 @@ async function loadItemsURL(url,label){
 function loadItemsFromData(data,label){
     const items=(data.features||[]).map(item=>({
         id:item.id,
-        title:item.properties?.title||item.id,
-        href:item.links?.find(link=>link.rel==="self")?.href||null
+        title:item.properties?.title||item.properties?.datetime||item.id,
+        datetime:item.properties?.datetime||"",
+        href:findLink(item,"self")?.href||null
     }));
+
+    const next=findLink(data,"next")?.href||null;
+    const previous=findLink(data,"prev")?.href||findLink(data,"previous")?.href||null;
 
     currentPage={
         label,
         items,
-        next:data.links?.find(link=>link.rel==="next")?.href||null,
-        previous:data.links?.find(link=>link.rel==="prev"||link.rel==="previous")?.href||null
+        next:next?resolveURL(rootURL,next):null,
+        previous:previous?resolveURL(rootURL,previous):null
     };
 
-    nextPage=currentPage.next?resolveURL(rootURL,currentPage.next):null;
-
     createDynamicLevel(label,items,loadItem);
-    createPageNavigation(label,currentPage.previous,nextPage);
+    createPageNavigation(label,currentPage.previous,currentPage.next);
 
     structure.textContent=JSON.stringify({
         type:data.type,
+        numberMatched:data.numberMatched,
+        numberReturned:data.numberReturned,
         numberOfItems:items.length,
-        next:nextPage,
-        previous:currentPage.previous?resolveURL(rootURL,currentPage.previous):null
+        next:currentPage.next,
+        previous:currentPage.previous
     },null,2);
 
+    clearPreview();
     status.textContent="Items loaded: "+items.length;
 }
 
@@ -8414,38 +8454,39 @@ function createPageNavigation(label,previous,next){
     if(!previous&&!next)return;
 
     const wrapper=document.createElement("div");
-    wrapper.className="stacField dynamic";
-    wrapper.dataset.stacPage="true";
+    wrapper.className="stacField stacDynamic";
 
-    const labelElement=document.createElement("label");
-    labelElement.textContent="Page";
+    const title=document.createElement("label");
+    title.textContent="Page";
 
     const controls=document.createElement("div");
     controls.style.display="flex";
     controls.style.gap="6px";
 
     const prevButton=document.createElement("button");
+    prevButton.type="button";
     prevButton.textContent="← Previous";
     prevButton.disabled=!previous;
 
     const nextButton=document.createElement("button");
+    nextButton.type="button";
     nextButton.textContent="Next →";
     nextButton.disabled=!next;
 
     prevButton.onclick=async()=>{
         if(!previous)return;
         status.textContent="Reading previous page...";
-        await loadItemsURL(resolveURL(rootURL,previous),label);
+        await loadItemsURL(previous,label);
     };
 
     nextButton.onclick=async()=>{
         if(!next)return;
         status.textContent="Reading next page...";
-        await loadItemsURL(resolveURL(rootURL,next),label);
+        await loadItemsURL(next,label);
     };
 
     controls.append(prevButton,nextButton);
-    wrapper.append(labelElement,controls);
+    wrapper.append(title,controls);
     menu.appendChild(wrapper);
 }
 
@@ -8453,7 +8494,7 @@ async function loadChildCatalog(url){
     try{
         const child=await fetchJSON(url);
         showStructure(child);
-        await buildRootMenu(child);
+        await exploreNode(child,url);
     }catch(error){
         if(error.name==="AbortError")return;
         throw error;
@@ -8463,20 +8504,27 @@ async function loadChildCatalog(url){
 async function loadItem(entry){
     currentResource=null;
     openButton.disabled=true;
+    clearPreview();
     removeAfterLabel("Items");
     removeLevel("Page");
+
     status.textContent="Reading item: "+entry.title;
 
     try{
-        const item=entry.item||await fetchJSON(resolveURL(rootURL,entry.href));
+        const itemURL=entry.href?resolveURL(rootURL,entry.href):null;
+        const item=entry.item||await fetchJSON(itemURL);
+
         showStructure(item);
+        renderItemInfo(item);
 
         const assets=Object.entries(item.assets||{}).map(([id,asset])=>({
             id,
             title:asset.title||id,
             href:asset.href,
             type:asset.type||"",
-            roles:asset.roles||[]
+            roles:asset.roles||[],
+            description:asset.description||"",
+            asset
         }));
 
         if(!assets.length){
@@ -8485,6 +8533,10 @@ async function loadItem(entry){
         }
 
         createDynamicLevel("Assets",assets,selectAsset);
+
+        const thumbnail=findThumbnail(item,assets);
+        if(thumbnail)renderAsset(thumbnail);
+
         status.textContent="Item loaded: "+assets.length+" assets";
     }catch(error){
         if(error.name==="AbortError")return;
@@ -8492,7 +8544,41 @@ async function loadItem(entry){
     }
 }
 
+function renderItemInfo(item){
+    const info={
+        id:item.id,
+        type:item.type,
+        datetime:item.properties?.datetime||null,
+        collection:item.collection||null,
+        bbox:item.bbox||null,
+        geometry:item.geometry||null,
+        assets:Object.keys(item.assets||{})
+    };
+
+    structure.textContent=JSON.stringify(info,null,2);
+}
+
+function findThumbnail(item,assets){
+    const direct=findLink(item,"thumbnail");
+    if(direct?.href){
+        return {
+            id:"thumbnail",
+            title:"Thumbnail",
+            href:resolveURL(rootURL,direct.href),
+            type:direct.type||"image/*",
+            roles:["thumbnail"]
+        };
+    }
+
+    return assets.find(asset=>
+        asset.roles?.includes("thumbnail")||
+        /^image\//i.test(asset.type||"")
+    )||null;
+}
+
 function selectAsset(asset){
+    clearPreview();
+
     if(!asset?.href){
         currentResource=null;
         openButton.disabled=true;
@@ -8502,22 +8588,136 @@ function selectAsset(asset){
 
     currentResource=asset.href;
     openButton.disabled=false;
-    status.textContent="Asset ready: "+asset.title;
 
     structure.textContent=JSON.stringify({
         id:asset.id,
         title:asset.title,
         type:asset.type,
         roles:asset.roles,
-        href:asset.href
+        href:asset.href,
+        description:asset.description
     },null,2);
+
+    renderAsset(asset);
+    status.textContent="Asset ready: "+asset.title;
+}
+
+function getAssetType(asset){
+    const type=(asset.type||"").toLowerCase();
+    const href=(asset.href||"").split("?")[0].toLowerCase();
+
+    if(type.startsWith("image/"))return"image";
+    if(type.includes("json"))return"json";
+    if(type.includes("csv")||type.includes("text/"))return"text";
+    if(type.includes("pdf"))return"pdf";
+    if(type.includes("geotiff")||type.includes("tiff")||/\.(tif|tiff|cog)$/.test(href))return"raster";
+    if(type.includes("geojson"))return"json";
+
+    if(/\.(png|jpg|jpeg|gif|webp|bmp|svg)$/.test(href))return"image";
+    if(/\.(json|geojson)$/.test(href))return"json";
+    if(/\.(csv|txt|xml)$/.test(href))return"text";
+    if(/\.pdf$/.test(href))return"pdf";
+    if(/\.(tif|tiff|cog)$/.test(href))return"raster";
+
+    return"resource";
+}
+
+async function renderAsset(asset){
+    ensurePreviewBox();
+
+    const type=getAssetType(asset);
+    const url=resolveURL(rootURL,asset.href);
+
+    previewBox.innerHTML="";
+    previewBox.style.display="block";
+
+    const heading=document.createElement("div");
+    heading.textContent=asset.title||asset.id;
+    heading.style.fontWeight="600";
+    heading.style.marginBottom="8px";
+    previewBox.appendChild(heading);
+
+    if(type==="image"){
+        const image=document.createElement("img");
+        image.src=url;
+        image.alt=asset.title||asset.id;
+        image.loading="lazy";
+        image.style.display="block";
+        image.style.maxWidth="100%";
+        image.style.maxHeight="500px";
+        image.style.objectFit="contain";
+        image.onerror=()=>{
+            previewBox.textContent="Image resource found, but preview could not be loaded.";
+        };
+        previewBox.appendChild(image);
+        return;
+    }
+
+    if(type==="json"){
+        try{
+            const response=await fetch(url);
+            if(!response.ok)throw new Error("HTTP "+response.status);
+            const data=await response.json();
+
+            const pre=document.createElement("pre");
+            pre.textContent=JSON.stringify(data,null,2);
+            pre.style.maxHeight="500px";
+            pre.style.overflow="auto";
+            previewBox.appendChild(pre);
+        }catch(error){
+            const message=document.createElement("div");
+            message.textContent="JSON resource detected. Preview unavailable: "+error.message;
+            previewBox.appendChild(message);
+        }
+        return;
+    }
+
+    if(type==="text"){
+        try{
+            const response=await fetch(url);
+            if(!response.ok)throw new Error("HTTP "+response.status);
+            const text=await response.text();
+
+            const pre=document.createElement("pre");
+            pre.textContent=text;
+            pre.style.maxHeight="500px";
+            pre.style.overflow="auto";
+            previewBox.appendChild(pre);
+        }catch(error){
+            const message=document.createElement("div");
+            message.textContent="Text resource detected. Preview unavailable: "+error.message;
+            previewBox.appendChild(message);
+        }
+        return;
+    }
+
+    if(type==="pdf"){
+        const frame=document.createElement("iframe");
+        frame.src=url;
+        frame.style.width="100%";
+        frame.style.height="500px";
+        frame.style.border="0";
+        previewBox.appendChild(frame);
+        return;
+    }
+
+    if(type==="raster"){
+        const info=document.createElement("div");
+        info.innerHTML="<strong>GeoTIFF / COG</strong><br>Raster asset detected.";
+        previewBox.appendChild(info);
+        return;
+    }
+
+    const info=document.createElement("div");
+    info.textContent="Resource detected: "+(asset.type||"unknown");
+    previewBox.appendChild(info);
 }
 
 function createDynamicLevel(label,items,callback){
     removeLevel(label);
 
     const wrapper=document.createElement("div");
-    wrapper.className="stacField dynamic";
+    wrapper.className="stacField stacDynamic";
 
     const title=document.createElement("label");
     title.textContent=label;
@@ -8533,8 +8733,10 @@ function createDynamicLevel(label,items,callback){
 
     select.onchange=async()=>{
         const selected=items[select.value];
-        try{await callback(selected);}
-        catch(error){
+
+        try{
+            await callback(selected);
+        }catch(error){
             if(error.name==="AbortError")return;
             console.error(error);
             status.textContent="Navigation error: "+error.message;
@@ -8543,6 +8745,9 @@ function createDynamicLevel(label,items,callback){
 
     wrapper.append(title,select);
     menu.appendChild(wrapper);
+
+    if(items.length)select.dispatchEvent(new Event("change"));
+
     return select;
 }
 
@@ -8558,8 +8763,13 @@ function removeAfterLabel(label){
 
     fields.forEach(field=>{
         const fieldLabel=field.querySelector("label")?.textContent;
-        if(fieldLabel===label){found=true;return;}
-        if(found&&field.classList.contains("dynamic"))field.remove();
+
+        if(fieldLabel===label){
+            found=true;
+            return;
+        }
+
+        if(found&&field.classList.contains("stacDynamic"))field.remove();
     });
 }
 
@@ -8583,6 +8793,7 @@ function openSelectedResource(){
 }
 
 createCatalogSelector();
+ensurePreviewBox();
 
 loadButton.onclick=loadSTAC;
 openButton.onclick=openSelectedResource;
@@ -8593,6 +8804,8 @@ urlInput.addEventListener("keydown",event=>{
 
 })();
 </script>
+
+
   
 </body>
 </html>
