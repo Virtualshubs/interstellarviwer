@@ -1397,6 +1397,7 @@ visibility:visible!important;
 
 <body>
 
+
 <div id="panel">
 
     <div id="header">
@@ -1411,20 +1412,25 @@ visibility:visible!important;
 </select>
 
 
-<div id="vectorTest">
-    <h3>Microsoft Building Footprints Test</h3>
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <input id="vectorLat" type="number" step="any" placeholder="Latitude">
-        <input id="vectorLon" type="number" step="any" placeholder="Longitude">
-        <button id="vectorSearch">Localizar Quadkey</button>
-        <button id="vectorBuild" disabled>Explotar Quadkey</button>
-        <span id="vectorStatus">Introduce una posición geográfica.</span>
+<div id="stacVectorTest" style="margin-top:20px;">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;">
+        <div>
+            <label for="vectorLat">Latitude</label>
+            <input id="vectorLat" type="number" step="any" placeholder="40.4168">
+        </div>
+        <div>
+            <label for="vectorLon">Longitude</label>
+            <input id="vectorLon" type="number" step="any" placeholder="-3.7038">
+        </div>
+        <button id="vectorSearch">Buscar en STAC</button>
+        <button id="vectorBuild" disabled>Reconstruir modelo 3D</button>
     </div>
 
-    <div id="vectorProductBox"></div>
+    <div id="vectorStatus" style="margin-top:10px;">
+        Introduce una posición geográfica.
+    </div>
 
-    <div id="vectorCanvas" style="width:100%;height:500px;margin-top:15px;background:#fff;border:1px solid #ccc"></div>
+    <div id="vectorCanvas" style="margin-top:15px;width:100%;min-height:500px;background:#fff;"></div>
 </div>
    
 
