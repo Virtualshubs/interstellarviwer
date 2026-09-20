@@ -8151,7 +8151,6 @@ loadCapabilities();
 </script>
 
 
-
 <script>
 (function(){
 "use strict";
@@ -8179,7 +8178,8 @@ const catalogs=[
 ];
 
 function createCatalogSelector(){
-    if(document.getElementById("stacCatalogSelect"))return;
+    const container=document.getElementById("contcatalogstac");
+    if(!container||document.getElementById("stacCatalogSelect"))return;
 
     const wrapper=document.createElement("div");
     wrapper.className="stacField";
@@ -8215,7 +8215,8 @@ function createCatalogSelector(){
         if(select.value)urlInput.value=select.value;
     };
 
-    menu.parentNode.insertBefore(wrapper,menu);
+    wrapper.append(label,select);
+    container.appendChild(wrapper);
 }
 
 function ensurePreviewBox(){
@@ -9045,13 +9046,11 @@ loadButton.onclick=loadSTAC;
 openButton.onclick=openSelectedResource;
 
 urlInput.addEventListener("keydown",event=>{
-    if(event.key==="Enter")loadSTAC;
+    if(event.key==="Enter")loadSTAC();
 });
 
 })();
 </script>
-
-
 
   
 </body>
