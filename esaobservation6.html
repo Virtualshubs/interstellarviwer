@@ -5054,7 +5054,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-
 let vectorQuadkey=null;
 let vectorScene=null;
 let vectorCamera=null;
@@ -5065,6 +5064,7 @@ let vectorQuadkeyPlane=null;
 let vectorQuadkeyEdges=null;
 let vectorCoordinatePoint=null;
 let vectorQuadkeyJSON=null;
+let vectorDuckDBPromise=null;
 
 const vectorLat=document.getElementById("vectorLat");
 const vectorLon=document.getElementById("vectorLon");
@@ -5154,12 +5154,18 @@ function vectorRemoveObject(object){
 function vectorRenderInitialPlane(){
     vectorInitScene();
     const geometry=new THREE.PlaneGeometry(100,100);
-    const plane=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0xe8e8e8,side:THREE.DoubleSide}));
+    const plane=new THREE.Mesh(
+        geometry,
+        new THREE.MeshBasicMaterial({color:0xe8e8e8,side:THREE.DoubleSide})
+    );
     plane.rotation.x=-Math.PI/2;
     plane.name="vectorInitialPlane";
     vectorScene.add(plane);
     const edges=new THREE.EdgesGeometry(geometry);
-    const line=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x222222}));
+    const line=new THREE.LineSegments(
+        edges,
+        new THREE.LineBasicMaterial({color:0x222222})
+    );
     line.rotation.x=-Math.PI/2;
     line.name="vectorInitialEdges";
     vectorScene.add(line);
@@ -5318,20 +5324,47 @@ async function vectorFindQuadkeyItem(quadkey){
 }
 
 function vectorGetItemDataAsset(){
-    const item=vectorQuadkeyJSON;
-    return item?.assets?.data||null;
+    return vectorQuadkeyJSON?.assets?.data||null;
 }
 
 function vectorGetAssetURL(){
-    const asset=vectorGetItemDataAsset();
-    return asset?.href||null;
+    return vectorGetItemDataAsset()?.href||null;
 }
 
 async function vectorGetParquetURL(){
-    const assetURL=vectorGetAssetURL();
+    const asset=vectorGetItemDataAsset();
+    const assetURL=asset?.href;
 
     if(!assetURL)
         throw new Error("El Item no contiene assets.data.href.");
+
+    if(!assetURL.startsWith("abfs://"))
+        return assetURL;
+
+    const storageAccount=
+        asset["table:storage_options"]?.account_name||
+        vectorQuadkeyJSON?.assets?.data?.["table:storage_options"]?.account_name||
+        null;
+
+    if(!storageAccount)
+        throw new Error("No se ha encontrado la cuenta de almacenamiento del GeoParquet.");
+
+    const path=assetURL.replace(/^abfs:\/\//,"");
+    const slash=path.indexOf("/");
+
+    if(slash<0)
+        throw new Error("La ruta ABFS del GeoParquet no es válida.");
+
+    const container=path.slice(0,slash);
+    const blobPath=path.slice(slash+1);
+
+    const blobURL=
+        "https://"+
+        storageAccount+
+        ".blob.core.windows.net/"+
+        container+
+        "/"+
+        blobPath;
 
     const selfLink=Array.isArray(vectorQuadkeyJSON.links)
         ?vectorQuadkeyJSON.links.find(link=>link.rel==="self"&&link.href)
@@ -5340,47 +5373,83 @@ async function vectorGetParquetURL(){
     if(!selfLink?.href)
         throw new Error("El Item no contiene su enlace self.");
 
-    const itemURL=new URL(selfLink.href);
-    const assetPath=assetURL.replace(/^abfs:\/\//,"");
+    const endpoint=
+        new URL(selfLink.href).origin+
+        "/api/sas/v1/sign?href="+
+        encodeURIComponent(blobURL);
 
-    const tokenURL=
-        itemURL.origin+
-        "/api/sas/v1/token/"+
-        encodeURIComponent(assetPath);
-
-    const response=await fetch(tokenURL);
+    const response=await fetch(endpoint);
 
     if(!response.ok)
-        throw new Error("No se ha podido obtener acceso al GeoParquet. HTTP "+response.status);
+        throw new Error("No se ha podido firmar el GeoParquet. HTTP "+response.status);
 
-    const tokenData=await response.json();
+    const signed=await response.json();
 
-    if(!tokenData.href)
-        throw new Error("La respuesta de acceso no contiene una URL válida.");
+    if(!signed.href)
+        throw new Error("La respuesta de firma no contiene una URL válida.");
 
-    return tokenData.href;
+    return signed.href;
+}
+
+async function vectorGetDuckDB(){
+    if(vectorDuckDBPromise)return vectorDuckDBPromise;
+
+    vectorDuckDBPromise=(async()=>{
+        vectorSetStatus("Cargando DuckDB-WASM...");
+
+        const duckdb=await import(
+            "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm/+esm"
+        );
+
+        const bundles=duckdb.getJsDelivrBundles();
+        const bundle=await duckdb.selectBundle(bundles);
+
+        const workerURL=URL.createObjectURL(
+            new Blob(
+                [`importScripts("${bundle.mainWorker}");`],
+                {type:"text/javascript"}
+            )
+        );
+
+        const worker=new Worker(workerURL);
+        const db=new duckdb.AsyncDuckDB(
+            new duckdb.ConsoleLogger(),
+            worker
+        );
+
+        await db.instantiate(
+            bundle.mainModule,
+            bundle.pthreadWorker
+        );
+
+        URL.revokeObjectURL(workerURL);
+
+        return db;
+    })();
+
+    try{
+        return await vectorDuckDBPromise;
+    }catch(error){
+        vectorDuckDBPromise=null;
+        throw error;
+    }
 }
 
 async function vectorLoadParquet(){
-    if(!window.duckdb)
-        throw new Error("DuckDB-WASM no está disponible en la página.");
-
     const parquetURL=await vectorGetParquetURL();
+    const db=await vectorGetDuckDB();
 
     vectorSetStatus("Leyendo GeoParquet de la Quadkey...");
 
-    const db=window.duckdb;
     const connection=await db.connect();
 
     try{
         const escapedURL=parquetURL.replace(/'/g,"''");
 
-        const result=await connection.query(`
+        return await connection.query(`
             SELECT geometry, meanHeight
             FROM read_parquet('${escapedURL}')
         `);
-
-        return result;
     }finally{
         await connection.close();
     }
@@ -5389,67 +5458,224 @@ async function vectorLoadParquet(){
 function vectorGetRows(result){
     if(!result)return[];
 
-    if(Array.isArray(result))
-        return result;
-
     if(typeof result.toArray==="function")
         return result.toArray();
 
-    if(Array.isArray(result.toJSON?.()))
-        return result.toJSON();
+    if(typeof result.toJSON==="function"){
+        const data=result.toJSON();
+        if(Array.isArray(data))return data;
+    }
+
+    if(Array.isArray(result))
+        return result;
 
     return[];
 }
 
-function vectorDecodeGeometry(value){
+function vectorGetBytes(value){
     if(value==null)return null;
 
+    if(value instanceof Uint8Array)
+        return value;
+
+    if(value instanceof ArrayBuffer)
+        return new Uint8Array(value);
+
+    if(ArrayBuffer.isView(value))
+        return new Uint8Array(
+            value.buffer,
+            value.byteOffset,
+            value.byteLength
+        );
+
+    if(Array.isArray(value))
+        return new Uint8Array(value);
+
     if(typeof value==="string"){
-        try{return JSON.parse(value);}catch(error){}
-    }
-
-    if(value instanceof Uint8Array||value instanceof ArrayBuffer){
-        const bytes=value instanceof Uint8Array?value:new Uint8Array(value);
-        const text=new TextDecoder().decode(bytes);
-        try{return JSON.parse(text);}catch(error){}
-    }
-
-    if(Array.isArray(value)){
-        const bytes=new Uint8Array(value);
-        const text=new TextDecoder().decode(bytes);
-        try{return JSON.parse(text);}catch(error){}
+        try{
+            const binary=atob(value);
+            const bytes=new Uint8Array(binary.length);
+            for(let i=0;i<binary.length;i++)
+                bytes[i]=binary.charCodeAt(i);
+            return bytes;
+        }catch(error){}
     }
 
     return null;
 }
 
-function vectorGeometryToShape(geometry,bounds){
-    if(!geometry||geometry.type!=="Polygon")return null;
+function vectorReadWKB(value){
+    const bytes=vectorGetBytes(value);
+    if(!bytes||bytes.length<5)return null;
 
+    const view=new DataView(
+        bytes.buffer,
+        bytes.byteOffset,
+        bytes.byteLength
+    );
+
+    let offset=0;
+
+    function readUInt32(little){
+        const value=view.getUint32(offset,little);
+        offset+=4;
+        return value;
+    }
+
+    function readFloat64(little){
+        const value=view.getFloat64(offset,little);
+        offset+=8;
+        return value;
+    }
+
+    function readGeometry(){
+        if(offset+5>view.byteLength)return null;
+
+        const byteOrder=view.getUint8(offset++);
+        const little=byteOrder===1;
+        let type=readUInt32(little);
+
+        const hasZ=(type&0x80000000)!==0;
+        const hasM=(type&0x40000000)!==0;
+
+        type=type&0x0fffffff;
+
+        if(type>=1000){
+            const baseType=type%1000;
+            const dimension=Math.floor(type/1000);
+            type=baseType;
+            if(dimension===1||dimension===2){}
+        }
+
+        const skipExtraCoordinates=()=>{
+            if(hasZ)readFloat64(little);
+            if(hasM)readFloat64(little);
+        };
+
+        if(type===3){
+            const ringCount=readUInt32(little);
+            const rings=[];
+
+            for(let r=0;r<ringCount;r++){
+                const pointCount=readUInt32(little);
+                const ring=[];
+
+                for(let p=0;p<pointCount;p++){
+                    const x=readFloat64(little);
+                    const y=readFloat64(little);
+                    skipExtraCoordinates();
+                    ring.push([x,y]);
+                }
+
+                rings.push(ring);
+            }
+
+            return{
+                type:"Polygon",
+                coordinates:rings
+            };
+        }
+
+        if(type===6){
+            const polygonCount=readUInt32(little);
+            const polygons=[];
+
+            for(let i=0;i<polygonCount;i++){
+                const polygon=readGeometry();
+                if(polygon&&polygon.type==="Polygon")
+                    polygons.push(polygon.coordinates);
+            }
+
+            return{
+                type:"MultiPolygon",
+                coordinates:polygons
+            };
+        }
+
+        return null;
+    }
+
+    return readGeometry();
+}
+
+function vectorCoordinateToXY(lon,lat,bounds){
     const centerLat=(bounds.latMin+bounds.latMax)/2;
     const centerLon=(bounds.lonMin+bounds.lonMax)/2;
     const cosLat=Math.cos(centerLat*Math.PI/180);
 
-    const shape=new THREE.Shape();
+    return{
+        x:(lon-centerLon)*111320*cosLat,
+        y:(lat-centerLat)*110540
+    };
+}
 
-    const rings=geometry.coordinates;
-    if(!Array.isArray(rings)||!rings.length)return null;
+function vectorRingArea(ring){
+    let area=0;
 
-    const ring=rings[0];
-    if(!Array.isArray(ring)||ring.length<3)return null;
+    for(let i=0;i<ring.length-1;i++){
+        area+=
+            ring[i][0]*ring[i+1][1]-
+            ring[i+1][0]*ring[i][1];
+    }
 
-    ring.forEach((coordinate,index)=>{
-        const lon=Number(coordinate[0]);
-        const lat=Number(coordinate[1]);
+    return area/2;
+}
 
-        const x=(lon-centerLon)*111320*cosLat;
-        const y=(lat-centerLat)*110540;
+function vectorGeometryToShapes(geometry,bounds){
+    if(!geometry)return[];
 
-        if(index===0)shape.moveTo(x,y);
-        else shape.lineTo(x,y);
+    const polygons=
+        geometry.type==="Polygon"
+            ?[geometry.coordinates]
+            :geometry.type==="MultiPolygon"
+                ?geometry.coordinates
+                :[];
+
+    const shapes=[];
+
+    polygons.forEach(polygon=>{
+        if(!Array.isArray(polygon)||!polygon.length)return;
+
+        const outer=polygon[0];
+        if(!Array.isArray(outer)||outer.length<3)return;
+
+        const shape=new THREE.Shape();
+
+        outer.forEach((coordinate,index)=>{
+            const point=vectorCoordinateToXY(
+                Number(coordinate[0]),
+                Number(coordinate[1]),
+                bounds
+            );
+
+            if(index===0)shape.moveTo(point.x,point.y);
+            else shape.lineTo(point.x,point.y);
+        });
+
+        for(let i=1;i<polygon.length;i++){
+            const ring=polygon[i];
+            if(!Array.isArray(ring)||ring.length<3)continue;
+
+            const hole=new THREE.Path();
+
+            ring.forEach((coordinate,index)=>{
+                const point=vectorCoordinateToXY(
+                    Number(coordinate[0]),
+                    Number(coordinate[1]),
+                    bounds
+                );
+
+                if(index===0)hole.moveTo(point.x,point.y);
+                else hole.lineTo(point.x,point.y);
+            });
+
+            shape.holes.push(hole);
+        }
+
+        shapes.push(shape);
     });
 
-    return shape;
+    return shapes;
 }
 
 function vectorBuildBuildings(rows,bounds){
@@ -5457,7 +5683,8 @@ function vectorBuildBuildings(rows,bounds){
     group.name="vectorBuildings";
 
     const material=new THREE.MeshBasicMaterial({
-        color:0x687985
+        color:0x687985,
+        side:THREE.DoubleSide
     });
 
     let count=0;
@@ -5468,7 +5695,8 @@ function vectorBuildBuildings(rows,bounds){
             row.GEOMETRY??
             row["geometry"];
 
-        const geometry=vectorDecodeGeometry(geometryData);
+        const geometry=vectorReadWKB(geometryData);
+
         const height=Number(
             row.meanHeight??
             row.MEANHEIGHT??
@@ -5478,26 +5706,30 @@ function vectorBuildBuildings(rows,bounds){
 
         if(!geometry||!Number.isFinite(height)||height<=0)return;
 
-        if(geometry.type==="Polygon"){
-            const shape=vectorGeometryToShape(geometry,bounds);
-            if(!shape)return;
+        const shapes=vectorGeometryToShapes(
+            geometry,
+            bounds
+        );
 
-            const extrudeGeometry=new THREE.ExtrudeGeometry(shape,{
+        if(!shapes.length)return;
+
+        const extrudeGeometry=new THREE.ExtrudeGeometry(
+            shapes,
+            {
                 depth:height,
                 bevelEnabled:false
-            });
+            }
+        );
 
-            extrudeGeometry.rotateX(-Math.PI/2);
+        extrudeGeometry.rotateX(-Math.PI/2);
 
-            const mesh=new THREE.Mesh(
-                extrudeGeometry,
-                material.clone()
-            );
+        const mesh=new THREE.Mesh(
+            extrudeGeometry,
+            material
+        );
 
-            mesh.position.y=0;
-            group.add(mesh);
-            count++;
-        }
+        group.add(mesh);
+        count++;
     });
 
     return{group,count};
@@ -5514,7 +5746,11 @@ async function vectorBuildModel(){
     try{
         const bounds=vectorQuadkeyBounds(vectorQuadkey);
 
-        vectorSetStatus("Preparando reconstrucción de "+vectorQuadkey+"...");
+        vectorSetStatus(
+            "Preparando reconstrucción de "+
+            vectorQuadkey+
+            "..."
+        );
 
         const result=await vectorLoadParquet();
         const rows=vectorGetRows(result);
@@ -5528,10 +5764,17 @@ async function vectorBuildModel(){
         if(oldBuildings)
             vectorRemoveObject(oldBuildings);
 
-        const built=vectorBuildBuildings(rows,bounds);
+        const built=vectorBuildBuildings(
+            rows,
+            bounds
+        );
 
         if(!built.count)
-            throw new Error("Se han leído "+rows.length+" registros, pero no se ha podido reconstruir ninguna geometría.");
+            throw new Error(
+                "Se han leído "+
+                rows.length+
+                " registros, pero no se ha podido reconstruir ninguna geometría."
+            );
 
         vectorScene.add(built.group);
 
@@ -5566,7 +5809,8 @@ async function vectorSearchQuadkey(){
     vectorProductBox.innerHTML="";
 
     const oldRaw=document.getElementById("vectorQuadkeyRawContent");
-    if(oldRaw)oldRaw.textContent="Esperando datos de la Quadkey...";
+    if(oldRaw)
+        oldRaw.textContent="Esperando datos de la Quadkey...";
 
     vectorSetStatus("Calculando Quadkey...");
 
@@ -5578,13 +5822,22 @@ async function vectorSearchQuadkey(){
         lon<-180||
         lon>180
     ){
-        vectorSetStatus("Posición no encontrada: coordenadas no válidas.");
+        vectorSetStatus(
+            "Posición no encontrada: coordenadas no válidas."
+        );
         return;
     }
 
     try{
-        const quadkey=vectorLatLonToQuadkey(lat,lon,9);
-        const bounds=vectorQuadkeyBounds(quadkey);
+        const quadkey=vectorLatLonToQuadkey(
+            lat,
+            lon,
+            9
+        );
+
+        const bounds=vectorQuadkeyBounds(
+            quadkey
+        );
 
         vectorQuadkey=quadkey;
 
@@ -5598,7 +5851,12 @@ async function vectorSearchQuadkey(){
             <div>Lon max: ${bounds.lonMax}</div>
         `;
 
-        vectorRenderQuadkey(bounds,lat,lon);
+        vectorRenderQuadkey(
+            bounds,
+            lat,
+            lon
+        );
+
         vectorCreateRawBox();
 
         vectorSetStatus(
@@ -5607,7 +5865,10 @@ async function vectorSearchQuadkey(){
             ". Buscando en Items STAC..."
         );
 
-        const found=await vectorFindQuadkeyItem(quadkey);
+        const found=await vectorFindQuadkeyItem(
+            quadkey
+        );
+
         const item=found.item;
 
         vectorSetRawJSON(item);
@@ -5642,9 +5903,12 @@ async function vectorSearchQuadkey(){
 function vectorAnimate(){
     if(!vectorRenderer||!vectorScene||!vectorCamera)return;
 
-    vectorAnimation=requestAnimationFrame(vectorAnimate);
+    vectorAnimation=requestAnimationFrame(
+        vectorAnimate
+    );
 
-    if(vectorControls)vectorControls.update();
+    if(vectorControls)
+        vectorControls.update();
 
     vectorRenderer.render(
         vectorScene,
@@ -5655,12 +5919,22 @@ function vectorAnimate(){
 function vectorResize(){
     if(!vectorRenderer||!vectorCamera)return;
 
-    const width=Math.max(vectorCanvas.clientWidth,300);
-    const height=Math.max(vectorCanvas.clientHeight,400);
+    const width=Math.max(
+        vectorCanvas.clientWidth,
+        300
+    );
+
+    const height=Math.max(
+        vectorCanvas.clientHeight,
+        400
+    );
 
     vectorCamera.aspect=width/height;
     vectorCamera.updateProjectionMatrix();
-    vectorRenderer.setSize(width,height);
+    vectorRenderer.setSize(
+        width,
+        height
+    );
 }
 
 vectorSearch.addEventListener(
