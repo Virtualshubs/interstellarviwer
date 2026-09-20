@@ -1404,14 +1404,34 @@ visibility:visible!important;
         <input id="search" value="Biomass">
         <button id="load">SEARCH</button>
       <button id="themeToggle">🌙 LUNAR</button>
-
- 
-       
     </div>
 
          <select id="collectionSelector">
 <option value="">Select collection...</option>
 </select>
+
+
+<div id="stacVectorTest" style="margin-top:20px;">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;">
+        <div>
+            <label for="vectorLat">Latitude</label>
+            <input id="vectorLat" type="number" step="any" placeholder="40.4168">
+        </div>
+        <div>
+            <label for="vectorLon">Longitude</label>
+            <input id="vectorLon" type="number" step="any" placeholder="-3.7038">
+        </div>
+        <button id="vectorSearch">Buscar en STAC</button>
+        <button id="vectorBuild" disabled>Reconstruir modelo 3D</button>
+    </div>
+
+    <div id="vectorStatus" style="margin-top:10px;">
+        Introduce una posición geográfica.
+    </div>
+
+    <div id="vectorCanvas" style="margin-top:15px;width:100%;min-height:500px;background:#fff;"></div>
+</div>
+   
 
     <div id="workspace">
 
@@ -1523,7 +1543,8 @@ visibility:visible!important;
 
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
 
   
 <script>
@@ -5028,6 +5049,411 @@ document.getElementById("themeToggle").addEventListener("click", () => {
             ? "🌙 LUNAR"
             : "☀ TERRA";
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const VECTOR_STAC_URL="https://planetarycomputer.microsoft.com/api/stac/v1";
+const VECTOR_TILE_URL="https://planetarycomputer.microsoft.com/api/data/v1/vector/collections/ms-buildings/tilesets/global-footprints/tiles/{z}/{x}/{y}";
+
+let vectorSearchResult=null;
+let vectorScene=null;
+let vectorCamera=null;
+let vectorRenderer=null;
+let vectorControls=null;
+let vectorAnimation=null;
+
+const vectorLat=document.getElementById("vectorLat");
+const vectorLon=document.getElementById("vectorLon");
+const vectorSearch=document.getElementById("vectorSearch");
+const vectorBuild=document.getElementById("vectorBuild");
+const vectorStatus=document.getElementById("vectorStatus");
+const vectorCanvas=document.getElementById("vectorCanvas");
+
+function vectorSetStatus(text){
+    vectorStatus.textContent=text;
+}
+
+function vectorLonToTileX(lon,z){
+    return Math.floor((lon+180)/360*Math.pow(2,z));
+}
+
+function vectorLatToTileY(lat,z){
+    const r=lat*Math.PI/180;
+    return Math.floor((1-Math.asinh(Math.tan(r))/Math.PI)/2*Math.pow(2,z));
+}
+
+function vectorTileXToLon(x,z){
+    return x/Math.pow(2,z)*360-180;
+}
+
+function vectorTileYToLat(y,z){
+    const n=Math.PI-2*Math.PI*y/Math.pow(2,z);
+    return 180/Math.PI*Math.atan(Math.sinh(n));
+}
+
+async function vectorFetchJSON(url){
+    const response=await fetch(url);
+    if(!response.ok)throw new Error("HTTP "+response.status);
+    return response.json();
+}
+
+async function vectorSearchSTAC(){
+    const lat=parseFloat(vectorLat.value);
+    const lon=parseFloat(vectorLon.value);
+
+    vectorBuild.disabled=true;
+    vectorSearchResult=null;
+
+    if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>90||lon<-180||lon>180){
+        vectorSetStatus("Coordenadas no válidas.");
+        return;
+    }
+
+    vectorSetStatus("Buscando geometrías vectoriales...");
+
+    try{
+        const z=13;
+        const x=vectorLonToTileX(lon,z);
+        const y=vectorLatToTileY(lat,z);
+
+        const tileURL=VECTOR_TILE_URL
+            .replace("{z}",z)
+            .replace("{x}",x)
+            .replace("{y}",y);
+
+        vectorSearchResult={
+            lat,
+            lon,
+            zoom:z,
+            tileX:x,
+            tileY:y,
+            tileURL
+        };
+
+        vectorSetStatus(
+            "Zona localizada en STAC. Tile vectorial: "+z+"/"+x+"/"+y
+        );
+
+        vectorBuild.disabled=false;
+    }catch(error){
+        vectorSearchResult=null;
+        vectorSetStatus("Error buscando en STAC: "+error.message);
+    }
+}
+
+function vectorDestroyScene(){
+    if(vectorAnimation){
+        cancelAnimationFrame(vectorAnimation);
+        vectorAnimation=null;
+    }
+
+    if(vectorControls){
+        vectorControls.dispose();
+        vectorControls=null;
+    }
+
+    if(vectorRenderer){
+        vectorRenderer.dispose();
+        vectorRenderer=null;
+    }
+
+    vectorScene=null;
+    vectorCamera=null;
+    vectorCanvas.innerHTML="";
+}
+
+function vectorBuildModel(){
+    if(!vectorSearchResult)return;
+
+    vectorDestroyScene();
+
+    vectorScene=new THREE.Scene();
+    vectorScene.background=new THREE.Color(0xffffff);
+
+    const width=Math.max(vectorCanvas.clientWidth,300);
+    const height=Math.max(vectorCanvas.clientHeight,500);
+
+    vectorCamera=new THREE.PerspectiveCamera(
+        45,
+        width/height,
+        0.1,
+        10000
+    );
+
+    vectorCamera.position.set(0,120,180);
+
+    vectorRenderer=new THREE.WebGLRenderer({
+        antialias:true,
+        alpha:false
+    });
+
+    vectorRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    vectorRenderer.setSize(width,height);
+    vectorRenderer.setClearColor(0xffffff,1);
+
+    vectorCanvas.appendChild(vectorRenderer.domElement);
+
+    const ambient=new THREE.AmbientLight(0xffffff,0.75);
+    vectorScene.add(ambient);
+
+    const directional=new THREE.DirectionalLight(0xffffff,1.2);
+    directional.position.set(100,200,150);
+    vectorScene.add(directional);
+
+    const grid=new THREE.GridHelper(500,50,0xcccccc,0xe8e8e8);
+    vectorScene.add(grid);
+
+    vectorControls=new THREE.OrbitControls(
+        vectorCamera,
+        vectorRenderer.domElement
+    );
+
+    vectorControls.enableDamping=true;
+    vectorControls.dampingFactor=0.08;
+    vectorControls.minDistance=10;
+    vectorControls.maxDistance=1000;
+
+    vectorLoadTile(vectorSearchResult.tileURL);
+}
+
+async function vectorLoadTile(tileURL){
+    vectorSetStatus("Cargando geometría vectorial...");
+
+    try{
+        const response=await fetch(tileURL);
+
+        if(!response.ok){
+            throw new Error("HTTP "+response.status);
+        }
+
+        const buffer=await response.arrayBuffer();
+
+        if(!window.VectorTile||!window.Pbf){
+            throw new Error("Biblioteca vector-tile no disponible.");
+        }
+
+        const tile=new VectorTile(new Pbf(new Uint8Array(buffer)));
+        const layerNames=Object.keys(tile.layers);
+
+        if(!layerNames.length){
+            throw new Error("El tile no contiene capas.");
+        }
+
+        let buildingLayer=null;
+
+        for(const name of layerNames){
+            if(
+                name.toLowerCase().includes("building")||
+                name.toLowerCase().includes("footprint")
+            ){
+                buildingLayer=tile.layers[name];
+                break;
+            }
+        }
+
+        if(!buildingLayer){
+            buildingLayer=tile.layers[layerNames[0]];
+        }
+
+        const features=[];
+
+        for(let i=0;i<buildingLayer.length;i++){
+            const feature=buildingLayer.feature(i);
+
+            if(!feature)continue;
+
+            const geometry=feature.loadGeometry();
+
+            if(!geometry||!geometry.length)continue;
+
+            features.push({
+                geometry,
+                properties:feature.properties||{}
+            });
+        }
+
+        if(!features.length){
+            throw new Error("No se encontraron polígonos.");
+        }
+
+        vectorRenderFeatures(
+            features,
+            vectorSearchResult
+        );
+
+        vectorSetStatus(
+            features.length+" geometrías encontradas. Modelo 3D reconstruido."
+        );
+    }catch(error){
+        vectorSetStatus("Error reconstruyendo geometrías: "+error.message);
+    }
+}
+
+function vectorRenderFeatures(features,info){
+    const z=info.zoom;
+    const tileX=info.tileX;
+    const tileY=info.tileY;
+
+    const scale=Math.pow(2,z);
+
+    const centerX=(info.lon+180)/360*scale;
+    const centerY=(1-Math.asinh(
+        Math.tan(info.lat*Math.PI/180)
+    )/Math.PI)/2*scale;
+
+    const group=new THREE.Group();
+
+    const material=new THREE.MeshStandardMaterial({
+        color:0x999999,
+        side:THREE.DoubleSide
+    });
+
+    let minX=Infinity;
+    let maxX=-Infinity;
+    let minY=Infinity;
+    let maxY=-Infinity;
+
+    features.forEach(item=>{
+        item.geometry.forEach(ring=>{
+            if(!ring||ring.length<3)return;
+
+            const shape=new THREE.Shape();
+
+            ring.forEach((point,index)=>{
+                const px=(
+                    tileX+
+                    point.x/4096-
+                    centerX+
+                    0
+                )*4096/scale;
+
+                const py=(
+                    tileY+
+                    point.y/4096-
+                    centerY+
+                    0
+                )*4096/scale;
+
+                const x=px*100;
+                const y=-py*100;
+
+                minX=Math.min(minX,x);
+                maxX=Math.max(maxX,x);
+                minY=Math.min(minY,y);
+                maxY=Math.max(maxY,y);
+
+                if(index===0){
+                    shape.moveTo(x,y);
+                }else{
+                    shape.lineTo(x,y);
+                }
+            });
+
+            shape.closePath();
+
+            const geometry=new THREE.ExtrudeGeometry(shape,{
+                depth:1,
+                bevelEnabled:false
+            });
+
+            const mesh=new THREE.Mesh(
+                geometry,
+                material
+            );
+
+            mesh.rotation.x=-Math.PI/2;
+            group.add(mesh);
+        });
+    });
+
+    const centerModelX=(minX+maxX)/2;
+    const centerModelY=(minY+maxY)/2;
+
+    group.position.x=-centerModelX;
+    group.position.z=centerModelY;
+
+    vectorScene.add(group);
+
+    const modelWidth=Math.max(maxX-minX,10);
+    const modelDepth=Math.max(maxY-minY,10);
+    const modelSize=Math.max(modelWidth,modelDepth);
+
+    vectorCamera.position.set(
+        modelSize*0.8,
+        modelSize*0.9,
+        modelSize*0.8
+    );
+
+    vectorControls.target.set(0,0,0);
+    vectorControls.update();
+
+    vectorAnimate();
+}
+
+function vectorAnimate(){
+    if(!vectorRenderer||!vectorScene||!vectorCamera)return;
+
+    vectorAnimation=requestAnimationFrame(vectorAnimate);
+
+    vectorControls.update();
+
+    vectorRenderer.render(
+        vectorScene,
+        vectorCamera
+    );
+}
+
+function vectorResize(){
+    if(!vectorRenderer||!vectorCamera)return;
+
+    const width=Math.max(vectorCanvas.clientWidth,300);
+    const height=Math.max(vectorCanvas.clientHeight,500);
+
+    vectorCamera.aspect=width/height;
+    vectorCamera.updateProjectionMatrix();
+
+    vectorRenderer.setSize(width,height);
+}
+
+vectorSearch.addEventListener("click",vectorSearchSTAC);
+vectorBuild.addEventListener("click",vectorBuildModel);
+window.addEventListener("resize",vectorResize);
+
+
+
+
+
+
+
+
+
+
+
+
+     
 
 </script>
   
