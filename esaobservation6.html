@@ -5055,7 +5055,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-
 let vectorQuadkey=null;
 let vectorScene=null;
 let vectorCamera=null;
@@ -5099,358 +5098,131 @@ function vectorQuadkeyToTile(quadkey){
     let x=0;
     let y=0;
     const level=quadkey.length;
-
     for(let i=0;i<level;i++){
         const bit=level-i-1;
         const digit=Number(quadkey[i]);
-
         if(digit&1)x+=1<<bit;
         if(digit&2)y+=1<<bit;
     }
-
     return{x,y,z:level};
 }
 
 function vectorQuadkeyBounds(quadkey){
     const tile=vectorQuadkeyToTile(quadkey);
     const n=Math.pow(2,tile.z);
-
     const lonMin=tile.x/n*360-180;
     const lonMax=(tile.x+1)/n*360-180;
-
-    const latMax=
-        Math.atan(
-            Math.sinh(
-                Math.PI*(1-2*tile.y/n)
-            )
-        )*180/Math.PI;
-
-    const latMin=
-        Math.atan(
-            Math.sinh(
-                Math.PI*(1-2*(tile.y+1)/n)
-            )
-        )*180/Math.PI;
-
-    return{
-        lonMin,
-        lonMax,
-        latMin,
-        latMax
-    };
+    const latMax=Math.atan(Math.sinh(Math.PI*(1-2*tile.y/n)))*180/Math.PI;
+    const latMin=Math.atan(Math.sinh(Math.PI*(1-2*(tile.y+1)/n)))*180/Math.PI;
+    return{lonMin,lonMax,latMin,latMax};
 }
 
 function vectorInitScene(){
     if(vectorScene)return;
-
     vectorCanvas.style.display="block";
-
     vectorScene=new THREE.Scene();
-    vectorScene.background=
-        new THREE.Color(0xffffff);
-
-    const width=
-        Math.max(
-            vectorCanvas.clientWidth,
-            300
-        );
-
-    const height=
-        Math.max(
-            vectorCanvas.clientHeight,
-            400
-        );
-
-    vectorCamera=
-        new THREE.PerspectiveCamera(
-            45,
-            width/height,
-            0.1,
-            10000
-        );
-
-    vectorCamera.position.set(
-        120,
-        120,
-        120
-    );
-
-    vectorRenderer=
-        new THREE.WebGLRenderer({
-            antialias:true
-        });
-
-    vectorRenderer.setPixelRatio(
-        Math.min(
-            window.devicePixelRatio||1,
-            2
-        )
-    );
-
-    vectorRenderer.setSize(
-        width,
-        height
-    );
-
-    vectorRenderer.setClearColor(
-        0xffffff,
-        1
-    );
-
-    vectorCanvas.appendChild(
-        vectorRenderer.domElement
-    );
-
-    vectorControls=
-        new THREE.OrbitControls(
-            vectorCamera,
-            vectorRenderer.domElement
-        );
-
+    vectorScene.background=new THREE.Color(0xffffff);
+    const width=Math.max(vectorCanvas.clientWidth,300);
+    const height=Math.max(vectorCanvas.clientHeight,400);
+    vectorCamera=new THREE.PerspectiveCamera(45,width/height,0.1,10000);
+    vectorCamera.position.set(120,120,120);
+    vectorRenderer=new THREE.WebGLRenderer({antialias:true});
+    vectorRenderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    vectorRenderer.setSize(width,height);
+    vectorRenderer.setClearColor(0xffffff,1);
+    vectorCanvas.appendChild(vectorRenderer.domElement);
+    vectorControls=new THREE.OrbitControls(vectorCamera,vectorRenderer.domElement);
     vectorControls.enableDamping=true;
     vectorControls.dampingFactor=0.08;
     vectorControls.target.set(0,0,0);
     vectorControls.update();
-
     vectorAnimate();
 }
 
 function vectorRemoveObject(object){
     if(!object||!vectorScene)return;
-
     vectorScene.remove(object);
-
     object.traverse(child=>{
-        if(child.geometry)
-            child.geometry.dispose();
-
+        if(child.geometry)child.geometry.dispose();
         if(child.material){
-            if(Array.isArray(child.material))
-                child.material.forEach(
-                    material=>material.dispose()
-                );
-            else
-                child.material.dispose();
+            if(Array.isArray(child.material))child.material.forEach(material=>material.dispose());
+            else child.material.dispose();
         }
     });
 }
 
 function vectorRenderInitialPlane(){
     vectorInitScene();
-
-    const geometry=
-        new THREE.PlaneGeometry(
-            100,
-            100
-        );
-
-    const material=
-        new THREE.MeshBasicMaterial({
-            color:0xe8e8e8,
-            side:THREE.DoubleSide
-        });
-
-    const plane=
-        new THREE.Mesh(
-            geometry,
-            material
-        );
-
+    const geometry=new THREE.PlaneGeometry(100,100);
+    const plane=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0xe8e8e8,side:THREE.DoubleSide}));
     plane.rotation.x=-Math.PI/2;
     plane.name="vectorInitialPlane";
-
     vectorScene.add(plane);
-
-    const edges=
-        new THREE.EdgesGeometry(
-            geometry
-        );
-
-    const line=
-        new THREE.LineSegments(
-            edges,
-            new THREE.LineBasicMaterial({
-                color:0x222222
-            })
-        );
-
+    const edges=new THREE.EdgesGeometry(geometry);
+    const line=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x222222}));
     line.rotation.x=-Math.PI/2;
     line.name="vectorInitialEdges";
-
     vectorScene.add(line);
 }
 
-function vectorRenderQuadkey(
-    bounds,
-    lat,
-    lon
-){
+function vectorRenderQuadkey(bounds,lat,lon){
     vectorInitScene();
 
-    const oldPlane=
-        vectorScene.getObjectByName(
-            "vectorInitialPlane"
-        );
+    const oldPlane=vectorScene.getObjectByName("vectorInitialPlane");
+    if(oldPlane)vectorRemoveObject(oldPlane);
 
-    if(oldPlane)
-        vectorRemoveObject(oldPlane);
+    const oldEdges=vectorScene.getObjectByName("vectorInitialEdges");
+    if(oldEdges)vectorRemoveObject(oldEdges);
 
-    const oldEdges=
-        vectorScene.getObjectByName(
-            "vectorInitialEdges"
-        );
+    if(vectorQuadkeyPlane)vectorRemoveObject(vectorQuadkeyPlane);
+    if(vectorQuadkeyEdges)vectorRemoveObject(vectorQuadkeyEdges);
+    if(vectorCoordinatePoint)vectorRemoveObject(vectorCoordinatePoint);
 
-    if(oldEdges)
-        vectorRemoveObject(oldEdges);
+    const centerLat=(bounds.latMin+bounds.latMax)/2;
+    const centerLon=(bounds.lonMin+bounds.lonMax)/2;
+    const cosLat=Math.cos(centerLat*Math.PI/180);
+    const width=(bounds.lonMax-bounds.lonMin)*111320*cosLat;
+    const height=(bounds.latMax-bounds.latMin)*110540;
 
-    if(vectorQuadkeyPlane)
-        vectorRemoveObject(
-            vectorQuadkeyPlane
-        );
+    const geometry=new THREE.PlaneGeometry(width,height);
 
-    if(vectorQuadkeyEdges)
-        vectorRemoveObject(
-            vectorQuadkeyEdges
-        );
-
-    if(vectorCoordinatePoint)
-        vectorRemoveObject(
-            vectorCoordinatePoint
-        );
-
-    const centerLat=
-        (bounds.latMin+bounds.latMax)/2;
-
-    const centerLon=
-        (bounds.lonMin+bounds.lonMax)/2;
-
-    const cosLat=
-        Math.cos(
-            centerLat*Math.PI/180
-        );
-
-    const width=
-        (bounds.lonMax-bounds.lonMin)*
-        111320*
-        cosLat;
-
-    const height=
-        (bounds.latMax-bounds.latMin)*
-        110540;
-
-    const geometry=
-        new THREE.PlaneGeometry(
-            width,
-            height
-        );
-
-    vectorQuadkeyPlane=
-        new THREE.Mesh(
-            geometry,
-            new THREE.MeshBasicMaterial({
-                color:0x9bb8cc,
-                side:THREE.DoubleSide
-            })
-        );
-
-    vectorQuadkeyPlane.rotation.x=
-        -Math.PI/2;
-
-    vectorQuadkeyPlane.name=
-        "vectorQuadkeyPlane";
-
-    vectorScene.add(
-        vectorQuadkeyPlane
+    vectorQuadkeyPlane=new THREE.Mesh(
+        geometry,
+        new THREE.MeshBasicMaterial({color:0x9bb8cc,side:THREE.DoubleSide})
     );
+    vectorQuadkeyPlane.rotation.x=-Math.PI/2;
+    vectorQuadkeyPlane.name="vectorQuadkeyPlane";
+    vectorScene.add(vectorQuadkeyPlane);
 
-    const edges=
-        new THREE.EdgesGeometry(
-            geometry
-        );
-
-    vectorQuadkeyEdges=
-        new THREE.LineSegments(
-            edges,
-            new THREE.LineBasicMaterial({
-                color:0x222222
-            })
-        );
-
-    vectorQuadkeyEdges.rotation.x=
-        -Math.PI/2;
-
-    vectorQuadkeyEdges.name=
-        "vectorQuadkeyEdges";
-
-    vectorScene.add(
-        vectorQuadkeyEdges
+    const edges=new THREE.EdgesGeometry(geometry);
+    vectorQuadkeyEdges=new THREE.LineSegments(
+        edges,
+        new THREE.LineBasicMaterial({color:0x222222})
     );
+    vectorQuadkeyEdges.rotation.x=-Math.PI/2;
+    vectorQuadkeyEdges.name="vectorQuadkeyEdges";
+    vectorScene.add(vectorQuadkeyEdges);
 
-    const pointX=
-        (lon-centerLon)*
-        111320*
-        cosLat;
+    const pointX=(lon-centerLon)*111320*cosLat;
+    const pointZ=-(lat-centerLat)*110540;
+    const pointSize=Math.max(Math.min(Math.max(width,height)*0.015,500),1);
 
-    const pointZ=
-        -(lat-centerLat)*
-        110540;
-
-    const pointSize=
-        Math.max(
-            Math.min(
-                Math.max(width,height)*0.015,
-                500
-            ),
-            1
-        );
-
-    vectorCoordinatePoint=
-        new THREE.Mesh(
-            new THREE.SphereGeometry(
-                pointSize,
-                16,
-                16
-            ),
-            new THREE.MeshBasicMaterial({
-                color:0x111111
-            })
-        );
-
-    vectorCoordinatePoint.position.set(
-        pointX,
-        pointSize,
-        pointZ
+    vectorCoordinatePoint=new THREE.Mesh(
+        new THREE.SphereGeometry(pointSize,16,16),
+        new THREE.MeshBasicMaterial({color:0x111111})
     );
+    vectorCoordinatePoint.position.set(pointX,pointSize,pointZ);
+    vectorCoordinatePoint.name="vectorCoordinatePoint";
+    vectorScene.add(vectorCoordinatePoint);
 
-    vectorCoordinatePoint.name=
-        "vectorCoordinatePoint";
-
-    vectorScene.add(
-        vectorCoordinatePoint
-    );
-
-    const maxSize=
-        Math.max(
-            width,
-            height
-        );
-
-    vectorCamera.position.set(
-        maxSize*0.8,
-        maxSize*0.8,
-        maxSize*0.8
-    );
-
+    const maxSize=Math.max(width,height);
+    vectorCamera.position.set(maxSize*0.8,maxSize*0.8,maxSize*0.8);
     vectorControls.target.set(0,0,0);
     vectorControls.update();
 }
 
 function vectorCreateRawBox(){
-    let box=
-        document.getElementById(
-            "vectorQuadkeyRaw"
-        );
-
+    let box=document.getElementById("vectorQuadkeyRaw");
     if(box)return box;
 
     box=document.createElement("div");
@@ -5458,225 +5230,345 @@ function vectorCreateRawBox(){
     box.style.marginTop="15px";
     box.style.width="100%";
 
-    const title=
-        document.createElement("h4");
-
-    title.textContent=
-        "Raw JSON — Quadkey";
-
+    const title=document.createElement("h4");
+    title.textContent="Raw JSON — Quadkey";
     box.appendChild(title);
 
-    const raw=
-        document.createElement("pre");
-
+    const raw=document.createElement("pre");
     raw.id="vectorQuadkeyRawContent";
     raw.style.maxHeight="400px";
     raw.style.overflow="auto";
     raw.style.whiteSpace="pre-wrap";
     raw.style.wordBreak="break-word";
-    raw.textContent=
-        "Esperando datos de la Quadkey...";
-
+    raw.textContent="Esperando datos de la Quadkey...";
     box.appendChild(raw);
 
-    vectorCanvas.parentNode.insertBefore(
-        box,
-        vectorCanvas.nextSibling
-    );
-
+    vectorCanvas.parentNode.insertBefore(box,vectorCanvas.nextSibling);
     return box;
 }
 
 function vectorSetRawJSON(data){
     vectorQuadkeyJSON=data;
-
     vectorCreateRawBox();
-
-    const raw=
-        document.getElementById(
-            "vectorQuadkeyRawContent"
-        );
-
-    if(raw)
-        raw.textContent=
-            JSON.stringify(
-                data,
-                null,
-                2
-            );
+    const raw=document.getElementById("vectorQuadkeyRawContent");
+    if(raw)raw.textContent=JSON.stringify(data,null,2);
 }
 
 function vectorGetInitialRaw(){
-    const raw=
-        document.getElementById("raw");
-
-    if(
-        !raw||
-        !raw.textContent.trim()
-    )
-        return null;
-
+    const raw=document.getElementById("raw");
+    if(!raw||!raw.textContent.trim())return null;
     try{
-        return JSON.parse(
-            raw.textContent
-        );
+        return JSON.parse(raw.textContent);
     }catch(error){
         return null;
     }
 }
 
 function vectorFindItemsURL(raw){
-    if(
-        !raw||
-        !Array.isArray(raw.links)
-    )
-        return null;
-
-    const link=
-        raw.links.find(
-            item=>
-                item.rel==="items"&&
-                item.href
-        );
-
+    if(!raw||!Array.isArray(raw.links))return null;
+    const link=raw.links.find(item=>item.rel==="items"&&item.href);
     return link?.href||null;
 }
 
-async function vectorFindQuadkeyItem(
-    quadkey
-){
-    const initial=
-        vectorGetInitialRaw();
+async function vectorFindQuadkeyItem(quadkey){
+    const initial=vectorGetInitialRaw();
 
     if(!initial)
-        throw new Error(
-            "No se ha podido leer el Raw JSON inicial."
-        );
+        throw new Error("No se ha podido leer el Raw JSON inicial.");
 
-    const itemsURL=
-        vectorFindItemsURL(
-            initial
-        );
+    const itemsURL=vectorFindItemsURL(initial);
 
     if(!itemsURL)
-        throw new Error(
-            "No se ha encontrado la URL de Items en el Raw JSON inicial."
-        );
+        throw new Error("No se ha encontrado la URL de Items en el Raw JSON inicial.");
 
     let pageURL=itemsURL;
     let pageNumber=1;
 
     while(pageURL){
+        vectorSetStatus("Buscando Quadkey "+quadkey+" — página "+pageNumber+"...");
 
-        vectorSetStatus(
-            "Buscando Quadkey "+
-            quadkey+
-            " — página "+
-            pageNumber+
-            "..."
+        const response=await fetch(pageURL);
+        if(!response.ok)
+            throw new Error("Error leyendo la página STAC "+pageNumber+" HTTP "+response.status);
+
+        const page=await response.json();
+
+        if(!page||page.type!=="FeatureCollection")
+            throw new Error("La respuesta de Items no es un FeatureCollection STAC.");
+
+        const features=Array.isArray(page.features)?page.features:[];
+
+        const found=features.find(
+            item=>String(item.properties?.["msbuildings:quadkey"]??"")===String(quadkey)
         );
 
-        const response=
-            await fetch(
-                pageURL
-            );
+        if(found)return{item:found,page:pageNumber,itemsURL};
 
-        if(!response.ok)
-            throw new Error(
-                "Error leyendo la página STAC "+
-                pageNumber+
-                " HTTP "+
-                response.status
-            );
+        const next=Array.isArray(page.links)
+            ?page.links.find(link=>link.rel==="next"&&link.href)
+            :null;
 
-        const page=
-            await response.json();
-
-        if(
-            !page||
-            page.type!=="FeatureCollection"
-        )
-            throw new Error(
-                "La respuesta de Items no es un FeatureCollection STAC."
-            );
-
-        const features=
-            Array.isArray(page.features)?
-            page.features:
-            [];
-
-        const found=
-            features.find(
-                item=>
-                    String(
-                        item.properties?.[
-                            "msbuildings:quadkey"
-                        ]??
-                        ""
-                    )===
-                    String(quadkey)
-            );
-
-        if(found){
-
-            return{
-                item:found,
-                page:pageNumber,
-                itemsURL
-            };
-        }
-
-        const next=
-            Array.isArray(page.links)?
-            page.links.find(
-                link=>
-                    link.rel==="next"&&
-                    link.href
-            ):
-            null;
-
-        if(!next)
-            break;
+        if(!next)break;
 
         pageURL=next.href;
         pageNumber++;
     }
 
-    throw new Error(
-        "No se ha encontrado la Quadkey "+
-        quadkey+
-        " en ninguna página STAC."
-    );
+    throw new Error("No se ha encontrado la Quadkey "+quadkey+" en ninguna página STAC.");
+}
+
+function vectorGetItemDataAsset(){
+    const item=vectorQuadkeyJSON;
+    return item?.assets?.data||null;
+}
+
+function vectorGetAssetURL(){
+    const asset=vectorGetItemDataAsset();
+    return asset?.href||null;
+}
+
+async function vectorGetParquetURL(){
+    const assetURL=vectorGetAssetURL();
+
+    if(!assetURL)
+        throw new Error("El Item no contiene assets.data.href.");
+
+    const selfLink=Array.isArray(vectorQuadkeyJSON.links)
+        ?vectorQuadkeyJSON.links.find(link=>link.rel==="self"&&link.href)
+        :null;
+
+    if(!selfLink?.href)
+        throw new Error("El Item no contiene su enlace self.");
+
+    const itemURL=new URL(selfLink.href);
+    const assetPath=assetURL.replace(/^abfs:\/\//,"");
+
+    const tokenURL=
+        itemURL.origin+
+        "/api/sas/v1/token/"+
+        encodeURIComponent(assetPath);
+
+    const response=await fetch(tokenURL);
+
+    if(!response.ok)
+        throw new Error("No se ha podido obtener acceso al GeoParquet. HTTP "+response.status);
+
+    const tokenData=await response.json();
+
+    if(!tokenData.href)
+        throw new Error("La respuesta de acceso no contiene una URL válida.");
+
+    return tokenData.href;
+}
+
+async function vectorLoadParquet(){
+    if(!window.duckdb)
+        throw new Error("DuckDB-WASM no está disponible en la página.");
+
+    const parquetURL=await vectorGetParquetURL();
+
+    vectorSetStatus("Leyendo GeoParquet de la Quadkey...");
+
+    const db=window.duckdb;
+    const connection=await db.connect();
+
+    try{
+        const escapedURL=parquetURL.replace(/'/g,"''");
+
+        const result=await connection.query(`
+            SELECT geometry, meanHeight
+            FROM read_parquet('${escapedURL}')
+        `);
+
+        return result;
+    }finally{
+        await connection.close();
+    }
+}
+
+function vectorGetRows(result){
+    if(!result)return[];
+
+    if(Array.isArray(result))
+        return result;
+
+    if(typeof result.toArray==="function")
+        return result.toArray();
+
+    if(Array.isArray(result.toJSON?.()))
+        return result.toJSON();
+
+    return[];
+}
+
+function vectorDecodeGeometry(value){
+    if(value==null)return null;
+
+    if(typeof value==="string"){
+        try{return JSON.parse(value);}catch(error){}
+    }
+
+    if(value instanceof Uint8Array||value instanceof ArrayBuffer){
+        const bytes=value instanceof Uint8Array?value:new Uint8Array(value);
+        const text=new TextDecoder().decode(bytes);
+        try{return JSON.parse(text);}catch(error){}
+    }
+
+    if(Array.isArray(value)){
+        const bytes=new Uint8Array(value);
+        const text=new TextDecoder().decode(bytes);
+        try{return JSON.parse(text);}catch(error){}
+    }
+
+    return null;
+}
+
+function vectorGeometryToShape(geometry,bounds){
+    if(!geometry||geometry.type!=="Polygon")return null;
+
+    const centerLat=(bounds.latMin+bounds.latMax)/2;
+    const centerLon=(bounds.lonMin+bounds.lonMax)/2;
+    const cosLat=Math.cos(centerLat*Math.PI/180);
+
+    const shape=new THREE.Shape();
+
+    const rings=geometry.coordinates;
+    if(!Array.isArray(rings)||!rings.length)return null;
+
+    const ring=rings[0];
+    if(!Array.isArray(ring)||ring.length<3)return null;
+
+    ring.forEach((coordinate,index)=>{
+        const lon=Number(coordinate[0]);
+        const lat=Number(coordinate[1]);
+
+        const x=(lon-centerLon)*111320*cosLat;
+        const y=(lat-centerLat)*110540;
+
+        if(index===0)shape.moveTo(x,y);
+        else shape.lineTo(x,y);
+    });
+
+    return shape;
+}
+
+function vectorBuildBuildings(rows,bounds){
+    const group=new THREE.Group();
+    group.name="vectorBuildings";
+
+    const material=new THREE.MeshBasicMaterial({
+        color:0x687985
+    });
+
+    let count=0;
+
+    rows.forEach(row=>{
+        const geometryData=
+            row.geometry??
+            row.GEOMETRY??
+            row["geometry"];
+
+        const geometry=vectorDecodeGeometry(geometryData);
+        const height=Number(
+            row.meanHeight??
+            row.MEANHEIGHT??
+            row["meanHeight"]??
+            0
+        );
+
+        if(!geometry||!Number.isFinite(height)||height<=0)return;
+
+        if(geometry.type==="Polygon"){
+            const shape=vectorGeometryToShape(geometry,bounds);
+            if(!shape)return;
+
+            const extrudeGeometry=new THREE.ExtrudeGeometry(shape,{
+                depth:height,
+                bevelEnabled:false
+            });
+
+            extrudeGeometry.rotateX(-Math.PI/2);
+
+            const mesh=new THREE.Mesh(
+                extrudeGeometry,
+                material.clone()
+            );
+
+            mesh.position.y=0;
+            group.add(mesh);
+            count++;
+        }
+    });
+
+    return{group,count};
+}
+
+async function vectorBuildModel(){
+    if(!vectorQuadkey||!vectorQuadkeyJSON){
+        vectorSetStatus("Primero hay que localizar una Quadkey.");
+        return;
+    }
+
+    vectorBuild.disabled=true;
+
+    try{
+        const bounds=vectorQuadkeyBounds(vectorQuadkey);
+
+        vectorSetStatus("Preparando reconstrucción de "+vectorQuadkey+"...");
+
+        const result=await vectorLoadParquet();
+        const rows=vectorGetRows(result);
+
+        if(!rows.length)
+            throw new Error("El GeoParquet no ha devuelto registros.");
+
+        const oldBuildings=
+            vectorScene.getObjectByName("vectorBuildings");
+
+        if(oldBuildings)
+            vectorRemoveObject(oldBuildings);
+
+        const built=vectorBuildBuildings(rows,bounds);
+
+        if(!built.count)
+            throw new Error("Se han leído "+rows.length+" registros, pero no se ha podido reconstruir ninguna geometría.");
+
+        vectorScene.add(built.group);
+
+        vectorProductBox.innerHTML+=`
+            <div>Registros GeoParquet leídos: ${rows.length}</div>
+            <div>Edificios reconstruidos: ${built.count}</div>
+        `;
+
+        vectorSetStatus(
+            "Reconstrucción completada: "+
+            built.count+
+            " edificios."
+        );
+
+    }catch(error){
+        vectorSetStatus(
+            "Error reconstruyendo Quadkey: "+
+            error.message
+        );
+    }finally{
+        vectorBuild.disabled=false;
+    }
 }
 
 async function vectorSearchQuadkey(){
-    const lat=
-        parseFloat(
-            vectorLat.value
-        );
-
-    const lon=
-        parseFloat(
-            vectorLon.value
-        );
+    const lat=parseFloat(vectorLat.value);
+    const lon=parseFloat(vectorLon.value);
 
     vectorBuild.disabled=true;
     vectorQuadkey=null;
     vectorQuadkeyJSON=null;
     vectorProductBox.innerHTML="";
 
-    const oldRaw=
-        document.getElementById(
-            "vectorQuadkeyRawContent"
-        );
+    const oldRaw=document.getElementById("vectorQuadkeyRawContent");
+    if(oldRaw)oldRaw.textContent="Esperando datos de la Quadkey...";
 
-    if(oldRaw)
-        oldRaw.textContent=
-            "Esperando datos de la Quadkey...";
-
-    vectorSetStatus(
-        "Calculando Quadkey..."
-    );
+    vectorSetStatus("Calculando Quadkey...");
 
     if(
         !Number.isFinite(lat)||
@@ -5686,28 +5578,15 @@ async function vectorSearchQuadkey(){
         lon<-180||
         lon>180
     ){
-        vectorSetStatus(
-            "Posición no encontrada: coordenadas no válidas."
-        );
+        vectorSetStatus("Posición no encontrada: coordenadas no válidas.");
         return;
     }
 
     try{
+        const quadkey=vectorLatLonToQuadkey(lat,lon,9);
+        const bounds=vectorQuadkeyBounds(quadkey);
 
-        const quadkey=
-            vectorLatLonToQuadkey(
-                lat,
-                lon,
-                9
-            );
-
-        const bounds=
-            vectorQuadkeyBounds(
-                quadkey
-            );
-
-        vectorQuadkey=
-            quadkey;
+        vectorQuadkey=quadkey;
 
         vectorProductBox.innerHTML=`
             <div>Quadkey: ${quadkey}</div>
@@ -5719,12 +5598,7 @@ async function vectorSearchQuadkey(){
             <div>Lon max: ${bounds.lonMax}</div>
         `;
 
-        vectorRenderQuadkey(
-            bounds,
-            lat,
-            lon
-        );
-
+        vectorRenderQuadkey(bounds,lat,lon);
         vectorCreateRawBox();
 
         vectorSetStatus(
@@ -5733,17 +5607,10 @@ async function vectorSearchQuadkey(){
             ". Buscando en Items STAC..."
         );
 
-        const found=
-            await vectorFindQuadkeyItem(
-                quadkey
-            );
+        const found=await vectorFindQuadkeyItem(quadkey);
+        const item=found.item;
 
-        const item=
-            found.item;
-
-        vectorSetRawJSON(
-            item
-        );
+        vectorSetRawJSON(item);
 
         vectorProductBox.innerHTML+=`
             <div>Item encontrado: ${item.id||"sin ID"}</div>
@@ -5758,11 +5625,10 @@ async function vectorSearchQuadkey(){
         vectorSetStatus(
             "Quadkey encontrada en la página "+
             found.page+
-            ". Raw JSON rellenado."
+            ". Raw JSON rellenado. Lista para reconstruir."
         );
 
     }catch(error){
-
         vectorQuadkey=null;
         vectorQuadkeyJSON=null;
 
@@ -5773,34 +5639,12 @@ async function vectorSearchQuadkey(){
     }
 }
 
-async function vectorBuildModel(){
-    if(!vectorQuadkey){
-        vectorSetStatus(
-            "Primero hay que localizar una Quadkey."
-        );
-        return;
-    }
-
-    vectorSetStatus(
-        "Quadkey localizada. La construcción del modelo se añadirá en el siguiente paso."
-    );
-}
-
 function vectorAnimate(){
-    if(
-        !vectorRenderer||
-        !vectorScene||
-        !vectorCamera
-    )
-        return;
+    if(!vectorRenderer||!vectorScene||!vectorCamera)return;
 
-    vectorAnimation=
-        requestAnimationFrame(
-            vectorAnimate
-        );
+    vectorAnimation=requestAnimationFrame(vectorAnimate);
 
-    if(vectorControls)
-        vectorControls.update();
+    if(vectorControls)vectorControls.update();
 
     vectorRenderer.render(
         vectorScene,
@@ -5809,33 +5653,14 @@ function vectorAnimate(){
 }
 
 function vectorResize(){
-    if(
-        !vectorRenderer||
-        !vectorCamera
-    )
-        return;
+    if(!vectorRenderer||!vectorCamera)return;
 
-    const width=
-        Math.max(
-            vectorCanvas.clientWidth,
-            300
-        );
+    const width=Math.max(vectorCanvas.clientWidth,300);
+    const height=Math.max(vectorCanvas.clientHeight,400);
 
-    const height=
-        Math.max(
-            vectorCanvas.clientHeight,
-            400
-        );
-
-    vectorCamera.aspect=
-        width/height;
-
+    vectorCamera.aspect=width/height;
     vectorCamera.updateProjectionMatrix();
-
-    vectorRenderer.setSize(
-        width,
-        height
-    );
+    vectorRenderer.setSize(width,height);
 }
 
 vectorSearch.addEventListener(
