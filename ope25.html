@@ -1694,20 +1694,21 @@ width:100%;
   
 <div id="earthLayersPanel">
 
-   <div id="stacExplorerTest">
+ <div id="stacExplorerTest" style="overflow-y:auto;overflow-x:hidden;max-height:85vh;">
 
 <h3>STAC Explorer Test</h3>
 
-<div id="stacURLRow">
+<div id="stacURLRow" style="display:flex;flex-direction:column;gap:10px;">
 
 <input
 id="stacURL"
 type="url"
 placeholder="https://example.com/stac/"
 autocomplete="off"
+style="width:100%;"
 >
 
-<button id="stacLoad">
+<button id="stacLoad" style="width:100%;">
 Load STAC
 </button>
 
