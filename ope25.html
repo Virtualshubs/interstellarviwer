@@ -8165,6 +8165,9 @@ const openButton=document.getElementById("stacOpen");
 let rootURL="";
 let currentResource=null;
 let controller=null;
+let currentPage=null;
+let nextPage=null;
+let previousPages=[];
 
 async function fetchJSON(url){
     if(controller)controller.abort();
@@ -8187,6 +8190,9 @@ function clearState(){
     if(controller)controller.abort();
     controller=null;
     currentResource=null;
+    currentPage=null;
+    nextPage=null;
+    previousPages=[];
     menu.innerHTML="";
     structure.textContent="";
     openButton.disabled=true;
@@ -8224,10 +8230,22 @@ async function buildRootMenu(root){
         return;
     }
 
-    const link=findLinks(root,["data","collections"])[0];
+    if(root.type==="Feature"){
+        await loadItem({item:root,id:root.id,title:root.id});
+        return;
+    }
 
-    if(link){
-        const url=resolveURL(rootURL,link.href);
+    if(root.type==="FeatureCollection"){
+        loadItemsFromData(root,"Items");
+        return;
+    }
+
+    const links=findLinks(root,["data","collections","search","child","items"]);
+
+    const collectionsLink=links.find(link=>link.rel==="data"||link.rel==="collections");
+
+    if(collectionsLink){
+        const url=resolveURL(rootURL,collectionsLink.href);
         const data=await fetchJSON(url);
 
         if(Array.isArray(data.collections)){
@@ -8236,7 +8254,9 @@ async function buildRootMenu(root){
                 title:collection.title||collection.id,
                 href:resolveURL(url,collection.links?.find(l=>l.rel==="self")?.href||collection.id)
             }));
+
             createDynamicLevel("Collections",collections,loadCollection);
+
             structure.textContent=JSON.stringify({
                 type:data.type,
                 id:data.id,
@@ -8247,12 +8267,25 @@ async function buildRootMenu(root){
         }
     }
 
-    if(root.type==="FeatureCollection"){
-        loadItemsFromData(root,"Items");
+    const searchLink=links.find(link=>link.rel==="search");
+    if(searchLink){
+        await loadItemsURL(resolveURL(rootURL,searchLink.href),"Items");
         return;
     }
 
-    status.textContent="Catalog loaded, but no navigable collections were found.";
+    const itemsLink=links.find(link=>link.rel==="items");
+    if(itemsLink){
+        await loadItemsURL(resolveURL(rootURL,itemsLink.href),"Items");
+        return;
+    }
+
+    const childLink=links.find(link=>link.rel==="child");
+    if(childLink){
+        await loadChildCatalog(resolveURL(rootURL,childLink.href));
+        return;
+    }
+
+    status.textContent="Catalog loaded, but no navigable resources were found.";
 }
 
 async function loadCollection(collection){
@@ -8263,38 +8296,35 @@ async function loadCollection(collection){
 
     let itemsURL=collection.itemsURL;
 
-    if(!itemsURL){
-        itemsURL=collection.href;
-        const node=await fetchJSON(itemsURL);
-        itemsURL=findLinks(node,["items"])[0]?.href;
-
-        if(!itemsURL)itemsURL=resolveURL(rootURL,"collections/"+encodeURIComponent(collection.id)+"/items");
-        else itemsURL=resolveURL(itemsURL,itemsURL);
-    }
-
     try{
-        const data=await fetchJSON(addLimit(itemsURL,20));
+        if(!itemsURL){
+            const node=await fetchJSON(collection.href);
+            const itemsLink=findLinks(node,["items"])[0];
 
-        if(data.type==="FeatureCollection"||Array.isArray(data.features)){
-            loadItemsFromData(data,"Items");
-            status.textContent="Collection loaded: "+(data.features?.length||0)+" items";
-            return;
+            if(itemsLink)itemsURL=resolveURL(collection.href,itemsLink.href);
+            else itemsURL=resolveURL(collection.href,"items");
         }
+
+        await loadItemsURL(itemsURL,"Items");
     }catch(error){
         if(error.name==="AbortError")return;
-        console.warn("Items endpoint failed:",error);
+        console.warn("Collection error:",error);
+        status.textContent="No items found in collection.";
     }
-
-    status.textContent="No items found in collection.";
 }
 
-function addLimit(url,limit){
+async function loadItemsURL(url,label){
     try{
-        const u=new URL(url);
-        if(!u.searchParams.has("limit"))u.searchParams.set("limit",limit);
-        return u.href;
-    }catch{
-        return url;
+        const data=await fetchJSON(url);
+        if(data.type==="FeatureCollection"||Array.isArray(data.features)){
+            loadItemsFromData(data,label);
+            return;
+        }
+
+        status.textContent="Resource is not a FeatureCollection.";
+    }catch(error){
+        if(error.name==="AbortError")return;
+        throw error;
     }
 }
 
@@ -8302,27 +8332,90 @@ function loadItemsFromData(data,label){
     const items=(data.features||[]).map(item=>({
         id:item.id,
         title:item.properties?.title||item.id,
-        href:item.links?.find(link=>link.rel==="self")?.href||null,
-        item
+        href:item.links?.find(link=>link.rel==="self")?.href||null
     }));
 
-    if(!items.length){
-        status.textContent="No items found.";
-        return;
-    }
+    currentPage={
+        label,
+        items,
+        next:data.links?.find(link=>link.rel==="next")?.href||null
+    };
+
+    nextPage=currentPage.next?resolveURL(rootURL,currentPage.next):null;
+
+    const previous=data.links?.find(link=>link.rel==="prev"||link.rel==="previous")?.href||null;
 
     createDynamicLevel(label,items,loadItem);
+
+    createPageNavigation(label,previous,nextPage);
+
     structure.textContent=JSON.stringify({
         type:data.type,
         numberOfItems:items.length,
-        next:data.links?.find(link=>link.rel==="next")?.href||null
+        next:nextPage,
+        previous:previous?resolveURL(rootURL,previous):null
     },null,2);
+
+    status.textContent="Items loaded: "+items.length;
+}
+
+function createPageNavigation(label,previous,next){
+    removeLevel("Page");
+
+    if(!previous&&!next)return;
+
+    const wrapper=document.createElement("div");
+    wrapper.className="stacField";
+    wrapper.dataset.stacPage="true";
+
+    const title=document.createElement("label");
+    title.textContent="Page";
+
+    const controls=document.createElement("div");
+    controls.style.display="flex";
+    controls.style.gap="6px";
+
+    const prevButton=document.createElement("button");
+    prevButton.textContent="← Previous";
+    prevButton.disabled=!previous;
+
+    const nextButton=document.createElement("button");
+    nextButton.textContent="Next →";
+    nextButton.disabled=!next;
+
+    prevButton.onclick=async()=>{
+        if(!previous)return;
+        status.textContent="Reading previous page...";
+        await loadItemsURL(resolveURL(rootURL,previous),label);
+    };
+
+    nextButton.onclick=async()=>{
+        if(!next)return;
+        status.textContent="Reading next page...";
+        await loadItemsURL(resolveURL(rootURL,next),label);
+    };
+
+    controls.append(prevButton,nextButton);
+    wrapper.append(title,controls);
+    menu.appendChild(wrapper);
+}
+
+async function loadChildCatalog(url){
+    try{
+        const child=await fetchJSON(url);
+        showStructure(child);
+        await buildRootMenu(child);
+    }catch(error){
+        if(error.name==="AbortError")return;
+        throw error;
+    }
 }
 
 async function loadItem(entry){
     currentResource=null;
     openButton.disabled=true;
     removeAfterLabel("Items");
+    removeLevel("Page");
     status.textContent="Reading item: "+entry.title;
 
     try{
@@ -8361,6 +8454,7 @@ function selectAsset(asset){
     currentResource=asset.href;
     openButton.disabled=false;
     status.textContent="Asset ready: "+asset.title;
+
     structure.textContent=JSON.stringify({
         id:asset.id,
         title:asset.title,
@@ -8412,6 +8506,7 @@ function removeLevel(label){
 function removeAfterLabel(label){
     const fields=[...menu.querySelectorAll(".stacField")];
     let found=false;
+
     fields.forEach(field=>{
         const fieldLabel=field.querySelector("label")?.textContent;
         if(fieldLabel===label){found=true;return;}
@@ -8442,7 +8537,7 @@ loadButton.onclick=loadSTAC;
 openButton.onclick=openSelectedResource;
 
 urlInput.addEventListener("keydown",event=>{
-    if(event.key==="Enter")loadSTAC();
+    if(event.key==="Enter")loadSTAC;
 });
 
 })();
