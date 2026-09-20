@@ -8167,7 +8167,66 @@ let currentResource=null;
 let controller=null;
 let currentPage=null;
 let nextPage=null;
-let previousPages=[];
+
+const catalogs=[
+    {group:"NASA",name:"NASA CMR STAC",url:"https://cmr.earthdata.nasa.gov/stac/"},
+    {group:"NASA",name:"NASA CloudSTAC",url:"https://cmr.earthdata.nasa.gov/cloudstac/"},
+    {group:"ESA",name:"ESA STAC",url:"https://catalogue.dataspace.copernicus.eu/stac/"},
+    {group:"Google",name:"Google Earth Engine / openEO",url:"https://earthengine.openeo.org/"},
+    {group:"Microsoft",name:"Planetary Computer",url:"https://planetarycomputer.microsoft.com/api/stac/v1"},
+    {group:"Planetary",name:"USGS Astrogeology",url:"https://stac.astrogeology.usgs.gov/api"},
+    {group:"Planetary",name:"Cassini VIMS-IR",url:"https://stac.astrogeology.usgs.gov/cassini-vims-ir/"},
+    {group:"Ocean",name:"HUB Ocean",url:"https://api.hubocean.earth/api/stac"},
+    {group:"Science",name:"EODC",url:"https://stac.eodc.eu/api/v1"},
+    {group:"Science",name:"OpenLandMap",url:"https://stac.openlandmap.org/"},
+    {group:"Science",name:"Paituli STAC",url:"https://stac.paituli.csc.fi/"},
+    {group:"Emergency",name:"GISTDA Flood Disaster",url:"https://stac.gistda.or.th/"},
+    {group:"USGS",name:"USGS 3DEP LiDAR",url:"https://landsatlook.usgs.gov/stac-server/"},
+    {group:"Other",name:"Earth Search",url:"https://earth-search.aws.element84.com/v1"}
+];
+
+function createCatalogSelector(){
+    const existing=document.getElementById("stacCatalogSelect");
+    if(existing)return;
+
+    const wrapper=document.createElement("div");
+    wrapper.className="stacField";
+
+    const label=document.createElement("label");
+    label.textContent="Test catalog";
+
+    const select=document.createElement("select");
+    select.id="stacCatalogSelect";
+
+    const first=document.createElement("option");
+    first.value="";
+    first.textContent="Select a catalog...";
+    select.appendChild(first);
+
+    let group="";
+
+    catalogs.forEach(catalog=>{
+        if(catalog.group!==group){
+            group=catalog.group;
+            const optgroup=document.createElement("optgroup");
+            optgroup.label=group;
+            catalogs.filter(item=>item.group===group).forEach(item=>{
+                const option=document.createElement("option");
+                option.value=item.url;
+                option.textContent=item.name;
+                optgroup.appendChild(option);
+            });
+            select.appendChild(optgroup);
+        }
+    });
+
+    select.onchange=()=>{
+        if(select.value)urlInput.value=select.value;
+    };
+
+    menu.parentNode.insertBefore(wrapper,menu);
+    wrapper.append(label,select);
+}
 
 async function fetchJSON(url){
     if(controller)controller.abort();
@@ -8192,14 +8251,14 @@ function clearState(){
     currentResource=null;
     currentPage=null;
     nextPage=null;
-    previousPages=[];
-    menu.innerHTML="";
+    menu.querySelectorAll(".stacField.dynamic").forEach(field=>field.remove());
     structure.textContent="";
     openButton.disabled=true;
 }
 
 async function loadSTAC(){
     const url=urlInput.value.trim();
+
     if(!url){
         status.textContent="Enter a STAC catalog URL.";
         return;
@@ -8240,9 +8299,7 @@ async function buildRootMenu(root){
         return;
     }
 
-    const links=findLinks(root,["data","collections","search","child","items"]);
-
-    const collectionsLink=links.find(link=>link.rel==="data"||link.rel==="collections");
+    const collectionsLink=findLinks(root,["data","collections"])[0];
 
     if(collectionsLink){
         const url=resolveURL(rootURL,collectionsLink.href);
@@ -8267,19 +8324,19 @@ async function buildRootMenu(root){
         }
     }
 
-    const searchLink=links.find(link=>link.rel==="search");
+    const searchLink=findLinks(root,["search"])[0];
     if(searchLink){
         await loadItemsURL(resolveURL(rootURL,searchLink.href),"Items");
         return;
     }
 
-    const itemsLink=links.find(link=>link.rel==="items");
+    const itemsLink=findLinks(root,["items"])[0];
     if(itemsLink){
         await loadItemsURL(resolveURL(rootURL,itemsLink.href),"Items");
         return;
     }
 
-    const childLink=links.find(link=>link.rel==="child");
+    const childLink=findLinks(root,["child"])[0];
     if(childLink){
         await loadChildCatalog(resolveURL(rootURL,childLink.href));
         return;
@@ -8294,17 +8351,10 @@ async function loadCollection(collection){
     removeAfterLabel("Collections");
     status.textContent="Reading collection: "+collection.title;
 
-    let itemsURL=collection.itemsURL;
-
     try{
-        if(!itemsURL){
-            const node=await fetchJSON(collection.href);
-            const itemsLink=findLinks(node,["items"])[0];
-
-            if(itemsLink)itemsURL=resolveURL(collection.href,itemsLink.href);
-            else itemsURL=resolveURL(collection.href,"items");
-        }
-
+        const node=await fetchJSON(collection.href);
+        const itemsLink=findLinks(node,["items"])[0];
+        const itemsURL=itemsLink?resolveURL(collection.href,itemsLink.href):resolveURL(collection.href,"items");
         await loadItemsURL(itemsURL,"Items");
     }catch(error){
         if(error.name==="AbortError")return;
@@ -8316,6 +8366,7 @@ async function loadCollection(collection){
 async function loadItemsURL(url,label){
     try{
         const data=await fetchJSON(url);
+
         if(data.type==="FeatureCollection"||Array.isArray(data.features)){
             loadItemsFromData(data,label);
             return;
@@ -8338,22 +8389,20 @@ function loadItemsFromData(data,label){
     currentPage={
         label,
         items,
-        next:data.links?.find(link=>link.rel==="next")?.href||null
+        next:data.links?.find(link=>link.rel==="next")?.href||null,
+        previous:data.links?.find(link=>link.rel==="prev"||link.rel==="previous")?.href||null
     };
 
     nextPage=currentPage.next?resolveURL(rootURL,currentPage.next):null;
 
-    const previous=data.links?.find(link=>link.rel==="prev"||link.rel==="previous")?.href||null;
-
     createDynamicLevel(label,items,loadItem);
-
-    createPageNavigation(label,previous,nextPage);
+    createPageNavigation(label,currentPage.previous,nextPage);
 
     structure.textContent=JSON.stringify({
         type:data.type,
         numberOfItems:items.length,
         next:nextPage,
-        previous:previous?resolveURL(rootURL,previous):null
+        previous:currentPage.previous?resolveURL(rootURL,currentPage.previous):null
     },null,2);
 
     status.textContent="Items loaded: "+items.length;
@@ -8365,11 +8414,11 @@ function createPageNavigation(label,previous,next){
     if(!previous&&!next)return;
 
     const wrapper=document.createElement("div");
-    wrapper.className="stacField";
+    wrapper.className="stacField dynamic";
     wrapper.dataset.stacPage="true";
 
-    const title=document.createElement("label");
-    title.textContent="Page";
+    const labelElement=document.createElement("label");
+    labelElement.textContent="Page";
 
     const controls=document.createElement("div");
     controls.style.display="flex";
@@ -8396,7 +8445,7 @@ function createPageNavigation(label,previous,next){
     };
 
     controls.append(prevButton,nextButton);
-    wrapper.append(title,controls);
+    wrapper.append(labelElement,controls);
     menu.appendChild(wrapper);
 }
 
@@ -8468,7 +8517,7 @@ function createDynamicLevel(label,items,callback){
     removeLevel(label);
 
     const wrapper=document.createElement("div");
-    wrapper.className="stacField";
+    wrapper.className="stacField dynamic";
 
     const title=document.createElement("label");
     title.textContent=label;
@@ -8510,7 +8559,7 @@ function removeAfterLabel(label){
     fields.forEach(field=>{
         const fieldLabel=field.querySelector("label")?.textContent;
         if(fieldLabel===label){found=true;return;}
-        if(found)field.remove();
+        if(found&&field.classList.contains("dynamic"))field.remove();
     });
 }
 
@@ -8533,11 +8582,13 @@ function openSelectedResource(){
     window.open(url,"_blank","noopener");
 }
 
+createCatalogSelector();
+
 loadButton.onclick=loadSTAC;
 openButton.onclick=openSelectedResource;
 
 urlInput.addEventListener("keydown",event=>{
-    if(event.key==="Enter")loadSTAC;
+    if(event.key==="Enter")loadSTAC();
 });
 
 })();
