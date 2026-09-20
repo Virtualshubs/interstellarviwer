@@ -5056,8 +5056,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-
-
 let vectorQuadkey=null;
 let vectorScene=null;
 let vectorCamera=null;
@@ -5697,17 +5695,12 @@ async function vectorSearchQuadkey(){
 
         vectorCreateRawBox();
 
-        vectorSetStatus(
-            "Quadkey localizada. Explotando datos..."
-        );
-
-        await vectorReadQuadkey();
-
         vectorBuild.disabled=false;
 
         vectorSetStatus(
-            "Quadkey localizada y datos cargados: "+
-            vectorQuadkey
+            "Quadkey localizada: "+
+            vectorQuadkey+
+            ". Lista para explotar."
         );
 
     }catch(error){
@@ -5722,7 +5715,7 @@ async function vectorSearchQuadkey(){
     }
 }
 
-function vectorBuildModel(){
+async function vectorBuildModel(){
     if(!vectorQuadkey){
         vectorSetStatus(
             "Primero hay que localizar un Quadkey."
@@ -5730,32 +5723,30 @@ function vectorBuildModel(){
         return;
     }
 
-    if(!vectorQuadkeyJSON){
-        vectorSetStatus(
-            "Primero hay que cargar los datos de la Quadkey."
-        );
-        return;
-    }
+    vectorSetStatus(
+        "Explotando datos de la Quadkey..."
+    );
 
     try{
-        vectorSetStatus(
-            "Reconstruyendo geometría..."
-        );
+        await vectorReadQuadkey();
 
-        vectorRenderMVT(
-            vectorQuadkeyJSON
-        );
+        if(!vectorQuadkeyJSON)
+            throw new Error(
+                "No se han generado datos para la Quadkey."
+            );
 
         vectorSetStatus(
-            "Geometría reconstruida: "+
+            "Datos de la Quadkey cargados: "+
+            vectorQuadkey+
+            " — "+
             vectorQuadkeyJSON.featureCount+
-            " geometrías encontradas."
+            " geometrías."
         );
 
     }catch(error){
 
         vectorSetStatus(
-            "Error reconstruyendo geometría: "+
+            "Error explotando Quadkey: "+
             error.message
         );
     }
@@ -5927,8 +5918,6 @@ vectorCreateRawBox();
 vectorSetStatus(
     "Introduce una posición geográfica."
 );
-
-
      
 </script>
   
