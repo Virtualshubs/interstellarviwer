@@ -1411,25 +1411,20 @@ visibility:visible!important;
 </select>
 
 
-<div id="stacVectorTest" style="margin-top:20px;">
-    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;">
-        <div>
-            <label for="vectorLat">Latitude</label>
-            <input id="vectorLat" type="number" step="any" placeholder="40.4168">
-        </div>
-        <div>
-            <label for="vectorLon">Longitude</label>
-            <input id="vectorLon" type="number" step="any" placeholder="-3.7038">
-        </div>
-        <button id="vectorSearch">Buscar en STAC</button>
-        <button id="vectorBuild" disabled>Reconstruir modelo 3D</button>
+<div id="vectorTest">
+    <h3>Microsoft Building Footprints Test</h3>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input id="vectorLat" type="number" step="any" placeholder="Latitude">
+        <input id="vectorLon" type="number" step="any" placeholder="Longitude">
+        <button id="vectorSearch">Localizar Quadkey</button>
+        <button id="vectorBuild" disabled>Explotar Quadkey</button>
+        <span id="vectorStatus">Introduce una posición geográfica.</span>
     </div>
 
-    <div id="vectorStatus" style="margin-top:10px;">
-        Introduce una posición geográfica.
-    </div>
+    <div id="vectorProductBox"></div>
 
-    <div id="vectorCanvas" style="margin-top:15px;width:100%;min-height:500px;background:#fff;"></div>
+    <div id="vectorCanvas" style="width:100%;height:500px;margin-top:15px;background:#fff;border:1px solid #ccc"></div>
 </div>
    
 
@@ -4492,574 +4487,6 @@ function createExplorationBlueMarble(grid,parentCell){
 
 
 
-
-
-
-
-   
-// ===============================
-// ADD ROW
-// ===============================
-
-function add(container,key,value){
-   
-if(value===undefined)
-return;
-const r=document.createElement("div");
-
-r.className="row";
-
-r.innerHTML=`
-
-<div class="key">${key}</div>
-<div class="value">${value}</div>
-
-`;
-
-container.appendChild(r);
-
-}
-
-
-
-// ===================================
-// REDISCOVER MAP fase 1
-// ===================================
-
-async function expandObservationMap(){
-    const seeds =
-    observationGrid.filter(c=>c.state===0);
-
-    if(seeds.length===0){
-        console.log("No reference cells.");
-        return;
-    }
-
-    if(!activeDataset.nextPage){
-        console.log(
-            "No more catalog pages."
-        );
-
-        document.getElementById("status").textContent =
-        "No more data pages.";
-
-        return;
-
-    }
-
-
-    document.getElementById("status").textContent =
-    "Expanding observation map...";
-
-    const discovered =
-    await discoverNeighbourCells();
-
-    updateGrid();
-   updateSpatialCoverage();
-
-    console.log(
-        "NEW CELLS:",
-        discovered
-    );
-
-
-    document.getElementById("status").textContent =
-    `Expansion complete. ${discovered} new cells`;
-
-}
-
-
-
-
-// ===================================
-// DISCOVER NEIGHBOUR CELLS
-// ===================================
-
-async function discoverNeighbourCells(){
-    const visited=new Set();
-    const queue=[];
-
-    observationGrid.forEach(cell=>{
-        if(cell.state===0){
-            queue.push(cell);
-            visited.add(cell.id);
-        }
-
-
-    });
-
-
-
-    let discovered=0;
-    while(queue.length){
-
-        const cell =
-        queue.shift();
-        const neighbours =
-        getNeighbours(cell);
-
-        for(const n of neighbours){
-            if(visited.has(n.id))
-                continue;
-
-            visited.add(n.id);
-
-            if(n.state!==-1)
-                continue;
-
-            const found =
-            await inspectCell(n);
-
-            if(found){
-
-                discovered++;
-                queue.push(n);
-
-            }
-
-            updateGrid();
-
-        }
-
-    }
-
-    return discovered;
-
-}
-
-
-
-
-// ===================================
-// GET NEIGHBOURS
-// ===================================
-
-function getNeighbours(cell){
-    const result=[];
-
-    const dirs=[
-
-        [-1,-1],[0,-1],[1,-1],
-
-        [-1,0],[1,0],
-
-        [-1,1],[0,1],[1,1]
-
-    ];
-
-    dirs.forEach(d=>{
-
-        const x = cell.x+d[0];
-
-        const y = cell.y+d[1];
-
-        const neighbour =
-        observationGrid.find(c=>
-            c.x===x &&
-            c.y===y
-        );
-
-        if(neighbour)
-            result.push(neighbour);
-
-    });
-
-    return result;
-
-}
-
-
-
-// ===================================
-// INSPECT NEXT CATALOG PAGE
-// ===================================
-
-async function inspectCell(cell){
-
-
-    if(!activeDataset.nextPage)
-        return false;
-
-    try{ console.log(
-            "READING NEXT PAGE:",
-            activeDataset.nextPage
-        );
-
-
-        const res =
-        await fetch(activeDataset.nextPage);
-
-        const json =
-        await res.json();
-
-
-        // guardar siguiente página
-
-        activeDataset.nextPage =
-        json.links?.find(
-            l=>l.rel==="next"
-        )?.href || null;
-
-        if(
-            !json.features ||
-            json.features.length===0
-        ){
-
-            return false;
-
-        }
-
-        const before =
-        cell.items.length;
-
-        appendSpatialData(
-            json.features
-        );
-
-
-        return (
-            cell.items.length > before
-        );
-
-
-    }
-
-
-    catch(e){
-        console.log(
-            "PAGE ERROR",
-            e
-        );
-
-        return false;
-
-    }
-
-
-}
-
-  // ===================================
-// APPEND SPATIAL DATA
-// ===================================
-
-function appendSpatialData(items){
-
-    items.forEach(item=>{
-        let coords=null;
-
-
-        if(
-            item.geometry &&
-            item.geometry.type==="Point"
-        ){
-            coords =
-            item.geometry.coordinates;
-
-        }
-
-        if(
-            !coords &&
-            item.bbox
-        ){
-            coords=[
-
-                (item.bbox[0]+item.bbox[2])/2,
-                (item.bbox[1]+item.bbox[3])/2
-
-            ];
-        }
-
-
-
-        if(!coords) return;
-
-        const lon = coords[0];
-
-        const lat = coords[1];
-
-        const cell =
-        observationGrid.find(c=>
-
-            lat>=c.latMin &&
-            lat<c.latMax &&
-
-            lon>=c.lonMin &&
-            lon<c.lonMax
-
-
-        );
-
-
-
-        if(cell){
-
-            const exists =
-            cell.items.some(
-                x=>x.id===item.id
-            );
-
-
-            if(!exists){
-
-                // comprobar si era una celda vacía
-
-                const wasEmpty =
-                cell.items.length===0;
-                cell.items.push(item);
-                cell.state=0;
-
-
-                // nueva cobertura descubierta
-
-                if(wasEmpty){
-                    cell.discovered=true;
-                }
-
-            }
-
-        }
-
-    });
-
-
-}
-  
-</script>
-
-  <script>
-
-function loadJanusDataset(json){
-    if(!json) return;
-    renderDataset(json);
-}
-
-
-// ==========================================
-// RENDER DATASET
-// ==========================================
-
-function renderDataset(json){
-
-const info=json.CELL_INFO||{};
-const observations=json.OBSERVATIONS||[];
-
-
-document.getElementById("janusStatus").textContent=
-"Dataset Loaded";
-
-document.getElementById("count").textContent=
-observations.length;
-
-document.getElementById("cellId").textContent=
-info.id||"-";
-
-document.getElementById("latRange").textContent=
-info.latRange||"-";
-
-document.getElementById("lonRange").textContent=
-info.lonRange||"-";
-
-document.getElementById("cellState").textContent=
-info.state??"-";
-
-
-
-const totalAssets=
-observations.reduce((t,o)=>{
-
-return t+Object.keys(o.assets||{}).length;
-
-},0);
-
-
-document.getElementById("assetCount").textContent=
-totalAssets;
-
-
-const container=
-document.getElementById("observations");
-
-container.innerHTML="";
-
-
-observations.forEach((obs,index)=>{
-
-const assets=
-Object.keys(obs.assets||{}).length;
-
-
-
-const card=
-document.createElement("div");
-
-card.className="card";
-
-
-
-card.innerHTML=`
-
-<h2>Observation ${index+1}</h2>
-
-<div class="row">
-<div class="label">ID</div>
-<div class="value">${obs.id||"-"}</div>
-</div>
-
-<div class="row">
-<div class="label">Collection</div>
-<div class="value">${obs.collection||"-"}</div>
-</div>
-
-<div class="row">
-<div class="label">Datetime</div>
-<div class="value">${obs.properties?.datetime||"-"}</div>
-</div>
-
-<div class="row">
-<div class="label">Assets</div>
-<div class="value">${assets}</div>
-</div>
-
-<div id="assets${index}"></div>
-
-<button onclick="toggleRaw(${index})">
-RAW JSON
-</button>
-
-<pre id="raw${index}" style="display:none"></pre>
-
-`;
-
-container.appendChild(card);
-
-document.getElementById("raw"+index).textContent=
-JSON.stringify(obs,null,2);
-
-renderAssets(obs,index);
-
-});
-
-}
-
-
-
-// ==========================================
-// RENDER ASSETS
-// ==========================================
-
-function renderAssets(obs,index){
-
-const box=
-document.getElementById("assets"+index);
-
-if(!obs.assets)
-return;
-
-
-
-Object.entries(obs.assets).forEach(([name,asset])=>{
-
-const div=
-document.createElement("div");
-
-div.className="asset";
-
-const type=asset.type||"Unknown";
-
-let html=`
-
-<div class="assetHeader">
-<div>
-
-<div class="assetName">${name}</div>
-<div class="assetType">${type}</div>
-
-</div>
-
-<a href="${asset.href}" target="_blank">
-Open
-</a>
-
-</div>
-
-`;
-
-
-
-if(type.startsWith("image/")){
-
-html+=`
-
-<img
-class="assetPreview"
-src="${asset.href}"
-loading="lazy"
-onclick="window.open('${asset.href}','_blank')"
-onerror="this.style.display='none';"
->
-
-`;
-
-}
-
-
-div.innerHTML=html;
-box.appendChild(div);
-
-});
-
-}
-
-
-
-// ==========================================
-// RAW
-// ==========================================
-
-function toggleRaw(i){
-
-const pre=
-document.getElementById("raw"+i);
-
-pre.style.display=
-pre.style.display==="none"
-?
-"block"
-:
-"none";
-
-}
-
-
-    // ===============================
-// THEME TOGGLE
-// ===============================
-
-const themes = ["lunar", "terra"];
-
-let currentTheme = 0;
-
-document.documentElement.setAttribute("data-theme", themes[currentTheme]);
-document.getElementById("themeToggle").addEventListener("click", () => {
-    currentTheme = (currentTheme + 1) % themes.length;
-    const theme = themes[currentTheme];
-    document.documentElement.setAttribute("data-theme", theme);
-    document.getElementById("themeToggle").textContent =
-        theme === "lunar"
-            ? "🌙 LUNAR"
-            : "☀ TERRA";
-});
-
-
-
-
-
-
-
-
-
-
-
 let vectorQuadkey=null;
 let vectorScene=null;
 let vectorCamera=null;
@@ -5103,14 +4530,12 @@ function vectorLatLonToQuadkey(lat,lon,level=9){
     for(let i=level;i>0;i--){
 
         let digit=0;
-
         const mask=1<<(i-1);
 
         if(x&mask)digit++;
         if(y&mask)digit+=2;
 
         quadkey+=digit;
-
     }
 
     return quadkey;
@@ -5130,7 +4555,6 @@ function vectorQuadkeyBounds(quadkey){
 
         if(digit&1)x+=1<<bit;
         if(digit&2)y+=1<<bit;
-
     }
 
     const n=Math.pow(2,level);
@@ -5179,72 +4603,14 @@ function vectorDestroyScene(){
 
     vectorScene=null;
     vectorCamera=null;
-
     vectorCanvas.innerHTML="";
 }
 
-function vectorSearchQuadkey(){
-
-    const lat=parseFloat(vectorLat.value);
-    const lon=parseFloat(vectorLon.value);
-
-    vectorBuild.disabled=true;
-    vectorQuadkey=null;
-    vectorProductBox.innerHTML="";
-
-    if(
-        !Number.isFinite(lat)||
-        !Number.isFinite(lon)||
-        lat<-90||
-        lat>90||
-        lon<-180||
-        lon>180
-    ){
-
-        vectorSetStatus("Coordenadas no válidas.");
-        return;
-    }
-
-    vectorQuadkey=
-        vectorLatLonToQuadkey(lat,lon,9);
-
-    const bounds=
-        vectorQuadkeyBounds(vectorQuadkey);
-
-    vectorProductBox.innerHTML=`
-        <div>Quadkey: ${vectorQuadkey}</div>
-        <div>Latitud: ${lat}</div>
-        <div>Longitud: ${lon}</div>
-        <div>Lat min: ${bounds.latMin}</div>
-        <div>Lat max: ${bounds.latMax}</div>
-        <div>Lon min: ${bounds.lonMin}</div>
-        <div>Lon max: ${bounds.lonMax}</div>
-    `;
-
-    vectorSetStatus(
-        "Quadkey localizado: "+vectorQuadkey
-    );
-
-    vectorBuild.disabled=false;
-
-    vectorBuildQuadkey(
-        vectorQuadkey,
-        bounds,
-        lat,
-        lon
-    );
-}
-
-function vectorBuildQuadkey(
-    quadkey,
-    bounds,
-    lat,
-    lon
-){
-
-    vectorCanvas.style.display="block";
+function vectorInitScene(){
 
     vectorDestroyScene();
+
+    vectorCanvas.style.display="block";
 
     vectorScene=new THREE.Scene();
 
@@ -5262,8 +4628,14 @@ function vectorBuildQuadkey(
             45,
             width/height,
             0.1,
-            100000
+            10000
         );
+
+    vectorCamera.position.set(
+        120,
+        120,
+        120
+    );
 
     vectorRenderer=
         new THREE.WebGLRenderer({
@@ -5274,7 +4646,10 @@ function vectorBuildQuadkey(
         Math.min(window.devicePixelRatio||1,2)
     );
 
-    vectorRenderer.setSize(width,height);
+    vectorRenderer.setSize(
+        width,
+        height
+    );
 
     vectorRenderer.setClearColor(
         0xffffff,
@@ -5294,6 +4669,141 @@ function vectorBuildQuadkey(
     vectorControls.enableDamping=true;
     vectorControls.dampingFactor=0.08;
 
+    const geometry=
+        new THREE.PlaneGeometry(
+            100,
+            100
+        );
+
+    const material=
+        new THREE.MeshBasicMaterial({
+            color:0xe8e8e8,
+            side:THREE.DoubleSide
+        });
+
+    const plane=
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+    plane.rotation.x=-Math.PI/2;
+
+    vectorScene.add(plane);
+
+    const edges=
+        new THREE.EdgesGeometry(
+            geometry
+        );
+
+    const line=
+        new THREE.LineSegments(
+            edges,
+            new THREE.LineBasicMaterial({
+                color:0x222222
+            })
+        );
+
+    line.rotation.x=-Math.PI/2;
+
+    vectorScene.add(line);
+
+    vectorControls.target.set(0,0,0);
+    vectorControls.update();
+
+    vectorAnimate();
+
+    vectorSetStatus(
+        "Introduce una posición geográfica."
+    );
+}
+
+function vectorSearchQuadkey(){
+
+    const lat=parseFloat(vectorLat.value);
+    const lon=parseFloat(vectorLon.value);
+
+    vectorBuild.disabled=true;
+    vectorQuadkey=null;
+    vectorProductBox.innerHTML="";
+
+    vectorSetStatus(
+        "Buscando Quadkey..."
+    );
+
+    if(
+        !Number.isFinite(lat)||
+        !Number.isFinite(lon)||
+        lat<-90||
+        lat>90||
+        lon<-180||
+        lon>180
+    ){
+
+        vectorSetStatus(
+            "Posición no encontrada: coordenadas no válidas."
+        );
+
+        return;
+    }
+
+    try{
+
+        const quadkey=
+            vectorLatLonToQuadkey(
+                lat,
+                lon,
+                9
+            );
+
+        const bounds=
+            vectorQuadkeyBounds(
+                quadkey
+            );
+
+        vectorQuadkey=quadkey;
+
+        vectorProductBox.innerHTML=`
+            <div>Quadkey: ${quadkey}</div>
+            <div>Latitud: ${lat}</div>
+            <div>Longitud: ${lon}</div>
+            <div>Lat min: ${bounds.latMin}</div>
+            <div>Lat max: ${bounds.latMax}</div>
+            <div>Lon min: ${bounds.lonMin}</div>
+            <div>Lon max: ${bounds.lonMax}</div>
+        `;
+
+        vectorSetStatus(
+            "Quadkey localizado: "+quadkey
+        );
+
+        vectorBuild.disabled=false;
+
+        vectorRenderQuadkey(
+            bounds,
+            lat,
+            lon
+        );
+
+    }catch(error){
+
+        vectorQuadkey=null;
+
+        vectorSetStatus(
+            "Quadkey no encontrado: "+
+            error.message
+        );
+    }
+}
+
+function vectorRenderQuadkey(
+    bounds,
+    lat,
+    lon
+){
+
+    vectorInitScene();
+
     const centerLat=
         (bounds.latMin+bounds.latMax)/2;
 
@@ -5301,21 +4811,23 @@ function vectorBuildQuadkey(
         (bounds.lonMin+bounds.lonMax)/2;
 
     const cosLat=
-        Math.cos(centerLat*Math.PI/180);
+        Math.cos(
+            centerLat*Math.PI/180
+        );
 
-    const planeWidth=
+    const width=
         (bounds.lonMax-bounds.lonMin)*
         111320*
         cosLat;
 
-    const planeHeight=
+    const height=
         (bounds.latMax-bounds.latMin)*
         110540;
 
     const geometry=
         new THREE.PlaneGeometry(
-            planeWidth,
-            planeHeight
+            width,
+            height
         );
 
     const material=
@@ -5360,18 +4872,18 @@ function vectorBuildQuadkey(
         -(lat-centerLat)*
         110540;
 
+    const pointSize=
+        Math.max(
+            Math.min(
+                Math.max(width,height)*0.015,
+                500
+            ),
+            1
+        );
+
     const pointGeometry=
         new THREE.SphereGeometry(
-            Math.max(
-                Math.min(
-                    Math.max(
-                        planeWidth,
-                        planeHeight
-                    )*0.015,
-                    500
-                ),
-                1
-            ),
+            pointSize,
             16,
             16
         );
@@ -5389,7 +4901,7 @@ function vectorBuildQuadkey(
 
     point.position.set(
         pointX,
-        0,
+        pointSize,
         pointZ
     );
 
@@ -5397,8 +4909,8 @@ function vectorBuildQuadkey(
 
     const maxSize=
         Math.max(
-            planeWidth,
-            planeHeight
+            width,
+            height
         );
 
     vectorCamera.position.set(
@@ -5415,7 +4927,9 @@ function vectorBuildQuadkey(
 
     vectorControls.update();
 
-    vectorAnimate();
+    vectorSetStatus(
+        "Quadkey localizado: "+vectorQuadkey
+    );
 }
 
 function vectorBuildModel(){
@@ -5496,6 +5010,8 @@ window.addEventListener(
     "resize",
     vectorResize
 );
+
+vectorInitScene();
 
 </script>
   
