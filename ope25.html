@@ -1337,10 +1337,11 @@ CAMERA TOGGLE
 }
 
 
-#panel{
-overflow:hidden;
+#panelstac{
+overflow-y:auto;
+overflow-x:hidden;
 transition:max-height .3s ease;
-max-height: 85vh;
+max-height:85vh;
 position:absolute;
 top:10px;
 right:10px;
@@ -1350,8 +1351,7 @@ background:#141b26;
 border:1px solid rgba(255,255,255,.08);
 border-radius:10px;
 padding:18px;
-overflow-y:auto;
-z-index: 500;
+z-index:500;
 box-shadow:0 10px 30px rgba(0,0,0,.45);
 }
 
