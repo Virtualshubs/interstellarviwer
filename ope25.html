@@ -8150,6 +8150,7 @@ loadCapabilities();
 </script>
 
 
+
 <script>
 (function(){
 "use strict";
@@ -8531,9 +8532,7 @@ async function loadItem(entry){
         }
 
         createDynamicLevel("Assets",assets,selectAsset);
-
-        const thumbnail=findThumbnail(item,assets);
-        if(thumbnail)renderAsset(thumbnail);
+        await renderObservation(item,assets);
 
         status.textContent="Item loaded: "+assets.length+" assets";
     }catch(error){
@@ -8575,8 +8574,6 @@ function findThumbnail(item,assets){
 }
 
 function selectAsset(asset){
-    clearPreview();
-
     if(!asset?.href){
         currentResource=null;
         openButton.disabled=true;
@@ -8586,18 +8583,7 @@ function selectAsset(asset){
 
     currentResource=asset.href;
     openButton.disabled=false;
-
-    structure.textContent=JSON.stringify({
-        id:asset.id,
-        title:asset.title,
-        type:asset.type,
-        roles:asset.roles,
-        href:asset.href,
-        description:asset.description
-    },null,2);
-
-    renderAsset(asset);
-    status.textContent="Asset ready: "+asset.title;
+    status.textContent="Asset selected: "+asset.title;
 }
 
 function getAssetType(asset){
@@ -8606,11 +8592,10 @@ function getAssetType(asset){
 
     if(type.startsWith("image/"))return"image";
     if(type.includes("json"))return"json";
-    if(type.includes("csv")||type.includes("text/"))return"text";
+    if(type.includes("csv"))return"text";
     if(type.includes("pdf"))return"pdf";
     if(type.includes("geotiff")||type.includes("tiff")||/\.(tif|tiff|cog)$/.test(href))return"raster";
     if(type.includes("geojson"))return"json";
-
     if(/\.(png|jpg|jpeg|gif|webp|bmp|svg)$/.test(href))return"image";
     if(/\.(json|geojson)$/.test(href))return"json";
     if(/\.(csv|txt|xml)$/.test(href))return"text";
@@ -8620,95 +8605,357 @@ function getAssetType(asset){
     return"resource";
 }
 
-async function renderAsset(asset){
+function isISISLabel(asset){
+    const text=((asset.id||"")+" "+(asset.title||"")+" "+(asset.description||"")).toLowerCase();
+    return text.includes("isis label")||text.includes("isislabel")||text==="label";
+}
+
+function isProvenance(asset){
+    const text=((asset.id||"")+" "+(asset.title||"")+" "+(asset.description||"")).toLowerCase();
+    return text.includes("provenance");
+}
+
+function createSection(title){
+    const section=document.createElement("div");
+    section.style.marginTop="14px";
+
+    const heading=document.createElement("div");
+    heading.textContent=title;
+    heading.style.fontWeight="600";
+    heading.style.marginBottom="8px";
+
+    section.appendChild(heading);
+    return section;
+}
+
+function createRawToggle(title,text){
+    const details=document.createElement("details");
+    details.style.marginTop="8px";
+
+    const summary=document.createElement("summary");
+    summary.textContent=title;
+    summary.style.cursor="pointer";
+
+    const pre=document.createElement("pre");
+    pre.textContent=text;
+    pre.style.maxHeight="350px";
+    pre.style.overflow="auto";
+    pre.style.whiteSpace="pre-wrap";
+    pre.style.marginTop="8px";
+
+    details.append(summary,pre);
+    return details;
+}
+
+function parsePVL(text){
+    const root={};
+    const stack=[root];
+
+    text.split(/\r?\n/).forEach(line=>{
+        line=line.trim();
+        if(!line||line==="End")return;
+
+        const objectMatch=line.match(/^Object\s*=\s*(.+)$/i);
+        const groupMatch=line.match(/^Group\s*=\s*(.+)$/i);
+        const endObject=line.match(/^End_Object/i);
+        const endGroup=line.match(/^End_Group/i);
+
+        if(endObject||endGroup){
+            if(stack.length>1)stack.pop();
+            return;
+        }
+
+        if(objectMatch||groupMatch){
+            const name=(objectMatch||groupMatch)[1].trim();
+            const obj={};
+            stack[stack.length-1][name]=obj;
+            stack.push(obj);
+            return;
+        }
+
+        const match=line.match(/^([^=]+?)\s*=\s*(.*)$/);
+        if(!match)return;
+
+        const key=match[1].trim();
+        let value=match[2].trim();
+
+        if((value.startsWith('"')&&value.endsWith('"'))||(value.startsWith("'")&&value.endsWith("'")))value=value.slice(1,-1);
+
+        if(/^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(value))value=Number(value);
+        else if(value.toLowerCase()==="true")value=true;
+        else if(value.toLowerCase()==="false")value=false;
+
+        stack[stack.length-1][key]=value;
+    });
+
+    return root;
+}
+
+function addDataRow(container,label,value){
+    const row=document.createElement("div");
+    row.style.display="grid";
+    row.style.gridTemplateColumns="minmax(130px,0.7fr) minmax(0,1.3fr)";
+    row.style.gap="8px";
+    row.style.padding="3px 0";
+    row.style.borderBottom="1px solid rgba(128,128,128,.15)";
+
+    const key=document.createElement("div");
+    key.textContent=label;
+    key.style.fontWeight="500";
+
+    const val=document.createElement("div");
+    val.textContent=value===null||value===undefined?"":String(value);
+    val.style.overflowWrap="anywhere";
+
+    row.append(key,val);
+    container.appendChild(row);
+}
+
+function flattenPVL(obj,prefix="",rows=[]){
+    Object.entries(obj||{}).forEach(([key,value])=>{
+        const path=prefix?prefix+" / "+key:key;
+
+        if(value&&typeof value==="object")flattenPVL(value,path,rows);
+        else rows.push([path,value]);
+    });
+
+    return rows;
+}
+
+function renderISISLabel(asset,text){
+    const section=createSection("ISIS Label");
+
+    try{
+        const data=parsePVL(text);
+        const rows=flattenPVL(data);
+
+        const table=document.createElement("div");
+        rows.forEach(([key,value])=>addDataRow(table,key,value));
+        section.appendChild(table);
+
+        section.appendChild(createRawToggle("View raw ISIS Label",text));
+    }catch(error){
+        section.appendChild(createRawToggle("View ISIS Label",text));
+    }
+
+    previewBox.appendChild(section);
+}
+
+function parseProvenance(text){
+    const lines=text.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+    const commands=lines.filter(line=>!line.startsWith("{")&&!line.startsWith('"')&&!line.startsWith("}"));
+
+    const result={
+        source:null,
+        steps:[]
+    };
+
+    const processing=lines.find(line=>/^Processing file:/i.test(line));
+    if(processing)result.source=processing.replace(/^Processing file:\s*/i,"").trim();
+
+    lines.forEach(line=>{
+        if(/^(gdalwarp|gdal_translate|python)\b/i.test(line))result.steps.push(line);
+    });
+
+    return result;
+}
+
+function renderProvenance(asset,text){
+    const section=createSection("Provenance");
+
+    const data=parseProvenance(text);
+
+    if(data.source)addDataRow(section,"Source",data.source);
+
+    if(data.steps.length){
+        const processing=document.createElement("div");
+        processing.style.marginTop="8px";
+
+        data.steps.forEach((step,index)=>{
+            const row=document.createElement("div");
+            row.style.padding="5px 0";
+            row.style.borderBottom="1px solid rgba(128,128,128,.15)";
+            row.textContent=(index+1)+". "+step;
+            row.style.overflowWrap="anywhere";
+            processing.appendChild(row);
+        });
+
+        section.appendChild(processing);
+    }
+
+    section.appendChild(createRawToggle("View raw Provenance",text));
+    previewBox.appendChild(section);
+}
+
+async function renderJSONAsset(asset,section){
+    try{
+        const response=await fetch(resolveURL(rootURL,asset.href));
+        if(!response.ok)throw new Error("HTTP "+response.status);
+
+        const data=await response.json();
+
+        const details=document.createElement("details");
+        details.style.marginTop="8px";
+
+        const summary=document.createElement("summary");
+        summary.textContent="View JSON";
+        summary.style.cursor="pointer";
+
+        const pre=document.createElement("pre");
+        pre.textContent=JSON.stringify(data,null,2);
+        pre.style.maxHeight="350px";
+        pre.style.overflow="auto";
+        pre.style.whiteSpace="pre-wrap";
+        pre.style.marginTop="8px";
+
+        details.append(summary,pre);
+        section.appendChild(details);
+    }catch(error){
+        const message=document.createElement("div");
+        message.textContent="JSON resource detected. Preview unavailable: "+error.message;
+        section.appendChild(message);
+    }
+}
+
+async function renderGenericAsset(asset,section){
+    const row=document.createElement("div");
+    row.style.display="flex";
+    row.style.flexWrap="wrap";
+    row.style.alignItems="center";
+    row.style.gap="8px";
+
+    const type=document.createElement("span");
+    type.textContent=asset.type||getAssetType(asset);
+    row.appendChild(type);
+
+    if(asset.href){
+        const link=document.createElement("a");
+        link.href=resolveURL(rootURL,asset.href);
+        link.target="_blank";
+        link.rel="noopener";
+        link.textContent="Open file";
+        row.appendChild(link);
+    }
+
+    section.appendChild(row);
+}
+
+async function renderObservation(item,assets){
     ensurePreviewBox();
-
-    const type=getAssetType(asset);
-    const url=resolveURL(rootURL,asset.href);
-
     previewBox.innerHTML="";
     previewBox.style.display="block";
 
-    const heading=document.createElement("div");
-    heading.textContent=asset.title||asset.id;
-    heading.style.fontWeight="600";
-    heading.style.marginBottom="8px";
-    previewBox.appendChild(heading);
+    const intro=createSection("Observation");
+    addDataRow(intro,"ID",item.id||"");
+    addDataRow(intro,"Datetime",item.properties?.datetime||"");
+    addDataRow(intro,"Collection",item.collection||"");
+    if(item.properties?.platform)addDataRow(intro,"Platform",item.properties.platform);
+    if(item.properties?.instrument)addDataRow(intro,"Instrument",item.properties.instrument);
+    previewBox.appendChild(intro);
 
-    if(type==="image"){
+    const thumbnail=findThumbnail(item,assets);
+    if(thumbnail){
+        const imageSection=createSection("Image");
         const image=document.createElement("img");
-        image.src=url;
-        image.alt=asset.title||asset.id;
+        image.src=resolveURL(rootURL,thumbnail.href);
+        image.alt=thumbnail.title||"STAC image";
         image.loading="lazy";
         image.style.display="block";
         image.style.maxWidth="100%";
         image.style.maxHeight="500px";
         image.style.objectFit="contain";
+
         image.onerror=()=>{
-            previewBox.textContent="Image resource found, but preview could not be loaded.";
+            imageSection.appendChild(document.createTextNode("Image resource found, but preview could not be loaded."));
         };
-        previewBox.appendChild(image);
-        return;
+
+        imageSection.appendChild(image);
+        previewBox.appendChild(imageSection);
     }
 
-    if(type==="json"){
-        try{
-            const response=await fetch(url);
-            if(!response.ok)throw new Error("HTTP "+response.status);
-            const data=await response.json();
+    for(const asset of assets){
+        if(asset===thumbnail)continue;
 
-            const pre=document.createElement("pre");
-            pre.textContent=JSON.stringify(data,null,2);
-            pre.style.maxHeight="500px";
-            pre.style.overflow="auto";
-            previewBox.appendChild(pre);
-        }catch(error){
-            const message=document.createElement("div");
-            message.textContent="JSON resource detected. Preview unavailable: "+error.message;
-            previewBox.appendChild(message);
+        const type=getAssetType(asset);
+
+        if(isISISLabel(asset)){
+            try{
+                const response=await fetch(resolveURL(rootURL,asset.href));
+                if(response.ok)renderISISLabel(asset,await response.text());
+                else{
+                    const section=createSection(asset.title||asset.id);
+                    addDataRow(section,"Type","ISIS Label");
+                    await renderGenericAsset(asset,section);
+                    previewBox.appendChild(section);
+                }
+            }catch(error){
+                const section=createSection(asset.title||asset.id);
+                addDataRow(section,"Type","ISIS Label");
+                await renderGenericAsset(asset,section);
+                previewBox.appendChild(section);
+            }
+            continue;
         }
-        return;
-    }
 
-    if(type==="text"){
-        try{
-            const response=await fetch(url);
-            if(!response.ok)throw new Error("HTTP "+response.status);
-            const text=await response.text();
-
-            const pre=document.createElement("pre");
-            pre.textContent=text;
-            pre.style.maxHeight="500px";
-            pre.style.overflow="auto";
-            previewBox.appendChild(pre);
-        }catch(error){
-            const message=document.createElement("div");
-            message.textContent="Text resource detected. Preview unavailable: "+error.message;
-            previewBox.appendChild(message);
+        if(isProvenance(asset)){
+            try{
+                const response=await fetch(resolveURL(rootURL,asset.href));
+                if(response.ok)renderProvenance(asset,await response.text());
+                else{
+                    const section=createSection(asset.title||asset.id);
+                    addDataRow(section,"Type","Provenance");
+                    await renderGenericAsset(asset,section);
+                    previewBox.appendChild(section);
+                }
+            }catch(error){
+                const section=createSection(asset.title||asset.id);
+                addDataRow(section,"Type","Provenance");
+                await renderGenericAsset(asset,section);
+                previewBox.appendChild(section);
+            }
+            continue;
         }
-        return;
-    }
 
-    if(type==="pdf"){
-        const frame=document.createElement("iframe");
-        frame.src=url;
-        frame.style.width="100%";
-        frame.style.height="500px";
-        frame.style.border="0";
-        previewBox.appendChild(frame);
-        return;
-    }
+        if(type==="json"){
+            const section=createSection(asset.title||asset.id);
+            addDataRow(section,"Type","JSON");
+            await renderJSONAsset(asset,section);
 
-    if(type==="raster"){
-        const info=document.createElement("div");
-        info.innerHTML="<strong>GeoTIFF / COG</strong><br>Raster asset detected.";
-        previewBox.appendChild(info);
-        return;
-    }
+            const link=document.createElement("a");
+            link.href=resolveURL(rootURL,asset.href);
+            link.target="_blank";
+            link.rel="noopener";
+            link.textContent="Open JSON";
+            link.style.display="inline-block";
+            link.style.marginTop="6px";
+            section.appendChild(link);
 
-    const info=document.createElement("div");
-    info.textContent="Resource detected: "+(asset.type||"unknown");
-    previewBox.appendChild(info);
+            previewBox.appendChild(section);
+            continue;
+        }
+
+        if(type==="image"){
+            const section=createSection(asset.title||asset.id);
+            const image=document.createElement("img");
+            image.src=resolveURL(rootURL,asset.href);
+            image.alt=asset.title||asset.id;
+            image.loading="lazy";
+            image.style.display="block";
+            image.style.maxWidth="100%";
+            image.style.maxHeight="500px";
+            image.style.objectFit="contain";
+            section.appendChild(image);
+            previewBox.appendChild(section);
+            continue;
+        }
+
+        const section=createSection(asset.title||asset.id);
+        addDataRow(section,"Type",asset.type||type);
+        if(asset.roles?.length)addDataRow(section,"Roles",asset.roles.join(", "));
+        if(asset.description)addDataRow(section,"Description",asset.description);
+        await renderGenericAsset(asset,section);
+        previewBox.appendChild(section);
+    }
 }
 
 function createDynamicLevel(label,items,callback){
@@ -8797,11 +9044,12 @@ loadButton.onclick=loadSTAC;
 openButton.onclick=openSelectedResource;
 
 urlInput.addEventListener("keydown",event=>{
-    if(event.key==="Enter")loadSTAC();
+    if(event.key==="Enter")loadSTAC;
 });
 
 })();
 </script>
+
 
 
   
