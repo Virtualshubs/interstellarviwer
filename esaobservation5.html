@@ -1413,6 +1413,26 @@ visibility:visible!important;
 <option value="">Select collection...</option>
 </select>
 
+
+
+   
+
+   <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+  <input
+    id="stac-url"
+    type="text"
+    placeholder="https://example.com/api/stac/v1"
+    style="flex:1;"
+  >
+  <button id="load-stac-url" type="button">Cargar STAC</button>
+</div>
+
+
+
+
+
+   
+
     <div id="workspace">
 
         <div id="content">
@@ -1528,7 +1548,7 @@ visibility:visible!important;
   
 <script>
 
-const BASE="https://catalog.maap.eo.esa.int/catalogue";
+let BASE="https://planetarycomputer.microsoft.com/api/stac/v1/";
 
 let collections=[];
 let activeDataset=null;
@@ -1538,6 +1558,23 @@ let currentItems=[];
 
 let explorationHistory=[];
 let explorationIndex=-1;
+
+
+
+document.getElementById("load-stac-url").onclick=changeSTAC;
+
+function changeSTAC(){
+
+const input=document.getElementById("stac-url");
+const url=input.value.trim();
+
+if(!url)return;
+
+BASE=url.replace(/\/+$/,"");
+
+load();
+
+}
 
 // ===============================
 // LOAD CATALOG
