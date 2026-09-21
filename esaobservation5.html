@@ -1570,7 +1570,29 @@ const url=input.value.trim();
 
 if(!url)return;
 
-BASE=url.replace(/\/+$/,"");
+let stacURL=url;
+
+if(url.includes("3dt0=")){
+
+const value=new URL(url).searchParams.get("3dt0");
+
+if(value){
+
+try{
+
+const decoded=atob(value);
+
+if(decoded.startsWith("http://")||decoded.startsWith("https://")){
+stacURL=decoded;
+}
+
+}catch(e){}
+
+}
+
+}
+
+BASE=stacURL.replace(/\/+$/,"");
 
 load();
 
