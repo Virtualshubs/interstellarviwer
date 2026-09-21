@@ -1598,6 +1598,18 @@ load();
 
 }
 
+
+
+const currentURL=new URL(window.location.href);
+
+if(currentURL.searchParams.has("3dt0")){
+
+document.getElementById("stac-url").value=window.location.href;
+
+document.getElementById("load-stac-url").click();
+
+}
+
 // ===============================
 // LOAD CATALOG
 // ===============================
