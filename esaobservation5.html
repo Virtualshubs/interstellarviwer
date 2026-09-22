@@ -1646,6 +1646,8 @@ Load
   <button id="load-stac-url" type="button" hidden>Cargar Data</button>
 </div>
 
+<div id="janus-stac-public"></div>
+   
 
          <select id="collectionSelector">
 <option value="">Select collection...</option>
@@ -2362,6 +2364,95 @@ realLoad.click();
 
 
 
+   
+// ===============================
+// public data stac
+// ===============================
+   
+
+const STAC_DATA_URLS={
+
+"ESA MAAP":
+"https://catalog.maap.eo.esa.int/catalogue",
+
+"Copernicus Data Space":
+"https://stac.dataspace.copernicus.eu/v1/",
+
+"Earth Search":
+"https://earth-search.aws.element84.com/v1/",
+
+"Planetary Computer":
+"https://planetarycomputer.microsoft.com/api/stac/v1/"
+
+};
+
+
+function createSTACSelector(){
+
+const container=
+document.getElementById("janus-stac-public");
+
+if(!container)return;
+
+const select=document.createElement("select");
+
+select.id="janus-stac-public-select";
+
+const defaultOption=
+document.createElement("option");
+
+defaultOption.value="";
+defaultOption.textContent="Select public STAC";
+
+select.appendChild(defaultOption);
+
+Object.entries(STAC_DATA_URLS).forEach(
+([name,url])=>{
+
+const option=
+document.createElement("option");
+
+option.value=url;
+option.textContent=name;
+
+select.appendChild(option);
+
+}
+);
+
+select.onchange=function(){
+
+const url=this.value;
+
+if(!url)return;
+
+const input=
+document.getElementById(
+"janus-stac-custom-input"
+);
+
+const load=
+document.getElementById(
+"janus-stac-custom-load"
+);
+
+if(!input||!load)return;
+
+input.value=url;
+
+load.click();
+
+this.value="";
+
+};
+
+container.appendChild(select);
+
+}
+
+
+createSTACSelector();
+   
 
 
 
