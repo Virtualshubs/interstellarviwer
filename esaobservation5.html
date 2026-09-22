@@ -1415,10 +1415,10 @@ visibility:visible!important;
   <input
     id="stac-url"
     type="text"
-    placeholder="https://example.com/api/stac/v1"
+    placeholder="https://example.com"
     style="flex:1;"
   >
-  <button id="load-stac-url" type="button">Cargar STAC</button>
+  <button id="load-stac-url" type="button">Cargar Data</button>
 </div>
 
 
@@ -1948,16 +1948,16 @@ document.getElementById("status").textContent=
 
 async function loadCollections(){
 const status=document.getElementById("status");
-if(status)status.textContent="LOADING EO PRODUCTS...";
+if(status)status.textContent="LOADING PRODUCTS...";
 try{
 const res=await fetch(`${BASE}/collections?limit=1000`);
 const data=await res.json();
 collections=data.collections||[];
 renderCollectionSelector();
-if(status)status.textContent=`✓ EO PRODUCTS READY · ${collections.length} COLLECTIONS`;
+if(status)status.textContent=`✓ PRODUCTS READY · ${collections.length} COLLECTIONS`;
 }catch(error){
 console.error("Error loading collections:",error);
-if(status)status.textContent="⚠ EO CATALOG UNAVAILABLE";
+if(status)status.textContent="⚠ CATALOG UNAVAILABLE";
 }
 }
    
