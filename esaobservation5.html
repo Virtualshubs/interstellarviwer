@@ -1524,6 +1524,8 @@ max-height:45vh;
 
     <div id="workspace">
 
+       <div id="janus-data-models"></div>
+
         <div id="content">
 
             <div id="cards"></div>
@@ -1980,17 +1982,9 @@ function addDataModel(url){
 
 dataModelCount++;
 
-let menu=document.getElementById("janus-data-models");
+const menu=document.getElementById("janus-data-models");
 
-if(!menu){
-
-menu=document.createElement("aside");
-
-menu.id="janus-data-models";
-
-document.body.appendChild(menu);
-
-}
+if(!menu)return;
 
 if(!document.getElementById("janus-data-models-title")){
 
@@ -2063,8 +2057,6 @@ window.open(url,"_blank");
 menu.appendChild(model);
 
 }
-
-
 
 async function shareDataModel(url){
 
