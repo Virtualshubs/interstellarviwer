@@ -1390,7 +1390,102 @@ opacity:1!important;
 visibility:visible!important;
 }
 
+#janus-data-models{
+position:fixed;
+top:20px;
+right:20px;
+width:230px;
+max-height:calc(100vh - 40px);
+overflow-y:auto;
+z-index:9999;
+font-family:Arial,Helvetica,sans-serif;
+}
 
+#janus-data-models-title{
+font-size:10px;
+font-weight:600;
+letter-spacing:1.5px;
+color:#888;
+margin:0 0 8px 2px;
+}
+
+.janus-data-model{
+background:rgba(255,255,255,.96);
+border:1px solid rgba(0,0,0,.12);
+border-radius:6px;
+padding:10px;
+margin-bottom:7px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+cursor:pointer;
+transition:
+border-color .15s ease,
+box-shadow .15s ease;
+}
+
+.janus-data-model:hover{
+border-color:rgba(0,0,0,.3);
+box-shadow:0 3px 14px rgba(0,0,0,.12);
+}
+
+.janus-data-model-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+}
+
+.janus-data-model-name{
+font-size:12px;
+font-weight:600;
+color:#222;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.janus-data-model-open{
+border:0;
+background:none;
+padding:0;
+font-size:10px;
+color:#666;
+cursor:pointer;
+}
+
+.janus-data-model-open:hover{
+color:#000;
+}
+
+.janus-data-model-actions{
+margin-top:8px;
+padding-top:7px;
+border-top:1px solid rgba(0,0,0,.08);
+}
+
+.janus-data-model-share{
+border:0;
+background:none;
+padding:0;
+font-size:10px;
+color:#777;
+cursor:pointer;
+}
+
+.janus-data-model-share:hover{
+color:#000;
+}
+
+@media(max-width:700px){
+
+#janus-data-models{
+top:auto;
+right:10px;
+bottom:10px;
+width:210px;
+max-height:45vh;
+}
+
+}
   
 </style>
 </head>
@@ -1552,6 +1647,8 @@ let currentItems=[];
 
 let explorationHistory=[];
 let explorationIndex=-1;
+
+let dataModelCount=0;
 
 
 
@@ -1871,7 +1968,162 @@ console.log(
 finalURL
 );
 
+addDataModel(finalURL);
+
 return finalURL;
+
+}
+
+
+
+function addDataModel(url){
+
+dataModelCount++;
+
+let menu=document.getElementById("janus-data-models");
+
+if(!menu){
+
+menu=document.createElement("aside");
+
+menu.id="janus-data-models";
+
+document.body.appendChild(menu);
+
+}
+
+if(!document.getElementById("janus-data-models-title")){
+
+const title=document.createElement("div");
+
+title.id="janus-data-models-title";
+title.textContent="DATA MODELS";
+
+menu.appendChild(title);
+
+}
+
+const model=document.createElement("div");
+
+model.className="janus-data-model";
+
+const header=document.createElement("div");
+
+header.className="janus-data-model-header";
+
+const name=document.createElement("div");
+
+name.className="janus-data-model-name";
+name.textContent="Data Model "+dataModelCount;
+
+const open=document.createElement("button");
+
+open.className="janus-data-model-open";
+open.textContent="Open";
+
+open.onclick=function(e){
+
+e.stopPropagation();
+
+window.open(url,"_blank");
+
+};
+
+header.appendChild(name);
+header.appendChild(open);
+
+const actions=document.createElement("div");
+
+actions.className="janus-data-model-actions";
+
+const share=document.createElement("button");
+
+share.className="janus-data-model-share";
+share.textContent="Share";
+
+share.onclick=function(e){
+
+e.stopPropagation();
+
+shareDataModel(url);
+
+};
+
+actions.appendChild(share);
+
+model.appendChild(header);
+model.appendChild(actions);
+
+model.onclick=function(){
+
+window.open(url,"_blank");
+
+};
+
+menu.appendChild(model);
+
+}
+
+
+
+async function shareDataModel(url){
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+title:"Janus Data Model",
+url:url
+});
+
+return;
+
+}catch(e){
+
+if(e.name==="AbortError")return;
+
+}
+
+}
+
+try{
+
+await navigator.clipboard.writeText(url);
+
+showShareFeedback();
+
+}catch(e){
+
+console.error(
+"Error copiando URL:",
+e
+);
+
+}
+
+}
+
+
+
+function showShareFeedback(){
+
+const button=
+document.querySelector(
+".janus-data-model-share:last-child"
+);
+
+if(!button)return;
+
+const original=button.textContent;
+
+button.textContent="Copied";
+
+setTimeout(function(){
+
+button.textContent=original;
+
+},1200);
 
 }
 
