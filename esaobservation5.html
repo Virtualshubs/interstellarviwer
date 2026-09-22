@@ -1634,10 +1634,14 @@ let currentItems=[];
 
 let explorationHistory=[];
 let explorationIndex=-1;
-
+   
 let dataModelCount=0;
 
 
+
+// ===============================
+// itnit
+// ===============================   
 
 document.getElementById("load-stac-url").onclick=changeSTAC;
 
@@ -2108,7 +2112,6 @@ button.textContent=original;
 }
 
 
-
 const currentURL=
 new URL(window.location.href);
 
@@ -2121,6 +2124,10 @@ document.getElementById("stac-url").value=
 window.location.href;
 
 document.getElementById("load-stac-url").click();
+
+}else{
+
+load();
 
 }
 
@@ -2139,8 +2146,6 @@ document.getElementById(
 ).value=url;
 
 };
-
-   
 
 // ===============================
 // LOAD CATALOG
