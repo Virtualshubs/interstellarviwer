@@ -1404,20 +1404,14 @@ visibility:visible!important;
         <input id="search" value="Biomass">
         <button id="load">SEARCH</button>
       <button id="themeToggle">🌙 LUNAR</button>
+       <button id="generate-3gb0" type="button">Generar 3GB0</button>
 
  
        
     </div>
 
-         <select id="collectionSelector">
-<option value="">Select collection...</option>
-</select>
 
-
-
-   
-
-   <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
   <input
     id="stac-url"
     type="text"
@@ -1428,10 +1422,10 @@ visibility:visible!important;
 </div>
 
 
+         <select id="collectionSelector">
+<option value="">Select collection...</option>
+</select>
 
-
-
-   
 
     <div id="workspace">
 
@@ -1572,7 +1566,38 @@ if(!url)return;
 
 let stacURL=url;
 
-if(url.includes("3dt0=")){
+if(url.includes("3gb0=")){
+
+const value=new URL(url).searchParams.get("3gb0");
+
+if(value){
+
+try{
+
+const glb=base64ToUint8Array(value);
+const metadata=readGLBMetadata(glb);
+
+if(metadata?.extras?.d1){
+
+const decoded=atob(metadata.extras.d1);
+
+if(decoded.startsWith("http://")||decoded.startsWith("https://")){
+stacURL=decoded;
+}
+
+}
+
+}catch(e){
+
+console.error("Error leyendo 3gb0:",e);
+
+}
+
+}
+
+}
+
+else if(url.includes("3dt0=")){
 
 const value=new URL(url).searchParams.get("3dt0");
 
@@ -1600,15 +1625,199 @@ load();
 
 
 
+function base64ToUint8Array(base64){
+
+const binary=atob(base64);
+const bytes=new Uint8Array(binary.length);
+
+for(let i=0;i<binary.length;i++){
+bytes[i]=binary.charCodeAt(i);
+}
+
+return bytes;
+
+}
+
+
+
+function uint8ArrayToBase64(bytes){
+
+let binary="";
+
+const chunkSize=0x8000;
+
+for(let i=0;i<bytes.length;i+=chunkSize){
+binary+=String.fromCharCode(...bytes.subarray(i,i+chunkSize));
+}
+
+return btoa(binary);
+
+}
+
+
+
+function readGLBMetadata(bytes){
+
+const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+
+const magic=view.getUint32(0,true);
+const version=view.getUint32(4,true);
+const length=view.getUint32(8,true);
+
+if(magic!==0x46546C67){
+throw new Error("GLB inválido");
+}
+
+if(version!==2){
+throw new Error("GLB version no soportada");
+}
+
+if(length>bytes.byteLength){
+throw new Error("GLB incompleto");
+}
+
+let offset=12;
+
+while(offset<length){
+
+const chunkLength=view.getUint32(offset,true);
+const chunkType=view.getUint32(offset+4,true);
+
+offset+=8;
+
+if(chunkType===0x4E4F534A){
+
+const jsonBytes=bytes.subarray(offset,offset+chunkLength);
+
+const jsonText=new TextDecoder().decode(jsonBytes);
+
+return JSON.parse(jsonText);
+
+}
+
+offset+=chunkLength;
+
+}
+
+throw new Error("No se encontró JSON en el GLB");
+
+}
+
+
+
+function createGLB(stacURL){
+
+const d1=btoa(stacURL);
+
+const gltf={
+asset:{
+version:"2.0",
+generator:"Janus"
+},
+scene:0,
+scenes:[
+{
+nodes:[0]
+}
+],
+nodes:[
+{
+name:"Janus Data Particle",
+extras:{
+d1:d1
+}
+}
+]
+};
+
+let json=JSON.stringify(gltf);
+
+const encoder=new TextEncoder();
+
+let jsonBytes=encoder.encode(json);
+
+const jsonPadding=(4-(jsonBytes.length%4))%4;
+
+if(jsonPadding){
+const padded=new Uint8Array(jsonBytes.length+jsonPadding);
+padded.set(jsonBytes);
+
+for(let i=jsonBytes.length;i<padded.length;i++){
+padded[i]=0x20;
+}
+
+jsonBytes=padded;
+
+}
+
+const totalLength=12+8+jsonBytes.length;
+
+const glb=new Uint8Array(totalLength);
+const view=new DataView(glb.buffer);
+
+view.setUint32(0,0x46546C67,true);
+view.setUint32(4,2,true);
+view.setUint32(8,totalLength,true);
+
+view.setUint32(12,jsonBytes.length,true);
+view.setUint32(16,0x4E4F534A,true);
+
+glb.set(jsonBytes,20);
+
+return glb;
+
+}
+
+
+
+function generate3GB0(){
+
+const stacURL=BASE.replace(/\/+$/,"");
+
+if(!stacURL)return;
+
+const glb=createGLB(stacURL);
+const encodedGLB=uint8ArrayToBase64(glb);
+
+const finalURL=
+window.location.origin+
+window.location.pathname+
+"?3gb0="+encodedGLB;
+
+console.log("URL 3GB0:",finalURL);
+
+return finalURL;
+
+}
+
+
+
 const currentURL=new URL(window.location.href);
 
-if(currentURL.searchParams.has("3dt0")){
+if(currentURL.searchParams.has("3gb0")||
+currentURL.searchParams.has("3dt0")){
 
 document.getElementById("stac-url").value=window.location.href;
-
 document.getElementById("load-stac-url").click();
 
 }
+
+
+
+document.getElementById("generate-3gb0").onclick=function(){
+
+const url=generate3GB0();
+
+if(!url)return;
+
+document.getElementById("stac-url").value=url;
+
+};
+
+
+
+
+   
 
 // ===============================
 // LOAD CATALOG
