@@ -1796,7 +1796,7 @@ document.getElementById("load-stac-url").onclick=changeSTAC;
 
 
 
-function changeSTAC(){
+async function changeSTAC(){
 
 const input=document.getElementById("stac-url");
 const url=input.value.trim();
@@ -1870,6 +1870,8 @@ return;
 }
 
 BASE=stacURL.replace(/\/+$/,"");
+
+   await loadCollections();
 
 load();
 
