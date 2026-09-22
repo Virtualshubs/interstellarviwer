@@ -1648,9 +1648,11 @@ function changeSTAC(){
 const input=document.getElementById("stac-url");
 const url=input.value.trim();
 
-if(!url)return;
+let stacURL=BASE;
 
-let stacURL=url;
+if(url){
+
+stacURL=url;
 
 try{
 
@@ -1712,12 +1714,13 @@ return;
 
 }
 
+}
+
 BASE=stacURL.replace(/\/+$/,"");
 
 load();
 
 }
-
 
 
 function base64ToUint8Array(base64){
