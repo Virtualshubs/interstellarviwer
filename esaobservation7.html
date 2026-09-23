@@ -2725,6 +2725,23 @@ throw new Error(
 
 const data=await res.json();
 
+
+// =================================
+// ACTUALIZAR RAW CON EL JSON REAL
+// =================================
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+data,
+null,
+2
+);
+
+
+// =================================
+// CATALOG
+// =================================
+
 if(data.type==="Catalog"&&Array.isArray(data.links)){
 
 collections=
@@ -2754,6 +2771,11 @@ document.getElementById("status").textContent=
 return;
 
 }
+
+
+// =================================
+// COLLECTION
+// =================================
 
 if(data.type==="Collection"){
 
@@ -2818,11 +2840,16 @@ activeDataset.endDate||""
 );
 
 document.getElementById("raw").textContent=
-JSON.stringify(col,null,2);
+JSON.stringify(
+col,
+null,
+2
+);
 
 loadItems(activeDataset);
 
 }
+
 
 
 // ===============================
@@ -2860,12 +2887,17 @@ l=>l.rel==="items"
 
 async function loadItems(data){
 
-if(!data.items)
-return;
-
-
 document.getElementById("status").textContent=
 "Reading dataset...";
+
+if(!data.items){
+
+document.getElementById("status").textContent=
+"Item error";
+
+return;
+
+}
 
 
 try{
@@ -2971,6 +3003,11 @@ url
 const res =
 await fetch(url);
 
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
 
 
 const json =
@@ -2979,7 +3016,7 @@ await res.json();
   activeDataset.nextPage =
 json.links?.find(
     l=>l.rel==="next"
-)?.href || null;
+  )?.href || null;
 
 
 
