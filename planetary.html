@@ -257,15 +257,77 @@ document.getElementById(id);
 
 async function request(url){
 
-const res=
-await fetch(url);
+try{
 
-if(!res.ok)
-throw new Error(
-`HTTP ${res.status} ${res.statusText}`
+console.log("FETCH TEST 1:",url);
+
+const res=await fetch(url);
+
+console.log("STATUS 1:",res.status);
+console.log("TYPE 1:",res.type);
+console.log("URL 1:",res.url);
+
+const text=await res.text();
+
+console.log(
+"RESPONSE 1:",
+text.slice(0,500)
 );
 
-return await res.json();
+return JSON.parse(text);
+
+}catch(error){
+
+console.error(
+"FETCH ERROR 1:",
+error
+);
+
+}
+
+try{
+
+console.log(
+"FETCH TEST 2 (CORS):",
+url
+);
+
+const res=await fetch(
+url,
+{
+mode:"cors"
+}
+);
+
+console.log(
+"STATUS 2:",
+res.status
+);
+
+console.log(
+"TYPE 2:",
+res.type
+);
+
+const text=await res.text();
+
+console.log(
+"RESPONSE 2:",
+text.slice(0,500)
+);
+
+return JSON.parse(text);
+
+}catch(error){
+
+console.error(
+"FETCH ERROR 2 (CORS):",
+error
+);
+
+throw error;
+
+}
 
 }
 
