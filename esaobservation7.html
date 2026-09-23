@@ -2717,7 +2717,7 @@ document.getElementById("status").textContent=
 "Loading catalog...";
 
 const res=await fetch(
-`${col.href}${col.href.includes("?")?"&":"?"}limit=3000`
+`${col.href}${col.href.includes("?")?"&":"?"}limit=1000`
 );
 
 if(!res.ok)
