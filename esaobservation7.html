@@ -2489,9 +2489,6 @@ document.getElementById("load").onclick=load;
 
 async function load(){
 
-const q=
-document.getElementById("search").value.trim();
-
 document.getElementById("status").textContent=
 "Loading catalog...";
 
@@ -2507,20 +2504,12 @@ if(root){
 const endpoint=
 `${BASE.replace(/\/+$/,"")}/${root}`;
 
-const params=new URLSearchParams();
-
-if(q)params.set("q",q);
-
-params.set("limit","1000");
-
-   console.log(
+console.log(
 "STAC REQUEST:",
-`${endpoint}?${params.toString()}`
+endpoint
 );
 
-const res=await fetch(
-`${endpoint}?${params.toString()}`
-);
+const res=await fetch(endpoint);
 
 if(!res.ok)
 throw new Error(
