@@ -2482,7 +2482,6 @@ container.appendChild(select);
 createSTACSelector();
 
 
-
 // ===============================
 // LOAD CATALOG
 // ===============================
@@ -2582,39 +2581,31 @@ throw new Error(
 
 const data=await res.json();
 
-let result=[];
-
 if(Array.isArray(data.collections))
-result.push(...data.collections);
+return data.collections;
 
 if(Array.isArray(data.links)){
 
-const children=
-data.links.filter(
+return data.links
+.filter(
 link=>link.rel==="child"&&link.href
-);
+)
+.map(link=>({
 
-for(const child of children){
+id:link.title||link.href,
 
-const childURL=
-new URL(
-child.href,
+title:link.title||link.href,
+
+href:new URL(
+link.href,
 url
-).href;
+).href
 
-const childCollections=
-await loadCatalogTree(
-childURL,
-visited
-);
-
-result.push(...childCollections);
+}));
 
 }
 
-}
-
-return result;
+return[];
 
 }
 
@@ -2714,7 +2705,73 @@ c.appendChild(d);
 // SHOW COLLECTION
 // ===============================
 
-function show(col){
+async function show(col){
+
+if(col.href){
+
+try{
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+const res=await fetch(
+`${col.href}${col.href.includes("?")?"&":"?"}limit=3000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+if(data.type==="Catalog"&&Array.isArray(data.links)){
+
+collections=
+data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+col.href
+).href
+
+}));
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+return;
+
+}
+
+}
+
+catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+return;
+
+}
+
+}
 
 const meta=
 document.getElementById("meta");
@@ -2789,6 +2846,7 @@ l=>l.rel==="items"
 };
 
 }
+
 
 
 // ===============================
