@@ -2487,9 +2487,7 @@ document.getElementById("status").textContent=
 
 try{
 
-const res=await fetch(
-`${BASE}/collections?q=${encodeURIComponent(q)}&limit=1000`
-);
+const res=await fetch(`${BASE}/collections`);
 
 const data=await res.json();
 
