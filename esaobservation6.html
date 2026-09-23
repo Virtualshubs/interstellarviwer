@@ -1557,6 +1557,9 @@ let currentItems=[];
 let explorationHistory=[];
 let explorationIndex=-1;
 
+
+   
+
 // ===============================
 // LOAD CATALOG
 // ===============================
@@ -1572,9 +1575,10 @@ document.getElementById("status").textContent="Loading...";
 
 
 const res = await fetch(
-`${BASE}/collections?q=${encodeURIComponent(q)}`
+`${BASE}/collections`
 );
 
+   
 const data=await res.json();
 
 
