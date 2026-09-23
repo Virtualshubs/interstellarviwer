@@ -2513,6 +2513,11 @@ if(q)params.set("q",q);
 
 params.set("limit","1000");
 
+   console.log(
+"STAC REQUEST:",
+`${endpoint}?${params.toString()}`
+);
+
 const res=await fetch(
 `${endpoint}?${params.toString()}`
 );
