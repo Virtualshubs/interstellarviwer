@@ -2855,17 +2855,406 @@ l=>l.rel==="items"
 
 
 // ===============================
+// LOAD CATALOG
+// ===============================
+
+document.getElementById("load").onclick=load;
+
+
+async function load(){
+
+const q=
+document.getElementById("search").value.trim();
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+try{
+
+const root=
+typeof window.JANUS_CUSTOM_ROOT!=="undefined"
+?window.JANUS_CUSTOM_ROOT
+:"collections";
+
+if(root){
+
+const endpoint=
+`${BASE.replace(/\/+$/,"")}/${root}`;
+
+const params=new URLSearchParams();
+
+if(q)params.set("q",q);
+
+params.set("limit","3000");
+
+const res=await fetch(
+`${endpoint}?${params.toString()}`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+collections=data.collections||[];
+
+}else{
+
+collections=
+await loadCatalogTree(
+BASE.replace(/\/+$/,"")
+);
+
+}
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+}catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+}
+
+}
+
+
+
+// ===============================
+// LOAD STAC CATALOG TREE
+// ===============================
+
+async function loadCatalogTree(url,visited=new Set()){
+
+if(visited.has(url))
+return[];
+
+visited.add(url);
+
+const res=await fetch(
+`${url}${url.includes("?")?"&":"?"}limit=3000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+if(Array.isArray(data.collections))
+return data.collections;
+
+if(Array.isArray(data.links)){
+
+return data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+url
+).href
+
+}));
+
+}
+
+return[];
+
+}
+
+
+
+// ===============================
+// RENDER COLLECTION SELECTOR
+// ===============================
+
+function renderCollectionSelector(){
+
+const select=
+document.getElementById(
+"collectionSelector"
+);
+
+if(!select)return;
+
+select.innerHTML=
+`<option value="">Select collection...</option>`;
+
+collections.forEach(collection=>{
+
+const option=
+document.createElement("option");
+
+option.value=collection.id;
+
+option.textContent=
+collection.title||collection.id;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+document.getElementById(
+"collectionSelector"
+).onchange=function(){
+
+document.getElementById("search").value=this.value;
+
+};
+
+
+
+// ===============================
+// RENDER COLLECTION CARDS
+// ===============================
+
+function renderCards(){
+
+const c=
+document.getElementById("cards");
+
+c.innerHTML="";
+
+collections.forEach(col=>{
+
+const d=
+document.createElement("div");
+
+d.className="card";
+
+d.innerHTML=`
+
+<h3>${col.id}</h3>
+
+<p><b>${col.title||""}</b></p>
+
+<p>
+${(col.description||"").substring(0,180)}...
+</p>
+
+<button class="open">
+OPEN
+</button>
+
+`;
+
+d.querySelector("button").onclick=
+()=>show(col);
+
+c.appendChild(d);
+
+});
+
+}
+
+
+
+// ===============================
+// SHOW COLLECTION
+// ===============================
+
+async function show(col){
+
+if(col.href){
+
+try{
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+const collectionHref=col.href;
+
+const res=await fetch(
+`${collectionHref}${collectionHref.includes("?")?"&":"?"}limit=3000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+if(data.type==="Catalog"&&Array.isArray(data.links)){
+
+collections=
+data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+collectionHref
+).href
+
+}));
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+return;
+
+}
+
+if(data.type==="Collection"){
+
+data.href=collectionHref;
+
+col=data;
+
+}
+
+}
+
+catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+return;
+
+}
+
+}
+
+const meta=
+document.getElementById("meta");
+
+meta.innerHTML="";
+
+document.getElementById(
+"queryBox"
+).innerHTML="";
+
+add(meta,"ID",col.id);
+add(meta,"Title",col.title);
+add(meta,"Version",col.version);
+add(meta,"Created",col.created);
+add(meta,"Updated",col.updated);
+add(meta,"Description",col.description);
+
+if(col.keywords)
+add(
+meta,
+"Keywords",
+col.keywords.join(", ")
+);
+
+activeDataset=
+parseCollection(col);
+
+add(
+meta,
+"DATA START",
+activeDataset.startDate||""
+);
+
+add(
+meta,
+"DATA END",
+activeDataset.endDate||""
+);
+
+document.getElementById("raw").textContent=
+JSON.stringify(col,null,2);
+
+loadItems(activeDataset);
+
+}
+
+
+
+// ===============================
+// PARSE COLLECTION
+// ===============================
+
+function parseCollection(col){
+
+return{
+
+id:col.id,
+
+title:col.title,
+
+startDate:
+col.extent?.temporal?.interval?.[0]?.[0]||null,
+
+endDate:
+col.extent?.temporal?.interval?.[0]?.[1]||null,
+
+items:
+col.links?.find(
+l=>l.rel==="items"
+)?.href||null,
+
+href:
+col.href||null
+
+};
+
+}
+
+
+
+// ===============================
 // LOAD ITEMS
 // ===============================
 
 async function loadItems(data){
 
-if(!data.items)
-return;
-
-
 document.getElementById("status").textContent=
 "Reading dataset...";
+
+
+if(!data.items){
+
+console.log(
+"NO ITEMS LINK:",
+data
+);
+
+document.getElementById("status").textContent=
+"Item error";
+
+return;
+
+}
 
 
 try{
@@ -3140,7 +3529,7 @@ box.appendChild(r);
 
 });
 
-
+}
 
 
 // ===============================
