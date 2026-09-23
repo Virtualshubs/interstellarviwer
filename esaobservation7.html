@@ -2486,8 +2486,19 @@ createSTACSelector();
 
 document.getElementById("load").onclick=load;
 
+let stacLoadController=null;
+
 
 async function load(){
+
+if(stacLoadController)
+stacLoadController.abort();
+
+stacLoadController=
+new AbortController();
+
+const signal=
+stacLoadController.signal;
 
 const q=
 document.getElementById("search").value.trim();
@@ -2514,7 +2525,8 @@ if(q)params.set("q",q);
 params.set("limit","3000");
 
 const res=await fetch(
-`${endpoint}?${params.toString()}`
+`${endpoint}?${params.toString()}`,
+{signal}
 );
 
 if(!res.ok)
@@ -2530,7 +2542,9 @@ collections=data.collections||[];
 
 collections=
 await loadCatalogTree(
-BASE.replace(/\/+$/,"")
+BASE.replace(/\/+$/,""),
+new Set(),
+signal
 );
 
 }
@@ -2542,6 +2556,9 @@ document.getElementById("status").textContent=
 `${collections.length} collections`;
 
 }catch(error){
+
+if(error.name==="AbortError")
+return;
 
 console.error(
 "Error loading catalog:",
@@ -2561,7 +2578,11 @@ document.getElementById("status").textContent=
 // LOAD STAC CATALOG TREE
 // ===============================
 
-async function loadCatalogTree(url,visited=new Set()){
+async function loadCatalogTree(
+url,
+visited=new Set(),
+signal=null
+){
 
 if(visited.has(url))
 return[];
@@ -2569,7 +2590,8 @@ return[];
 visited.add(url);
 
 const res=await fetch(
-`${url}${url.includes("?")?"&":"?"}limit=3000`
+`${url}${url.includes("?")?"&":"?"}limit=3000`,
+{signal}
 );
 
 if(!res.ok)
