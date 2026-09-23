@@ -2383,23 +2383,32 @@ realLoad.click();
 
 const STAC_DATA_URLS={
 
-"ESA MAAP":
-"https://catalog.maap.eo.esa.int/catalogue",
+"ESA MAAP":{
+url:"https://catalog.maap.eo.esa.int/catalogue",
+root:"collections"
+},
 
-"Google Earth Engine":
-"https://storage.googleapis.com/earthengine-stac/",
+"Google Earth Engine":{
+url:"https://storage.googleapis.com/earthengine-stac/catalog/catalog.json",
+root:""
+},
 
-"AWS Earth Search":
-"https://earth-search.aws.element84.com/v1/",
+"AWS Earth Search":{
+url:"https://earth-search.aws.element84.com/v1",
+root:"collections"
+},
 
-"Microsoft Planetary Computer":
-"https://planetarycomputer.microsoft.com/api/stac/v1/",
+"Microsoft Planetary Computer":{
+url:"https://planetarycomputer.microsoft.com/api/stac/v1",
+root:"collections"
+},
 
-"NASA CMR":
-"https://cmr.earthdata.nasa.gov/stac/"
+"NASA CMR":{
+url:"https://cmr.earthdata.nasa.gov/stac",
+root:""
+}
 
 };
-
 
 
 function createSTACSelector(){
@@ -2422,12 +2431,12 @@ defaultOption.textContent="Select public STAC";
 select.appendChild(defaultOption);
 
 Object.entries(STAC_DATA_URLS).forEach(
-([name,url])=>{
+([name,config])=>{
 
 const option=
 document.createElement("option");
 
-option.value=url;
+option.value=JSON.stringify(config);
 option.textContent=name;
 
 select.appendChild(option);
@@ -2437,9 +2446,11 @@ select.appendChild(option);
 
 select.onchange=function(){
 
-const url=this.value;
+const value=this.value;
 
-if(!url)return;
+if(!value)return;
+
+const config=JSON.parse(value);
 
 const input=
 document.getElementById(
@@ -2453,7 +2464,9 @@ document.getElementById(
 
 if(!input||!load)return;
 
-input.value=url;
+input.value=config.url;
+
+window.JANUS_CUSTOM_ROOT=config.root;
 
 load.click();
 
@@ -2487,8 +2500,23 @@ document.getElementById("status").textContent=
 
 try{
 
+const root=
+typeof window.JANUS_CUSTOM_ROOT!=="undefined"
+?window.JANUS_CUSTOM_ROOT
+:"collections";
+
+const endpoint=root
+?`${BASE.replace(/\/+$/,"")}/${root}`
+:BASE.replace(/\/+$/,"");
+
+const params=new URLSearchParams();
+
+if(q)params.set("q",q);
+
+params.set("limit","3000");
+
 const res=await fetch(
-`${BASE}/collections?q=${encodeURIComponent(q)}&limit=3000`
+`${endpoint}?${params.toString()}`
 );
 
 const data=await res.json();
