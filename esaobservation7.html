@@ -2569,7 +2569,7 @@ return[];
 visited.add(url);
 
 const res=await fetch(
-`${url}${url.includes("?")?"&":"?"}limit=3000`
+`${url}${url.includes("?")?"&":"?"}limit=1000`
 );
 
 if(!res.ok)
