@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Microsoft Planetary Computer STAC Test</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>STAC Web Index</title>
 
 <style>
 *{
@@ -12,373 +12,505 @@ box-sizing:border-box;
 
 body{
 margin:0;
-font-family:Arial,sans-serif;
-background:#f5f5f5;
-color:#222;
-}
-
-header{
-padding:24px;
-background:#222;
-color:#fff;
+padding:40px;
+background:#f4f4f4;
+color:#111;
+font-family:Arial,Helvetica,sans-serif;
 }
 
 main{
-max-width:1200px;
-margin:0 auto;
-padding:24px;
+max-width:1100px;
+margin:auto;
+}
+
+h1{
+margin:0 0 10px;
+font-size:28px;
+font-weight:600;
+}
+
+.subtitle{
+margin:0 0 30px;
+color:#666;
 }
 
 .panel{
 background:#fff;
 border:1px solid #ddd;
-border-radius:8px;
-padding:18px;
-margin-bottom:18px;
+padding:24px;
+margin-bottom:20px;
 }
 
-h1,h2,h3{
-margin-top:0;
+label{
+display:block;
+font-size:13px;
+font-weight:600;
+margin-bottom:8px;
 }
 
-button,
-select,
 input{
-font:inherit;
-padding:9px 11px;
+width:100%;
+padding:12px;
 border:1px solid #bbb;
-border-radius:5px;
-background:#fff;
+font-size:14px;
 }
 
 button{
-cursor:pointer;
-background:#222;
+margin-top:14px;
+padding:11px 18px;
+border:1px solid #111;
+background:#111;
 color:#fff;
-border-color:#222;
+cursor:pointer;
+font-size:14px;
 }
 
-.controls{
-display:flex;
-gap:8px;
-flex-wrap:wrap;
+button:hover{
+background:#333;
 }
 
-input{
-flex:1;
-min-width:260px;
+.status{
+margin-top:18px;
+font-family:monospace;
+font-size:13px;
+white-space:pre-wrap;
 }
 
-#status{
-margin-top:12px;
-color:#666;
-}
-
-#collections{
+.tests{
 display:grid;
-grid-template-columns:
-repeat(auto-fill,minmax(250px,1fr));
+grid-template-columns:1fr;
 gap:10px;
 }
 
-.collection{
-padding:14px;
+.test{
 border:1px solid #ddd;
-border-radius:6px;
+padding:15px;
+background:#fafafa;
+}
+
+.test-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+}
+
+.test-name{
+font-weight:600;
+}
+
+.test-status{
+font-family:monospace;
+font-size:13px;
+}
+
+.pending{
+color:#777;
+}
+
+.ok{
+color:#087a28;
+}
+
+.fail{
+color:#b00020;
+}
+
+.details{
+margin-top:10px;
+font-family:monospace;
+font-size:12px;
+white-space:pre-wrap;
+word-break:break-word;
+color:#555;
+}
+
+.hidden{
+display:none;
+}
+
+.collections{
+margin-top:20px;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:12px;
+}
+
+.collection{
+border:1px solid #ddd;
+padding:15px;
 background:#fafafa;
 cursor:pointer;
 }
 
 .collection:hover{
-background:#eee;
+background:#f0f0f0;
 }
 
-.collection strong{
-display:block;
-margin-bottom:6px;
-}
-
-.meta{
-font-size:13px;
-color:#666;
+.collection-id{
+font-family:monospace;
+font-size:12px;
+color:#555;
+margin-top:6px;
+word-break:break-word;
 }
 
 pre{
-white-space:pre-wrap;
-word-break:break-word;
-max-height:600px;
+background:#111;
+color:#eee;
+padding:18px;
 overflow:auto;
-background:#f1f1f1;
-padding:14px;
-border-radius:6px;
 font-size:12px;
+line-height:1.5;
 }
 
-#details{
-display:none;
+@media(max-width:700px){
+body{
+padding:20px;
 }
-
-#items{
-display:grid;
-grid-template-columns:
-repeat(auto-fill,minmax(250px,1fr));
-gap:10px;
-margin-top:15px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>Microsoft Planetary Computer — STAC Test</h1>
-<div>Direct STAC API test</div>
-</header>
-
 <main>
 
-<section class="panel">
+<h1>STAC Web Index</h1>
 
-<h2>STAC API</h2>
+<p class="subtitle">
+STAC API browser compatibility and structure test
+</p>
 
-<div class="controls">
+<div class="panel">
+
+<label for="stac-url">STAC API</label>
 
 <input
-id="stacUrl"
+id="stac-url"
+type="url"
 value="https://planetarycomputer.microsoft.com/api/stac/v1"
 >
 
-<button id="loadBtn">
-Load catalog
+<button id="run-tests">
+Run tests
 </button>
 
+<div id="status" class="status">
+Ready.
 </div>
 
-<div id="status">
-Ready
 </div>
 
-</section>
+<div class="panel">
 
+<h2>Web access</h2>
 
-<section class="panel">
+<div id="tests" class="tests">
 
-<h2>API diagnostics</h2>
+<div class="test" id="test-root">
+<div class="test-head">
+<div class="test-name">1. Landing Page</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
-<pre id="diagnostic">Not tested yet.</pre>
+<div class="test" id="test-conformance">
+<div class="test-head">
+<div class="test-name">2. Conformance</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
-</section>
+<div class="test" id="test-collections">
+<div class="test-head">
+<div class="test-name">3. Collections</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
+<div class="test" id="test-collection">
+<div class="test-head">
+<div class="test-name">4. Collection</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
-<section class="panel">
+<div class="test" id="test-items">
+<div class="test-head">
+<div class="test-name">5. Items</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
-<h2>Root</h2>
+<div class="test" id="test-item">
+<div class="test-head">
+<div class="test-name">6. Item</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
-<pre id="rootJson"></pre>
+<div class="test" id="test-search">
+<div class="test-head">
+<div class="test-name">7. Search</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
-</section>
+<div class="test" id="test-queryables">
+<div class="test-head">
+<div class="test-name">8. Queryables</div>
+<div class="test-status pending">WAITING</div>
+</div>
+<div class="details"></div>
+</div>
 
+</div>
 
-<section class="panel">
+</div>
+
+<div id="collections-panel" class="panel hidden">
 
 <h2>Collections</h2>
 
-<div id="collections"></div>
+<div id="collections" class="collections"></div>
 
-</section>
+</div>
 
+<div id="collection-panel" class="panel hidden">
 
-<section
-class="panel"
-id="details"
->
+<h2>Selected collection</h2>
 
-<h2 id="collectionTitle"></h2>
+<pre id="collection-data"></pre>
 
-<div
-id="collectionMeta"
-class="meta"
-></div>
+</div>
 
+<div id="item-panel" class="panel hidden">
 
-<h3 style="margin-top:20px">
-Collection JSON
-</h3>
+<h2>Items</h2>
 
-<pre id="collectionJson"></pre>
+<pre id="item-data"></pre>
 
-
-<h3 style="margin-top:20px">
-Items
-</h3>
-
-<div
-id="itemsStatus"
-class="meta"
-></div>
-
-<div id="items"></div>
-
-<pre id="itemJson"></pre>
-
-</section>
+</div>
 
 </main>
 
-
 <script>
 
-const BASE=
+const DEFAULT_BASE=
 "https://planetarycomputer.microsoft.com/api/stac/v1";
 
+let BASE=DEFAULT_BASE;
+
 let collections=[];
-let activeCollection=null;
+let selectedCollection=null;
+let selectedItem=null;
+
+const statusElement=
+document.getElementById("status");
+
+const testsElement=
+document.getElementById("tests");
+
+const collectionsPanel=
+document.getElementById("collections-panel");
+
+const collectionPanel=
+document.getElementById("collection-panel");
+
+const itemPanel=
+document.getElementById("item-panel");
+
+const collectionsElement=
+document.getElementById("collections");
+
+const collectionData=
+document.getElementById("collection-data");
+
+const itemData=
+document.getElementById("item-data");
 
 
-const $=id=>
+function setTest(id,status,details=""){
+
+const element=
 document.getElementById(id);
 
+const statusElement=
+element.querySelector(".test-status");
 
-/* ===============================
-   DIRECT FETCH
-   =============================== */
+const detailsElement=
+element.querySelector(".details");
 
-async function request(url){
-
-console.log(
-"STAC REQUEST:",
-url
+statusElement.className=
+"test-status "+(
+status==="OK"
+?"ok"
+:
+status==="FAIL"
+?"fail"
+:
+"pending"
 );
 
-try{
+statusElement.textContent=status;
 
-const res=
+detailsElement.textContent=details;
+
+}
+
+
+function resetTests(){
+
+document
+.querySelectorAll(".test-status")
+.forEach(element=>{
+element.className="test-status pending";
+element.textContent="WAITING";
+});
+
+document
+.querySelectorAll(".details")
+.forEach(element=>{
+element.textContent="";
+});
+
+collections=[];
+selectedCollection=null;
+selectedItem=null;
+
+collectionsElement.innerHTML="";
+collectionData.textContent="";
+itemData.textContent="";
+
+collectionsPanel.classList.add("hidden");
+collectionPanel.classList.add("hidden");
+itemPanel.classList.add("hidden");
+
+}
+
+
+function normalizeBase(url){
+
+return url.trim().replace(/\/+$/,"");
+
+}
+
+
+function endpoint(path){
+
+return `${BASE}/${path}`;
+
+}
+
+
+async function request(url,options={}){
+
+const response=
 await fetch(
 url,
 {
 method:"GET",
 mode:"cors",
-cache:"no-store"
+cache:"no-store",
+...options
 }
 );
 
-
-console.log(
-"STATUS:",
-res.status
-);
-
-console.log(
-"TYPE:",
-res.type
-);
-
-console.log(
-"URL:",
-res.url
-);
-
-
-if(!res.ok){
+if(!response.ok){
 
 throw new Error(
-`HTTP ${res.status} ${res.statusText}`
+`HTTP ${response.status} ${response.statusText}`
 );
 
 }
 
+const contentType=
+response.headers.get("content-type")||"";
 
 const text=
-await res.text();
+await response.text();
 
-
-console.log(
-"BODY PREVIEW:",
-text.slice(0,500)
-);
-
-
-return JSON.parse(text);
-
-}catch(error){
-
-console.error(
-"REQUEST ERROR:",
-url,
-error
-);
-
-throw error;
-
-}
-
-}
-
-
-/* ===============================
-   LOAD ROOT
-   =============================== */
-
-async function loadRoot(){
-
-const base=
-$("stacUrl")
-.value
-.trim()
-.replace(/\/+$/,"");
-
-const url=
-`${base}/`;
-
-$("diagnostic").textContent=
-"REQUESTING ROOT:\n\n"+
-url;
+let data=null;
 
 try{
 
-const data=
-await request(url);
+data=JSON.parse(text);
 
-$("rootJson").textContent=
-JSON.stringify(
-data,
-null,
-2
+}catch(e){
+
+throw new Error(
+`Response is not valid JSON.\nContent-Type: ${contentType}`
 );
 
-$("diagnostic").textContent=
-"ROOT SUCCESS\n\n"+
-url+
-"\n\n"+
-"STAC VERSION:\n"+
-(
-data.stac_version||
-"not present"
-)+
-"\n\n"+
-"TYPE:\n"+
-(
-data.type||
-"not present"
-)+
-"\n\n"+
-"TITLE:\n"+
-(
-data.title||
-"not present"
+}
+
+return{
+response,
+data,
+contentType
+};
+
+}
+
+
+async function testRoot(){
+
+const url=
+`${BASE}/`;
+
+try{
+
+const result=
+await request(url);
+
+const data=result.data;
+
+if(
+!data||
+typeof data!=="object"
+){
+
+throw new Error(
+"Landing Page is not a JSON object."
+);
+
+}
+
+setTest(
+"test-root",
+"OK",
+[
+`URL: ${url}`,
+`HTTP: ${result.response.status}`,
+`Content-Type: ${result.contentType}`,
+`type: ${data.type||"not declared"}`,
+`id: ${data.id||"not declared"}`
+].join("\n")
 );
 
 return data;
 
 }catch(error){
 
-$("diagnostic").textContent=
-"ROOT FAILED\n\n"+
-url+
-"\n\n"+
-error.name+
-"\n"+
-error.message;
+setTest(
+"test-root",
+"FAIL",
+[
+`URL: ${url}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`,
+"",
+"JavaScript could not obtain a readable response."
+].join("\n")
+);
 
 throw error;
 
@@ -387,387 +519,590 @@ throw error;
 }
 
 
-/* ===============================
-   LOAD COLLECTIONS
-   =============================== */
-
-async function loadCollections(){
-
-const base=
-$("stacUrl")
-.value
-.trim()
-.replace(/\/+$/,"");
+async function testConformance(){
 
 const url=
-`${base}/collections`;
-
-$("diagnostic").textContent+=
-"\n\nREQUESTING COLLECTIONS:\n\n"+
-url;
+endpoint("conformance");
 
 try{
 
-const data=
+const result=
 await request(url);
+
+const data=result.data;
+
+const conforms=
+Array.isArray(data.conforms)
+?data.conforms.length
+:0;
+
+setTest(
+"test-conformance",
+"OK",
+[
+`URL: ${url}`,
+`HTTP: ${result.response.status}`,
+`Conformance classes: ${conforms}`
+].join("\n")
+);
+
+return data;
+
+}catch(error){
+
+setTest(
+"test-conformance",
+"FAIL",
+[
+`URL: ${url}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
+);
+
+return null;
+
+}
+
+}
+
+
+async function testCollections(){
+
+const url=
+endpoint("collections");
+
+try{
+
+const result=
+await request(url);
+
+const data=result.data;
+
+if(!Array.isArray(data.collections)){
+
+throw new Error(
+"Response does not contain a collections array."
+);
+
+}
 
 collections=
-data.collections||[];
+data.collections;
 
-$("diagnostic").textContent+=
-"\n\nCOLLECTIONS SUCCESS\n\n"+
-"COUNT: "+
-collections.length;
-
-renderCollections(
-collections
+setTest(
+"test-collections",
+"OK",
+[
+`URL: ${url}`,
+`HTTP: ${result.response.status}`,
+`Collections: ${collections.length}`
+].join("\n")
 );
+
+renderCollections();
 
 return data;
 
 }catch(error){
 
-$("diagnostic").textContent+=
-"\n\nCOLLECTIONS FAILED\n\n"+
-error.name+
-"\n"+
-error.message;
-
-throw error;
-
-}
-
-}
-
-
-/* ===============================
-   LOAD CATALOG
-   =============================== */
-
-async function loadCatalog(){
-
-$("status").textContent=
-"Loading STAC API...";
-
-$("collections").innerHTML="";
-
-$("details").style.display=
-"none";
-
-$("rootJson").textContent="";
-
-$("diagnostic").textContent=
-"Starting direct STAC test...";
-
-
-try{
-
-await loadRoot();
-
-await loadCollections();
-
-$("status").textContent=
-`${collections.length} collections loaded`;
-
-}catch(error){
-
-console.error(
-"CATALOG ERROR:",
-error
+setTest(
+"test-collections",
+"FAIL",
+[
+`URL: ${url}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
 );
 
-$("status").textContent=
-`Error: ${error.message}`;
+return null;
 
 }
 
 }
 
 
-/* ===============================
-   RENDER COLLECTIONS
-   =============================== */
+function renderCollections(){
 
-function renderCollections(list){
+collectionsElement.innerHTML="";
 
-const container=
-$("collections");
+collectionsPanel.classList.remove("hidden");
 
-container.innerHTML="";
+if(!collections.length){
 
-
-if(!list.length){
-
-container.textContent=
-"No collections found.";
+collectionsElement.textContent=
+"No collections returned.";
 
 return;
 
 }
 
+collections.forEach((collection,index)=>{
 
-list.forEach(col=>{
-
-const card=
+const element=
 document.createElement("div");
 
-card.className=
-"collection";
+element.className="collection";
 
+element.innerHTML=`
+<strong>${escapeHTML(
+collection.title||collection.id||"Collection"
+)}</strong>
+<div class="collection-id">
+${escapeHTML(collection.id||"")}
+</div>
+`;
 
-const title=
-document.createElement("strong");
+element.onclick=
+()=>loadCollection(collection,index);
 
-title.textContent=
-col.title||col.id;
-
-
-const id=
-document.createElement("div");
-
-id.className=
-"meta";
-
-id.textContent=
-col.id;
-
-
-card.appendChild(title);
-card.appendChild(id);
-
-
-card.onclick=()=>
-openCollection(col);
-
-
-container.appendChild(card);
+collectionsElement.appendChild(element);
 
 });
 
 }
 
 
-/* ===============================
-   OPEN COLLECTION
-   =============================== */
+async function loadCollection(collection,index){
 
-async function openCollection(col){
+selectedCollection=collection;
 
-activeCollection=
-col;
+const href=
+collection.links?.find(
+link=>link.rel==="self"
+)?.href
+||
+`${BASE}/collections/${encodeURIComponent(
+collection.id
+)}`;
 
-$("details").style.display=
-"block";
+collectionPanel.classList.remove("hidden");
 
-$("collectionTitle").textContent=
-col.title||col.id;
+collectionData.textContent=
+"Loading collection...";
 
-$("collectionMeta").textContent=
-col.id;
+try{
 
-$("collectionJson").textContent=
-JSON.stringify(
-col,
-null,
-2
+const result=
+await request(href);
+
+const data=
+result.data;
+
+collectionData.textContent=
+JSON.stringify(data,null,2);
+
+setTest(
+"test-collection",
+"OK",
+[
+`URL: ${href}`,
+`HTTP: ${result.response.status}`,
+`ID: ${data.id||collection.id}`,
+`Title: ${data.title||""}`
+].join("\n")
 );
 
-$("items").innerHTML="";
+await testItems(data);
 
-$("itemJson").textContent="";
+await testItem(data);
 
-$("itemsStatus").textContent=
-"";
+await testQueryables(data);
+
+}catch(error){
+
+collectionData.textContent=
+error.message;
+
+setTest(
+"test-collection",
+"FAIL",
+[
+`URL: ${href}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
+);
+
+}
+
+}
 
 
-const collectionLink=
-col.links?.find(
+async function testItems(collection){
+
+const itemLink=
+collection.links?.find(
+link=>link.rel==="items"
+);
+
+if(!itemLink){
+
+setTest(
+"test-items",
+"FAIL",
+"Collection does not expose a rel=\"items\" link."
+);
+
+return null;
+
+}
+
+const href=itemLink.href;
+
+try{
+
+const result=
+await request(href);
+
+const data=result.data;
+
+if(
+!Array.isArray(data.features)
+){
+
+throw new Error(
+"Items response does not contain a features array."
+);
+
+}
+
+setTest(
+"test-items",
+"OK",
+[
+`URL: ${href}`,
+`HTTP: ${result.response.status}`,
+`Items returned: ${data.features.length}`
+].join("\n")
+);
+
+if(data.features.length){
+
+selectedItem=
+data.features[0];
+
+}
+
+return data;
+
+}catch(error){
+
+setTest(
+"test-items",
+"FAIL",
+[
+`URL: ${href}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
+);
+
+return null;
+
+}
+
+}
+
+
+async function testItem(collection){
+
+if(!selectedItem){
+
+setTest(
+"test-item",
+"FAIL",
+"No Item available to test."
+);
+
+return null;
+
+}
+
+let href=
+selectedItem.links?.find(
 link=>link.rel==="self"
 )?.href;
 
+if(!href){
 
-const itemsLink=
-col.links?.find(
-link=>link.rel==="items"
-)?.href;
+const itemId=
+selectedItem.id;
 
+const collectionId=
+collection.id;
 
-if(!collectionLink){
+if(!itemId||!collectionId){
 
-$("itemsStatus").textContent=
-"No self link in this collection.";
+setTest(
+"test-item",
+"FAIL",
+"Cannot construct Item URL."
+);
 
-return;
+return null;
 
 }
 
+href=
+`${BASE}/collections/`+
+`${encodeURIComponent(collectionId)}/items/`+
+`${encodeURIComponent(itemId)}`;
+
+}
 
 try{
 
-$("itemsStatus").textContent=
-"Loading collection...";
+const result=
+await request(href);
 
+const data=result.data;
 
-const collection=
-await request(
-collectionLink
+itemPanel.classList.remove("hidden");
+
+itemData.textContent=
+JSON.stringify(data,null,2);
+
+setTest(
+"test-item",
+"OK",
+[
+`URL: ${href}`,
+`HTTP: ${result.response.status}`,
+`ID: ${data.id||"not declared"}`,
+`Type: ${data.type||"not declared"}`
+].join("\n")
 );
 
-$("collectionJson").textContent=
-JSON.stringify(
-collection,
-null,
-2
-);
-
+return data;
 
 }catch(error){
 
-console.error(
-"COLLECTION ERROR:",
-error
+setTest(
+"test-item",
+"FAIL",
+[
+`URL: ${href}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
 );
 
-$("itemsStatus").textContent=
-`Collection error: ${error.message}`;
+return null;
 
-return;
+}
 
 }
 
 
-if(!itemsLink){
+async function testSearch(){
 
-$("itemsStatus").textContent=
-"No items link in this collection.";
-
-return;
-
-}
-
+const url=
+endpoint("search");
 
 try{
 
-$("itemsStatus").textContent=
-"Loading items...";
-
+const result=
+await request(
+url
+);
 
 const data=
-await request(
-itemsLink
+result.data;
+
+setTest(
+"test-search",
+"OK",
+[
+`URL: ${url}`,
+`HTTP: ${result.response.status}`,
+`Response type: ${data.type||"not declared"}`,
+`Features: ${
+Array.isArray(data.features)
+?data.features.length
+:"not declared"
+}`
+].join("\n")
 );
 
-const features=
-data.features||[];
-
-$("itemsStatus").textContent=
-`${features.length} items loaded`;
-
-renderItems(
-features
-);
-
-
-if(features.length){
-
-$("itemJson").textContent=
-JSON.stringify(
-features[0],
-null,
-2
-);
-
-}
+return data;
 
 }catch(error){
 
-console.error(
-"ITEM ERROR:",
-error
+setTest(
+"test-search",
+"FAIL",
+[
+`URL: ${url}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
 );
 
-$("itemsStatus").textContent=
-`Item error: ${error.message}`;
+return null;
 
 }
 
 }
 
 
-/* ===============================
-   RENDER ITEMS
-   =============================== */
+async function testQueryables(collection){
 
-function renderItems(features){
+if(!collection){
 
-const container=
-$("items");
-
-container.innerHTML="";
-
-
-features
-.slice(0,100)
-.forEach(item=>{
-
-const card=
-document.createElement("div");
-
-card.className=
-"collection";
-
-
-const title=
-document.createElement("strong");
-
-title.textContent=
-item.properties?.datetime||
-item.id||
-"Item";
-
-
-const id=
-document.createElement("div");
-
-id.className=
-"meta";
-
-id.textContent=
-item.id||"";
-
-
-card.appendChild(title);
-card.appendChild(id);
-
-
-card.onclick=function(){
-
-$("itemJson").textContent=
-JSON.stringify(
-item,
-null,
-2
+setTest(
+"test-queryables",
+"FAIL",
+"No collection available."
 );
 
-};
+return null;
 
+}
 
-container.appendChild(card);
+const collectionId=
+collection.id;
 
-});
+const href=
+`${BASE}/collections/`+
+`${encodeURIComponent(collectionId)}/queryables`;
+
+try{
+
+const result=
+await request(href);
+
+const data=
+result.data;
+
+setTest(
+"test-queryables",
+"OK",
+[
+`URL: ${href}`,
+`HTTP: ${result.response.status}`,
+`Type: ${data.type||"not declared"}`
+].join("\n")
+);
+
+return data;
+
+}catch(error){
+
+setTest(
+"test-queryables",
+"FAIL",
+[
+`URL: ${href}`,
+`Error: ${error.name}`,
+`Message: ${error.message}`
+].join("\n")
+);
+
+return null;
+
+}
 
 }
 
 
-/* ===============================
-   EVENTS
-   =============================== */
+function escapeHTML(value){
 
-$("loadBtn").onclick=
-loadCatalog;
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
 
 
-loadCatalog();
+async function runTests(){
+
+resetTests();
+
+BASE=
+normalizeBase(
+document
+.getElementById("stac-url")
+.value
+);
+
+if(!BASE){
+
+statusElement.textContent=
+"STAC URL required.";
+
+return;
+
+}
+
+statusElement.textContent=
+`Testing ${BASE} ...`;
+
+let root;
+
+try{
+
+root=
+await testRoot();
+
+}catch(error){
+
+statusElement.textContent=
+"Landing Page failed. Browser cannot read the STAC API.";
+
+return;
+
+}
+
+await testConformance();
+
+const collectionsData=
+await testCollections();
+
+if(
+collectionsData&&
+collections.length
+){
+
+statusElement.textContent=
+`Web access OK. ${collections.length} collections available. Select a collection below.`;
+
+}else{
+
+statusElement.textContent=
+"Landing Page readable, but Collections failed.";
+
+}
+
+await testSearch();
+
+}
+
+
+document
+.getElementById("run-tests")
+.onclick=
+runTests;
+
+
+document
+.getElementById("stac-url")
+.addEventListener(
+"keydown",
+event=>{
+
+if(event.key==="Enter"){
+
+runTests();
+
+}
+
+}
+);
 
 </script>
 
