@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Microsoft Planetary Computer STAC Test</title>
+
+<style>
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f5f5f5;
+color:#222;
+}
+
+header{
+padding:24px;
+background:#222;
+color:#fff;
+}
+
+main{
+max-width:1200px;
+margin:0 auto;
+padding:24px;
+}
+
+.panel{
+background:#fff;
+border:1px solid #ddd;
+border-radius:8px;
+padding:18px;
+margin-bottom:18px;
+}
+
+h1,h2,h3{
+margin-top:0;
+}
+
+button,
+select,
+input{
+font:inherit;
+padding:9px 11px;
+border:1px solid #bbb;
+border-radius:5px;
+background:#fff;
+}
+
+button{
+cursor:pointer;
+background:#222;
+color:#fff;
+border-color:#222;
+}
+
+.controls{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+}
+
+input{
+flex:1;
+min-width:260px;
+}
+
+#status{
+margin-top:12px;
+color:#666;
+}
+
+#collections{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(250px,1fr));
+gap:10px;
+}
+
+.collection{
+padding:14px;
+border:1px solid #ddd;
+border-radius:6px;
+background:#fafafa;
+cursor:pointer;
+}
+
+.collection:hover{
+background:#eee;
+}
+
+.collection strong{
+display:block;
+margin-bottom:6px;
+}
+
+.meta{
+font-size:13px;
+color:#666;
+}
+
+pre{
+white-space:pre-wrap;
+word-break:break-word;
+max-height:600px;
+overflow:auto;
+background:#f1f1f1;
+padding:14px;
+border-radius:6px;
+font-size:12px;
+}
+
+#details{
+display:none;
+}
+
+select{
+min-width:280px;
+}
+
+.row{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+align-items:center;
+}
+
+#items{
+display:grid;
+grid-template-columns:
+repeat(auto-fill,minmax(250px,1fr));
+gap:10px;
+margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Microsoft Planetary Computer — STAC Test</h1>
+<div>Direct test of the public STAC API</div>
+</header>
+
+<main>
+
+<section class="panel">
+
+<h2>STAC</h2>
+
+<div class="controls">
+
+<input
+id="stacUrl"
+value="https://planetarycomputer.microsoft.com/api/stac/v1"
+>
+
+<button id="loadBtn">
+Load catalog
+</button>
+
+</div>
+
+<div id="status">
+Ready
+</div>
+
+</section>
+
+
+<section class="panel">
+
+<h2>Collections</h2>
+
+<div class="row">
+
+<input
+id="search"
+placeholder="Search collections, e.g. ms-buildings"
+>
+
+<button id="searchBtn">
+Search
+</button>
+
+</div>
+
+<div
+id="collections"
+style="margin-top:15px"
+></div>
+
+</section>
+
+
+<section
+class="panel"
+id="details"
+>
+
+<h2 id="collectionTitle"></h2>
+
+<div
+id="collectionMeta"
+class="meta"
+></div>
+
+
+<h3 style="margin-top:20px">
+Collection fields
+</h3>
+
+<select id="fieldSelect"></select>
+
+
+<h3 style="margin-top:20px">
+Collection JSON
+</h3>
+
+<pre id="collectionJson"></pre>
+
+
+<h3 style="margin-top:20px">
+Items / products
+</h3>
+
+<div
+id="itemsStatus"
+class="meta"
+></div>
+
+<div id="items"></div>
+
+<pre id="itemJson"></pre>
+
+</section>
+
+</main>
+
+
+<script>
+
+const BASE=
+"https://planetarycomputer.microsoft.com/api/stac/v1";
+
+let collections=[];
+let activeCollection=null;
+
+
+const $=id=>
+document.getElementById(id);
+
+
+async function request(url){
+
+const res=
+await fetch(url);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+return await res.json();
+
+}
+
+
+async function loadCatalog(){
+
+const base=
+$("stacUrl")
+.value
+.trim()
+.replace(/\/+$/,"");
+
+$("status").textContent=
+"Loading catalog...";
+
+$("collections").innerHTML="";
+
+$("details").style.display=
+"none";
+
+
+try{
+
+console.log(
+"STAC REQUEST:",
+`${base}/collections`
+);
+
+const data=
+await request(
+`${base}/collections`
+);
+
+collections=
+data.collections||[];
+
+$("status").textContent=
+`${collections.length} collections loaded`;
+
+renderCollections(
+collections
+);
+
+}catch(error){
+
+console.error(
+error
+);
+
+$("status").textContent=
+`Error: ${error.message}`;
+
+}
+
+}
+
+
+async function searchCollections(){
+
+const base=
+$("stacUrl")
+.value
+.trim()
+.replace(/\/+$/,"");
+
+const q=
+$("search")
+.value
+.trim();
+
+if(!q){
+
+renderCollections(
+collections
+);
+
+return;
+
+}
+
+$("status").textContent=
+"Searching collections...";
+
+
+try{
+
+const url=
+`${base}/collections?q=${encodeURIComponent(q)}`;
+
+console.log(
+"STAC SEARCH:",
+url
+);
+
+const data=
+await request(url);
+
+const result=
+data.collections||[];
+
+$("status").textContent=
+`${result.length} collections found`;
+
+renderCollections(
+result
+);
+
+}catch(error){
+
+console.error(
+error
+);
+
+$("status").textContent=
+`Search error: ${error.message}`;
+
+}
+
+}
+
+
+function renderCollections(list){
+
+const container=
+$("collections");
+
+container.innerHTML="";
+
+
+if(!list.length){
+
+container.textContent=
+"No collections found.";
+
+return;
+
+}
+
+
+list.forEach(col=>{
+
+const card=
+document.createElement("div");
+
+card.className=
+"collection";
+
+
+const title=
+document.createElement("strong");
+
+title.textContent=
+col.title||col.id;
+
+
+const id=
+document.createElement("div");
+
+id.className=
+"meta";
+
+id.textContent=
+col.id;
+
+
+card.appendChild(title);
+card.appendChild(id);
+
+
+card.onclick=()=>
+openCollection(col);
+
+
+container.appendChild(card);
+
+});
+
+}
+
+
+async function openCollection(col){
+
+activeCollection=
+col;
+
+$("details").style.display=
+"block";
+
+$("collectionTitle").textContent=
+col.title||col.id;
+
+$("collectionMeta").textContent=
+col.id;
+
+$("collectionJson").textContent=
+JSON.stringify(
+col,
+null,
+2
+);
+
+buildFieldSelector(col);
+
+$("items").innerHTML="";
+
+$("itemJson").textContent="";
+
+$("itemsStatus").textContent="";
+
+
+const itemsLink=
+col.links?.find(
+link=>link.rel==="items"
+)?.href;
+
+
+if(!itemsLink){
+
+$("itemsStatus").textContent=
+"No items link in this collection.";
+
+return;
+
+}
+
+
+try{
+
+$("itemsStatus").textContent=
+"Loading items...";
+
+
+const data=
+await request(
+itemsLink
+);
+
+const features=
+data.features||[];
+
+
+$("itemsStatus").textContent=
+`${features.length} items loaded`;
+
+renderItems(
+features
+);
+
+
+if(features.length){
+
+$("itemJson").textContent=
+JSON.stringify(
+features[0],
+null,
+2
+);
+
+}
+
+}catch(error){
+
+console.error(
+error
+);
+
+$("itemsStatus").textContent=
+`Item error: ${error.message}`;
+
+}
+
+}
+
+
+function buildFieldSelector(col){
+
+const select=
+$("fieldSelect");
+
+select.innerHTML="";
+
+const fields=[];
+
+
+function addField(path,value){
+
+if(value===undefined)
+return;
+
+fields.push({
+path,
+value
+});
+
+}
+
+
+Object.entries(col)
+.forEach(
+([key,value])=>{
+addField(
+key,
+value
+);
+}
+);
+
+
+if(col.properties){
+
+Object.entries(
+col.properties
+).forEach(
+([key,value])=>{
+addField(
+`properties.${key}`,
+value
+);
+}
+);
+
+}
+
+
+if(col.extent){
+
+Object.entries(
+col.extent
+).forEach(
+([key,value])=>{
+addField(
+`extent.${key}`,
+value
+);
+}
+);
+
+}
+
+
+if(col.summaries){
+
+Object.entries(
+col.summaries
+).forEach(
+([key,value])=>{
+addField(
+`summaries.${key}`,
+value
+);
+}
+);
+
+}
+
+
+if(col.links){
+
+addField(
+"links",
+col.links
+);
+
+}
+
+
+fields.forEach(
+(field,index)=>{
+
+const option=
+document.createElement("option");
+
+option.value=
+index;
+
+option.textContent=
+field.path;
+
+select.appendChild(
+option
+);
+
+}
+);
+
+
+select.onchange=function(){
+
+const field=
+fields[
+Number(this.value)
+];
+
+if(field){
+
+$("collectionJson").textContent=
+JSON.stringify(
+{
+[field.path]:
+field.value
+},
+null,
+2
+);
+
+}
+
+};
+
+}
+
+
+function renderItems(features){
+
+const container=
+$("items");
+
+container.innerHTML="";
+
+
+features
+.slice(0,100)
+.forEach(item=>{
+
+const card=
+document.createElement("div");
+
+card.className=
+"collection";
+
+
+const title=
+document.createElement("strong");
+
+title.textContent=
+item.properties?.datetime||
+item.id||
+"Item";
+
+
+const id=
+document.createElement("div");
+
+id.className=
+"meta";
+
+id.textContent=
+item.id||"";
+
+
+card.appendChild(title);
+card.appendChild(id);
+
+
+card.onclick=function(){
+
+$("itemJson").textContent=
+JSON.stringify(
+item,
+null,
+2
+);
+
+};
+
+
+container.appendChild(card);
+
+});
+
+}
+
+
+$("loadBtn").onclick=
+loadCatalog;
+
+
+$("searchBtn").onclick=
+searchCollections;
+
+
+$("search").addEventListener(
+"keydown",
+e=>{
+
+if(e.key==="Enter")
+searchCollections();
+
+}
+);
+
+
+loadCatalog();
+
+</script>
+
+</body>
+</html>
