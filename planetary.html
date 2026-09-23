@@ -118,17 +118,6 @@ font-size:12px;
 display:none;
 }
 
-select{
-min-width:280px;
-}
-
-.row{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-align-items:center;
-}
-
 #items{
 display:grid;
 grid-template-columns:
@@ -143,14 +132,14 @@ margin-top:15px;
 
 <header>
 <h1>Microsoft Planetary Computer — STAC Test</h1>
-<div>Direct test of the public STAC API</div>
+<div>Direct STAC API test</div>
 </header>
 
 <main>
 
 <section class="panel">
 
-<h2>STAC</h2>
+<h2>STAC API</h2>
 
 <div class="controls">
 
@@ -174,9 +163,18 @@ Ready
 
 <section class="panel">
 
-<h2>CORS diagnostic</h2>
+<h2>API diagnostics</h2>
 
-<pre id="corsStatus">Not tested yet.</pre>
+<pre id="diagnostic">Not tested yet.</pre>
+
+</section>
+
+
+<section class="panel">
+
+<h2>Root</h2>
+
+<pre id="rootJson"></pre>
 
 </section>
 
@@ -185,23 +183,7 @@ Ready
 
 <h2>Collections</h2>
 
-<div class="row">
-
-<input
-id="search"
-placeholder="Search collections, e.g. ms-buildings"
->
-
-<button id="searchBtn">
-Search
-</button>
-
-</div>
-
-<div
-id="collections"
-style="margin-top:15px"
-></div>
+<div id="collections"></div>
 
 </section>
 
@@ -220,13 +202,6 @@ class="meta"
 
 
 <h3 style="margin-top:20px">
-Collection fields
-</h3>
-
-<select id="fieldSelect"></select>
-
-
-<h3 style="margin-top:20px">
 Collection JSON
 </h3>
 
@@ -234,7 +209,7 @@ Collection JSON
 
 
 <h3 style="margin-top:20px">
-Items / products
+Items
 </h3>
 
 <div
@@ -256,9 +231,6 @@ class="meta"
 const BASE=
 "https://planetarycomputer.microsoft.com/api/stac/v1";
 
-const PROXY=
-"https://api.allorigins.win/raw?url=";
-
 let collections=[];
 let activeCollection=null;
 
@@ -268,59 +240,42 @@ document.getElementById(id);
 
 
 /* ===============================
-   REQUEST THROUGH ALLORIGINS
+   DIRECT FETCH
    =============================== */
 
 async function request(url){
 
-const output=$("corsStatus");
-
-output.textContent=
-"Testing through AllOrigins...\n\n"+
-"PAGE ORIGIN:\n"+
-window.location.origin+
-"\n\n"+
-"TARGET:\n"+
-url+
-"\n\n"+
-"PROXY:\n"+
-PROXY+
-encodeURIComponent(url);
-
-
 console.log(
-"ALLORIGINS TARGET:",
+"STAC REQUEST:",
 url
 );
-
-console.log(
-"ALLORIGINS REQUEST:",
-PROXY+
-encodeURIComponent(url)
-);
-
 
 try{
 
 const res=
 await fetch(
-PROXY+
-encodeURIComponent(url),
+url,
 {
 method:"GET",
+mode:"cors",
 cache:"no-store"
 }
 );
 
 
 console.log(
-"ALLORIGINS STATUS:",
+"STATUS:",
 res.status
 );
 
 console.log(
-"ALLORIGINS TYPE:",
+"TYPE:",
 res.type
+);
+
+console.log(
+"URL:",
+res.url
 );
 
 
@@ -338,31 +293,9 @@ await res.text();
 
 
 console.log(
-"ALLORIGINS BODY PREVIEW:",
+"BODY PREVIEW:",
 text.slice(0,500)
 );
-
-
-output.textContent=
-"RESULT: PROXY FETCH SUCCESS\n\n"+
-"PAGE ORIGIN:\n"+
-window.location.origin+
-"\n\n"+
-"TARGET:\n"+
-url+
-"\n\n"+
-"PROXY:\n"+
-PROXY+
-encodeURIComponent(url)+
-"\n\n"+
-"STATUS:\n"+
-res.status+
-"\n\n"+
-"TYPE:\n"+
-res.type+
-"\n\n"+
-"BODY PREVIEW:\n"+
-text.slice(0,1000);
 
 
 return JSON.parse(text);
@@ -370,20 +303,135 @@ return JSON.parse(text);
 }catch(error){
 
 console.error(
-"ALLORIGINS ERROR:",
+"REQUEST ERROR:",
+url,
 error
 );
 
+throw error;
 
-output.textContent+=
+}
+
+}
+
+
+/* ===============================
+   LOAD ROOT
+   =============================== */
+
+async function loadRoot(){
+
+const base=
+$("stacUrl")
+.value
+.trim()
+.replace(/\/+$/,"");
+
+const url=
+`${base}/`;
+
+$("diagnostic").textContent=
+"REQUESTING ROOT:\n\n"+
+url;
+
+try{
+
+const data=
+await request(url);
+
+$("rootJson").textContent=
+JSON.stringify(
+data,
+null,
+2
+);
+
+$("diagnostic").textContent=
+"ROOT SUCCESS\n\n"+
+url+
 "\n\n"+
-"RESULT: PROXY FETCH FAILED\n\n"+
-"ERROR NAME:\n"+
+"STAC VERSION:\n"+
+(
+data.stac_version||
+"not present"
+)+
+"\n\n"+
+"TYPE:\n"+
+(
+data.type||
+"not present"
+)+
+"\n\n"+
+"TITLE:\n"+
+(
+data.title||
+"not present"
+);
+
+return data;
+
+}catch(error){
+
+$("diagnostic").textContent=
+"ROOT FAILED\n\n"+
+url+
+"\n\n"+
 error.name+
-"\n\n"+
-"ERROR MESSAGE:\n"+
+"\n"+
 error.message;
 
+throw error;
+
+}
+
+}
+
+
+/* ===============================
+   LOAD COLLECTIONS
+   =============================== */
+
+async function loadCollections(){
+
+const base=
+$("stacUrl")
+.value
+.trim()
+.replace(/\/+$/,"");
+
+const url=
+`${base}/collections`;
+
+$("diagnostic").textContent+=
+"\n\nREQUESTING COLLECTIONS:\n\n"+
+url;
+
+try{
+
+const data=
+await request(url);
+
+collections=
+data.collections||[];
+
+$("diagnostic").textContent+=
+"\n\nCOLLECTIONS SUCCESS\n\n"+
+"COUNT: "+
+collections.length;
+
+renderCollections(
+collections
+);
+
+return data;
+
+}catch(error){
+
+$("diagnostic").textContent+=
+"\n\nCOLLECTIONS FAILED\n\n"+
+error.name+
+"\n"+
+error.message;
 
 throw error;
 
@@ -398,43 +446,28 @@ throw error;
 
 async function loadCatalog(){
 
-const base=
-$("stacUrl")
-.value
-.trim()
-.replace(/\/+$/,"");
-
 $("status").textContent=
-"Loading catalog...";
+"Loading STAC API...";
 
 $("collections").innerHTML="";
 
 $("details").style.display=
 "none";
 
+$("rootJson").textContent="";
+
+$("diagnostic").textContent=
+"Starting direct STAC test...";
+
 
 try{
 
-const url=
-`${base}/collections`;
+await loadRoot();
 
-console.log(
-"STAC REQUEST:",
-url
-);
-
-const data=
-await request(url);
-
-collections=
-data.collections||[];
+await loadCollections();
 
 $("status").textContent=
 `${collections.length} collections loaded`;
-
-renderCollections(
-collections
-);
 
 }catch(error){
 
@@ -445,75 +478,6 @@ error
 
 $("status").textContent=
 `Error: ${error.message}`;
-
-}
-
-}
-
-
-/* ===============================
-   SEARCH
-   =============================== */
-
-async function searchCollections(){
-
-const base=
-$("stacUrl")
-.value
-.trim()
-.replace(/\/+$/,"");
-
-const q=
-$("search")
-.value
-.trim();
-
-if(!q){
-
-renderCollections(
-collections
-);
-
-return;
-
-}
-
-$("status").textContent=
-"Searching collections...";
-
-
-try{
-
-const url=
-`${base}/collections?q=${encodeURIComponent(q)}`;
-
-console.log(
-"STAC SEARCH:",
-url
-);
-
-const data=
-await request(url);
-
-const result=
-data.collections||[];
-
-$("status").textContent=
-`${result.length} collections found`;
-
-renderCollections(
-result
-);
-
-}catch(error){
-
-console.error(
-"SEARCH ERROR:",
-error
-);
-
-$("status").textContent=
-`Search error: ${error.message}`;
 
 }
 
@@ -608,19 +572,68 @@ null,
 2
 );
 
-buildFieldSelector(col);
-
 $("items").innerHTML="";
 
 $("itemJson").textContent="";
 
-$("itemsStatus").textContent="";
+$("itemsStatus").textContent=
+"";
+
+
+const collectionLink=
+col.links?.find(
+link=>link.rel==="self"
+)?.href;
 
 
 const itemsLink=
 col.links?.find(
 link=>link.rel==="items"
 )?.href;
+
+
+if(!collectionLink){
+
+$("itemsStatus").textContent=
+"No self link in this collection.";
+
+return;
+
+}
+
+
+try{
+
+$("itemsStatus").textContent=
+"Loading collection...";
+
+
+const collection=
+await request(
+collectionLink
+);
+
+$("collectionJson").textContent=
+JSON.stringify(
+collection,
+null,
+2
+);
+
+
+}catch(error){
+
+console.error(
+"COLLECTION ERROR:",
+error
+);
+
+$("itemsStatus").textContent=
+`Collection error: ${error.message}`;
+
+return;
+
+}
 
 
 if(!itemsLink){
@@ -646,7 +659,6 @@ itemsLink
 
 const features=
 data.features||[];
-
 
 $("itemsStatus").textContent=
 `${features.length} items loaded`;
@@ -678,148 +690,6 @@ $("itemsStatus").textContent=
 `Item error: ${error.message}`;
 
 }
-
-}
-
-
-/* ===============================
-   FIELD SELECTOR
-   =============================== */
-
-function buildFieldSelector(col){
-
-const select=
-$("fieldSelect");
-
-select.innerHTML="";
-
-const fields=[];
-
-
-function addField(path,value){
-
-if(value===undefined)
-return;
-
-fields.push({
-path,
-value
-});
-
-}
-
-
-Object.entries(col)
-.forEach(
-([key,value])=>{
-addField(
-key,
-value
-);
-}
-);
-
-
-if(col.properties){
-
-Object.entries(
-col.properties
-).forEach(
-([key,value])=>{
-addField(
-`properties.${key}`,
-value
-);
-}
-);
-
-}
-
-
-if(col.extent){
-
-Object.entries(
-col.extent
-).forEach(
-([key,value])=>{
-addField(
-`extent.${key}`,
-value
-);
-}
-);
-
-}
-
-
-if(col.summaries){
-
-Object.entries(
-col.summaries
-).forEach(
-([key,value])=>{
-addField(
-`summaries.${key}`,
-value
-);
-}
-);
-
-}
-
-
-if(col.links){
-
-addField(
-"links",
-col.links
-);
-
-}
-
-
-fields.forEach(
-(field,index)=>{
-
-const option=
-document.createElement("option");
-
-option.value=
-index;
-
-option.textContent=
-field.path;
-
-select.appendChild(
-option
-);
-
-}
-);
-
-
-select.onchange=function(){
-
-const field=
-fields[
-Number(this.value)
-];
-
-if(field){
-
-$("collectionJson").textContent=
-JSON.stringify(
-{
-[field.path]:
-field.value
-},
-null,
-2
-);
-
-}
-
-};
 
 }
 
@@ -895,21 +765,6 @@ container.appendChild(card);
 
 $("loadBtn").onclick=
 loadCatalog;
-
-
-$("searchBtn").onclick=
-searchCollections;
-
-
-$("search").addEventListener(
-"keydown",
-e=>{
-
-if(e.key==="Enter")
-searchCollections();
-
-}
-);
 
 
 loadCatalog();
