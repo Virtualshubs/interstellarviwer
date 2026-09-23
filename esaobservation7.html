@@ -2505,9 +2505,10 @@ typeof window.JANUS_CUSTOM_ROOT!=="undefined"
 ?window.JANUS_CUSTOM_ROOT
 :"collections";
 
-const endpoint=root
-?`${BASE.replace(/\/+$/,"")}/${root}`
-:BASE.replace(/\/+$/,"");
+if(root){
+
+const endpoint=
+`${BASE.replace(/\/+$/,"")}/${root}`;
 
 const params=new URLSearchParams();
 
@@ -2519,9 +2520,23 @@ const res=await fetch(
 `${endpoint}?${params.toString()}`
 );
 
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
 const data=await res.json();
 
 collections=data.collections||[];
+
+}else{
+
+collections=
+await loadCatalogTree(
+BASE.replace(/\/+$/,"")
+);
+
+}
 
 renderCards();
 renderCollectionSelector();
@@ -2540,6 +2555,66 @@ document.getElementById("status").textContent=
 "Catalog unavailable";
 
 }
+
+}
+
+
+
+// ===============================
+// LOAD STAC CATALOG TREE
+// ===============================
+
+async function loadCatalogTree(url,visited=new Set()){
+
+if(visited.has(url))
+return[];
+
+visited.add(url);
+
+const res=await fetch(
+`${url}${url.includes("?")?"&":"?"}limit=3000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+let result=[];
+
+if(Array.isArray(data.collections))
+result.push(...data.collections);
+
+if(Array.isArray(data.links)){
+
+const children=
+data.links.filter(
+link=>link.rel==="child"&&link.href
+);
+
+for(const child of children){
+
+const childURL=
+new URL(
+child.href,
+url
+).href;
+
+const childCollections=
+await loadCatalogTree(
+childURL,
+visited
+);
+
+result.push(...childCollections);
+
+}
+
+}
+
+return result;
 
 }
 
