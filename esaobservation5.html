@@ -2475,11 +2475,11 @@ async function load(){
 
 const q=document.getElementById("search").value.trim();
 
-document.getElementById("status").textContent="Loading...";
+document.getElementById("status").textContent="Loading catalog...";
 
 
 const res = await fetch(
-`${BASE}/collections?q=${encodeURIComponent(q)}&limit=1000`
+`${BASE}/collections?q=${encodeURIComponent(q)}&limit=1500`
 );
 
 const data=await res.json();
