@@ -174,6 +174,15 @@ Ready
 
 <section class="panel">
 
+<h2>CORS diagnostic</h2>
+
+<pre id="corsStatus">Not tested yet.</pre>
+
+</section>
+
+
+<section class="panel">
+
 <h2>Collections</h2>
 
 <div class="row">
@@ -255,75 +264,236 @@ const $=id=>
 document.getElementById(id);
 
 
-async function request(url){
+/* ===============================
+   CORS DIAGNOSTIC
+   =============================== */
 
-try{
+async function corsDiagnostic(url){
 
-console.log("FETCH TEST 1:",url);
+const output=$("corsStatus");
 
-const res=await fetch(url);
+output.textContent=
+"Testing CORS...\n\n"+
+"PAGE ORIGIN:\n"+
+window.location.origin+
+"\n\n"+
+"TARGET:\n"+
+url;
 
-console.log("STATUS 1:",res.status);
-console.log("TYPE 1:",res.type);
-console.log("URL 1:",res.url);
-
-const text=await res.text();
-
-console.log(
-"RESPONSE 1:",
-text.slice(0,500)
-);
-
-return JSON.parse(text);
-
-}catch(error){
-
-console.error(
-"FETCH ERROR 1:",
-error
-);
-
-}
-
-try{
 
 console.log(
-"FETCH TEST 2 (CORS):",
+"CORS DIAGNOSTIC — PAGE ORIGIN:",
+window.location.origin
+);
+
+console.log(
+"CORS DIAGNOSTIC — TARGET:",
 url
 );
 
-const res=await fetch(
+
+/* ===============================
+   NORMAL FETCH
+   =============================== */
+
+try{
+
+const res=
+await fetch(
 url,
 {
-mode:"cors"
+method:"GET",
+mode:"cors",
+cache:"no-store"
 }
 );
 
+const headers=
+[...res.headers.entries()]
+.map(
+([key,value])=>
+`${key}: ${value}`
+)
+.join("\n");
+
+const allowOrigin=
+res.headers.get(
+"access-control-allow-origin"
+);
+
+const allowCredentials=
+res.headers.get(
+"access-control-allow-credentials"
+);
+
+const contentType=
+res.headers.get(
+"content-type"
+);
+
 console.log(
-"STATUS 2:",
+"CORS STATUS:",
 res.status
 );
 
 console.log(
-"TYPE 2:",
+"CORS TYPE:",
 res.type
 );
 
-const text=await res.text();
+console.log(
+"ACCESS-CONTROL-ALLOW-ORIGIN:",
+allowOrigin
+);
 
 console.log(
-"RESPONSE 2:",
+"ACCESS-CONTROL-ALLOW-CREDENTIALS:",
+allowCredentials
+);
+
+console.log(
+"CONTENT-TYPE:",
+contentType
+);
+
+console.log(
+"HEADERS:",
+headers
+);
+
+
+const text=
+await res.text();
+
+console.log(
+"BODY PREVIEW:",
 text.slice(0,500)
 );
+
+
+output.textContent=
+"RESULT: FETCH SUCCESS\n\n"+
+"PAGE ORIGIN:\n"+
+window.location.origin+
+"\n\n"+
+"TARGET:\n"+
+url+
+"\n\n"+
+"STATUS:\n"+
+res.status+
+"\n\n"+
+"TYPE:\n"+
+res.type+
+"\n\n"+
+"ACCESS-CONTROL-ALLOW-ORIGIN:\n"+
+(
+allowOrigin===null
+?"NOT PRESENT"
+:allowOrigin
+)+
+"\n\n"+
+"ACCESS-CONTROL-ALLOW-CREDENTIALS:\n"+
+(
+allowCredentials===null
+?"NOT PRESENT"
+:allowCredentials
+)+
+"\n\n"+
+"CONTENT-TYPE:\n"+
+(
+contentType===null
+?"NOT PRESENT"
+:contentType
+)+
+"\n\n"+
+"ALL RESPONSE HEADERS:\n"+
+(
+headers||"NO HEADERS READ"
+)+
+"\n\n"+
+"BODY PREVIEW:\n"+
+text.slice(0,1000);
+
 
 return JSON.parse(text);
 
 }catch(error){
 
 console.error(
-"FETCH ERROR 2 (CORS):",
+"CORS FETCH ERROR:",
 error
 );
+
+output.textContent+=
+"\n\n"+
+"RESULT: FETCH FAILED\n\n"+
+"ERROR NAME:\n"+
+error.name+
+"\n\n"+
+"ERROR MESSAGE:\n"+
+error.message+
+"\n\n"+
+"El navegador no ha entregado una Response legible a JavaScript.";
+
+
+/* ===============================
+   NO-CORS DIAGNOSTIC
+   =============================== */
+
+try{
+
+console.log(
+"NO-CORS TEST:",
+url
+);
+
+const res=
+await fetch(
+url,
+{
+method:"GET",
+mode:"no-cors",
+cache:"no-store"
+}
+);
+
+console.log(
+"NO-CORS STATUS:",
+res.status
+);
+
+console.log(
+"NO-CORS TYPE:",
+res.type
+);
+
+output.textContent+=
+"\n\n"+
+"NO-CORS TEST:\n\n"+
+"STATUS: "+
+res.status+
+"\n"+
+"TYPE: "+
+res.type+
+"\n\n"+
+"Una respuesta no-cors puede ser OPAQUE. "+
+"Su contenido no puede ser leído por JavaScript.";
+
+}catch(noCorsError){
+
+console.error(
+"NO-CORS ERROR:",
+noCorsError
+);
+
+output.textContent+=
+"\n\n"+
+"NO-CORS ERROR:\n"+
+noCorsError.name+
+"\n"+
+noCorsError.message;
+
+}
 
 throw error;
 
@@ -331,6 +501,21 @@ throw error;
 
 }
 
+
+/* ===============================
+   REQUEST
+   =============================== */
+
+async function request(url){
+
+return await corsDiagnostic(url);
+
+}
+
+
+/* ===============================
+   LOAD CATALOG
+   =============================== */
 
 async function loadCatalog(){
 
@@ -351,15 +536,16 @@ $("details").style.display=
 
 try{
 
+const url=
+`${base}/collections`;
+
 console.log(
 "STAC REQUEST:",
-`${base}/collections`
+url
 );
 
 const data=
-await request(
-`${base}/collections`
-);
+await request(url);
 
 collections=
 data.collections||[];
@@ -374,6 +560,7 @@ collections
 }catch(error){
 
 console.error(
+"CATALOG ERROR:",
 error
 );
 
@@ -384,6 +571,10 @@ $("status").textContent=
 
 }
 
+
+/* ===============================
+   SEARCH
+   =============================== */
 
 async function searchCollections(){
 
@@ -438,6 +629,7 @@ result
 }catch(error){
 
 console.error(
+"SEARCH ERROR:",
 error
 );
 
@@ -448,6 +640,10 @@ $("status").textContent=
 
 }
 
+
+/* ===============================
+   RENDER COLLECTIONS
+   =============================== */
 
 function renderCollections(list){
 
@@ -507,6 +703,10 @@ container.appendChild(card);
 
 }
 
+
+/* ===============================
+   OPEN COLLECTION
+   =============================== */
 
 async function openCollection(col){
 
@@ -591,6 +791,7 @@ null,
 }catch(error){
 
 console.error(
+"ITEM ERROR:",
 error
 );
 
@@ -601,6 +802,10 @@ $("itemsStatus").textContent=
 
 }
 
+
+/* ===============================
+   FIELD SELECTOR
+   =============================== */
 
 function buildFieldSelector(col){
 
@@ -740,6 +945,10 @@ null,
 }
 
 
+/* ===============================
+   RENDER ITEMS
+   =============================== */
+
 function renderItems(features){
 
 const container=
@@ -801,6 +1010,10 @@ container.appendChild(card);
 }
 
 
+/* ===============================
+   EVENTS
+   =============================== */
+
 $("loadBtn").onclick=
 loadCatalog;
 
@@ -826,3 +1039,4 @@ loadCatalog();
 
 </body>
 </html>
+
