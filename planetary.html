@@ -256,6 +256,9 @@ class="meta"
 const BASE=
 "https://planetarycomputer.microsoft.com/api/stac/v1";
 
+const PROXY=
+"https://api.allorigins.win/raw?url=";
+
 let collections=[];
 let activeCollection=null;
 
@@ -265,151 +268,98 @@ document.getElementById(id);
 
 
 /* ===============================
-   CORS DIAGNOSTIC
+   REQUEST THROUGH ALLORIGINS
    =============================== */
 
-async function corsDiagnostic(url){
+async function request(url){
 
 const output=$("corsStatus");
 
 output.textContent=
-"Testing CORS...\n\n"+
-"PAGE ORIGIN:\n"+
-window.location.origin+
-"\n\n"+
-"TARGET:\n"+
-url;
-
-
-console.log(
-"CORS DIAGNOSTIC — PAGE ORIGIN:",
-window.location.origin
-);
-
-console.log(
-"CORS DIAGNOSTIC — TARGET:",
-url
-);
-
-
-/* ===============================
-   NORMAL FETCH
-   =============================== */
-
-try{
-
-const res=
-await fetch(
-url,
-{
-method:"GET",
-mode:"cors",
-cache:"no-store"
-}
-);
-
-const headers=
-[...res.headers.entries()]
-.map(
-([key,value])=>
-`${key}: ${value}`
-)
-.join("\n");
-
-const allowOrigin=
-res.headers.get(
-"access-control-allow-origin"
-);
-
-const allowCredentials=
-res.headers.get(
-"access-control-allow-credentials"
-);
-
-const contentType=
-res.headers.get(
-"content-type"
-);
-
-console.log(
-"CORS STATUS:",
-res.status
-);
-
-console.log(
-"CORS TYPE:",
-res.type
-);
-
-console.log(
-"ACCESS-CONTROL-ALLOW-ORIGIN:",
-allowOrigin
-);
-
-console.log(
-"ACCESS-CONTROL-ALLOW-CREDENTIALS:",
-allowCredentials
-);
-
-console.log(
-"CONTENT-TYPE:",
-contentType
-);
-
-console.log(
-"HEADERS:",
-headers
-);
-
-
-const text=
-await res.text();
-
-console.log(
-"BODY PREVIEW:",
-text.slice(0,500)
-);
-
-
-output.textContent=
-"RESULT: FETCH SUCCESS\n\n"+
+"Testing through AllOrigins...\n\n"+
 "PAGE ORIGIN:\n"+
 window.location.origin+
 "\n\n"+
 "TARGET:\n"+
 url+
 "\n\n"+
+"PROXY:\n"+
+PROXY+
+encodeURIComponent(url);
+
+
+console.log(
+"ALLORIGINS TARGET:",
+url
+);
+
+console.log(
+"ALLORIGINS REQUEST:",
+PROXY+
+encodeURIComponent(url)
+);
+
+
+try{
+
+const res=
+await fetch(
+PROXY+
+encodeURIComponent(url),
+{
+method:"GET",
+cache:"no-store"
+}
+);
+
+
+console.log(
+"ALLORIGINS STATUS:",
+res.status
+);
+
+console.log(
+"ALLORIGINS TYPE:",
+res.type
+);
+
+
+if(!res.ok){
+
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+}
+
+
+const text=
+await res.text();
+
+
+console.log(
+"ALLORIGINS BODY PREVIEW:",
+text.slice(0,500)
+);
+
+
+output.textContent=
+"RESULT: PROXY FETCH SUCCESS\n\n"+
+"PAGE ORIGIN:\n"+
+window.location.origin+
+"\n\n"+
+"TARGET:\n"+
+url+
+"\n\n"+
+"PROXY:\n"+
+PROXY+
+encodeURIComponent(url)+
+"\n\n"+
 "STATUS:\n"+
 res.status+
 "\n\n"+
 "TYPE:\n"+
 res.type+
-"\n\n"+
-"ACCESS-CONTROL-ALLOW-ORIGIN:\n"+
-(
-allowOrigin===null
-?"NOT PRESENT"
-:allowOrigin
-)+
-"\n\n"+
-"ACCESS-CONTROL-ALLOW-CREDENTIALS:\n"+
-(
-allowCredentials===null
-?"NOT PRESENT"
-:allowCredentials
-)+
-"\n\n"+
-"CONTENT-TYPE:\n"+
-(
-contentType===null
-?"NOT PRESENT"
-:contentType
-)+
-"\n\n"+
-"ALL RESPONSE HEADERS:\n"+
-(
-headers||"NO HEADERS READ"
-)+
 "\n\n"+
 "BODY PREVIEW:\n"+
 text.slice(0,1000);
@@ -420,95 +370,24 @@ return JSON.parse(text);
 }catch(error){
 
 console.error(
-"CORS FETCH ERROR:",
+"ALLORIGINS ERROR:",
 error
 );
 
+
 output.textContent+=
 "\n\n"+
-"RESULT: FETCH FAILED\n\n"+
+"RESULT: PROXY FETCH FAILED\n\n"+
 "ERROR NAME:\n"+
 error.name+
 "\n\n"+
 "ERROR MESSAGE:\n"+
-error.message+
-"\n\n"+
-"El navegador no ha entregado una Response legible a JavaScript.";
+error.message;
 
-
-/* ===============================
-   NO-CORS DIAGNOSTIC
-   =============================== */
-
-try{
-
-console.log(
-"NO-CORS TEST:",
-url
-);
-
-const res=
-await fetch(
-url,
-{
-method:"GET",
-mode:"no-cors",
-cache:"no-store"
-}
-);
-
-console.log(
-"NO-CORS STATUS:",
-res.status
-);
-
-console.log(
-"NO-CORS TYPE:",
-res.type
-);
-
-output.textContent+=
-"\n\n"+
-"NO-CORS TEST:\n\n"+
-"STATUS: "+
-res.status+
-"\n"+
-"TYPE: "+
-res.type+
-"\n\n"+
-"Una respuesta no-cors puede ser OPAQUE. "+
-"Su contenido no puede ser leído por JavaScript.";
-
-}catch(noCorsError){
-
-console.error(
-"NO-CORS ERROR:",
-noCorsError
-);
-
-output.textContent+=
-"\n\n"+
-"NO-CORS ERROR:\n"+
-noCorsError.name+
-"\n"+
-noCorsError.message;
-
-}
 
 throw error;
 
 }
-
-}
-
-
-/* ===============================
-   REQUEST
-   =============================== */
-
-async function request(url){
-
-return await corsDiagnostic(url);
 
 }
 
@@ -1039,4 +918,3 @@ loadCatalog();
 
 </body>
 </html>
-
