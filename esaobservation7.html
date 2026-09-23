@@ -2714,10 +2714,8 @@ try{
 document.getElementById("status").textContent=
 "Loading catalog...";
 
-const collectionHref=col.href;
-
 const res=await fetch(
-`${collectionHref}${collectionHref.includes("?")?"&":"?"}limit=3000`
+`${col.href}${col.href.includes("?")?"&":"?"}limit=3000`
 );
 
 if(!res.ok)
@@ -2742,7 +2740,7 @@ title:link.title||link.href,
 
 href:new URL(
 link.href,
-collectionHref
+col.href
 ).href
 
 }));
@@ -2758,8 +2756,6 @@ return;
 }
 
 if(data.type==="Collection"){
-
-data.href=collectionHref;
 
 col=data;
 
@@ -2850,13 +2846,7 @@ col.extent?.temporal?.interval?.[0]?.[1]||null,
 items:
 col.links?.find(
 l=>l.rel==="items"
-)?.href||null,
-
-href:
-col.href||null,
-
-type:
-col.type||null
+)?.href||null
 
 };
 
@@ -2870,23 +2860,12 @@ col.type||null
 
 async function loadItems(data){
 
-document.getElementById("status").textContent=
-"Reading dataset...";
-
-
-if(!data.items){
-
-console.log(
-"COLLECTION WITHOUT ITEMS:",
-data
-);
-
-document.getElementById("status").textContent=
-"Item error";
-
+if(!data.items)
 return;
 
-}
+
+document.getElementById("status").textContent=
+"Reading dataset...";
 
 
 try{
@@ -3161,7 +3140,6 @@ box.appendChild(r);
 
 });
 
-}
 
 
 
