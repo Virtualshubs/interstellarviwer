@@ -2883,8 +2883,6 @@ l=>l.rel==="items"
 
 
 
-
-
 // ===============================
 // LOAD ITEMS
 // ===============================
@@ -3062,6 +3060,14 @@ referenceDate
 
 
 // =================================
+// LIMPIAR PRECISIÓN TEMPORAL
+// =================================
+
+referenceDate=
+referenceDate.replace(/\.\d+Z$/,"Z");
+
+
+// =================================
 // PEDIR VENTANA DE DATOS
 // =================================
 
@@ -3139,7 +3145,6 @@ document.getElementById("status").textContent=
 }
 
 }
-
 
    
 // ===============================
