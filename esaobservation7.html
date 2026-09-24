@@ -2882,6 +2882,8 @@ l=>l.rel==="items"
 }
 
 
+
+
 // ===============================
 // LOAD ITEMS
 // ===============================
@@ -3077,6 +3079,14 @@ console.log(
 url
 );
 
+let json=null;
+
+// =================================
+// INTENTO NORMAL — 2000 OBSERVACIONES
+// =================================
+
+try{
+
 const res =
 await fetch(url);
 
@@ -3085,8 +3095,113 @@ throw new Error(
 `HTTP ${res.status} ${res.statusText}`
 );
 
-const json =
+json =
 await res.json();
+
+if(
+!json.features ||
+!Array.isArray(json.features) ||
+json.features.length===0
+){
+
+throw new Error(
+"Items query did not return FeatureCollection"
+);
+
+}
+
+console.log(
+"ITEM QUERY SUCCESS:",
+json.features.length
+);
+
+}
+
+// =================================
+// FALLBACK — PAGINACIÓN
+// =================================
+
+catch(e){
+
+console.log(
+"ITEM QUERY FAILED, USING PAGINATION:",
+e.message
+);
+
+const features=[];
+let pageURL=data.items;
+let numberMatched=0;
+
+while(
+pageURL &&
+features.length<2000
+){
+
+console.log(
+"ITEM PAGE:",
+pageURL
+);
+
+const pageRes=
+await fetch(pageURL);
+
+if(!pageRes.ok)
+throw new Error(
+`HTTP ${pageRes.status} ${pageRes.statusText}`
+);
+
+const page=
+await pageRes.json();
+
+if(
+!page.features ||
+!Array.isArray(page.features)
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+features.push(
+...page.features
+);
+
+numberMatched=
+page.numberMatched||
+page.context?.matched||
+numberMatched;
+
+console.log(
+"ITEMS ACCUMULATED:",
+features.length
+);
+
+pageURL=
+page.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+}
+
+json={
+type:"FeatureCollection",
+features:features,
+numberMatched:numberMatched,
+numberReturned:features.length
+};
+
+console.log(
+"PAGINATED ITEMS:",
+json.features.length
+);
+
+}
+
+// =================================
+// GUARDAR PAGINACIÓN
+// =================================
 
 activeDataset.nextPage =
 json.links?.find(
@@ -3112,6 +3227,10 @@ a.properties?.datetime
 });
 
 }
+
+// =================================
+// CONTINUAR FLUJO NORMAL
+// =================================
 
 console.log(
 "ITEMS:",
@@ -3142,6 +3261,11 @@ document.getElementById("status").textContent=
 }
 
 }
+
+
+
+
+   
    
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
