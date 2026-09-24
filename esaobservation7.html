@@ -2894,228 +2894,42 @@ document.getElementById("status").textContent=
 try{
 
 // =================================
-// LEER JSON ACTUAL
-// =================================
-
-const rawJSON=
-JSON.parse(
-document.getElementById("raw").textContent
-);
-
-let json=null;
-
-
-// =================================
-// SI YA ES FEATURE COLLECTION
-// =================================
-
-if(
-rawJSON.type==="FeatureCollection" &&
-Array.isArray(rawJSON.features)
-){
-
-json=rawJSON;
-
-console.log(
-"USING FEATURE COLLECTION FROM RAW"
-);
-
-}
-
-
-// =================================
 // EXPLOTAR COLLECTION → ITEMS
 // =================================
 
-else{
+const rawText=
+document.getElementById("raw").textContent;
 
-const itemsLink=
-rawJSON.links?.find(
-link=>link.rel==="items"
-);
+const itemsMatch=
+rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
 
-if(!itemsLink?.href){
+let itemsJSON=null;
 
-throw new Error(
-"Collection does not contain rel=items link"
-);
-
-}
+if(itemsMatch){
 
 const itemsURL=
-itemsLink.href;
-
-data.items=itemsURL;
+itemsMatch[0];
 
 console.log(
-"ITEMS URL FOUND IN COLLECTION:",
+"ITEMS URL FOUND IN RAW:",
 itemsURL
 );
 
-
-// =================================
-// PRIMER INTENTO — 1000 OBSERVACIONES
-// =================================
-
-let referenceDate=null;
-
-try{
-
-const firstRes=
+const itemsRes=
 await fetch(itemsURL);
 
-if(!firstRes.ok)
+if(!itemsRes.ok)
 throw new Error(
-`HTTP ${firstRes.status} ${firstRes.statusText}`
+`HTTP ${itemsRes.status} ${itemsRes.statusText}`
 );
 
-const firstJSON=
-await firstRes.json();
+itemsJSON=
+await itemsRes.json();
 
 if(
-firstJSON.features &&
-Array.isArray(firstJSON.features) &&
-firstJSON.features.length
-){
-
-const dates=
-firstJSON.features
-.map(
-item=>item.properties?.datetime
-)
-.filter(Boolean)
-.sort(
-(a,b)=>
-new Date(b)-new Date(a)
-);
-
-if(dates.length){
-
-referenceDate=
-dates[0];
-
-console.log(
-"USING LATEST OBSERVATION FROM ITEMS:",
-referenceDate
-);
-
-}
-
-}
-
-}catch(e){
-
-console.log(
-"INITIAL ITEMS QUERY FAILED:",
-e.message
-);
-
-}
-
-
-// =================================
-// CONSULTA GRANDE NORMAL
-// =================================
-
-if(referenceDate){
-
-referenceDate=
-referenceDate.replace(
-(/\.\d+Z$/),
-"Z"
-);
-
-const url=
-`${itemsURL}?limit=1000&datetime=../${referenceDate}`;
-
-console.log(
-"ITEM QUERY:",
-url
-);
-
-try{
-
-const res=
-await fetch(url);
-
-if(!res.ok)
-throw new Error(
-`HTTP ${res.status} ${res.statusText}`
-);
-
-const result=
-await res.json();
-
-if(
-!result.features ||
-!Array.isArray(result.features) ||
-result.features.length===0
-){
-
-throw new Error(
-"Large Items query did not return FeatureCollection"
-);
-
-}
-
-json=result;
-
-console.log(
-"USING LARGE ITEMS QUERY:",
-json.features.length
-);
-
-}catch(e){
-
-console.log(
-"LARGE ITEMS QUERY FAILED:",
-e.message
-);
-
-}
-
-}
-
-
-// =================================
-// FALLBACK — PAGINACIÓN
-// =================================
-
-if(!json){
-
-console.log(
-"USING ITEMS PAGINATION"
-);
-
-let pageURL=itemsURL;
-
-const features=[];
-let firstPage=true;
-
-while(
-pageURL &&
-features.length<1000
-){
-
-console.log(
-"ITEM PAGE:",
-pageURL
-);
-
-const res=
-await fetch(pageURL);
-
-if(!res.ok)
-throw new Error(
-`HTTP ${res.status} ${res.statusText}`
-);
-
-const page=
-await res.json();
-
-if(
-!page.features ||
-!Array.isArray(page.features)
+!itemsJSON.features ||
+!Array.isArray(itemsJSON.features) ||
+itemsJSON.features.length===0
 ){
 
 throw new Error(
@@ -3124,44 +2938,65 @@ throw new Error(
 
 }
 
-features.push(
-...page.features
+data.items=itemsURL;
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+itemsJSON,
+null,
+2
 );
 
 console.log(
-"ITEMS ACCUMULATED:",
-features.length
-);
-
-if(firstPage){
-
-firstPage=false;
-
-console.log(
-"FIRST PAGE SIZE:",
-page.features.length
+"RAW UPDATED WITH ITEMS JSON"
 );
 
 }
 
-pageURL=
-page.links?.find(
-l=>l.rel==="next"
-)?.href || null;
 
-}
+// =================================
+// USAR FEATURE COLLECTION OBTENIDA
+// =================================
 
-json={
-...rawJSON,
-...{
-type:"FeatureCollection",
-features:features
-}
-};
+let json=null;
+
+if(itemsJSON){
+
+json=itemsJSON;
 
 console.log(
-"FINAL PAGINATED ITEMS:",
-json.features.length
+"USING FEATURE COLLECTION FROM ITEMS"
+);
+
+}
+
+
+// =================================
+// SI NO HAY ITEMS NUEVOS,
+// LEER FEATURE COLLECTION DESDE RAW
+// =================================
+
+else{
+
+json=
+JSON.parse(
+document.getElementById("raw").textContent
+);
+
+if(
+!json.features ||
+!Array.isArray(json.features) ||
+json.features.length===0
+){
+
+throw new Error(
+"Raw JSON did not contain FeatureCollection"
+);
+
+}
+
+console.log(
+"USING FEATURE COLLECTION FROM RAW"
 );
 
 }
@@ -3231,8 +3066,6 @@ document.getElementById("status").textContent=
 }
 
 }
-
-   
    
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
