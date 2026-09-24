@@ -2915,7 +2915,9 @@ itemsURL
 );
 
 const itemsRes=
-await fetch(itemsURL);
+await fetch(
+`${itemsURL}?limit=2000`
+);
 
 if(!itemsRes.ok)
 throw new Error(
@@ -3099,6 +3101,8 @@ document.getElementById("status").textContent=
 }
 
 }
+
+   
 
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
