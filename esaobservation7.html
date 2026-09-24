@@ -2882,7 +2882,6 @@ l=>l.rel==="items"
 }
 
 
-
 // ===============================
 // LOAD ITEMS
 // ===============================
@@ -2956,139 +2955,56 @@ console.log(
 
 
 // =================================
-// DETERMINAR FECHA DE REFERENCIA
+// USAR FEATURE COLLECTION OBTENIDA
 // =================================
 
-let referenceDate=null;
-
-
-// =================================
-// SI ACABAMOS DE EXPLOTAR /ITEMS
-// USAR SUS OBSERVACIONES
-// =================================
+let json=null;
 
 if(itemsJSON){
 
-const dates=
-itemsJSON.features
-.map(
-item=>item.properties?.datetime
-)
-.filter(Boolean)
-.sort(
-(a,b)=>
-new Date(b)-new Date(a)
-);
-
-if(!dates.length){
-
-throw new Error(
-"No datetime found in Items"
-);
-
-}
-
-referenceDate=dates[0];
+json=itemsJSON;
 
 console.log(
-"USING LATEST OBSERVATION FROM ITEMS:",
-referenceDate
+"USING FEATURE COLLECTION FROM ITEMS"
 );
 
 }
 
 
-// misión terminada
-else if(data.endDate){
+// =================================
+// SI NO HAY ITEMS NUEVOS,
+// LEER FEATURE COLLECTION DESDE RAW
+// =================================
 
-referenceDate=data.endDate;
-
-console.log(
-"USING DATASET END DATE:",
-referenceDate
-);
-
-}
-
-
-// misión activa
 else{
 
-const latestJSON=
+json=
 JSON.parse(
 document.getElementById("raw").textContent
 );
 
 if(
-!latestJSON.features ||
-latestJSON.features.length===0
+!json.features ||
+!Array.isArray(json.features) ||
+json.features.length===0
 ){
 
 throw new Error(
-"No latest observation"
+"Raw JSON did not contain FeatureCollection"
 );
 
 }
-
-const dates=
-latestJSON.features
-.map(
-item=>item.properties?.datetime
-)
-.filter(Boolean)
-.sort(
-(a,b)=>
-new Date(b)-new Date(a)
-);
-
-if(!dates.length){
-
-throw new Error(
-"No datetime found"
-);
-
-}
-
-referenceDate=dates[0];
 
 console.log(
-"USING LATEST OBSERVATION:",
-referenceDate
+"USING FEATURE COLLECTION FROM RAW"
 );
 
 }
 
 
 // =================================
-// LIMPIAR PRECISIÓN TEMPORAL
+// GUARDAR PAGINACIÓN
 // =================================
-
-referenceDate=
-referenceDate.replace(/\.\d+Z$/,"Z");
-
-
-// =================================
-// PEDIR VENTANA DE DATOS
-// =================================
-
-const url =
-`${data.items}?limit=2000&datetime=../${referenceDate}`;
-
-console.log(
-"ITEM QUERY:",
-url
-);
-
-const res =
-await fetch(url);
-
-if(!res.ok)
-throw new Error(
-`HTTP ${res.status} ${res.statusText}`
-);
-
-const json =
-await res.json();
 
 activeDataset.nextPage =
 json.links?.find(
@@ -3105,16 +3021,21 @@ if(json.features){
 json.features.sort((a,b)=>{
 
 return new Date(
-b.properties.datetime
+b.properties?.datetime
 )
 -
 new Date(
-a.properties.datetime
+a.properties?.datetime
 );
 
 });
 
 }
+
+
+// =================================
+// CONTINUAR FLUJO NORMAL
+// =================================
 
 console.log(
 "ITEMS:",
@@ -3145,7 +3066,6 @@ document.getElementById("status").textContent=
 }
 
 }
-
    
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
