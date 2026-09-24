@@ -2892,7 +2892,11 @@ async function loadItems(data){
 document.getElementById("status").textContent=
 "Reading dataset...";
 
-let recoveredItemsJSON=null;
+try{
+
+// =================================
+// RECUPERAR ITEMS DESDE COLLECTION
+// =================================
 
 if(!data.items){
 
@@ -2927,12 +2931,25 @@ throw new Error(
 `HTTP ${itemsRes.status} ${itemsRes.statusText}`
 );
 
-recoveredItemsJSON=
+const itemsJSON=
 await itemsRes.json();
+
+if(
+!itemsJSON.features ||
+itemsJSON.features.length===0
+){
+
+throw new Error(
+"No items found"
+);
+
+}
+
+data.items=itemsURL;
 
 document.getElementById("raw").textContent=
 JSON.stringify(
-recoveredItemsJSON,
+itemsJSON,
 null,
 2
 );
@@ -2944,73 +2961,11 @@ console.log(
 }
 
 
-try{
-
-
-let referenceDate=null;
-
-
-
 // =================================
 // DETERMINAR FECHA DE REFERENCIA
 // =================================
 
-
-if(recoveredItemsJSON){
-
-if(
-!recoveredItemsJSON.features ||
-recoveredItemsJSON.features.length===0
-){
-
-throw new Error(
-"No items found"
-);
-
-}
-
-const json=
-recoveredItemsJSON;
-
-activeDataset.nextPage =
-json.links?.find(
-l=>l.rel==="next"
-)?.href || null;
-
-if(json.features){
-
-json.features.sort((a,b)=>{
-
-return new Date(
-b.properties.datetime
-)
--
-new Date(
-a.properties.datetime
-);
-
-});
-
-}
-
-console.log(
-"ITEMS:",
-json
-);
-
-renderAvailableData(json);
-
-document.getElementById("status").textContent=
-`${json.numberMatched||json.features.length} products indexed`;
-
-return;
-
-}
-
-
-// =================================
-// FLUJO NORMAL EXISTENTE
-// =================================
+let referenceDate=null;
 
 
 // misión terminada
@@ -3040,6 +2995,11 @@ latestURL
 const latestRes =
 await fetch(latestURL);
 
+if(!latestRes.ok)
+throw new Error(
+`HTTP ${latestRes.status} ${latestRes.statusText}`
+);
+
 const latestJSON =
 await latestRes.json();
 
@@ -3065,7 +3025,6 @@ referenceDate
 );
 
 }
-
 
 
 // =================================
@@ -3095,7 +3054,6 @@ activeDataset.nextPage =
 json.links?.find(
 l=>l.rel==="next"
 )?.href || null;
-
 
 
 // =================================
