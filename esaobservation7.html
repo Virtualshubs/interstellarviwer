@@ -2883,14 +2883,7 @@ l=>l.rel==="items"
 
 
 
-
-   
-   
-   
-   
-   
-   
-   // ===============================
+// ===============================
 // LOAD ITEMS
 // ===============================
 
@@ -2901,55 +2894,10 @@ document.getElementById("status").textContent=
 
 if(!data.items){
 
-const rawText=
-document.getElementById("raw").textContent;
-
-const itemsMatch=
-rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
-
-if(itemsMatch){
-
-const itemsURL=
-itemsMatch[0];
-
-console.log(
-"ITEMS URL FOUND IN RAW:",
-itemsURL
-);
-
-const itemsRes=
-await fetch(itemsURL);
-
-if(!itemsRes.ok)
-throw new Error(
-`HTTP ${itemsRes.status} ${itemsRes.statusText}`
-);
-
-data.items=itemsURL;
-
-data=
-await itemsRes.json();
-
-console.log(
-"ITEM JSON LOADED FROM RAW URL:",
-data
-);
-
-document.getElementById("raw").textContent=
-JSON.stringify(
-data,
-null,
-2
-);
-
-}else{
-
 document.getElementById("status").textContent=
 "Item error";
 
 return;
-
-}
 
 }
 
@@ -3067,10 +3015,10 @@ throw new Error(
 const json =
 await res.json();
 
-activeDataset.nextPage =
+  activeDataset.nextPage =
 json.links?.find(
-l=>l.rel==="next"
-)?.href || null;
+    l=>l.rel==="next"
+  )?.href || null;
 
 
 
@@ -3140,10 +3088,6 @@ document.getElementById("status").textContent=
 
 
 }
-
-
-
-   
 
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
