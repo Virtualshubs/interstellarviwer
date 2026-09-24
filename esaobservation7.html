@@ -2885,8 +2885,7 @@ l=>l.rel==="items"
 
 
 
-   
- // ===============================
+// ===============================
 // LOAD ITEMS
 // ===============================
 
@@ -2966,7 +2965,8 @@ let referenceDate=null;
 
 
 // =================================
-// FEATURE COLLECTION RECIÉN OBTENIDA
+// SI ACABAMOS DE EXPLOTAR /ITEMS
+// USAR SUS OBSERVACIONES
 // =================================
 
 if(itemsJSON){
@@ -2985,7 +2985,7 @@ new Date(b)-new Date(a)
 if(!dates.length){
 
 throw new Error(
-"No datetime found"
+"No datetime found in Items"
 );
 
 }
@@ -3139,8 +3139,6 @@ document.getElementById("status").textContent=
 }
 
 }
-
-
 
 
    
