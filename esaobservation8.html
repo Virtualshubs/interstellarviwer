@@ -3966,6 +3966,7 @@ observations.firstChild
 
 }
 
+
 // ===============================
 // EXPLORE CELL
 // ===============================
@@ -4086,6 +4087,16 @@ console.log(
 url
 );
 
+let json=null;
+let nextPage=null;
+
+
+// =================================
+// INTENTO NORMAL — 2000
+// =================================
+
+try{
+
 const res=
 await fetch(url);
 
@@ -4097,19 +4108,154 @@ throw new Error(
 
 }
 
-const json=
+json=
 await res.json();
+
+nextPage=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||null;
+
+console.log(
+"SPACE QUERY SUCCESS:",
+json.features?.length||0
+);
+
+}
+
+
+// =================================
+// FALLBACK — PAGINACIÓN
+// =================================
+
+catch(error){
+
+if(error.message!=="Failed to fetch"){
+
+throw error;
+
+}
+
+console.log(
+"SPACE QUERY FAILED — USING PAGINATION"
+);
+
+container.querySelector(
+"div[style*='color:#ffb04d']"
+).textContent=
+"SPATIAL QUERY UNAVAILABLE · READING PAGINATED DATA...";
+
+const features=[];
+let pageURL=
+`${activeDataset.items}`+
+`?datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${cell.lonMin},${cell.latMin},`+
+`${cell.lonMax},${cell.latMax}`;
+
+let numberMatched=0;
+let pages=0;
+
+while(
+pageURL&&
+features.length<2000
+){
+
+pages++;
+
+console.log(
+"SPACE PAGE:",
+pages
+);
+
+console.log(
+"SPACE PAGE URL:",
+pageURL
+);
+
+const pageRes=
+await fetch(pageURL);
+
+if(!pageRes.ok){
+
+throw new Error(
+`STAC HTTP ${pageRes.status}`
+);
+
+}
+
+const page=
+await pageRes.json();
+
+if(
+!page.features||
+!Array.isArray(page.features)
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+features.push(
+...page.features
+);
+
+numberMatched=
+page.numberMatched||
+page.context?.matched||
+numberMatched;
+
+console.log(
+"SPACE ITEMS ACCUMULATED:",
+features.length
+);
+
+container.querySelector(
+"div[style*='color:#ffb04d']"
+).textContent=
+`READING PAGINATED DATA · ${features.length.toLocaleString()} OBSERVATIONS`;
+
+pageURL=
+page.links?.find(
+l=>l.rel==="next"
+)?.href||null;
+
+}
+
+json={
+
+type:"FeatureCollection",
+
+features:features,
+
+numberMatched:numberMatched,
+
+numberReturned:features.length
+
+};
+
+nextPage=
+pageURL;
+
+console.log(
+"PAGINATED SPACE ITEMS:",
+json.features.length
+);
+
+}
+
+
+// =================================
+// RESULTADO ESPACIAL
+// =================================
 
 const received=
 json.features?.length||0;
 
 const matched=
 json.numberMatched??"unknown";
-
-const nextPage=
-json.links?.find(
-l=>l.rel==="next"
-)?.href||null;
 
 console.log(
 "SPACE RESULT"
@@ -4251,6 +4397,8 @@ Spatial query error: ${error.message}
 }
 
 }
+
+
 
 
 // ===============================
