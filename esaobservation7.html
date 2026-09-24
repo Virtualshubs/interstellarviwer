@@ -2894,10 +2894,22 @@ document.getElementById("status").textContent=
 
 if(!data.items){
 
+const itemsLink=data.links?.find(
+l=>l.rel==="items" && l.href
+);
+
+if(itemsLink){
+
+data.items=itemsLink.href;
+
+}else{
+
 document.getElementById("status").textContent=
 "Item error";
 
 return;
+
+}
 
 }
 
@@ -3015,10 +3027,10 @@ throw new Error(
 const json =
 await res.json();
 
-  activeDataset.nextPage =
+activeDataset.nextPage =
 json.links?.find(
-    l=>l.rel==="next"
-  )?.href || null;
+l=>l.rel==="next"
+)?.href || null;
 
 
 
