@@ -2895,10 +2895,8 @@ document.getElementById("status").textContent=
 try{
 
 // =================================
-// RECUPERAR ITEMS DESDE COLLECTION
+// EXPLOTAR COLLECTION → ITEMS
 // =================================
-
-if(!data.items){
 
 const rawText=
 document.getElementById("raw").textContent;
@@ -2906,14 +2904,7 @@ document.getElementById("raw").textContent;
 const itemsMatch=
 rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
 
-if(!itemsMatch){
-
-document.getElementById("status").textContent=
-"Item error";
-
-return;
-
-}
+if(itemsMatch){
 
 const itemsURL=
 itemsMatch[0];
@@ -2936,11 +2927,12 @@ await itemsRes.json();
 
 if(
 !itemsJSON.features ||
+!Array.isArray(itemsJSON.features) ||
 itemsJSON.features.length===0
 ){
 
 throw new Error(
-"No items found"
+"Items endpoint did not return FeatureCollection"
 );
 
 }
@@ -2984,24 +2976,10 @@ referenceDate
 // misión activa
 else{
 
-const latestURL =
-`${data.items}?limit=1&sortby=-datetime`;
-
-console.log(
-"LATEST QUERY:",
-latestURL
+const latestJSON=
+JSON.parse(
+document.getElementById("raw").textContent
 );
-
-const latestRes =
-await fetch(latestURL);
-
-if(!latestRes.ok)
-throw new Error(
-`HTTP ${latestRes.status} ${latestRes.statusText}`
-);
-
-const latestJSON =
-await latestRes.json();
 
 if(
 !latestJSON.features ||
@@ -3014,10 +2992,26 @@ throw new Error(
 
 }
 
-referenceDate =
-latestJSON.features[0]
-.properties
-.datetime;
+const dates=
+latestJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found"
+);
+
+}
+
+referenceDate=dates[0];
 
 console.log(
 "USING LATEST OBSERVATION:",
