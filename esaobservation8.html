@@ -1,0 +1,6370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>3D SAC</title>
+
+<style>
+
+:root[data-theme="terra"]{
+
+/* BACKGROUND */
+
+--bg:#ece9e3;
+--surface:#f4f2ee;
+--surface2:#ffffff;
+--surface3:#e6e1d9;
+--paper:#faf9f7;
+
+/* PANELS */
+
+--panel:#f5f3ef;
+--panel-header:#ffffff;
+--panel-footer:#ebe6df;
+
+/* CARDS */
+
+--card-bg:#ffffff;
+--card-hover:#f3f1ed;
+--card-border:#d3ccc2;
+
+/* BORDERS */
+
+--border:#cfc7bc;
+--border-light:#b8b0a5;
+--divider:#ddd7ce;
+
+/* TEXT */
+
+--text:#2f3439;
+--text-soft:#555d65;
+--text-muted:#808890;
+--text-inverse:#ffffff;
+
+/* BUTTONS */
+
+--button-bg:#647b90;
+--button-hover:#748ba0;
+--button-border:#7f93a6;
+--button-text:#ffffff;
+
+/* INPUTS */
+
+--input-bg:#ffffff;
+--input-border:#c8c1b8;
+--input-text:#2f3439;
+--input-placeholder:#90979e;
+
+/* TABLE */
+
+--table-header:#ece7e0;
+--table-row:#ffffff;
+--table-hover:#f5f2ed;
+
+/* GRID */
+
+--grid-bg:#ddd8d0;
+--grid-cell:#f8f7f5;
+--grid-hover:#d9e3eb;
+
+/* CODE */
+
+--code-bg:#f1efeb;
+--code-text:#2d3237;
+
+/* STATUS */
+
+--success:#6f8d70;
+--warning:#a77b48;
+--danger:#9d625d;
+--info:#5f7790;
+
+/* ACCENT */
+
+--accent:#5c7387;
+--accent-hover:#70889c;
+
+/* UI */
+
+--radius:4px;
+--transition:.15s;
+
+}
+
+
+/* =======================================================
+   LUNAR
+=======================================================*/
+
+:root[data-theme="lunar"]{
+
+/* BACKGROUND */
+
+--bg:#2b3036;
+--surface:#353b43;
+--surface2:#404852;
+--surface3:#4c5562;
+--paper:#596371;
+
+/* PANELS */
+
+--panel:#343b44;
+--panel-header:#3e4650;
+--panel-footer:#323840;
+
+/* CARDS */
+
+--card-bg:#363d46;
+--card-hover:#404854;
+--card-border:#5a6572;
+
+/* BORDERS */
+
+--border:#697482;
+--border-light:#808b99;
+--divider:#555f6c;
+
+/* TEXT */
+
+--text:#eef2f5;
+--text-soft:#d2d9df;
+--text-muted:#99a5b2;
+--text-inverse:#1f252b;
+
+/* BUTTONS */
+
+--button-bg:#486b89;
+--button-hover:#5a7c99;
+--button-border:#6d879d;
+--button-text:#ffffff;
+
+/* INPUTS */
+
+--input-bg:#2f353d;
+--input-border:#67717e;
+--input-text:#eef2f5;
+--input-placeholder:#98a3af;
+
+/* TABLE */
+
+--table-header:#404854;
+--table-row:#353c45;
+--table-hover:#424b56;
+
+/* GRID */
+
+--grid-bg:#2f343b;
+--grid-cell:#3d444d;
+--grid-hover:#516070;
+
+/* CODE */
+
+--code-bg:#232930;
+--code-text:#d8e1ea;
+
+/* STATUS */
+
+--success:#6e9475;
+--warning:#b18a53;
+--danger:#a86161;
+--info:#5d87a8;
+
+/* ACCENT */
+
+--accent:#547898;
+--accent-hover:#6487a6;
+
+/* UI */
+
+--radius:4px;
+--transition:.15s;
+
+}
+  
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+html,
+body{
+
+width:100%;
+height:100%;
+
+background:var(--bg);
+
+color:var(--text);
+
+overflow:hidden;
+
+}
+
+#themeToggle{
+
+min-width:110px;
+
+font-size:12px;
+
+letter-spacing:.08em;
+
+text-transform:uppercase;
+
+background:var(--surface3);
+
+border:1px solid var(--border);
+
+color:var(--text);
+
+}
+
+#themeToggle:hover{
+
+background:var(--surface2);
+
+}
+/* =======================================================
+   PANEL
+=======================================================*/
+
+#panel{
+
+width:100vw;
+height:100vh;
+
+display:flex;
+flex-direction:column;
+
+background:var(--bg);
+
+overflow:hidden;
+
+}
+
+
+/* =======================================================
+   HEADER
+=======================================================*/
+
+#header{
+
+height:58px;
+
+display:flex;
+
+align-items:center;
+
+gap:14px;
+
+padding:0 18px;
+
+background:var(--surface);
+
+border-bottom:1px solid var(--border);
+
+flex-shrink:0;
+
+}
+
+
+/* =======================================================
+   SEARCH
+=======================================================*/
+
+#search{
+
+flex:1;
+
+height:38px;
+
+padding:0 14px;
+
+background:#f3f4f6;
+
+color:#1f2937;
+
+border:1px solid #d1d5db;
+
+border-radius:6px;
+
+transition:var(--transition);
+
+font-size:13px;
+
+}
+
+#search:focus{
+
+outline:none;
+
+border-color:#9ca3af;
+
+box-shadow:0 0 0 3px rgba(156,163,175,.2);
+
+}
+
+/* =======================================================
+   BUTTONS
+=======================================================*/
+
+button{
+
+height:38px;
+
+padding:0 16px;
+
+background:#5c6675;
+
+color:#ffffff;
+
+border:1px solid rgba(255,255,255,.12);
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-size:13px;
+
+font-weight:600;
+
+transition:var(--transition);
+
+}
+
+button:hover{
+
+background:#6d7888;
+
+}
+
+button:active{
+
+transform:translateY(1px);
+
+}
+
+
+/* =======================================================
+   STATUS BAR
+=======================================================*/
+
+#status{
+
+height:42px;
+
+display:flex;
+
+align-items:center;
+
+padding:0 18px;
+
+background:#f3f4f6;
+
+border-bottom:1px solid #d1d5db;
+
+font-size:13px;
+
+color:#4b5563;
+
+}
+
+
+/* =======================================================
+   WORKSPACE
+=======================================================*/
+
+#workspace{
+
+flex:1;
+
+display:flex;
+
+overflow:hidden;
+
+}
+
+
+/* =======================================================
+   CONTENT
+=======================================================*/
+
+#content{
+
+flex:1;
+
+display:grid;
+
+grid-template-columns:380px 1fr;
+
+overflow:hidden;
+
+background:var(--bg);
+
+}
+
+
+/* =======================================================
+   MAIN
+=======================================================*/
+
+#main{
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+
+/* =======================================================
+   SCROLL AREA
+=======================================================*/
+
+#cards,
+#detail{
+
+overflow:auto;
+
+padding:18px;
+
+}
+
+
+/* =======================================================
+   CARDS
+=======================================================*/
+
+.card{
+
+background:var(--surface);
+
+border:1px solid var(--border);
+
+border-radius:var(--radius);
+
+padding:16px;
+
+margin-bottom:14px;
+
+transition:var(--transition);
+
+}
+
+.card:hover{
+
+border-color:var(--border-light);
+
+}
+
+.card h3{
+
+font-size:16px;
+
+font-weight:600;
+
+margin-bottom:12px;
+
+color:var(--orange);
+
+}
+
+.card p{
+
+font-size:13px;
+
+line-height:1.6;
+
+color:var(--text-soft);
+
+margin:5px 0;
+
+}
+
+
+/* =======================================================
+   ROWS
+=======================================================*/
+
+.row{
+
+display:flex;
+
+align-items:flex-start;
+
+gap:18px;
+
+padding:9px 0;
+
+border-bottom:1px solid rgba(255,255,255,.05);
+
+}
+
+.key{
+
+width:180px;
+
+font-weight:600;
+
+font-size:13px;
+
+color:var(--blue2);
+
+}
+
+.value{
+
+flex:1;
+
+font-size:13px;
+
+line-height:1.5;
+
+color:var(--text-soft);
+
+word-break:break-word;
+
+}
+
+
+/* =======================================================
+   INPUTS
+=======================================================*/
+
+input{
+
+height:36px;
+padding:0 10px;
+background:#0f151e;
+border:1px solid var(--border);
+border-radius:6px;
+color:white;
+transition:var(--transition);
+width:180px;
+
+}
+
+input:focus{
+outline:none;
+border-color:var(--blue);
+
+}
+
+
+/* =======================================================
+   DETAILS
+=======================================================*/
+
+details{
+margin-top:18px;
+}
+
+summary{
+cursor:pointer;
+color:var(--blue2);
+font-weight:600;
+
+}
+
+
+/* =======================================================
+   PRE
+=======================================================*/
+
+pre{
+white-space:pre-wrap;
+font-size:12px;
+line-height:1.55;
+font-family:Consolas,Menlo,monospace;
+
+}
+
+
+/* =======================================================
+   QUERY BOX
+=======================================================*/
+
+#queryBox{
+margin-top:22px;
+padding:16px;
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:var(--radius);
+}
+
+
+/* =======================================================
+   GRID
+=======================================================*/
+
+#dataGrid{
+position: relative;
+display:grid;
+grid-template-columns:repeat(36,1fr);
+grid-template-rows:repeat(18,1fr);
+aspect-ratio:2/1;
+width:100%;
+max-width:1100px;
+margin:24px auto;
+gap:1px;
+background: transparent;
+border:1px solid var(--border);
+}
+
+
+/* =======================================================
+   DATA CELLS
+=======================================================*/
+
+.dataCell{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+aspect-ratio:1;
+background:#17202b;
+border:1px solid rgba(255,255,255,.04);
+font-size:10px;
+color:#dbe6f5;
+cursor:pointer;
+transition:background .15s,border-color .15s;
+overflow:hidden;
+line-height:1.05;
+
+}
+
+.dataCell:hover{
+border-color:var(--blue2);
+background:#233245;
+transform:none;
+z-index:1;
+
+}
+
+
+#blueMarble {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+ .dataCell.searchMatch{
+
+    outline:2px solid #ffffff;
+
+    box-shadow:
+        0 0 0 2px rgba(80,190,255,.8),
+        0 0 18px rgba(80,190,255,.6);
+
+    z-index:5;
+
+}  
+/* =======================================================
+   RAW JSON
+=======================================================*/
+
+#raw{
+
+max-height:60vh;
+
+overflow:auto;
+
+padding:14px;
+
+background:#101720;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+}
+
+
+/* =======================================================
+   SCROLLBAR
+=======================================================*/
+
+::-webkit-scrollbar{
+
+width:10px;
+
+height:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+background:#0f141c;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+background:#2f3e51;
+
+border-radius:30px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+background:#42566f;
+
+}
+
+  /* =======================================================
+   JANUS READER v2
+   Compatible 100%
+=======================================================*/
+
+#janusReader{
+
+width:430px;
+height:100%;
+
+display:flex;
+flex-direction:column;
+
+flex-shrink:0;
+
+background:var(--surface);
+
+border-left:1px solid var(--border);
+
+overflow-y:auto;
+overflow-x:hidden;
+
+}
+
+
+/* =======================================================
+   HEADER
+=======================================================*/
+
+#janusSummary{
+
+padding:22px;
+
+background:var(--surface2);
+
+border-bottom:1px solid var(--border);
+
+flex-shrink:0;
+
+}
+
+#janusReader h2{
+
+font-size:18px;
+
+font-weight:600;
+
+letter-spacing:.02em;
+
+margin-bottom:18px;
+
+color:var(--text);
+
+}
+
+
+/* =======================================================
+   STATS
+=======================================================*/
+
+#janusReader .stats{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:12px;
+
+margin-bottom:18px;
+
+}
+
+#janusReader .stat{
+
+padding:16px;
+
+background:var(--surface3);
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+transition:.15s;
+
+}
+
+#janusReader .stat:hover{
+
+border-color:var(--border-light);
+
+}
+
+#janusReader .statTitle{
+
+font-size:10px;
+
+text-transform:uppercase;
+
+letter-spacing:.12em;
+
+font-weight:700;
+
+color:var(--text-muted);
+
+margin-bottom:8px;
+
+}
+
+#janusReader .statValue{
+
+font-size:26px;
+
+font-weight:700;
+
+color:white;
+
+}
+
+
+/* =======================================================
+   DATA INFO
+=======================================================*/
+
+#janusReader .details{
+
+display:flex;
+
+flex-direction:column;
+
+gap:6px;
+
+padding-top:18px;
+
+border-top:1px solid rgba(255,255,255,.06);
+
+}
+
+#janusReader .row{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-start;
+
+gap:18px;
+
+padding:8px 0;
+
+border-bottom:1px solid rgba(255,255,255,.04);
+
+}
+
+#janusReader .label{
+
+font-size:12px;
+
+font-weight:600;
+
+color:var(--text-muted);
+
+}
+
+#janusReader .value{
+
+flex:1;
+
+text-align:right;
+
+font-size:13px;
+
+line-height:1.45;
+
+color:var(--text-soft);
+
+word-break:break-word;
+
+}
+
+
+/* =======================================================
+   OBSERVATIONS
+=======================================================*/
+#janusObservations{
+
+display:flex;
+flex-direction:column;
+
+padding:18px;
+
+background:var(--bg);
+
+}
+
+/* =======================================================
+   CARDS
+=======================================================*/
+
+#janusReader .card{
+
+background:var(--surface2);
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+padding:18px;
+
+margin-bottom:16px;
+
+box-shadow:none;
+
+transition:.15s;
+
+}
+
+#janusReader .card:hover{
+
+border-color:var(--border-light);
+
+}
+
+#janusReader .card h2{
+
+font-size:15px;
+
+font-weight:600;
+
+margin-bottom:16px;
+
+color:white;
+
+}
+
+
+/* =======================================================
+   ASSETS
+=======================================================*/
+
+#janusReader .asset{
+
+margin-top:14px;
+
+padding:14px;
+
+background:#101720;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+}
+
+#janusReader .assetHeader{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:10px;
+
+gap:10px;
+
+}
+
+#janusReader .assetName{
+
+font-size:13px;
+
+font-weight:600;
+
+color:white;
+
+word-break:break-word;
+
+}
+
+#janusReader .assetType{
+
+font-size:11px;
+
+color:var(--text-muted);
+
+text-transform:uppercase;
+
+letter-spacing:.08em;
+
+}
+
+
+/* =======================================================
+   PREVIEW
+=======================================================*/
+
+#janusReader .assetPreview{
+
+display:block;
+
+width:100%;
+
+max-height:180px;
+
+object-fit:cover;
+
+border-radius:6px;
+
+border:1px solid var(--border);
+
+cursor:pointer;
+
+margin-top:12px;
+
+transition:.15s;
+
+}
+
+#janusReader .assetPreview:hover{
+
+border-color:var(--blue);
+
+}
+
+
+/* =======================================================
+   BUTTONS
+=======================================================*/
+
+#janusReader button{
+
+width:100%;
+
+height:38px;
+
+margin-top:16px;
+
+background:var(--blue);
+
+border:none;
+
+border-radius:6px;
+
+font-size:13px;
+
+font-weight:600;
+
+color:white;
+
+cursor:pointer;
+
+transition:.15s;
+
+}
+
+#janusReader button:hover{
+
+background:#4c90ff;
+
+}
+
+
+/* =======================================================
+   JSON
+=======================================================*/
+
+#janusReader pre{
+
+margin-top:16px;
+
+padding:16px;
+
+background:#0b1017;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+max-height:320px;
+
+overflow:auto;
+
+font-size:12px;
+
+line-height:1.55;
+
+color:#d7e4f4;
+
+font-family:Consolas,Menlo,monospace;
+
+}
+
+
+/* =======================================================
+   SCROLL
+=======================================================*/
+
+#janusObservations::-webkit-scrollbar{
+
+width:8px;
+
+}
+
+#janusObservations::-webkit-scrollbar-track{
+
+background:#0f151d;
+
+}
+
+#janusObservations::-webkit-scrollbar-thumb{
+
+background:#334455;
+
+border-radius:20px;
+
+}
+
+#janusObservations::-webkit-scrollbar-thumb:hover{
+
+background:#4d6177;
+
+}
+
+
+/* =======================================================
+   LINKS
+=======================================================*/
+
+#janusReader a{
+
+color:var(--blue2);
+
+text-decoration:none;
+
+}
+
+#janusReader a:hover{
+
+text-decoration:underline;
+
+}
+
+
+/* =======================================================
+   BADGES
+=======================================================*/
+
+.badge{
+
+display:inline-flex;
+
+align-items:center;
+
+padding:4px 10px;
+
+background:#182230;
+
+border:1px solid var(--border);
+
+border-radius:20px;
+
+font-size:11px;
+
+font-weight:600;
+
+color:var(--text-soft);
+
+}
+
+.badge.green{
+
+background:rgba(47,191,113,.12);
+
+border-color:rgba(47,191,113,.35);
+
+color:#7ee2a8;
+
+}
+
+.badge.orange{
+
+background:rgba(255,157,61,.12);
+
+border-color:rgba(255,157,61,.35);
+
+color:#ffc278;
+
+}
+
+.badge.red{
+
+background:rgba(239,68,68,.12);
+
+border-color:rgba(239,68,68,.35);
+
+color:#ff9b9b;
+
+}
+
+.badge.blue{
+
+background:rgba(59,130,246,.12);
+
+border-color:rgba(59,130,246,.35);
+
+color:#8ec5ff;
+
+}
+
+
+/* =======================================================
+   SMALL ANIMATIONS
+=======================================================*/
+
+.card,
+.asset,
+.stat,
+button,
+.dataCell,
+input{
+
+transition:all .18s ease;
+
+}
+
+
+/* =======================================================
+   RESPONSIVE
+=======================================================*/
+
+@media (max-width:1500px){
+
+#content{
+
+grid-template-columns:320px 1fr;
+
+}
+
+#janusReader{
+
+width:360px;
+
+}
+
+}
+
+@media (max-width:1200px){
+
+#content{
+
+grid-template-columns:1fr;
+
+}
+
+#janusReader{
+
+display:none;
+
+}
+
+}
+
+
+
+   .spatialCoverage{
+    display:none;
+    margin:12px 0;
+    padding:12px 14px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;
+    background:rgba(255,255,255,.04);
+    text-align:center;
+}
+
+.spatialCoverageTitle{
+    font-size:10px;
+    letter-spacing:1.5px;
+    opacity:.6;
+    margin-bottom:4px;
+}
+
+.spatialCoverageValue{
+    font-size:24px;
+    font-weight:600;
+    line-height:1.1;
+}
+
+.spatialCoverageDetails{
+    display:flex;
+    justify-content:center;
+    gap:5px;
+    margin-top:4px;
+    font-size:10px;
+    opacity:.55;
+}
+
+#collectionSelector{
+width:100%;
+padding:10px 36px 10px 12px;
+border:1px solid rgba(255,255,255,.14);
+border-radius:7px;
+background:rgba(255,255,255,.05);
+color:#fff;
+font-size:12px;
+font-family:Arial,sans-serif;
+outline:none;
+cursor:pointer;
+appearance:none;
+-webkit-appearance:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23ffffff' stroke-width='1.4'/%3E%3C/svg%3E");
+background-repeat:no-repeat;
+background-position:right 12px center;
+transition:border-color .2s,background .2s;
+}
+#collectionSelector:hover{
+border-color:rgba(255,255,255,.28);
+background-color:rgba(255,255,255,.07);
+}
+#collectionSelector:focus{
+border-color:rgba(255,255,255,.4);
+background-color:rgba(255,255,255,.08);
+}
+#collectionSelector option{
+background:#080b12;
+color:#fff;
+}
+
+
+   #explorationGrid{
+position:relative;
+display:grid;
+grid-template-columns:repeat(18,1fr);
+grid-template-rows:repeat(18,1fr);
+aspect-ratio:1/1;
+width:100%;
+gap:2px;
+}
+
+#explorationGrid .dataCell{
+position:relative;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+min-width:0;
+min-height:0;
+border:1px solid rgba(255,255,255,.25)!important;
+box-sizing:border-box;
+background:transparent;
+color:#000!important;
+opacity:1!important;
+visibility:visible!important;
+   filter:none!important;
+   backdrop-filter:none!important;
+}
+
+#explorationGrid .dataCell div{
+display:block!important;
+visibility:visible!important;
+opacity:1!important;
+color:#000!important;
+}
+
+#explorationGrid .dataCell:hover{
+opacity:1!important;
+visibility:visible!important;
+}
+
+#janus-data-models{
+width:100%;
+margin:12px 0;
+padding:0 8px;
+box-sizing:border-box;
+}
+
+   
+#janus-data-models-title{
+font-size:10px;
+font-weight:600;
+letter-spacing:1.5px;
+color:#888;
+margin:0 0 8px 2px;
+}
+
+.janus-data-model{
+background:rgba(255,255,255,.96);
+border:1px solid rgba(0,0,0,.12);
+border-radius:6px;
+padding:10px;
+margin-bottom:7px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+cursor:pointer;
+transition:
+border-color .15s ease,
+box-shadow .15s ease;
+}
+
+.janus-data-model:hover{
+border-color:rgba(0,0,0,.3);
+box-shadow:0 3px 14px rgba(0,0,0,.12);
+}
+
+.janus-data-model-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+}
+
+.janus-data-model-name{
+font-size:12px;
+font-weight:600;
+color:#222;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.janus-data-model-open{
+border:0;
+background:none;
+padding:0;
+font-size:10px;
+color:#666;
+cursor:pointer;
+}
+
+.janus-data-model-open:hover{
+color:#000;
+}
+
+.janus-data-model-actions{
+margin-top:8px;
+padding-top:7px;
+border-top:1px solid rgba(0,0,0,.08);
+}
+
+.janus-data-model-share{
+border:0;
+background:none;
+padding:0;
+font-size:10px;
+color:#777;
+cursor:pointer;
+}
+
+.janus-data-model-share:hover{
+color:#000;
+}
+
+
+
+
+
+   
+#janus-stac-custom{
+display:block;
+width:100%;
+max-width:100%;
+box-sizing:border-box;
+margin:12px 0;
+padding:0;
+}
+
+#janus-stac-custom-header{
+display:block;
+width:100vh;
+max-width:100vh;
+height:20px;
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+#janus-stac-custom-action{
+display:block;
+width:100%;
+height:20px;
+box-sizing:border-box;
+margin:5;
+padding:0;
+text-align:right;
+}
+
+#janus-stac-custom-toggle{
+display:inline-block;
+width:auto;
+height:20px;
+box-sizing:border-box;
+margin:0;
+padding:0;
+border:0;
+background:none;
+font-family:Arial,Helvetica,sans-serif;
+font-size:10px;
+line-height:20px;
+color:#666;
+white-space:nowrap;
+cursor:pointer;
+}
+
+#janus-stac-custom-toggle:hover{
+color:#000;
+}
+
+#janus-stac-custom-panel{
+display:none;
+width:100%;
+max-width:100%;
+box-sizing:border-box;
+margin:8px 0 0;
+padding:0;
+}
+
+#janus-stac-custom-input{
+display:inline-block;
+width:calc(100% - 58px);
+max-width:calc(100% - 58px);
+height:34px;
+box-sizing:border-box;
+margin:0;
+padding:0 9px;
+border:1px solid rgba(0,0,0,.15);
+border-radius:5px;
+background:#fff;
+font-family:Arial,Helvetica,sans-serif;
+font-size:12px;
+color:#333;
+outline:none;
+vertical-align:top;
+}
+
+#janus-stac-custom-load{
+display:inline-block;
+width:52px;
+max-width:52px;
+height:34px;
+box-sizing:border-box;
+margin:0 0 0 6px;
+padding:0;
+border:1px solid rgba(0,0,0,.15);
+border-radius:5px;
+background:#fff;
+font-family:Arial,Helvetica,sans-serif;
+font-size:11px;
+line-height:32px;
+color:#555;
+text-align:center;
+white-space:nowrap;
+vertical-align:top;
+cursor:pointer;
+}
+
+#janus-stac-custom-load:hover{
+border-color:rgba(0,0,0,.3);
+color:#000;
+}
+   
+</style>
+</head>
+
+<body>
+
+
+
+<div id="panel">
+
+      <div id="janus-stac-custom">
+<div id="janus-stac-custom-header">
+<div id="janus-stac-custom-action">
+<button
+id="janus-stac-custom-toggle"
+type="button"
+>
+Add
+</button>
+</div>
+
+</div>
+
+<div id="janus-stac-custom-panel">
+
+<input
+id="janus-stac-custom-input"
+type="text"
+placeholder="Enter STAC catalog URL"
+>
+
+<button
+id="janus-stac-custom-load"
+type="button"
+>
+Load
+</button>
+
+</div>
+
+</div> 
+
+    <div id="header">
+        <div id="status">Ready</div>
+        <input id="search" value="">
+        <button id="load">SEARCH</button>
+      <button id="themeToggle">🌙 LUNAR</button>
+       <button id="generate-3gb0" type="button">Generar 3GB</button>
+       
+    </div>
+
+
+
+
+
+   
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+       
+  <input
+    id="stac-url"
+    type="text"
+    placeholder="https://example.com"
+    style="flex:1;"
+ hidden >
+  <button id="load-stac-url" type="button" hidden>Cargar Data</button>
+</div>
+
+<div id="janus-stac-public"></div>
+   
+
+         <select id="collectionSelector">
+<option value="">Select collection...</option>
+</select>
+
+
+    <div id="workspace">
+       
+<div class="sidebar">
+    <div id="janus-data-models"></div>
+</div>
+
+        <div id="content">
+
+            <div id="cards"></div>
+
+            <div id="detail">
+
+                <h2>Select a collection</h2>
+
+                <div id="meta"></div>
+              
+   <button id="expandMapBtn" onclick="expandObservationMap()">
+                    REDISCOVER MAP
+                </button>
+
+<div id="spatialCoverage" class="spatialCoverage">
+    <div class="spatialCoverageTitle">
+        SPATIAL COVERAGE
+    </div>
+    <div class="spatialCoverageValue">
+        <span id="spatialCoveragePercentage">0.0%</span>
+    </div>
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageCells">0 / 0</span>
+        <span>cells discovered</span>
+    </div>
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageObservations">0</span>
+        <span>observations explored</span>
+    </div>
+</div>
+
+               
+              
+                <div id="queryBox"></div>
+
+               
+
+
+                <details>
+                    <summary>Raw JSON</summary>
+                    <pre id="raw"></pre>
+                </details>
+
+            </div>
+
+        </div>
+
+        <div id="janusReader">
+
+            <div id="summary" class="card">
+
+                <h2>Dataset Overview</h2>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="statTitle">STATUS</div>
+                        <div class="statValue" id="janusStatus">   
+                        Waiting for data...
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">OBSERVATIONS</div>
+                        <div class="statValue" id="count">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">CELL</div>
+                        <div class="statValue" id="cellId">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">ASSETS</div>
+                        <div class="statValue" id="assetCount">-</div>
+                    </div>
+
+                </div>
+
+                <div class="details">
+
+                    <div class="row">
+                        <div class="label">Latitude</div>
+                        <div class="value" id="latRange">-</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">Longitude</div>
+                        <div class="value" id="lonRange">-</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">State</div>
+                        <div class="value" id="cellState">-</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="observations"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+  
+<script>
+let BASE="";
+
+let collections=[];
+let activeDataset=null;
+
+let observationGrid=[];
+let currentItems=[];
+
+let explorationHistory=[];
+let explorationIndex=-1;
+
+let dataModelCount=0;
+
+
+// ===============================
+// INIT
+// ===============================
+
+document.getElementById("load-stac-url").onclick=changeSTAC;
+
+
+async function changeSTAC(){
+
+const input=document.getElementById("stac-url");
+const url=input.value.trim();
+
+let stacURL=BASE;
+
+if(url){
+
+stacURL=url;
+
+try{
+
+const parsedURL=new URL(url);
+
+if(parsedURL.searchParams.has("3dt0")){
+
+const value=parsedURL.searchParams.get("3dt0");
+
+if(value){
+
+const decoded=atob(value);
+
+if(
+decoded.startsWith("http://")||
+decoded.startsWith("https://")
+){
+
+stacURL=decoded;
+input.value=stacURL;
+
+}
+
+}
+
+}
+
+else if(parsedURL.searchParams.has("3gb0")){
+
+const value=parsedURL.searchParams.get("3gb0");
+
+if(value){
+
+const glb=base64ToUint8Array(value);
+const metadata=readGLBMetadata(glb);
+
+if(metadata?.nodes?.[0]?.extras?.d1){
+
+const valueD1=metadata.nodes[0].extras.d1;
+const decoded=atob(valueD1);
+
+if(
+decoded.startsWith("http://")||
+decoded.startsWith("https://")
+){
+
+stacURL=decoded;
+input.value=stacURL;
+
+}
+
+}
+
+}
+
+}
+
+}catch(e){
+
+console.error("Error leyendo URL:",e);
+return;
+
+}
+
+}
+
+BASE=stacURL.replace(/\/+$/,"");
+
+load();
+
+}
+
+
+function base64ToUint8Array(base64){
+
+const binary=atob(base64);
+
+const bytes=new Uint8Array(binary.length);
+
+for(let i=0;i<binary.length;i++){
+
+bytes[i]=binary.charCodeAt(i);
+
+}
+
+return bytes;
+
+}
+
+
+
+function uint8ArrayToBase64(bytes){
+
+let binary="";
+
+const chunkSize=0x8000;
+
+for(let i=0;i<bytes.length;i+=chunkSize){
+
+binary+=String.fromCharCode(
+...bytes.subarray(i,i+chunkSize)
+);
+
+}
+
+return btoa(binary);
+
+}
+
+
+
+function readGLBMetadata(bytes){
+
+const view=new DataView(
+bytes.buffer,
+bytes.byteOffset,
+bytes.byteLength
+);
+
+const magic=view.getUint32(0,true);
+const version=view.getUint32(4,true);
+const length=view.getUint32(8,true);
+
+if(magic!==0x46546C67){
+
+throw new Error("GLB inválido");
+
+}
+
+if(version!==2){
+
+throw new Error("GLB version no soportada");
+
+}
+
+if(length>bytes.byteLength){
+
+throw new Error("GLB incompleto");
+
+}
+
+let offset=12;
+
+while(offset<length){
+
+const chunkLength=view.getUint32(offset,true);
+const chunkType=view.getUint32(offset+4,true);
+
+offset+=8;
+
+if(chunkType===0x4E4F534A){
+
+const jsonBytes=bytes.subarray(
+offset,
+offset+chunkLength
+);
+
+const jsonText=new TextDecoder().decode(jsonBytes);
+
+return JSON.parse(jsonText);
+
+}
+
+offset+=chunkLength;
+
+}
+
+throw new Error("No se encontró JSON en el GLB");
+
+}
+
+
+
+function createGLB(stacURL){
+
+const d1=btoa(stacURL);
+
+const gltf={
+
+asset:{
+version:"2.0",
+generator:"Janus"
+},
+
+scene:0,
+
+scenes:[
+{
+nodes:[0]
+}
+],
+
+nodes:[
+{
+name:"Janus Data Particle",
+
+extras:{
+d1:d1
+}
+
+}
+]
+
+};
+
+let json=JSON.stringify(gltf);
+
+const encoder=new TextEncoder();
+
+let jsonBytes=encoder.encode(json);
+
+const jsonPadding=
+(4-(jsonBytes.length%4))%4;
+
+if(jsonPadding){
+
+const padded=new Uint8Array(
+jsonBytes.length+jsonPadding
+);
+
+padded.set(jsonBytes);
+
+for(
+let i=jsonBytes.length;
+i<padded.length;
+i++
+){
+
+padded[i]=0x20;
+
+}
+
+jsonBytes=padded;
+
+}
+
+const totalLength=
+12+
+8+
+jsonBytes.length;
+
+const glb=new Uint8Array(totalLength);
+
+const view=new DataView(glb.buffer);
+
+view.setUint32(
+0,
+0x46546C67,
+true
+);
+
+view.setUint32(
+4,
+2,
+true
+);
+
+view.setUint32(
+8,
+totalLength,
+true
+);
+
+view.setUint32(
+12,
+jsonBytes.length,
+true
+);
+
+view.setUint32(
+16,
+0x4E4F534A,
+true
+);
+
+glb.set(
+jsonBytes,
+20
+);
+
+return glb;
+
+}
+
+
+
+function generate3GB0(){
+
+const stacURL=BASE.replace(/\/+$/,"");
+
+if(!stacURL)return;
+
+const glb=createGLB(stacURL);
+
+const encodedGLB=
+uint8ArrayToBase64(glb);
+
+const finalURL=
+window.location.origin+
+window.location.pathname+
+"?3gb0="+
+encodeURIComponent(encodedGLB);
+
+console.log(
+"URL 3GB0:",
+finalURL
+);
+
+addDataModel(finalURL);
+
+return finalURL;
+
+}
+
+
+
+function addDataModel(url){
+
+dataModelCount++;
+
+const menu=document.getElementById("janus-data-models");
+
+if(!menu)return;
+
+if(!document.getElementById("janus-data-models-title")){
+
+const title=document.createElement("div");
+
+title.id="janus-data-models-title";
+title.textContent="DATA MODELS";
+
+menu.appendChild(title);
+
+}
+
+const model=document.createElement("div");
+
+model.className="janus-data-model";
+
+const header=document.createElement("div");
+
+header.className="janus-data-model-header";
+
+const name=document.createElement("div");
+
+name.className="janus-data-model-name";
+name.textContent="Data Model "+dataModelCount;
+
+const open=document.createElement("button");
+
+open.className="janus-data-model-open";
+open.textContent="Open";
+
+open.onclick=function(e){
+
+e.stopPropagation();
+
+window.open(url,"_blank");
+
+};
+
+header.appendChild(name);
+header.appendChild(open);
+
+const actions=document.createElement("div");
+
+actions.className="janus-data-model-actions";
+
+const share=document.createElement("button");
+
+share.className="janus-data-model-share";
+share.textContent="Share";
+
+share.onclick=function(e){
+
+e.stopPropagation();
+
+shareDataModel(url);
+
+};
+
+actions.appendChild(share);
+
+model.appendChild(header);
+model.appendChild(actions);
+
+model.onclick=function(){
+
+window.open(url,"_blank");
+
+};
+
+menu.appendChild(model);
+
+}
+
+
+async function shareDataModel(url){
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+title:"Janus Data Model",
+url:url
+});
+
+return;
+
+}catch(e){
+
+if(e.name==="AbortError")return;
+
+}
+
+}
+
+try{
+
+await navigator.clipboard.writeText(url);
+
+showShareFeedback();
+
+}catch(e){
+
+console.error(
+"Error copiando URL:",
+e
+);
+
+}
+
+}
+
+
+
+function showShareFeedback(){
+
+const button=
+document.querySelector(
+".janus-data-model-share:last-child"
+);
+
+if(!button)return;
+
+const original=button.textContent;
+
+button.textContent="Copied";
+
+setTimeout(function(){
+
+button.textContent=original;
+
+},1200);
+
+}
+
+
+
+// ===============================
+// INITIAL URL
+// ===============================
+
+const currentURL=
+new URL(window.location.href);
+
+if(
+currentURL.searchParams.has("3gb0")||
+currentURL.searchParams.has("3dt0")
+){
+
+document.getElementById("stac-url").value=
+window.location.href;
+
+document.getElementById("load-stac-url").click();
+
+}else{
+
+load();
+
+}
+
+
+
+// ===============================
+// GENERATE 3GB0
+// ===============================
+
+document.getElementById(
+"generate-3gb0"
+).onclick=function(){
+
+const url=generate3GB0();
+
+if(!url)return;
+
+document.getElementById(
+"stac-url"
+).value=url;
+
+};
+
+
+
+// ===============================
+// CUSTOM STAC
+// ===============================
+
+const stacCustomToggle=
+document.getElementById(
+"janus-stac-custom-toggle"
+);
+
+const stacCustomPanel=
+document.getElementById(
+"janus-stac-custom-panel"
+);
+
+const stacCustomInput=
+document.getElementById(
+"janus-stac-custom-input"
+);
+
+const stacCustomLoad=
+document.getElementById(
+"janus-stac-custom-load"
+);
+
+
+stacCustomToggle.onclick=function(){
+
+const open=
+stacCustomPanel.style.display==="flex";
+
+if(open){
+
+stacCustomPanel.style.display="none";
+stacCustomToggle.textContent="Add";
+
+}else{
+
+stacCustomPanel.style.display="flex";
+stacCustomToggle.textContent="Close";
+stacCustomInput.focus();
+
+}
+
+};
+
+
+stacCustomLoad.onclick=function(){
+
+const url=
+stacCustomInput.value.trim();
+
+if(!url)return;
+
+const realInput=
+document.getElementById("stac-url");
+
+const realLoad=
+document.getElementById("load-stac-url");
+
+if(!realInput||!realLoad)return;
+
+realInput.value=url;
+
+realLoad.click();
+
+};
+
+
+
+// ===============================
+// PUBLIC DATA STAC
+// ===============================
+
+const STAC_DATA_URLS={
+
+"ESA MAAP":{
+url:"https://catalog.maap.eo.esa.int/catalogue",
+root:"collections"
+},
+
+"Google Earth Engine":{
+url:"https://storage.googleapis.com/earthengine-stac/catalog/catalog.json",
+root:""
+},
+
+"AWS Earth Search":{
+url:"https://earth-search.aws.element84.com/v1",
+root:"collections"
+},
+
+"Microsoft Planetary Computer":{
+url:"https://planetarycomputer.microsoft.com/api/stac/v1",
+root:"collections"
+},
+
+"NASA CMR":{
+url:"https://cmr.earthdata.nasa.gov/stac",
+root:""
+}
+
+};
+
+
+function createSTACSelector(){
+
+const container=
+document.getElementById("janus-stac-public");
+
+if(!container)return;
+
+const select=document.createElement("select");
+
+select.id="janus-stac-public-select";
+
+const defaultOption=
+document.createElement("option");
+
+defaultOption.value="";
+defaultOption.textContent="Select public STAC";
+
+select.appendChild(defaultOption);
+
+Object.entries(STAC_DATA_URLS).forEach(
+([name,config])=>{
+
+const option=
+document.createElement("option");
+
+option.value=JSON.stringify(config);
+option.textContent=name;
+
+select.appendChild(option);
+
+}
+);
+
+select.onchange=function(){
+
+const value=this.value;
+
+if(!value)return;
+
+const config=JSON.parse(value);
+
+const input=
+document.getElementById(
+"janus-stac-custom-input"
+);
+
+const load=
+document.getElementById(
+"janus-stac-custom-load"
+);
+
+if(!input||!load)return;
+
+input.value=config.url;
+
+window.JANUS_CUSTOM_ROOT=config.root;
+
+load.click();
+
+};
+
+container.appendChild(select);
+
+}
+
+
+createSTACSelector();
+
+
+// ===============================
+// LOAD CATALOG
+// ===============================
+
+document.getElementById("load").onclick=load;
+
+
+async function load(){
+
+const q=
+document.getElementById("search").value.trim();
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+try{
+
+const root=
+typeof window.JANUS_CUSTOM_ROOT!=="undefined"
+?window.JANUS_CUSTOM_ROOT
+:"collections";
+
+if(root){
+
+const endpoint=
+`${BASE.replace(/\/+$/,"")}/${root}`;
+
+const params=new URLSearchParams();
+
+if(q)params.set("q",q);
+
+params.set("limit","1000");
+
+   console.log(
+"STAC REQUEST:",
+`${endpoint}?${params.toString()}`
+);
+
+const res=await fetch(
+`${endpoint}?${params.toString()}`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+collections=data.collections||[];
+
+}else{
+
+collections=
+await loadCatalogTree(
+BASE.replace(/\/+$/,"")
+);
+
+}
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+}catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+}
+
+}
+
+
+// ===============================
+// LOAD STAC CATALOG TREE
+// ===============================
+
+async function loadCatalogTree(url,visited=new Set()){
+
+if(visited.has(url))
+return[];
+
+visited.add(url);
+
+const res=await fetch(
+`${url}${url.includes("?")?"&":"?"}limit=1000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+if(Array.isArray(data.collections))
+return data.collections;
+
+if(Array.isArray(data.links)){
+
+return data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+url
+).href
+
+}));
+
+}
+
+return[];
+
+}
+
+
+
+// ===============================
+// RENDER COLLECTION SELECTOR
+// ===============================
+
+function renderCollectionSelector(){
+
+const select=
+document.getElementById(
+"collectionSelector"
+);
+
+if(!select)return;
+
+select.innerHTML=
+`<option value="">Select collection...</option>`;
+
+collections.forEach(collection=>{
+
+const option=
+document.createElement("option");
+
+option.value=collection.id;
+
+option.textContent=
+collection.title||collection.id;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+document.getElementById(
+"collectionSelector"
+).onchange=function(){
+
+document.getElementById(
+"search"
+).value=this.value;
+
+};
+
+
+
+// ===============================
+// RENDER COLLECTION CARDS
+// ===============================
+
+function renderCards(){
+
+const c=
+document.getElementById("cards");
+
+c.innerHTML="";
+
+collections.forEach(col=>{
+
+const d=
+document.createElement("div");
+
+d.className="card";
+
+d.innerHTML=`
+
+<h3>${col.id}</h3>
+
+<p><b>${col.title||""}</b></p>
+
+<p>
+${(col.description||"").substring(0,180)}...
+</p>
+
+<button class="open">
+OPEN
+</button>
+
+`;
+
+d.querySelector("button").onclick=
+()=>show(col);
+
+c.appendChild(d);
+
+});
+
+}
+
+
+
+// ===============================
+// SHOW COLLECTION
+// ===============================
+
+async function show(col){
+
+if(col.href){
+
+try{
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+const res=await fetch(
+`${col.href}${col.href.includes("?")?"&":"?"}limit=1000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+
+// =================================
+// ACTUALIZAR RAW CON EL JSON REAL
+// =================================
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+data,
+null,
+2
+);
+
+
+// =================================
+// CATALOG
+// =================================
+
+if(data.type==="Catalog"&&Array.isArray(data.links)){
+
+collections=
+data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+col.href
+).href
+
+}));
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+return;
+
+}
+
+
+// =================================
+// COLLECTION
+// =================================
+
+if(data.type==="Collection"){
+
+col=data;
+
+}
+
+}
+
+catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+return;
+
+}
+
+}
+
+const meta=
+document.getElementById("meta");
+
+meta.innerHTML="";
+
+document.getElementById(
+"queryBox"
+).innerHTML="";
+
+add(meta,"ID",col.id);
+add(meta,"Title",col.title);
+add(meta,"Version",col.version);
+add(meta,"Created",col.created);
+add(meta,"Updated",col.updated);
+add(meta,"Description",col.description);
+
+if(col.keywords)
+add(
+meta,
+"Keywords",
+col.keywords.join(", ")
+);
+
+activeDataset=
+parseCollection(col);
+
+add(
+meta,
+"DATA START",
+activeDataset.startDate||""
+);
+
+add(
+meta,
+"DATA END",
+activeDataset.endDate||""
+);
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+col,
+null,
+2
+);
+
+loadItems(activeDataset);
+
+}
+
+
+
+// ===============================
+// PARSE COLLECTION
+// ===============================
+
+function parseCollection(col){
+
+return{
+
+id:col.id,
+
+title:col.title,
+
+startDate:
+col.extent?.temporal?.interval?.[0]?.[0]||null,
+
+endDate:
+col.extent?.temporal?.interval?.[0]?.[1]||null,
+
+items:
+col.links?.find(
+l=>l.rel==="items"
+)?.href||null
+
+};
+
+}
+
+
+
+
+// ===============================
+// LOAD ITEMS
+// ===============================
+
+async function loadItems(data){
+
+document.getElementById("status").textContent=
+"Reading dataset...";
+
+try{
+
+// =================================
+// EXPLOTAR COLLECTION → ITEMS
+// =================================
+
+const collectionJSON=
+JSON.parse(
+document.getElementById("raw").textContent
+);
+
+const itemsLink=
+collectionJSON.links?.find(
+link=>link.rel==="items"
+);
+
+let itemsJSON=null;
+
+if(itemsLink?.href){
+
+const itemsURL=
+itemsLink.href;
+
+console.log(
+"ITEMS URL FOUND IN COLLECTION:",
+itemsURL
+);
+
+const itemsRes=
+await fetch(itemsURL);
+
+if(!itemsRes.ok)
+throw new Error(
+`HTTP ${itemsRes.status} ${itemsRes.statusText}`
+);
+
+itemsJSON=
+await itemsRes.json();
+
+if(
+!itemsJSON.features ||
+!Array.isArray(itemsJSON.features) ||
+itemsJSON.features.length===0
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+data.items=itemsURL;
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+itemsJSON,
+null,
+2
+);
+
+console.log(
+"RAW UPDATED WITH ITEMS JSON"
+);
+
+}
+
+
+// =================================
+// DETERMINAR FECHA DE REFERENCIA
+// =================================
+
+let referenceDate=null;
+
+// =================================
+// SI ACABAMOS DE EXPLOTAR /ITEMS
+// USAR SUS OBSERVACIONES
+// =================================
+
+if(itemsJSON){
+
+const dates=
+itemsJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found in Items"
+);
+
+}
+
+referenceDate=dates[0];
+
+console.log(
+"USING LATEST OBSERVATION FROM ITEMS:",
+referenceDate
+);
+
+}
+
+// misión terminada
+else if(data.endDate){
+
+referenceDate=data.endDate;
+
+console.log(
+"USING DATASET END DATE:",
+referenceDate
+);
+
+}
+
+// misión activa
+else{
+
+const latestJSON=
+JSON.parse(
+document.getElementById("raw").textContent
+);
+
+if(
+!latestJSON.features ||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+const dates=
+latestJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found"
+);
+
+}
+
+referenceDate=dates[0];
+
+console.log(
+"USING LATEST OBSERVATION:",
+referenceDate
+);
+
+}
+
+// =================================
+// LIMPIAR PRECISIÓN TEMPORAL
+// =================================
+
+referenceDate=
+referenceDate.replace(/\.\d+Z$/,"Z");
+
+// =================================
+// PEDIR VENTANA DE DATOS
+// =================================
+
+const url =
+`${data.items}?limit=2000&datetime=../${referenceDate}`;
+
+console.log(
+"ITEM QUERY:",
+url
+);
+
+let json=null;
+
+// =================================
+// INTENTO NORMAL — 2000 OBSERVACIONES
+// =================================
+
+try{
+
+const res =
+await fetch(url);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+json =
+await res.json();
+
+if(
+!json.features ||
+!Array.isArray(json.features) ||
+json.features.length===0
+){
+
+throw new Error(
+"Items query did not return FeatureCollection"
+);
+
+}
+
+console.log(
+"ITEM QUERY SUCCESS:",
+json.features.length
+);
+
+}
+
+// =================================
+// FALLBACK — PAGINACIÓN
+// =================================
+
+catch(e){
+
+console.log(
+"ITEM QUERY FAILED, USING PAGINATION:",
+e.message
+);
+
+const features=[];
+let pageURL=data.items;
+let numberMatched=0;
+
+while(
+pageURL &&
+features.length<2000
+){
+
+console.log(
+"ITEM PAGE:",
+pageURL
+);
+
+const pageRes=
+await fetch(pageURL);
+
+if(!pageRes.ok)
+throw new Error(
+`HTTP ${pageRes.status} ${pageRes.statusText}`
+);
+
+const page=
+await pageRes.json();
+
+if(
+!page.features ||
+!Array.isArray(page.features)
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+features.push(
+...page.features
+);
+
+numberMatched=
+page.numberMatched||
+page.context?.matched||
+numberMatched;
+
+console.log(
+"ITEMS ACCUMULATED:",
+features.length
+);
+
+pageURL=
+page.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+}
+
+json={
+type:"FeatureCollection",
+features:features,
+numberMatched:numberMatched,
+numberReturned:features.length
+};
+
+console.log(
+"PAGINATED ITEMS:",
+json.features.length
+);
+
+}
+
+// =================================
+// GUARDAR PAGINACIÓN
+// =================================
+
+activeDataset.nextPage =
+json.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+// =================================
+// ORDENAR POR FECHA DESCENDENTE
+// =================================
+
+if(json.features){
+
+json.features.sort((a,b)=>{
+
+return new Date(
+b.properties?.datetime
+)
+-
+new Date(
+a.properties?.datetime
+);
+
+});
+
+}
+
+// =================================
+// CONTINUAR FLUJO NORMAL
+// =================================
+
+console.log(
+"ITEMS:",
+json
+);
+
+renderAvailableData(json);
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+json,
+null,
+2
+);
+
+document.getElementById("status").textContent=
+`${json.numberMatched||json.features.length} products indexed`;
+
+}
+
+catch(e){
+
+console.error(e);
+
+document.getElementById("status").textContent=
+"Items error";
+
+}
+
+}
+
+
+
+
+   
+   
+// ===============================
+// AVAILABLE DATA + SPATIAL GRID
+// ===============================
+
+function renderAvailableData(json){
+
+const box=document.getElementById("queryBox");
+
+
+box.innerHTML=`
+
+<h3 style="color:#ffb04d;margin-bottom:12px">
+AVAILABLE DATA
+</h3>
+
+`;
+
+
+
+if(!json.features||json.features.length===0){
+
+box.innerHTML+=`
+<p>No products found</p>
+`;
+
+return;
+
+}
+
+
+currentItems=json.features;
+
+
+// resumen fechas
+
+const dates={};
+
+
+
+json.features.forEach(item=>{
+
+
+const dt=item.properties?.datetime;
+
+
+if(!dt)
+return;
+
+
+const day=dt.split("T")[0];
+
+
+if(!dates[day])
+dates[day]=0;
+
+
+dates[day]++;
+
+
+});
+
+
+Object.keys(dates)
+.sort()
+.forEach(date=>{
+
+
+const r=document.createElement("div");
+
+
+r.className="row";
+
+r.innerHTML=`
+
+<div class="key">
+${date}
+</div>
+
+<div class="value">
+${dates[date]} observations
+</div>
+
+`;
+
+
+box.appendChild(r);
+
+
+});
+
+
+
+
+// ===============================
+// SPATIAL CELLS
+// ===============================
+
+
+const title=document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginTop="20px";
+
+title.textContent=
+"SPATIAL DATA CELLS";
+
+
+box.appendChild(title);
+
+const grid=document.createElement("div");
+
+grid.id="dataGrid";
+
+box.appendChild(grid);
+
+createSpatialGrid(json.features);
+
+//test exploracion espacial
+   const explorationContainer=document.createElement("div");
+explorationContainer.id="explorationContainer";
+explorationContainer.style.marginTop="25px";
+box.appendChild(explorationContainer);
+
+
+}
+
+
+
+
+
+  
+
+// ===============================
+// CREATE SPATIAL GRID
+// ===============================
+
+function createSpatialGrid(items){
+
+const grid=document.getElementById("dataGrid");
+
+grid.innerHTML="";
+
+observationGrid=[];
+
+
+// resolución inicial del mapa
+
+const rows=18;
+const cols=36;
+
+
+for(let y=0;y<rows;y++){
+
+for(let x=0;x<cols;x++){
+
+const cell={
+
+    id:y*cols+x,
+
+    x,
+    y,
+
+    state:-1,
+
+    latMin:90-(y+1)*(180/rows),
+    latMax:90-y*(180/rows),
+
+    lonMin:-180+x*(360/cols),
+    lonMax:-180+(x+1)*(360/cols),
+
+    items:[]
+
+};
+   
+observationGrid.push(cell);
+
+const div=document.createElement("div");
+
+div.className="dataCell";
+
+div.textContent="";
+
+div.onclick=()=>{
+    clearGridSearch();
+    showCellData(cell);
+};
+
+grid.appendChild(div);
+
+}
+}
+
+
+// ===============================
+// DISTRIBUIR OBSERVACIONES
+// ===============================
+
+items.forEach(item=>{
+let coords=null;
+const geom=item.geometry;
+
+// ------------------------------------------------
+// 1. POINT (STAC)
+// ------------------------------------------------
+
+if(geom && geom.type==="Point"){
+coords=geom.coordinates;
+}
+
+
+
+// ------------------------------------------------
+// 2. LAT/LON EN PROPERTIES
+// ------------------------------------------------
+
+if(!coords &&
+item.properties &&
+item.properties.latitude!==undefined &&
+item.properties.longitude!==undefined){
+
+coords=[
+
+item.properties.longitude,
+item.properties.latitude
+
+];
+
+}
+
+
+
+if(!coords &&
+item.properties &&
+item.properties.lat!==undefined &&
+item.properties.lon!==undefined){
+
+coords=[
+
+item.properties.lon,
+
+item.properties.lat
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 3. BBOX
+// ------------------------------------------------
+
+if(!coords && item.bbox){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 4. POLYGON
+// ------------------------------------------------
+
+if(!coords &&
+geom &&
+geom.type==="Polygon"){
+
+const ring=geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+coords=[
+
+lon/ring.length,
+
+lat/ring.length
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 5. MULTIPOLYGON
+// ------------------------------------------------
+
+if(!coords &&
+geom &&
+geom.type==="MultiPolygon"){
+
+const ring=geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+coords=[
+
+lon/ring.length,
+
+lat/ring.length
+
+];
+
+}
+
+
+// ------------------------------------------------
+// 6. SIN SOPORTE
+// ------------------------------------------------
+
+if(!coords){
+
+console.log(
+
+"Unsupported geometry:",
+
+geom?.type,
+
+item
+
+);
+
+return;
+
+}
+
+
+
+const lon=coords[0];
+const lat=coords[1];
+
+
+
+const cell=observationGrid.find(c=>
+
+lat>=c.latMin &&
+lat<c.latMax &&
+
+lon>=c.lonMin &&
+lon<c.lonMax
+
+);
+
+
+
+if(cell){
+
+cell.state=0;
+
+cell.items.push(item);
+
+}
+
+});
+
+
+updateGrid();
+updateSpatialCoverage();
+createGridSearch();
+createBlueMarble();
+
+}
+
+
+
+
+// ===============================
+// UPDATE SPATIAL COVERAGE contador janus 
+// ===============================
+
+function updateSpatialCoverage(){
+
+    const discoveredCells=observationGrid.filter(
+        cell=>cell.state===0
+    ).length;
+
+    const totalCells=observationGrid.length;
+
+    const coveragePercentage=totalCells>0
+        ? (discoveredCells/totalCells)*100
+        : 0;
+
+    const totalObservations=observationGrid.reduce(
+        (total,cell)=>total+cell.items.length,
+        0
+    );
+
+    const discoveredElement=document.getElementById("spatialCoverageCells");
+    const percentageElement=document.getElementById("spatialCoveragePercentage");
+    const observationsElement=document.getElementById("spatialCoverageObservations");
+
+    if(discoveredElement){
+        discoveredElement.textContent=`${discoveredCells} / ${totalCells}`;
+    }
+
+    if(percentageElement){
+        percentageElement.textContent=`${coveragePercentage.toFixed(1)}%`;
+    }
+
+    if(observationsElement){
+        observationsElement.textContent=
+            totalObservations.toLocaleString();
+    }
+
+    const container=document.getElementById("spatialCoverage");
+
+    if(container){
+        container.style.display="block";
+    }
+
+}
+
+
+
+function clearGridSearch(){
+    document
+        .querySelectorAll(".dataCell.searchMatch")
+        .forEach(div => {
+            div.classList.remove("searchMatch");
+        });
+
+    observationGrid.forEach(cell => {
+        cell.searchMatch = false;
+    });
+}
+
+
+
+   
+function createBlueMarble(){
+    const grid = document.getElementById("dataGrid");
+    if(!grid){
+        console.warn("Blue Marble: dataGrid not found");
+        return;
+    }
+
+    let marble = document.getElementById("blueMarble");
+
+    if(!marble){
+        marble = document.createElement("img");
+        marble.id = "blueMarble";
+        marble.src = "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
+        marble.alt = "";
+        grid.insertBefore(marble, grid.firstChild);
+    }
+}
+
+
+   
+// ===============================
+// SEARCH LAT LON
+// ===============================
+
+function createGridSearch(){
+const box=document.getElementById("queryBox");
+const div=document.createElement("div");
+div.innerHTML=`
+
+<div style="margin-top:15px">
+
+Lat:
+
+<input id="gridLat" value="0">
+
+Lon:
+
+<input id="gridLon" value="0">
+
+<button onclick="searchGrid()">
+
+SEARCH POSITION
+
+</button>
+
+</div>
+
+`;
+
+box.appendChild(div);
+
+}
+
+
+
+
+// ===============================
+// SEARCH LAT LON
+// ===============================
+
+function searchGrid(){
+    const lat =
+        Number(document.getElementById("gridLat").value);
+    const lon =
+        Number(document.getElementById("gridLon").value);
+
+
+    // ===============================
+    // LIMPIAR BÚSQUEDA ANTERIOR
+    // ===============================
+
+    observationGrid.forEach(cell => {
+        cell.searchMatch = false;
+    });
+
+
+    // ===============================
+    // BUSCAR CELDA
+    // ===============================
+
+    const targetCell = observationGrid.find(cell =>
+        lat >= cell.latMin &&
+        lat < cell.latMax &&
+        lon >= cell.lonMin &&
+        lon < cell.lonMax
+
+    );
+
+    // ===============================
+    // MARCAR CELDA
+    // ===============================
+
+    if(targetCell){
+        targetCell.searchMatch = true;
+        console.log(
+            "Grid position:",
+            targetCell.latMin,
+            targetCell.latMax,
+            targetCell.lonMin,
+            targetCell.lonMax
+        );
+    }
+
+    updateGrid();
+
+
+    // ===============================
+    // APLICAR HIGHLIGHT VISUAL
+    // ===============================
+
+    const cells =
+        document.querySelectorAll(".dataCell");
+
+    cells.forEach((div, index) => {
+        div.classList.remove("searchMatch");
+
+    });
+
+    if(targetCell){
+        const div = cells[targetCell.id];
+        if(div){
+            div.classList.add("searchMatch");
+
+        }
+
+    }
+
+}
+
+
+// ===============================
+// UPDATE VISUAL STATES
+// ===============================
+
+function updateGrid(){
+const cells=document.querySelectorAll(".dataCell");
+cells.forEach((div,index)=>{
+const cell=observationGrid[index];
+const label=`<div style="font-size:9px;opacity:.6;">${cell.id}</div><div>${cell.items.length}</div>`;
+   
+if(cell.discovered){
+div.style.background="#ff66cc";
+div.innerHTML=label;
+return;
+
+}
+
+if(cell.state===-1){
+div.style.background="#222";
+div.textContent="";
+return;
+
+}
+
+if(cell.state===0){
+div.style.background="#16803c";
+div.innerHTML=label;
+return;
+
+}
+
+if(cell.state===1){
+div.style.background="#ff8c00";
+div.innerHTML=label;
+return;
+
+}
+
+});
+
+}
+
+
+
+
+   // ===============================
+// SHOW CELL DATA generico
+// ===============================
+
+function showCellData(cell){
+
+const dataset={
+CELL_INFO:{
+id:cell.id,
+latRange:`${cell.latMin} / ${cell.latMax}`,
+lonRange:`${cell.lonMin} / ${cell.lonMax}`,
+state:cell.state,
+observations:cell.items.length
+},
+OBSERVATIONS:cell.items
+};
+
+document.getElementById("raw").textContent=
+JSON.stringify(dataset,null,2);
+
+renderDataset(dataset);
+
+   
+
+
+   
+// ===============================
+// EXPLORE SPACE fase 2 de observacion espacial
+// ===============================
+
+const observations=
+document.getElementById("observations");
+
+if(!observations)
+return;
+
+const oldButton=
+document.getElementById("exploreCellButton");
+
+if(oldButton)
+oldButton.remove();
+
+if(cell.state===0 && cell.items.length>0){
+
+const button=document.createElement("button");
+
+button.id="exploreCellButton";
+button.textContent="EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background="rgba(102,204,255,.08)";
+button.style.border="1px solid rgba(102,204,255,.35)";
+button.style.borderRadius="6px";
+button.style.color="#66ccff";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+exploreCell(cell);
+};
+
+observations.insertBefore(
+button,
+observations.firstChild
+);
+
+}
+
+}
+
+// ===============================
+// EXPLORE CELL
+// ===============================
+
+async function exploreCell(cell){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+container.innerHTML=`
+
+<h3 style="color:#66ccff;margin-bottom:8px">
+SPACE EXPLORATION · CELL ${cell.id}
+</h3>
+
+<div style="font-size:11px;color:#999;margin-bottom:12px">
+LAT ${cell.latMin.toFixed(6)} → ${cell.latMax.toFixed(6)}
+<br>
+LON ${cell.lonMin.toFixed(6)} → ${cell.lonMax.toFixed(6)}
+</div>
+
+<div style="color:#ffb04d">
+QUERYING STAC...
+</div>
+
+`;
+
+try{
+
+let referenceDate=
+activeDataset.endDate;
+
+
+// =================================
+// SI NO HAY FECHA FINAL
+// =================================
+
+if(!referenceDate){
+
+const latestURL=
+`${activeDataset.items}?limit=1&sortby=-datetime`;
+
+const latestRes=
+await fetch(latestURL);
+
+if(!latestRes.ok){
+
+throw new Error(
+`STAC HTTP ${latestRes.status}`
+);
+
+}
+
+const latestJSON=
+await latestRes.json();
+
+if(
+!latestJSON.features||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+referenceDate=
+latestJSON.features[0]
+.properties
+.datetime;
+
+}
+
+
+// =================================
+// CONSULTA ESPACIAL INICIAL
+// =================================
+
+const url=
+`${activeDataset.items}?limit=2000`+
+`&datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${cell.lonMin},${cell.latMin},`+
+`${cell.lonMax},${cell.latMax}`;
+
+console.log(
+"==================================="
+);
+
+console.log(
+"SPACE EXPLORATION START"
+);
+
+console.log(
+"PARENT CELL:",
+cell.id
+);
+
+console.log(
+"BBOX:",
+cell.lonMin,
+cell.latMin,
+cell.lonMax,
+cell.latMax
+);
+
+console.log(
+"INITIAL LIMIT:",
+2000
+);
+
+console.log(
+"SPACE QUERY:",
+url
+);
+
+const res=
+await fetch(url);
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+const json=
+await res.json();
+
+const received=
+json.features?.length||0;
+
+const matched=
+json.numberMatched??"unknown";
+
+const nextPage=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||null;
+
+console.log(
+"SPACE RESULT"
+);
+
+console.log(
+"MATCHED:",
+matched
+);
+
+console.log(
+"RECEIVED:",
+received
+);
+
+console.log(
+"NEXT PAGE:",
+nextPage
+);
+
+
+// =================================
+// SIN RESULTADOS
+// =================================
+
+if(
+!json.features||
+json.features.length===0
+){
+
+container.innerHTML=`
+
+<h3 style="color:#66ccff">
+SPACE EXPLORATION · CELL ${cell.id}
+</h3>
+
+<div style="color:#ff7777">
+No products found in this spatial area.
+</div>
+
+`;
+
+return;
+
+}
+
+
+// =================================
+// GUARDAR HISTORIAL
+// =================================
+
+// si hemos vuelto atrás y exploramos
+// desde ese punto, eliminamos FORWARD
+
+if(
+explorationIndex<
+explorationHistory.length-1
+){
+
+explorationHistory=
+explorationHistory.slice(
+0,
+explorationIndex+1
+);
+
+}
+
+
+// =================================
+// CREAR NUEVA EXPLORACIÓN
+// =================================
+
+const exploration=
+createExplorationGrid(
+json.features,
+cell,
+nextPage
+);
+
+
+// =================================
+// GUARDAR EXPLORACIÓN
+// =================================
+
+explorationHistory.push(
+exploration
+);
+
+explorationIndex=
+explorationHistory.length-1;
+
+
+// =================================
+// MOSTRAR RESULTADO
+// =================================
+
+renderSavedExploration(
+exploration
+);
+
+renderExplorationNavigation();
+
+console.log(
+"INITIAL LOCAL GRID CREATED"
+);
+
+console.log(
+"OBSERVATIONS:",
+received
+);
+
+console.log(
+"NEXT PAGE AVAILABLE:",
+!!nextPage
+);
+
+console.log(
+"==================================="
+);
+
+document.getElementById("status").textContent=
+`Space exploration ready · ${received.toLocaleString()} observations`;
+
+}catch(error){
+
+console.error(
+"SPACE EXPLORATION ERROR:",
+error
+);
+
+container.innerHTML+=`
+
+<div style="color:#ff7777;margin-top:10px">
+Spatial query error: ${error.message}
+</div>
+
+`;
+
+}
+
+}
+
+
+// ===============================
+// CREATE EXPLORATION GRID
+// ===============================
+
+function createExplorationGrid(
+items,
+parentCell,
+nextPage
+){
+
+const container=
+document.getElementById(
+"explorationContainer"
+);
+
+if(!container)
+return null;
+
+container.innerHTML="";
+
+
+const title=
+document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginBottom="12px";
+
+title.textContent=
+`SPATIAL DATA · CELL ${parentCell.id}`;
+
+container.appendChild(title);
+
+
+// =================================
+// RE-EXPLORE BUTTON
+// =================================
+
+const button=
+document.createElement("button");
+
+button.id=
+"reExploreSpaceButton";
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background=
+"rgba(255,176,77,.08)";
+button.style.border=
+"1px solid rgba(255,176,77,.35)";
+button.style.borderRadius="6px";
+button.style.color="#ffb04d";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+
+reExploreSpace(
+explorationHistory[
+explorationIndex
+]
+);
+
+};
+
+container.appendChild(button);
+
+
+// =================================
+// GRID
+// =================================
+
+const grid=
+document.createElement("div");
+
+grid.id=
+"explorationGrid";
+
+grid.style.display="grid";
+grid.style.gridTemplateColumns=
+"repeat(18,1fr)";
+grid.style.aspectRatio="1/1";
+grid.style.width="100%";
+grid.style.gap="2px";
+
+container.appendChild(grid);
+   
+const rows=18;
+const cols=18;
+
+const latStep=
+(parentCell.latMax-parentCell.latMin)/
+rows;
+
+const lonStep=
+(parentCell.lonMax-parentCell.lonMin)/
+cols;
+
+
+const cells=[];
+
+
+// =================================
+// CREAR CELDAS
+// =================================
+
+for(let y=0;y<rows;y++){
+
+for(let x=0;x<cols;x++){
+
+const geographicY=rows-1-y;
+
+const cell={
+
+id:y*cols+x,
+
+x,
+y,
+
+state:-1,
+
+latMin:
+parentCell.latMin+
+geographicY*latStep,
+
+latMax:
+parentCell.latMin+
+(geographicY+1)*latStep,
+
+lonMin:
+parentCell.lonMin+
+x*lonStep,
+
+lonMax:
+parentCell.lonMin+
+(x+1)*lonStep,
+
+items:[]
+
+};
+
+cells.push(cell);
+
+const div=
+document.createElement("div");
+
+div.className=
+"dataCell";
+
+div.onclick=()=>{
+
+clearGridSearch();
+
+showCellData(cell);
+
+};
+
+grid.appendChild(div);
+
+}
+
+}
+
+
+// =================================
+// DISTRIBUIR ITEMS INICIALES
+// =================================
+
+appendExplorationSpatialData(
+items,
+{
+grid:cells
+}
+);
+
+
+// =================================
+// ACTUALIZAR VISUAL
+// =================================
+
+updateExplorationGridVisual(
+cells,
+grid
+);
+
+
+// =================================
+// DEVOLVER ESTADO
+// =================================
+
+return{
+
+parentCell:parentCell,
+
+grid:cells,
+
+items:items,
+
+bbox:{
+
+latMin:
+parentCell.latMin,
+
+latMax:
+parentCell.latMax,
+
+lonMin:
+parentCell.lonMin,
+
+lonMax:
+parentCell.lonMax
+
+},
+
+nextPage:nextPage
+
+};
+
+}
+
+
+// ===============================
+// UPDATE EXPLORATION GRID VISUAL
+// ===============================
+function updateExplorationGridVisual(cells,grid){
+    if(!grid)return;
+    const cellDivs=grid.querySelectorAll(".dataCell");
+    cells.forEach((cell,index)=>{
+        const div=cellDivs[index];
+        if(!div)return;
+        div.style.border="1px solid rgba(255,255,255,.25)";
+        div.style.boxSizing="border-box";
+        div.style.background=cell.state===0?(cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)"):"transparent";
+        div.style.color="#000";
+        div.innerHTML=`
+<div style="font-size:9px;color:#000;font-weight:bold;line-height:1">
+${cell.id}
+</div>
+<div style="font-size:11px;color:#000;font-weight:bold;line-height:1.2">
+${cell.items.length}
+</div>
+`;
+    });
+}
+
+// ===============================
+// RE-EXPLORE SPACE
+// ===============================
+
+async function reExploreSpace(
+exploration
+){
+
+if(!exploration)
+return;
+
+
+const grid=
+exploration.grid;
+
+
+// =================================
+// COMPROBAR REFERENCIAS
+// =================================
+
+const seeds=
+grid.filter(
+c=>c.state===0
+);
+
+
+if(seeds.length===0){
+
+console.log(
+"LOCAL REDISCOVERY:"
+);
+
+console.log(
+"No reference cells in exploration."
+);
+
+document.getElementById(
+"status"
+).textContent=
+"No reference cells.";
+
+return;
+
+}
+
+
+// =================================
+// CREAR BBOX SI NO EXISTE
+// =================================
+
+if(!exploration.bbox){
+
+exploration.bbox={
+
+latMin:
+exploration.parentCell.latMin,
+
+latMax:
+exploration.parentCell.latMax,
+
+lonMin:
+exploration.parentCell.lonMin,
+
+lonMax:
+exploration.parentCell.lonMax
+
+};
+
+}
+
+
+// =================================
+// BOTÓN
+// =================================
+
+const button=
+document.getElementById(
+"reExploreSpaceButton"
+);
+
+if(button){
+
+button.disabled=true;
+
+button.textContent=
+"RE-EXPLORING SPACE...";
+
+}
+
+
+// =================================
+// CONTADORES
+// =================================
+
+let pages=0;
+
+let receivedTotal=0;
+
+let newObservations=0;
+
+let updatedCells=0;
+
+let newCells=0;
+
+
+// =================================
+// ESTADO ANTERIOR
+// =================================
+
+const initialCounts=
+new Map();
+
+grid.forEach(cell=>{
+
+initialCounts.set(
+cell.id,
+cell.items.length
+);
+
+});
+
+
+// =================================
+// PRIMERA NUEVA BÚSQUEDA
+// =================================
+
+// IMPORTANTE:
+//
+// RE-EXPLORE NO DEPENDE DE QUE
+// EL EXPLORE INICIAL TUVIESE NEXT.
+//
+// Si no tenemos cursor,
+// hacemos una nueva consulta sobre
+// el mismo BBOX.
+//
+// Si ya tenemos cursor,
+// continuamos desde él.
+//
+
+let pageURL=
+exploration.rediscoveryNextPage||
+null;
+
+
+// =================================
+// FECHA
+// =================================
+
+let referenceDate=
+activeDataset.endDate;
+
+
+try{
+
+if(!referenceDate){
+
+const latestURL=
+`${activeDataset.items}?limit=1&sortby=-datetime`;
+
+const latestRes=
+await fetch(latestURL);
+
+if(!latestRes.ok){
+
+throw new Error(
+`STAC HTTP ${latestRes.status}`
+);
+
+}
+
+const latestJSON=
+await latestRes.json();
+
+if(
+!latestJSON.features||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+referenceDate=
+latestJSON.features[0]
+.properties
+.datetime;
+
+}
+
+
+// =================================
+// NUEVA CONSULTA SI NO TENEMOS CURSOR
+// =================================
+
+if(!pageURL){
+
+const bbox=
+exploration.bbox;
+
+pageURL=
+`${activeDataset.items}?limit=1500`+
+`&datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${bbox.lonMin},${bbox.latMin},`+
+`${bbox.lonMax},${bbox.latMax}`;
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY NEW SEARCH"
+);
+
+console.log(
+"BBOX:",
+bbox.lonMin,
+bbox.latMin,
+bbox.lonMax,
+bbox.latMax
+);
+
+console.log(
+"LIMIT:",
+1500
+);
+
+console.log(
+"QUERY:",
+pageURL
+);
+
+}else{
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY CONTINUE"
+);
+
+console.log(
+"NEXT PAGE:",
+pageURL
+);
+
+}
+
+
+// =================================
+// CONSUMIR PÁGINAS
+// =================================
+
+while(pageURL){
+
+pages++;
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · PAGE ${pages} · querying...`;
+
+console.log(
+"-----------------------------------"
+);
+
+console.log(
+"LOCAL REDISCOVERY PAGE:",
+pages
+);
+
+console.log(
+"URL:",
+pageURL
+);
+
+
+const res=
+await fetch(pageURL);
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+
+const json=
+await res.json();
+
+
+const pageItems=
+json.features||[];
+
+const pageReceived=
+pageItems.length;
+
+const pageMatched=
+json.numberMatched??
+"unknown";
+
+
+const next=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||
+null;
+
+
+console.log(
+"PAGE MATCHED:",
+pageMatched
+);
+
+console.log(
+"PAGE RECEIVED:",
+pageReceived
+);
+
+console.log(
+"PAGE NEXT:",
+next
+);
+
+
+// =================================
+// GUARDAR ITEMS ANTES
+// =================================
+
+const beforeCounts=
+new Map();
+
+grid.forEach(cell=>{
+
+beforeCounts.set(
+cell.id,
+cell.items.length
+);
+
+});
+
+
+// =================================
+// DISTRIBUIR PÁGINA COMPLETA
+// =================================
+
+appendExplorationSpatialData(
+pageItems,
+exploration
+);
+
+
+// =================================
+// MEDIR CAMBIOS
+// =================================
+
+let pageNewObservations=0;
+
+let pageUpdatedCells=0;
+
+let pageNewCells=0;
+
+
+grid.forEach(cell=>{
+
+const before=
+beforeCounts.get(
+cell.id
+)||0;
+
+const after=
+cell.items.length;
+
+const added=
+after-before;
+
+
+if(added>0){
+
+pageNewObservations+=
+added;
+
+pageUpdatedCells++;
+
+if(before===0){
+
+pageNewCells++;
+
+}
+
+}
+
+});
+
+
+// =================================
+// ACUMULAR
+// =================================
+
+receivedTotal+=
+pageReceived;
+
+newObservations+=
+pageNewObservations;
+
+updatedCells+=
+pageUpdatedCells;
+
+newCells+=
+pageNewCells;
+
+
+// =================================
+// GUARDAR CURSOR
+// =================================
+
+exploration.rediscoveryNextPage=
+next;
+
+
+// =================================
+// ACTUALIZAR VISUAL
+// =================================
+
+const visualGrid=
+document.getElementById(
+"explorationGrid"
+);
+
+updateExplorationGridVisual(
+grid,
+visualGrid
+);
+
+renderExplorationNavigation();
+
+
+// =================================
+// LOG
+// =================================
+
+console.log(
+"PAGE NEW OBSERVATIONS:",
+pageNewObservations
+);
+
+console.log(
+"PAGE UPDATED CELLS:",
+pageUpdatedCells
+);
+
+console.log(
+"PAGE NEW CELLS:",
+pageNewCells
+);
+
+console.log(
+"PAGE REMAINING:",
+!!next
+);
+
+
+// =================================
+// STATUS
+// =================================
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · PAGE ${pages} · ${pageReceived.toLocaleString()} received · +${pageNewObservations.toLocaleString()} observations`;
+
+
+// =================================
+// SIGUIENTE
+// =================================
+
+pageURL=
+next;
+
+}
+
+
+// =================================
+// RESULTADO FINAL
+// =================================
+
+let finalObservations=0;
+
+grid.forEach(cell=>{
+
+finalObservations+=
+cell.items.length;
+
+});
+
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY FINISHED"
+);
+
+console.log(
+"PAGES:",
+pages
+);
+
+console.log(
+"RECEIVED TOTAL:",
+receivedTotal
+);
+
+console.log(
+"NEW OBSERVATIONS:",
+newObservations
+);
+
+console.log(
+"UPDATED CELLS:",
+updatedCells
+);
+
+console.log(
+"NEW CELLS:",
+newCells
+);
+
+console.log(
+"FINAL OBSERVATIONS IN GRID:",
+finalObservations
+);
+
+console.log(
+"NEXT PAGE:",
+exploration.rediscoveryNextPage
+);
+
+console.log(
+"==================================="
+);
+
+
+// =================================
+// ESTADO DEL BOTÓN
+// =================================
+
+if(button){
+
+if(
+exploration.rediscoveryNextPage
+){
+
+button.disabled=false;
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
+}else{
+
+button.disabled=true;
+
+button.textContent=
+"NO MORE DATA";
+
+}
+
+}
+
+
+// =================================
+// STATUS FINAL
+// =================================
+
+if(
+exploration.rediscoveryNextPage
+){
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · +${newObservations.toLocaleString()} observations · +${newCells} cells · ${pages} pages · MORE DATA AVAILABLE`;
+
+}else{
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery complete · +${newObservations.toLocaleString()} observations · +${newCells} cells · ${pages} pages`;
+
+}
+
+
+}catch(e){
+
+console.error(
+"LOCAL REDISCOVERY ERROR:",
+e
+);
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery error: ${e.message}`;
+
+if(button){
+
+button.disabled=false;
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
+}
+
+}
+
+}
+
+
+// ===============================
+// GET EXPLORATION NEIGHBOURS
+// ===============================
+
+function getExplorationNeighbours(
+cell,
+grid
+){
+
+const result=[];
+
+const dirs=[
+
+[-1,-1],[0,-1],[1,-1],
+
+[-1,0],[1,0],
+
+[-1,1],[0,1],[1,1]
+
+];
+
+
+dirs.forEach(d=>{
+
+const x=
+cell.x+d[0];
+
+const y=
+cell.y+d[1];
+
+
+const neighbour=
+grid.find(c=>
+c.x===x&&
+c.y===y
+);
+
+
+if(neighbour)
+result.push(neighbour);
+
+});
+
+
+return result;
+
+}
+
+
+// ===============================
+// APPEND EXPLORATION SPATIAL DATA
+// ===============================
+
+function appendExplorationSpatialData(
+items,
+exploration
+){
+
+const grid=
+exploration.grid;
+
+
+items.forEach(item=>{
+
+let coords=null;
+
+const geom=
+item.geometry;
+
+
+// =================================
+// POINT
+// =================================
+
+if(
+geom&&
+geom.type==="Point"
+){
+
+coords=
+geom.coordinates;
+
+}
+
+
+// =================================
+// LAT / LON
+// =================================
+
+if(
+!coords&&
+item.properties&&
+item.properties.latitude!==undefined&&
+item.properties.longitude!==undefined
+){
+
+coords=[
+
+item.properties.longitude,
+item.properties.latitude
+
+];
+
+}
+
+
+// =================================
+// LAT / LON ALTERNATIVOS
+// =================================
+
+if(
+!coords&&
+item.properties&&
+item.properties.lat!==undefined&&
+item.properties.lon!==undefined
+){
+
+coords=[
+
+item.properties.lon,
+item.properties.lat
+
+];
+
+}
+
+
+// =================================
+// BBOX
+// =================================
+
+if(
+!coords&&
+item.bbox
+){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
+
+
+// =================================
+// POLYGON
+// =================================
+
+if(
+!coords&&
+geom&&
+geom.type==="Polygon"
+){
+
+const ring=
+geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+
+coords=[
+
+lon/ring.length,
+lat/ring.length
+
+];
+
+}
+
+
+// =================================
+// MULTIPOLYGON
+// =================================
+
+if(
+!coords&&
+geom&&
+geom.type==="MultiPolygon"
+){
+
+const ring=
+geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+
+coords=[
+
+lon/ring.length,
+lat/ring.length
+
+];
+
+}
+
+
+if(!coords)
+return;
+
+
+const lon=
+coords[0];
+
+const lat=
+coords[1];
+
+
+// =================================
+// BUSCAR CELDA LOCAL
+// =================================
+
+const cell=
+grid.find(c=>
+
+lat>=c.latMin&&
+lat<c.latMax&&
+
+lon>=c.lonMin&&
+lon<c.lonMax
+
+);
+
+
+if(!cell)
+return;
+
+
+// =================================
+// EVITAR DUPLICADOS
+// =================================
+
+const exists=
+cell.items.some(
+x=>x.id===item.id
+);
+
+
+if(exists)
+return;
+
+
+// =================================
+// INSERTAR OBSERVACIÓN
+// =================================
+
+const wasEmpty=
+cell.items.length===0;
+
+
+cell.items.push(item);
+
+cell.state=0;
+
+
+// =================================
+// MARCAR NUEVA COBERTURA
+// =================================
+
+if(wasEmpty){
+
+cell.discovered=true;
+
+}
+
+});
+
+}
+
+   // ===============================
+// EXPLORATION NAVIGATION adelante y atras en el estado
+// ===============================
+
+function renderExplorationNavigation(){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+
+const old=
+document.getElementById(
+"explorationNavigation"
+);
+
+if(old)
+old.remove();
+
+
+const nav=
+document.createElement("div");
+
+nav.id=
+"explorationNavigation";
+
+nav.style.display="flex";
+nav.style.gap="8px";
+nav.style.marginBottom="12px";
+
+
+const back=
+document.createElement("button");
+
+back.textContent="← BACK";
+
+back.disabled=
+explorationIndex<=0;
+
+back.onclick=()=>{
+goBackExploration();
+};
+
+
+const forward=
+document.createElement("button");
+
+forward.textContent="FORWARD →";
+
+forward.disabled=
+explorationIndex>=
+explorationHistory.length-1;
+
+forward.onclick=()=>{
+goForwardExploration();
+};
+
+
+nav.appendChild(back);
+nav.appendChild(forward);
+
+
+container.insertBefore(
+nav,
+container.firstChild
+);
+
+}
+
+
+
+
+
+   
+
+   // ===============================
+// BACK
+// ===============================
+
+function goBackExploration(){
+
+if(explorationIndex<=0)
+return;
+
+explorationIndex--;
+
+renderSavedExploration(
+explorationHistory[
+explorationIndex
+]
+);
+
+renderExplorationNavigation();
+
+}
+
+   // ===============================
+// FORWARD
+// ===============================
+
+function goForwardExploration(){
+
+if(
+explorationIndex>=
+explorationHistory.length-1
+)
+return;
+
+explorationIndex++;
+
+renderSavedExploration(
+explorationHistory[
+explorationIndex
+]
+);
+
+renderExplorationNavigation();
+
+}
+
+
+   
+   // ===============================
+// RESTORE SAVED EXPLORATION
+// ===============================
+
+function renderSavedExploration(exploration){
+const container=document.getElementById("explorationContainer");
+if(!container)return;
+container.innerHTML="";
+
+const title=document.createElement("h3");
+title.style.color="#66ccff";
+title.style.marginBottom="12px";
+title.textContent=`SPATIAL DATA · CELL ${exploration.parentCell.id}`;
+container.appendChild(title);
+
+// =================================
+// RE-EXPLORE SPACE
+// =================================
+
+const button=document.createElement("button");
+
+button.id="reExploreSpaceButton";
+button.textContent="RE-EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background="rgba(255,176,77,.08)";
+button.style.border="1px solid rgba(255,176,77,.35)";
+button.style.borderRadius="6px";
+button.style.color="#ffb04d";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+reExploreSpace(exploration);
+};
+
+container.appendChild(button);
+
+// =================================
+// CREAR GRID VISUAL
+// =================================
+
+const grid=document.createElement("div");
+grid.id="explorationGrid";
+grid.style.display="grid";
+grid.style.gridTemplateColumns="repeat(18,1fr)";
+grid.style.aspectRatio="1/1";
+grid.style.width="100%";
+grid.style.gap="2px";
+
+container.appendChild(grid);
+
+createExplorationBlueMarble(grid,exploration.parentCell);
+
+// =================================
+// RESTAURAR CELDAS
+// =================================
+
+exploration.grid.forEach(cell=>{
+
+const div=document.createElement("div");
+
+div.className="dataCell";
+
+div.onclick=()=>{
+clearGridSearch();
+showCellData(cell);
+};
+
+if(cell.state===0){
+    div.style.background=cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)";
+}else{
+    div.style.background="transparent";
+}
+
+div.style.border="1px solid rgba(255,255,255,.25)";
+div.style.boxSizing="border-box";
+div.style.color="#000";
+
+div.innerHTML=`
+<div style="font-size:9px;color:#000;font-weight:bold;line-height:1">
+${cell.id}
+</div>
+<div style="font-size:11px;color:#000;font-weight:bold;line-height:1.2">
+${cell.items.length}
+</div>
+`;
+
+grid.appendChild(div);
+
+});
+
+}
+
+
+
+
+
+
+
+
+   
+
+   
+function createExplorationBlueMarble(grid,parentCell){
+    if(!grid||!parentCell)return;
+
+    grid.style.position="relative";
+    grid.style.overflow="hidden";
+
+    const getDateUTC=offset=>{
+        const d=new Date();
+        d.setUTCDate(d.getUTCDate()+offset);
+        return d.toISOString().split("T")[0];
+    };
+
+    const createURL=date=>{
+        const bbox=[
+            parentCell.latMin,
+            parentCell.lonMin,
+            parentCell.latMax,
+            parentCell.lonMax
+        ].join(",");
+
+        const latCenter=(parentCell.latMin+parentCell.latMax)/2;
+
+        const latKm=
+            (parentCell.latMax-parentCell.latMin)*111.32;
+
+        const lonKm=
+            (parentCell.lonMax-parentCell.lonMin)*
+            111.32*
+            Math.cos(latCenter*Math.PI/180);
+
+        const areaKm=Math.max(latKm,lonKm);
+
+        // =================================
+        // ESCALA DEL GRID 18 × 18
+        // =================================
+
+        const gridCellKm=areaKm/18;
+
+        // =================================
+        // RESOLUCIÓN VISUAL
+        // =================================
+        //
+        // Mantenemos una relación fija
+        // entre la imagen y las 18 celdas.
+        //
+        // 32 píxeles de imagen por celda.
+        //
+
+        const pixelsPerCell=32;
+
+        let resolution=
+            18*pixelsPerCell;
+
+        resolution=
+            Math.min(resolution,8200);
+
+        // =================================
+        // ESCALA RESULTANTE
+        // =================================
+
+        const pixelSizeKm=
+            areaKm/resolution;
+
+        const pixelsPerGridCell=
+            gridCellKm/pixelSizeKm;
+
+        console.log("NASA MAP SCALE:",{
+            bboxKm:areaKm.toFixed(3),
+            gridCellKm:gridCellKm.toFixed(4),
+            resolution:resolution,
+            pixelSizeKm:pixelSizeKm.toFixed(4),
+            pixelsPerGridCell:pixelsPerGridCell.toFixed(2)
+        });
+
+        return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
+        "?REQUEST=GetSnapshot"+
+        "&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
+        "&CRS=EPSG:4326"+
+        `&TIME=${date}`+
+        "&WRAP=DAY,X"+
+        `&BBOX=${bbox}`+
+        "&FORMAT=image/jpeg"+
+        `&WIDTH=${resolution}`+
+        `&HEIGHT=${resolution}`+
+        "&AUTOSCALE=TRUE";
+    };
+
+    const today=getDateUTC(0);
+    const yesterday=getDateUTC(-1);
+
+    const marble=document.createElement("img");
+
+    marble.className="explorationBlueMarble";
+    marble.alt="";
+
+    marble.style.position="absolute";
+    marble.style.left="0";
+    marble.style.top="0";
+    marble.style.width="100%";
+    marble.style.height="100%";
+    marble.style.pointerEvents="none";
+    marble.style.zIndex="0";
+    marble.style.imageRendering="auto";
+
+    let usingDate=today;
+
+    marble.onerror=()=>{
+        if(usingDate===today){
+            usingDate=yesterday;
+
+            console.log(
+                "NASA SNAPSHOT: today unavailable, trying previous day:",
+                yesterday
+            );
+
+            marble.src=createURL(yesterday);
+        }else{
+            console.error(
+                "NASA SNAPSHOT: today and previous day unavailable"
+            );
+        }
+    };
+
+    marble.onload=()=>{
+        console.log(
+            "NASA SNAPSHOT LOADED:",
+            usingDate
+        );
+    };
+
+    marble.src=createURL(today);
+
+    console.log(
+        "NASA SNAPSHOT TODAY:",
+        createURL(today)
+    );
+
+    grid.insertBefore(
+        marble,
+        grid.firstChild
+    );
+}
+// fin bloque observacion fase 2 espacial
+   
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+   
+// ===============================
+// ADD ROW
+// ===============================
+
+function add(container,key,value){
+   
+if(value===undefined)
+return;
+const r=document.createElement("div");
+
+r.className="row";
+
+r.innerHTML=`
+
+<div class="key">${key}</div>
+<div class="value">${value}</div>
+
+`;
+
+container.appendChild(r);
+
+}
+
+
+
+// ===================================
+// REDISCOVER MAP fase 1
+// ===================================
+
+async function expandObservationMap(){
+    const seeds =
+    observationGrid.filter(c=>c.state===0);
+
+    if(seeds.length===0){
+        console.log("No reference cells.");
+        return;
+    }
+
+    if(!activeDataset.nextPage){
+        console.log(
+            "No more catalog pages."
+        );
+
+        document.getElementById("status").textContent =
+        "No more data pages.";
+
+        return;
+
+    }
+
+
+    document.getElementById("status").textContent =
+    "Expanding observation map...";
+
+    const discovered =
+    await discoverNeighbourCells();
+
+    updateGrid();
+   updateSpatialCoverage();
+
+    console.log(
+        "NEW CELLS:",
+        discovered
+    );
+
+
+    document.getElementById("status").textContent =
+    `Expansion complete. ${discovered} new cells`;
+
+}
+
+
+
+
+// ===================================
+// DISCOVER NEIGHBOUR CELLS
+// ===================================
+
+async function discoverNeighbourCells(){
+    const visited=new Set();
+    const queue=[];
+
+    observationGrid.forEach(cell=>{
+        if(cell.state===0){
+            queue.push(cell);
+            visited.add(cell.id);
+        }
+
+
+    });
+
+
+
+    let discovered=0;
+    while(queue.length){
+
+        const cell =
+        queue.shift();
+        const neighbours =
+        getNeighbours(cell);
+
+        for(const n of neighbours){
+            if(visited.has(n.id))
+                continue;
+
+            visited.add(n.id);
+
+            if(n.state!==-1)
+                continue;
+
+            const found =
+            await inspectCell(n);
+
+            if(found){
+
+                discovered++;
+                queue.push(n);
+
+            }
+
+            updateGrid();
+
+        }
+
+    }
+
+    return discovered;
+
+}
+
+
+
+
+// ===================================
+// GET NEIGHBOURS
+// ===================================
+
+function getNeighbours(cell){
+    const result=[];
+
+    const dirs=[
+
+        [-1,-1],[0,-1],[1,-1],
+
+        [-1,0],[1,0],
+
+        [-1,1],[0,1],[1,1]
+
+    ];
+
+    dirs.forEach(d=>{
+
+        const x = cell.x+d[0];
+
+        const y = cell.y+d[1];
+
+        const neighbour =
+        observationGrid.find(c=>
+            c.x===x &&
+            c.y===y
+        );
+
+        if(neighbour)
+            result.push(neighbour);
+
+    });
+
+    return result;
+
+}
+
+
+
+// ===================================
+// INSPECT NEXT CATALOG PAGE
+// ===================================
+
+async function inspectCell(cell){
+
+
+    if(!activeDataset.nextPage)
+        return false;
+
+    try{ console.log(
+            "READING NEXT PAGE:",
+            activeDataset.nextPage
+        );
+
+
+        const res =
+        await fetch(activeDataset.nextPage);
+
+        const json =
+        await res.json();
+
+
+        // guardar siguiente página
+
+        activeDataset.nextPage =
+        json.links?.find(
+            l=>l.rel==="next"
+        )?.href || null;
+
+        if(
+            !json.features ||
+            json.features.length===0
+        ){
+
+            return false;
+
+        }
+
+        const before =
+        cell.items.length;
+
+        appendSpatialData(
+            json.features
+        );
+
+
+        return (
+            cell.items.length > before
+        );
+
+
+    }
+
+
+    catch(e){
+        console.log(
+            "PAGE ERROR",
+            e
+        );
+
+        return false;
+
+    }
+
+
+}
+
+  // ===================================
+// APPEND SPATIAL DATA
+// ===================================
+
+function appendSpatialData(items){
+
+    items.forEach(item=>{
+        let coords=null;
+
+
+        if(
+            item.geometry &&
+            item.geometry.type==="Point"
+        ){
+            coords =
+            item.geometry.coordinates;
+
+        }
+
+        if(
+            !coords &&
+            item.bbox
+        ){
+            coords=[
+
+                (item.bbox[0]+item.bbox[2])/2,
+                (item.bbox[1]+item.bbox[3])/2
+
+            ];
+        }
+
+
+
+        if(!coords) return;
+
+        const lon = coords[0];
+
+        const lat = coords[1];
+
+        const cell =
+        observationGrid.find(c=>
+
+            lat>=c.latMin &&
+            lat<c.latMax &&
+
+            lon>=c.lonMin &&
+            lon<c.lonMax
+
+
+        );
+
+
+
+        if(cell){
+
+            const exists =
+            cell.items.some(
+                x=>x.id===item.id
+            );
+
+
+            if(!exists){
+
+                // comprobar si era una celda vacía
+
+                const wasEmpty =
+                cell.items.length===0;
+                cell.items.push(item);
+                cell.state=0;
+
+
+                // nueva cobertura descubierta
+
+                if(wasEmpty){
+                    cell.discovered=true;
+                }
+
+            }
+
+        }
+
+    });
+
+
+}
+  
+</script>
+
+  <script>
+
+function loadJanusDataset(json){
+    if(!json) return;
+    renderDataset(json);
+}
+
+
+// ==========================================
+// RENDER DATASET
+// ==========================================
+
+function renderDataset(json){
+
+const info=json.CELL_INFO||{};
+const observations=json.OBSERVATIONS||[];
+
+
+document.getElementById("janusStatus").textContent=
+"Dataset Loaded";
+
+document.getElementById("count").textContent=
+observations.length;
+
+document.getElementById("cellId").textContent=
+info.id||"-";
+
+document.getElementById("latRange").textContent=
+info.latRange||"-";
+
+document.getElementById("lonRange").textContent=
+info.lonRange||"-";
+
+document.getElementById("cellState").textContent=
+info.state??"-";
+
+
+
+const totalAssets=
+observations.reduce((t,o)=>{
+
+return t+Object.keys(o.assets||{}).length;
+
+},0);
+
+
+document.getElementById("assetCount").textContent=
+totalAssets;
+
+
+const container=
+document.getElementById("observations");
+
+container.innerHTML="";
+
+
+observations.forEach((obs,index)=>{
+
+const assets=
+Object.keys(obs.assets||{}).length;
+
+
+
+const card=
+document.createElement("div");
+
+card.className="card";
+
+
+
+card.innerHTML=`
+
+<h2>Observation ${index+1}</h2>
+
+<div class="row">
+<div class="label">ID</div>
+<div class="value">${obs.id||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Collection</div>
+<div class="value">${obs.collection||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Datetime</div>
+<div class="value">${obs.properties?.datetime||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Assets</div>
+<div class="value">${assets}</div>
+</div>
+
+<div id="assets${index}"></div>
+
+<button onclick="toggleRaw(${index})">
+RAW JSON
+</button>
+
+<pre id="raw${index}" style="display:none"></pre>
+
+`;
+
+container.appendChild(card);
+
+document.getElementById("raw"+index).textContent=
+JSON.stringify(obs,null,2);
+
+renderAssets(obs,index);
+
+});
+
+}
+
+
+
+// ==========================================
+// RENDER ASSETS
+// ==========================================
+
+function renderAssets(obs,index){
+
+const box=
+document.getElementById("assets"+index);
+
+if(!obs.assets)
+return;
+
+
+
+Object.entries(obs.assets).forEach(([name,asset])=>{
+
+const div=
+document.createElement("div");
+
+div.className="asset";
+
+const type=asset.type||"Unknown";
+
+let html=`
+
+<div class="assetHeader">
+<div>
+
+<div class="assetName">${name}</div>
+<div class="assetType">${type}</div>
+
+</div>
+
+<a href="${asset.href}" target="_blank">
+Open
+</a>
+
+</div>
+
+`;
+
+
+
+if(type.startsWith("image/")){
+
+html+=`
+
+<img
+class="assetPreview"
+src="${asset.href}"
+loading="lazy"
+onclick="window.open('${asset.href}','_blank')"
+onerror="this.style.display='none';"
+>
+
+`;
+
+}
+
+
+div.innerHTML=html;
+box.appendChild(div);
+
+});
+
+}
+
+
+
+// ==========================================
+// RAW
+// ==========================================
+
+function toggleRaw(i){
+
+const pre=
+document.getElementById("raw"+i);
+
+pre.style.display=
+pre.style.display==="none"
+?
+"block"
+:
+"none";
+
+}
+
+
+    // ===============================
+// THEME TOGGLE
+// ===============================
+
+const themes = ["lunar", "terra"];
+
+let currentTheme = 0;
+
+document.documentElement.setAttribute("data-theme", themes[currentTheme]);
+document.getElementById("themeToggle").addEventListener("click", () => {
+    currentTheme = (currentTheme + 1) % themes.length;
+    const theme = themes[currentTheme];
+    document.documentElement.setAttribute("data-theme", theme);
+    document.getElementById("themeToggle").textContent =
+        theme === "lunar"
+            ? "🌙 LUNAR"
+            : "☀ TERRA";
+});
+
+</script>
+  
+</body>
+</html>
