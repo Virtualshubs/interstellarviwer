@@ -2883,7 +2883,10 @@ l=>l.rel==="items"
 
 
 
-// ===============================
+
+
+   
+ // ===============================
 // LOAD ITEMS
 // ===============================
 
@@ -2904,6 +2907,8 @@ document.getElementById("raw").textContent;
 const itemsMatch=
 rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
 
+let itemsJSON=null;
+
 if(itemsMatch){
 
 const itemsURL=
@@ -2922,7 +2927,7 @@ throw new Error(
 `HTTP ${itemsRes.status} ${itemsRes.statusText}`
 );
 
-const itemsJSON=
+itemsJSON=
 await itemsRes.json();
 
 if(
@@ -2960,8 +2965,43 @@ console.log(
 let referenceDate=null;
 
 
+// =================================
+// FEATURE COLLECTION RECIÉN OBTENIDA
+// =================================
+
+if(itemsJSON){
+
+const dates=
+itemsJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found"
+);
+
+}
+
+referenceDate=dates[0];
+
+console.log(
+"USING LATEST OBSERVATION FROM ITEMS:",
+referenceDate
+);
+
+}
+
+
 // misión terminada
-if(data.endDate){
+else if(data.endDate){
 
 referenceDate=data.endDate;
 
@@ -3100,6 +3140,10 @@ document.getElementById("status").textContent=
 
 }
 
+
+
+
+   
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
 // ===============================
