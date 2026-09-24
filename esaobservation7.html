@@ -2882,8 +2882,6 @@ l=>l.rel==="items"
 }
 
 
-
-
 // ===============================
 // LOAD ITEMS
 // ===============================
@@ -2899,25 +2897,21 @@ try{
 // EXPLOTAR COLLECTION → ITEMS
 // =================================
 
-const collectionJSON=
-JSON.parse(
-document.getElementById("raw").textContent
-);
+const rawText=
+document.getElementById("raw").textContent;
 
-const itemsLink=
-collectionJSON.links?.find(
-link=>link.rel==="items"
-);
+const itemsMatch=
+rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
 
 let itemsJSON=null;
 
-if(itemsLink?.href){
+if(itemsMatch){
 
 const itemsURL=
-itemsLink.href;
+itemsMatch[0];
 
 console.log(
-"ITEMS URL FOUND IN COLLECTION:",
+"ITEMS URL FOUND IN RAW:",
 itemsURL
 );
 
@@ -2961,142 +2955,33 @@ console.log(
 
 
 // =================================
-// DETERMINAR FECHA DE REFERENCIA
+// USAR FEATURE COLLECTION OBTENIDA
 // =================================
-
-let referenceDate=null;
-
-// =================================
-// SI ACABAMOS DE EXPLOTAR /ITEMS
-// USAR SUS OBSERVACIONES
-// =================================
-
-if(itemsJSON){
-
-const dates=
-itemsJSON.features
-.map(
-item=>item.properties?.datetime
-)
-.filter(Boolean)
-.sort(
-(a,b)=>
-new Date(b)-new Date(a)
-);
-
-if(!dates.length){
-
-throw new Error(
-"No datetime found in Items"
-);
-
-}
-
-referenceDate=dates[0];
-
-console.log(
-"USING LATEST OBSERVATION FROM ITEMS:",
-referenceDate
-);
-
-}
-
-// misión terminada
-else if(data.endDate){
-
-referenceDate=data.endDate;
-
-console.log(
-"USING DATASET END DATE:",
-referenceDate
-);
-
-}
-
-// misión activa
-else{
-
-const latestJSON=
-JSON.parse(
-document.getElementById("raw").textContent
-);
-
-if(
-!latestJSON.features ||
-latestJSON.features.length===0
-){
-
-throw new Error(
-"No latest observation"
-);
-
-}
-
-const dates=
-latestJSON.features
-.map(
-item=>item.properties?.datetime
-)
-.filter(Boolean)
-.sort(
-(a,b)=>
-new Date(b)-new Date(a)
-);
-
-if(!dates.length){
-
-throw new Error(
-"No datetime found"
-);
-
-}
-
-referenceDate=dates[0];
-
-console.log(
-"USING LATEST OBSERVATION:",
-referenceDate
-);
-
-}
-
-// =================================
-// LIMPIAR PRECISIÓN TEMPORAL
-// =================================
-
-referenceDate=
-referenceDate.replace(/\.\d+Z$/,"Z");
-
-// =================================
-// PEDIR VENTANA DE DATOS
-// =================================
-
-const url =
-`${data.items}?limit=2000&datetime=../${referenceDate}`;
-
-console.log(
-"ITEM QUERY:",
-url
-);
 
 let json=null;
 
-// =================================
-// INTENTO NORMAL — 2000 OBSERVACIONES
-// =================================
+if(itemsJSON){
 
-try{
+json=itemsJSON;
 
-const res =
-await fetch(url);
-
-if(!res.ok)
-throw new Error(
-`HTTP ${res.status} ${res.statusText}`
+console.log(
+"USING FEATURE COLLECTION FROM ITEMS"
 );
 
-json =
-await res.json();
+}
+
+
+// =================================
+// SI NO HAY ITEMS NUEVOS,
+// LEER FEATURE COLLECTION DESDE RAW
+// =================================
+
+else{
+
+json=
+JSON.parse(
+document.getElementById("raw").textContent
+);
 
 if(
 !json.features ||
@@ -3105,99 +2990,17 @@ json.features.length===0
 ){
 
 throw new Error(
-"Items query did not return FeatureCollection"
+"Raw JSON did not contain FeatureCollection"
 );
 
 }
 
 console.log(
-"ITEM QUERY SUCCESS:",
-json.features.length
+"USING FEATURE COLLECTION FROM RAW"
 );
 
 }
 
-// =================================
-// FALLBACK — PAGINACIÓN
-// =================================
-
-catch(e){
-
-console.log(
-"ITEM QUERY FAILED, USING PAGINATION:",
-e.message
-);
-
-const features=[];
-let pageURL=data.items;
-let numberMatched=0;
-
-while(
-pageURL &&
-features.length<2000
-){
-
-console.log(
-"ITEM PAGE:",
-pageURL
-);
-
-const pageRes=
-await fetch(pageURL);
-
-if(!pageRes.ok)
-throw new Error(
-`HTTP ${pageRes.status} ${pageRes.statusText}`
-);
-
-const page=
-await pageRes.json();
-
-if(
-!page.features ||
-!Array.isArray(page.features)
-){
-
-throw new Error(
-"Items endpoint did not return FeatureCollection"
-);
-
-}
-
-features.push(
-...page.features
-);
-
-numberMatched=
-page.numberMatched||
-page.context?.matched||
-numberMatched;
-
-console.log(
-"ITEMS ACCUMULATED:",
-features.length
-);
-
-pageURL=
-page.links?.find(
-l=>l.rel==="next"
-)?.href || null;
-
-}
-
-json={
-type:"FeatureCollection",
-features:features,
-numberMatched:numberMatched,
-numberReturned:features.length
-};
-
-console.log(
-"PAGINATED ITEMS:",
-json.features.length
-);
-
-}
 
 // =================================
 // GUARDAR PAGINACIÓN
@@ -3207,6 +3010,7 @@ activeDataset.nextPage =
 json.links?.find(
 l=>l.rel==="next"
 )?.href || null;
+
 
 // =================================
 // ORDENAR POR FECHA DESCENDENTE
@@ -3227,6 +3031,7 @@ a.properties?.datetime
 });
 
 }
+
 
 // =================================
 // CONTINUAR FLUJO NORMAL
@@ -3261,11 +3066,6 @@ document.getElementById("status").textContent=
 }
 
 }
-
-
-
-
-   
    
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
