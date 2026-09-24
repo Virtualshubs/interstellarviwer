@@ -2897,21 +2897,25 @@ try{
 // EXPLOTAR COLLECTION → ITEMS
 // =================================
 
-const rawText=
-document.getElementById("raw").textContent;
+const collectionJSON=
+JSON.parse(
+document.getElementById("raw").textContent
+);
 
-const itemsMatch=
-rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
+const itemsLink=
+collectionJSON.links?.find(
+link=>link.rel==="items"
+);
 
 let itemsJSON=null;
 
-if(itemsMatch){
+if(itemsLink?.href){
 
 const itemsURL=
-itemsMatch[0];
+itemsLink.href;
 
 console.log(
-"ITEMS URL FOUND IN RAW:",
+"ITEMS URL FOUND IN COLLECTION:",
 itemsURL
 );
 
@@ -2955,62 +2959,139 @@ console.log(
 
 
 // =================================
-// USAR FEATURE COLLECTION OBTENIDA
+// DETERMINAR FECHA DE REFERENCIA
 // =================================
 
-let json=null;
+let referenceDate=null;
+
+// =================================
+// SI ACABAMOS DE EXPLOTAR /ITEMS
+// USAR SUS OBSERVACIONES
+// =================================
 
 if(itemsJSON){
 
-json=itemsJSON;
+const dates=
+itemsJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
 
-console.log(
-"USING FEATURE COLLECTION FROM ITEMS"
+if(!dates.length){
+
+throw new Error(
+"No datetime found in Items"
 );
 
 }
 
+referenceDate=dates[0];
 
-// =================================
-// SI NO HAY ITEMS NUEVOS,
-// LEER FEATURE COLLECTION DESDE RAW
-// =================================
+console.log(
+"USING LATEST OBSERVATION FROM ITEMS:",
+referenceDate
+);
 
+}
+
+// misión terminada
+else if(data.endDate){
+
+referenceDate=data.endDate;
+
+console.log(
+"USING DATASET END DATE:",
+referenceDate
+);
+
+}
+
+// misión activa
 else{
 
-json=
+const latestJSON=
 JSON.parse(
 document.getElementById("raw").textContent
 );
 
 if(
-!json.features ||
-!Array.isArray(json.features) ||
-json.features.length===0
+!latestJSON.features ||
+latestJSON.features.length===0
 ){
 
 throw new Error(
-"Raw JSON did not contain FeatureCollection"
+"No latest observation"
 );
 
 }
+
+const dates=
+latestJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found"
+);
+
+}
+
+referenceDate=dates[0];
 
 console.log(
-"USING FEATURE COLLECTION FROM RAW"
+"USING LATEST OBSERVATION:",
+referenceDate
 );
 
 }
 
+// =================================
+// LIMPIAR PRECISIÓN TEMPORAL
+// =================================
+
+referenceDate=
+referenceDate.replace(/\.\d+Z$/,"Z");
 
 // =================================
-// GUARDAR PAGINACIÓN
+// PEDIR VENTANA DE DATOS
 // =================================
+
+const url =
+`${data.items}?limit=2000&datetime=../${referenceDate}`;
+
+console.log(
+"ITEM QUERY:",
+url
+);
+
+const res =
+await fetch(url);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const json =
+await res.json();
 
 activeDataset.nextPage =
 json.links?.find(
 l=>l.rel==="next"
 )?.href || null;
-
 
 // =================================
 // ORDENAR POR FECHA DESCENDENTE
@@ -3031,11 +3112,6 @@ a.properties?.datetime
 });
 
 }
-
-
-// =================================
-// CONTINUAR FLUJO NORMAL
-// =================================
 
 console.log(
 "ITEMS:",
