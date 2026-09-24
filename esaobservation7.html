@@ -2892,12 +2892,54 @@ async function loadItems(data){
 document.getElementById("status").textContent=
 "Reading dataset...";
 
+let recoveredItemsJSON=null;
+
 if(!data.items){
+
+const rawText=
+document.getElementById("raw").textContent;
+
+const itemsMatch=
+rawText.match(/https?:\/\/[^"\s]+\/items[^"\s]*/);
+
+if(!itemsMatch){
 
 document.getElementById("status").textContent=
 "Item error";
 
 return;
+
+}
+
+const itemsURL=
+itemsMatch[0];
+
+console.log(
+"ITEMS URL FOUND IN RAW:",
+itemsURL
+);
+
+const itemsRes=
+await fetch(itemsURL);
+
+if(!itemsRes.ok)
+throw new Error(
+`HTTP ${itemsRes.status} ${itemsRes.statusText}`
+);
+
+recoveredItemsJSON=
+await itemsRes.json();
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+recoveredItemsJSON,
+null,
+2
+);
+
+console.log(
+"RAW UPDATED WITH ITEMS JSON"
+);
 
 }
 
@@ -2914,18 +2956,72 @@ let referenceDate=null;
 // =================================
 
 
+if(recoveredItemsJSON){
+
+if(
+!recoveredItemsJSON.features ||
+recoveredItemsJSON.features.length===0
+){
+
+throw new Error(
+"No items found"
+);
+
+}
+
+const json=
+recoveredItemsJSON;
+
+activeDataset.nextPage =
+json.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+if(json.features){
+
+json.features.sort((a,b)=>{
+
+return new Date(
+b.properties.datetime
+)
+-
+new Date(
+a.properties.datetime
+);
+
+});
+
+}
+
+console.log(
+"ITEMS:",
+json
+);
+
+renderAvailableData(json);
+
+document.getElementById("status").textContent=
+`${json.numberMatched||json.features.length} products indexed`;
+
+return;
+
+}
+
+
+// =================================
+// FLUJO NORMAL EXISTENTE
+// =================================
+
+
 // misión terminada
 if(data.endDate){
 
-
 referenceDate=data.endDate;
-
 
 console.log(
 "USING DATASET END DATE:",
 referenceDate
 );
-
 
 }
 
@@ -2933,27 +3029,19 @@ referenceDate
 // misión activa
 else{
 
-
 const latestURL =
 `${data.items}?limit=1&sortby=-datetime`;
-
 
 console.log(
 "LATEST QUERY:",
 latestURL
 );
 
-
-
 const latestRes =
 await fetch(latestURL);
 
-
-
 const latestJSON =
 await latestRes.json();
-
-
 
 if(
 !latestJSON.features ||
@@ -2966,20 +3054,15 @@ throw new Error(
 
 }
 
-
-
 referenceDate =
 latestJSON.features[0]
 .properties
 .datetime;
 
-
-
 console.log(
 "USING LATEST OBSERVATION:",
 referenceDate
 );
-
 
 }
 
@@ -2989,18 +3072,13 @@ referenceDate
 // PEDIR VENTANA DE DATOS
 // =================================
 
-
 const url =
 `${data.items}?limit=2000&datetime=../${referenceDate}`;
-
-
 
 console.log(
 "ITEM QUERY:",
 url
 );
-
-
 
 const res =
 await fetch(url);
@@ -3010,16 +3088,13 @@ throw new Error(
 `HTTP ${res.status} ${res.statusText}`
 );
 
-
-
 const json =
 await res.json();
 
-  activeDataset.nextPage =
+activeDataset.nextPage =
 json.links?.find(
-    l=>l.rel==="next"
-  )?.href || null;
-
+l=>l.rel==="next"
+)?.href || null;
 
 
 
@@ -3027,12 +3102,9 @@ json.links?.find(
 // ORDENAR POR FECHA DESCENDENTE
 // =================================
 
-
 if(json.features){
 
-
 json.features.sort((a,b)=>{
-
 
 return new Date(
 b.properties.datetime
@@ -3042,24 +3114,16 @@ new Date(
 a.properties.datetime
 );
 
-
 });
 
-
 }
-
-
 
 console.log(
 "ITEMS:",
 json
 );
 
-
-
 renderAvailableData(json);
-
-
 
 document.getElementById("raw").textContent=
 JSON.stringify(
@@ -3068,12 +3132,8 @@ null,
 2
 );
 
-
-
 document.getElementById("status").textContent=
 `${json.numberMatched||json.features.length} products indexed`;
-
-
 
 }
 
@@ -3085,7 +3145,6 @@ document.getElementById("status").textContent=
 "Items error";
 
 }
-
 
 }
 
