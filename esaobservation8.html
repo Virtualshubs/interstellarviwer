@@ -9515,6 +9515,12 @@ obs.crs?.properties?.name||
 const resource3D=
 findObservation3D(obs);
 
+const resource3DText=
+resource3D.length
+?`YES — ${resource3D.join(", ")}`
+:"NO";
+
+
 container.innerHTML=`
 
 <div class="exploitationSection">
@@ -9609,7 +9615,7 @@ Array.isArray(properties.instruments)
 
 <div>
 <span>3D RESOURCE</span>
-<strong>${resource3D?"Available":"—"}</strong>
+<strong>${resource3DText}</strong>
 </div>
 
 </div>
