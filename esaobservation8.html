@@ -8406,7 +8406,7 @@ image
 
 
 // ==========================================
-// FIND 3D RESOURCE
+// FIND 3D RESOURCES
 // ==========================================
 
 function findObservation3D(obs){
@@ -8416,9 +8416,9 @@ const resources=[
 ...(obs.links||[])
 ];
 
+const found=[];
 
-return resources.find(
-resource=>{
+resources.forEach(resource=>{
 
 const href=
 (resource.href||"").toLowerCase();
@@ -8431,17 +8431,154 @@ const roles=
 .join(" ")
 .toLowerCase();
 
+const title=
+(resource.title||"").toLowerCase();
 
-return(
+
+// ==========================================
+// GLB
+// ==========================================
+
+if(
 /\.glb(\?|$)/i.test(href) ||
-/\.gltf(\?|$)/i.test(href) ||
-/model\/gltf/i.test(type) ||
-/model\/gltf-binary/i.test(type) ||
-/3d|model|spatial/i.test(roles)
-);
+type==="model/gltf-binary"
+){
+
+if(!found.includes("GLB"))
+found.push("GLB");
+
+return;
 
 }
-)||null;
+
+
+// ==========================================
+// GLTF
+// ==========================================
+
+if(
+/\.gltf(\?|$)/i.test(href) ||
+type==="model/gltf+json"
+){
+
+if(!found.includes("GLTF"))
+found.push("GLTF");
+
+return;
+
+}
+
+
+// ==========================================
+// 3D TILES
+// ==========================================
+
+if(
+/3dtiles/i.test(href) ||
+/3dtiles/i.test(type) ||
+/3d\s*tiles/i.test(roles) ||
+/3d\s*tiles/i.test(title)
+){
+
+if(!found.includes("3D TILES"))
+found.push("3D TILES");
+
+return;
+
+}
+
+
+// ==========================================
+// COPC
+// ==========================================
+
+if(
+/\.copc\.laz(\?|$)/i.test(href) ||
+/copc/i.test(type) ||
+/copc/i.test(roles) ||
+/copc/i.test(title)
+){
+
+if(!found.includes("COPC"))
+found.push("COPC");
+
+return;
+
+}
+
+
+// ==========================================
+// LAZ
+// ==========================================
+
+if(
+/\.laz(\?|$)/i.test(href) ||
+/laszip/i.test(type) ||
+/laz/i.test(type)
+){
+
+if(!found.includes("LAZ"))
+found.push("LAZ");
+
+return;
+
+}
+
+
+// ==========================================
+// LAS
+// ==========================================
+
+if(
+/\.las(\?|$)/i.test(href) ||
+/las/i.test(type)
+){
+
+if(!found.includes("LAS"))
+found.push("LAS");
+
+return;
+
+}
+
+
+// ==========================================
+// EPT
+// ==========================================
+
+if(
+/ept\.json(\?|$)/i.test(href) ||
+/ept/i.test(type) ||
+/ept/i.test(roles) ||
+/ept/i.test(title)
+){
+
+if(!found.includes("EPT"))
+found.push("EPT");
+
+return;
+
+}
+
+
+// ==========================================
+// POINT CLOUD
+// ==========================================
+
+if(
+/point[\s_-]*cloud/i.test(type) ||
+/point[\s_-]*cloud/i.test(roles) ||
+/point[\s_-]*cloud/i.test(title)
+){
+
+if(!found.includes("POINT CLOUD"))
+found.push("POINT CLOUD");
+
+}
+
+});
+
+return found;
 
 }
 
