@@ -1599,6 +1599,7 @@ font-size:12px;
 font-weight:600;
 
 cursor:pointer;
+
 }
 
 .exploitButton:hover{
@@ -1609,15 +1610,30 @@ background:#333;
 
 
 /* ==========================================
+   CENTRAL CONTAINER
+   ========================================== */
+
+#itemExploitation{
+
+width:100%;
+
+margin-top:24px;
+margin-bottom:24px;
+
+}
+
+
+/* ==========================================
    CONTAINER
    ========================================== */
 
 .exploitationContainer{
 
-margin-top:18px;
-padding-top:18px;
+width:100%;
 
 border-top:1px solid #ccc;
+
+padding-top:18px;
 
 }
 
@@ -1628,7 +1644,7 @@ border-top:1px solid #ccc;
 
 .exploitationHeader{
 
-margin-bottom:12px;
+margin-bottom:14px;
 
 }
 
@@ -1661,7 +1677,7 @@ word-break:break-all;
 position:relative;
 
 width:100%;
-min-height:300px;
+min-height:400px;
 
 background:#111;
 
@@ -1682,10 +1698,11 @@ justify-content:center;
 
 display:block;
 
-width:100%;
-height:auto;
-
+max-width:100%;
 max-height:600px;
+
+width:auto;
+height:auto;
 
 object-fit:contain;
 
@@ -1864,7 +1881,7 @@ Load
               
                 <div id="queryBox"></div>
 
-               
+               <div id="itemExploitation"></div>
 
 
                 <details>
@@ -6659,7 +6676,7 @@ exploitButton.textContent="EXPLOIT";
 
 exploitButton.onclick=()=>{
 
-exploitObservation(obs,index);
+exploitObservation(obs);
 
 };
 
@@ -6670,16 +6687,16 @@ box.appendChild(exploitButton);
 }
 
 
-     // ==========================================
+// ==========================================
 // EXPLOIT OBSERVATION
 // ==========================================
 
-function exploitObservation(obs,index){
+function exploitObservation(obs){
 
-const card=
-document.querySelectorAll(".card")[index];
+const container=
+document.getElementById("itemExploitation");
 
-if(!card)
+if(!container)
 return;
 
 
@@ -6687,23 +6704,20 @@ return;
 // REMOVE PREVIOUS EXPLOITATION
 // ==========================================
 
-const old=
-card.querySelector(".exploitationContainer");
-
-if(old)
-old.remove();
+container.innerHTML="";
 
 
 // ==========================================
 // CONTAINER
 // ==========================================
 
-const container=
+const exploitation=
 document.createElement("div");
 
-container.className="exploitationContainer";
+exploitation.className=
+"exploitationContainer";
 
-container.innerHTML=`
+exploitation.innerHTML=`
 
 <div class="exploitationHeader">
 
@@ -6727,7 +6741,7 @@ Loading observation...
 
 `;
 
-card.appendChild(container);
+container.appendChild(exploitation);
 
 
 // ==========================================
@@ -6750,7 +6764,9 @@ return type.startsWith("image/");
 // ==========================================
 
 const viewer=
-container.querySelector(".exploitationViewer");
+exploitation.querySelector(
+".exploitationViewer"
+);
 
 viewer.innerHTML="";
 
@@ -6854,14 +6870,22 @@ coords[0]+1,
 coords[1]+1
 ];
 
+const lonRange=
+bbox[2]-bbox[0];
+
+const latRange=
+bbox[3]-bbox[1];
+
 const x=
-((coords[0]-bbox[0])/
-(bbox[2]-bbox[0]))*1000;
+lonRange===0
+?500
+:((coords[0]-bbox[0])/lonRange)*1000;
 
 const y=
-600-
-((coords[1]-bbox[1])/
-(bbox[3]-bbox[1]))*600;
+latRange===0
+?300
+:600-
+((coords[1]-bbox[1])/latRange)*600;
 
 const circle=
 document.createElementNS(
@@ -6869,9 +6893,20 @@ document.createElementNS(
 "circle"
 );
 
-circle.setAttribute("cx",x);
-circle.setAttribute("cy",y);
-circle.setAttribute("r","8");
+circle.setAttribute(
+"cx",
+x
+);
+
+circle.setAttribute(
+"cy",
+y
+);
+
+circle.setAttribute(
+"r",
+"8"
+);
 
 circle.classList.add(
 "exploitationPoint"
@@ -6893,17 +6928,25 @@ const bbox=
 obs.bbox||
 getGeometryBBox(coordinates);
 
+const lonRange=
+bbox[2]-bbox[0];
+
+const latRange=
+bbox[3]-bbox[1];
+
 const points=
 coordinates.map(coord=>{
 
 const x=
-((coord[0]-bbox[0])/
-(bbox[2]-bbox[0]))*1000;
+lonRange===0
+?500
+:((coord[0]-bbox[0])/lonRange)*1000;
 
 const y=
-600-
-((coord[1]-bbox[1])/
-(bbox[3]-bbox[1]))*600;
+latRange===0
+?300
+:600-
+((coord[1]-bbox[1])/latRange)*600;
 
 return `${x},${y}`;
 
@@ -6972,8 +7015,6 @@ maxLat
 ];
 
 }
-
-
 
 // ==========================================
 // RAW
