@@ -6855,6 +6855,15 @@ renderAssets(obs,index);
 
 
 
+
+
+
+
+
+
+
+
+
 // ==========================================
 // RENDER ASSETS
 // ==========================================
@@ -6896,7 +6905,9 @@ Open
 `;
 
 
-if(type.startsWith("image/")){
+if(
+/^image\/(jpeg|jpg|png|webp|gif|svg\+xml)/i.test(type)
+){
 
 html+=`
 
@@ -6927,9 +6938,16 @@ const exploitable=
 !!obs.geometry ||
 !!obs.bbox ||
 Object.values(obs.assets||{}).some(asset=>
-(asset.type||"").startsWith("image/") ||
+/^image\//i.test(asset.type||"") ||
 /wms|wmts/i.test(asset.href||"") ||
-(asset.roles||[]).some(role=>/wms|wmts/i.test(role))
+(asset.roles||[]).some(role=>
+/wms|wmts|thumbnail|overview|visual/i.test(role)
+)
+) ||
+(obs.links||[]).some(link=>
+/wms|wmts|thumbnail|preview|overview/i.test(
+link.rel||""
+)
 );
 
 if(exploitable){
@@ -7049,42 +7067,6 @@ container.appendChild(exploitation);
 const extent=
 getObservationExtent(obs);
 
-if(!extent){
-
-exploitation.querySelector(
-".exploitationMapMessage"
-).textContent=
-"No geographic extent available.";
-
-return;
-
-}
-
-
-const lonMin=
-extent[0];
-
-const latMin=
-extent[1];
-
-const lonMax=
-extent[2];
-
-const latMax=
-extent[3];
-
-const lonRange=
-Math.max(
-lonMax-lonMin,
-0.000001
-);
-
-const latRange=
-Math.max(
-latMax-latMin,
-0.000001
-);
-
 
 // ==========================================
 // ELEMENTS
@@ -7153,6 +7135,96 @@ startPanX:0,
 startPanY:0
 
 };
+
+
+// ==========================================
+// VISUAL-ONLY MODE
+// ==========================================
+
+if(!extent){
+
+message.textContent=
+"Visual resource available — no geographic extent";
+
+
+const thumbnail=
+findObservationThumbnail(obs);
+
+const image=
+findObservationImage(obs);
+
+
+const visual=
+thumbnail||image;
+
+
+if(visual){
+
+addVisualImage(
+imageLayer,
+visual,
+()=>{
+
+message.textContent=
+"Visual resource loaded";
+
+}
+);
+
+}else{
+
+message.textContent=
+"No geographic extent or visual resource available.";
+
+}
+
+
+setupMapInteraction(
+map,
+exploitation,
+state,
+null,
+coordinates
+);
+
+renderExploitationData(
+data,
+obs,
+null
+);
+
+return;
+
+}
+
+
+// ==========================================
+// GEOGRAPHIC RANGE
+// ==========================================
+
+const lonMin=
+extent[0];
+
+const latMin=
+extent[1];
+
+const lonMax=
+extent[2];
+
+const latMax=
+extent[3];
+
+const lonRange=
+Math.max(
+lonMax-lonMin,
+0.000001
+);
+
+const latRange=
+Math.max(
+latMax-latMin,
+0.000001
+);
 
 
 // ==========================================
@@ -7556,91 +7628,15 @@ project
 
 
 // ==========================================
-// WMS
+// CONTENT RESOLUTION
 // ==========================================
 
-const wms=
-findObservationWMS(obs);
-
-if(wms){
-
-const wmsUrl=
-buildObservationWMS(
-wms,
+resolveObservationContent(
+obs,
 extent,
-obs
+imageLayer,
+message
 );
-
-if(wmsUrl){
-
-const wmsImage=
-document.createElementNS(
-"http://www.w3.org/2000/svg",
-"image"
-);
-
-wmsImage.setAttribute(
-"x",
-"0"
-);
-
-wmsImage.setAttribute(
-"y",
-"0"
-);
-
-wmsImage.setAttribute(
-"width",
-"1000"
-);
-
-wmsImage.setAttribute(
-"height",
-"600"
-);
-
-wmsImage.setAttribute(
-"preserveAspectRatio",
-"none"
-);
-
-wmsImage.setAttribute(
-"href",
-wmsUrl
-);
-
-wmsImage.classList.add(
-"exploitationWMSImage"
-);
-
-wmsImage.onload=()=>{
-
-message.textContent=
-"WMS loaded";
-
-};
-
-wmsImage.onerror=()=>{
-
-message.textContent=
-"Footprint loaded — WMS unavailable";
-
-wmsImage.remove();
-
-};
-
-imageLayer.appendChild(
-wmsImage
-);
-
-}
-
-}else{
-
-message.textContent=
-"Footprint loaded";
-
-}
 
 
 // ==========================================
@@ -7892,6 +7888,565 @@ applyMapTransform();
 
 
 // ==========================================
+// RESOLVE OBSERVATION CONTENT
+// ==========================================
+
+function resolveObservationContent(
+obs,
+extent,
+imageLayer,
+message
+){
+
+const wms=
+findObservationWMS(obs);
+
+
+if(wms){
+
+const wmsUrl=
+buildObservationWMS(
+wms,
+extent,
+obs
+);
+
+if(wmsUrl){
+
+const wmsImage=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+wmsImage.setAttribute(
+"x",
+"0"
+);
+
+wmsImage.setAttribute(
+"y",
+"0"
+);
+
+wmsImage.setAttribute(
+"width",
+"1000"
+);
+
+wmsImage.setAttribute(
+"height",
+"600"
+);
+
+wmsImage.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+wmsImage.setAttribute(
+"href",
+wmsUrl
+);
+
+wmsImage.classList.add(
+"exploitationWMSImage"
+);
+
+wmsImage.onload=()=>{
+
+message.textContent=
+"WMS loaded";
+
+};
+
+wmsImage.onerror=()=>{
+
+wmsImage.remove();
+
+resolveObservationVisualFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+};
+
+imageLayer.appendChild(
+wmsImage
+);
+
+return;
+
+}
+
+}
+
+
+resolveObservationVisualFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+}
+
+
+// ==========================================
+// VISUAL FALLBACK
+// ==========================================
+
+function resolveObservationVisualFallback(
+obs,
+extent,
+imageLayer,
+message
+){
+
+const image=
+findObservationImage(obs);
+
+if(image){
+
+addGeographicImage(
+imageLayer,
+image,
+()=>{
+
+message.textContent=
+"Image loaded";
+
+},
+()=>{
+
+resolveObservationThumbnailFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+}
+);
+
+return;
+
+}
+
+
+resolveObservationThumbnailFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+}
+
+
+// ==========================================
+// THUMBNAIL FALLBACK
+// ==========================================
+
+function resolveObservationThumbnailFallback(
+obs,
+extent,
+imageLayer,
+message
+){
+
+const thumbnail=
+findObservationThumbnail(obs);
+
+if(!thumbnail){
+
+message.textContent=
+"Footprint loaded — no visual resource available";
+
+return;
+
+}
+
+
+addGeographicImage(
+imageLayer,
+thumbnail,
+()=>{
+
+message.textContent=
+"Thumbnail loaded";
+
+},
+()=>{
+
+message.textContent=
+"Footprint loaded — thumbnail unavailable";
+
+}
+);
+
+}
+
+
+// ==========================================
+// FIND IMAGE
+// ==========================================
+
+function findObservationImage(obs){
+
+const assets=
+Object.values(
+obs.assets||{}
+);
+
+
+return assets.find(
+asset=>{
+
+const type=
+(asset.type||"").toLowerCase();
+
+const href=
+(asset.href||"").toLowerCase();
+
+if(
+!/^https?:\/\//i.test(
+asset.href||""
+)
+)
+return false;
+
+
+if(
+!/^image\/(jpeg|jpg|png|webp|gif|svg\+xml)/i.test(type)
+)
+return false;
+
+
+if(
+/thumbnail|preview|overview/i.test(
+asset.roles?.join(" ")||""
+)
+)
+return false;
+
+
+if(
+/thumbnail|preview|overview/i.test(
+asset.title||""
+)
+)
+return false;
+
+
+if(
+/\.tif(f)?(\?|$)/i.test(href)
+)
+return false;
+
+
+return true;
+
+}
+);
+
+}
+
+
+// ==========================================
+// FIND THUMBNAIL
+// ==========================================
+
+function findObservationThumbnail(obs){
+
+const links=
+obs.links||[];
+
+
+const thumbnailLink=
+links.find(
+link=>{
+
+const rel=
+(link.rel||"").toLowerCase();
+
+return(
+rel==="thumbnail" ||
+rel==="preview" ||
+rel==="overview"
+);
+
+}
+);
+
+if(
+thumbnailLink?.href
+){
+
+return{
+href:thumbnailLink.href,
+type:thumbnailLink.type||"image/jpeg",
+title:thumbnailLink.title||"Thumbnail"
+};
+
+}
+
+
+const assets=
+Object.values(
+obs.assets||{}
+);
+
+
+const thumbnailAsset=
+assets.find(
+asset=>{
+
+const roles=
+(asset.roles||[])
+.join(" ")
+.toLowerCase();
+
+const title=
+(asset.title||"").toLowerCase();
+
+const type=
+(asset.type||"").toLowerCase();
+
+return(
+roles.includes("thumbnail") ||
+roles.includes("overview") ||
+roles.includes("visual") ||
+title.includes("thumbnail") ||
+title.includes("preview") ||
+title.includes("overview")
+) &&
+/^https?:\/\//i.test(
+asset.href||""
+) &&
+(
+type.startsWith("image/") ||
+/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(
+asset.href||""
+)
+);
+
+}
+);
+
+if(
+thumbnailAsset
+)
+return thumbnailAsset;
+
+
+return null;
+
+}
+
+
+// ==========================================
+// ADD GEOGRAPHIC IMAGE
+// ==========================================
+
+function addGeographicImage(
+layer,
+resource,
+onload,
+onerror
+){
+
+if(
+!resource||
+!resource.href
+)
+return;
+
+
+const image=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+image.setAttribute(
+"x",
+"0"
+);
+
+image.setAttribute(
+"y",
+"0"
+);
+
+image.setAttribute(
+"width",
+"1000"
+);
+
+image.setAttribute(
+"height",
+"600"
+);
+
+image.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+image.setAttribute(
+"href",
+resource.href
+);
+
+image.classList.add(
+"exploitationContentImage"
+);
+
+image.onload=()=>{
+
+if(onload)
+onload();
+
+};
+
+image.onerror=()=>{
+
+image.remove();
+
+if(onerror)
+onerror();
+
+};
+
+layer.appendChild(
+image
+);
+
+}
+
+
+// ==========================================
+// ADD VISUAL IMAGE
+// ==========================================
+
+function addVisualImage(
+layer,
+resource,
+onload
+){
+
+if(
+!resource||
+!resource.href
+)
+return;
+
+
+const image=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+image.setAttribute(
+"x",
+"0"
+);
+
+image.setAttribute(
+"y",
+"0"
+);
+
+image.setAttribute(
+"width",
+"1000"
+);
+
+image.setAttribute(
+"height",
+"600"
+);
+
+image.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+image.setAttribute(
+"href",
+resource.href
+);
+
+image.classList.add(
+"exploitationVisualImage"
+);
+
+image.onload=()=>{
+
+if(onload)
+onload();
+
+};
+
+image.onerror=()=>{
+
+image.remove();
+
+};
+
+layer.appendChild(
+image
+);
+
+}
+
+
+// ==========================================
+// FIND 3D RESOURCE
+// ==========================================
+
+function findObservation3D(obs){
+
+const resources=[
+...Object.values(obs.assets||{}),
+...(obs.links||[])
+];
+
+
+return resources.find(
+resource=>{
+
+const href=
+(resource.href||"").toLowerCase();
+
+const type=
+(resource.type||"").toLowerCase();
+
+const roles=
+(resource.roles||[])
+.join(" ")
+.toLowerCase();
+
+
+return(
+/\.glb(\?|$)/i.test(href) ||
+/\.gltf(\?|$)/i.test(href) ||
+/model\/gltf/i.test(type) ||
+/model\/gltf-binary/i.test(type) ||
+/3d|model|spatial/i.test(roles)
+);
+
+}
+)||null;
+
+}
+
+
+// ==========================================
 // FIND WMS
 // ==========================================
 
@@ -7917,6 +8472,7 @@ const title=
 
 return(
 roles.includes("/wms#") ||
+roles.includes("wms") ||
 title.includes("getmap") ||
 (
 href.includes("service=wms")&&
@@ -7942,7 +8498,10 @@ candidate=>{
 const rel=
 (candidate.rel||"").toLowerCase();
 
-return rel==="wms";
+return(
+rel==="wms" ||
+rel==="wmts"
+);
 
 }
 );
@@ -7993,7 +8552,7 @@ obs.properties?.datetime||
 
 
 // ==========================================
-// ESA PLACEHOLDERS
+// PLACEHOLDERS
 // ==========================================
 
 url=
@@ -8064,7 +8623,7 @@ encodeURIComponent(time)
 
 
 // ==========================================
-// EXISTING WMS
+// EXISTING GETMAP
 // ==========================================
 
 if(
@@ -8141,6 +8700,173 @@ url+=
 "&transparent=true";
 
 return url;
+
+}
+
+
+// ==========================================
+// MAP INTERACTION
+// ==========================================
+
+function setupMapInteraction(
+map,
+exploitation,
+state,
+extent,
+coordinates
+){
+
+map.addEventListener(
+"wheel",
+event=>{
+
+event.preventDefault();
+
+const oldZoom=
+state.zoom;
+
+state.zoom=
+event.deltaY<0
+?Math.min(
+state.zoom*1.2,
+8
+)
+:Math.max(
+state.zoom/1.2,
+1
+);
+
+if(oldZoom!==state.zoom){
+
+const rect=
+map.getBoundingClientRect();
+
+const x=
+((event.clientX-rect.left)/
+rect.width)*1000;
+
+const y=
+((event.clientY-rect.top)/
+rect.height)*600;
+
+state.panX=
+x-
+(x-state.panX)*
+(state.zoom/oldZoom);
+
+state.panY=
+y-
+(y-state.panY)*
+(state.zoom/oldZoom);
+
+const layers=
+map.querySelectorAll(
+"g"
+);
+
+const transform=
+`translate(${state.panX} ${state.panY}) scale(${state.zoom})`;
+
+layers.forEach(
+layer=>
+layer.setAttribute(
+"transform",
+transform
+)
+);
+
+}
+
+},
+{passive:false}
+);
+
+
+map.addEventListener(
+"mousedown",
+event=>{
+
+state.dragging=true;
+
+state.startX=
+event.clientX;
+
+state.startY=
+event.clientY;
+
+state.startPanX=
+state.panX;
+
+state.startPanY=
+state.panY;
+
+map.classList.add(
+"dragging"
+);
+
+}
+);
+
+
+const stopDrag=()=>{
+
+state.dragging=false;
+
+map.classList.remove(
+"dragging"
+);
+
+};
+
+
+window.addEventListener(
+"mouseup",
+stopDrag
+);
+
+
+window.addEventListener(
+"mousemove",
+event=>{
+
+if(!state.dragging)
+return;
+
+const rect=
+map.getBoundingClientRect();
+
+const dx=
+((event.clientX-state.startX)/
+rect.width)*1000;
+
+const dy=
+((event.clientY-state.startY)/
+rect.height)*600;
+
+state.panX=
+state.startPanX+dx;
+
+state.panY=
+state.startPanY+dy;
+
+const layers=
+map.querySelectorAll(
+"g"
+);
+
+const transform=
+`translate(${state.panX} ${state.panY}) scale(${state.zoom})`;
+
+layers.forEach(
+layer=>
+layer.setAttribute(
+"transform",
+transform
+)
+);
+
+}
+);
 
 }
 
@@ -8576,6 +9302,66 @@ extent
 const properties=
 obs.properties||{};
 
+
+if(!extent){
+
+container.innerHTML=`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+SPATIAL DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>EXTENT</span>
+<strong>
+Not available
+</strong>
+</div>
+
+<div>
+<span>GEOMETRY</span>
+<strong>
+${obs.geometry?.type||"—"}
+</strong>
+</div>
+
+</div>
+
+</div>
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+ITEM DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>COLLECTION</span>
+<strong>${obs.collection||"—"}</strong>
+</div>
+
+<div>
+<span>DATETIME</span>
+<strong>${properties.datetime||"—"}</strong>
+</div>
+
+</div>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
 const centerLon=
 (extent[0]+extent[2])/2;
 
@@ -8584,9 +9370,13 @@ const centerLat=
 
 const crs=
 properties["proj:code"]||
+properties["proj:epsg"]||
 obs.crs?.properties?.name||
 "EPSG:4326";
 
+
+const resource3D=
+findObservation3D(obs);
 
 container.innerHTML=`
 
@@ -8678,6 +9468,11 @@ Array.isArray(properties.instruments)
 <div>
 <span>PROCESSING</span>
 <strong>${properties["processing:level"]||"—"}</strong>
+</div>
+
+<div>
+<span>3D RESOURCE</span>
+<strong>${resource3D?"Available":"—"}</strong>
 </div>
 
 </div>
