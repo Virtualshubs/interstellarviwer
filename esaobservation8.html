@@ -1579,6 +1579,175 @@ cursor:pointer;
 border-color:rgba(0,0,0,.3);
 color:#000;
 }
+
+
+
+/* ==========================================
+   EXPLOITATION
+   ========================================== */
+
+.exploitButton{
+
+margin-top:12px;
+padding:8px 14px;
+
+border:1px solid #999;
+background:#111;
+color:#fff;
+
+font-size:12px;
+font-weight:600;
+
+cursor:pointer;
+}
+
+.exploitButton:hover{
+
+background:#333;
+
+}
+
+
+/* ==========================================
+   CONTAINER
+   ========================================== */
+
+.exploitationContainer{
+
+margin-top:18px;
+padding-top:18px;
+
+border-top:1px solid #ccc;
+
+}
+
+
+/* ==========================================
+   HEADER
+   ========================================== */
+
+.exploitationHeader{
+
+margin-bottom:12px;
+
+}
+
+.exploitationTitle{
+
+font-size:13px;
+font-weight:700;
+letter-spacing:.08em;
+
+}
+
+.exploitationInfo{
+
+margin-top:4px;
+
+font-size:11px;
+opacity:.65;
+
+word-break:break-all;
+
+}
+
+
+/* ==========================================
+   VIEWER
+   ========================================== */
+
+.exploitationViewer{
+
+position:relative;
+
+width:100%;
+min-height:300px;
+
+background:#111;
+
+overflow:hidden;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+
+/* ==========================================
+   IMAGE
+   ========================================== */
+
+.exploitationImage{
+
+display:block;
+
+width:100%;
+height:auto;
+
+max-height:600px;
+
+object-fit:contain;
+
+}
+
+
+/* ==========================================
+   FOOTPRINT
+   ========================================== */
+
+.exploitationFootprint{
+
+position:absolute;
+
+inset:0;
+
+width:100%;
+height:100%;
+
+pointer-events:none;
+
+}
+
+.exploitationPolygon{
+
+fill:rgba(255,255,255,.12);
+
+stroke:#fff;
+
+stroke-width:3;
+
+vector-effect:non-scaling-stroke;
+
+}
+
+.exploitationPoint{
+
+fill:#fff;
+
+stroke:#111;
+
+stroke-width:3;
+
+}
+
+
+/* ==========================================
+   EMPTY
+   ========================================== */
+
+.exploitationEmpty{
+
+padding:40px;
+
+font-size:13px;
+
+opacity:.7;
+
+}
+
+   
+   
    
 </style>
 </head>
@@ -6418,7 +6587,6 @@ if(!obs.assets)
 return;
 
 
-
 Object.entries(obs.assets).forEach(([name,asset])=>{
 
 const div=
@@ -6447,7 +6615,6 @@ Open
 `;
 
 
-
 if(type.startsWith("image/")){
 
 html+=`
@@ -6469,6 +6636,340 @@ div.innerHTML=html;
 box.appendChild(div);
 
 });
+
+
+// ==========================================
+// EXPLOIT BUTTON
+// ==========================================
+
+const exploitable=
+!!obs.geometry ||
+!!obs.bbox ||
+Object.values(obs.assets||{}).some(asset=>
+(asset.type||"").startsWith("image/")
+);
+
+if(exploitable){
+
+const exploitButton=
+document.createElement("button");
+
+exploitButton.className="exploitButton";
+exploitButton.textContent="EXPLOIT";
+
+exploitButton.onclick=()=>{
+
+exploitObservation(obs,index);
+
+};
+
+box.appendChild(exploitButton);
+
+}
+
+}
+
+
+     // ==========================================
+// EXPLOIT OBSERVATION
+// ==========================================
+
+function exploitObservation(obs,index){
+
+const card=
+document.querySelectorAll(".card")[index];
+
+if(!card)
+return;
+
+
+// ==========================================
+// REMOVE PREVIOUS EXPLOITATION
+// ==========================================
+
+const old=
+card.querySelector(".exploitationContainer");
+
+if(old)
+old.remove();
+
+
+// ==========================================
+// CONTAINER
+// ==========================================
+
+const container=
+document.createElement("div");
+
+container.className="exploitationContainer";
+
+container.innerHTML=`
+
+<div class="exploitationHeader">
+
+<div class="exploitationTitle">
+ITEM EXPLOITATION
+</div>
+
+<div class="exploitationInfo">
+${obs.id||"Observation"}
+</div>
+
+</div>
+
+<div class="exploitationViewer">
+
+<div class="exploitationMessage">
+Loading observation...
+</div>
+
+</div>
+
+`;
+
+card.appendChild(container);
+
+
+// ==========================================
+// FIND IMAGE
+// ==========================================
+
+const imageAsset=
+Object.values(obs.assets||{}).find(asset=>{
+
+const type=
+(asset.type||"").toLowerCase();
+
+return type.startsWith("image/");
+
+});
+
+
+// ==========================================
+// VIEWER
+// ==========================================
+
+const viewer=
+container.querySelector(".exploitationViewer");
+
+viewer.innerHTML="";
+
+
+if(imageAsset){
+
+const image=
+document.createElement("img");
+
+image.className=
+"exploitationImage";
+
+image.src=
+imageAsset.href;
+
+image.alt=
+obs.id||"Observation";
+
+image.loading=
+"lazy";
+
+image.onerror=()=>{
+
+image.remove();
+
+showExploitationFootprint(
+viewer,
+obs
+);
+
+};
+
+viewer.appendChild(image);
+
+}else{
+
+showExploitationFootprint(
+viewer,
+obs
+);
+
+}
+
+}
+
+
+// ==========================================
+// FOOTPRINT
+// ==========================================
+
+function showExploitationFootprint(viewer,obs){
+
+if(!obs.geometry){
+
+viewer.innerHTML=`
+
+<div class="exploitationEmpty">
+No image or geometry available.
+</div>
+
+`;
+
+return;
+}
+
+
+const geometry=
+obs.geometry;
+
+const svg=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"svg"
+);
+
+svg.classList.add(
+"exploitationFootprint"
+);
+
+svg.setAttribute(
+"viewBox",
+"0 0 1000 600"
+);
+
+svg.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+
+if(geometry.type==="Point"){
+
+const coords=
+geometry.coordinates;
+
+const bbox=
+obs.bbox||[
+coords[0]-1,
+coords[1]-1,
+coords[0]+1,
+coords[1]+1
+];
+
+const x=
+((coords[0]-bbox[0])/
+(bbox[2]-bbox[0]))*1000;
+
+const y=
+600-
+((coords[1]-bbox[1])/
+(bbox[3]-bbox[1]))*600;
+
+const circle=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"circle"
+);
+
+circle.setAttribute("cx",x);
+circle.setAttribute("cy",y);
+circle.setAttribute("r","8");
+
+circle.classList.add(
+"exploitationPoint"
+);
+
+svg.appendChild(circle);
+
+}
+
+
+if(geometry.type==="Polygon"){
+
+const coordinates=
+geometry.coordinates?.[0];
+
+if(coordinates&&coordinates.length){
+
+const bbox=
+obs.bbox||
+getGeometryBBox(coordinates);
+
+const points=
+coordinates.map(coord=>{
+
+const x=
+((coord[0]-bbox[0])/
+(bbox[2]-bbox[0]))*1000;
+
+const y=
+600-
+((coord[1]-bbox[1])/
+(bbox[3]-bbox[1]))*600;
+
+return `${x},${y}`;
+
+}).join(" ");
+
+
+const polygon=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"polygon"
+);
+
+polygon.setAttribute(
+"points",
+points
+);
+
+polygon.classList.add(
+"exploitationPolygon"
+);
+
+svg.appendChild(polygon);
+
+}
+
+}
+
+
+viewer.appendChild(svg);
+
+}
+
+
+// ==========================================
+// GEOMETRY BBOX
+// ==========================================
+
+function getGeometryBBox(coords){
+
+let minLon=Infinity;
+let minLat=Infinity;
+let maxLon=-Infinity;
+let maxLat=-Infinity;
+
+coords.forEach(coord=>{
+
+minLon=
+Math.min(minLon,coord[0]);
+
+minLat=
+Math.min(minLat,coord[1]);
+
+maxLon=
+Math.max(maxLon,coord[0]);
+
+maxLat=
+Math.max(maxLat,coord[1]);
+
+});
+
+return[
+minLon,
+minLat,
+maxLon,
+maxLat
+];
 
 }
 
