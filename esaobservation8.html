@@ -6591,6 +6591,8 @@ renderAssets(obs,index);
 
 
 
+
+
 // ==========================================
 // RENDER ASSETS
 // ==========================================
@@ -6663,7 +6665,8 @@ const exploitable=
 !!obs.geometry ||
 !!obs.bbox ||
 Object.values(obs.assets||{}).some(asset=>
-(asset.type||"").startsWith("image/")
+(asset.type||"").startsWith("image/") ||
+/wms|wmts/i.test(asset.href||"")
 );
 
 if(exploitable){
@@ -6731,13 +6734,53 @@ ${obs.id||"Observation"}
 
 </div>
 
-<div class="exploitationViewer">
+<div class="exploitationControls">
 
-<div class="exploitationMessage">
-Loading observation...
+<button type="button" data-action="zoomIn">
++
+</button>
+
+<button type="button" data-action="zoomOut">
+−
+</button>
+
+<button type="button" data-action="reset">
+RESET
+</button>
+
+<span class="exploitationCoordinates">
+Lon: — | Lat: —
+</span>
+
+</div>
+
+<div class="exploitationMap">
+
+<svg
+class="exploitationMapSvg"
+viewBox="0 0 1000 600"
+preserveAspectRatio="none"
+>
+
+<g class="exploitationWorld"></g>
+
+<g class="exploitationImageLayer"></g>
+
+<g class="exploitationGridLayer"></g>
+
+<g class="exploitationBBoxLayer"></g>
+
+<g class="exploitationFootprintLayer"></g>
+
+</svg>
+
+<div class="exploitationMapMessage">
+Loading...
 </div>
 
 </div>
+
+<div class="exploitationData"></div>
 
 `;
 
@@ -6745,11 +6788,857 @@ container.appendChild(exploitation);
 
 
 // ==========================================
-// FIND IMAGE
+// GEOGRAPHIC EXTENT
 // ==========================================
 
+const extent=
+getObservationExtent(obs);
+
+if(!extent){
+
+exploitation.querySelector(
+".exploitationMapMessage"
+).textContent=
+"No geographic extent available.";
+
+return;
+
+}
+
+
+const map=
+exploitation.querySelector(
+".exploitationMapSvg"
+);
+
+const world=
+exploitation.querySelector(
+".exploitationWorld"
+);
+
+const imageLayer=
+exploitation.querySelector(
+".exploitationImageLayer"
+);
+
+const gridLayer=
+exploitation.querySelector(
+".exploitationGridLayer"
+);
+
+const bboxLayer=
+exploitation.querySelector(
+".exploitationBBoxLayer"
+);
+
+const footprintLayer=
+exploitation.querySelector(
+".exploitationFootprintLayer"
+);
+
+const message=
+exploitation.querySelector(
+".exploitationMapMessage"
+);
+
+const coordinates=
+exploitation.querySelector(
+".exploitationCoordinates"
+);
+
+const data=
+exploitation.querySelector(
+".exploitationData"
+);
+
+
+// ==========================================
+// MAP STATE
+// ==========================================
+
+const state={
+
+zoom:1,
+panX:0,
+panY:0,
+
+dragging:false,
+startX:0,
+startY:0,
+startPanX:0,
+startPanY:0
+
+};
+
+
+// ==========================================
+// GEOGRAPHIC TRANSFORM
+// ==========================================
+
+const lonMin=
+extent[0];
+
+const latMin=
+extent[1];
+
+const lonMax=
+extent[2];
+
+const latMax=
+extent[3];
+
+const lonRange=
+Math.max(
+lonMax-lonMin,
+0.000001
+);
+
+const latRange=
+Math.max(
+latMax-latMin,
+0.000001
+);
+
+
+function project(lon,lat){
+
+return{
+
+x:
+((lon-lonMin)/lonRange)*1000,
+
+y:
+600-
+((lat-latMin)/latRange)*600
+
+};
+
+}
+
+
+// ==========================================
+// MAP TRANSFORM
+// ==========================================
+
+function applyMapTransform(){
+
+const transform=
+`translate(${state.panX} ${state.panY}) scale(${state.zoom})`;
+
+world.setAttribute(
+"transform",
+transform
+);
+
+imageLayer.setAttribute(
+"transform",
+transform
+);
+
+gridLayer.setAttribute(
+"transform",
+transform
+);
+
+bboxLayer.setAttribute(
+"transform",
+transform
+);
+
+footprintLayer.setAttribute(
+"transform",
+transform
+);
+
+}
+
+
+// ==========================================
+// WORLD BACKGROUND
+// ==========================================
+
+const background=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"rect"
+);
+
+background.setAttribute(
+"x",
+"0"
+);
+
+background.setAttribute(
+"y",
+"0"
+);
+
+background.setAttribute(
+"width",
+"1000"
+);
+
+background.setAttribute(
+"height",
+"600"
+);
+
+background.setAttribute(
+"class",
+"exploitationMapBackground"
+);
+
+world.appendChild(background);
+
+
+// ==========================================
+// GRID
+// ==========================================
+
+function drawGrid(){
+
+gridLayer.innerHTML="";
+
+const lonStep=
+getGridStep(lonRange);
+
+const latStep=
+getGridStep(latRange);
+
+
+let lonStart=
+Math.ceil(lonMin/lonStep)*lonStep;
+
+for(
+let lon=lonStart;
+lon<=lonMax;
+lon+=lonStep
+){
+
+const p1=
+project(lon,latMin);
+
+const p2=
+project(lon,latMax);
+
+const line=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"line"
+);
+
+line.setAttribute(
+"x1",
+p1.x
+);
+
+line.setAttribute(
+"y1",
+p1.y
+);
+
+line.setAttribute(
+"x2",
+p2.x
+);
+
+line.setAttribute(
+"y2",
+p2.y
+);
+
+line.classList.add(
+"exploitationGrid"
+);
+
+gridLayer.appendChild(line);
+
+
+const label=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"text"
+);
+
+label.setAttribute(
+"x",
+p1.x+5
+);
+
+label.setAttribute(
+"y",
+20
+);
+
+label.classList.add(
+"exploitationGridLabel"
+);
+
+label.textContent=
+formatCoordinate(lon,true);
+
+gridLayer.appendChild(label);
+
+}
+
+
+let latStart=
+Math.ceil(latMin/latStep)*latStep;
+
+for(
+let lat=latStart;
+lat<=latMax;
+lat+=latStep
+){
+
+const p1=
+project(lonMin,lat);
+
+const p2=
+project(lonMax,lat);
+
+const line=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"line"
+);
+
+line.setAttribute(
+"x1",
+p1.x
+);
+
+line.setAttribute(
+"y1",
+p1.y
+);
+
+line.setAttribute(
+"x2",
+p2.x
+);
+
+line.setAttribute(
+"y2",
+p2.y
+);
+
+line.classList.add(
+"exploitationGrid"
+);
+
+gridLayer.appendChild(line);
+
+
+const label=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"text"
+);
+
+label.setAttribute(
+"x",
+"8"
+);
+
+label.setAttribute(
+"y",
+p1.y-6
+);
+
+label.classList.add(
+"exploitationGridLabel"
+);
+
+label.textContent=
+formatCoordinate(lat,false);
+
+gridLayer.appendChild(label);
+
+}
+
+}
+
+
+function getGridStep(range){
+
+if(range>120)
+return 20;
+
+if(range>60)
+return 10;
+
+if(range>30)
+return 5;
+
+if(range>10)
+return 2;
+
+if(range>5)
+return 1;
+
+if(range>2)
+return 0.5;
+
+if(range>1)
+return 0.2;
+
+if(range>0.5)
+return 0.1;
+
+return 0.05;
+
+}
+
+
+function formatCoordinate(value,longitude){
+
+const suffix=
+longitude
+?value>=0?"E":"W"
+:value>=0?"N":"S";
+
+return(
+Math.abs(value).toFixed(2)+
+"°"+
+suffix
+);
+
+}
+
+
+drawGrid();
+
+
+// ==========================================
+// BBOX
+// ==========================================
+
+const bboxRect=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"rect"
+);
+
+bboxRect.setAttribute(
+"x",
+"0"
+);
+
+bboxRect.setAttribute(
+"y",
+"0"
+);
+
+bboxRect.setAttribute(
+"width",
+"1000"
+);
+
+bboxRect.setAttribute(
+"height",
+"600"
+);
+
+bboxRect.classList.add(
+"exploitationBBox"
+);
+
+bboxLayer.appendChild(
+bboxRect
+);
+
+
+// ==========================================
+// FOOTPRINT
+// ==========================================
+
+drawObservationGeometry(
+footprintLayer,
+obs,
+project
+);
+
+
+// ==========================================
+// WMS / IMAGE
+// ==========================================
+
+const wmsAsset=
+findWMSAsset(obs);
+
 const imageAsset=
-Object.values(obs.assets||{}).find(asset=>{
+findImageAsset(obs);
+
+
+if(wmsAsset){
+
+const wmsUrl=
+buildWMSUrl(
+wmsAsset.href,
+extent,
+obs
+);
+
+if(wmsUrl){
+
+const image=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+image.setAttribute(
+"x",
+"0"
+);
+
+image.setAttribute(
+"y",
+"0"
+);
+
+image.setAttribute(
+"width",
+"1000"
+);
+
+image.setAttribute(
+"height",
+"600"
+);
+
+image.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+image.setAttribute(
+"href",
+wmsUrl
+);
+
+image.classList.add(
+"exploitationMapImage"
+);
+
+image.onerror=()=>{
+
+image.remove();
+
+if(imageAsset){
+
+addImageAsset(
+imageLayer,
+imageAsset,
+extent
+);
+
+}
+
+message.textContent=
+"Footprint loaded";
+
+};
+
+image.onload=()=>{
+
+message.textContent=
+"WMS loaded";
+
+};
+
+imageLayer.appendChild(
+image
+);
+
+}else if(imageAsset){
+
+addImageAsset(
+imageLayer,
+imageAsset,
+extent
+);
+
+message.textContent=
+"Footprint loaded";
+
+}else{
+
+message.textContent=
+"Footprint loaded";
+
+}
+
+}else if(imageAsset){
+
+addImageAsset(
+imageLayer,
+imageAsset,
+extent
+);
+
+message.textContent=
+"Image loaded";
+
+}else{
+
+message.textContent=
+"Footprint loaded";
+
+}
+
+
+// ==========================================
+// MAP INTERACTION
+// ==========================================
+
+map.addEventListener(
+"wheel",
+event=>{
+
+event.preventDefault();
+
+const oldZoom=
+state.zoom;
+
+state.zoom=
+event.deltaY<0
+?Math.min(
+state.zoom*1.2,
+8
+)
+:Math.max(
+state.zoom/1.2,
+1
+);
+
+if(oldZoom!==state.zoom){
+
+const rect=
+map.getBoundingClientRect();
+
+const x=
+((event.clientX-rect.left)/
+rect.width)*1000;
+
+const y=
+((event.clientY-rect.top)/
+rect.height)*600;
+
+state.panX=
+x-
+(x-state.panX)*
+(state.zoom/oldZoom);
+
+state.panY=
+y-
+(y-state.panY)*
+(state.zoom/oldZoom);
+
+applyMapTransform();
+
+}
+
+},
+{passive:false}
+);
+
+
+map.addEventListener(
+"mousedown",
+event=>{
+
+state.dragging=true;
+
+state.startX=
+event.clientX;
+
+state.startY=
+event.clientY;
+
+state.startPanX=
+state.panX;
+
+state.startPanY=
+state.panY;
+
+map.classList.add(
+"dragging"
+);
+
+}
+);
+
+
+window.addEventListener(
+"mousemove",
+event=>{
+
+if(!state.dragging)
+return;
+
+const rect=
+map.getBoundingClientRect();
+
+const dx=
+((event.clientX-state.startX)/
+rect.width)*1000;
+
+const dy=
+((event.clientY-state.startY)/
+rect.height)*600;
+
+state.panX=
+state.startPanX+dx;
+
+state.panY=
+state.startPanY+dy;
+
+applyMapTransform();
+
+}
+);
+
+
+window.addEventListener(
+"mouseup",
+()=>{
+
+state.dragging=false;
+
+map.classList.remove(
+"dragging"
+);
+
+}
+);
+
+
+// ==========================================
+// CURSOR COORDINATES
+// ==========================================
+
+map.addEventListener(
+"mousemove",
+event=>{
+
+const rect=
+map.getBoundingClientRect();
+
+const sx=
+((event.clientX-rect.left)/
+rect.width)*1000;
+
+const sy=
+((event.clientY-rect.top)/
+rect.height)*600;
+
+const x=
+(sx-state.panX)/state.zoom;
+
+const y=
+(sy-state.panY)/state.zoom;
+
+const lon=
+lonMin+
+(x/1000)*lonRange;
+
+const lat=
+latMin+
+((600-y)/600)*latRange;
+
+coordinates.textContent=
+`Lon: ${lon.toFixed(5)} | Lat: ${lat.toFixed(5)}`;
+
+}
+);
+
+
+// ==========================================
+// CONTROLS
+// ==========================================
+
+exploitation
+.querySelector(
+'[data-action="zoomIn"]'
+)
+.onclick=()=>{
+
+state.zoom=
+Math.min(
+state.zoom*1.4,
+8
+);
+
+applyMapTransform();
+
+};
+
+
+exploitation
+.querySelector(
+'[data-action="zoomOut"]'
+)
+.onclick=()=>{
+
+state.zoom=
+Math.max(
+state.zoom/1.4,
+1
+);
+
+if(state.zoom===1){
+
+state.panX=0;
+state.panY=0;
+
+}
+
+applyMapTransform();
+
+};
+
+
+exploitation
+.querySelector(
+'[data-action="reset"]'
+)
+.onclick=()=>{
+
+state.zoom=1;
+state.panX=0;
+state.panY=0;
+
+applyMapTransform();
+
+};
+
+
+// ==========================================
+// DATA PANEL
+// ==========================================
+
+renderExploitationData(
+data,
+obs,
+extent
+);
+
+applyMapTransform();
+
+}
+
+
+// ==========================================
+// FIND IMAGE ASSET
+// ==========================================
+
+function findImageAsset(obs){
+
+return Object.values(
+obs.assets||{}
+).find(asset=>{
 
 const type=
 (asset.type||"").toLowerCase();
@@ -6758,134 +7647,292 @@ return type.startsWith("image/");
 
 });
 
+}
+
 
 // ==========================================
-// VIEWER
+// FIND WMS ASSET
 // ==========================================
 
-const viewer=
-exploitation.querySelector(
-".exploitationViewer"
+function findWMSAsset(obs){
+
+const assets=
+Object.values(
+obs.assets||{}
 );
 
-viewer.innerHTML="";
+const direct=
+assets.find(asset=>{
+
+const href=
+(asset.href||"").toLowerCase();
+
+return(
+href.includes("request=getmap") ||
+href.includes("service=wms")
+);
+
+});
+
+if(direct)
+return direct;
 
 
-if(imageAsset){
+return assets.find(asset=>{
+
+const href=
+(asset.href||"").toLowerCase();
+
+const title=
+(asset.title||"").toLowerCase();
+
+const roles=
+(asset.roles||[]).join(" ").toLowerCase();
+
+return(
+href.includes("wms") ||
+title.includes("wms") ||
+roles.includes("wms")
+);
+
+});
+
+}
+
+
+// ==========================================
+// BUILD WMS URL
+// ==========================================
+
+function buildWMSUrl(href,extent,obs){
+
+if(!href)
+return null;
+
+let url=
+href;
+
+const bbox=
+extent.join(",");
+
+const width=
+1200;
+
+const height=
+720;
+
+
+// ==========================================
+// TEMPLATE PARAMETERS
+// ==========================================
+
+url=
+url.replace(
+/\{bbox\}/gi,
+bbox
+);
+
+url=
+url.replace(
+/\{width\}/gi,
+String(width)
+);
+
+url=
+url.replace(
+/\{height\}/gi,
+String(height)
+);
+
+url=
+url.replace(
+/\{crs\}/gi,
+"EPSG:4326"
+);
+
+url=
+url.replace(
+/\{srs\}/gi,
+"EPSG:4326"
+);
+
+url=
+url.replace(
+/\{time\}/gi,
+encodeURIComponent(
+obs.properties?.datetime||""
+)
+);
+
+
+// ==========================================
+// GETMAP PARAMETERS
+// ==========================================
+
+const hasGetMap=
+/request=getmap/i.test(url);
+
+if(!hasGetMap){
+
+url+=
+(url.includes("?")?"&":"?")+
+"service=WMS"+
+"&request=GetMap"+
+"&version=1.3.0"+
+"&crs=EPSG:4326"+
+"&bbox="+encodeURIComponent(bbox)+
+"&width="+width+
+"&height="+height+
+"&format=image/png"+
+"&transparent=true";
+
+}
+
+
+// ==========================================
+// BBOX PARAMETER ALREADY PRESENT
+// ==========================================
+
+if(
+!/[?&]bbox=/i.test(url)
+){
+
+url+=
+"&bbox="+
+encodeURIComponent(bbox);
+
+}
+
+if(
+!/[?&](crs|srs)=/i.test(url)
+){
+
+url+=
+"&crs=EPSG:4326";
+
+}
+
+if(
+!/[?&]width=/i.test(url)
+){
+
+url+=
+"&width="+width;
+
+}
+
+if(
+!/[?&]height=/i.test(url)
+){
+
+url+=
+"&height="+height;
+
+}
+
+if(
+!/[?&]format=/i.test(url)
+){
+
+url+=
+"&format=image/png";
+
+}
+
+return url;
+
+}
+
+
+// ==========================================
+// ADD IMAGE AS GEOGRAPHIC RESOURCE
+// ==========================================
+
+function addImageAsset(layer,asset,extent){
+
+if(!asset||!asset.href)
+return;
 
 const image=
-document.createElement("img");
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
 
-image.className=
-"exploitationImage";
+image.setAttribute(
+"x",
+"0"
+);
 
-image.src=
-imageAsset.href;
+image.setAttribute(
+"y",
+"0"
+);
 
-image.alt=
-obs.id||"Observation";
+image.setAttribute(
+"width",
+"1000"
+);
 
-image.loading=
-"lazy";
+image.setAttribute(
+"height",
+"600"
+);
+
+image.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+image.setAttribute(
+"href",
+asset.href
+);
+
+image.classList.add(
+"exploitationMapImage"
+);
 
 image.onerror=()=>{
 
 image.remove();
 
-showExploitationFootprint(
-viewer,
-obs
-);
-
 };
 
-viewer.appendChild(image);
-
-}else{
-
-showExploitationFootprint(
-viewer,
-obs
+layer.appendChild(
+image
 );
 
 }
 
-}
-
 
 // ==========================================
-// FOOTPRINT
+// DRAW OBSERVATION GEOMETRY
 // ==========================================
 
-function showExploitationFootprint(viewer,obs){
+function drawObservationGeometry(
+layer,
+obs,
+project
+){
 
-if(!obs.geometry){
-
-viewer.innerHTML=`
-
-<div class="exploitationEmpty">
-No image or geometry available.
-</div>
-
-`;
-
+if(!obs.geometry)
 return;
-}
 
 
 const geometry=
 obs.geometry;
 
-const svg=
-document.createElementNS(
-"http://www.w3.org/2000/svg",
-"svg"
+
+if(
+geometry.type==="Point"
+){
+
+const p=
+project(
+geometry.coordinates[0],
+geometry.coordinates[1]
 );
-
-svg.classList.add(
-"exploitationFootprint"
-);
-
-svg.setAttribute(
-"viewBox",
-"0 0 1000 600"
-);
-
-svg.setAttribute(
-"preserveAspectRatio",
-"none"
-);
-
-
-if(geometry.type==="Point"){
-
-const coords=
-geometry.coordinates;
-
-const bbox=
-obs.bbox||[
-coords[0]-1,
-coords[1]-1,
-coords[0]+1,
-coords[1]+1
-];
-
-const lonRange=
-bbox[2]-bbox[0];
-
-const latRange=
-bbox[3]-bbox[1];
-
-const x=
-lonRange===0
-?500
-:((coords[0]-bbox[0])/lonRange)*1000;
-
-const y=
-latRange===0
-?300
-:600-
-((coords[1]-bbox[1])/latRange)*600;
 
 const circle=
 document.createElementNS(
@@ -6895,62 +7942,117 @@ document.createElementNS(
 
 circle.setAttribute(
 "cx",
-x
+p.x
 );
 
 circle.setAttribute(
 "cy",
-y
+p.y
 );
 
 circle.setAttribute(
 "r",
-"8"
+"7"
 );
 
 circle.classList.add(
-"exploitationPoint"
+"exploitationInteractivePoint"
 );
 
-svg.appendChild(circle);
+circle.addEventListener(
+"click",
+event=>{
+
+event.stopPropagation();
+
+showFootprintInteraction(
+event.target,
+obs,
+geometry.coordinates
+);
+
+}
+);
+
+layer.appendChild(
+circle
+);
+
+return;
 
 }
 
 
-if(geometry.type==="Polygon"){
+if(
+geometry.type==="Polygon"
+){
 
-const coordinates=
-geometry.coordinates?.[0];
+drawPolygon(
+layer,
+geometry.coordinates?.[0],
+project,
+obs
+);
 
-if(coordinates&&coordinates.length){
+return;
 
-const bbox=
-obs.bbox||
-getGeometryBBox(coordinates);
+}
 
-const lonRange=
-bbox[2]-bbox[0];
 
-const latRange=
-bbox[3]-bbox[1];
+if(
+geometry.type==="MultiPolygon"
+){
+
+geometry.coordinates.forEach(
+polygon=>{
+
+drawPolygon(
+layer,
+polygon?.[0],
+project,
+obs
+);
+
+}
+);
+
+}
+
+}
+
+
+// ==========================================
+// DRAW POLYGON
+// ==========================================
+
+function drawPolygon(
+layer,
+coordinates,
+project,
+obs
+){
+
+if(
+!coordinates||
+!coordinates.length
+)
+return;
+
 
 const points=
-coordinates.map(coord=>{
+coordinates.map(
+coord=>{
 
-const x=
-lonRange===0
-?500
-:((coord[0]-bbox[0])/lonRange)*1000;
+const p=
+project(
+coord[0],
+coord[1]
+);
 
-const y=
-latRange===0
-?300
-:600-
-((coord[1]-bbox[1])/latRange)*600;
+return `${p.x},${p.y}`;
 
-return `${x},${y}`;
-
-}).join(" ");
+}
+).join(" ");
 
 
 const polygon=
@@ -6965,17 +8067,210 @@ points
 );
 
 polygon.classList.add(
-"exploitationPolygon"
+"exploitationInteractivePolygon"
 );
 
-svg.appendChild(polygon);
+polygon.addEventListener(
+"mouseenter",
+()=>{
+
+polygon.classList.add(
+"active"
+);
+
+}
+);
+
+polygon.addEventListener(
+"mouseleave",
+()=>{
+
+polygon.classList.remove(
+"active"
+);
+
+}
+);
+
+polygon.addEventListener(
+"click",
+event=>{
+
+event.stopPropagation();
+
+showFootprintInteraction(
+polygon,
+obs,
+coordinates[0]
+);
+
+}
+);
+
+layer.appendChild(
+polygon
+);
+
+}
+
+
+// ==========================================
+// FOOTPRINT INTERACTION
+// ==========================================
+
+function showFootprintInteraction(
+element,
+obs,
+coordinates
+){
+
+const viewer=
+element.closest(
+".exploitationContainer"
+);
+
+if(!viewer)
+return;
+
+
+const previous=
+viewer.querySelector(
+".footprintInteraction"
+);
+
+if(previous)
+previous.remove();
+
+
+const panel=
+document.createElement("div");
+
+panel.className=
+"footprintInteraction";
+
+const coordText=
+Array.isArray(coordinates)
+?`${Number(coordinates[0]).toFixed(5)}, ${Number(coordinates[1]).toFixed(5)}`
+:"—";
+
+
+panel.innerHTML=`
+
+<div class="footprintInteractionTitle">
+FOOTPRINT
+</div>
+
+<div class="footprintInteractionRow">
+<span>Item</span>
+<strong>${obs.id||"—"}</strong>
+</div>
+
+<div class="footprintInteractionRow">
+<span>Coordinate</span>
+<strong>${coordText}</strong>
+</div>
+
+<div class="footprintInteractionRow">
+<span>Geometry</span>
+<strong>${obs.geometry?.type||"—"}</strong>
+</div>
+
+`;
+
+viewer.appendChild(
+panel
+);
+
+}
+
+
+// ==========================================
+// OBSERVATION EXTENT
+// ==========================================
+
+function getObservationExtent(obs){
+
+if(
+Array.isArray(obs.bbox)&&
+obs.bbox.length>=4
+){
+
+return[
+Number(obs.bbox[0]),
+Number(obs.bbox[1]),
+Number(obs.bbox[2]),
+Number(obs.bbox[3])
+];
+
+}
+
+
+if(obs.geometry){
+
+const bbox=
+getGeometryBBoxFromGeometry(
+obs.geometry
+);
+
+if(bbox)
+return bbox;
+
+}
+
+return null;
+
+}
+
+
+// ==========================================
+// GEOMETRY BBOX
+// ==========================================
+
+function getGeometryBBoxFromGeometry(
+geometry
+){
+
+const coords=[];
+
+
+function collect(value){
+
+if(
+Array.isArray(value)&&
+typeof value[0]==="number"
+){
+
+coords.push(value);
+
+return;
+
+}
+
+if(
+Array.isArray(value)
+){
+
+value.forEach(
+collect
+);
 
 }
 
 }
 
 
-viewer.appendChild(svg);
+collect(
+geometry.coordinates
+);
+
+
+if(!coords.length)
+return null;
+
+
+return getGeometryBBox(
+coords
+);
 
 }
 
@@ -6994,16 +8289,28 @@ let maxLat=-Infinity;
 coords.forEach(coord=>{
 
 minLon=
-Math.min(minLon,coord[0]);
+Math.min(
+minLon,
+Number(coord[0])
+);
 
 minLat=
-Math.min(minLat,coord[1]);
+Math.min(
+minLat,
+Number(coord[1])
+);
 
 maxLon=
-Math.max(maxLon,coord[0]);
+Math.max(
+maxLon,
+Number(coord[0])
+);
 
 maxLat=
-Math.max(maxLat,coord[1]);
+Math.max(
+maxLat,
+Number(coord[1])
+);
 
 });
 
@@ -7016,6 +8323,141 @@ maxLat
 
 }
 
+
+// ==========================================
+// EXPLOITATION DATA
+// ==========================================
+
+function renderExploitationData(
+container,
+obs,
+extent
+){
+
+const properties=
+obs.properties||{};
+
+const centerLon=
+(extent[0]+extent[2])/2;
+
+const centerLat=
+(extent[1]+extent[3])/2;
+
+const crs=
+properties["proj:code"]||
+obs.crs?.properties?.name||
+"EPSG:4326";
+
+
+container.innerHTML=`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+SPATIAL DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>BBOX</span>
+<strong>
+${extent.map(v=>Number(v).toFixed(5)).join(", ")}
+</strong>
+</div>
+
+<div>
+<span>CENTER</span>
+<strong>
+${centerLat.toFixed(5)}°, ${centerLon.toFixed(5)}°
+</strong>
+</div>
+
+<div>
+<span>CRS</span>
+<strong>${crs}</strong>
+</div>
+
+<div>
+<span>GEOMETRY</span>
+<strong>${obs.geometry?.type||"—"}</strong>
+</div>
+
+<div>
+<span>WIDTH</span>
+<strong>${Math.abs(extent[2]-extent[0]).toFixed(5)}°</strong>
+</div>
+
+<div>
+<span>HEIGHT</span>
+<strong>${Math.abs(extent[3]-extent[1]).toFixed(5)}°</strong>
+</div>
+
+</div>
+
+</div>
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+ITEM DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>COLLECTION</span>
+<strong>${obs.collection||"—"}</strong>
+</div>
+
+<div>
+<span>DATETIME</span>
+<strong>${properties.datetime||"—"}</strong>
+</div>
+
+<div>
+<span>PLATFORM</span>
+<strong>${properties.platform||"—"}</strong>
+</div>
+
+<div>
+<span>INSTRUMENT</span>
+<strong>
+${
+Array.isArray(properties.instruments)
+?properties.instruments.join(", ")
+:properties.instruments||"—"
+}
+</strong>
+</div>
+
+<div>
+<span>ORBIT</span>
+<strong>${properties["sat:absolute_orbit"]||"—"}</strong>
+</div>
+
+<div>
+<span>PROCESSING</span>
+<strong>${properties["processing:level"]||"—"}</strong>
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+
+
+
+
+
+
+
+     
 // ==========================================
 // RAW
 // ==========================================
