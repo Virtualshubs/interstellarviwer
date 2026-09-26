@@ -2217,6 +2217,18 @@ Load
 </div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
+   <script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/jquery/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/other/BinaryHeap.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/tween/tween.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/d3/d3.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/proj4/proj4.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/openlayers3/ol.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/i18next/i18next.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/jstree/jstree.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/copc/index.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/build/potree/potree.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/plasio/js/laslaz.js"></script>
+
 
    
 <script>
@@ -9775,7 +9787,7 @@ new THREE.PerspectiveCamera(
 canvasContainer.clientWidth/
 canvasContainer.clientHeight,
 0.1,
-100
+100000000
 );
 
 camera.position.set(
@@ -9803,6 +9815,11 @@ canvasContainer.innerHTML="";
 canvasContainer.appendChild(
 renderer.domElement
 );
+
+
+// ==========================================
+// LIGHTS
+// ==========================================
 
 const ambientLight=
 new THREE.AmbientLight(
@@ -9860,6 +9877,10 @@ scene.add(cube);
 
 let realModel=null;
 
+let pointCloud=null;
+
+let pointCloudViewer=null;
+
 
 // ==========================================
 // MODEL TYPE
@@ -9880,14 +9901,14 @@ return "GLTF";
 if(cleanURL.endsWith(".copc.laz"))
 return "COPC";
 
+if(cleanURL.endsWith(".ept.json"))
+return "EPT";
+
 if(cleanURL.endsWith(".laz"))
 return "LAZ";
 
 if(cleanURL.endsWith(".las"))
 return "LAS";
-
-if(cleanURL.endsWith(".ept.json"))
-return "EPT";
 
 return "UNKNOWN";
 
@@ -9898,13 +9919,38 @@ getModelType(modelURL);
 
 
 // ==========================================
+// STATUS
+// ==========================================
+
+status.textContent=
+"FILE AVAILABLE";
+
+
+// ==========================================
+// REMOVE CUBE
+// ==========================================
+
+function removeCube(){
+
+scene.remove(
+cube
+);
+
+cube.geometry.dispose();
+
+cube.material.dispose();
+
+}
+
+
+// ==========================================
 // LOAD GLTF / GLB
 // ==========================================
 
 function loadGLTF(){
 
 status.textContent=
-"LOADING "+modelType;
+"PROCESSING MODEL";
 
 
 const script=
@@ -9914,6 +9960,7 @@ script.type=
 "module";
 
 script.textContent=`
+
 import {
 GLTFLoader
 }
@@ -9922,6 +9969,7 @@ from
 
 window.__JanusGLTFLoader=
 GLTFLoader;
+
 `;
 
 script.onload=()=>{
@@ -9932,7 +9980,7 @@ window.__JanusGLTFLoader;
 if(!Loader){
 
 status.textContent=
-"GLTF LOADER NOT AVAILABLE";
+"GLTF LOADER ERROR";
 
 return;
 
@@ -9940,7 +9988,6 @@ return;
 
 const loader=
 new Loader();
-
 
 loader.load(
 
@@ -9951,16 +9998,70 @@ gltf=>{
 realModel=
 gltf.scene;
 
+
+// ==========================================
+// AUTO FRAME
+// ==========================================
+
+const box=
+new THREE.Box3()
+.setFromObject(
+realModel
+);
+
+const center=
+box.getCenter(
+new THREE.Vector3()
+);
+
+const size=
+box.getSize(
+new THREE.Vector3()
+);
+
+realModel.position.sub(
+center
+);
+
 scene.add(
 realModel
 );
 
-scene.remove(
-cube
+const maxSize=
+Math.max(
+size.x,
+size.y,
+size.z
 );
 
+distance=
+maxSize*
+1.8;
+
+distance=
+Math.max(
+distance,
+0.1
+);
+
+camera.near=
+Math.max(
+maxSize/10000,
+0.001
+);
+
+camera.far=
+Math.max(
+maxSize*100,
+100
+);
+
+camera.updateProjectionMatrix();
+
+removeCube();
+
 status.textContent=
-modelType+" MODEL READY";
+"MODEL READY";
 
 },
 
@@ -9969,22 +10070,21 @@ progress=>{
 if(progress.total){
 
 const percent=
+Math.round(
 progress.loaded/
 progress.total*
-100;
+100
+);
 
 status.textContent=
-"LOADING "+
-modelType+
-" "+
-Math.round(percent)+
+"PROCESSING MODEL "+
+percent+
 "%";
 
 }else{
 
 status.textContent=
-"LOADING "+
-modelType;
+"PROCESSING MODEL";
 
 }
 
@@ -9993,13 +10093,12 @@ modelType;
 error=>{
 
 console.error(
-"3D MODEL LOAD ERROR",
+"GLTF LOAD ERROR",
 error
 );
 
 status.textContent=
-modelType+
-" LOAD ERROR";
+"LOAD ERROR";
 
 }
 
@@ -10010,12 +10109,202 @@ modelType+
 script.onerror=()=>{
 
 status.textContent=
-"GLTF LOADER LOAD ERROR";
+"GLTF LOADER ERROR";
 
 };
 
 document.head.appendChild(
 script
+);
+
+}
+
+
+// ==========================================
+// POINT CLOUD CONTROLS
+// ==========================================
+
+function createPointBudgetControl(){
+
+if(
+document.getElementById(
+"pointBudgetControl"
+)
+)
+return;
+
+const control=
+document.createElement("div");
+
+control.id=
+"pointBudgetControl";
+
+control.style.cssText=`
+
+margin-top:10px;
+padding:8px 0;
+font-size:11px;
+letter-spacing:.08em;
+
+`;
+
+control.innerHTML=`
+
+<div>
+
+POINT BUDGET:
+<span id="pointBudgetValue">
+500000
+</span>
+
+</div>
+
+<input
+id="pointBudgetSlider"
+type="range"
+min="500000"
+max="5000000"
+step="250000"
+value="500000"
+style="
+width:100%;
+margin-top:6px;
+"
+>
+
+`;
+
+status.parentElement.appendChild(
+control
+);
+
+const slider=
+document.getElementById(
+"pointBudgetSlider"
+);
+
+const value=
+document.getElementById(
+"pointBudgetValue"
+);
+
+slider.oninput=()=>{
+
+const budget=
+Number(
+slider.value
+);
+
+value.textContent=
+budget.toLocaleString();
+
+if(pointCloudViewer){
+
+pointCloudViewer.setPointBudget(
+budget
+);
+
+}
+
+};
+
+}
+
+
+// ==========================================
+// LOAD POINT CLOUD
+// ==========================================
+
+function loadPointCloud(){
+
+status.textContent=
+"PROCESSING MODEL";
+
+if(!window.Potree){
+
+status.textContent=
+"POTREE NOT AVAILABLE";
+
+return;
+
+}
+
+createPointBudgetControl();
+
+const budget=
+500000;
+
+pointCloudViewer=
+new Potree.Viewer(
+canvasContainer
+);
+
+pointCloudViewer.setEDLEnabled(
+true
+);
+
+pointCloudViewer.setFOV(
+60
+);
+
+pointCloudViewer.setPointBudget(
+budget
+);
+
+pointCloudViewer.setBackground(
+"black"
+);
+
+status.textContent=
+"PROCESSING MODEL";
+
+Potree.loadPointCloud(
+
+modelURL,
+
+"JanusPointCloud",
+
+event=>{
+
+pointCloud=
+event.pointcloud;
+
+pointCloudViewer.scene.addPointCloud(
+pointCloud
+);
+
+const material=
+pointCloud.material;
+
+material.size=
+1;
+
+material.pointSizeType=
+Potree.PointSizeType.ADAPTIVE;
+
+pointCloudViewer.fitToScreen(
+0.5
+);
+
+removeCube();
+
+status.textContent=
+"READY";
+
+},
+
+error=>{
+
+console.error(
+"POINT CLOUD LOAD ERROR",
+error
+);
+
+status.textContent=
+"LOAD ERROR";
+
+}
+
 );
 
 }
@@ -10032,11 +10321,34 @@ modelType==="GLTF"
 
 loadGLTF();
 
+}else if(
+modelType==="COPC" ||
+modelType==="EPT"
+){
+
+loadPointCloud();
+
+}else if(
+modelType==="LAZ"
+){
+
+status.textContent=
+"PROCESSING MODEL";
+
+status.textContent=
+"LAZ DETECTED — CONVERSION REQUIRED";
+
+}else if(
+modelType==="LAS"
+){
+
+status.textContent=
+"LAS DETECTED — CONVERSION REQUIRED";
+
 }else{
 
 status.textContent=
-modelType+
-" DETECTED — LOADER PENDING";
+"UNKNOWN 3D RESOURCE";
 
 }
 
@@ -10146,6 +10458,9 @@ canvasContainer.addEventListener(
 "wheel",
 event=>{
 
+if(pointCloudViewer)
+return;
+
 event.preventDefault();
 
 distance+=
@@ -10176,6 +10491,8 @@ function animate(){
 requestAnimationFrame(
 animate
 );
+
+if(!pointCloudViewer){
 
 if(realModel){
 
@@ -10214,6 +10531,8 @@ camera
 
 }
 
+}
+
 animate();
 
 
@@ -10229,6 +10548,8 @@ canvasContainer.clientWidth;
 const height=
 canvasContainer.clientHeight;
 
+if(!pointCloudViewer){
+
 camera.aspect=
 width/height;
 
@@ -10241,6 +10562,8 @@ height
 
 }
 
+}
+
 window.addEventListener(
 "resize",
 resize
@@ -10250,17 +10573,6 @@ resize
 // ==========================================
 // READY
 // ==========================================
-
-if(
-modelType!=="GLB" &&
-modelType!=="GLTF"
-){
-
-status.textContent=
-modelType+
-" DETECTED";
-
-}
 
 viewer.dataset.modelUrl=
 modelURL;
