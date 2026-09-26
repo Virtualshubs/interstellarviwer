@@ -9779,8 +9779,8 @@ canvasContainer.clientHeight,
 );
 
 camera.position.set(
-2.8,
-2.2,
+0,
+0,
 4
 );
 
@@ -9848,6 +9848,11 @@ material
 
 scene.add(cube);
 
+
+// ==========================================
+// MODEL INTERACTION
+// ==========================================
+
 let isDragging=false;
 
 let previousX=0;
@@ -9860,15 +9865,18 @@ let rotationY=0;
 
 let distance=4;
 
+
 canvasContainer.addEventListener(
 "pointerdown",
 event=>{
 
 isDragging=true;
 
-previousX=event.clientX;
+previousX=
+event.clientX;
 
-previousY=event.clientY;
+previousY=
+event.clientY;
 
 canvasContainer.setPointerCapture(
 event.pointerId
@@ -9876,6 +9884,7 @@ event.pointerId
 
 }
 );
+
 
 canvasContainer.addEventListener(
 "pointermove",
@@ -9885,10 +9894,12 @@ if(!isDragging)
 return;
 
 const deltaX=
-event.clientX-previousX;
+event.clientX-
+previousX;
 
 const deltaY=
-event.clientY-previousY;
+event.clientY-
+previousY;
 
 previousX=
 event.clientX;
@@ -9914,6 +9925,7 @@ rotationX
 }
 );
 
+
 canvasContainer.addEventListener(
 "pointerup",
 event=>{
@@ -9927,6 +9939,7 @@ event.pointerId
 }
 );
 
+
 canvasContainer.addEventListener(
 "pointercancel",
 ()=>{
@@ -9935,6 +9948,7 @@ isDragging=false;
 
 }
 );
+
 
 canvasContainer.addEventListener(
 "wheel",
@@ -9960,6 +9974,11 @@ passive:false
 }
 );
 
+
+// ==========================================
+// ANIMATION
+// ==========================================
+
 function animate(){
 
 requestAnimationFrame(
@@ -9973,9 +9992,9 @@ cube.rotation.y=
 rotationY;
 
 camera.position.set(
-Math.sin(rotationY)*distance,
-Math.sin(rotationX)*distance,
-Math.cos(rotationY)*distance
+0,
+0,
+distance
 );
 
 camera.lookAt(
@@ -9992,6 +10011,11 @@ camera
 }
 
 animate();
+
+
+// ==========================================
+// RESIZE
+// ==========================================
 
 function resize(){
 
@@ -10018,6 +10042,11 @@ window.addEventListener(
 resize
 );
 
+
+// ==========================================
+// READY
+// ==========================================
+
 status.textContent=
 "MODEL READY TO OPEN";
 
@@ -10025,7 +10054,6 @@ viewer.dataset.modelUrl=
 modelURL;
 
 }
-
 
 
 
