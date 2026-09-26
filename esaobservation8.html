@@ -8444,8 +8444,11 @@ if(
 type==="model/gltf-binary"
 ){
 
-if(!found.includes("GLB"))
-found.push("GLB");
+if(!found.some(item=>item.type==="GLB"))
+found.push({
+type:"GLB",
+resource:resource
+});
 
 return;
 
@@ -8461,8 +8464,11 @@ if(
 type==="model/gltf+json"
 ){
 
-if(!found.includes("GLTF"))
-found.push("GLTF");
+if(!found.some(item=>item.type==="GLTF"))
+found.push({
+type:"GLTF",
+resource:resource
+});
 
 return;
 
@@ -8480,8 +8486,11 @@ if(
 /3d\s*tiles/i.test(title)
 ){
 
-if(!found.includes("3D TILES"))
-found.push("3D TILES");
+if(!found.some(item=>item.type==="3D TILES"))
+found.push({
+type:"3D TILES",
+resource:resource
+});
 
 return;
 
@@ -8499,8 +8508,11 @@ if(
 /copc/i.test(title)
 ){
 
-if(!found.includes("COPC"))
-found.push("COPC");
+if(!found.some(item=>item.type==="COPC"))
+found.push({
+type:"COPC",
+resource:resource
+});
 
 return;
 
@@ -8517,8 +8529,11 @@ if(
 /laz/i.test(type)
 ){
 
-if(!found.includes("LAZ"))
-found.push("LAZ");
+if(!found.some(item=>item.type==="LAZ"))
+found.push({
+type:"LAZ",
+resource:resource
+});
 
 return;
 
@@ -8534,8 +8549,11 @@ if(
 /las/i.test(type)
 ){
 
-if(!found.includes("LAS"))
-found.push("LAS");
+if(!found.some(item=>item.type==="LAS"))
+found.push({
+type:"LAS",
+resource:resource
+});
 
 return;
 
@@ -8553,8 +8571,11 @@ if(
 /ept/i.test(title)
 ){
 
-if(!found.includes("EPT"))
-found.push("EPT");
+if(!found.some(item=>item.type==="EPT"))
+found.push({
+type:"EPT",
+resource:resource
+});
 
 return;
 
@@ -8571,8 +8592,11 @@ if(
 /point[\s_-]*cloud/i.test(title)
 ){
 
-if(!found.includes("POINT CLOUD"))
-found.push("POINT CLOUD");
+if(!found.some(item=>item.type==="POINT CLOUD"))
+found.push({
+type:"POINT CLOUD",
+resource:resource
+});
 
 }
 
@@ -9444,34 +9468,17 @@ findObservation3D(obs);
 
 const resource3DText=
 resource3D.length
-?`YES — ${resource3D.join(", ")}`
+?`YES — ${resource3D.map(item=>item.type).join(", ")}`
 :"NO";
 
-const modelResources=[
-...Object.values(obs.assets||{}),
-...(obs.links||[])
-];
-
-const modelResource=
-modelResources.find(resource=>{
-
-const href=
-(resource.href||"").toLowerCase();
-
-const type=
-(resource.type||"").toLowerCase();
-
-return(
-/\.glb(\?|$)/i.test(href) ||
-type==="model/gltf-binary" ||
-/\.gltf(\?|$)/i.test(href) ||
-type==="model/gltf+json"
+const modelResource3D=
+resource3D.find(item=>
+item.type==="GLB" ||
+item.type==="GLTF"
 );
 
-});
-
 const modelURL=
-modelResource?.href||"";
+modelResource3D?.resource?.href||"";
 
 let spatialHTML="";
 
@@ -9924,8 +9931,6 @@ script
 );
 
 }
-
-
      
 // ==========================================
 // RAW
