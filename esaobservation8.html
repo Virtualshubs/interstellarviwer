@@ -2216,7 +2216,7 @@ Load
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
 
    
 <script>
@@ -9763,15 +9763,6 @@ return;
 
 }
 
-if(!window.THREE.OrbitControls){
-
-status.textContent=
-"ORBIT CONTROLS NOT AVAILABLE";
-
-return;
-
-}
-
 const scene=
 new THREE.Scene();
 
@@ -9812,30 +9803,6 @@ canvasContainer.innerHTML="";
 canvasContainer.appendChild(
 renderer.domElement
 );
-
-const controls=
-new THREE.OrbitControls(
-camera,
-renderer.domElement
-);
-
-controls.enableDamping=true;
-
-controls.enableRotate=true;
-
-controls.enableZoom=true;
-
-controls.minDistance=2;
-
-controls.maxDistance=8;
-
-controls.target.set(
-0,
-0,
-0
-);
-
-controls.update();
 
 const ambientLight=
 new THREE.AmbientLight(
@@ -9881,13 +9848,141 @@ material
 
 scene.add(cube);
 
+let isDragging=false;
+
+let previousX=0;
+
+let previousY=0;
+
+let rotationX=0;
+
+let rotationY=0;
+
+let distance=4;
+
+canvasContainer.addEventListener(
+"pointerdown",
+event=>{
+
+isDragging=true;
+
+previousX=event.clientX;
+
+previousY=event.clientY;
+
+canvasContainer.setPointerCapture(
+event.pointerId
+);
+
+}
+);
+
+canvasContainer.addEventListener(
+"pointermove",
+event=>{
+
+if(!isDragging)
+return;
+
+const deltaX=
+event.clientX-previousX;
+
+const deltaY=
+event.clientY-previousY;
+
+previousX=
+event.clientX;
+
+previousY=
+event.clientY;
+
+rotationY+=
+deltaX*0.01;
+
+rotationX+=
+deltaY*0.01;
+
+rotationX=
+Math.max(
+-1.5,
+Math.min(
+1.5,
+rotationX
+)
+);
+
+}
+);
+
+canvasContainer.addEventListener(
+"pointerup",
+event=>{
+
+isDragging=false;
+
+canvasContainer.releasePointerCapture(
+event.pointerId
+);
+
+}
+);
+
+canvasContainer.addEventListener(
+"pointercancel",
+()=>{
+
+isDragging=false;
+
+}
+);
+
+canvasContainer.addEventListener(
+"wheel",
+event=>{
+
+event.preventDefault();
+
+distance+=
+event.deltaY*0.01;
+
+distance=
+Math.max(
+2,
+Math.min(
+8,
+distance
+)
+);
+
+},
+{
+passive:false
+}
+);
+
 function animate(){
 
 requestAnimationFrame(
 animate
 );
 
-controls.update();
+cube.rotation.x=
+rotationX;
+
+cube.rotation.y=
+rotationY;
+
+camera.position.set(
+Math.sin(rotationY)*distance,
+Math.sin(rotationX)*distance,
+Math.cos(rotationY)*distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
 
 renderer.render(
 scene,
@@ -9930,6 +10025,11 @@ viewer.dataset.modelUrl=
 modelURL;
 
 }
+
+
+
+
+     
      
 // ==========================================
 // RAW
