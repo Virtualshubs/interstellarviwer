@@ -2215,10 +2215,10 @@ Load
     </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>  
+   
 <script>
 let BASE="";
 
@@ -9763,6 +9763,15 @@ return;
 
 }
 
+if(!window.THREE.OrbitControls){
+
+status.textContent=
+"ORBIT CONTROLS NOT AVAILABLE";
+
+return;
+
+}
+
 const scene=
 new THREE.Scene();
 
@@ -9803,6 +9812,30 @@ canvasContainer.innerHTML="";
 canvasContainer.appendChild(
 renderer.domElement
 );
+
+const controls=
+new THREE.OrbitControls(
+camera,
+renderer.domElement
+);
+
+controls.enableDamping=true;
+
+controls.enableRotate=true;
+
+controls.enableZoom=true;
+
+controls.minDistance=2;
+
+controls.maxDistance=8;
+
+controls.target.set(
+0,
+0,
+0
+);
+
+controls.update();
 
 const ambientLight=
 new THREE.AmbientLight(
@@ -9854,8 +9887,7 @@ requestAnimationFrame(
 animate
 );
 
-cube.rotation.x+=0.01;
-cube.rotation.y+=0.015;
+controls.update();
 
 renderer.render(
 scene,
