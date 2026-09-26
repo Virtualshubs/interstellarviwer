@@ -9439,7 +9439,6 @@ extent
 const properties=
 obs.properties||{};
 
-
 if(!extent){
 
 container.innerHTML=`
@@ -9498,7 +9497,6 @@ return;
 
 }
 
-
 const centerLon=
 (extent[0]+extent[2])/2;
 
@@ -9511,7 +9509,6 @@ properties["proj:epsg"]||
 obs.crs?.properties?.name||
 "EPSG:4326";
 
-
 const resource3D=
 findObservation3D(obs);
 
@@ -9520,6 +9517,31 @@ resource3D.length
 ?`YES — ${resource3D.join(", ")}`
 :"NO";
 
+const modelResources=[
+...Object.values(obs.assets||{}),
+...(obs.links||[])
+];
+
+const modelResource=
+modelResources.find(resource=>{
+
+const href=
+(resource.href||"").toLowerCase();
+
+const type=
+(resource.type||"").toLowerCase();
+
+return(
+/\.glb(\?|$)/i.test(href) ||
+type==="model/gltf-binary" ||
+/\.gltf(\?|$)/i.test(href) ||
+type==="model/gltf+json"
+);
+
+});
+
+const modelURL=
+modelResource?.href||"";
 
 container.innerHTML=`
 
@@ -9622,10 +9644,290 @@ Array.isArray(properties.instruments)
 
 </div>
 
+${
+modelURL
+?`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+3D MODEL
+</div>
+
+<div>
+
+<button
+id="open3DModel"
+class="exploitButton"
+>
+VIEW 3D MODEL
+</button>
+
+</div>
+
+<div
+id="three3DViewer"
+style="
+display:none;
+margin-top:12px;
+width:100%;
+"
+data-model-url="${modelURL.replace(/"/g,"&quot;")}"
+>
+
+<div
+id="three3DCanvas"
+style="
+width:100%;
+height:420px;
+background:#111;
+position:relative;
+overflow:hidden;
+"
+></div>
+
+<div
+id="three3DStatus"
+style="
+padding:8px 0;
+font-size:11px;
+letter-spacing:.08em;
+"
+>
+INITIALIZING
+</div>
+
+</div>
+
+</div>
+
+`
+:""
+
+}
+
 `;
+
+if(modelURL){
+
+document.getElementById("open3DModel").onclick=()=>{
+
+const viewer=
+document.getElementById("three3DViewer");
+
+viewer.style.display="block";
+
+create3DViewer(
+viewer,
+modelURL
+);
+
+};
+
+}
+
 }
 
 
+// ==========================================
+// CREATE 3D VIEWER
+// ==========================================
+
+function create3DViewer(
+viewer,
+modelURL
+){
+
+const canvasContainer=
+document.getElementById("three3DCanvas");
+
+const status=
+document.getElementById("three3DStatus");
+
+if(!canvasContainer)
+return;
+
+if(canvasContainer.dataset.initialized==="true")
+return;
+
+canvasContainer.dataset.initialized="true";
+
+function initializeThree(){
+
+if(!window.THREE){
+
+status.textContent=
+"THREE.JS NOT AVAILABLE";
+
+return;
+
+}
+
+const scene=
+new THREE.Scene();
+
+scene.background=
+new THREE.Color(0x111111);
+
+const camera=
+new THREE.PerspectiveCamera(
+45,
+canvasContainer.clientWidth/
+canvasContainer.clientHeight,
+0.1,
+100
+);
+
+camera.position.set(
+2.8,
+2.2,
+4
+);
+
+const renderer=
+new THREE.WebGLRenderer({
+antialias:true
+});
+
+renderer.setPixelRatio(
+window.devicePixelRatio
+);
+
+renderer.setSize(
+canvasContainer.clientWidth,
+canvasContainer.clientHeight
+);
+
+canvasContainer.innerHTML="";
+
+canvasContainer.appendChild(
+renderer.domElement
+);
+
+const ambientLight=
+new THREE.AmbientLight(
+0xffffff,
+1.5
+);
+
+scene.add(
+ambientLight
+);
+
+const directionalLight=
+new THREE.DirectionalLight(
+0xffffff,
+2
+);
+
+directionalLight.position.set(
+3,
+4,
+5
+);
+
+scene.add(
+directionalLight
+);
+
+const geometry=
+new THREE.BoxGeometry(
+1,
+1,
+1
+);
+
+const material=
+new THREE.MeshStandardMaterial();
+
+const cube=
+new THREE.Mesh(
+geometry,
+material
+);
+
+scene.add(cube);
+
+function animate(){
+
+requestAnimationFrame(
+animate
+);
+
+cube.rotation.x+=0.01;
+cube.rotation.y+=0.015;
+
+renderer.render(
+scene,
+camera
+);
+
+}
+
+animate();
+
+function resize(){
+
+const width=
+canvasContainer.clientWidth;
+
+const height=
+canvasContainer.clientHeight;
+
+camera.aspect=
+width/height;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+width,
+height
+);
+
+}
+
+window.addEventListener(
+"resize",
+resize
+);
+
+status.textContent=
+"MODEL READY TO OPEN";
+
+viewer.dataset.modelUrl=
+modelURL;
+
+}
+
+if(window.THREE){
+
+initializeThree();
+
+return;
+
+}
+
+const script=
+document.createElement("script");
+
+script.src=
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js";
+
+script.onload=
+initializeThree;
+
+script.onerror=()=>{
+
+status.textContent=
+"THREE.JS LOAD ERROR";
+
+};
+
+document.head.appendChild(
+script
+);
+
+}
 
 
 
