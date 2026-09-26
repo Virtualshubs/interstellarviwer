@@ -9830,6 +9830,11 @@ scene.add(
 directionalLight
 );
 
+
+// ==========================================
+// FALLBACK CUBE
+// ==========================================
+
 const geometry=
 new THREE.BoxGeometry(
 1,
@@ -9847,6 +9852,193 @@ material
 );
 
 scene.add(cube);
+
+
+// ==========================================
+// MODEL STATE
+// ==========================================
+
+let realModel=null;
+
+
+// ==========================================
+// MODEL TYPE
+// ==========================================
+
+function getModelType(url){
+
+const cleanURL=
+url.split("?")[0]
+.toLowerCase();
+
+if(cleanURL.endsWith(".glb"))
+return "GLB";
+
+if(cleanURL.endsWith(".gltf"))
+return "GLTF";
+
+if(cleanURL.endsWith(".copc.laz"))
+return "COPC";
+
+if(cleanURL.endsWith(".laz"))
+return "LAZ";
+
+if(cleanURL.endsWith(".las"))
+return "LAS";
+
+if(cleanURL.endsWith(".ept.json"))
+return "EPT";
+
+return "UNKNOWN";
+
+}
+
+const modelType=
+getModelType(modelURL);
+
+
+// ==========================================
+// LOAD GLTF / GLB
+// ==========================================
+
+function loadGLTF(){
+
+status.textContent=
+"LOADING "+modelType;
+
+
+const script=
+document.createElement("script");
+
+script.type=
+"module";
+
+script.textContent=`
+import {
+GLTFLoader
+}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+
+window.__JanusGLTFLoader=
+GLTFLoader;
+`;
+
+script.onload=()=>{
+
+const Loader=
+window.__JanusGLTFLoader;
+
+if(!Loader){
+
+status.textContent=
+"GLTF LOADER NOT AVAILABLE";
+
+return;
+
+}
+
+const loader=
+new Loader();
+
+
+loader.load(
+
+modelURL,
+
+gltf=>{
+
+realModel=
+gltf.scene;
+
+scene.add(
+realModel
+);
+
+scene.remove(
+cube
+);
+
+status.textContent=
+modelType+" MODEL READY";
+
+},
+
+progress=>{
+
+if(progress.total){
+
+const percent=
+progress.loaded/
+progress.total*
+100;
+
+status.textContent=
+"LOADING "+
+modelType+
+" "+
+Math.round(percent)+
+"%";
+
+}else{
+
+status.textContent=
+"LOADING "+
+modelType;
+
+}
+
+},
+
+error=>{
+
+console.error(
+"3D MODEL LOAD ERROR",
+error
+);
+
+status.textContent=
+modelType+
+" LOAD ERROR";
+
+}
+
+);
+
+};
+
+script.onerror=()=>{
+
+status.textContent=
+"GLTF LOADER LOAD ERROR";
+
+};
+
+document.head.appendChild(
+script
+);
+
+}
+
+
+// ==========================================
+// RESOURCE DISPATCH
+// ==========================================
+
+if(
+modelType==="GLB" ||
+modelType==="GLTF"
+){
+
+loadGLTF();
+
+}else{
+
+status.textContent=
+modelType+
+" DETECTED — LOADER PENDING";
+
+}
 
 
 // ==========================================
@@ -9985,11 +10177,23 @@ requestAnimationFrame(
 animate
 );
 
+if(realModel){
+
+realModel.rotation.x=
+rotationX;
+
+realModel.rotation.y=
+rotationY;
+
+}else{
+
 cube.rotation.x=
 rotationX;
 
 cube.rotation.y=
 rotationY;
+
+}
 
 camera.position.set(
 0,
@@ -10047,14 +10251,21 @@ resize
 // READY
 // ==========================================
 
+if(
+modelType!=="GLB" &&
+modelType!=="GLTF"
+){
+
 status.textContent=
-"MODEL READY TO OPEN";
+modelType+
+" DETECTED";
+
+}
 
 viewer.dataset.modelUrl=
 modelURL;
 
 }
-
 
 
      
