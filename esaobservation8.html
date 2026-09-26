@@ -9469,12 +9469,11 @@ findObservation3D(obs);
 const resource3DText=
 resource3D.length
 ?`YES — ${resource3D.map(item=>item.type).join(", ")}`
-:"NO";
+:"";
 
 const modelResource3D=
 resource3D.find(item=>
-item.type==="GLB" ||
-item.type==="GLTF"
+item.resource?.href
 );
 
 const modelURL=
@@ -9630,7 +9629,7 @@ Array.isArray(properties.instruments)
 
 <div>
 <span>3D RESOURCE</span>
-<strong>${resource3DText}</strong>
+<strong>${resource3DText||"NO"}</strong>
 </div>
 
 </div>
