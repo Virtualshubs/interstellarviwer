@@ -9439,76 +9439,6 @@ extent
 const properties=
 obs.properties||{};
 
-if(!extent){
-
-container.innerHTML=`
-
-<div class="exploitationSection">
-
-<div class="exploitationSectionTitle">
-SPATIAL DATA
-</div>
-
-<div class="exploitationDataGrid">
-
-<div>
-<span>EXTENT</span>
-<strong>
-Not available
-</strong>
-</div>
-
-<div>
-<span>GEOMETRY</span>
-<strong>
-${obs.geometry?.type||"—"}
-</strong>
-</div>
-
-</div>
-
-</div>
-
-<div class="exploitationSection">
-
-<div class="exploitationSectionTitle">
-ITEM DATA
-</div>
-
-<div class="exploitationDataGrid">
-
-<div>
-<span>COLLECTION</span>
-<strong>${obs.collection||"—"}</strong>
-</div>
-
-<div>
-<span>DATETIME</span>
-<strong>${properties.datetime||"—"}</strong>
-</div>
-
-</div>
-
-</div>
-
-`;
-
-return;
-
-}
-
-const centerLon=
-(extent[0]+extent[2])/2;
-
-const centerLat=
-(extent[1]+extent[3])/2;
-
-const crs=
-properties["proj:code"]||
-properties["proj:epsg"]||
-obs.crs?.properties?.name||
-"EPSG:4326";
-
 const resource3D=
 findObservation3D(obs);
 
@@ -9543,7 +9473,23 @@ type==="model/gltf+json"
 const modelURL=
 modelResource?.href||"";
 
-container.innerHTML=`
+let spatialHTML="";
+
+if(extent){
+
+const centerLon=
+(extent[0]+extent[2])/2;
+
+const centerLat=
+(extent[1]+extent[3])/2;
+
+const crs=
+properties["proj:code"]||
+properties["proj:epsg"]||
+obs.crs?.properties?.name||
+"EPSG:4326";
+
+spatialHTML=`
 
 <div class="exploitationSection">
 
@@ -9590,6 +9536,46 @@ ${centerLat.toFixed(5)}°, ${centerLon.toFixed(5)}°
 </div>
 
 </div>
+
+`;
+
+}else{
+
+spatialHTML=`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+SPATIAL DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>EXTENT</span>
+<strong>
+Not available
+</strong>
+</div>
+
+<div>
+<span>GEOMETRY</span>
+<strong>
+${obs.geometry?.type||"—"}
+</strong>
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+container.innerHTML=`
+
+${spatialHTML}
 
 <div class="exploitationSection">
 
@@ -9710,10 +9696,18 @@ INITIALIZING
 
 if(modelURL){
 
-document.getElementById("open3DModel").onclick=()=>{
+const button=
+document.getElementById("open3DModel");
+
+if(button){
+
+button.onclick=()=>{
 
 const viewer=
 document.getElementById("three3DViewer");
+
+if(!viewer)
+return;
 
 viewer.style.display="block";
 
@@ -9723,6 +9717,8 @@ modelURL
 );
 
 };
+
+}
 
 }
 
@@ -9928,8 +9924,6 @@ script
 );
 
 }
-
-
 
 
      
