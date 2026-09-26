@@ -9748,10 +9748,7 @@ modelURL
      
      
      
-     
-     
-     
-// ==========================================
+  // ==========================================
 // CREATE 3D VIEWER
 // ==========================================
 
@@ -10066,6 +10063,18 @@ maxSize,
 distance=
 modelSize*
 1.8;
+
+minimumDistance=
+Math.max(
+modelSize*0.05,
+0.001
+);
+
+maximumDistance=
+Math.max(
+modelSize*20,
+minimumDistance*10
+);
 
 camera.near=
 Math.max(
@@ -10432,12 +10441,16 @@ modelSize*
 1.8;
 
 minimumDistance=
-modelSize*
-0.05;
+Math.max(
+modelSize*0.05,
+0.001
+);
 
 maximumDistance=
-modelSize*
-20;
+Math.max(
+modelSize*20,
+minimumDistance*10
+);
 
 camera.near=
 Math.max(
@@ -10915,7 +10928,13 @@ let maximumDistance=100;
 // CANVAS INTERACTION
 // ==========================================
 
-canvasContainer.style.touchAction=
+const canvas=
+renderer.domElement;
+
+canvas.style.touchAction=
+"none";
+
+canvas.style.userSelect=
 "none";
 
 
@@ -10923,7 +10942,7 @@ canvasContainer.style.touchAction=
 // POINTER DOWN
 // ==========================================
 
-canvasContainer.addEventListener(
+canvas.addEventListener(
 "pointerdown",
 event=>{
 
@@ -10935,6 +10954,8 @@ return;
 
 event.preventDefault();
 
+event.stopPropagation();
+
 isDragging=true;
 
 previousX=
@@ -10943,7 +10964,7 @@ event.clientX;
 previousY=
 event.clientY;
 
-canvasContainer.setPointerCapture(
+canvas.setPointerCapture(
 event.pointerId
 );
 
@@ -10958,7 +10979,7 @@ passive:false
 // POINTER MOVE
 // ==========================================
 
-canvasContainer.addEventListener(
+canvas.addEventListener(
 "pointermove",
 event=>{
 
@@ -10968,7 +10989,14 @@ pointCloudViewer
 )
 return;
 
+if(
+(event.buttons&1)!==1
+)
+return;
+
 event.preventDefault();
+
+event.stopPropagation();
 
 const deltaX=
 event.clientX-
@@ -11010,27 +11038,34 @@ passive:false
 // POINTER UP
 // ==========================================
 
-canvasContainer.addEventListener(
+canvas.addEventListener(
 "pointerup",
 event=>{
 
 if(event.button!==0)
 return;
 
+event.preventDefault();
+
+event.stopPropagation();
+
 isDragging=false;
 
 if(
-canvasContainer.hasPointerCapture(
+canvas.hasPointerCapture(
 event.pointerId
 )
 ){
 
-canvasContainer.releasePointerCapture(
+canvas.releasePointerCapture(
 event.pointerId
 );
 
 }
 
+},
+{
+passive:false
 }
 );
 
@@ -11039,24 +11074,31 @@ event.pointerId
 // POINTER CANCEL
 // ==========================================
 
-canvasContainer.addEventListener(
+canvas.addEventListener(
 "pointercancel",
 event=>{
+
+event.preventDefault();
+
+event.stopPropagation();
 
 isDragging=false;
 
 if(
-canvasContainer.hasPointerCapture(
+canvas.hasPointerCapture(
 event.pointerId
 )
 ){
 
-canvasContainer.releasePointerCapture(
+canvas.releasePointerCapture(
 event.pointerId
 );
 
 }
 
+},
+{
+passive:false
 }
 );
 
@@ -11065,14 +11107,19 @@ event.pointerId
 // WHEEL ZOOM
 // ==========================================
 
-canvasContainer.addEventListener(
+canvas.addEventListener(
 "wheel",
 event=>{
 
 if(pointCloudViewer)
 return;
 
+if(isDragging)
+return;
+
 event.preventDefault();
+
+event.stopPropagation();
 
 if(modelSize<=0)
 return;
@@ -11087,7 +11134,7 @@ zoomFactor;
 
 minimumDistance=
 Math.max(
-modelSize*0.01,
+modelSize*0.05,
 0.001
 );
 
@@ -11114,19 +11161,47 @@ passive:false
 
 
 // ==========================================
+// CONTEXT MENU
+// ==========================================
+
+canvas.addEventListener(
+"contextmenu",
+event=>{
+
+event.preventDefault();
+
+event.stopPropagation();
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
 // DOUBLE CLICK RESET
 // ==========================================
 
-canvasContainer.addEventListener(
+canvas.addEventListener(
 "dblclick",
-()=>{
+event=>{
 
 if(pointCloudViewer)
 return;
 
+event.preventDefault();
+
+event.stopPropagation();
+
 distance=
-modelSize*
-1.8;
+Math.max(
+minimumDistance,
+Math.min(
+maximumDistance,
+modelSize*1.8
+)
+);
 
 rotationX=
 0;
@@ -11146,6 +11221,9 @@ camera.lookAt(
 0
 );
 
+},
+{
+passive:false
 }
 );
 
