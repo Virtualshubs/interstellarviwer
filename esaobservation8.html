@@ -9827,9 +9827,7 @@ new THREE.AmbientLight(
 1.5
 );
 
-scene.add(
-ambientLight
-);
+scene.add(ambientLight);
 
 const directionalLight=
 new THREE.DirectionalLight(
@@ -9843,9 +9841,7 @@ directionalLight.position.set(
 5
 );
 
-scene.add(
-directionalLight
-);
+scene.add(directionalLight);
 
 
 // ==========================================
@@ -9880,6 +9876,20 @@ let realModel=null;
 let pointCloud=null;
 
 let pointCloudViewer=null;
+
+let lazGeometry=null;
+
+let lazMaterial=null;
+
+let lazPoints=null;
+
+let lazPositions=null;
+
+let lazColors=null;
+
+let lazPointCount=0;
+
+let lazBudget=500000;
 
 
 // ==========================================
@@ -9931,6 +9941,9 @@ status.textContent=
 // ==========================================
 
 function removeCube(){
+
+if(!cube.parent)
+return;
 
 scene.remove(
 cube
@@ -10061,7 +10074,7 @@ camera.updateProjectionMatrix();
 removeCube();
 
 status.textContent=
-"MODEL READY";
+"READY";
 
 },
 
@@ -10121,7 +10134,7 @@ script
 
 
 // ==========================================
-// POINT CLOUD CONTROLS
+// POINT BUDGET CONTROL
 // ==========================================
 
 function createPointBudgetControl(){
@@ -10198,6 +10211,11 @@ slider.value
 value.textContent=
 budget.toLocaleString();
 
+
+// ==========================================
+// POTREE
+// ==========================================
+
 if(pointCloudViewer){
 
 pointCloudViewer.setPointBudget(
@@ -10206,7 +10224,444 @@ budget
 
 }
 
+
+// ==========================================
+// LAZ
+// ==========================================
+
+if(
+lazPositions &&
+lazPoints
+){
+
+lazBudget=
+budget;
+
+updateLAZPoints(
+budget
+);
+
+}
+
 };
+
+}
+
+
+// ==========================================
+// BUILD LAZ POINT CLOUD
+// ==========================================
+
+function updateLAZPoints(
+budget
+){
+
+if(
+!lazPositions ||
+!lazPoints
+)
+return;
+
+const totalPoints=
+lazPointCount;
+
+const visiblePoints=
+Math.min(
+budget,
+totalPoints
+);
+
+const sourceStride=
+totalPoints/
+visiblePoints;
+
+const positions=
+new Float32Array(
+visiblePoints*3
+);
+
+let colors=null;
+
+if(lazColors){
+
+colors=
+new Float32Array(
+visiblePoints*3
+);
+
+}
+
+for(
+let i=0;
+i<visiblePoints;
+i++
+){
+
+const sourceIndex=
+Math.min(
+Math.floor(
+i*sourceStride
+),
+totalPoints-1
+);
+
+positions[i*3]=
+lazPositions[sourceIndex*3];
+
+positions[i*3+1]=
+lazPositions[sourceIndex*3+1];
+
+positions[i*3+2]=
+lazPositions[sourceIndex*3+2];
+
+
+if(lazColors){
+
+colors[i*3]=
+lazColors[sourceIndex*3];
+
+colors[i*3+1]=
+lazColors[sourceIndex*3+1];
+
+colors[i*3+2]=
+lazColors[sourceIndex*3+2];
+
+}
+
+}
+
+if(!lazGeometry){
+
+lazGeometry=
+new THREE.BufferGeometry();
+
+lazPoints=
+new THREE.Points(
+lazGeometry,
+lazMaterial
+);
+
+scene.add(
+lazPoints
+);
+
+}
+
+lazGeometry.setAttribute(
+"position",
+new THREE.BufferAttribute(
+positions,
+3
+)
+);
+
+if(colors){
+
+lazGeometry.setAttribute(
+"color",
+new THREE.BufferAttribute(
+colors,
+3
+)
+);
+
+lazMaterial.vertexColors=
+true;
+
+}
+
+lazGeometry.computeBoundingSphere();
+
+}
+
+
+// ==========================================
+// AUTO FRAME LAZ
+// ==========================================
+
+function frameLAZ(){
+
+if(!lazGeometry)
+return;
+
+lazGeometry.computeBoundingBox();
+
+const box=
+lazGeometry.boundingBox;
+
+if(!box)
+return;
+
+const center=
+box.getCenter(
+new THREE.Vector3()
+);
+
+const size=
+box.getSize(
+new THREE.Vector3()
+);
+
+lazPoints.position.sub(
+center
+);
+
+const maxSize=
+Math.max(
+size.x,
+size.y,
+size.z
+);
+
+distance=
+Math.max(
+maxSize*1.8,
+1
+);
+
+camera.near=
+Math.max(
+maxSize/100000,
+0.001
+);
+
+camera.far=
+Math.max(
+maxSize*100,
+100
+);
+
+camera.updateProjectionMatrix();
+
+}
+
+
+// ==========================================
+// LOAD LAZ
+// ==========================================
+
+async function loadLAZ(){
+
+status.textContent=
+"PROCESSING MODEL";
+
+createPointBudgetControl();
+
+try{
+
+const core=
+await import(
+"https://esm.sh/@loaders.gl/core@4.4.0"
+);
+
+const lasModule=
+await import(
+"https://esm.sh/@loaders.gl/las@4.4.0"
+);
+
+const load=
+core.load;
+
+const LASLoader=
+lasModule.LASLoader;
+
+if(
+!load ||
+!LASLoader
+){
+
+throw new Error(
+"LAS LOADER NOT AVAILABLE"
+);
+
+}
+
+status.textContent=
+"CARGANDO PUNTOS 500K";
+
+const data=
+await load(
+modelURL,
+LASLoader,
+{
+core:{
+worker:false
+},
+las:{
+shape:"mesh",
+skip:1,
+fp64:false,
+colorDepth:"auto"
+}
+}
+);
+
+
+const attributes=
+data?.attributes||{};
+
+const positionAttribute=
+attributes.POSITION;
+
+const colorAttribute=
+attributes.COLOR_0;
+
+if(
+!positionAttribute ||
+!positionAttribute.value
+){
+
+throw new Error(
+"POSITION ATTRIBUTE NOT FOUND"
+);
+
+}
+
+lazPositions=
+positionAttribute.value;
+
+lazPointCount=
+Math.floor(
+lazPositions.length/3
+);
+
+if(
+lazPointCount===0
+){
+
+throw new Error(
+"EMPTY POINT CLOUD"
+);
+
+}
+
+
+if(
+colorAttribute &&
+colorAttribute.value
+){
+
+const sourceColors=
+colorAttribute.value;
+
+const colorSize=
+colorAttribute.size||3;
+
+const sourceColorCount=
+Math.floor(
+sourceColors.length/
+colorSize
+);
+
+lazColors=
+new Float32Array(
+sourceColorCount*3
+);
+
+for(
+let i=0;
+i<sourceColorCount;
+i++
+){
+
+const r=
+sourceColors[i*colorSize];
+
+const g=
+sourceColors[i*colorSize+1];
+
+const b=
+sourceColors[i*colorSize+2];
+
+lazColors[i*3]=
+r>1?
+r/255:
+r;
+
+lazColors[i*3+1]=
+g>1?
+g/255:
+g;
+
+lazColors[i*3+2]=
+b>1?
+b/255:
+b;
+
+}
+
+}
+
+
+// ==========================================
+// MATERIAL
+// ==========================================
+
+lazMaterial=
+new THREE.PointsMaterial({
+size:0.02,
+sizeAttenuation:true,
+vertexColors:
+!!lazColors
+});
+
+
+// ==========================================
+// INITIAL POINT BUDGET
+// ==========================================
+
+lazBudget=
+500000;
+
+updateLAZPoints(
+lazBudget
+);
+
+
+// ==========================================
+// AUTO FRAME
+// ==========================================
+
+frameLAZ();
+
+
+// ==========================================
+// REAL MODEL READY
+// ==========================================
+
+removeCube();
+
+status.textContent=
+"READY";
+
+console.log(
+"JANUS LAZ POINTS:",
+lazPointCount
+);
+
+if(
+data.header &&
+data.header.boundingBox
+){
+
+console.log(
+"JANUS LAZ BOUNDING BOX:",
+data.header.boundingBox
+);
+
+}
+
+}catch(error){
+
+console.error(
+"LAZ LOAD ERROR",
+error
+);
+
+status.textContent=
+"LOAD ERROR";
+
+}
 
 }
 
@@ -10322,6 +10777,12 @@ modelType==="GLTF"
 loadGLTF();
 
 }else if(
+modelType==="LAZ"
+){
+
+loadLAZ();
+
+}else if(
 modelType==="COPC" ||
 modelType==="EPT"
 ){
@@ -10329,21 +10790,10 @@ modelType==="EPT"
 loadPointCloud();
 
 }else if(
-modelType==="LAZ"
-){
-
-status.textContent=
-"PROCESSING MODEL";
-
-status.textContent=
-"LAZ DETECTED — CONVERSION REQUIRED";
-
-}else if(
 modelType==="LAS"
 ){
 
-status.textContent=
-"LAS DETECTED — CONVERSION REQUIRED";
+loadLAZ();
 
 }else{
 
@@ -10374,6 +10824,9 @@ canvasContainer.addEventListener(
 "pointerdown",
 event=>{
 
+if(pointCloudViewer)
+return;
+
 isDragging=true;
 
 previousX=
@@ -10394,7 +10847,10 @@ canvasContainer.addEventListener(
 "pointermove",
 event=>{
 
-if(!isDragging)
+if(
+!isDragging ||
+pointCloudViewer
+)
 return;
 
 const deltaX=
@@ -10436,9 +10892,17 @@ event=>{
 
 isDragging=false;
 
+if(
+canvasContainer.hasPointerCapture(
+event.pointerId
+)
+){
+
 canvasContainer.releasePointerCapture(
 event.pointerId
 );
+
+}
 
 }
 );
@@ -10500,6 +10964,14 @@ realModel.rotation.x=
 rotationX;
 
 realModel.rotation.y=
+rotationY;
+
+}else if(lazPoints){
+
+lazPoints.rotation.x=
+rotationX;
+
+lazPoints.rotation.y=
 rotationY;
 
 }else{
