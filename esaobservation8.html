@@ -9750,7 +9750,9 @@ modelURL
      
      
      
- // ==========================================
+     
+     
+// ==========================================
 // CREATE 3D VIEWER
 // ==========================================
 
@@ -9823,9 +9825,6 @@ canvasContainer.appendChild(
 renderer.domElement
 );
 
-const canvas=
-renderer.domElement;
-
 
 // ==========================================
 // LIGHTS
@@ -9859,24 +9858,6 @@ directionalLight
 
 
 // ==========================================
-// CENTRAL MODEL PIVOT
-// ==========================================
-
-const modelPivot=
-new THREE.Group();
-
-modelPivot.position.set(
-0,
-0,
-0
-);
-
-scene.add(
-modelPivot
-);
-
-
-// ==========================================
 // FALLBACK CUBE
 // ==========================================
 
@@ -9896,9 +9877,7 @@ geometry,
 material
 );
 
-modelPivot.add(
-cube
-);
+scene.add(cube);
 
 
 // ==========================================
@@ -9983,126 +9962,13 @@ function removeCube(){
 if(!cube.parent)
 return;
 
-cube.parent.remove(
+scene.remove(
 cube
 );
 
 cube.geometry.dispose();
 
 cube.material.dispose();
-
-}
-
-
-// ==========================================
-// BOUNDING BOX HELPERS
-// ==========================================
-
-function getBoundingBoxFromData(
-boundingBox
-){
-
-if(!boundingBox)
-return null;
-
-const min=
-boundingBox.min||
-boundingBox[0];
-
-const max=
-boundingBox.max||
-boundingBox[1];
-
-if(!min || !max)
-return null;
-
-const minX=
-min[0]!==undefined
-?min[0]
-:min.x;
-
-const minY=
-min[1]!==undefined
-?min[1]
-:min.y;
-
-const minZ=
-min[2]!==undefined
-?min[2]
-:min.z;
-
-const maxX=
-max[0]!==undefined
-?max[0]
-:max.x;
-
-const maxY=
-max[1]!==undefined
-?max[1]
-:max.y;
-
-const maxZ=
-max[2]!==undefined
-?max[2]
-:max.z;
-
-if(
-[
-minX,
-minY,
-minZ,
-maxX,
-maxY,
-maxZ
-].some(
-value=>value===undefined
-)
-)
-return null;
-
-return new THREE.Box3(
-new THREE.Vector3(
-minX,
-minY,
-minZ
-),
-new THREE.Vector3(
-maxX,
-maxY,
-maxZ
-)
-);
-
-}
-
-
-// ==========================================
-// SET CUBE TO BOUNDING BOX
-// ==========================================
-
-function setCubeToBoundingBox(
-box
-){
-
-if(!box)
-return;
-
-const size=
-box.getSize(
-new THREE.Vector3()
-);
-
-cube.position.set(
-0,
-0,
-0
-);
-
-cube.scale.set(
-Math.max(size.x,0.001),
-Math.max(size.y,0.001),
-Math.max(size.z,0.001)
-);
 
 }
 
@@ -10181,7 +10047,7 @@ realModel.position.sub(
 center
 );
 
-modelPivot.add(
+scene.add(
 realModel
 );
 
@@ -10202,14 +10068,6 @@ distance=
 modelSize*
 1.8;
 
-minimumDistance=
-modelSize*
-0.01;
-
-maximumDistance=
-modelSize*
-20;
-
 camera.near=
 Math.max(
 modelSize/10000,
@@ -10223,8 +10081,6 @@ modelSize*100,
 );
 
 camera.updateProjectionMatrix();
-
-updateCamera();
 
 removeCube();
 
@@ -10416,9 +10272,6 @@ budget,
 totalPoints
 );
 
-if(visiblePoints<=0)
-return;
-
 const sourceStride=
 totalPoints/
 visiblePoints;
@@ -10427,21 +10280,6 @@ const positions=
 new Float32Array(
 visiblePoints*3
 );
-
-let colors=null;
-
-if(
-lazColors &&
-lazColors.length>=
-totalPoints*3
-){
-
-colors=
-new Float32Array(
-visiblePoints*3
-);
-
-}
 
 for(
 let i=0;
@@ -10466,19 +10304,6 @@ lazPositions[sourceIndex*3+1];
 positions[i*3+2]=
 lazPositions[sourceIndex*3+2];
 
-if(colors){
-
-colors[i*3]=
-lazColors[sourceIndex*3];
-
-colors[i*3+1]=
-lazColors[sourceIndex*3+1];
-
-colors[i*3+2]=
-lazColors[sourceIndex*3+2];
-
-}
-
 }
 
 lazGeometry.setAttribute(
@@ -10488,24 +10313,6 @@ positions,
 3
 )
 );
-
-if(colors){
-
-lazGeometry.setAttribute(
-"color",
-new THREE.BufferAttribute(
-colors,
-3
-)
-);
-
-}else{
-
-lazGeometry.deleteAttribute(
-"color"
-);
-
-}
 
 lazGeometry.computeBoundingBox();
 
@@ -10532,10 +10339,42 @@ if(
 )
 return;
 
-let box=
-getBoundingBoxFromData(
+let box;
+
+if(
 lazBoundingBox
+){
+
+const min=
+lazBoundingBox.min||
+lazBoundingBox[0];
+
+const max=
+lazBoundingBox.max||
+lazBoundingBox[1];
+
+if(
+min &&
+max
+){
+
+box=
+new THREE.Box3(
+new THREE.Vector3(
+min[0]??min.x,
+min[1]??min.y,
+min[2]??min.z
+),
+new THREE.Vector3(
+max[0]??max.x,
+max[1]??max.y,
+max[2]??max.z
+)
 );
+
+}
+
+}
 
 if(!box){
 
@@ -10584,21 +10423,6 @@ lazPoints.position.set(
 -center.z
 );
 
-lazPoints.rotation.set(
-0,
-0,
-0
-);
-
-
-// ==========================================
-// SIZE FALLBACK CUBE
-// ==========================================
-
-setCubeToBoundingBox(
-box
-);
-
 
 // ==========================================
 // CAMERA FIT
@@ -10610,7 +10434,7 @@ modelSize*
 
 minimumDistance=
 modelSize*
-0.01;
+0.05;
 
 maximumDistance=
 modelSize*
@@ -10630,7 +10454,17 @@ modelSize*100,
 
 camera.updateProjectionMatrix();
 
-updateCamera();
+camera.position.set(
+0,
+0,
+distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
 
 }
 
@@ -10749,27 +10583,12 @@ data.header.boundingBox
 lazBoundingBox=
 data.header.boundingBox;
 
-const boundingBox=
-getBoundingBoxFromData(
-lazBoundingBox
-);
-
-if(boundingBox){
-
-setCubeToBoundingBox(
-boundingBox
-);
-
-}
-
 }
 
 
 // ==========================================
 // OPTIONAL RGB
 // ==========================================
-
-lazColors=null;
 
 if(
 colorAttribute &&
@@ -10788,18 +10607,14 @@ sourceColors.length/
 colorSize
 );
 
-if(
-sourceColorCount>=lazPointCount
-){
-
 lazColors=
 new Float32Array(
-lazPointCount*3
+sourceColorCount*3
 );
 
 for(
 let i=0;
-i<lazPointCount;
+i<sourceColorCount;
 i++
 ){
 
@@ -10831,8 +10646,6 @@ b;
 
 }
 
-}
-
 
 // ==========================================
 // POINT MATERIAL
@@ -10851,7 +10664,7 @@ sizeAttenuation:
 false,
 
 vertexColors:
-!!lazColors
+false
 
 });
 
@@ -10869,7 +10682,7 @@ lazGeometry,
 lazMaterial
 );
 
-modelPivot.add(
+scene.add(
 lazPoints
 );
 
@@ -11083,15 +10896,14 @@ let previousX=0;
 
 let previousY=0;
 
+let rotationX=0;
+
+let rotationY=0;
+
 
 // ==========================================
-// CAMERA ORBIT
+// CAMERA DISTANCE
 // ==========================================
-
-let azimuth=0;
-
-let polar=
-Math.PI/2;
 
 let distance=4;
 
@@ -11101,50 +10913,10 @@ let maximumDistance=100;
 
 
 // ==========================================
-// UPDATE CAMERA
-// ==========================================
-
-function updateCamera(){
-
-const sinPolar=
-Math.sin(
-polar
-);
-
-camera.position.x=
-distance*
-sinPolar*
-Math.sin(
-azimuth
-);
-
-camera.position.y=
-distance*
-Math.cos(
-polar
-);
-
-camera.position.z=
-distance*
-sinPolar*
-Math.cos(
-azimuth
-);
-
-camera.lookAt(
-0,
-0,
-0
-);
-
-}
-
-
-// ==========================================
 // CANVAS INTERACTION
 // ==========================================
 
-canvas.style.touchAction=
+canvasContainer.style.touchAction=
 "none";
 
 
@@ -11152,7 +10924,7 @@ canvas.style.touchAction=
 // POINTER DOWN
 // ==========================================
 
-canvas.addEventListener(
+canvasContainer.addEventListener(
 "pointerdown",
 event=>{
 
@@ -11172,7 +10944,7 @@ event.clientX;
 previousY=
 event.clientY;
 
-canvas.setPointerCapture(
+canvasContainer.setPointerCapture(
 event.pointerId
 );
 
@@ -11187,7 +10959,7 @@ passive:false
 // POINTER MOVE
 // ==========================================
 
-canvas.addEventListener(
+canvasContainer.addEventListener(
 "pointermove",
 event=>{
 
@@ -11213,24 +10985,20 @@ event.clientX;
 previousY=
 event.clientY;
 
-azimuth-=
-deltaX*
-0.01;
+rotationY+=
+deltaX*0.01;
 
-polar-=
-deltaY*
-0.01;
+rotationX+=
+deltaY*0.01;
 
-polar=
+rotationX=
 Math.max(
-0.05,
+-1.5,
 Math.min(
-Math.PI-0.05,
-polar
+1.5,
+rotationX
 )
 );
-
-updateCamera();
 
 },
 {
@@ -11243,7 +11011,7 @@ passive:false
 // POINTER UP
 // ==========================================
 
-canvas.addEventListener(
+canvasContainer.addEventListener(
 "pointerup",
 event=>{
 
@@ -11253,12 +11021,12 @@ return;
 isDragging=false;
 
 if(
-canvas.hasPointerCapture(
+canvasContainer.hasPointerCapture(
 event.pointerId
 )
 ){
 
-canvas.releasePointerCapture(
+canvasContainer.releasePointerCapture(
 event.pointerId
 );
 
@@ -11272,19 +11040,19 @@ event.pointerId
 // POINTER CANCEL
 // ==========================================
 
-canvas.addEventListener(
+canvasContainer.addEventListener(
 "pointercancel",
 event=>{
 
 isDragging=false;
 
 if(
-canvas.hasPointerCapture(
+canvasContainer.hasPointerCapture(
 event.pointerId
 )
 ){
 
-canvas.releasePointerCapture(
+canvasContainer.releasePointerCapture(
 event.pointerId
 );
 
@@ -11298,7 +11066,7 @@ event.pointerId
 // WHEEL ZOOM
 // ==========================================
 
-canvas.addEventListener(
+canvasContainer.addEventListener(
 "wheel",
 event=>{
 
@@ -11339,8 +11107,6 @@ distance
 )
 );
 
-updateCamera();
-
 },
 {
 passive:false
@@ -11352,24 +11118,34 @@ passive:false
 // DOUBLE CLICK RESET
 // ==========================================
 
-canvas.addEventListener(
+canvasContainer.addEventListener(
 "dblclick",
 ()=>{
 
 if(pointCloudViewer)
 return;
 
-azimuth=
-0;
-
-polar=
-Math.PI/2;
-
 distance=
 modelSize*
 1.8;
 
-updateCamera();
+rotationX=
+0;
+
+rotationY=
+0;
+
+camera.position.set(
+0,
+0,
+distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
 
 }
 );
@@ -11387,7 +11163,43 @@ animate
 
 if(!pointCloudViewer){
 
-updateCamera();
+if(realModel){
+
+realModel.rotation.x=
+rotationX;
+
+realModel.rotation.y=
+rotationY;
+
+}else if(lazPoints){
+
+lazPoints.rotation.x=
+rotationX;
+
+lazPoints.rotation.y=
+rotationY;
+
+}else{
+
+cube.rotation.x=
+rotationX;
+
+cube.rotation.y=
+rotationY;
+
+}
+
+camera.position.set(
+0,
+0,
+distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
 
 renderer.render(
 scene,
