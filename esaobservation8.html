@@ -2218,7 +2218,7 @@ Load
 
 
 
-  
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>  
 <script>
 let BASE="";
 
@@ -9754,8 +9754,6 @@ return;
 
 canvasContainer.dataset.initialized="true";
 
-function initializeThree(){
-
 if(!window.THREE){
 
 status.textContent=
@@ -9898,36 +9896,6 @@ status.textContent=
 
 viewer.dataset.modelUrl=
 modelURL;
-
-}
-
-if(window.THREE){
-
-initializeThree();
-
-return;
-
-}
-
-const script=
-document.createElement("script");
-
-script.src=
-"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js";
-
-script.onload=
-initializeThree;
-
-script.onerror=()=>{
-
-status.textContent=
-"THREE.JS LOAD ERROR";
-
-};
-
-document.head.appendChild(
-script
-);
 
 }
      
