@@ -9743,6 +9743,16 @@ modelURL
 }
 
 
+
+     
+     
+     
+     
+     
+     
+     
+     
+     
 // ==========================================
 // CREATE 3D VIEWER
 // ==========================================
@@ -9827,7 +9837,9 @@ new THREE.AmbientLight(
 1.5
 );
 
-scene.add(ambientLight);
+scene.add(
+ambientLight
+);
 
 const directionalLight=
 new THREE.DirectionalLight(
@@ -9841,7 +9853,9 @@ directionalLight.position.set(
 5
 );
 
-scene.add(directionalLight);
+scene.add(
+directionalLight
+);
 
 
 // ==========================================
@@ -9889,7 +9903,9 @@ let lazColors=null;
 
 let lazPointCount=0;
 
-let lazBudget=500000;
+let lazBudget=1000000;
+
+let lazBoundingBox=null;
 
 
 // ==========================================
@@ -10167,7 +10183,7 @@ control.innerHTML=`
 
 POINT BUDGET:
 <span id="pointBudgetValue">
-500000
+1,000,000
 </span>
 
 </div>
@@ -10178,7 +10194,7 @@ type="range"
 min="500000"
 max="5000000"
 step="250000"
-value="500000"
+value="1000000"
 style="
 width:100%;
 margin-top:6px;
@@ -10280,17 +10296,6 @@ new Float32Array(
 visiblePoints*3
 );
 
-let colors=null;
-
-if(lazColors){
-
-colors=
-new Float32Array(
-visiblePoints*3
-);
-
-}
-
 for(
 let i=0;
 i<visiblePoints;
@@ -10314,37 +10319,6 @@ lazPositions[sourceIndex*3+1];
 positions[i*3+2]=
 lazPositions[sourceIndex*3+2];
 
-
-if(lazColors){
-
-colors[i*3]=
-lazColors[sourceIndex*3];
-
-colors[i*3+1]=
-lazColors[sourceIndex*3+1];
-
-colors[i*3+2]=
-lazColors[sourceIndex*3+2];
-
-}
-
-}
-
-if(!lazGeometry){
-
-lazGeometry=
-new THREE.BufferGeometry();
-
-lazPoints=
-new THREE.Points(
-lazGeometry,
-lazMaterial
-);
-
-scene.add(
-lazPoints
-);
-
 }
 
 lazGeometry.setAttribute(
@@ -10355,22 +10329,21 @@ positions,
 )
 );
 
-if(colors){
-
-lazGeometry.setAttribute(
-"color",
-new THREE.BufferAttribute(
-colors,
-3
-)
-);
-
-lazMaterial.vertexColors=
-true;
-
-}
+lazGeometry.computeBoundingBox();
 
 lazGeometry.computeBoundingSphere();
+
+
+// ==========================================
+// STATUS
+// ==========================================
+
+status.textContent=
+"READY — "+
+visiblePoints.toLocaleString()+
+" / "+
+totalPoints.toLocaleString()+
+" POINTS";
 
 }
 
@@ -10381,7 +10354,9 @@ lazGeometry.computeBoundingSphere();
 
 function frameLAZ(){
 
-if(!lazGeometry)
+if(
+!lazGeometry
+)
 return;
 
 lazGeometry.computeBoundingBox();
@@ -10447,6 +10422,9 @@ status.textContent=
 
 createPointBudgetControl();
 
+lazBudget=
+1000000;
+
 try{
 
 const core=
@@ -10477,7 +10455,7 @@ throw new Error(
 }
 
 status.textContent=
-"CARGANDO PUNTOS 500K";
+"CARGANDO PUNTOS 1M";
 
 const data=
 await load(
@@ -10535,6 +10513,25 @@ throw new Error(
 
 }
 
+
+// ==========================================
+// LAZ BOUNDING BOX
+// ==========================================
+
+if(
+data.header &&
+data.header.boundingBox
+){
+
+lazBoundingBox=
+data.header.boundingBox;
+
+}
+
+
+// ==========================================
+// OPTIONAL RGB
+// ==========================================
 
 if(
 colorAttribute &&
@@ -10594,24 +10591,48 @@ b;
 
 
 // ==========================================
-// MATERIAL
+// POINT MATERIAL
 // ==========================================
 
 lazMaterial=
 new THREE.PointsMaterial({
-size:0.02,
-sizeAttenuation:true,
+
+color:
+0xffffff,
+
+size:
+0.1,
+
+sizeAttenuation:
+false,
+
 vertexColors:
-!!lazColors
+false
+
 });
 
 
 // ==========================================
-// INITIAL POINT BUDGET
+// CREATE GEOMETRY
 // ==========================================
 
-lazBudget=
-500000;
+lazGeometry=
+new THREE.BufferGeometry();
+
+lazPoints=
+new THREE.Points(
+lazGeometry,
+lazMaterial
+);
+
+scene.add(
+lazPoints
+);
+
+
+// ==========================================
+// INITIAL SAMPLE
+// ==========================================
 
 updateLAZPoints(
 lazBudget
@@ -10632,24 +10653,29 @@ frameLAZ();
 removeCube();
 
 status.textContent=
-"READY";
+"READY — "+
+Math.min(
+lazBudget,
+lazPointCount
+).toLocaleString()+
+" / "+
+lazPointCount.toLocaleString()+
+" POINTS";
 
 console.log(
 "JANUS LAZ POINTS:",
 lazPointCount
 );
 
-if(
-data.header &&
-data.header.boundingBox
-){
-
 console.log(
 "JANUS LAZ BOUNDING BOX:",
-data.header.boundingBox
+lazBoundingBox
 );
 
-}
+console.log(
+"JANUS LAZ COLORS:",
+!!lazColors
+);
 
 }catch(error){
 
