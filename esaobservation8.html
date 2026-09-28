@@ -3532,7 +3532,7 @@ referenceDate.replace(/\.\d+Z$/,"Z");
 // =================================
 
 const url =
-`${data.items}?limit=2000&datetime=../${referenceDate}`;
+`${data.items}?limit=1000&datetime=../${referenceDate}`;
 
 console.log(
 "ITEM QUERY:",
@@ -4510,7 +4510,7 @@ latestJSON.features[0]
 // =================================
 
 const url=
-`${activeDataset.items}?limit=2000`+
+`${activeDataset.items}?limit=1000`+
 `&datetime=../${encodeURIComponent(referenceDate)}`+
 `&bbox=`+
 `${cell.lonMin},${cell.latMin},`+
@@ -4618,7 +4618,7 @@ let pages=0;
 
 while(
 pageURL&&
-features.length<2000
+features.length<1000
 ){
 
 pages++;
@@ -5311,7 +5311,7 @@ const bbox=
 exploration.bbox;
 
 pageURL=
-`${activeDataset.items}?limit=1500`+
+`${activeDataset.items}?limit=1000`+
 `&datetime=../${encodeURIComponent(referenceDate)}`+
 `&bbox=`+
 `${bbox.lonMin},${bbox.latMin},`+
