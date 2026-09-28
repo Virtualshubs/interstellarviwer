@@ -10303,6 +10303,20 @@ new Float32Array(
 visiblePoints*3
 );
 
+let colors=null;
+
+if(
+lazColors &&
+lazColors.length>=totalPoints*3
+){
+
+colors=
+new Float32Array(
+visiblePoints*3
+);
+
+}
+
 for(
 let i=0;
 i<visiblePoints;
@@ -10326,6 +10340,19 @@ lazPositions[sourceIndex*3+1];
 positions[i*3+2]=
 lazPositions[sourceIndex*3+2];
 
+if(colors){
+
+colors[i*3]=
+lazColors[sourceIndex*3];
+
+colors[i*3+1]=
+lazColors[sourceIndex*3+1];
+
+colors[i*3+2]=
+lazColors[sourceIndex*3+2];
+
+}
+
 }
 
 lazGeometry.setAttribute(
@@ -10336,9 +10363,44 @@ positions,
 )
 );
 
+if(colors){
+
+lazGeometry.setAttribute(
+"color",
+new THREE.BufferAttribute(
+colors,
+3
+)
+);
+
+lazMaterial.vertexColors=
+true;
+
+}else{
+
+if(
+lazGeometry.getAttribute(
+"color"
+)
+){
+
+lazGeometry.deleteAttribute(
+"color"
+);
+
+}
+
+lazMaterial.vertexColors=
+false;
+
+}
+
 lazGeometry.computeBoundingBox();
 
 lazGeometry.computeBoundingSphere();
+
+lazMaterial.needsUpdate=
+true;
 
 status.textContent=
 "READY — "+
@@ -10616,6 +10678,8 @@ data.header.boundingBox;
 // OPTIONAL RGB
 // ==========================================
 
+lazColors=null;
+
 if(
 colorAttribute &&
 colorAttribute.value
@@ -10633,14 +10697,47 @@ sourceColors.length/
 colorSize
 );
 
+if(
+sourceColorCount>=lazPointCount
+){
+
+let colorScale=1;
+
+let maxColorValue=0;
+
+for(
+let i=0;
+i<Math.min(
+sourceColors.length,
+300
+);
+i++
+){
+
+if(
+sourceColors[i]>
+maxColorValue
+){
+
+maxColorValue=
+sourceColors[i];
+
+}
+
+}
+
+if(maxColorValue>255)
+colorScale=
+65535;
+
 lazColors=
 new Float32Array(
-sourceColorCount*3
+lazPointCount*3
 );
 
 for(
 let i=0;
-i<sourceColorCount;
+i<lazPointCount;
 i++
 ){
 
@@ -10654,19 +10751,21 @@ const b=
 sourceColors[i*colorSize+2];
 
 lazColors[i*3]=
-r>1?
-r/255:
-r;
+colorScale===1
+?(r>1?r/255:r)
+:r/65535;
 
 lazColors[i*3+1]=
-g>1?
-g/255:
-g;
+colorScale===1
+?(g>1?g/255:g)
+:g/65535;
 
 lazColors[i*3+2]=
-b>1?
-b/255:
-b;
+colorScale===1
+?(b>1?b/255:b)
+:b/65535;
+
+}
 
 }
 
@@ -10758,6 +10857,11 @@ lazBoundingBox
 console.log(
 "JANUS LAZ COLORS:",
 !!lazColors
+);
+
+console.log(
+"JANUS LAZ COLOR ATTRIBUTE:",
+colorAttribute
 );
 
 }catch(error){
@@ -10926,6 +11030,10 @@ let rotationX=0;
 
 let rotationY=0;
 
+let dragOffsetX=0;
+
+let dragOffsetY=0;
+
 
 // ==========================================
 // CAMERA DISTANCE
@@ -11026,20 +11134,38 @@ event.clientX;
 previousY=
 event.clientY;
 
-rotationY+=
-deltaX*0.01;
 
-rotationX+=
-deltaY*0.01;
+// ==========================================
+// CLASSIC DRAG / PAN
+// ==========================================
 
-rotationX=
+const canvasWidth=
 Math.max(
--1.5,
-Math.min(
-1.5,
-rotationX
-)
+canvasContainer.clientWidth,
+1
 );
+
+const canvasHeight=
+Math.max(
+canvasContainer.clientHeight,
+1
+);
+
+const panScale=
+modelSize/
+Math.min(
+canvasWidth,
+canvasHeight
+)*
+2;
+
+dragOffsetX+=
+deltaX*
+panScale;
+
+dragOffsetY-=
+deltaY*
+panScale;
 
 },
 {
@@ -11128,8 +11254,15 @@ event=>{
 if(pointCloudViewer)
 return;
 
-if(isDragging)
+if(isDragging){
+
+event.preventDefault();
+
+event.stopPropagation();
+
 return;
+
+}
 
 event.preventDefault();
 
@@ -11223,6 +11356,18 @@ rotationX=
 rotationY=
 0;
 
+dragOffsetX=
+0;
+
+dragOffsetY=
+0;
+
+modelGroup.position.set(
+0,
+0,
+0
+);
+
 camera.position.set(
 0,
 0,
@@ -11259,6 +11404,12 @@ rotationX;
 
 modelGroup.rotation.y=
 rotationY;
+
+modelGroup.position.x=
+dragOffsetX;
+
+modelGroup.position.y=
+dragOffsetY;
 
 camera.position.set(
 0,
