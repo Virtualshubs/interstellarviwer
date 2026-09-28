@@ -9748,7 +9748,7 @@ modelURL
      
      
      
-  // ==========================================
+// ==========================================
 // CREATE 3D VIEWER
 // ==========================================
 
@@ -9823,6 +9823,18 @@ renderer.domElement
 
 
 // ==========================================
+// MODEL GROUP
+// ==========================================
+
+const modelGroup=
+new THREE.Group();
+
+scene.add(
+modelGroup
+);
+
+
+// ==========================================
 // LIGHTS
 // ==========================================
 
@@ -9873,7 +9885,9 @@ geometry,
 material
 );
 
-scene.add(cube);
+modelGroup.add(
+cube
+);
 
 
 // ==========================================
@@ -9958,7 +9972,7 @@ function removeCube(){
 if(!cube.parent)
 return;
 
-scene.remove(
+modelGroup.remove(
 cube
 );
 
@@ -10043,7 +10057,7 @@ realModel.position.sub(
 center
 );
 
-scene.add(
+modelGroup.add(
 realModel
 );
 
@@ -10694,7 +10708,7 @@ lazGeometry,
 lazMaterial
 );
 
-scene.add(
+modelGroup.add(
 lazPoints
 );
 
@@ -11240,31 +11254,11 @@ animate
 
 if(!pointCloudViewer){
 
-if(realModel){
-
-realModel.rotation.x=
+modelGroup.rotation.x=
 rotationX;
 
-realModel.rotation.y=
+modelGroup.rotation.y=
 rotationY;
-
-}else if(lazPoints){
-
-lazPoints.rotation.x=
-rotationX;
-
-lazPoints.rotation.y=
-rotationY;
-
-}else{
-
-cube.rotation.x=
-rotationX;
-
-cube.rotation.y=
-rotationY;
-
-}
 
 camera.position.set(
 0,
