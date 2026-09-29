@@ -11958,7 +11958,7 @@ modelURL;
 
 
 // ==========================================
-// JANUS SPATIAL CONTEXT VIEWER test celsium
+// JANUS SPATIAL CONTEXT VIEWER
 // ==========================================
 
 let janusContextViewer=null;
@@ -12000,7 +12000,7 @@ baseLayerPicker:true,
 geocoder:false,
 homeButton:false,
 sceneModePicker:false,
-navigationHelpButton:false, 
+navigationHelpButton:false,
 fullscreenButton:false,
 infoBox:false,
 selectionIndicator:false
@@ -12094,20 +12094,8 @@ lon
 
 
 // ==========================================
-// INITIALIZE
+// UPDATE FROM STAC OBSERVATION
 // ==========================================
-
-setTimeout(
-()=>{
-
-initJanusContextViewer();
-
-},
-100
-);
-
-
-
 
 function updateJanusContextFromObservation(obs){
 
@@ -12145,7 +12133,10 @@ Number.isFinite(lat) &&
 Number.isFinite(lon)
 ){
 
-updateJanusContext(lat,lon);
+updateJanusContext(
+lat,
+lon
+);
 
 }
 
@@ -12154,6 +12145,18 @@ updateJanusContext(lat,lon);
 }
 
 
+// ==========================================
+// INITIALIZE
+// ==========================================
+
+setTimeout(
+()=>{
+
+initJanusContextViewer();
+
+},
+100
+);
 
 
 
