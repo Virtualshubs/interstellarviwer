@@ -12015,9 +12015,9 @@ container,
 animation:false,
 timeline:true,
 baseLayerPicker:true,
-geocoder:false,
+geocoder:true,
 homeButton:false,
-sceneModePicker:false,
+sceneModePicker:true,
 navigationHelpButton:false,
 fullscreenButton:false,
 infoBox:false,
@@ -12042,6 +12042,10 @@ error
 
 }
 
+
+// ==========================================
+// UPDATE CESIUM FROM CELL
+// ==========================================
 
 function updateJanusContextCell(
 lat1,
@@ -12130,6 +12134,79 @@ lon2
 
 
 // ==========================================
+// UPDATE CESIUM FROM ITEM
+// ==========================================
+
+function updateJanusContext(
+lat,
+lon
+){
+
+if(!janusContextReady){
+
+initJanusContextViewer();
+
+}
+
+if(!janusContextViewer)
+return;
+
+lat=Number(lat);
+lon=Number(lon);
+
+if(
+!Number.isFinite(lat) ||
+!Number.isFinite(lon)
+){
+
+console.warn(
+"JANUS CONTEXT: INVALID COORDINATES",
+lat,
+lon
+);
+
+return;
+
+}
+
+const coords=
+document.getElementById(
+"janusContextCoords"
+);
+
+if(coords){
+
+coords.textContent=
+lat.toFixed(6)+
+"°  "+
+lon.toFixed(6)+
+"°  | ITEM";
+
+}
+
+janusContextViewer.camera.flyTo({
+
+destination:
+Cesium.Cartesian3.fromDegrees(
+lon,
+lat,
+800
+),
+
+duration:1.2
+
+});
+
+console.log(
+"JANUS CONTEXT ITEM:",
+lat,
+lon
+);
+
+}
+
+
+// ==========================================
 // UPDATE FROM STAC OBSERVATION
 // ==========================================
 
@@ -12193,15 +12270,6 @@ initJanusContextViewer();
 },
 100
 );
-
-
-
-
-
-
-
-
-
 
 
 
