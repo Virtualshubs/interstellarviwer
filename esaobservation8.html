@@ -9900,6 +9900,10 @@ let pointCloud=null;
 
 let pointCloudViewer=null;
 
+let cesiumViewer=null;
+
+let cesiumTileset=null;
+
 let lazGeometry=null;
 
 let lazMaterial=null;
@@ -9946,6 +9950,27 @@ return "LAZ";
 
 if(cleanURL.endsWith(".las"))
 return "LAS";
+
+if(
+cleanURL.includes(
+"application/3dtiles"
+)
+)
+return "3DTILES";
+
+if(
+cleanURL.includes(
+"api.cesium.com/v1/assets/"
+)
+)
+return "3DTILES";
+
+if(
+cleanURL.includes(
+"app.iconem.com/external/"
+)
+)
+return "3DTILES";
 
 return "UNKNOWN";
 
@@ -11035,6 +11060,196 @@ status.textContent=
 
 
 // ==========================================
+// LOAD 3D TILES
+// ==========================================
+
+function load3DTiles(){
+
+status.textContent=
+"PROCESSING 3D TILES";
+
+const loadCesium=()=>{
+
+if(!window.Cesium){
+
+status.textContent=
+"CESIUM NOT AVAILABLE";
+
+return;
+
+}
+
+renderer.domElement.style.display=
+"none";
+
+canvasContainer.style.position=
+"relative";
+
+const cesiumContainer=
+document.createElement("div");
+
+cesiumContainer.id=
+"janusCesiumContainer";
+
+cesiumContainer.style.cssText=`
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+overflow:hidden;
+`;
+
+canvasContainer.appendChild(
+cesiumContainer
+);
+
+try{
+
+cesiumViewer=
+new Cesium.Viewer(
+cesiumContainer,
+{
+animation:false,
+timeline:false,
+baseLayerPicker:false,
+geocoder:false,
+homeButton:false,
+sceneModePicker:false,
+navigationHelpButton:false,
+fullscreenButton:false,
+infoBox:false,
+selectionIndicator:false,
+scene3DOnly:true,
+baseLayer:false,
+terrain:false
+}
+);
+
+Cesium.Cesium3DTileset.fromUrl(
+modelURL
+)
+.then(tileset=>{
+
+cesiumTileset=
+tileset;
+
+cesiumViewer.scene.primitives.add(
+tileset
+);
+
+removeCube();
+
+cesiumViewer.zoomTo(
+tileset
+);
+
+status.textContent=
+"READY — 3D TILES";
+
+console.log(
+"JANUS 3D TILES:",
+modelURL
+);
+
+})
+.catch(error=>{
+
+console.error(
+"3D TILES LOAD ERROR",
+error
+);
+
+status.textContent=
+"3D TILES LOAD ERROR";
+
+});
+
+}catch(error){
+
+console.error(
+"CESIUM VIEWER ERROR",
+error
+);
+
+status.textContent=
+"CESIUM VIEWER ERROR";
+
+}
+
+};
+
+
+// ==========================================
+// LOAD CESIUMJS
+// ==========================================
+
+if(window.Cesium){
+
+loadCesium();
+
+return;
+
+}
+
+const cssId=
+"janusCesiumCSS";
+
+if(
+!document.getElementById(cssId)
+){
+
+const css=
+document.createElement("link");
+
+css.id=
+cssId;
+
+css.rel=
+"stylesheet";
+
+css.href=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/widgets.css";
+
+document.head.appendChild(
+css
+);
+
+}
+
+window.CESIUM_BASE_URL=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/";
+
+const script=
+document.createElement("script");
+
+script.src=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Cesium.js";
+
+script.onload=()=>{
+
+loadCesium();
+
+};
+
+script.onerror=()=>{
+
+console.error(
+"CESIUMJS LOAD ERROR"
+);
+
+status.textContent=
+"CESIUMJS LOAD ERROR";
+
+};
+
+document.head.appendChild(
+script
+);
+
+}
+
+
+// ==========================================
 // RESOURCE DISPATCH
 // ==========================================
 
@@ -11057,6 +11272,12 @@ modelType==="EPT"
 ){
 
 loadPointCloud();
+
+}else if(
+modelType==="3DTILES"
+){
+
+load3DTiles();
 
 }else if(
 modelType==="LAS"
@@ -11568,6 +11789,12 @@ renderer.setSize(
 width,
 height
 );
+
+}
+
+if(cesiumViewer){
+
+cesiumViewer.resize();
 
 }
 
