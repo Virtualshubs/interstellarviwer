@@ -6865,6 +6865,39 @@ const info=json.CELL_INFO||{};
 const observations=json.OBSERVATIONS||[];
 
 
+
+
+
+// test celsium
+
+const latParts=String(info.latRange||"").split("/");
+const lonParts=String(info.lonRange||"").split("/");
+
+if(latParts.length===2 && lonParts.length===2){
+
+const lat1=Number(latParts[0].trim());
+const lat2=Number(latParts[1].trim());
+const lon1=Number(lonParts[0].trim());
+const lon2=Number(lonParts[1].trim());
+
+if(
+Number.isFinite(lat1) &&
+Number.isFinite(lat2) &&
+Number.isFinite(lon1) &&
+Number.isFinite(lon2)
+){
+
+const cellLat=(lat1+lat2)/2;
+const cellLon=(lon1+lon2)/2;
+
+updateJanusContext(cellLat,cellLon);
+
+}
+}
+
+   
+
+
 document.getElementById("janusStatus").textContent=
 "Dataset Loaded";
 
