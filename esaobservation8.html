@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <title>3D SAC</title>
 
+   <link
+rel="stylesheet"
+href="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/widgets.css"
+>
+
+
 <style>
 
 :root[data-theme="terra"]{
@@ -2027,6 +2033,65 @@ font-weight:500;
 word-break:break-word;
 
 }  
+
+
+
+
+
+
+
+#janusContextPanel{
+width:100%;
+margin:20px 0;
+background:#080808;
+border:1px solid #202020;
+box-sizing:border-box;
+}
+
+.janusContextHeader{
+height:54px;
+padding:0 16px;
+display:flex;
+align-items:center;
+background:#111;
+border-bottom:1px solid #252525;
+box-sizing:border-box;
+}
+
+.janusContextTitle{
+font-size:11px;
+font-weight:600;
+letter-spacing:1.5px;
+color:#aaa;
+}
+
+#janusContextCoords{
+margin-top:4px;
+font-size:11px;
+color:#666;
+font-family:monospace;
+}
+
+#janusContextViewer{
+width:100%;
+height:420px;
+position:relative;
+overflow:hidden;
+background:#000;
+}
+
+#janusContextViewer .cesium-viewer{
+width:100%;
+height:100%;
+}
+
+
+
+
+
+
+
+   
    
 </style>
 </head>
@@ -2208,6 +2273,31 @@ Load
 
             </div>
 
+
+           
+
+<div id="janusContextPanel">
+
+<div class="janusContextHeader">
+
+<div>
+
+<div class="janusContextTitle">
+SPATIAL CONTEXT
+</div>
+
+<div id="janusContextCoords">
+Waiting for cell selection
+</div>
+
+</div>
+
+</div>
+
+<div id="janusContextViewer"></div>
+
+</div>
+           
             <div id="observations"></div>
 
         </div>
@@ -2229,7 +2319,16 @@ Load
 <script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/build/potree/potree.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/potree/potree@develop/libs/plasio/js/laslaz.js"></script>
 
+<script>
 
+window.CESIUM_BASE_URL=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/";
+
+</script>
+
+<script
+src="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Cesium.js">
+</script>
    
 <script>
 let BASE="";
@@ -11811,6 +11910,206 @@ viewer.dataset.modelUrl=
 modelURL;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// JANUS SPATIAL CONTEXT VIEWER test celsium
+// ==========================================
+
+let janusContextViewer=null;
+let janusContextReady=false;
+
+
+function initJanusContextViewer(){
+
+const container=
+document.getElementById(
+"janusContextViewer"
+);
+
+if(!container)
+return;
+
+if(janusContextViewer)
+return;
+
+if(!window.Cesium){
+
+console.error(
+"JANUS CONTEXT: CESIUM NOT AVAILABLE"
+);
+
+return;
+
+}
+
+try{
+
+janusContextViewer=
+new Cesium.Viewer(
+container,
+{
+animation:false,
+timeline:false,
+baseLayerPicker:false,
+geocoder:false,
+homeButton:false,
+sceneModePicker:false,
+navigationHelpButton:false,
+fullscreenButton:false,
+infoBox:false,
+selectionIndicator:false
+}
+);
+
+janusContextReady=true;
+
+console.log(
+"JANUS CONTEXT VIEWER READY"
+);
+
+}catch(error){
+
+console.error(
+"JANUS CONTEXT VIEWER ERROR",
+error
+);
+
+}
+
+}
+
+
+function updateJanusContext(
+lat,
+lon
+){
+
+if(!janusContextReady){
+
+initJanusContextViewer();
+
+}
+
+if(!janusContextViewer)
+return;
+
+lat=Number(lat);
+lon=Number(lon);
+
+if(
+!Number.isFinite(lat) ||
+!Number.isFinite(lon)
+){
+
+console.warn(
+"JANUS CONTEXT: INVALID COORDINATES",
+lat,
+lon
+);
+
+return;
+
+}
+
+const coords=
+document.getElementById(
+"janusContextCoords"
+);
+
+if(coords){
+
+coords.textContent=
+lat.toFixed(6)+
+"°  "+
+lon.toFixed(6)+"°";
+
+}
+
+janusContextViewer.camera.flyTo({
+
+destination:
+Cesium.Cartesian3.fromDegrees(
+lon,
+lat,
+3000
+),
+
+duration:1.2
+
+});
+
+console.log(
+"JANUS CONTEXT POSITION:",
+lat,
+lon
+);
+
+}
+
+
+// ==========================================
+// INITIALIZE
+// ==========================================
+
+setTimeout(
+()=>{
+
+initJanusContextViewer();
+
+},
+100
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      
      
 // ==========================================
