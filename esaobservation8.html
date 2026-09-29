@@ -6868,17 +6868,32 @@ const observations=json.OBSERVATIONS||[];
 
 
 
-// test celsium
+// ==========================================
+// UPDATE CESIUM FROM CELL
+// ==========================================
 
-const latParts=String(info.latRange||"").split("/");
-const lonParts=String(info.lonRange||"").split("/");
+const latParts=
+String(info.latRange||"").split("/");
 
-if(latParts.length===2 && lonParts.length===2){
+const lonParts=
+String(info.lonRange||"").split("/");
 
-const lat1=Number(latParts[0].trim());
-const lat2=Number(latParts[1].trim());
-const lon1=Number(lonParts[0].trim());
-const lon2=Number(lonParts[1].trim());
+if(
+latParts.length===2 &&
+lonParts.length===2
+){
+
+const lat1=
+Number(latParts[0].trim());
+
+const lat2=
+Number(latParts[1].trim());
+
+const lon1=
+Number(lonParts[0].trim());
+
+const lon2=
+Number(lonParts[1].trim());
 
 if(
 Number.isFinite(lat1) &&
@@ -6887,12 +6902,15 @@ Number.isFinite(lon1) &&
 Number.isFinite(lon2)
 ){
 
-const cellLat=(lat1+lat2)/2;
-const cellLon=(lon1+lon2)/2;
-
-updateJanusContext(cellLat,cellLon);
+updateJanusContextCell(
+lat1,
+lat2,
+lon1,
+lon2
+);
 
 }
+
 }
 
    
@@ -12025,9 +12043,11 @@ error
 }
 
 
-function updateJanusContext(
-lat,
-lon
+function updateJanusContextCell(
+lat1,
+lat2,
+lon1,
+lon2
 ){
 
 if(!janusContextReady){
@@ -12039,23 +12059,35 @@ initJanusContextViewer();
 if(!janusContextViewer)
 return;
 
-lat=Number(lat);
-lon=Number(lon);
+lat1=Number(lat1);
+lat2=Number(lat2);
+lon1=Number(lon1);
+lon2=Number(lon2);
 
 if(
-!Number.isFinite(lat) ||
-!Number.isFinite(lon)
+!Number.isFinite(lat1) ||
+!Number.isFinite(lat2) ||
+!Number.isFinite(lon1) ||
+!Number.isFinite(lon2)
 ){
 
 console.warn(
-"JANUS CONTEXT: INVALID COORDINATES",
-lat,
-lon
+"JANUS CONTEXT: INVALID CELL RANGE",
+lat1,
+lat2,
+lon1,
+lon2
 );
 
 return;
 
 }
+
+const centerLat=
+(lat1+lat2)/2;
+
+const centerLon=
+(lon1+lon2)/2;
 
 const coords=
 document.getElementById(
@@ -12065,19 +12097,21 @@ document.getElementById(
 if(coords){
 
 coords.textContent=
-lat.toFixed(6)+
+centerLat.toFixed(6)+
 "°  "+
-lon.toFixed(6)+"°";
+centerLon.toFixed(6)+
+"°  | CELL";
 
 }
 
 janusContextViewer.camera.flyTo({
 
 destination:
-Cesium.Cartesian3.fromDegrees(
-lon,
-lat,
-3000
+Cesium.Rectangle.fromDegrees(
+lon1,
+lat1,
+lon2,
+lat2
 ),
 
 duration:1.2
@@ -12085,9 +12119,11 @@ duration:1.2
 });
 
 console.log(
-"JANUS CONTEXT POSITION:",
-lat,
-lon
+"JANUS CONTEXT CELL:",
+lat1,
+lat2,
+lon1,
+lon2
 );
 
 }
