@@ -7211,6 +7211,8 @@ container.appendChild(exploitation);
 const extent=
 getObservationExtent(obs);
 
+   updateJanusContextFromObservation(obs);
+
 
 // ==========================================
 // ELEMENTS
@@ -12107,10 +12109,49 @@ initJanusContextViewer();
 
 
 
+function updateJanusContextFromObservation(obs){
 
+const centroid=
+obs.properties?.["proj:centroid"];
 
+if(
+centroid &&
+Number.isFinite(Number(centroid.lat)) &&
+Number.isFinite(Number(centroid.lon))
+){
 
+updateJanusContext(
+Number(centroid.lat),
+Number(centroid.lon)
+);
 
+return;
+
+}
+
+if(
+obs.geometry?.coordinates &&
+obs.geometry.type==="Point"
+){
+
+const lon=
+Number(obs.geometry.coordinates[0]);
+
+const lat=
+Number(obs.geometry.coordinates[1]);
+
+if(
+Number.isFinite(lat) &&
+Number.isFinite(lon)
+){
+
+updateJanusContext(lat,lon);
+
+}
+
+}
+
+}
 
 
 
