@@ -1608,13 +1608,13 @@ width:100%;
 <div id="dock" hidden>
   
 
-    <button id="compassBtn" class="dockButton">
+    <button id="compassBtn" class="dockButton" hidden>
         <span class="material-symbols-rounded">explore</span>
     </button>
 
     <button
         class="dockButton"
-        onclick="toggleEarthFacts()">
+        onclick="toggleEarthFacts()" hidden>
 
         <span class="material-symbols-rounded">globe</span>
         Earth Data Twin
@@ -1636,18 +1636,18 @@ width:100%;
 
     </button>
 
-    <button id="earthViewBtn" class="camera-active">
+    <button id="earthViewBtn" class="camera-active" hidden>
 
         <span class="material-symbols-rounded">language</span>
         General View
 
     </button>
 
-  <button id="moonCameraBtn">
+  <button id="moonCameraBtn" hidden>
      Moon View
 </button>
 
-    <button id="followViewBtn">
+    <button id="followViewBtn" hidden>
 
         <span class="material-symbols-rounded">satellite_alt</span>
         Satellite View
@@ -1664,7 +1664,7 @@ width:100%;
 
     </button>
 
-    <button onclick="showActiveFires()">
+    <button onclick="showActiveFires()" hidden>
 
         <span class="material-symbols-rounded">local_fire_department</span>
         Active Fires FIRMS NASA
@@ -1673,14 +1673,14 @@ width:100%;
 
     <button
         class="btn"
-        onclick="openCopernicus()">
+        onclick="openCopernicus()" hidden>
 
         <span class="material-symbols-rounded">public</span>
         View in Copernicus ESA 
 
     </button>
 
-    <button onclick="openWindy()">
+    <button onclick="openWindy()" hidden>
 
         <span class="material-symbols-rounded">radar</span>
         Weather Radar WINDI
