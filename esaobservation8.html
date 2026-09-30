@@ -2190,11 +2190,13 @@ Load
 </div>
 
         <div id="content">
+           
 
+            <div id="cards"></div>
 
+            <div id="detail">
 
-
-<div id="janusOpeFrameWrap">
+               <div id="janusOpeFrameWrap">
     <iframe
         id="janusOpeFrame"
         src="https://3d.staratlas.es/ope25.html"
@@ -2202,11 +2204,6 @@ Load
         loading="eager">
     </iframe>
 </div>
-           
-
-            <div id="cards"></div>
-
-            <div id="detail">
 
                 <h2>Select a collection</h2>
 
@@ -12365,6 +12362,37 @@ document.getElementById("themeToggle").addEventListener("click", () => {
             ? "🌙 LUNAR"
             : "☀ TERRA";
 });
+
+
+
+
+
+
+
+    // ===============================
+// ope moon call
+// ===============================
+     
+const opeFrame=document.getElementById("janusOpeFrame");
+
+opeFrame.addEventListener("load",()=>{
+    try{
+        const doc=opeFrame.contentDocument;
+        const moonButton=doc.getElementById("moonCameraBtn");
+
+        if(moonButton){
+            console.log("JANUS OPE: Moon View button found");
+            moonButton.click();
+            console.log("JANUS OPE: Moon View activated");
+        }else{
+            console.warn("JANUS OPE: moonCameraBtn not found");
+        }
+    }catch(error){
+        console.error("JANUS OPE: iframe access error",error);
+    }
+});
+
+     
 
 </script>
 
