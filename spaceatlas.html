@@ -7165,6 +7165,123 @@ function applyURLView(){
     }
 
     // ==========================================
+    // MOON
+    // ==========================================
+
+    if(body === "moon"){
+
+        if(!moon){
+            console.warn(
+                "🌙 URL VIEW: Moon object not found"
+            );
+            return;
+        }
+
+        // Aseguramos que la Luna tenga sus
+        // transformaciones mundiales actualizadas.
+
+        moon.updateMatrixWorld(true);
+
+        // ==========================================
+        // MOON RADIUS
+        // ==========================================
+
+        let moonRadius = 1;
+
+        if(moon.geometry){
+
+            if(!moon.geometry.boundingSphere){
+                moon.geometry.computeBoundingSphere();
+            }
+
+            if(
+                moon.geometry.boundingSphere &&
+                Number.isFinite(
+                    moon.geometry.boundingSphere.radius
+                )
+            ){
+
+                moonRadius =
+                    moon.geometry.boundingSphere.radius;
+
+            }
+
+        }
+
+        // ==========================================
+        // LAT/LON → MOON LOCAL POSITION
+        // ==========================================
+
+        const latRad =
+            THREE.MathUtils.degToRad(lat);
+
+        const lonRad =
+            THREE.MathUtils.degToRad(lon);
+
+        const cosLat =
+            Math.cos(latRad);
+
+        const localPoint =
+            new THREE.Vector3(
+                Math.cos(lonRad) * cosLat,
+                Math.sin(latRad),
+                Math.sin(lonRad) * cosLat
+            );
+
+        localPoint.multiplyScalar(
+            moonRadius
+        );
+
+        // ==========================================
+        // MOON SURFACE → WORLD
+        // ==========================================
+
+        const worldPoint =
+            localPoint.clone();
+
+        moon.localToWorld(
+            worldPoint
+        );
+
+        // ==========================================
+        // CAMERA DIRECTION
+        // ==========================================
+
+        const direction =
+            worldPoint.normalize();
+
+        targetRotX =
+            Math.asin(
+                THREE.MathUtils.clamp(
+                    direction.y,
+                    -1,
+                    1
+                )
+            );
+
+        targetRotY =
+            Math.atan2(
+                direction.x,
+                direction.z
+            );
+
+        rotX = targetRotX;
+        rotY = targetRotY;
+
+        console.log(
+            "🌙 URL MOON VIEW:",
+            {
+                lat,
+                lon,
+                moonRadius,
+                worldPoint,
+                direction
+            }
+        );
+
+    }
+
+    // ==========================================
     // ZOOM
     // ==========================================
 
@@ -7195,10 +7312,6 @@ function applyURLView(){
     );
 
 }
-
-
-
-
 
 
 
