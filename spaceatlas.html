@@ -7323,7 +7323,7 @@ function applyURLView(){
 
 
   
-  function animate(){
+function animate(){
 
     requestAnimationFrame(animate);
 
@@ -7371,18 +7371,10 @@ function applyURLView(){
             .clone()
             .normalize();
 
-    // ------------------------------------------------------
-    // Luz solar direccional
-    //
-    // La distancia de la DirectionalLight es solo espacial
-    // para Three.js. Lo importante físicamente es la dirección.
-    // ------------------------------------------------------
-
     sunLight.position.copy(
         sunDirection.multiplyScalar(100)
     );
 
-    // La luz apunta al centro del sistema Tierra-Luna
     sunLight.target.position.set(
         0,
         0,
@@ -7399,11 +7391,6 @@ function applyURLView(){
 
 
     // ======================================================
-    // CAMERA
-    // ======================================================
-
-
-    // ======================================================
     // 🌙 MOON CAMERA
     // ======================================================
 
@@ -7413,9 +7400,6 @@ function applyURLView(){
 
             // --------------------------------------------------
             // SUAVIZAR CONTROLES
-            //
-            // Reutilizamos exactamente los controles
-            // existentes de la cámara terrestre.
             // --------------------------------------------------
 
             rotY +=
@@ -7438,9 +7422,6 @@ function applyURLView(){
 
             // --------------------------------------------------
             // RADIO VISUAL DE LA LUNA
-            //
-            // Tierra = 1
-            // Luna   ≈ 0.2727
             // --------------------------------------------------
 
             const moonRadius =
@@ -7449,10 +7430,6 @@ function applyURLView(){
 
             // --------------------------------------------------
             // POSICIÓN ORBITAL DE LA CÁMARA
-            //
-            // Exactamente la misma lógica que usamos
-            // alrededor de la Tierra, pero tomando la Luna
-            // como centro.
             // --------------------------------------------------
 
             const offset =
@@ -7480,12 +7457,30 @@ function applyURLView(){
 
             // --------------------------------------------------
             // MOVIMIENTO SUAVE
+            //
+            // Cuando ya estamos prácticamente en el objetivo,
+            // eliminamos el último resto de interpolación.
             // --------------------------------------------------
 
-            camera.position.lerp(
-                desired,
-                0.08
-            );
+            if(
+                Math.abs(distance - targetDistance) < 0.001
+            ){
+
+                distance =
+                    targetDistance;
+
+                camera.position.copy(
+                    desired
+                );
+
+            }else{
+
+                camera.position.lerp(
+                    desired,
+                    0.08
+                );
+
+            }
 
 
             // --------------------------------------------------
@@ -7499,11 +7494,8 @@ function applyURLView(){
             // --------------------------------------------------
             // TRANSICIÓN LUNA → TIERRA
             //
-            // La cámara permanece orientada hacia la Luna
-            // mientras esté fuera de su superficie.
-            //
-            // Solo cuando se aproxima a la capa lunar
-            // comienza la transición hacia la Tierra.
+            // La cámara permanece mirando a la Luna hasta
+            // llegar prácticamente a su superficie.
             // --------------------------------------------------
 
             const moonSurfaceLimit =
@@ -7626,11 +7618,6 @@ function applyURLView(){
 
         if(mesh){
 
-            // --------------------------------------------------
-            // Si existe un modelo GLB usamos ese.
-            // Si no, seguimos la esfera.
-            // --------------------------------------------------
-
             const target =
                 mesh.userData.model || mesh;
 
@@ -7680,9 +7667,6 @@ function applyURLView(){
             const desired =
                 target.position.clone();
 
-
-            // Distancia variable detrás del satélite
-
             desired.sub(
                 dir
                     .clone()
@@ -7692,15 +7676,14 @@ function applyURLView(){
                     )
             );
 
-
-            // Altura proporcional al zoom
-
             desired.y +=
                 radius *
                 (followDistance * 0.15);
 
 
-            // Movimiento suave
+            // ==================================================
+            // MOVIMIENTO SUAVE
+            // ==================================================
 
             camera.position.lerp(
                 desired,
@@ -7708,7 +7691,9 @@ function applyURLView(){
             );
 
 
-            // La cámara mira siempre al satélite
+            // ==================================================
+            // MIRAR AL SATÉLITE
+            // ==================================================
 
             camera.lookAt(
                 target.position
@@ -7729,6 +7714,10 @@ function applyURLView(){
     );
 
 }
+
+
+
+  
   
 function onResize(){
   camera.aspect = window.innerWidth/window.innerHeight;
