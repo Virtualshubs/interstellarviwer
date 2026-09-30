@@ -7076,7 +7076,6 @@ function getSunPosition(date){
 
 
 
-
 function applyURLView(){
 
     const params = new URLSearchParams(
@@ -7125,7 +7124,7 @@ function applyURLView(){
         ).normalize();
 
     // ==========================================
-    // APPLY THE SAME EARTH ORIENTATION
+    // APPLY EARTH ORIENTATION
     // ==========================================
 
     if(body === "earth"){
@@ -7183,7 +7182,10 @@ function applyURLView(){
 
     if(body === "earth"){
 
-        moveCityPin(lat, lon);
+        moveCityPin(
+            lat,
+            lon
+        );
 
     }
 
