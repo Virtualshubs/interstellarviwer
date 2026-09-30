@@ -7096,12 +7096,6 @@ function getSunPosition(date){
 
 
 
-
-
-// ======================================================
-// URL POSITION
-// ======================================================
-
 function applyURLView(){
 
     const params = new URLSearchParams(window.location.search);
@@ -7139,19 +7133,25 @@ function applyURLView(){
         moonCameraMode = false;
         cameraMode = "earth";
 
+        // ==================================================
+        // PIN
+        // ==================================================
+
+        moveCityPin(lat, lon);
+
     }else{
 
         return;
     }
 
     // ======================================================
-    // LAT / LON → USAR EL MISMO SISTEMA DEL PIN
+    // LAT / LON → CAMERA ROTATION
     // ======================================================
 
-    moveCityPin(lat, lon);
-
     const direction =
-        cityPin.position.clone().normalize();
+        body === "earth"
+            ? cityPin.position.clone().normalize()
+            : latLonToVec3(lat, lon, 1).normalize();
 
     targetRotX =
         Math.asin(
@@ -7200,9 +7200,6 @@ function applyURLView(){
     );
 
 }
-
-
-
 
 
 
