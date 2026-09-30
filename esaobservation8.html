@@ -12378,7 +12378,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-
 function updateJanusGridMap(body){
 
     const marble =
@@ -12388,10 +12387,22 @@ function updateJanusGridMap(body){
         return;
     }
 
-    marble.src =
-        body === "moon"
-            ? "https://3d.staratlas.es/Moonmap_from_clementine_data.png"
-            : "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
+    if(body === "moon"){
+
+        marble.src =
+            "https://3d.staratlas.es/Moonmap_from_clementine_data.png";
+
+    }else if(body === "mars"){
+
+        marble.src =
+            "https://3d.staratlas.es/Moonmap_from_clementine_data.png";
+
+    }else{
+
+        marble.src =
+            "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
+
+    }
 
 }
 
@@ -12400,13 +12411,8 @@ function updateJanusGridMap(body){
 
 
 
-
-
      
-
-
-
-  function updateOpeFromCell(data){
+function updateOpeFromCell(data){
 
     if(
         !data ||
@@ -12449,6 +12455,7 @@ function updateJanusGridMap(body){
     const lon =
         (lonValues[0] + lonValues[1]) / 2;
 
+
     // ==========================================
     // DETECT BODY
     // ==========================================
@@ -12460,12 +12467,50 @@ function updateJanusGridMap(body){
         raw.includes("moon") ||
         raw.includes("luna");
 
-    const body =
-        isMoon
-            ? "moon"
-            : "earth";
+    const isMars =
+        raw.includes("mars") ||
+        raw.includes("marte");
 
-     updateJanusGridMap(body);
+    let body = "earth";
+
+    if(isMoon){
+
+        body = "moon";
+
+    }else if(isMars){
+
+        body = "mars";
+
+    }
+
+
+    // ==========================================
+    // UPDATE JANUS GRID MAP
+    // ==========================================
+
+    updateJanusGridMap(body);
+
+
+    // ==========================================
+    // ZOOM
+    //
+    // Tierra → más cerca
+    // Luna   → más lejos
+    // Marte  → más lejos
+    // ==========================================
+
+    let zoom = 0.7;
+
+    if(body === "moon"){
+
+        zoom = 1.5;
+
+    }else if(body === "mars"){
+
+        zoom = 1.5;
+
+    }
+
 
     // ==========================================
     // BUILD OPE URL
@@ -12476,8 +12521,9 @@ function updateJanusGridMap(body){
             body: body,
             lat: lat,
             lon: lon,
-            zoom: 0.7
+            zoom: zoom
         });
+
 
     const opeFrame =
         document.getElementById("janusOpeFrame");
@@ -12486,9 +12532,11 @@ function updateJanusGridMap(body){
         return;
     }
 
+
     opeFrame.src =
         "https://3d.staratlas.es/spaceatlas.html?" +
         params.toString();
+
 
     console.log(
         "JANUS OPE:",
@@ -12497,7 +12545,9 @@ function updateJanusGridMap(body){
             lat,
             lon,
             body,
-            moonDetected: isMoon
+            zoom,
+            moonDetected: isMoon,
+            marsDetected: isMars
         }
     );
 
