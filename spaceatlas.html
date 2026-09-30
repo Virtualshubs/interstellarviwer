@@ -7077,8 +7077,6 @@ function getSunPosition(date){
 
 
 
-
-
 function applyURLView(){
 
     const params = new URLSearchParams(
@@ -7125,6 +7123,30 @@ function applyURLView(){
             lon,
             1
         ).normalize();
+
+    // ==========================================
+    // APPLY THE SAME EARTH ORIENTATION
+    // ==========================================
+
+    if(body === "earth"){
+
+        if(typeof earth !== "undefined"){
+
+            direction.applyQuaternion(
+                earth.quaternion
+            );
+
+        }
+
+        if(typeof earthGroup !== "undefined"){
+
+            direction.applyQuaternion(
+                earthGroup.quaternion
+            );
+
+        }
+
+    }
 
     targetRotX =
         Math.asin(
@@ -7176,11 +7198,6 @@ function applyURLView(){
     );
 
 }
-
-
-
-
-
 
 
 
