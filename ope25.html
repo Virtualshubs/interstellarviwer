@@ -7087,10 +7087,6 @@ function getSunPosition(date){
 
 
 
-
-
-
-
 function applyURLView(){
 
     const params = new URLSearchParams(
@@ -7098,10 +7094,6 @@ function applyURLView(){
     );
 
     const body = params.get("body");
-
-    // ======================================================
-    // SIN BODY → COMPORTAMIENTO NORMAL
-    // ======================================================
 
     if(!body){
         return;
@@ -7118,87 +7110,47 @@ function applyURLView(){
         return;
     }
 
-    // ======================================================
-    // EARTH
-    // ======================================================
-
     if(body === "earth"){
 
         moonCameraMode = false;
         cameraMode = "earth";
 
-        // Usar exactamente el mismo sistema
-        // que ya utiliza OPE para colocar el pin
-
-        moveCityPin(lat, lon);
-
-        const direction =
-            cityPin.position.clone().normalize();
-
-        targetRotX =
-            Math.asin(
-                THREE.MathUtils.clamp(
-                    direction.y,
-                    -1,
-                    1
-                )
-            );
-
-        targetRotY =
-            Math.atan2(
-                direction.x,
-                direction.z
-            );
-
-    }
-
-    // ======================================================
-    // MOON
-    // ======================================================
-
-    else if(body === "moon"){
+    }else if(body === "moon"){
 
         if(!moonCameraMode){
             toggleMoonCamera();
         }
 
-        const direction =
-            latLonToVec3(
-                lat,
-                lon,
-                1
-            ).normalize();
-
-        targetRotX =
-            Math.asin(
-                THREE.MathUtils.clamp(
-                    direction.y,
-                    -1,
-                    1
-                )
-            );
-
-        targetRotY =
-            Math.atan2(
-                direction.x,
-                direction.z
-            );
-
-    }
-
-    // ======================================================
-    // UNKNOWN BODY
-    // ======================================================
-
-    else{
+    }else{
 
         return;
 
     }
 
-    // ======================================================
-    // ZOOM
-    // ======================================================
+    const direction =
+        latLonToVec3(
+            lat,
+            lon,
+            1
+        ).normalize();
+
+    targetRotX =
+        Math.asin(
+            THREE.MathUtils.clamp(
+                direction.y,
+                -1,
+                1
+            )
+        );
+
+    targetRotY =
+        Math.atan2(
+            direction.x,
+            direction.z
+        );
+
+    rotX = targetRotX;
+    rotY = targetRotY;
 
     if(Number.isFinite(zoom)){
 
@@ -7215,12 +7167,11 @@ function applyURLView(){
 
     }
 
-    // ======================================================
-    // APPLY CAMERA
-    // ======================================================
+    if(body === "earth"){
 
-    rotX = targetRotX;
-    rotY = targetRotY;
+        moveCityPin(lat, lon);
+
+    }
 
     console.log(
         "🌐 URL VIEW:",
@@ -7233,10 +7184,6 @@ function applyURLView(){
     );
 
 }
-
-
-
-
 
 
 
