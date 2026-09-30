@@ -7079,17 +7079,14 @@ function getSunPosition(date){
 
 
 
-// ======================================================
-// URL POSITION
-// ======================================================
-
 function applyURLView(){
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+        window.location.search
+    );
 
     const body = params.get("body");
 
-    // Sin parámetro body → comportamiento normal de OPE
     if(!body){
         return;
     }
@@ -7105,34 +7102,29 @@ function applyURLView(){
         return;
     }
 
-    // ======================================================
-    // BODY
-    // ======================================================
+    if(body === "earth"){
 
-    if(body === "moon"){
+        moonCameraMode = false;
+        cameraMode = "earth";
+
+    }else if(body === "moon"){
 
         if(!moonCameraMode){
             toggleMoonCamera();
         }
 
-    }else if(body === "earth"){
-
-        moonCameraMode = false;
-        cameraMode = "earth";
-
     }else{
 
         return;
+
     }
 
-    // ======================================================
-    // LAT / LON → USAR EL MISMO SISTEMA DEL PIN
-    // ======================================================
-
-    moveCityPin(lat, lon);
-
     const direction =
-        cityPin.position.clone().normalize();
+        latLonToVec3(
+            lat,
+            lon,
+            1
+        ).normalize();
 
     targetRotX =
         Math.asin(
@@ -7147,27 +7139,30 @@ function applyURLView(){
         Math.atan2(
             direction.x,
             direction.z
-        );
+        ) + Math.PI;
 
-    // ======================================================
-    // ZOOM
-    // ======================================================
+    rotX = targetRotX;
+    rotY = targetRotY;
 
     if(Number.isFinite(zoom)){
 
         targetDistance =
             Math.max(
                 0.05,
-                Math.min(8, zoom)
+                Math.min(
+                    8,
+                    zoom
+                )
             );
+
+        distance = targetDistance;
 
     }
 
-    rotX = targetRotX;
-    rotY = targetRotY;
+    if(body === "earth"){
 
-    if(Number.isFinite(zoom)){
-        distance = targetDistance;
+        moveCityPin(lat, lon);
+
     }
 
     console.log(
@@ -7181,7 +7176,6 @@ function applyURLView(){
     );
 
 }
-
 
 
 
@@ -9097,6 +9091,11 @@ async function renderObservation(item,assets){
     }
 }
 
+
+
+
+  
+
 function createDynamicLevel(label,items,callback){
     removeLevel(label);
 
@@ -9187,6 +9186,10 @@ urlInput.addEventListener("keydown",event=>{
 });
 
 })();
+
+
+
+  
 </script>
 
   
