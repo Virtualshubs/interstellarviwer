@@ -7068,9 +7068,6 @@ function getSunPosition(date){
 
 
 
-
-
-
 function applyURLView(){
 
     const params = new URLSearchParams(
@@ -7265,8 +7262,31 @@ function applyURLView(){
                 direction.z
             );
 
-        rotX = targetRotX;
-        rotY = targetRotY;
+        // ==========================================
+        // SINCRONIZAR CÁMARA LUNAR
+        // ==========================================
+
+        rotX =
+            targetRotX;
+
+        rotY =
+            targetRotY;
+
+        if(Number.isFinite(zoom)){
+
+            targetDistance =
+                Math.max(
+                    0.05,
+                    Math.min(
+                        8,
+                        zoom
+                    )
+                );
+
+            distance =
+                targetDistance;
+
+        }
 
         console.log(
             "🌙 URL MOON VIEW:",
@@ -7275,7 +7295,10 @@ function applyURLView(){
                 lon,
                 moonRadius,
                 worldPoint,
-                direction
+                direction,
+                targetRotX,
+                targetRotY,
+                distance
             }
         );
 
@@ -7312,11 +7335,6 @@ function applyURLView(){
     );
 
 }
-
-
-
-
-
 
 
 
