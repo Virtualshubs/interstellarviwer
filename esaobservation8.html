@@ -12376,6 +12376,36 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
+
+
+
+function updateJanusGridMap(body){
+
+    const marble =
+        document.getElementById("blueMarble");
+
+    if(!marble){
+        return;
+    }
+
+    marble.src =
+        body === "moon"
+            ? "https://3d.staratlas.es/Moonmap_from_clementine_data.png"
+            : "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
+
+}
+
+
+
+
+
+
+
+
+     
+
+
+
   function updateOpeFromCell(data){
 
     if(
@@ -12434,6 +12464,8 @@ document.getElementById("themeToggle").addEventListener("click", () => {
         isMoon
             ? "moon"
             : "earth";
+
+     updateJanusGridMap(body);
 
     // ==========================================
     // BUILD OPE URL
