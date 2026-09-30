@@ -12373,8 +12373,7 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
 
-     
-function updateOpeFromCell(data){
+  function updateOpeFromCell(data){
 
     if(
         !data ||
@@ -12417,12 +12416,32 @@ function updateOpeFromCell(data){
     const lon =
         (lonValues[0] + lonValues[1]) / 2;
 
+    // ==========================================
+    // DETECT BODY
+    // ==========================================
+
+    const raw =
+        JSON.stringify(data).toLowerCase();
+
+    const isMoon =
+        raw.includes("moon") ||
+        raw.includes("luna");
+
+    const body =
+        isMoon
+            ? "moon"
+            : "earth";
+
+    // ==========================================
+    // BUILD OPE URL
+    // ==========================================
+
     const params =
         new URLSearchParams({
-            body: "earth",
+            body: body,
             lat: lat,
             lon: lon,
-            zoom: 1.2
+            zoom: 1.3
         });
 
     const opeFrame =
@@ -12442,8 +12461,8 @@ function updateOpeFromCell(data){
             cell: cell.id,
             lat,
             lon,
-            body: "earth",
-            zoom: 1.4
+            body,
+            moonDetected: isMoon
         }
     );
 
