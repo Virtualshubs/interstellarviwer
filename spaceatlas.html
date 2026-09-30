@@ -7076,7 +7076,7 @@ function getSunPosition(date){
 
 
 
-function applyURLView(){
+  function applyURLView(){
 
     const params = new URLSearchParams(
         window.location.search
@@ -7104,56 +7104,6 @@ function applyURLView(){
         moonCameraMode = false;
         cameraMode = "earth";
 
-        // ==========================================
-        // USE OPE CUSTOM COORDINATES
-        // ==========================================
-
-        const citySelect =
-            document.getElementById("citySelect");
-
-        const latInput =
-            document.getElementById("lat");
-
-        const lonInput =
-            document.getElementById("lon");
-
-        if(
-            citySelect &&
-            latInput &&
-            lonInput
-        ){
-
-            citySelect.value = "custom";
-
-            latInput.value = lat;
-            lonInput.value = lon;
-
-            latInput.style.display = "";
-            lonInput.style.display = "";
-
-            latInput.dispatchEvent(
-                new Event("input", {
-                    bubbles: true
-                })
-            );
-
-            lonInput.dispatchEvent(
-                new Event("input", {
-                    bubbles: true
-                })
-            );
-
-        }
-
-        // ==========================================
-        // USE THE EXISTING OPE PIN PATH
-        // ==========================================
-
-        moveCityPin(
-            lat,
-            lon
-        );
-
     }else if(body === "moon"){
 
         if(!moonCameraMode){
@@ -7166,9 +7116,30 @@ function applyURLView(){
 
     }
 
-    // ==========================================
-    // URL ZOOM
-    // ==========================================
+    const direction =
+        latLonToVec3(
+            lat,
+            lon,
+            1
+        ).normalize();
+
+    targetRotX =
+        Math.asin(
+            THREE.MathUtils.clamp(
+                direction.y,
+                -1,
+                1
+            )
+        );
+
+    targetRotY =
+        Math.atan2(
+            direction.x,
+            direction.z
+        );
+
+    rotX = targetRotX;
+    rotY = targetRotY;
 
     if(Number.isFinite(zoom)){
 
@@ -7181,8 +7152,13 @@ function applyURLView(){
                 )
             );
 
-        distance =
-            targetDistance;
+        distance = targetDistance;
+
+    }
+
+    if(body === "earth"){
+
+        moveCityPin(lat, lon);
 
     }
 
@@ -7197,6 +7173,7 @@ function applyURLView(){
     );
 
 }
+
 
 
 
