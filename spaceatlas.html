@@ -1597,10 +1597,7 @@ width:100%;
 </head>
 
 <body>
-  <div id="spacePanel"></div>
-
-
-
+  <div id="spacePanel" hidden></div>
 
 
 
@@ -7074,8 +7071,6 @@ function getSunPosition(date){
 
 
 
-
-
 function applyURLView(){
 
     const params = new URLSearchParams(
@@ -7116,30 +7111,62 @@ function applyURLView(){
 
     }
 
-    const direction =
-        latLonToVec3(
+    // ==========================================
+    // EARTH
+    // ==========================================
+
+    if(body === "earth"){
+
+        // Primero colocamos el pin usando exactamente
+        // la misma lógica que utiliza OPE normalmente.
+
+        moveCityPin(
             lat,
-            lon,
-            1
-        ).normalize();
-
-    targetRotX =
-        Math.asin(
-            THREE.MathUtils.clamp(
-                direction.y,
-                -1,
-                1
-            )
+            lon
         );
 
-    targetRotY =
-        Math.atan2(
-            direction.x,
-            direction.z
-        );
+        // Actualizamos las transformaciones del mundo
+        // antes de consultar la posición final del pin.
 
-    rotX = targetRotX;
-    rotY = targetRotY;
+        earth.updateMatrixWorld(true);
+        earthGroup.updateMatrixWorld(true);
+
+        // Posición REAL del pin en coordenadas de scene.
+        const worldPoint =
+            cityPin.getWorldPosition(
+                new THREE.Vector3()
+            );
+
+        const direction =
+            worldPoint.normalize();
+
+        // ==========================================
+        // CAMERA → WORLD POINT
+        // ==========================================
+
+        targetRotX =
+            Math.asin(
+                THREE.MathUtils.clamp(
+                    direction.y,
+                    -1,
+                    1
+                )
+            );
+
+        targetRotY =
+            Math.atan2(
+                direction.x,
+                direction.z
+            );
+
+        rotX = targetRotX;
+        rotY = targetRotY;
+
+    }
+
+    // ==========================================
+    // ZOOM
+    // ==========================================
 
     if(Number.isFinite(zoom)){
 
@@ -7152,13 +7179,8 @@ function applyURLView(){
                 )
             );
 
-        distance = targetDistance;
-
-    }
-
-    if(body === "earth"){
-
-        moveCityPin(lat, lon);
+        distance =
+            targetDistance;
 
     }
 
@@ -7173,10 +7195,6 @@ function applyURLView(){
     );
 
 }
-
-
-
-
 
 
 
