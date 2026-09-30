@@ -12499,18 +12499,17 @@ function updateOpeFromCell(data){
     // Marte  → más lejos
     // ==========================================
 
-    let zoom = 0.7;
+let zoom = 1.7;
 
-    if(body === "moon"){
+if(body === "moon"){
 
-        zoom = 1.5;
+    zoom = 0.7;
 
-    }else if(body === "mars"){
+}else if(body === "mars"){
 
-        zoom = 1.5;
+    zoom = 1.2;
 
-    }
-
+}
 
     // ==========================================
     // BUILD OPE URL
