@@ -7104,6 +7104,56 @@ function applyURLView(){
         moonCameraMode = false;
         cameraMode = "earth";
 
+        // ==========================================
+        // USE OPE CUSTOM COORDINATES
+        // ==========================================
+
+        const citySelect =
+            document.getElementById("citySelect");
+
+        const latInput =
+            document.getElementById("lat");
+
+        const lonInput =
+            document.getElementById("lon");
+
+        if(
+            citySelect &&
+            latInput &&
+            lonInput
+        ){
+
+            citySelect.value = "custom";
+
+            latInput.value = lat;
+            lonInput.value = lon;
+
+            latInput.style.display = "";
+            lonInput.style.display = "";
+
+            latInput.dispatchEvent(
+                new Event("input", {
+                    bubbles: true
+                })
+            );
+
+            lonInput.dispatchEvent(
+                new Event("input", {
+                    bubbles: true
+                })
+            );
+
+        }
+
+        // ==========================================
+        // USE THE EXISTING OPE PIN PATH
+        // ==========================================
+
+        moveCityPin(
+            lat,
+            lon
+        );
+
     }else if(body === "moon"){
 
         if(!moonCameraMode){
@@ -7116,54 +7166,9 @@ function applyURLView(){
 
     }
 
-    const direction =
-        latLonToVec3(
-            lat,
-            lon,
-            1
-        ).normalize();
-
     // ==========================================
-    // APPLY EARTH ORIENTATION
+    // URL ZOOM
     // ==========================================
-
-    if(body === "earth"){
-
-        if(typeof earth !== "undefined"){
-
-            direction.applyQuaternion(
-                earth.quaternion
-            );
-
-        }
-
-        if(typeof earthGroup !== "undefined"){
-
-            direction.applyQuaternion(
-                earthGroup.quaternion
-            );
-
-        }
-
-    }
-
-    targetRotX =
-        Math.asin(
-            THREE.MathUtils.clamp(
-                direction.y,
-                -1,
-                1
-            )
-        );
-
-    targetRotY =
-        Math.atan2(
-            direction.x,
-            direction.z
-        ) + Math.PI;
-
-    rotX = targetRotX;
-    rotY = targetRotY;
 
     if(Number.isFinite(zoom)){
 
@@ -7176,16 +7181,8 @@ function applyURLView(){
                 )
             );
 
-        distance = targetDistance;
-
-    }
-
-    if(body === "earth"){
-
-        moveCityPin(
-            lat,
-            lon
-        );
+        distance =
+            targetDistance;
 
     }
 
@@ -7200,8 +7197,6 @@ function applyURLView(){
     );
 
 }
-
-
 
 
 
