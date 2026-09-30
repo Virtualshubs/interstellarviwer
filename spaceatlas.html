@@ -7174,8 +7174,7 @@ function applyURLView(){
             return;
         }
 
-        // Aseguramos que la Luna tenga sus
-        // transformaciones mundiales actualizadas.
+        // Actualizamos las transformaciones de la Luna.
 
         moon.updateMatrixWorld(true);
 
@@ -7230,22 +7229,33 @@ function applyURLView(){
         );
 
         // ==========================================
-        // MOON SURFACE → WORLD
+        // MOON LOCAL → WORLD
         // ==========================================
 
-        const worldPoint =
+        const surfacePoint =
             localPoint.clone();
 
         moon.localToWorld(
-            worldPoint
+            surfacePoint
         );
 
         // ==========================================
-        // CAMERA DIRECTION
+        // MOON CENTER → SURFACE POINT
         // ==========================================
 
+        const moonCenter =
+            moon.getWorldPosition(
+                new THREE.Vector3()
+            );
+
         const direction =
-            worldPoint.normalize();
+            surfacePoint
+                .sub(moonCenter)
+                .normalize();
+
+        // ==========================================
+        // CAMERA → MOON SURFACE
+        // ==========================================
 
         targetRotX =
             Math.asin(
@@ -7262,31 +7272,8 @@ function applyURLView(){
                 direction.z
             );
 
-        // ==========================================
-        // SINCRONIZAR CÁMARA LUNAR
-        // ==========================================
-
-        rotX =
-            targetRotX;
-
-        rotY =
-            targetRotY;
-
-        if(Number.isFinite(zoom)){
-
-            targetDistance =
-                Math.max(
-                    0.05,
-                    Math.min(
-                        8,
-                        zoom
-                    )
-                );
-
-            distance =
-                targetDistance;
-
-        }
+        rotX = targetRotX;
+        rotY = targetRotY;
 
         console.log(
             "🌙 URL MOON VIEW:",
@@ -7294,11 +7281,8 @@ function applyURLView(){
                 lat,
                 lon,
                 moonRadius,
-                worldPoint,
-                direction,
-                targetRotX,
-                targetRotY,
-                distance
+                moonCenter,
+                direction
             }
         );
 
@@ -7335,7 +7319,6 @@ function applyURLView(){
     );
 
 }
-
 
 
 
