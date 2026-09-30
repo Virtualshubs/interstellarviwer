@@ -7079,7 +7079,9 @@ function getSunPosition(date){
 
 
 
-//ur position I
+// ======================================================
+// URL POSITION
+// ======================================================
 
 function applyURLView(){
 
@@ -7124,11 +7126,13 @@ function applyURLView(){
     }
 
     // ======================================================
-    // LAT / LON → CAMERA ROTATION
+    // LAT / LON → USAR EL MISMO SISTEMA DEL PIN
     // ======================================================
 
+    moveCityPin(lat, lon);
+
     const direction =
-        latLonToVec3(lat, lon, 1).normalize();
+        cityPin.position.clone().normalize();
 
     targetRotX =
         Math.asin(
