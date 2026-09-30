@@ -12374,8 +12374,6 @@ document.getElementById("themeToggle").addEventListener("click", () => {
 
 
      
-
-
 function updateOpeFromCell(data){
 
     if(
@@ -12435,7 +12433,7 @@ function updateOpeFromCell(data){
     }
 
     opeFrame.src =
-        "https://3d.staratlas.es/ope23.html?" +
+        "https://3d.staratlas.es/spaceatlas.html?" +
         params.toString();
 
     console.log(
@@ -12444,12 +12442,12 @@ function updateOpeFromCell(data){
             cell: cell.id,
             lat,
             lon,
-            body: "earth"
+            body: "earth",
+            zoom: 1.5
         }
     );
 
 }
-
      
 
 </script>
