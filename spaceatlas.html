@@ -7086,6 +7086,12 @@ function applyURLView(){
     const params = new URLSearchParams(window.location.search);
 
     const body = params.get("body");
+
+    // Sin parámetro body → comportamiento normal de OPE
+    if(!body){
+        return;
+    }
+
     const lat = Number(params.get("lat"));
     const lon = Number(params.get("lon"));
     const zoom = Number(params.get("zoom"));
@@ -7112,6 +7118,9 @@ function applyURLView(){
         moonCameraMode = false;
         cameraMode = "earth";
 
+    }else{
+
+        return;
     }
 
     // ======================================================
@@ -7163,15 +7172,11 @@ function applyURLView(){
             body,
             lat,
             lon,
-            zoom,
-            rotX: targetRotX,
-            rotY: targetRotY
+            zoom
         }
     );
 
 }
-
-
 
 
 
