@@ -4305,6 +4305,8 @@ window.addEventListener("mousemove",(e)=>{
 
   loadEarthLayers();
 
+  applyURLView();
+
   window.addEventListener("resize", onResize);
 }
 
@@ -7070,6 +7072,166 @@ function getSunPosition(date){
     };
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ======================================================
+// URL POSITION
+// ======================================================
+
+function applyURLView(){
+
+    const params = new URLSearchParams(window.location.search);
+
+    const body = params.get("body");
+
+    // Sin parámetro body → comportamiento normal de OPE
+    if(!body){
+        return;
+    }
+
+    const lat = Number(params.get("lat"));
+    const lon = Number(params.get("lon"));
+    const zoom = Number(params.get("zoom"));
+
+    if(
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lon)
+    ){
+        return;
+    }
+
+    // ======================================================
+    // BODY
+    // ======================================================
+
+    if(body === "moon"){
+
+        if(!moonCameraMode){
+            toggleMoonCamera();
+        }
+
+    }else if(body === "earth"){
+
+        moonCameraMode = false;
+        cameraMode = "earth";
+
+    }else{
+
+        return;
+    }
+
+    // ======================================================
+    // LAT / LON → USAR EL MISMO SISTEMA DEL PIN
+    // ======================================================
+
+    moveCityPin(lat, lon);
+
+    const direction =
+        cityPin.position.clone().normalize();
+
+    targetRotX =
+        Math.asin(
+            THREE.MathUtils.clamp(
+                direction.y,
+                -1,
+                1
+            )
+        );
+
+    targetRotY =
+        Math.atan2(
+            direction.x,
+            direction.z
+        );
+
+    // ======================================================
+    // ZOOM
+    // ======================================================
+
+    if(Number.isFinite(zoom)){
+
+        targetDistance =
+            Math.max(
+                0.05,
+                Math.min(8, zoom)
+            );
+
+    }
+
+    rotX = targetRotX;
+    rotY = targetRotY;
+
+    if(Number.isFinite(zoom)){
+        distance = targetDistance;
+    }
+
+    console.log(
+        "🌐 URL VIEW:",
+        {
+            body,
+            lat,
+            lon,
+            zoom
+        }
+    );
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
   
 // ======================================================
