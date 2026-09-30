@@ -7323,12 +7323,7 @@ function applyURLView(){
 
 
   
-  
-// ======================================================
-// LOOP
-// ======================================================
-
-function animate(){
+  function animate(){
 
     requestAnimationFrame(animate);
 
@@ -7363,35 +7358,37 @@ function animate(){
 
     earthGroup.rotation.y = rotation;
 
-// ======================================================
-// ☀️ SUN
-// ======================================================
 
-const sunData =
-    getSunPosition(now);
+    // ======================================================
+    // ☀️ SUN
+    // ======================================================
 
-const sunDirection =
-    sunData.direction
-        .clone()
-        .normalize();
+    const sunData =
+        getSunPosition(now);
 
-// ------------------------------------------------------
-// Luz solar direccional
-//
-// La distancia de la DirectionalLight es solo espacial
-// para Three.js. Lo importante físicamente es la dirección.
-// ------------------------------------------------------
+    const sunDirection =
+        sunData.direction
+            .clone()
+            .normalize();
 
-sunLight.position.copy(
-    sunDirection.multiplyScalar(100)
-);
+    // ------------------------------------------------------
+    // Luz solar direccional
+    //
+    // La distancia de la DirectionalLight es solo espacial
+    // para Three.js. Lo importante físicamente es la dirección.
+    // ------------------------------------------------------
 
-// La luz apunta al centro del sistema Tierra-Luna
-sunLight.target.position.set(
-    0,
-    0,
-    0
-);
+    sunLight.position.copy(
+        sunDirection.multiplyScalar(100)
+    );
+
+    // La luz apunta al centro del sistema Tierra-Luna
+    sunLight.target.position.set(
+        0,
+        0,
+        0
+    );
+
 
     // ======================================================
     // 🛰️ SATELLITES
@@ -7502,39 +7499,42 @@ sunLight.target.position.set(
             // --------------------------------------------------
             // TRANSICIÓN LUNA → TIERRA
             //
-            // Lejos:
-            //     target = Luna
+            // La cámara permanece orientada hacia la Luna
+            // mientras esté fuera de su superficie.
             //
-            // Cerca:
-            //     target = Tierra
+            // Solo cuando se aproxima a la capa lunar
+            // comienza la transición hacia la Tierra.
             // --------------------------------------------------
 
-            const transitionStart =
-                moonRadius * 5.0;
+            const moonSurfaceLimit =
+                moonRadius * 1.05;
 
-            const transitionEnd =
-                moonRadius * 1.5;
+            let moonObserverBlend = 0;
+
+            if(distance <= moonSurfaceLimit){
+
+                moonObserverBlend =
+                    THREE.MathUtils.mapLinear(
+                        distance,
+                        moonSurfaceLimit,
+                        moonRadius * 0.75,
+                        0,
+                        1
+                    );
+
+                moonObserverBlend =
+                    THREE.MathUtils.clamp(
+                        moonObserverBlend,
+                        0,
+                        1
+                    );
+
+            }
 
 
-            let moonObserverBlend =
-                THREE.MathUtils.mapLinear(
-                    distance,
-                    transitionStart,
-                    transitionEnd,
-                    0,
-                    1
-                );
-
-
-            moonObserverBlend =
-                THREE.MathUtils.clamp(
-                    moonObserverBlend,
-                    0,
-                    1
-                );
-
-
-            // Suavizamos la transición
+            // --------------------------------------------------
+            // SUAVIZAR TRANSICIÓN
+            // --------------------------------------------------
 
             moonObserverBlend =
                 moonObserverBlend *
@@ -7729,7 +7729,6 @@ sunLight.target.position.set(
     );
 
 }
-
   
 function onResize(){
   camera.aspect = window.innerWidth/window.innerHeight;
