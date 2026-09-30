@@ -6350,15 +6350,21 @@ grid.appendChild(div);
 
 
    
-function createExplorationBlueMarble(grid,parentCell){
 
+   
+function createExplorationBlueMarble(grid,parentCell){
     if(!grid||!parentCell)return;
 
     grid.style.position="relative";
     grid.style.overflow="hidden";
 
-    const createURL=()=>{
+    const getDateUTC=offset=>{
+        const d=new Date();
+        d.setUTCDate(d.getUTCDate()+offset);
+        return d.toISOString().split("T")[0];
+    };
 
+    const createURL=date=>{
         const bbox=[
             parentCell.latMin,
             parentCell.lonMin,
@@ -6366,8 +6372,7 @@ function createExplorationBlueMarble(grid,parentCell){
             parentCell.lonMax
         ].join(",");
 
-        const latCenter=
-            (parentCell.latMin+parentCell.latMax)/2;
+        const latCenter=(parentCell.latMin+parentCell.latMax)/2;
 
         const latKm=
             (parentCell.latMax-parentCell.latMin)*111.32;
@@ -6388,6 +6393,12 @@ function createExplorationBlueMarble(grid,parentCell){
         // =================================
         // RESOLUCIÓN VISUAL
         // =================================
+        //
+        // Mantenemos una relación fija
+        // entre la imagen y las 18 celdas.
+        //
+        // 32 píxeles de imagen por celda.
+        //
 
         const pixelsPerCell=32;
 
@@ -6407,7 +6418,7 @@ function createExplorationBlueMarble(grid,parentCell){
         const pixelsPerGridCell=
             gridCellKm/pixelSizeKm;
 
-        console.log("PNOA MAP SCALE:",{
+        console.log("NASA MAP SCALE:",{
             bboxKm:areaKm.toFixed(3),
             gridCellKm:gridCellKm.toFixed(4),
             resolution:resolution,
@@ -6415,69 +6426,79 @@ function createExplorationBlueMarble(grid,parentCell){
             pixelsPerGridCell:pixelsPerGridCell.toFixed(2)
         });
 
-        // =================================
-        // PNOA WMS
-        // =================================
-
-        return "https://www.ign.es/wms-inspire/pnoa-ma"+
-        "?SERVICE=WMS"+
-        "&VERSION=1.3.0"+
-        "&REQUEST=GetMap"+
-        "&LAYERS=OI.OrthoimageCoverage"+
-        "&STYLES="+
+        return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
+        "?REQUEST=GetSnapshot"+
+        "&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
         "&CRS=EPSG:4326"+
+        `&TIME=${date}`+
+        "&WRAP=DAY,X"+
         `&BBOX=${bbox}`+
+        "&FORMAT=image/jpeg"+
         `&WIDTH=${resolution}`+
         `&HEIGHT=${resolution}`+
-        "&FORMAT=image/jpeg"+
-        "&TRANSPARENT=FALSE";
+        "&AUTOSCALE=TRUE";
     };
 
+    const today=getDateUTC(0);
+    const yesterday=getDateUTC(-1);
 
-    const aerial=document.createElement("img");
+    const marble=document.createElement("img");
 
-    aerial.className="explorationBlueMarble";
-    aerial.alt="";
+    marble.className="explorationBlueMarble";
+    marble.alt="";
 
-    aerial.style.position="absolute";
-    aerial.style.left="0";
-    aerial.style.top="0";
-    aerial.style.width="100%";
-    aerial.style.height="100%";
-    aerial.style.pointerEvents="none";
-    aerial.style.zIndex="0";
-    aerial.style.imageRendering="auto";
+    marble.style.position="absolute";
+    marble.style.left="0";
+    marble.style.top="0";
+    marble.style.width="100%";
+    marble.style.height="100%";
+    marble.style.pointerEvents="none";
+    marble.style.zIndex="0";
+    marble.style.imageRendering="auto";
 
-    aerial.onload=()=>{
+    let usingDate=today;
 
+    marble.onerror=()=>{
+        if(usingDate===today){
+            usingDate=yesterday;
+
+            console.log(
+                "NASA SNAPSHOT: today unavailable, trying previous day:",
+                yesterday
+            );
+
+            marble.src=createURL(yesterday);
+        }else{
+            console.error(
+                "NASA SNAPSHOT: today and previous day unavailable"
+            );
+        }
+    };
+
+    marble.onload=()=>{
         console.log(
-            "PNOA IMAGE LOADED:",
-            aerial.src
+            "NASA SNAPSHOT LOADED:",
+            usingDate
         );
-
     };
 
-    aerial.onerror=()=>{
-
-        console.error(
-            "PNOA IMAGE ERROR:",
-            aerial.src
-        );
-
-    };
-
-    aerial.src=createURL();
+    marble.src=createURL(today);
 
     console.log(
-        "PNOA IMAGE URL:",
-        aerial.src
+        "NASA SNAPSHOT TODAY:",
+        createURL(today)
     );
 
     grid.insertBefore(
-        aerial,
+        marble,
         grid.firstChild
     );
 }
+// fin bloque observacion fase 2 espacial
+   
+
+
+
 
 
 
