@@ -10168,8 +10168,10 @@ return;
 viewer.style.display="block";
 
 create3DViewer(
-viewer,
-modelURL
+    viewer,
+    modelURL,
+    obs,
+    extent
 );
 
 };
@@ -10192,7 +10194,9 @@ modelURL
 
 function create3DViewer(
 viewer,
-modelURL
+modelURL,
+obs,
+extent
 ){
 
 const canvasContainer=
@@ -10359,6 +10363,37 @@ let lazBudget=1000000;
 let lazBoundingBox=null;
 
 let modelSize=1;
+
+
+// ==========================================
+// COPC STATE
+// ==========================================
+
+let copcAPI=null;
+
+let copcData=null;
+
+let copcGetter=null;
+
+let copcCandidates=[];
+
+let copcCandidateIndex=0;
+
+let copcLoadedNodes=0;
+
+let copcLoadedPointCount=0;
+
+let copcLoading=false;
+
+let copcTargetBudget=1000000;
+
+let copcChunks=[];
+
+let copcColorChunks=[];
+
+let copcHasColors=false;
+
+let copcFramed=false;
 
 
 // ==========================================
@@ -10706,6 +10741,26 @@ slider.value
 
 value.textContent=
 budget.toLocaleString();
+
+if(
+modelType==="COPC" &&
+copcData &&
+copcCandidates.length
+){
+
+lazBudget=
+budget;
+
+copcTargetBudget=
+budget;
+
+loadCOPCBudget(
+budget
+);
+
+return;
+
+}
 
 if(pointCloudViewer){
 
@@ -11121,11 +11176,6 @@ throw new Error(
 
 }
 
-
-// ==========================================
-// BOUNDING BOX
-// ==========================================
-
 if(
 data.header &&
 data.header.boundingBox
@@ -11135,11 +11185,6 @@ lazBoundingBox=
 data.header.boundingBox;
 
 }
-
-
-// ==========================================
-// OPTIONAL RGB
-// ==========================================
 
 lazColors=null;
 
@@ -11276,11 +11321,6 @@ b/colorScale
 
 }
 
-
-// ==========================================
-// POINT MATERIAL
-// ==========================================
-
 lazMaterial=
 new THREE.PointsMaterial({
 
@@ -11298,11 +11338,6 @@ false
 
 });
 
-
-// ==========================================
-// CREATE GEOMETRY
-// ==========================================
-
 lazGeometry=
 new THREE.BufferGeometry();
 
@@ -11316,26 +11351,11 @@ modelGroup.add(
 lazPoints
 );
 
-
-// ==========================================
-// INITIAL SAMPLE
-// ==========================================
-
 updateLAZPoints(
 lazBudget
 );
 
-
-// ==========================================
-// AUTO FRAME
-// ==========================================
-
 frameLAZ();
-
-
-// ==========================================
-// REAL MODEL READY
-// ==========================================
 
 removeCube();
 
@@ -11392,6 +11412,1426 @@ error
 
 status.textContent=
 "LOAD ERROR";
+
+}
+
+}
+
+
+// ==========================================
+// COPC NODE BOUNDING BOX
+// ==========================================
+
+function getCOPCNodeBox(
+copc,
+nodeId
+){
+
+const cube=
+copc?.info?.cube;
+
+if(
+!Array.isArray(cube) ||
+cube.length<6
+)
+return null;
+
+const parts=
+String(nodeId)
+.split("-")
+.map(Number);
+
+if(
+parts.length!==4 ||
+parts.some(
+v=>!Number.isFinite(v)
+)
+)
+return null;
+
+const level=
+parts[0];
+
+const ix=
+parts[1];
+
+const iy=
+parts[2];
+
+const iz=
+parts[3];
+
+if(level<0)
+return null;
+
+const rootMinX=
+Number(cube[0]);
+
+const rootMinY=
+Number(cube[1]);
+
+const rootMinZ=
+Number(cube[2]);
+
+const rootMaxX=
+Number(cube[3]);
+
+const rootMaxY=
+Number(cube[4]);
+
+const rootMaxZ=
+Number(cube[5]);
+
+const rootSizeX=
+rootMaxX-rootMinX;
+
+const rootSizeY=
+rootMaxY-rootMinY;
+
+const rootSizeZ=
+rootMaxZ-rootMinZ;
+
+const divisor=
+Math.pow(
+2,
+level
+);
+
+const sizeX=
+rootSizeX/divisor;
+
+const sizeY=
+rootSizeY/divisor;
+
+const sizeZ=
+rootSizeZ/divisor;
+
+const minX=
+rootMinX+
+ix*sizeX;
+
+const minY=
+rootMinY+
+iy*sizeY;
+
+const minZ=
+rootMinZ+
+iz*sizeZ;
+
+return {
+
+min:[
+minX,
+minY,
+minZ
+],
+
+max:[
+minX+sizeX,
+minY+sizeY,
+minZ+sizeZ
+]
+
+};
+
+}
+
+
+// ==========================================
+// BOX INTERSECTION
+// ==========================================
+
+function COPCBoxesIntersect(
+a,
+b
+){
+
+if(!a || !b)
+return false;
+
+return !(
+a.max[0]<b.min[0] ||
+a.min[0]>b.max[0] ||
+a.max[1]<b.min[1] ||
+a.min[1]>b.max[1] ||
+a.max[2]<b.min[2] ||
+a.min[2]>b.max[2]
+);
+
+}
+
+
+// ==========================================
+// MOON CELL → CARTESIAN BBOX
+// ==========================================
+
+function getCOPCTargetBox(
+copc
+){
+
+const rootCube=
+copc?.info?.cube;
+
+if(
+!Array.isArray(rootCube) ||
+rootCube.length<6
+)
+return null;
+
+if(
+!Array.isArray(extent) ||
+extent.length<4
+){
+
+return {
+
+min:[
+Number(rootCube[0]),
+Number(rootCube[1]),
+Number(rootCube[2])
+],
+
+max:[
+Number(rootCube[3]),
+Number(rootCube[4]),
+Number(rootCube[5])
+]
+
+};
+
+}
+
+const targets=
+obs?.properties?.["ssys:targets"];
+
+const wkt=
+String(
+obs?.properties?.["proj:wkt2"]||
+""
+);
+
+const isMoon=
+(
+Array.isArray(targets) &&
+targets.some(
+value=>
+String(value)
+.toLowerCase()==="moon"
+)
+) ||
+wkt.toLowerCase().includes(
+"moon (2015)"
+) ||
+wkt.toLowerCase().includes(
+"moon(2015)"
+);
+
+if(!isMoon){
+
+return {
+
+min:[
+Number(rootCube[0]),
+Number(rootCube[1]),
+Number(rootCube[2])
+],
+
+max:[
+Number(rootCube[3]),
+Number(rootCube[4]),
+Number(rootCube[5])
+]
+
+};
+
+}
+
+let radius=
+1737400;
+
+const radiusMatch=
+wkt.match(
+/ELLIPSOID\s*\[\s*"[^"]*"\s*,\s*([0-9.]+)/i
+);
+
+if(radiusMatch){
+
+const parsedRadius=
+Number(
+radiusMatch[1]
+);
+
+if(
+Number.isFinite(parsedRadius) &&
+parsedRadius>0
+){
+
+radius=
+parsedRadius;
+
+}
+
+}
+
+const lon1=
+Number(extent[0]);
+
+const lat1=
+Number(extent[1]);
+
+const lon2=
+Number(extent[2]);
+
+const lat2=
+Number(extent[3]);
+
+if(
+!Number.isFinite(lon1) ||
+!Number.isFinite(lat1) ||
+!Number.isFinite(lon2) ||
+!Number.isFinite(lat2)
+){
+
+return {
+
+min:[
+Number(rootCube[0]),
+Number(rootCube[1]),
+Number(rootCube[2])
+],
+
+max:[
+Number(rootCube[3]),
+Number(rootCube[4]),
+Number(rootCube[5])
+]
+
+};
+
+}
+
+const samples=[];
+
+const steps=8;
+
+for(
+let iy=0;
+iy<=steps;
+iy++
+){
+
+const lat=
+lat1+
+(lat2-lat1)*
+iy/steps;
+
+for(
+let ix=0;
+ix<=steps;
+ix++
+){
+
+const lon=
+lon1+
+(lon2-lon1)*
+ix/steps;
+
+const latRad=
+lat*
+Math.PI/
+180;
+
+const lonRad=
+lon*
+Math.PI/
+180;
+
+const cosLat=
+Math.cos(
+latRad
+);
+
+samples.push([
+radius*
+cosLat*
+Math.cos(lonRad),
+
+radius*
+cosLat*
+Math.sin(lonRad),
+
+radius*
+Math.sin(latRad)
+]);
+
+}
+
+}
+
+let minX=Infinity;
+
+let minY=Infinity;
+
+let minZ=Infinity;
+
+let maxX=-Infinity;
+
+let maxY=-Infinity;
+
+let maxZ=-Infinity;
+
+for(
+const point of samples
+){
+
+minX=
+Math.min(
+minX,
+point[0]
+);
+
+minY=
+Math.min(
+minY,
+point[1]
+);
+
+minZ=
+Math.min(
+minZ,
+point[2]
+);
+
+maxX=
+Math.max(
+maxX,
+point[0]
+);
+
+maxY=
+Math.max(
+maxY,
+point[1]
+);
+
+maxZ=
+Math.max(
+maxZ,
+point[2]
+);
+
+}
+
+
+// ==========================================
+// SMALL SPATIAL SAFETY MARGIN
+// ==========================================
+
+const rootSize=
+Math.max(
+Number(rootCube[3])-Number(rootCube[0]),
+Number(rootCube[4])-Number(rootCube[1]),
+Number(rootCube[5])-Number(rootCube[2])
+);
+
+const padding=
+rootSize*
+0.002;
+
+return {
+
+min:[
+minX-padding,
+minY-padding,
+minZ-padding
+],
+
+max:[
+maxX+padding,
+maxY+padding,
+maxZ+padding
+]
+
+};
+
+}
+
+
+// ==========================================
+// APPEND COPC POINT CHUNK
+// ==========================================
+
+function appendCOPCChunk(
+positions,
+colors
+){
+
+if(
+!positions ||
+positions.length===0
+)
+return;
+
+copcChunks.push(
+positions
+);
+
+if(colors){
+
+copcColorChunks.push(
+colors
+);
+
+}else if(
+copcHasColors
+){
+
+const white=
+new Float32Array(
+positions.length
+);
+
+white.fill(1);
+
+copcColorChunks.push(
+white
+);
+
+}
+
+copcLoadedPointCount+=
+Math.floor(
+positions.length/3
+);
+
+}
+
+
+// ==========================================
+// REBUILD COPC ARRAYS
+// ==========================================
+
+function rebuildCOPCArrays(){
+
+let total=
+0;
+
+for(
+const chunk of copcChunks
+){
+
+total+=
+chunk.length;
+
+}
+
+if(total===0)
+return;
+
+lazPositions=
+new Float64Array(
+total
+);
+
+let positionOffset=0;
+
+for(
+const chunk of copcChunks
+){
+
+lazPositions.set(
+chunk,
+positionOffset
+);
+
+positionOffset+=
+chunk.length;
+
+}
+
+lazPointCount=
+Math.floor(
+total/3
+);
+
+if(
+copcHasColors &&
+copcColorChunks.length
+){
+
+let colorTotal=0;
+
+for(
+const chunk of copcColorChunks
+){
+
+colorTotal+=
+chunk.length;
+
+}
+
+lazColors=
+new Float32Array(
+colorTotal
+);
+
+let colorOffset=0;
+
+for(
+const chunk of copcColorChunks
+){
+
+lazColors.set(
+chunk,
+colorOffset
+);
+
+colorOffset+=
+chunk.length;
+
+}
+
+}else{
+
+lazColors=
+null;
+
+}
+
+}
+
+
+// ==========================================
+// LOAD COPC BUDGET
+// ==========================================
+
+async function loadCOPCBudget(
+budget
+){
+
+if(
+!copcData ||
+!copcCandidates.length
+)
+return;
+
+copcTargetBudget=
+Math.min(
+Number(budget)||1000000,
+5000000
+);
+
+if(copcLoading)
+return;
+
+if(
+copcLoadedPointCount>=
+copcTargetBudget
+){
+
+updateLAZPoints(
+copcTargetBudget
+);
+
+return;
+
+}
+
+copcLoading=true;
+
+try{
+
+while(
+copcLoadedPointCount<
+copcTargetBudget &&
+copcCandidateIndex<
+copcCandidates.length
+){
+
+const candidate=
+copcCandidates[
+copcCandidateIndex
+];
+
+copcCandidateIndex++;
+
+if(!candidate)
+continue;
+
+const node=
+candidate.node;
+
+const pointCount=
+Number(
+node?.pointCount
+);
+
+if(
+!Number.isFinite(pointCount) ||
+pointCount<=0
+)
+continue;
+
+status.textContent=
+"LOADING COPC — "+
+Math.min(
+copcLoadedPointCount,
+copcTargetBudget
+).toLocaleString()+
+" POINTS";
+
+const view=
+await copcAPI.loadPointDataView(
+copcGetter,
+copcData,
+node
+);
+
+if(
+!view ||
+typeof view.getter!=="function"
+)
+continue;
+
+const getX=
+view.getter("X");
+
+const getY=
+view.getter("Y");
+
+const getZ=
+view.getter("Z");
+
+if(
+typeof getX!=="function" ||
+typeof getY!=="function" ||
+typeof getZ!=="function"
+)
+continue;
+
+const count=
+Math.min(
+pointCount,
+view.pointCount||
+pointCount
+);
+
+const positions=
+new Float64Array(
+count*3
+);
+
+let colors=null;
+
+let getR=null;
+
+let getG=null;
+
+let getB=null;
+
+if(copcHasColors){
+
+try{
+
+getR=
+view.getter("Red");
+
+getG=
+view.getter("Green");
+
+getB=
+view.getter("Blue");
+
+if(
+typeof getR==="function" &&
+typeof getG==="function" &&
+typeof getB==="function"
+){
+
+colors=
+new Float32Array(
+count*3
+);
+
+}
+
+}catch(error){
+
+colors=null;
+
+}
+
+}
+
+for(
+let i=0;
+i<count;
+i++
+){
+
+positions[i*3]=
+Number(
+getX(i)
+);
+
+positions[i*3+1]=
+Number(
+getY(i)
+);
+
+positions[i*3+2]=
+Number(
+getZ(i)
+);
+
+if(colors){
+
+colors[i*3]=
+Math.min(
+1,
+Math.max(
+0,
+Number(getR(i))/
+65535
+)
+);
+
+colors[i*3+1]=
+Math.min(
+1,
+Math.max(
+0,
+Number(getG(i))/
+65535
+)
+);
+
+colors[i*3+2]=
+Math.min(
+1,
+Math.max(
+0,
+Number(getB(i))/
+65535
+)
+);
+
+}
+
+}
+
+appendCOPCChunk(
+positions,
+colors
+);
+
+}
+
+rebuildCOPCArrays();
+
+if(
+lazPointCount>0 &&
+!lazPoints
+){
+
+lazMaterial=
+new THREE.PointsMaterial({
+
+color:
+0xffffff,
+
+size:
+0.1,
+
+sizeAttenuation:
+false,
+
+vertexColors:
+false
+
+});
+
+lazGeometry=
+new THREE.BufferGeometry();
+
+lazPoints=
+new THREE.Points(
+lazGeometry,
+lazMaterial
+);
+
+modelGroup.add(
+lazPoints
+);
+
+}
+
+if(
+lazPoints
+){
+
+updateLAZPoints(
+copcTargetBudget
+);
+
+}
+
+if(
+lazPointCount>0 &&
+!copcFramed
+){
+
+frameLAZ();
+
+copcFramed=true;
+
+removeCube();
+
+}
+
+status.textContent=
+"READY — "+
+Math.min(
+copcTargetBudget,
+lazPointCount
+).toLocaleString()+
+" / "+
+lazPointCount.toLocaleString()+
+" POINTS";
+
+console.log(
+"JANUS COPC LOADED POINTS:",
+lazPointCount
+);
+
+console.log(
+"JANUS COPC NODES LOADED:",
+copcLoadedNodes
+);
+
+}catch(error){
+
+console.error(
+"COPC POINT LOAD ERROR",
+error
+);
+
+status.textContent=
+"COPC POINT LOAD ERROR";
+
+}finally{
+
+copcLoading=false;
+
+if(
+copcTargetBudget>
+lazPointCount &&
+copcCandidateIndex<
+copcCandidates.length
+){
+
+if(
+copcTargetBudget<=5000000
+){
+
+loadCOPCBudget(
+copcTargetBudget
+);
+
+}
+
+}
+
+}
+
+}
+
+
+// ==========================================
+// LOAD COPC
+// ==========================================
+
+async function loadCOPC(){
+
+status.textContent=
+"PROCESSING COPC";
+
+createPointBudgetControl();
+
+lazBudget=
+1000000;
+
+copcTargetBudget=
+1000000;
+
+copcCandidateIndex=
+0;
+
+copcLoadedNodes=
+0;
+
+copcLoadedPointCount=
+0;
+
+copcChunks=[];
+
+copcColorChunks=[];
+
+copcCandidates=[];
+
+copcFramed=false;
+
+try{
+
+const apiCandidate=
+window.Copc||
+window.copc;
+
+if(
+!apiCandidate
+){
+
+throw new Error(
+"COPC READER NOT AVAILABLE"
+);
+
+}
+
+copcAPI=
+apiCandidate.Copc||
+apiCandidate;
+
+if(
+!copcAPI ||
+typeof copcAPI.create!=="function" ||
+typeof copcAPI.loadHierarchyPage!=="function" ||
+typeof copcAPI.loadPointDataView!=="function"
+){
+
+throw new Error(
+"COPC API INCOMPLETE"
+);
+
+}
+
+
+// ==========================================
+// RANGE GETTER
+// ==========================================
+
+copcGetter=
+async(
+begin,
+end
+)=>{
+
+const start=
+Number(begin);
+
+const finish=
+Number(end)-1;
+
+if(
+!Number.isFinite(start) ||
+!Number.isFinite(finish) ||
+finish<start
+){
+
+throw new Error(
+"INVALID COPC RANGE"
+);
+
+}
+
+const response=
+await fetch(
+modelURL,
+{
+headers:{
+Range:
+"bytes="+
+start+
+"-"+
+finish
+},
+cache:"no-store"
+}
+);
+
+if(
+!response.ok &&
+response.status!==206
+){
+
+throw new Error(
+"COPC HTTP "+
+response.status
+);
+
+}
+
+if(
+response.status!==206
+){
+
+throw new Error(
+"COPC SERVER DID NOT RETURN HTTP 206"
+);
+
+}
+
+const contentRange=
+response.headers.get(
+"Content-Range"
+);
+
+if(
+contentRange
+){
+
+const match=
+contentRange.match(
+/bytes\s+(\d+)-(\d+)\/(\d+)/i
+);
+
+if(match){
+
+const returnedStart=
+Number(match[1]);
+
+if(
+returnedStart!==start
+){
+
+throw new Error(
+"COPC RANGE MISMATCH"
+);
+
+}
+
+}
+
+}
+
+return new Uint8Array(
+await response.arrayBuffer()
+);
+
+};
+
+
+// ==========================================
+// OPEN COPC
+// ==========================================
+
+status.textContent=
+"READING COPC HEADER";
+
+copcData=
+await copcAPI.create(
+copcGetter
+);
+
+if(!copcData){
+
+throw new Error(
+"COPC HEADER NOT AVAILABLE"
+);
+
+}
+
+console.log(
+"JANUS COPC HEADER:",
+copcData.header
+);
+
+console.log(
+"JANUS COPC INFO:",
+copcData.info
+);
+
+
+// ==========================================
+// TARGET CELL
+// ==========================================
+
+const targetBox=
+getCOPCTargetBox(
+copcData
+);
+
+console.log(
+"JANUS COPC TARGET BOX:",
+targetBox
+);
+
+
+// ==========================================
+// READ HIERARCHY
+// ==========================================
+
+status.textContent=
+"READING COPC HIERARCHY";
+
+const hierarchyNodes=
+new Map();
+
+const hierarchyPages=
+new Set();
+
+const pageQueue=[
+copcData.info.rootHierarchyPage
+];
+
+while(
+pageQueue.length
+){
+
+const page=
+pageQueue.shift();
+
+if(!page)
+continue;
+
+const pageKey=
+String(
+page.pageOffset
+)+
+":"+
+String(
+page.pageLength
+);
+
+if(
+hierarchyPages.has(
+pageKey
+)
+)
+continue;
+
+hierarchyPages.add(
+pageKey
+);
+
+const result=
+await copcAPI.loadHierarchyPage(
+copcGetter,
+page
+);
+
+if(
+result?.nodes
+){
+
+for(
+const [
+nodeId,
+node
+] of Object.entries(
+result.nodes
+)
+){
+
+hierarchyNodes.set(
+nodeId,
+node
+);
+
+}
+
+}
+
+if(
+result?.pages
+){
+
+for(
+const childPage of
+Object.values(
+result.pages
+)
+){
+
+if(childPage){
+
+pageQueue.push(
+childPage
+);
+
+}
+
+}
+
+}
+
+}
+
+console.log(
+"JANUS COPC HIERARCHY NODES:",
+hierarchyNodes.size
+);
+
+
+// ==========================================
+// FIND SPATIAL NODES
+// ==========================================
+
+for(
+const [
+nodeId,
+node
+] of hierarchyNodes
+){
+
+const pointCount=
+Number(
+node?.pointCount
+);
+
+if(
+!Number.isFinite(pointCount) ||
+pointCount<=0
+)
+continue;
+
+const nodeBox=
+getCOPCNodeBox(
+copcData,
+nodeId
+);
+
+if(
+!nodeBox
+)
+continue;
+
+if(
+COPCBoxesIntersect(
+nodeBox,
+targetBox
+)
+){
+
+const parts=
+String(nodeId)
+.split("-")
+.map(Number);
+
+copcCandidates.push({
+
+id:
+nodeId,
+
+node,
+
+level:
+parts[0]||0,
+
+pointCount,
+
+box:
+nodeBox
+
+});
+
+}
+
+}
+
+
+// ==========================================
+// DETAIL FIRST
+// ==========================================
+
+copcCandidates.sort(
+(a,b)=>{
+
+if(
+b.level!==a.level
+){
+
+return b.level-a.level;
+
+}
+
+return b.pointCount-
+a.pointCount;
+
+}
+);
+
+console.log(
+"JANUS COPC SPATIAL NODES:",
+copcCandidates.length
+);
+
+console.log(
+"JANUS COPC SPATIAL POINTS:",
+copcCandidates.reduce(
+(sum,item)=>
+sum+
+item.pointCount,
+0
+)
+);
+
+
+// ==========================================
+// DETECT RGB
+// ==========================================
+
+const dimensions=
+copcData.header||
+{};
+
+const pointFormat=
+Number(
+dimensions.pointDataRecordFormat
+);
+
+copcHasColors=
+pointFormat===7 ||
+pointFormat===8;
+
+console.log(
+"JANUS COPC POINT FORMAT:",
+pointFormat
+);
+
+console.log(
+"JANUS COPC RGB:",
+copcHasColors
+);
+
+if(
+!copcCandidates.length
+){
+
+status.textContent=
+"NO COPC POINTS IN CELL";
+
+return;
+
+}
+
+
+// ==========================================
+// LOAD INITIAL 1M
+// ==========================================
+
+await loadCOPCBudget(
+1000000
+);
+
+}catch(error){
+
+console.error(
+"COPC LOAD ERROR",
+error
+);
+
+status.textContent=
+"COPC LOAD ERROR";
 
 }
 
@@ -11702,7 +13142,12 @@ modelType==="LAZ"
 loadLAZ();
 
 }else if(
-modelType==="COPC" ||
+modelType==="COPC"
+){
+
+loadCOPC();
+
+}else if(
 modelType==="EPT"
 ){
 
@@ -12249,325 +13694,6 @@ viewer.dataset.modelUrl=
 modelURL;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-// ==========================================
-// JANUS SPATIAL CONTEXT VIEWER
-// ==========================================
-
-let janusContextViewer=null;
-let janusContextReady=false;
-
-
-function initJanusContextViewer(){
-
-const container=
-document.getElementById(
-"janusContextViewer"
-);
-
-if(!container)
-return;
-
-if(janusContextViewer)
-return;
-
-if(!window.Cesium){
-
-console.error(
-"JANUS CONTEXT: CESIUM NOT AVAILABLE"
-);
-
-return;
-
-}
-
-try{
-
-janusContextViewer=
-new Cesium.Viewer(
-container,
-{
-animation:false,
-timeline:true,
-baseLayerPicker:true,
-geocoder:true,
-homeButton:false,
-sceneModePicker:true,
-navigationHelpButton:false,
-fullscreenButton:false,
-infoBox:false,
-selectionIndicator:false
-}
-);
-
-janusContextReady=true;
-
-console.log(
-"JANUS CONTEXT VIEWER READY"
-);
-
-}catch(error){
-
-console.error(
-"JANUS CONTEXT VIEWER ERROR",
-error
-);
-
-}
-
-}
-
-
-// ==========================================
-// UPDATE CESIUM FROM CELL
-// ==========================================
-
-function updateJanusContextCell(
-lat1,
-lat2,
-lon1,
-lon2
-){
-
-if(!janusContextReady){
-
-initJanusContextViewer();
-
-}
-
-if(!janusContextViewer)
-return;
-
-lat1=Number(lat1);
-lat2=Number(lat2);
-lon1=Number(lon1);
-lon2=Number(lon2);
-
-if(
-!Number.isFinite(lat1) ||
-!Number.isFinite(lat2) ||
-!Number.isFinite(lon1) ||
-!Number.isFinite(lon2)
-){
-
-console.warn(
-"JANUS CONTEXT: INVALID CELL RANGE",
-lat1,
-lat2,
-lon1,
-lon2
-);
-
-return;
-
-}
-
-const centerLat=
-(lat1+lat2)/2;
-
-const centerLon=
-(lon1+lon2)/2;
-
-const coords=
-document.getElementById(
-"janusContextCoords"
-);
-
-if(coords){
-
-coords.textContent=
-centerLat.toFixed(6)+
-"°  "+
-centerLon.toFixed(6)+
-"°  | CELL";
-
-}
-
-janusContextViewer.camera.flyTo({
-
-destination:
-Cesium.Rectangle.fromDegrees(
-lon1,
-lat1,
-lon2,
-lat2
-),
-
-duration:1.2
-
-});
-
-console.log(
-"JANUS CONTEXT CELL:",
-lat1,
-lat2,
-lon1,
-lon2
-);
-
-}
-
-
-// ==========================================
-// UPDATE CESIUM FROM ITEM
-// ==========================================
-
-function updateJanusContext(
-lat,
-lon
-){
-
-if(!janusContextReady){
-
-initJanusContextViewer();
-
-}
-
-if(!janusContextViewer)
-return;
-
-lat=Number(lat);
-lon=Number(lon);
-
-if(
-!Number.isFinite(lat) ||
-!Number.isFinite(lon)
-){
-
-console.warn(
-"JANUS CONTEXT: INVALID COORDINATES",
-lat,
-lon
-);
-
-return;
-
-}
-
-const coords=
-document.getElementById(
-"janusContextCoords"
-);
-
-if(coords){
-
-coords.textContent=
-lat.toFixed(6)+
-"°  "+
-lon.toFixed(6)+
-"°  | ITEM";
-
-}
-
-janusContextViewer.camera.flyTo({
-
-destination:
-Cesium.Cartesian3.fromDegrees(
-lon,
-lat,
-800
-),
-
-duration:1.2
-
-});
-
-console.log(
-"JANUS CONTEXT ITEM:",
-lat,
-lon
-);
-
-}
-
-
-// ==========================================
-// UPDATE FROM STAC OBSERVATION
-// ==========================================
-
-function updateJanusContextFromObservation(obs){
-
-const centroid=
-obs.properties?.["proj:centroid"];
-
-if(
-centroid &&
-Number.isFinite(Number(centroid.lat)) &&
-Number.isFinite(Number(centroid.lon))
-){
-
-updateJanusContext(
-Number(centroid.lat),
-Number(centroid.lon)
-);
-
-return;
-
-}
-
-if(
-obs.geometry?.coordinates &&
-obs.geometry.type==="Point"
-){
-
-const lon=
-Number(obs.geometry.coordinates[0]);
-
-const lat=
-Number(obs.geometry.coordinates[1]);
-
-if(
-Number.isFinite(lat) &&
-Number.isFinite(lon)
-){
-
-updateJanusContext(
-lat,
-lon
-);
-
-}
-
-}
-
-}
-
-
-// ==========================================
-// INITIALIZE
-// ==========================================
-
-setTimeout(
-()=>{
-
-initJanusContextViewer();
-
-},
-100
-);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
