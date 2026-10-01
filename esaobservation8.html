@@ -6383,13 +6383,224 @@ grid.appendChild(div);
 
 
    
-
-   
 function createExplorationBlueMarble(grid,parentCell){
     if(!grid||!parentCell)return;
 
     grid.style.position="relative";
     grid.style.overflow="hidden";
+
+    // ==========================================
+    // DETECTAR CUERPO DESDE LA CELDA
+    // ==========================================
+
+    const cellText=
+        JSON.stringify(parentCell).toLowerCase();
+
+    const isMoon=
+        cellText.includes("moon")||
+        cellText.includes("luna");
+
+    const isMars=
+        cellText.includes("mars")||
+        cellText.includes("marte");
+
+    const body=
+        isMoon
+        ?"moon"
+        :
+        isMars
+        ?"mars"
+        :
+        "earth";
+
+    console.log(
+        "EXPLORATION BODY:",
+        body
+    );
+
+    // ==========================================
+    // LUNA / MARTE
+    // ==========================================
+
+    if(body==="moon"||body==="mars"){
+
+        const marble=document.createElement("img");
+
+        marble.className="explorationBlueMarble";
+        marble.alt="";
+
+        marble.style.position="absolute";
+        marble.style.pointerEvents="none";
+        marble.style.zIndex="0";
+        marble.style.imageRendering="auto";
+        marble.style.maxWidth="none";
+        marble.style.maxHeight="none";
+
+        const textureURL=
+            body==="moon"
+            ?
+            "https://3d.staratlas.es/Moonmap_from_clementine_data.png"
+            :
+            "https://astrogeology.usgs.gov/ckan/dataset/7131d503-cdc9-45a5-8f83-5126c0fd397e/resource/6afad901-1caa-48a7-8b62-3911da0004c2/download/mars_viking_mdim21_clrmosaic_global_1024.jpg";
+
+        marble.onload=()=>{
+
+            const gridWidth=
+                grid.clientWidth;
+
+            const gridHeight=
+                grid.clientHeight;
+
+            const latMin=
+                Number(parentCell.latMin);
+
+            const latMax=
+                Number(parentCell.latMax);
+
+            const lonMin=
+                Number(parentCell.lonMin);
+
+            const lonMax=
+                Number(parentCell.lonMax);
+
+            if(
+                !gridWidth||
+                !gridHeight||
+                !marble.naturalWidth||
+                !marble.naturalHeight||
+                ![
+                    latMin,
+                    latMax,
+                    lonMin,
+                    lonMax
+                ].every(Number.isFinite)
+            ){
+                console.warn(
+                    "PLANET MAP: invalid geometry"
+                );
+                return;
+            }
+
+            // ==========================================
+            // MAPA GLOBAL EQUIRECTANGULAR
+            //
+            // X: -180 ... +180
+            // Y: +90  ... -90
+            // ==========================================
+
+            const imageWidth=
+                marble.naturalWidth;
+
+            const imageHeight=
+                marble.naturalHeight;
+
+            const cellWidth=
+                Math.max(
+                    0.0001,
+                    lonMax-lonMin
+                );
+
+            const cellHeight=
+                Math.max(
+                    0.0001,
+                    latMax-latMin
+                );
+
+            // ==========================================
+            // PIXELES QUE CORRESPONDEN A LA CELDA
+            // ==========================================
+
+            const sourceX=
+                ((lonMin+180)/360)*
+                imageWidth;
+
+            const sourceY=
+                ((90-latMax)/180)*
+                imageHeight;
+
+            const sourceWidth=
+                (cellWidth/360)*
+                imageWidth;
+
+            const sourceHeight=
+                (cellHeight/180)*
+                imageHeight;
+
+            // ==========================================
+            // ESCALA PARA QUE LA CELDA LLENE EL GRID
+            // ==========================================
+
+            const scaleX=
+                gridWidth/sourceWidth;
+
+            const scaleY=
+                gridHeight/sourceHeight;
+
+            const scale=
+                Math.max(
+                    scaleX,
+                    scaleY
+                );
+
+            const renderedWidth=
+                imageWidth*scale;
+
+            const renderedHeight=
+                imageHeight*scale;
+
+            // ==========================================
+            // POSICIÓN DEL RECORTE
+            // ==========================================
+
+            marble.style.width=
+                renderedWidth+"px";
+
+            marble.style.height=
+                renderedHeight+"px";
+
+            marble.style.left=
+                (-sourceX*scale)+"px";
+
+            marble.style.top=
+                (-sourceY*scale)+"px";
+
+            console.log(
+                body.toUpperCase()+" MAP:",
+                {
+                    latMin,
+                    latMax,
+                    lonMin,
+                    lonMax,
+                    sourceX,
+                    sourceY,
+                    sourceWidth,
+                    sourceHeight,
+                    scale
+                }
+            );
+
+        };
+
+        marble.onerror=()=>{
+            console.error(
+                body.toUpperCase()+
+                " MAP: texture unavailable"
+            );
+        };
+
+        marble.src=textureURL;
+
+        grid.insertBefore(
+            marble,
+            grid.firstChild
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // TIERRA — NOAA ACTUAL
+    // ==========================================
 
     const getDateUTC=offset=>{
         const d=new Date();
@@ -6398,6 +6609,7 @@ function createExplorationBlueMarble(grid,parentCell){
     };
 
     const createURL=date=>{
+
         const bbox=[
             parentCell.latMin,
             parentCell.lonMin,
@@ -6405,41 +6617,49 @@ function createExplorationBlueMarble(grid,parentCell){
             parentCell.lonMax
         ].join(",");
 
-        const latCenter=(parentCell.latMin+parentCell.latMax)/2;
+        const latCenter=
+            (parentCell.latMin+
+             parentCell.latMax)/2;
 
         const latKm=
-            (parentCell.latMax-parentCell.latMin)*111.32;
+            (parentCell.latMax-
+             parentCell.latMin)*111.32;
 
         const lonKm=
-            (parentCell.lonMax-parentCell.lonMin)*
+            (parentCell.lonMax-
+             parentCell.lonMin)*
             111.32*
-            Math.cos(latCenter*Math.PI/180);
+            Math.cos(
+                latCenter*Math.PI/180
+            );
 
-        const areaKm=Math.max(latKm,lonKm);
+        const areaKm=
+            Math.max(
+                latKm,
+                lonKm
+            );
 
         // =================================
         // ESCALA DEL GRID 18 × 18
         // =================================
 
-        const gridCellKm=areaKm/18;
+        const gridCellKm=
+            areaKm/18;
 
         // =================================
         // RESOLUCIÓN VISUAL
         // =================================
-        //
-        // Mantenemos una relación fija
-        // entre la imagen y las 18 celdas.
-        //
-        // 32 píxeles de imagen por celda.
-        //
 
-const pixelsPerCell=32;
+        const pixelsPerCell=32;
 
-let resolution=
-    18*pixelsPerCell;
+        let resolution=
+            18*pixelsPerCell;
 
-resolution=
-    Math.min(resolution,8200);
+        resolution=
+            Math.min(
+                resolution,
+                8200
+            );
 
         // =================================
         // ESCALA RESULTANTE
@@ -6451,13 +6671,18 @@ resolution=
         const pixelsPerGridCell=
             gridCellKm/pixelSizeKm;
 
-        console.log("NASA MAP SCALE:",{
-            bboxKm:areaKm.toFixed(3),
-            gridCellKm:gridCellKm.toFixed(4),
-            resolution:resolution,
-            pixelSizeKm:pixelSizeKm.toFixed(4),
-            pixelsPerGridCell:pixelsPerGridCell.toFixed(2)
-        });
+        console.log(
+            "NASA MAP SCALE:",
+            {
+                bboxKm:areaKm.toFixed(3),
+                gridCellKm:gridCellKm.toFixed(4),
+                resolution,
+                pixelSizeKm:
+                    pixelSizeKm.toFixed(4),
+                pixelsPerGridCell:
+                    pixelsPerGridCell.toFixed(2)
+            }
+        );
 
         return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
         "?REQUEST=GetSnapshot"+
@@ -6472,15 +6697,23 @@ resolution=
         "&AUTOSCALE=TRUE";
     };
 
-    const today=getDateUTC(0);
-    const yesterday=getDateUTC(-1);
+    const today=
+        getDateUTC(0);
 
-    const marble=document.createElement("img");
+    const yesterday=
+        getDateUTC(-1);
 
-    marble.className="explorationBlueMarble";
+    const marble=
+        document.createElement("img");
+
+    marble.className=
+        "explorationBlueMarble";
+
     marble.alt="";
 
-    marble.style.position="absolute";
+    marble.style.position=
+        "absolute";
+
     marble.style.left="0";
     marble.style.top="0";
     marble.style.width="100%";
@@ -6492,7 +6725,9 @@ resolution=
     let usingDate=today;
 
     marble.onerror=()=>{
+
         if(usingDate===today){
+
             usingDate=yesterday;
 
             console.log(
@@ -6500,22 +6735,30 @@ resolution=
                 yesterday
             );
 
-            marble.src=createURL(yesterday);
+            marble.src=
+                createURL(yesterday);
+
         }else{
+
             console.error(
                 "NASA SNAPSHOT: today and previous day unavailable"
             );
+
         }
+
     };
 
     marble.onload=()=>{
+
         console.log(
             "NASA SNAPSHOT LOADED:",
             usingDate
         );
+
     };
 
-    marble.src=createURL(today);
+    marble.src=
+        createURL(today);
 
     console.log(
         "NASA SNAPSHOT TODAY:",
@@ -6527,14 +6770,6 @@ resolution=
         grid.firstChild
     );
 }
-// fin bloque observacion fase 2 espacial
-   
-
-
-
-
-
-
 
 
 
