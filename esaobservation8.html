@@ -572,6 +572,96 @@ overflow:hidden;
 }
 
 
+
+   .janus-sector-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9990;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.janus-sector-inner {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 10px 24px 9px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.janus-sector-title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111;
+  line-height: 1.2;
+}
+
+.janus-sector-subtitle {
+  margin-top: 3px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: #666;
+  line-height: 1.2;
+}
+
+.janus-sector-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #444;
+}
+
+.janus-sector-list span {
+  white-space: nowrap;
+}
+
+.janus-sector-list span:not(:last-child)::after {
+  content: "·";
+  margin-left: 18px;
+  color: #999;
+}
+
+@media (max-width: 800px) {
+  .janus-sector-inner {
+    padding: 8px 14px;
+  }
+
+  .janus-sector-title {
+    font-size: 13px;
+  }
+
+  .janus-sector-subtitle {
+    font-size: 10px;
+  }
+
+  .janus-sector-list {
+    gap: 5px 12px;
+    font-size: 8px;
+  }
+
+  .janus-sector-list span:not(:last-child)::after {
+    margin-left: 12px;
+  }
+}
+
+
 /* =======================================================
    HEADER
 =======================================================*/
@@ -2564,6 +2654,14 @@ height:100%;
     justify-content:center;
   }
 }  
+
+
+
+
+
+
+
+   
    
 </style>
 </head>
@@ -2573,6 +2671,25 @@ height:100%;
 
 
 <div id="panel">
+   
+   <div class="janus-sector-strip">
+  <div class="janus-sector-inner">
+    <div class="janus-sector-title">Spatial Data Exploitation</div>
+    <div class="janus-sector-subtitle">Technology transfer across sectors</div>
+    <div class="janus-sector-list">
+      <span>Forestry</span>
+      <span>Agriculture</span>
+      <span>Construction</span>
+      <span>Mining</span>
+      <span>Energy</span>
+      <span>Infrastructure</span>
+      <span>Archaeology</span>
+      <span>Cultural Heritage</span>
+      <span>Research</span>
+      <span>Education</span>
+    </div>
+  </div>
+</div>
 
       <div id="janus-stac-custom">
 <div id="janus-stac-custom-header">
