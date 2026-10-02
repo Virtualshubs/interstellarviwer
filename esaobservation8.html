@@ -2181,6 +2181,12 @@ Load
 
 </div> 
 
+   
+         <select id="collectionSelector">
+<option value="">Select collection</option>
+</select>
+
+
     <div id="header">
         <div id="status">Ready</div>
         <input id="search" value="">
@@ -2204,11 +2210,6 @@ Load
 </div>
 
 
-   
-
-         <select id="collectionSelector">
-<option value="">Select collection</option>
-</select>
 
 
     <div id="workspace">
@@ -3066,7 +3067,7 @@ const defaultOption=
 document.createElement("option");
 
 defaultOption.value="";
-defaultOption.textContent="Select public STAC";
+defaultOption.textContent="Select public collection";
 
 select.appendChild(defaultOption);
 
