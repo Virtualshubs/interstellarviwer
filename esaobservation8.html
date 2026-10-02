@@ -2136,7 +2136,112 @@ height:100%;
 }
 
 
-   
+ .janus-footer{
+  width:100%;
+  margin-top:40px;
+  border-top:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.18);
+  color:rgba(255,255,255,.55);
+}
+
+.janus-footer-inner{
+  width:100%;
+  max-width:1400px;
+  min-height:54px;
+  margin:0 auto;
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  box-sizing:border-box;
+}
+
+.janus-footer-links{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex:1;
+}
+
+.janus-footer-link,
+.janus-footer-contact{
+  color:rgba(255,255,255,.55);
+  text-decoration:none;
+  font-size:11px;
+  letter-spacing:.04em;
+  transition:color .2s ease;
+}
+
+.janus-footer-link:hover,
+.janus-footer-contact:hover{
+  color:#fff;
+}
+
+.janus-footer-credit{
+  flex:1;
+  text-align:center;
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  color:rgba(255,255,255,.38);
+}
+
+.janus-footer-credit strong{
+  color:rgba(255,255,255,.68);
+  font-weight:500;
+}
+
+.janus-footer-cta{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  font-size:11px;
+  white-space:nowrap;
+  color:rgba(255,255,255,.38);
+}
+
+.janus-footer-contact{
+  color:rgba(255,255,255,.68);
+}
+
+@media (max-width:700px){
+
+  .janus-footer{
+    margin-top:30px;
+  }
+
+  .janus-footer-inner{
+    min-height:0;
+    padding:14px 18px;
+    flex-direction:column;
+    gap:9px;
+    text-align:center;
+  }
+
+  .janus-footer-links{
+    order:1;
+    flex:none;
+    justify-content:center;
+    gap:18px;
+  }
+
+  .janus-footer-credit{
+    order:2;
+    flex:none;
+    white-space:normal;
+    line-height:1.4;
+  }
+
+  .janus-footer-cta{
+    order:3;
+    flex:none;
+    justify-content:center;
+  }
+}  
    
 </style>
 </head>
@@ -2371,6 +2476,26 @@ Waiting for cell selection
     </div>
 
 </div>
+
+   <footer class="janus-footer">
+  <div class="janus-footer-inner">
+
+    <div class="janus-footer-links">
+      <a href="#" class="janus-footer-link">Privacy</a>
+      <a href="mailto:" class="janus-footer-link">Contact</a>
+    </div>
+
+    <div class="janus-footer-credit">
+      Technology developed by <strong>3DTWINS</strong>
+    </div>
+
+    <div class="janus-footer-cta">
+      <span>Need this technology?</span>
+      <a href="mailto:" class="janus-footer-contact">Contact us</a>
+    </div>
+
+  </div>
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/jquery/jquery-3.1.1.min.js"></script>
