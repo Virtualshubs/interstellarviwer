@@ -185,6 +185,327 @@ href="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/
 --radius:4px;
 --transition:.15s;
 
+
+/* =======================================================
+   LUNAR UI SYNCHRONIZATION
+======================================================= */
+
+/* ---------- FORM ELEMENTS ---------- */
+
+input,
+select,
+textarea{
+  background:var(--input-bg);
+  color:var(--input-text);
+  border-color:var(--input-border);
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:var(--input-placeholder);
+}
+
+select{
+  color-scheme:dark;
+}
+
+select option{
+  background:var(--surface);
+  color:var(--text);
+}
+
+
+/* ---------- BUTTONS ---------- */
+
+button{
+  background:var(--button-bg);
+  color:var(--button-text);
+  border-color:var(--button-border);
+}
+
+button:hover{
+  background:var(--button-hover);
+}
+
+
+/* ---------- STAC CONTROLS ---------- */
+
+#janus-stac-custom{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#janus-stac-custom-header{
+  background:var(--panel-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#janus-stac-custom-panel{
+  background:var(--panel);
+  color:var(--text);
+}
+
+#janus-stac-public{
+  color:var(--text);
+}
+
+#janus-stac-public select{
+  background:var(--input-bg);
+  color:var(--input-text);
+  border-color:var(--input-border);
+}
+
+#janus-stac-public select option{
+  background:var(--surface);
+  color:var(--text);
+}
+
+#collectionSelector{
+  background:var(--input-bg);
+  color:var(--input-text);
+  border-color:var(--input-border);
+}
+
+
+/* ---------- HEADER ---------- */
+
+#header{
+  background:var(--panel-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#status{
+  color:var(--text-muted);
+}
+
+
+/* ---------- WORKSPACE ---------- */
+
+.sidebar{
+  background:var(--panel);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#content{
+  color:var(--text);
+}
+
+#janusReader{
+  color:var(--text);
+}
+
+
+/* ---------- CARDS ---------- */
+
+.card{
+  background:var(--card-bg);
+  color:var(--text);
+  border-color:var(--card-border);
+}
+
+.card:hover{
+  background:var(--card-hover);
+}
+
+
+/* ---------- DATA EXPLORATION ---------- */
+
+#detail{
+  color:var(--text);
+}
+
+#detail h2,
+#summary h2{
+  color:var(--text);
+}
+
+#meta,
+#queryBox,
+#itemExploitation{
+  color:var(--text);
+}
+
+
+/* ---------- SPATIAL COVERAGE ---------- */
+
+.spatialCoverage{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.spatialCoverageTitle{
+  color:var(--text-soft);
+}
+
+.spatialCoverageValue{
+  color:var(--text);
+}
+
+.spatialCoverageDetails{
+  color:var(--text-muted);
+}
+
+
+/* ---------- JANUS CONTEXT ---------- */
+
+#janusContextPanel{
+  background:var(--panel);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.janusContextHeader{
+  background:var(--panel-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.janusContextTitle{
+  color:var(--text-soft);
+}
+
+#janusContextCoords{
+  color:var(--text-muted);
+}
+
+
+/* ---------- DATASET OVERVIEW ---------- */
+
+.stats{
+  color:var(--text);
+}
+
+.stat{
+  background:var(--surface2);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.statTitle{
+  color:var(--text-muted);
+}
+
+.statValue{
+  color:var(--text);
+}
+
+
+/* ---------- DETAILS ---------- */
+
+.details{
+  color:var(--text);
+}
+
+.row{
+  border-color:var(--divider);
+}
+
+.label{
+  color:var(--text-muted);
+}
+
+.value{
+  color:var(--text);
+}
+
+
+/* ---------- DATASET RAW ---------- */
+
+details{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+details summary{
+  background:var(--panel-header);
+  color:var(--text-soft);
+}
+
+pre{
+  background:var(--code-bg);
+  color:var(--code-text);
+}
+
+
+/* ---------- TABLES ---------- */
+
+table{
+  color:var(--text);
+  border-color:var(--border);
+}
+
+th{
+  background:var(--table-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+td{
+  background:var(--table-row);
+  color:var(--text);
+  border-color:var(--divider);
+}
+
+tr:hover td{
+  background:var(--table-hover);
+}
+
+
+/* ---------- LINKS ---------- */
+
+a{
+  color:var(--accent);
+}
+
+a:hover{
+  color:var(--accent-hover);
+}
+
+
+/* ---------- FOOTER ---------- */
+
+.janus-footer{
+  background:var(--panel-footer);
+  color:var(--text-muted);
+  border-color:var(--border);
+}
+
+.janus-footer-link,
+.janus-footer-contact{
+  color:var(--text-muted);
+}
+
+.janus-footer-link:hover,
+.janus-footer-contact:hover{
+  color:var(--text);
+}
+
+.janus-footer-credit{
+  color:var(--text-muted);
+}
+
+.janus-footer-credit strong{
+  color:var(--text-soft);
+}
+
+
+/* ---------- NATIVE CONTROLS ---------- */
+
+input[type="checkbox"],
+input[type="radio"]{
+  accent-color:var(--accent);
+}
+
+hr{
+  border-color:var(--divider);
+}
+
 }
   
 
