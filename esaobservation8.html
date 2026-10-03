@@ -2564,7 +2564,7 @@ console.log(
 </script>
 
 
-
+<script src="https://cdn.jsdelivr.net/npm/geotiff"></script>
 
 <script>
 
@@ -7499,7 +7499,221 @@ renderAssets(obs,index);
 
 
 
+async function renderCOGAsset(asset,obs,div){
 
+    const href=
+        String(asset?.href||"");
+
+    if(!href)
+        return;
+
+
+    let url=href;
+
+    const options={};
+
+
+    if(href.startsWith("s3://")){
+
+        const parts=
+            href.slice(5).split("/");
+
+        const bucket=
+            parts.shift();
+
+        const key=
+            parts.join("/");
+
+        if(!bucket || !key)
+            return;
+
+
+        const region=
+            obs?.properties?.["storage:region"] ||
+            "us-west-2";
+
+
+        url=
+            "https://" +
+            bucket +
+            ".s3." +
+            region +
+            ".amazonaws.com/" +
+            key
+                .split("/")
+                .map(encodeURIComponent)
+                .join("/");
+
+
+        if(
+            obs?.properties?.["storage:requester_pays"] === true
+        ){
+
+            options.headers={
+                "x-amz-request-payer":
+                    "requester"
+            };
+
+        }
+
+    }
+
+
+    if(
+        typeof GeoTIFF==="undefined" ||
+        typeof GeoTIFF.fromUrl!=="function"
+    ){
+
+        console.warn(
+            "GeoTIFF library not available"
+        );
+
+        return;
+    }
+
+
+    try{
+
+        const tiff=
+            await GeoTIFF.fromUrl(
+                url,
+                options
+            );
+
+
+        const image=
+            await tiff.getImage();
+
+
+        const width=
+            image.getWidth();
+
+        const height=
+            image.getHeight();
+
+
+        const maxSize=
+            600;
+
+
+        const scale=
+            Math.min(
+                1,
+                maxSize /
+                Math.max(width,height)
+            );
+
+
+        const outWidth=
+            Math.max(
+                1,
+                Math.round(width*scale)
+            );
+
+
+        const outHeight=
+            Math.max(
+                1,
+                Math.round(height*scale)
+            );
+
+
+        const rgb=
+            await image.readRGB({
+
+                width:outWidth,
+
+                height:outHeight,
+
+                resampleMethod:
+                    "bilinear"
+
+            });
+
+
+        const canvas=
+            document.createElement("canvas");
+
+
+        canvas.className=
+            "assetPreview";
+
+
+        canvas.width=
+            outWidth;
+
+        canvas.height=
+            outHeight;
+
+
+        const ctx=
+            canvas.getContext("2d");
+
+
+        const imageData=
+            ctx.createImageData(
+                outWidth,
+                outHeight
+            );
+
+
+        for(
+            let i=0,
+            j=0;
+
+            i<rgb.length;
+
+            i+=3,
+            j+=4
+        ){
+
+            imageData.data[j]=
+                rgb[i];
+
+            imageData.data[j+1]=
+                rgb[i+1];
+
+            imageData.data[j+2]=
+                rgb[i+2];
+
+            imageData.data[j+3]=
+                255;
+
+        }
+
+
+        ctx.putImageData(
+            imageData,
+            0,
+            0
+        );
+
+
+        canvas.onclick=()=>{
+
+            window.open(
+                url,
+                "_blank"
+            );
+
+        };
+
+
+        div.appendChild(
+            canvas
+        );
+
+
+    }catch(error){
+
+        console.warn(
+            "COG render failed:",
+            error
+        );
+
+    }
+
+}
 
 
 
@@ -7570,6 +7784,22 @@ onerror="this.style.display='none';"
 
 div.innerHTML=html;
 box.appendChild(div);
+
+   
+
+   if(
+    String(asset?.type||"")
+        .toLowerCase()
+        .includes("image/tiff")
+){
+
+    renderCOGAsset(
+        asset,
+        obs,
+        div
+    );
+
+}
 
 });
 
