@@ -2550,8 +2550,6 @@ Waiting for cell selection
 
 <script src="https://potree.org/potree/build/potree/potree.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/plasio/js/laslaz.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/geotiff"></script>
    
 <script>
 console.log("AFTER POTREE:",window.Potree);
@@ -7503,179 +7501,16 @@ renderAssets(obs,index);
 
 
 
-function isCOGAsset(asset){
-
-    const type=
-        String(asset?.type||"").toLowerCase();
-
-    return type.includes("image/tiff") &&
-           type.includes("cloud-optimized");
-
-}
 
 
-function isGeoTIFFAsset(asset){
-
-    const type=
-        String(asset?.type||"").toLowerCase();
-
-    return type.includes("image/tiff");
-
-}
 
 
-async function renderCOGAsset(asset,div){
-
-    const href=
-        String(asset?.href||"");
-
-    if(
-        !/^https?:\/\//i.test(href)
-    ){
-
-        console.warn(
-            "GeoTIFF asset is not directly HTTP accessible:",
-            href
-        );
-
-        return;
-    }
 
 
-    if(
-        typeof GeoTIFF==="undefined" ||
-        typeof GeoTIFF.fromUrl!=="function"
-    ){
 
-        console.warn(
-            "GeoTIFF library not available"
-        );
-
-        return;
-    }
-
-
-    try{
-
-        const tiff=
-            await GeoTIFF.fromUrl(href);
-
-        const image=
-            await tiff.getImage();
-
-        const width=
-            image.getWidth();
-
-        const height=
-            image.getHeight();
-
-        const maxSize=
-            600;
-
-        const scale=
-            Math.min(
-                1,
-                maxSize/
-                Math.max(width,height)
-            );
-
-        const outWidth=
-            Math.max(
-                1,
-                Math.round(width*scale)
-            );
-
-        const outHeight=
-            Math.max(
-                1,
-                Math.round(height*scale)
-            );
-
-        const rgb=
-            await image.readRGB({
-
-                width:outWidth,
-                height:outHeight,
-
-                resampleMethod:"bilinear"
-
-            });
-
-        const canvas=
-            document.createElement("canvas");
-
-        canvas.className=
-            "assetPreview";
-
-        canvas.width=
-            outWidth;
-
-        canvas.height=
-            outHeight;
-
-        const ctx=
-            canvas.getContext("2d");
-
-        const imageData=
-            ctx.createImageData(
-                outWidth,
-                outHeight
-            );
-
-        for(
-            let i=0,
-            j=0;
-
-            i<rgb.length;
-
-            i+=3,
-            j+=4
-        ){
-
-            imageData.data[j]=
-                rgb[i];
-
-            imageData.data[j+1]=
-                rgb[i+1];
-
-            imageData.data[j+2]=
-                rgb[i+2];
-
-            imageData.data[j+3]=
-                255;
-
-        }
-
-        ctx.putImageData(
-            imageData,
-            0,
-            0
-        );
-
-        canvas.onclick=()=>{
-
-            window.open(
-                href,
-                "_blank"
-            );
-
-        };
-
-        div.appendChild(
-            canvas
-        );
-
-    }catch(error){
-
-        console.warn(
-            "GeoTIFF render failed:",
-            error
-        );
-
-    }
-
-}
-
+// ==========================================
+// RENDER ASSETS
+// ==========================================
 
 function renderAssets(obs,index){
 
@@ -7693,8 +7528,7 @@ document.createElement("div");
 
 div.className="asset";
 
-const type=
-asset.type||"Unknown";
+const type=asset.type||"Unknown";
 
 let html=`
 
@@ -7702,7 +7536,6 @@ let html=`
 <div>
 
 <div class="assetName">${name}</div>
-
 <div class="assetType">${type}</div>
 
 </div>
@@ -7735,30 +7568,11 @@ onerror="this.style.display='none';"
 }
 
 
-div.innerHTML=
-html;
-
-box.appendChild(
-    div
-);
-
-
-if(
-    isCOGAsset(asset) ||
-    isGeoTIFFAsset(asset)
-){
-
-    renderCOGAsset(
-        asset,
-        div
-    );
-
-}
+div.innerHTML=html;
+box.appendChild(div);
 
 });
 
-}
-     
 
 // ==========================================
 // EXPLOIT BUTTON
