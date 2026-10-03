@@ -7499,11 +7499,83 @@ renderAssets(obs,index);
 
 
 
+     
+
+
+
+// ==========================================
+// RENDER COG ASSET
+// ==========================================
+
+function renderCOGAsset(obs,asset,index,name){
+
+const div=
+document.createElement("div");
+
+div.className="assetCog";
+
+div.innerHTML=`
+
+<div class="assetCogHeader">
+
+<div>
+<div class="assetName">${name}</div>
+<div class="assetType">${asset.type||"Cloud Optimized GeoTIFF"}</div>
+</div>
+
+<button
+type="button"
+onclick="exploitCOGAsset(${index},'${name}')"
+>
+Exploit image
+</button>
+
+</div>
+
+<canvas
+id="cogCanvas${index}_${name}"
+class="assetPreview"
+style="display:none;"
+></canvas>
+
+`;
+
+return div;
+
+}
+
+
+// ==========================================
+// EXPLOIT COG ASSET
+// ==========================================
+
+function exploitCOGAsset(index,name){
+
+const obs=
+window.janusObservations?.[index];
+
+if(!obs||!obs.assets?.[name])
+return;
+
+const asset=
+obs.assets[name];
+
+console.log(
+"COG exploitation:",
+{
+observation:obs.id,
+asset:name,
+href:asset.href,
+type:asset.type
+}
+);
+
+}
 
 
 
 
-
+     
 
 
 
