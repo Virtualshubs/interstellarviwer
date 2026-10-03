@@ -667,21 +667,14 @@ overflow:hidden;
 =======================================================*/
 
 #header{
-
+top: 64px;
 height:58px;
-
 display:flex;
-
 align-items:center;
-
 gap:14px;
-
 padding:0 18px;
-
 background:var(--surface);
-
 border-bottom:1px solid var(--border);
-
 flex-shrink:0;
 
 }
@@ -692,33 +685,20 @@ flex-shrink:0;
 =======================================================*/
 
 #search{
-
 flex:1;
-
 height:38px;
-
 padding:0 14px;
-
 background:#f3f4f6;
-
 color:#1f2937;
-
 border:1px solid #d1d5db;
-
 border-radius:6px;
-
 transition:var(--transition);
-
 font-size:13px;
-
 }
 
 #search:focus{
-
 outline:none;
-
 border-color:#9ca3af;
-
 box-shadow:0 0 0 3px rgba(156,163,175,.2);
 
 }
@@ -728,37 +708,25 @@ box-shadow:0 0 0 3px rgba(156,163,175,.2);
 =======================================================*/
 
 button{
-
 height:38px;
-
 padding:0 16px;
-
 background:#5c6675;
-
 color:#ffffff;
-
 border:1px solid rgba(255,255,255,.12);
-
 border-radius:6px;
-
 cursor:pointer;
-
 font-size:13px;
-
 font-weight:600;
-
 transition:var(--transition);
-
 }
+   
 
 button:hover{
-
 background:#6d7888;
 
 }
 
 button:active{
-
 transform:translateY(1px);
 
 }
@@ -769,23 +737,14 @@ transform:translateY(1px);
 =======================================================*/
 
 #status{
-
 height:42px;
-
 display:flex;
-
 align-items:center;
-
 padding:0 18px;
-
 background:#f3f4f6;
-
 border-bottom:1px solid #d1d5db;
-
 font-size:13px;
-
 color:#4b5563;
-
 }
 
 
@@ -794,13 +753,9 @@ color:#4b5563;
 =======================================================*/
 
 #workspace{
-
 flex:1;
-
 display:flex;
-
 overflow:hidden;
-
 }
 
 
@@ -809,17 +764,11 @@ overflow:hidden;
 =======================================================*/
 
 #content{
-
 flex:1;
-
 display:grid;
-
 grid-template-columns:380px 1fr;
-
 overflow:hidden;
-
 background:var(--bg);
-
 }
 
 
@@ -828,13 +777,9 @@ background:var(--bg);
 =======================================================*/
 
 #main{
-
 display:flex;
-
 flex-direction:column;
-
 overflow:hidden;
-
 }
 
 
@@ -844,11 +789,8 @@ overflow:hidden;
 
 #cards,
 #detail{
-
 overflow:auto;
-
 padding:18px;
-
 }
 
 
@@ -857,49 +799,30 @@ padding:18px;
 =======================================================*/
 
 .card{
-
 background:var(--surface);
-
 border:1px solid var(--border);
-
 border-radius:var(--radius);
-
 padding:16px;
-
 margin-bottom:14px;
-
 transition:var(--transition);
-
 }
 
 .card:hover{
-
 border-color:var(--border-light);
-
 }
 
 .card h3{
-
 font-size:16px;
-
 font-weight:600;
-
 margin-bottom:12px;
-
 color:var(--orange);
-
 }
 
 .card p{
-
 font-size:13px;
-
 line-height:1.6;
-
 color:var(--text-soft);
-
 margin:5px 0;
-
 }
 
 
@@ -908,43 +831,26 @@ margin:5px 0;
 =======================================================*/
 
 .row{
-
 display:flex;
-
 align-items:flex-start;
-
 gap:18px;
-
 padding:9px 0;
-
 border-bottom:1px solid rgba(255,255,255,.05);
-
 }
 
 .key{
-
 width:180px;
-
 font-weight:600;
-
 font-size:13px;
-
 color:var(--blue2);
-
 }
 
 .value{
-
 flex:1;
-
 font-size:13px;
-
 line-height:1.5;
-
 color:var(--text-soft);
-
 word-break:break-word;
-
 }
 
 
@@ -953,7 +859,6 @@ word-break:break-word;
 =======================================================*/
 
 input{
-
 height:36px;
 padding:0 10px;
 background:#0f151e;
@@ -1076,9 +981,7 @@ z-index:1;
 }
 
  .dataCell.searchMatch{
-
     outline:2px solid #ffffff;
-
     box-shadow:
         0 0 0 2px rgba(80,190,255,.8),
         0 0 18px rgba(80,190,255,.6);
@@ -1091,19 +994,12 @@ z-index:1;
 =======================================================*/
 
 #raw{
-
 max-height:60vh;
-
 overflow:auto;
-
 padding:14px;
-
 background:#101720;
-
 border:1px solid var(--border);
-
 border-radius:8px;
-
 }
 
 
@@ -1112,29 +1008,21 @@ border-radius:8px;
 =======================================================*/
 
 ::-webkit-scrollbar{
-
 width:10px;
-
 height:10px;
-
 }
 
 ::-webkit-scrollbar-track{
-
 background:#0f141c;
 
 }
 
 ::-webkit-scrollbar-thumb{
-
 background:#2f3e51;
-
 border-radius:30px;
-
 }
 
 ::-webkit-scrollbar-thumb:hover{
-
 background:#42566f;
 
 }
@@ -1145,22 +1033,15 @@ background:#42566f;
 =======================================================*/
 
 #janusReader{
-
 width:430px;
 height:100%;
-
 display:flex;
 flex-direction:column;
-
 flex-shrink:0;
-
 background:var(--surface);
-
 border-left:1px solid var(--border);
-
 overflow-y:auto;
 overflow-x:hidden;
-
 }
 
 
@@ -1169,29 +1050,18 @@ overflow-x:hidden;
 =======================================================*/
 
 #janusSummary{
-
 padding:22px;
-
 background:var(--surface2);
-
 border-bottom:1px solid var(--border);
-
 flex-shrink:0;
-
 }
 
 #janusReader h2{
-
 font-size:18px;
-
 font-weight:600;
-
 letter-spacing:.02em;
-
 margin-bottom:18px;
-
 color:var(--text);
-
 }
 
 
@@ -1200,61 +1070,38 @@ color:var(--text);
 =======================================================*/
 
 #janusReader .stats{
-
 display:grid;
-
 grid-template-columns:repeat(2,1fr);
-
 gap:12px;
-
 margin-bottom:18px;
-
 }
 
 #janusReader .stat{
-
 padding:16px;
-
 background:var(--surface3);
-
 border:1px solid var(--border);
-
 border-radius:8px;
-
 transition:.15s;
-
 }
 
 #janusReader .stat:hover{
-
 border-color:var(--border-light);
-
 }
 
 #janusReader .statTitle{
-
 font-size:10px;
-
 text-transform:uppercase;
-
 letter-spacing:.12em;
-
 font-weight:700;
-
 color:var(--text-muted);
-
 margin-bottom:8px;
-
 }
+   
 
 #janusReader .statValue{
-
 font-size:26px;
-
 font-weight:700;
-
 color:white;
-
 }
 
 
@@ -1263,59 +1110,38 @@ color:white;
 =======================================================*/
 
 #janusReader .details{
-
 display:flex;
-
 flex-direction:column;
-
 gap:6px;
-
 padding-top:18px;
-
 border-top:1px solid rgba(255,255,255,.06);
-
 }
+   
 
 #janusReader .row{
-
 display:flex;
-
 justify-content:space-between;
-
 align-items:flex-start;
-
 gap:18px;
-
 padding:8px 0;
-
 border-bottom:1px solid rgba(255,255,255,.04);
-
 }
+   
 
 #janusReader .label{
-
 font-size:12px;
-
 font-weight:600;
-
 color:var(--text-muted);
-
 }
+   
 
 #janusReader .value{
-
 flex:1;
-
 text-align:right;
-
 font-size:13px;
-
 line-height:1.45;
-
 color:var(--text-soft);
-
 word-break:break-word;
-
 }
 
 
@@ -1323,54 +1149,38 @@ word-break:break-word;
    OBSERVATIONS
 =======================================================*/
 #janusObservations{
-
 display:flex;
 flex-direction:column;
-
 padding:18px;
-
 background:var(--bg);
-
 }
 
+   
 /* =======================================================
    CARDS
 =======================================================*/
 
 #janusReader .card{
-
 background:var(--surface2);
-
 border:1px solid var(--border);
-
 border-radius:8px;
-
 padding:18px;
-
 margin-bottom:16px;
-
 box-shadow:none;
-
 transition:.15s;
-
 }
 
+   
 #janusReader .card:hover{
-
 border-color:var(--border-light);
-
 }
+   
 
 #janusReader .card h2{
-
 font-size:15px;
-
 font-weight:600;
-
 margin-bottom:16px;
-
 color:white;
-
 }
 
 
@@ -1379,55 +1189,36 @@ color:white;
 =======================================================*/
 
 #janusReader .asset{
-
 margin-top:14px;
-
 padding:14px;
-
 background:#101720;
-
 border:1px solid var(--border);
-
 border-radius:8px;
-
 }
+   
 
 #janusReader .assetHeader{
-
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
-
 margin-bottom:10px;
-
 gap:10px;
-
 }
 
+   
 #janusReader .assetName{
-
 font-size:13px;
-
 font-weight:600;
-
 color:white;
-
 word-break:break-word;
-
 }
+   
 
 #janusReader .assetType{
-
 font-size:11px;
-
 color:var(--text-muted);
-
 text-transform:uppercase;
-
 letter-spacing:.08em;
-
 }
 
 
@@ -1436,31 +1227,20 @@ letter-spacing:.08em;
 =======================================================*/
 
 #janusReader .assetPreview{
-
 display:block;
-
 width:100%;
-
 max-height:180px;
-
 object-fit:cover;
-
 border-radius:6px;
-
 border:1px solid var(--border);
-
 cursor:pointer;
-
 margin-top:12px;
-
 transition:.15s;
-
 }
+   
 
 #janusReader .assetPreview:hover{
-
 border-color:var(--blue);
-
 }
 
 
@@ -1469,66 +1249,42 @@ border-color:var(--blue);
 =======================================================*/
 
 #janusReader button{
-
 width:100%;
-
 height:38px;
-
 margin-top:16px;
-
 background:var(--blue);
-
 border:none;
-
 border-radius:6px;
-
 font-size:13px;
-
 font-weight:600;
-
 color:white;
-
 cursor:pointer;
-
 transition:.15s;
-
 }
+   
 
 #janusReader button:hover{
-
 background:#4c90ff;
-
 }
 
 
-/* =======================================================
+
+   /* =======================================================
    JSON
 =======================================================*/
 
 #janusReader pre{
-
 margin-top:16px;
-
 padding:16px;
-
 background:#0b1017;
-
 border:1px solid var(--border);
-
 border-radius:8px;
-
 max-height:320px;
-
 overflow:auto;
-
 font-size:12px;
-
 line-height:1.55;
-
 color:#d7e4f4;
-
 font-family:Consolas,Menlo,monospace;
-
 }
 
 
@@ -1537,29 +1293,20 @@ font-family:Consolas,Menlo,monospace;
 =======================================================*/
 
 #janusObservations::-webkit-scrollbar{
-
 width:8px;
-
 }
 
 #janusObservations::-webkit-scrollbar-track{
-
 background:#0f151d;
-
 }
 
 #janusObservations::-webkit-scrollbar-thumb{
-
 background:#334455;
-
 border-radius:20px;
-
 }
 
 #janusObservations::-webkit-scrollbar-thumb:hover{
-
 background:#4d6177;
-
 }
 
 
@@ -1568,17 +1315,12 @@ background:#4d6177;
 =======================================================*/
 
 #janusReader a{
-
 color:var(--blue2);
-
 text-decoration:none;
-
 }
 
 #janusReader a:hover{
-
 text-decoration:underline;
-
 }
 
 
@@ -1587,66 +1329,45 @@ text-decoration:underline;
 =======================================================*/
 
 .badge{
-
 display:inline-flex;
-
 align-items:center;
-
 padding:4px 10px;
-
 background:#182230;
-
 border:1px solid var(--border);
-
 border-radius:20px;
-
 font-size:11px;
-
 font-weight:600;
-
 color:var(--text-soft);
-
 }
 
+   
 .badge.green{
-
 background:rgba(47,191,113,.12);
-
 border-color:rgba(47,191,113,.35);
-
 color:#7ee2a8;
-
 }
+   
 
 .badge.orange{
-
 background:rgba(255,157,61,.12);
-
 border-color:rgba(255,157,61,.35);
-
 color:#ffc278;
-
 }
+   
 
 .badge.red{
-
 background:rgba(239,68,68,.12);
-
 border-color:rgba(239,68,68,.35);
-
 color:#ff9b9b;
-
 }
+   
 
 .badge.blue{
-
 background:rgba(59,130,246,.12);
-
 border-color:rgba(59,130,246,.35);
-
 color:#8ec5ff;
-
 }
+   
 
 
 /* =======================================================
@@ -1672,33 +1393,25 @@ transition:all .18s ease;
 @media (max-width:1500px){
 
 #content{
-
 grid-template-columns:320px 1fr;
-
 }
 
 #janusReader{
-
 width:360px;
-
 }
 
 }
 
 @media (max-width:1200px){
-
 #content{
-
 grid-template-columns:1fr;
 
 }
 
 #janusReader{
-
 display:none;
 
 }
-
 }
 
 
@@ -2032,9 +1745,7 @@ background:#333;
    ========================================== */
 
 #itemExploitation{
-
 width:100%;
-
 margin-top:24px;
 margin-bottom:24px;
 
@@ -2046,13 +1757,9 @@ margin-bottom:24px;
    ========================================== */
 
 .exploitationContainer{
-
 width:100%;
-
 border-top:1px solid #ccc;
-
 padding-top:18px;
-
 }
 
 
@@ -2061,28 +1768,20 @@ padding-top:18px;
    ========================================== */
 
 .exploitationHeader{
-
 margin-bottom:14px;
-
 }
 
 .exploitationTitle{
-
 font-size:13px;
 font-weight:700;
 letter-spacing:.08em;
-
 }
 
 .exploitationInfo{
-
 margin-top:4px;
-
 font-size:11px;
 opacity:.65;
-
 word-break:break-all;
-
 }
 
 
@@ -2091,16 +1790,11 @@ word-break:break-all;
    ========================================== */
 
 .exploitationViewer{
-
 position:relative;
-
 width:100%;
 min-height:400px;
-
 background:#111;
-
 overflow:hidden;
-
 display:flex;
 align-items:center;
 justify-content:center;
@@ -2113,15 +1807,11 @@ justify-content:center;
    ========================================== */
 
 .exploitationImage{
-
 display:block;
-
 max-width:100%;
 max-height:600px;
-
 width:auto;
 height:auto;
-
 object-fit:contain;
 
 }
@@ -2132,38 +1822,24 @@ object-fit:contain;
    ========================================== */
 
 .exploitationFootprint{
-
 position:absolute;
-
 inset:0;
-
 width:100%;
 height:100%;
-
 pointer-events:none;
-
 }
 
 .exploitationPolygon{
-
 fill:rgba(255,255,255,.12);
-
 stroke:#fff;
-
 stroke-width:3;
-
 vector-effect:non-scaling-stroke;
-
 }
 
 .exploitationPoint{
-
 fill:#fff;
-
 stroke:#111;
-
 stroke-width:3;
-
 }
 
 
@@ -2172,104 +1848,67 @@ stroke-width:3;
    ========================================== */
 
 .exploitationEmpty{
-
 padding:40px;
-
 font-size:13px;
-
 opacity:.7;
-
 }
 
    
  .exploitationMap{
-
 position:relative;
-
 width:100%;
 height:520px;
-
 background:#111;
-
 overflow:hidden;
-
 cursor:grab;
-
 }
 
 .exploitationMap.dragging{
-
 cursor:grabbing;
-
 }
 
 .exploitationMapSvg{
-
 display:block;
-
 width:100%;
 height:100%;
 
 }
 
 .exploitationBaseImage{
-
 opacity:.9;
-
 }
 
 .exploitationWMSImage{
-
 opacity:.85;
-
 }
 
 .exploitationGrid{
-
 stroke:rgba(255,255,255,.28);
 stroke-width:1;
-
 vector-effect:non-scaling-stroke;
-
 }
 
 .exploitationGridLabel{
-
 fill:rgba(255,255,255,.75);
-
 font-size:12px;
-
 pointer-events:none;
-
 }
 
 .exploitationBBox{
-
 fill:none;
-
 stroke:rgba(255,255,255,.45);
 stroke-width:2;
-
 stroke-dasharray:8 6;
-
 vector-effect:non-scaling-stroke;
-
 }
 
 .exploitationInteractivePolygon{
-
 fill:rgba(255,255,255,.10);
-
 stroke:#fff;
-
 stroke-width:3;
-
 vector-effect:non-scaling-stroke;
-
 cursor:pointer;
-
 pointer-events:all;
-
 }
 
 .exploitationInteractivePolygon.active{
@@ -2279,176 +1918,115 @@ fill:rgba(255,255,255,.25);
 }
 
 .exploitationInteractivePoint{
-
 fill:#fff;
-
 stroke:#111;
-
 stroke-width:3;
-
 cursor:pointer;
-
 }
 
 .exploitationMapMessage{
-
 position:absolute;
-
 left:12px;
 bottom:12px;
-
 padding:6px 9px;
-
 background:rgba(0,0,0,.7);
-
 color:#fff;
-
 font-size:11px;
-
 pointer-events:none;
 
 }
 
 .exploitationControls{
-
 display:flex;
-
 align-items:center;
-
 gap:6px;
-
 margin-bottom:8px;
 
 }
 
 .exploitationControls button{
-
 padding:5px 9px;
-
 border:1px solid #999;
-
 background:#111;
-
 color:#fff;
-
 cursor:pointer;
-
 font-size:11px;
 
 }
 
 .exploitationCoordinates{
-
 margin-left:8px;
-
 font-size:11px;
-
 opacity:.7;
-
 }
 
 .footprintInteraction{
-
 margin-top:10px;
-
 padding:12px;
-
 border:1px solid #ccc;
-
 font-size:11px;
-
 }
 
 .footprintInteractionTitle{
-
 font-weight:700;
-
 letter-spacing:.08em;
-
 margin-bottom:8px;
-
 }
 
 .footprintInteractionRow{
-
 display:flex;
-
 gap:12px;
-
 margin-top:4px;
-
 }
 
 .footprintInteractionRow span{
-
 opacity:.55;
-
 min-width:90px;
 
 }
 
 .exploitationSection{
-
 margin-top:18px;
-
 padding-top:14px;
-
 border-top:1px solid #ccc;
 
 }
 
 .exploitationSectionTitle{
-
 font-size:12px;
 font-weight:700;
 letter-spacing:.08em;
-
 margin-bottom:10px;
 
 }
 
 .exploitationDataGrid{
-
 display:grid;
-
 grid-template-columns:
 repeat(2,minmax(0,1fr));
-
 gap:10px;
 
 }
 
 .exploitationDataGrid>div{
-
 display:flex;
-
 flex-direction:column;
-
 gap:3px;
 
 }
 
 .exploitationDataGrid span{
-
 font-size:10px;
-
 opacity:.55;
 
 }
 
 .exploitationDataGrid strong{
-
 font-size:11px;
-
 font-weight:500;
-
 word-break:break-word;
 
 }  
-
-
-
-
 
 
 
