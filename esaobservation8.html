@@ -7502,7 +7502,7 @@ renderAssets(obs,index);
 async function renderCOGAsset(asset,obs,div){
 
     const href=
-        String(asset?.href||"");
+        String(asset?.href||"").trim();
 
     if(!href)
         return;
@@ -7530,7 +7530,7 @@ async function renderCOGAsset(asset,obs,div){
 
         const region=
             obs?.properties?.["storage:region"] ||
-            "us-west-2";
+            "us-east-1";
 
 
         url=
@@ -7592,14 +7592,12 @@ async function renderCOGAsset(asset,obs,div){
             image.getHeight();
 
 
-        const maxSize=
-            600;
-
+        const maxSize=600;
 
         const scale=
             Math.min(
                 1,
-                maxSize /
+                maxSize/
                 Math.max(width,height)
             );
 
@@ -7609,7 +7607,6 @@ async function renderCOGAsset(asset,obs,div){
                 1,
                 Math.round(width*scale)
             );
-
 
         const outHeight=
             Math.max(
@@ -7622,11 +7619,8 @@ async function renderCOGAsset(asset,obs,div){
             await image.readRGB({
 
                 width:outWidth,
-
                 height:outHeight,
-
-                resampleMethod:
-                    "bilinear"
+                resampleMethod:"bilinear"
 
             });
 
@@ -7634,21 +7628,14 @@ async function renderCOGAsset(asset,obs,div){
         const canvas=
             document.createElement("canvas");
 
+        canvas.className="assetPreview";
 
-        canvas.className=
-            "assetPreview";
-
-
-        canvas.width=
-            outWidth;
-
-        canvas.height=
-            outHeight;
+        canvas.width=outWidth;
+        canvas.height=outHeight;
 
 
         const ctx=
             canvas.getContext("2d");
-
 
         const imageData=
             ctx.createImageData(
@@ -7658,26 +7645,15 @@ async function renderCOGAsset(asset,obs,div){
 
 
         for(
-            let i=0,
-            j=0;
-
+            let i=0,j=0;
             i<rgb.length;
-
-            i+=3,
-            j+=4
+            i+=3,j+=4
         ){
 
-            imageData.data[j]=
-                rgb[i];
-
-            imageData.data[j+1]=
-                rgb[i+1];
-
-            imageData.data[j+2]=
-                rgb[i+2];
-
-            imageData.data[j+3]=
-                255;
+            imageData.data[j]=rgb[i];
+            imageData.data[j+1]=rgb[i+1];
+            imageData.data[j+2]=rgb[i+2];
+            imageData.data[j+3]=255;
 
         }
 
@@ -7699,9 +7675,7 @@ async function renderCOGAsset(asset,obs,div){
         };
 
 
-        div.appendChild(
-            canvas
-        );
+        div.appendChild(canvas);
 
 
     }catch(error){
