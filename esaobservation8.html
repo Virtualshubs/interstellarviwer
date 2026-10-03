@@ -196,7 +196,7 @@ input,
 select,
 textarea{
   background:var(--input-bg);
-  color:var(--input-text);
+  color: black;
   border-color:var(--input-border);
 }
 
@@ -518,55 +518,37 @@ font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
 
 html,
 body{
-
 width:100%;
 height:100%;
-
 background:var(--bg);
-
 color:var(--text);
-
 overflow:hidden;
-
 }
 
+   
 #themeToggle{
-
 min-width:110px;
-
 font-size:12px;
-
 letter-spacing:.08em;
-
 text-transform:uppercase;
-
 background:var(--surface3);
-
 border:1px solid var(--border);
-
 color:var(--text);
-
 }
 
 #themeToggle:hover{
-
 background:var(--surface2);
-
 }
 /* =======================================================
    PANEL
 =======================================================*/
 
 #panel{
-
 width:100vw;
 height:100vh;
-
 display:flex;
 flex-direction:column;
-
 background:var(--bg);
-
 overflow:hidden;
 
 }
@@ -595,13 +577,44 @@ overflow:hidden;
 }
 
 .janus-sector-title {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  line-height: 1.2;
+}
+
+.janus-main-title {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #111;
-  line-height: 1.2;
+}
+
+.janus-transfer-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #666;
+}
+
+@media (max-width: 700px) {
+  .janus-sector-title {
+    gap: 6px 10px;
+  }
+
+  .janus-main-title {
+    font-size: 13px;
+  }
+
+  .janus-transfer-title {
+    font-size: 11px;
+  }
 }
 
 .janus-sector-subtitle {
@@ -2252,8 +2265,10 @@ height:100%;
    
  <div class="janus-sector-strip">
   <div class="janus-sector-inner">
-    <div class="janus-sector-title">Spatial Data Exploitation</div>
-    <div class="janus-sector-subtitle">Technology transfer across sectors</div>
+<div class="janus-sector-title">
+  <span class="janus-main-title">Spatial Data Exploitation</span>
+  <span class="janus-transfer-title">Technology transfer across sectors</span>
+</div>
     <div class="janus-sector-list">
       <span>Forestry</span>
       <span>Agriculture</span>
