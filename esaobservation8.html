@@ -7574,13 +7574,17 @@ async function renderCOGAsset(asset,obs,div){
 
     try{
 
-        const tiff=
-            await GeoTIFF.fromUrl(
-                url,
-                options
-            );
+     console.log("COG TYPE:", asset.type);
+console.log("COG ORIGINAL HREF:", href);
+console.log("COG FETCH URL:", url);
 
+const tiff=
+    await GeoTIFF.fromUrl(
+        url,
+        options
+    );
 
+       
         const image=
             await tiff.getImage();
 
