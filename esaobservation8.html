@@ -7593,6 +7593,12 @@ if(!obs.assets)
 return;
 
 
+window.janusObservations=
+window.janusObservations||[];
+
+window.janusObservations[index]=obs;
+
+
 Object.entries(obs.assets).forEach(([name,asset])=>{
 
 const div=
@@ -7601,6 +7607,22 @@ document.createElement("div");
 div.className="asset";
 
 const type=asset.type||"Unknown";
+
+
+if(
+/image\/tiff/i.test(type) ||
+/cloud-optimized/i.test(type) ||
+/\.tif(f)?$/i.test(asset.href||"")
+){
+
+box.appendChild(
+renderCOGAsset(obs,asset,index,name)
+);
+
+return;
+
+}
+
 
 let html=`
 
@@ -7644,6 +7666,10 @@ div.innerHTML=html;
 box.appendChild(div);
 
 });
+
+}
+
+     
 
 
 // ==========================================
