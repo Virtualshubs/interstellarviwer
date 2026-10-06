@@ -2955,9 +2955,14 @@ const glb=createGLB(stacURL);
 const encodedGLB=
 uint8ArrayToBase64(glb);
 
+//const finalURL=
+//window.location.origin+
+//window.location.pathname+
+//"?3gb0="+
+//encodeURIComponent(encodedGLB);
+
 const finalURL=
-window.location.origin+
-window.location.pathname+
+"https://3d.staratlas.es/observationvisor.html"+
 "?3gb0="+
 encodeURIComponent(encodedGLB);
 
