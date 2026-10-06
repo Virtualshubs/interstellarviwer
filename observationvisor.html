@@ -539,7 +539,9 @@ color:var(--text);
 #themeToggle:hover{
 background:var(--surface2);
 }
-/* =======================================================
+
+   
+   /* =======================================================
    PANEL
 =======================================================*/
 
@@ -548,132 +550,237 @@ width:100vw;
 height:100vh;
 display:flex;
 flex-direction:column;
-background:var(--bg);
+background:#1e1e1e;
 overflow:hidden;
+}
+
+
+/* =======================================================
+   JANUS — SECTOR STRIP
+=======================================================*/
+
+.janus-sector-strip{
+position:relative;
+top:0;
+left:0;
+width:100%;
+z-index:9990;
+
+background:#1e1e1e;
+
+border-bottom:1px solid rgba(255,255,255,0.12);
+
+box-sizing:border-box;
+}
+
+
+.janus-sector-inner{
+max-width:1500px;
+margin:0 auto;
+
+padding:18px 28px 16px;
+
+text-align:center;
+
+box-sizing:border-box;
+}
+
+
+/* =======================================================
+   TITLES
+=======================================================*/
+
+.janus-sector-title{
+display:flex;
+justify-content:center;
+align-items:baseline;
+
+gap:14px;
+flex-wrap:wrap;
+
+line-height:1.2;
+}
+
+
+.janus-main-title{
+font-family:
+Arial,
+Helvetica,
+sans-serif;
+
+font-size:15px;
+font-weight:600;
+
+letter-spacing:0.12em;
+text-transform:uppercase;
+
+color:#f2f2f2;
+}
+
+
+.janus-transfer-title{
+font-family:
+Arial,
+Helvetica,
+sans-serif;
+
+font-size:13px;
+font-weight:400;
+
+letter-spacing:0.04em;
+
+color:#a8a8a8;
+}
+
+
+/* =======================================================
+   SUBTITLE
+=======================================================*/
+
+.janus-sector-subtitle{
+margin-top:7px;
+
+font-family:
+Arial,
+Helvetica,
+sans-serif;
+
+font-size:11px;
+font-style:normal;
+font-weight:400;
+
+letter-spacing:0.05em;
+
+color:#858585;
+
+line-height:1.4;
+}
+
+
+/* =======================================================
+   SECTORS
+=======================================================*/
+
+.janus-sector-list{
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+flex-wrap:wrap;
+
+gap:0;
+
+margin-top:14px;
+
+font-family:
+Arial,
+Helvetica,
+sans-serif;
+
+font-size:10px;
+font-weight:500;
+
+letter-spacing:0.09em;
+
+text-transform:uppercase;
+
+color:#c4c4c4;
+}
+
+
+.janus-sector-list span{
+white-space:nowrap;
+
+transition:
+color 0.2s ease;
+}
+
+
+.janus-sector-list span:not(:last-child)::after{
+content:"·";
+
+margin-left:18px;
+
+color:#666;
+}
+
+
+/* =======================================================
+   RESPONSIVE
+=======================================================*/
+
+@media (max-width:800px){
+
+.janus-sector-inner{
+padding:14px 16px 13px;
+}
+
+
+.janus-sector-title{
+gap:6px 10px;
+}
+
+
+.janus-main-title{
+font-size:13px;
+}
+
+
+.janus-transfer-title{
+font-size:11px;
+}
+
+
+.janus-sector-subtitle{
+font-size:10px;
+margin-top:5px;
+}
+
+
+.janus-sector-list{
+margin-top:11px;
+
+font-size:8px;
+
+letter-spacing:0.07em;
+}
+
+
+.janus-sector-list span:not(:last-child)::after{
+margin-left:12px;
+}
 
 }
 
 
+@media (max-width:500px){
 
-   .janus-sector-strip {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 9990;
-  background: rgba(255, 255, 255, 0.96);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-sizing: border-box;
+.janus-sector-inner{
+padding:12px 12px 11px;
 }
 
-.janus-sector-inner {
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 10px 24px 9px;
-  text-align: center;
-  box-sizing: border-box;
+
+.janus-main-title{
+font-size:12px;
 }
 
-.janus-sector-title {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  gap: 14px;
-  flex-wrap: wrap;
-  line-height: 1.2;
+
+.janus-transfer-title{
+font-size:10px;
 }
 
-.janus-main-title {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #111;
+
+.janus-sector-subtitle{
+font-size:9px;
 }
 
-.janus-transfer-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  color: #666;
+
+.janus-sector-list{
+font-size:7px;
 }
 
-@media (max-width: 700px) {
-  .janus-sector-title {
-    gap: 6px 10px;
-  }
-
-  .janus-main-title {
-    font-size: 13px;
-  }
-
-  .janus-transfer-title {
-    font-size: 11px;
-  }
 }
-
-.janus-sector-subtitle {
-  margin-top: 3px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  font-style: italic;
-  letter-spacing: 0.04em;
-  color: #666;
-  line-height: 1.2;
-}
-
-.janus-sector-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px 18px;
-  margin-top: 8px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: #444;
-}
-
-.janus-sector-list span {
-  white-space: nowrap;
-}
-
-.janus-sector-list span:not(:last-child)::after {
-  content: "·";
-  margin-left: 18px;
-  color: #999;
-}
-
-@media (max-width: 800px) {
-  .janus-sector-inner {
-    padding: 8px 14px;
-  }
-
-  .janus-sector-title {
-    font-size: 13px;
-  }
-
-  .janus-sector-subtitle {
-    font-size: 10px;
-  }
-
-  .janus-sector-list {
-    gap: 5px 12px;
-    font-size: 8px;
-  }
-
-  .janus-sector-list span:not(:last-child)::after {
-    margin-left: 12px;
-  }
-}
-
 
 /* =======================================================
    HEADER
