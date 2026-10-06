@@ -3033,6 +3033,24 @@ window.open(url,"_blank");
 header.appendChild(name);
 header.appendChild(open);
 
+const stacName=document.createElement("div");
+
+stacName.className="janus-data-model-stac-name";
+
+try{
+
+const parsed=new URL(BASE);
+
+stacName.textContent=
+parsed.hostname+
+parsed.pathname.replace(/\/+$/,"");
+
+}catch(e){
+
+stacName.textContent=BASE;
+
+}
+
 const actions=document.createElement("div");
 
 actions.className="janus-data-model-actions";
@@ -3053,6 +3071,7 @@ shareDataModel(url);
 actions.appendChild(share);
 
 model.appendChild(header);
+model.appendChild(stacName);
 model.appendChild(actions);
 
 model.onclick=function(){
