@@ -1,0 +1,13217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>3D SAC</title>
+
+   <link
+rel="stylesheet"
+href="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/widgets.css"
+>
+
+
+<style>
+
+:root[data-theme="terra"]{
+
+/* BACKGROUND */
+
+--bg:#ece9e3;
+--surface:#f4f2ee;
+--surface2:#ffffff;
+--surface3:#e6e1d9;
+--paper:#faf9f7;
+
+/* PANELS */
+
+--panel:#f5f3ef;
+--panel-header:#ffffff;
+--panel-footer:#ebe6df;
+
+/* CARDS */
+
+--card-bg:#ffffff;
+--card-hover:#f3f1ed;
+--card-border:#d3ccc2;
+
+/* BORDERS */
+
+--border:#cfc7bc;
+--border-light:#b8b0a5;
+--divider:#ddd7ce;
+
+/* TEXT */
+
+--text:#2f3439;
+--text-soft:#555d65;
+--text-muted:#808890;
+--text-inverse:#ffffff;
+
+/* BUTTONS */
+
+--button-bg:#647b90;
+--button-hover:#748ba0;
+--button-border:#7f93a6;
+--button-text:#ffffff;
+
+/* INPUTS */
+
+--input-bg:#ffffff;
+--input-border:#c8c1b8;
+--input-text:#2f3439;
+--input-placeholder:#90979e;
+
+/* TABLE */
+
+--table-header:#ece7e0;
+--table-row:#ffffff;
+--table-hover:#f5f2ed;
+
+/* GRID */
+
+--grid-bg:#ddd8d0;
+--grid-cell:#f8f7f5;
+--grid-hover:#d9e3eb;
+
+/* CODE */
+
+--code-bg:#f1efeb;
+--code-text:#2d3237;
+
+/* STATUS */
+
+--success:#6f8d70;
+--warning:#a77b48;
+--danger:#9d625d;
+--info:#5f7790;
+
+/* ACCENT */
+
+--accent:#5c7387;
+--accent-hover:#70889c;
+
+/* UI */
+
+--radius:4px;
+--transition:.15s;
+
+}
+
+
+/* =======================================================
+   LUNAR
+=======================================================*/
+
+:root[data-theme="lunar"]{
+
+/* BACKGROUND */
+
+--bg:#2b3036;
+--surface:#353b43;
+--surface2:#404852;
+--surface3:#4c5562;
+--paper:#596371;
+
+/* PANELS */
+
+--panel:#343b44;
+--panel-header:#3e4650;
+--panel-footer:#323840;
+
+/* CARDS */
+
+--card-bg:#363d46;
+--card-hover:#404854;
+--card-border:#5a6572;
+
+/* BORDERS */
+
+--border:#697482;
+--border-light:#808b99;
+--divider:#555f6c;
+
+/* TEXT */
+
+--text:#eef2f5;
+--text-soft:#d2d9df;
+--text-muted:#99a5b2;
+--text-inverse:#1f252b;
+
+/* BUTTONS */
+
+--button-bg:#486b89;
+--button-hover:#5a7c99;
+--button-border:#6d879d;
+--button-text:#ffffff;
+
+/* INPUTS */
+
+--input-bg:#2f353d;
+--input-border:#67717e;
+--input-text:#eef2f5;
+--input-placeholder:#98a3af;
+
+/* TABLE */
+
+--table-header:#404854;
+--table-row:#353c45;
+--table-hover:#424b56;
+
+/* GRID */
+
+--grid-bg:#2f343b;
+--grid-cell:#3d444d;
+--grid-hover:#516070;
+
+/* CODE */
+
+--code-bg:#232930;
+--code-text:#d8e1ea;
+
+/* STATUS */
+
+--success:#6e9475;
+--warning:#b18a53;
+--danger:#a86161;
+--info:#5d87a8;
+
+/* ACCENT */
+
+--accent:#547898;
+--accent-hover:#6487a6;
+
+/* UI */
+
+--radius:4px;
+--transition:.15s;
+
+
+/* =======================================================
+   LUNAR UI SYNCHRONIZATION
+======================================================= */
+
+/* ---------- FORM ELEMENTS ---------- */
+
+input,
+select,
+textarea{
+  background:var(--input-bg);
+  color: black;
+  border-color:var(--input-border);
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:var(--input-placeholder);
+}
+
+select{
+  color-scheme:dark;
+}
+
+select option{
+  background:var(--surface);
+  color:var(--text);
+}
+
+
+/* ---------- BUTTONS ---------- */
+
+button{
+  background:var(--button-bg);
+  color:var(--button-text);
+  border-color:var(--button-border);
+}
+
+button:hover{
+  background:var(--button-hover);
+}
+
+
+/* ---------- STAC CONTROLS ---------- */
+
+#janus-stac-custom{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#janus-stac-custom-header{
+  background:var(--panel-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#janus-stac-custom-panel{
+  background:var(--panel);
+  color:var(--text);
+}
+
+#janus-stac-public{
+  color:var(--text);
+}
+
+#janus-stac-public select{
+  background:var(--input-bg);
+  color:var(--input-text);
+  border-color:var(--input-border);
+}
+
+#janus-stac-public select option{
+  background:var(--surface);
+  color:var(--text);
+}
+
+#collectionSelector{
+  background:var(--input-bg);
+  color:var(--input-text);
+  border-color:var(--input-border);
+}
+
+
+/* ---------- HEADER ---------- */
+
+#header{
+  background:var(--panel-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#status{
+  color:var(--text-muted);
+}
+
+
+/* ---------- WORKSPACE ---------- */
+
+.sidebar{
+  background:var(--panel);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+#content{
+  color:var(--text);
+}
+
+#janusReader{
+  color:var(--text);
+}
+
+
+/* ---------- CARDS ---------- */
+
+.card{
+  background:var(--card-bg);
+  color:var(--text);
+  border-color:var(--card-border);
+}
+
+.card:hover{
+  background:var(--card-hover);
+}
+
+
+/* ---------- DATA EXPLORATION ---------- */
+
+#detail{
+  color:var(--text);
+}
+
+#detail h2,
+#summary h2{
+  color:var(--text);
+}
+
+#meta,
+#queryBox,
+#itemExploitation{
+  color:var(--text);
+}
+
+
+/* ---------- SPATIAL COVERAGE ---------- */
+
+.spatialCoverage{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.spatialCoverageTitle{
+  color:var(--text-soft);
+}
+
+.spatialCoverageValue{
+  color:var(--text);
+}
+
+.spatialCoverageDetails{
+  color:var(--text-muted);
+}
+
+
+/* ---------- JANUS CONTEXT ---------- */
+
+#janusContextPanel{
+  background:var(--panel);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.janusContextHeader{
+  background:var(--panel-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.janusContextTitle{
+  color:var(--text-soft);
+}
+
+#janusContextCoords{
+  color:var(--text-muted);
+}
+
+
+/* ---------- DATASET OVERVIEW ---------- */
+
+.stats{
+  color:var(--text);
+}
+
+.stat{
+  background:var(--surface2);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+.statTitle{
+  color:var(--text-muted);
+}
+
+.statValue{
+  color:var(--text);
+}
+
+
+/* ---------- DETAILS ---------- */
+
+.details{
+  color:var(--text);
+}
+
+.row{
+  border-color:var(--divider);
+}
+
+.label{
+  color:var(--text-muted);
+}
+
+.value{
+  color:var(--text);
+}
+
+
+/* ---------- DATASET RAW ---------- */
+
+details{
+  background:var(--surface);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+details summary{
+  background:var(--panel-header);
+  color:var(--text-soft);
+}
+
+pre{
+  background:var(--code-bg);
+  color:var(--code-text);
+}
+
+
+/* ---------- TABLES ---------- */
+
+table{
+  color:var(--text);
+  border-color:var(--border);
+}
+
+th{
+  background:var(--table-header);
+  color:var(--text);
+  border-color:var(--border);
+}
+
+td{
+  background:var(--table-row);
+  color:var(--text);
+  border-color:var(--divider);
+}
+
+tr:hover td{
+  background:var(--table-hover);
+}
+
+
+/* ---------- LINKS ---------- */
+
+a{
+  color:var(--accent);
+}
+
+a:hover{
+  color:var(--accent-hover);
+}
+
+
+/* ---------- FOOTER ---------- */
+
+.janus-footer{
+  background:var(--panel-footer);
+  color:var(--text-muted);
+  border-color:var(--border);
+}
+
+.janus-footer-link,
+.janus-footer-contact{
+  color:var(--text-muted);
+}
+
+.janus-footer-link:hover,
+.janus-footer-contact:hover{
+  color:var(--text);
+}
+
+.janus-footer-credit{
+  color:var(--text-muted);
+}
+
+.janus-footer-credit strong{
+  color:var(--text-soft);
+}
+
+
+/* ---------- NATIVE CONTROLS ---------- */
+
+input[type="checkbox"],
+input[type="radio"]{
+  accent-color:var(--accent);
+}
+
+hr{
+  border-color:var(--divider);
+}
+
+}
+  
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+html,
+body{
+width:100%;
+height:100%;
+background:var(--bg);
+color:var(--text);
+overflow:hidden;
+}
+
+   
+#themeToggle{
+min-width:110px;
+font-size:12px;
+letter-spacing:.08em;
+text-transform:uppercase;
+background:var(--surface3);
+border:1px solid var(--border);
+color:var(--text);
+}
+
+#themeToggle:hover{
+background:var(--surface2);
+}
+/* =======================================================
+   PANEL
+=======================================================*/
+
+#panel{
+width:100vw;
+height:100vh;
+display:flex;
+flex-direction:column;
+background:var(--bg);
+overflow:hidden;
+
+}
+
+
+
+   .janus-sector-strip {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9990;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+.janus-sector-inner {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 10px 24px 9px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.janus-sector-title {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  line-height: 1.2;
+}
+
+.janus-main-title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111;
+}
+
+.janus-transfer-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #666;
+}
+
+@media (max-width: 700px) {
+  .janus-sector-title {
+    gap: 6px 10px;
+  }
+
+  .janus-main-title {
+    font-size: 13px;
+  }
+
+  .janus-transfer-title {
+    font-size: 11px;
+  }
+}
+
+.janus-sector-subtitle {
+  margin-top: 3px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: #666;
+  line-height: 1.2;
+}
+
+.janus-sector-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #444;
+}
+
+.janus-sector-list span {
+  white-space: nowrap;
+}
+
+.janus-sector-list span:not(:last-child)::after {
+  content: "·";
+  margin-left: 18px;
+  color: #999;
+}
+
+@media (max-width: 800px) {
+  .janus-sector-inner {
+    padding: 8px 14px;
+  }
+
+  .janus-sector-title {
+    font-size: 13px;
+  }
+
+  .janus-sector-subtitle {
+    font-size: 10px;
+  }
+
+  .janus-sector-list {
+    gap: 5px 12px;
+    font-size: 8px;
+  }
+
+  .janus-sector-list span:not(:last-child)::after {
+    margin-left: 12px;
+  }
+}
+
+
+/* =======================================================
+   HEADER
+=======================================================*/
+
+#header{
+top: 64px;
+height:58px;
+display:flex;
+align-items:center;
+gap:14px;
+padding:0 18px;
+background:var(--surface);
+border-bottom:1px solid var(--border);
+flex-shrink:0;
+
+}
+
+
+/* =======================================================
+   SEARCH
+=======================================================*/
+
+#search{
+flex:1;
+height:38px;
+padding:0 14px;
+background:#f3f4f6;
+color:#1f2937;
+border:1px solid #d1d5db;
+border-radius:6px;
+transition:var(--transition);
+font-size:13px;
+}
+
+#search:focus{
+outline:none;
+border-color:#9ca3af;
+box-shadow:0 0 0 3px rgba(156,163,175,.2);
+
+}
+
+/* =======================================================
+   BUTTONS
+=======================================================*/
+
+button{
+height:38px;
+padding:0 16px;
+background:#5c6675;
+color:#ffffff;
+border:1px solid rgba(255,255,255,.12);
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+font-weight:600;
+transition:var(--transition);
+}
+   
+
+button:hover{
+background:#6d7888;
+
+}
+
+button:active{
+transform:translateY(1px);
+
+}
+
+
+/* =======================================================
+   STATUS BAR
+=======================================================*/
+
+#status{
+height:42px;
+display:flex;
+align-items:center;
+padding:0 18px;
+background:#f3f4f6;
+border-bottom:1px solid #d1d5db;
+font-size:13px;
+color:#4b5563;
+}
+
+
+/* =======================================================
+   WORKSPACE
+=======================================================*/
+
+#workspace{
+flex:1;
+display:flex;
+overflow:hidden;
+}
+
+
+/* =======================================================
+   CONTENT
+=======================================================*/
+
+#content{
+flex:1;
+display:grid;
+grid-template-columns:380px 1fr;
+overflow:hidden;
+background:var(--bg);
+}
+
+
+/* =======================================================
+   MAIN
+=======================================================*/
+
+#main{
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+
+/* =======================================================
+   SCROLL AREA
+=======================================================*/
+
+#cards,
+#detail{
+overflow:auto;
+padding:18px;
+}
+
+
+/* =======================================================
+   CARDS
+=======================================================*/
+
+.card{
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:var(--radius);
+padding:16px;
+margin-bottom:14px;
+transition:var(--transition);
+}
+
+.card:hover{
+border-color:var(--border-light);
+}
+
+.card h3{
+font-size:16px;
+font-weight:600;
+margin-bottom:12px;
+color:var(--orange);
+}
+
+.card p{
+font-size:13px;
+line-height:1.6;
+color:var(--text-soft);
+margin:5px 0;
+}
+
+
+/* =======================================================
+   ROWS
+=======================================================*/
+
+.row{
+display:flex;
+align-items:flex-start;
+gap:18px;
+padding:9px 0;
+border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.key{
+width:180px;
+font-weight:600;
+font-size:13px;
+color:var(--blue2);
+}
+
+.value{
+flex:1;
+font-size:13px;
+line-height:1.5;
+color:var(--text-soft);
+word-break:break-word;
+}
+
+
+/* =======================================================
+   INPUTS
+=======================================================*/
+
+input{
+height:36px;
+padding:0 10px;
+background:#0f151e;
+border:1px solid var(--border);
+border-radius:6px;
+color:white;
+transition:var(--transition);
+width:180px;
+
+}
+
+input:focus{
+outline:none;
+border-color:var(--blue);
+
+}
+
+
+/* =======================================================
+   DETAILS
+=======================================================*/
+
+details{
+margin-top:18px;
+}
+
+summary{
+cursor:pointer;
+color:var(--blue2);
+font-weight:600;
+
+}
+
+
+/* =======================================================
+   PRE
+=======================================================*/
+
+pre{
+white-space:pre-wrap;
+font-size:12px;
+line-height:1.55;
+font-family:Consolas,Menlo,monospace;
+
+}
+
+
+/* =======================================================
+   QUERY BOX
+=======================================================*/
+
+#queryBox{
+margin-top:22px;
+padding:16px;
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:var(--radius);
+}
+
+
+/* =======================================================
+   GRID
+=======================================================*/
+
+#dataGrid{
+position: relative;
+display:grid;
+grid-template-columns:repeat(36,1fr);
+grid-template-rows:repeat(18,1fr);
+aspect-ratio:2/1;
+width:100%;
+max-width:1100px;
+margin:24px auto;
+gap:1px;
+background: transparent;
+border:1px solid var(--border);
+}
+
+
+/* =======================================================
+   DATA CELLS
+=======================================================*/
+
+.dataCell{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+aspect-ratio:1;
+background:#17202b;
+border:1px solid rgba(255,255,255,.04);
+font-size:10px;
+color:#dbe6f5;
+cursor:pointer;
+transition:background .15s,border-color .15s;
+overflow:hidden;
+line-height:1.05;
+
+}
+
+.dataCell:hover{
+border-color:var(--blue2);
+background:#233245;
+transform:none;
+z-index:1;
+
+}
+
+
+#blueMarble {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+ .dataCell.searchMatch{
+    outline:2px solid #ffffff;
+    box-shadow:
+        0 0 0 2px rgba(80,190,255,.8),
+        0 0 18px rgba(80,190,255,.6);
+
+    z-index:5;
+
+}  
+/* =======================================================
+   RAW JSON
+=======================================================*/
+
+#raw{
+max-height:60vh;
+overflow:auto;
+padding:14px;
+background:#101720;
+border:1px solid var(--border);
+border-radius:8px;
+}
+
+
+/* =======================================================
+   SCROLLBAR
+=======================================================*/
+
+::-webkit-scrollbar{
+width:10px;
+height:10px;
+}
+
+::-webkit-scrollbar-track{
+background:#0f141c;
+
+}
+
+::-webkit-scrollbar-thumb{
+background:#2f3e51;
+border-radius:30px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+background:#42566f;
+
+}
+
+  /* =======================================================
+   JANUS READER v2
+   Compatible 100%
+=======================================================*/
+
+#janusReader{
+width:430px;
+height:100%;
+display:flex;
+flex-direction:column;
+flex-shrink:0;
+background:var(--surface);
+border-left:1px solid var(--border);
+overflow-y:auto;
+overflow-x:hidden;
+}
+
+
+/* =======================================================
+   HEADER
+=======================================================*/
+
+#janusSummary{
+padding:22px;
+background:var(--surface2);
+border-bottom:1px solid var(--border);
+flex-shrink:0;
+}
+
+#janusReader h2{
+font-size:18px;
+font-weight:600;
+letter-spacing:.02em;
+margin-bottom:18px;
+color:var(--text);
+}
+
+
+/* =======================================================
+   STATS
+=======================================================*/
+
+#janusReader .stats{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+margin-bottom:18px;
+}
+
+#janusReader .stat{
+padding:16px;
+background:var(--surface3);
+border:1px solid var(--border);
+border-radius:8px;
+transition:.15s;
+}
+
+#janusReader .stat:hover{
+border-color:var(--border-light);
+}
+
+#janusReader .statTitle{
+font-size:10px;
+text-transform:uppercase;
+letter-spacing:.12em;
+font-weight:700;
+color:var(--text-muted);
+margin-bottom:8px;
+}
+   
+
+#janusReader .statValue{
+font-size:26px;
+font-weight:700;
+color:white;
+}
+
+
+/* =======================================================
+   DATA INFO
+=======================================================*/
+
+#janusReader .details{
+display:flex;
+flex-direction:column;
+gap:6px;
+padding-top:18px;
+border-top:1px solid rgba(255,255,255,.06);
+}
+   
+
+#janusReader .row{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:18px;
+padding:8px 0;
+border-bottom:1px solid rgba(255,255,255,.04);
+}
+   
+
+#janusReader .label{
+font-size:12px;
+font-weight:600;
+color:var(--text-muted);
+}
+   
+
+#janusReader .value{
+flex:1;
+text-align:right;
+font-size:13px;
+line-height:1.45;
+color:var(--text-soft);
+word-break:break-word;
+}
+
+
+/* =======================================================
+   OBSERVATIONS
+=======================================================*/
+#janusObservations{
+display:flex;
+flex-direction:column;
+padding:18px;
+background:var(--bg);
+}
+
+   
+/* =======================================================
+   CARDS
+=======================================================*/
+
+#janusReader .card{
+background:var(--surface2);
+border:1px solid var(--border);
+border-radius:8px;
+padding:18px;
+margin-bottom:16px;
+box-shadow:none;
+transition:.15s;
+}
+
+   
+#janusReader .card:hover{
+border-color:var(--border-light);
+}
+   
+
+#janusReader .card h2{
+font-size:15px;
+font-weight:600;
+margin-bottom:16px;
+color:white;
+}
+
+
+/* =======================================================
+   ASSETS
+=======================================================*/
+
+#janusReader .asset{
+margin-top:14px;
+padding:14px;
+background:#101720;
+border:1px solid var(--border);
+border-radius:8px;
+}
+   
+
+#janusReader .assetHeader{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+gap:10px;
+}
+
+   
+#janusReader .assetName{
+font-size:13px;
+font-weight:600;
+color:white;
+word-break:break-word;
+}
+   
+
+#janusReader .assetType{
+font-size:11px;
+color:var(--text-muted);
+text-transform:uppercase;
+letter-spacing:.08em;
+}
+
+
+/* =======================================================
+   PREVIEW
+=======================================================*/
+
+#janusReader .assetPreview{
+display:block;
+width:100%;
+max-height:180px;
+object-fit:cover;
+border-radius:6px;
+border:1px solid var(--border);
+cursor:pointer;
+margin-top:12px;
+transition:.15s;
+}
+   
+
+#janusReader .assetPreview:hover{
+border-color:var(--blue);
+}
+
+
+/* =======================================================
+   BUTTONS
+=======================================================*/
+
+#janusReader button{
+width:100%;
+height:38px;
+margin-top:16px;
+background:var(--blue);
+border:none;
+border-radius:6px;
+font-size:13px;
+font-weight:600;
+color:white;
+cursor:pointer;
+transition:.15s;
+}
+   
+
+#janusReader button:hover{
+background:#4c90ff;
+}
+
+
+
+   /* =======================================================
+   JSON
+=======================================================*/
+
+#janusReader pre{
+margin-top:16px;
+padding:16px;
+background:#0b1017;
+border:1px solid var(--border);
+border-radius:8px;
+max-height:320px;
+overflow:auto;
+font-size:12px;
+line-height:1.55;
+color:#d7e4f4;
+font-family:Consolas,Menlo,monospace;
+}
+
+
+/* =======================================================
+   SCROLL
+=======================================================*/
+
+#janusObservations::-webkit-scrollbar{
+width:8px;
+}
+
+#janusObservations::-webkit-scrollbar-track{
+background:#0f151d;
+}
+
+#janusObservations::-webkit-scrollbar-thumb{
+background:#334455;
+border-radius:20px;
+}
+
+#janusObservations::-webkit-scrollbar-thumb:hover{
+background:#4d6177;
+}
+
+
+/* =======================================================
+   LINKS
+=======================================================*/
+
+#janusReader a{
+color:var(--blue2);
+text-decoration:none;
+}
+
+#janusReader a:hover{
+text-decoration:underline;
+}
+
+
+/* =======================================================
+   BADGES
+=======================================================*/
+
+.badge{
+display:inline-flex;
+align-items:center;
+padding:4px 10px;
+background:#182230;
+border:1px solid var(--border);
+border-radius:20px;
+font-size:11px;
+font-weight:600;
+color:var(--text-soft);
+}
+
+   
+.badge.green{
+background:rgba(47,191,113,.12);
+border-color:rgba(47,191,113,.35);
+color:#7ee2a8;
+}
+   
+
+.badge.orange{
+background:rgba(255,157,61,.12);
+border-color:rgba(255,157,61,.35);
+color:#ffc278;
+}
+   
+
+.badge.red{
+background:rgba(239,68,68,.12);
+border-color:rgba(239,68,68,.35);
+color:#ff9b9b;
+}
+   
+
+.badge.blue{
+background:rgba(59,130,246,.12);
+border-color:rgba(59,130,246,.35);
+color:#8ec5ff;
+}
+   
+
+
+/* =======================================================
+   SMALL ANIMATIONS
+=======================================================*/
+
+.card,
+.asset,
+.stat,
+button,
+.dataCell,
+input{
+
+transition:all .18s ease;
+
+}
+
+
+/* =======================================================
+   RESPONSIVE
+=======================================================*/
+
+@media (max-width:1500px){
+
+#content{
+grid-template-columns:320px 1fr;
+}
+
+#janusReader{
+width:360px;
+}
+
+}
+
+@media (max-width:1200px){
+#content{
+grid-template-columns:1fr;
+
+}
+
+#janusReader{
+display:none;
+
+}
+}
+
+
+
+   .spatialCoverage{
+    display:none;
+    margin:12px 0;
+    padding:12px 14px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;
+    background:rgba(255,255,255,.04);
+    text-align:center;
+}
+
+.spatialCoverageTitle{
+    font-size:10px;
+    letter-spacing:1.5px;
+    opacity:.6;
+    margin-bottom:4px;
+}
+
+.spatialCoverageValue{
+    font-size:24px;
+    font-weight:600;
+    line-height:1.1;
+}
+
+.spatialCoverageDetails{
+    display:flex;
+    justify-content:center;
+    gap:5px;
+    margin-top:4px;
+    font-size:10px;
+    opacity:.55;
+}
+
+#collectionSelector{
+width:100%;
+padding:10px 36px 10px 12px;
+border:1px solid rgba(255,255,255,.14);
+border-radius:7px;
+background:rgba(255,255,255,.05);
+color:#fff;
+font-size:12px;
+font-family:Arial,sans-serif;
+outline:none;
+cursor:pointer;
+appearance:none;
+-webkit-appearance:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23ffffff' stroke-width='1.4'/%3E%3C/svg%3E");
+background-repeat:no-repeat;
+background-position:right 12px center;
+transition:border-color .2s,background .2s;
+}
+#collectionSelector:hover{
+border-color:rgba(255,255,255,.28);
+background-color:rgba(255,255,255,.07);
+}
+#collectionSelector:focus{
+border-color:rgba(255,255,255,.4);
+background-color:rgba(255,255,255,.08);
+}
+#collectionSelector option{
+background:#080b12;
+color:#fff;
+}
+
+
+   #explorationGrid{
+position:relative;
+display:grid;
+grid-template-columns:repeat(18,1fr);
+grid-template-rows:repeat(18,1fr);
+aspect-ratio:1/1;
+width:100%;
+gap:2px;
+}
+
+#explorationGrid .dataCell{
+position:relative;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+min-width:0;
+min-height:0;
+border:1px solid rgba(255,255,255,.25)!important;
+box-sizing:border-box;
+background:transparent;
+color:#000!important;
+opacity:1!important;
+visibility:visible!important;
+   filter:none!important;
+   backdrop-filter:none!important;
+}
+
+#explorationGrid .dataCell div{
+display:block!important;
+visibility:visible!important;
+opacity:1!important;
+color:#000!important;
+}
+
+#explorationGrid .dataCell:hover{
+opacity:1!important;
+visibility:visible!important;
+}
+
+#janus-data-models{
+width:100%;
+margin:12px 0;
+padding:0 8px;
+box-sizing:border-box;
+}
+
+   
+#janus-data-models-title{
+font-size:10px;
+font-weight:600;
+letter-spacing:1.5px;
+color:#888;
+margin:0 0 8px 2px;
+}
+
+.janus-data-model{
+background:rgba(255,255,255,.96);
+border:1px solid rgba(0,0,0,.12);
+border-radius:6px;
+padding:10px;
+margin-bottom:7px;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+cursor:pointer;
+transition:
+border-color .15s ease,
+box-shadow .15s ease;
+}
+
+.janus-data-model:hover{
+border-color:rgba(0,0,0,.3);
+box-shadow:0 3px 14px rgba(0,0,0,.12);
+}
+
+.janus-data-model-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:8px;
+}
+
+.janus-data-model-name{
+font-size:12px;
+font-weight:600;
+color:#222;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.janus-data-model-open{
+border:0;
+background:none;
+padding:0;
+font-size:10px;
+color:#666;
+cursor:pointer;
+}
+
+.janus-data-model-open:hover{
+color:#000;
+}
+
+.janus-data-model-actions{
+margin-top:8px;
+padding-top:7px;
+border-top:1px solid rgba(0,0,0,.08);
+}
+
+.janus-data-model-share{
+border:0;
+background:none;
+padding:0;
+font-size:10px;
+color:#777;
+cursor:pointer;
+}
+
+.janus-data-model-share:hover{
+color:#000;
+}
+
+
+
+
+
+   
+#janus-stac-custom{
+display:block;
+width:100%;
+max-width:100%;
+box-sizing:border-box;
+margin:12px 0;
+padding:0;
+}
+
+#janus-stac-custom-header{
+width:100%;
+max-width:100%;
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+#janus-stac-custom-action{
+width:100%;
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+#janus-stac-custom-toggle{
+display:flex;
+width:100%;
+height:auto;
+min-height:20px;
+box-sizing:border-box;
+margin:0;
+padding:5px 8px;
+border:0;
+background:none;
+font-family:Arial,Helvetica,sans-serif;
+font-size:11px;
+font-weight:500;
+line-height:1.3;
+color:#c9823a;
+align-items:center;
+justify-content:center;
+text-align:center;
+white-space:normal;
+overflow-wrap:anywhere;
+cursor:pointer;
+}
+
+#janus-stac-custom-toggle:hover{
+color:#000;
+}
+
+#janus-stac-custom-panel{
+display:none;
+width:100%;
+max-width:100%;
+box-sizing:border-box;
+margin:8px 0 0;
+padding:0;
+}
+
+#janus-stac-custom-input{
+display:inline-block;
+width:calc(100% - 58px);
+max-width:calc(100% - 58px);
+height:34px;
+box-sizing:border-box;
+margin:0;
+padding:0 9px;
+border:1px solid rgba(0,0,0,.15);
+border-radius:5px;
+background:#fff;
+font-family:Arial,Helvetica,sans-serif;
+font-size:12px;
+color:#333;
+outline:none;
+vertical-align:top;
+}
+
+#janus-stac-custom-load{
+display:inline-block;
+width:52px;
+max-width:52px;
+height:34px;
+box-sizing:border-box;
+margin:0 0 0 6px;
+padding:0;
+border:1px solid rgba(0,0,0,.15);
+border-radius:5px;
+background:#fff;
+font-family:Arial,Helvetica,sans-serif;
+font-size:11px;
+line-height:32px;
+color:#555;
+text-align:center;
+white-space:nowrap;
+vertical-align:top;
+cursor:pointer;
+}
+
+#janus-stac-custom-load:hover{
+border-color:rgba(0,0,0,.3);
+color:#000;
+}
+
+
+
+/* ==========================================
+   EXPLOITATION
+   ========================================== */
+
+.exploitButton{
+
+margin-top:12px;
+padding:8px 14px;
+
+border:1px solid #999;
+background:#111;
+color:#fff;
+
+font-size:12px;
+font-weight:600;
+
+cursor:pointer;
+
+}
+
+.exploitButton:hover{
+
+background:#333;
+
+}
+
+
+/* ==========================================
+   CENTRAL CONTAINER
+   ========================================== */
+
+#itemExploitation{
+width:100%;
+margin-top:24px;
+margin-bottom:24px;
+
+}
+
+
+/* ==========================================
+   CONTAINER
+   ========================================== */
+
+.exploitationContainer{
+width:100%;
+border-top:1px solid #ccc;
+padding-top:18px;
+}
+
+
+/* ==========================================
+   HEADER
+   ========================================== */
+
+.exploitationHeader{
+margin-bottom:14px;
+}
+
+.exploitationTitle{
+font-size:13px;
+font-weight:700;
+letter-spacing:.08em;
+}
+
+.exploitationInfo{
+margin-top:4px;
+font-size:11px;
+opacity:.65;
+word-break:break-all;
+}
+
+
+/* ==========================================
+   VIEWER
+   ========================================== */
+
+.exploitationViewer{
+position:relative;
+width:100%;
+min-height:400px;
+background:#111;
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+
+/* ==========================================
+   IMAGE
+   ========================================== */
+
+.exploitationImage{
+display:block;
+max-width:100%;
+max-height:600px;
+width:auto;
+height:auto;
+object-fit:contain;
+
+}
+
+
+/* ==========================================
+   FOOTPRINT
+   ========================================== */
+
+.exploitationFootprint{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+pointer-events:none;
+}
+
+.exploitationPolygon{
+fill:rgba(255,255,255,.12);
+stroke:#fff;
+stroke-width:3;
+vector-effect:non-scaling-stroke;
+}
+
+.exploitationPoint{
+fill:#fff;
+stroke:#111;
+stroke-width:3;
+}
+
+
+/* ==========================================
+   EMPTY
+   ========================================== */
+
+.exploitationEmpty{
+padding:40px;
+font-size:13px;
+opacity:.7;
+}
+
+   
+ .exploitationMap{
+position:relative;
+width:100%;
+height:520px;
+background:#111;
+overflow:hidden;
+cursor:grab;
+}
+
+.exploitationMap.dragging{
+cursor:grabbing;
+}
+
+.exploitationMapSvg{
+display:block;
+width:100%;
+height:100%;
+
+}
+
+.exploitationBaseImage{
+opacity:.9;
+}
+
+.exploitationWMSImage{
+opacity:.85;
+}
+
+.exploitationGrid{
+stroke:rgba(255,255,255,.28);
+stroke-width:1;
+vector-effect:non-scaling-stroke;
+}
+
+.exploitationGridLabel{
+fill:rgba(255,255,255,.75);
+font-size:12px;
+pointer-events:none;
+}
+
+.exploitationBBox{
+fill:none;
+stroke:rgba(255,255,255,.45);
+stroke-width:2;
+stroke-dasharray:8 6;
+vector-effect:non-scaling-stroke;
+}
+
+.exploitationInteractivePolygon{
+fill:rgba(255,255,255,.10);
+stroke:#fff;
+stroke-width:3;
+vector-effect:non-scaling-stroke;
+cursor:pointer;
+pointer-events:all;
+}
+
+.exploitationInteractivePolygon.active{
+
+fill:rgba(255,255,255,.25);
+
+}
+
+.exploitationInteractivePoint{
+fill:#fff;
+stroke:#111;
+stroke-width:3;
+cursor:pointer;
+}
+
+.exploitationMapMessage{
+position:absolute;
+left:12px;
+bottom:12px;
+padding:6px 9px;
+background:rgba(0,0,0,.7);
+color:#fff;
+font-size:11px;
+pointer-events:none;
+
+}
+
+.exploitationControls{
+display:flex;
+align-items:center;
+gap:6px;
+margin-bottom:8px;
+
+}
+
+.exploitationControls button{
+padding:5px 9px;
+border:1px solid #999;
+background:#111;
+color:#fff;
+cursor:pointer;
+font-size:11px;
+
+}
+
+.exploitationCoordinates{
+margin-left:8px;
+font-size:11px;
+opacity:.7;
+}
+
+.footprintInteraction{
+margin-top:10px;
+padding:12px;
+border:1px solid #ccc;
+font-size:11px;
+}
+
+.footprintInteractionTitle{
+font-weight:700;
+letter-spacing:.08em;
+margin-bottom:8px;
+}
+
+.footprintInteractionRow{
+display:flex;
+gap:12px;
+margin-top:4px;
+}
+
+.footprintInteractionRow span{
+opacity:.55;
+min-width:90px;
+
+}
+
+.exploitationSection{
+margin-top:18px;
+padding-top:14px;
+border-top:1px solid #ccc;
+
+}
+
+.exploitationSectionTitle{
+font-size:12px;
+font-weight:700;
+letter-spacing:.08em;
+margin-bottom:10px;
+
+}
+
+.exploitationDataGrid{
+display:grid;
+grid-template-columns:
+repeat(2,minmax(0,1fr));
+gap:10px;
+
+}
+
+.exploitationDataGrid>div{
+display:flex;
+flex-direction:column;
+gap:3px;
+
+}
+
+.exploitationDataGrid span{
+font-size:10px;
+opacity:.55;
+
+}
+
+.exploitationDataGrid strong{
+font-size:11px;
+font-weight:500;
+word-break:break-word;
+
+}  
+
+
+
+#janusContextPanel{
+width:100%;
+margin:20px 0;
+background:#080808;
+border:1px solid #202020;
+box-sizing:border-box;
+}
+
+.janusContextHeader{
+height:54px;
+padding:0 16px;
+display:flex;
+align-items:center;
+background:#111;
+border-bottom:1px solid #252525;
+box-sizing:border-box;
+}
+
+.janusContextTitle{
+font-size:11px;
+font-weight:600;
+letter-spacing:1.5px;
+color:#aaa;
+}
+
+#janusContextCoords{
+margin-top:4px;
+font-size:11px;
+color:#666;
+font-family:monospace;
+}
+
+#janusContextViewer{
+width:100%;
+height:420px;
+position:relative;
+overflow:hidden;
+background:#000;
+}
+
+#janusContextViewer .cesium-viewer{
+width:100%;
+height:100%;
+}
+
+
+#janusOpeFrameWrap{
+    width:100%;
+    height:420px;
+    position:relative;
+    overflow:hidden;
+    background:#000;
+}
+
+#janusOpeFrame{
+    position:absolute;
+    width:100%;
+    height:100%;
+    left:0;
+    top:0;
+    border:0;
+}
+
+#janus-stac-public{
+  width:100%;
+  margin:1px 0;
+}
+
+#janus-stac-public select{
+  width:100%;
+  padding:9px 12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:6px;
+  background:#15191d;
+  color:#e8ecef;
+  font:inherit;
+  cursor:pointer;
+  outline:none;
+  appearance:none;
+}
+
+#janus-stac-public select:hover{
+  border-color:rgba(255,255,255,.35);
+}
+
+#janus-stac-public select:focus{
+  border-color:rgba(255,255,255,.5);
+  box-shadow:0 0 0 2px rgba(255,255,255,.08);
+}
+
+#janus-stac-public option{
+  background:#15191d;
+  color:#e8ecef;
+}
+
+
+ .janus-footer{
+  width:100%;
+  margin-top:1px;
+  border-top:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.18);
+  color:rgba(255,255,255,.55);
+}
+
+.janus-footer-inner{
+  width:100%;
+  max-width:1400px;
+  min-height:54px;
+  margin:0 auto;
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  box-sizing:border-box;
+}
+
+.janus-footer-links{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex:1;
+}
+
+.janus-footer-link,
+.janus-footer-contact{
+  color:rgba(255,255,255,.55);
+  text-decoration:none;
+  font-size:11px;
+  letter-spacing:.04em;
+  transition:color .2s ease;
+}
+
+.janus-footer-link:hover,
+.janus-footer-contact:hover{
+  color:#fff;
+}
+
+.janus-footer-credit{
+  flex:1;
+  text-align:center;
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  color:rgba(255,255,255,.38);
+}
+
+.janus-footer-credit strong{
+  color:rgba(255,255,255,.68);
+  font-weight:500;
+}
+
+.janus-footer-cta{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  font-size:11px;
+  white-space:nowrap;
+  color:rgba(255,255,255,.38);
+}
+
+.janus-footer-contact{
+  color:rgba(255,255,255,.68);
+}
+
+@media (max-width:700px){
+
+  .janus-footer{
+    margin-top:30px;
+  }
+
+  .janus-footer-inner{
+    min-height:0;
+    padding:14px 18px;
+    flex-direction:column;
+    gap:9px;
+    text-align:center;
+  }
+
+  .janus-footer-links{
+    order:1;
+    flex:none;
+    justify-content:center;
+    gap:18px;
+  }
+
+  .janus-footer-credit{
+    order:2;
+    flex:none;
+    white-space:normal;
+    line-height:1.4;
+  }
+
+  .janus-footer-cta{
+    order:3;
+    flex:none;
+    justify-content:center;
+  }
+}  
+
+
+
+
+
+
+
+   
+   
+</style>
+</head>
+
+<body>
+
+  
+
+<div id="panel">
+   
+ <div class="janus-sector-strip">
+  <div class="janus-sector-inner">
+<div class="janus-sector-title">
+  <span class="janus-main-title">Technology transfer across sectors</span>
+  <span class="janus-transfer-title">By 3DTwins</span>
+</div>
+    <div class="janus-sector-list">
+      <span>Forestry</span>
+      <span>Agriculture</span>
+      <span>Construction</span>
+      <span>Mining</span>
+      <span>Energy</span>
+      <span>Infrastructure</span>
+      <span>Archaeology</span>
+      <span>Cultural Heritage</span>
+      <span>Research</span>
+      <span>Education</span>
+    </div>
+  </div>
+</div>
+
+      <div id="janus-stac-custom" hidden>
+<div id="janus-stac-custom-header">
+<div id="janus-stac-custom-action">
+<button
+id="janus-stac-custom-toggle"
+type="button"
+>
+Add collection (only PRO counts)
+</button>
+</div>
+
+</div>
+
+<div id="janus-stac-custom-panel">
+
+<input
+id="janus-stac-custom-input"
+type="text"
+placeholder="Enter STAC catalog URL"
+>
+
+<button
+id="janus-stac-custom-load"
+type="button"
+>
+Load
+</button>
+
+</div>
+
+ <div id="janus-stac-public"></div>        
+
+</div> 
+
+   
+         <select id="collectionSelector" hidden>
+<option value="">Select collection</option>
+</select>
+
+
+    <div id="header">
+        <div id="status">Ready</div>
+        <input id="search" value="">
+        <button id="load">SEARCH</button>
+      <button id="themeToggle">🌙</button>
+       <button id="generate-3gb0" type="button">Share collection (only PRO counts)</button>
+       
+    </div>
+
+
+   
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+       
+  <input
+    id="stac-url"
+    type="text"
+    placeholder="https://example.com"
+    style="flex:1;"
+ hidden >
+  <button id="load-stac-url" type="button" hidden>Update data (only PRO counts)</button>
+</div>
+
+
+
+
+   
+
+
+    <div id="workspace">
+       
+<div class="sidebar">
+
+    <div id="janus-data-models"></div>
+</div>
+
+        <div id="content">
+           
+
+            <div id="cards"></div>
+
+            <div id="detail">
+
+   
+
+                <h2>Spatial Data exploration</h2>
+
+                <div id="meta"></div>
+              
+   <button id="expandMapBtn" onclick="expandObservationMap()">
+                    REDISCOVER MAP
+                </button>
+
+<div id="spatialCoverage" class="spatialCoverage">
+    <div class="spatialCoverageTitle">
+        SPATIAL COVERAGE
+    </div>
+    <div class="spatialCoverageValue">
+        <span id="spatialCoveragePercentage">0.0%</span>
+    </div>
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageCells">0 / 0</span>
+        <span>cells discovered</span>
+    </div>
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageObservations">0</span>
+        <span>observations explored</span>
+    </div>
+</div>
+
+               
+              
+                <div id="queryBox"></div>
+
+
+   <div id="janusContextPanel" >
+<div class="janusContextHeader">
+<div>
+
+<div class="janusContextTitle">
+SPATIAL CONTEXT
+</div>
+
+<div id="janusContextCoords">
+Waiting for cell selection
+</div>
+</div>
+
+</div>
+      <div id="janusOpeFrameWrap">
+    <iframe
+        id="janusOpeFrame"
+        src="https://3d.staratlas.es/spaceatlas.html"
+        allow="fullscreen"
+        loading="eager">
+    </iframe>
+</div>
+
+
+<div id="janusContextViewer" hidden></div>
+</div>
+
+               
+
+               <div id="itemExploitation"></div>
+
+
+                <details>
+                    <summary>Data set (only PRO counts)</summary>
+                    <pre id="raw"></pre>
+                </details>
+
+            </div>
+
+        </div>
+
+        <div id="janusReader" >
+
+           
+
+
+           
+      
+
+            <div id="summary" class="card">
+
+
+
+                <h2>Dataset Overview</h2>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="statTitle">STATUS</div>
+                        <div class="statValue" id="janusStatus">   
+                        Waiting for data...
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">OBSERVATIONS</div>
+                        <div class="statValue" id="count">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">CELL</div>
+                        <div class="statValue" id="cellId">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="statTitle">ASSETS</div>
+                        <div class="statValue" id="assetCount">-</div>
+                    </div>
+
+                </div>
+
+                <div class="details">
+
+                    <div class="row">
+                        <div class="label">Latitude</div>
+                        <div class="value" id="latRange">-</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">Longitude</div>
+                        <div class="value" id="lonRange">-</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="label">State</div>
+                        <div class="value" id="cellState">-</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+           
+
+
+           
+            <div id="observations"></div>
+
+        </div>
+
+    </div>
+
+
+    <footer class="janus-footer">
+  <div class="janus-footer-inner">
+
+    <div class="janus-footer-links">
+      <a href="#" class="janus-footer-link">Privacy</a>
+      <a href="mailto:" class="janus-footer-link">Contact</a>
+    </div>
+
+    <div class="janus-footer-credit">
+      Technology developed by <strong>3DTWINS</strong>
+    </div>
+
+    <div class="janus-footer-cta">
+      <span>Need this technology?</span>
+      <a href="mailto:" class="janus-footer-contact">Contact us</a>
+    </div>
+
+  </div>
+</footer>
+
+</div>
+
+  
+   
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/jquery/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/other/BinaryHeap.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/tween/tween.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/d3/d3.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/proj4/proj4.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/openlayers3/ol.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/i18next/i18next.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/jstree/jstree.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/copc/index.js"></script>
+
+<script src="https://potree.org/potree/build/potree/potree.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/potree/potree@1.8.2/libs/plasio/js/laslaz.js"></script>
+   
+<script>
+console.log("AFTER POTREE:",window.Potree);
+console.log(
+    "AFTER POTREE LOAD:",
+    typeof window.Potree?.loadPointCloud
+);
+console.log(
+    "AFTER COPC:",
+    typeof window.Copc
+);
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/geotiff"></script>
+
+<script>
+
+window.CESIUM_BASE_URL=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/";
+
+</script>
+
+<script
+src="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Cesium.js">
+</script>
+   
+<script>
+let BASE="";
+
+let collections=[];
+let activeDataset=null;
+
+let observationGrid=[];
+let currentItems=[];
+
+let explorationHistory=[];
+let explorationIndex=-1;
+
+let dataModelCount=0;
+
+
+// ===============================
+// INIT
+// ===============================
+
+document.getElementById("load-stac-url").onclick=changeSTAC;
+
+
+async function changeSTAC(){
+
+const input=document.getElementById("stac-url");
+const url=input.value.trim();
+
+let stacURL=BASE;
+
+if(url){
+
+stacURL=url;
+
+try{
+
+const parsedURL=new URL(url);
+
+if(parsedURL.searchParams.has("3dt0")){
+
+const value=parsedURL.searchParams.get("3dt0");
+
+if(value){
+
+const decoded=atob(value);
+
+if(
+decoded.startsWith("http://")||
+decoded.startsWith("https://")
+){
+
+stacURL=decoded;
+input.value=stacURL;
+
+}
+
+}
+
+}
+
+else if(parsedURL.searchParams.has("3gb0")){
+
+const value=parsedURL.searchParams.get("3gb0");
+
+if(value){
+
+const glb=base64ToUint8Array(value);
+const metadata=readGLBMetadata(glb);
+
+if(metadata?.nodes?.[0]?.extras?.d1){
+
+const valueD1=metadata.nodes[0].extras.d1;
+const decoded=atob(valueD1);
+
+if(
+decoded.startsWith("http://")||
+decoded.startsWith("https://")
+){
+
+stacURL=decoded;
+input.value=stacURL;
+
+}
+
+}
+
+}
+
+}
+
+}catch(e){
+
+console.error("Error leyendo URL:",e);
+return;
+
+}
+
+}
+
+BASE=stacURL.replace(/\/+$/,"");
+
+load();
+
+}
+
+
+function base64ToUint8Array(base64){
+
+const binary=atob(base64);
+
+const bytes=new Uint8Array(binary.length);
+
+for(let i=0;i<binary.length;i++){
+
+bytes[i]=binary.charCodeAt(i);
+
+}
+
+return bytes;
+
+}
+
+
+
+function uint8ArrayToBase64(bytes){
+
+let binary="";
+
+const chunkSize=0x8000;
+
+for(let i=0;i<bytes.length;i+=chunkSize){
+
+binary+=String.fromCharCode(
+...bytes.subarray(i,i+chunkSize)
+);
+
+}
+
+return btoa(binary);
+
+}
+
+
+
+function readGLBMetadata(bytes){
+
+const view=new DataView(
+bytes.buffer,
+bytes.byteOffset,
+bytes.byteLength
+);
+
+const magic=view.getUint32(0,true);
+const version=view.getUint32(4,true);
+const length=view.getUint32(8,true);
+
+if(magic!==0x46546C67){
+
+throw new Error("GLB inválido");
+
+}
+
+if(version!==2){
+
+throw new Error("GLB version no soportada");
+
+}
+
+if(length>bytes.byteLength){
+
+throw new Error("GLB incompleto");
+
+}
+
+let offset=12;
+
+while(offset<length){
+
+const chunkLength=view.getUint32(offset,true);
+const chunkType=view.getUint32(offset+4,true);
+
+offset+=8;
+
+if(chunkType===0x4E4F534A){
+
+const jsonBytes=bytes.subarray(
+offset,
+offset+chunkLength
+);
+
+const jsonText=new TextDecoder().decode(jsonBytes);
+
+return JSON.parse(jsonText);
+
+}
+
+offset+=chunkLength;
+
+}
+
+throw new Error("No se encontró JSON en el GLB");
+
+}
+
+
+
+function createGLB(stacURL){
+
+const d1=btoa(stacURL);
+
+const gltf={
+
+asset:{
+version:"2.0",
+generator:"Janus"
+},
+
+scene:0,
+
+scenes:[
+{
+nodes:[0]
+}
+],
+
+nodes:[
+{
+name:"Janus Data Particle",
+
+extras:{
+d1:d1
+}
+
+}
+]
+
+};
+
+let json=JSON.stringify(gltf);
+
+const encoder=new TextEncoder();
+
+let jsonBytes=encoder.encode(json);
+
+const jsonPadding=
+(4-(jsonBytes.length%4))%4;
+
+if(jsonPadding){
+
+const padded=new Uint8Array(
+jsonBytes.length+jsonPadding
+);
+
+padded.set(jsonBytes);
+
+for(
+let i=jsonBytes.length;
+i<padded.length;
+i++
+){
+
+padded[i]=0x20;
+
+}
+
+jsonBytes=padded;
+
+}
+
+const totalLength=
+12+
+8+
+jsonBytes.length;
+
+const glb=new Uint8Array(totalLength);
+
+const view=new DataView(glb.buffer);
+
+view.setUint32(
+0,
+0x46546C67,
+true
+);
+
+view.setUint32(
+4,
+2,
+true
+);
+
+view.setUint32(
+8,
+totalLength,
+true
+);
+
+view.setUint32(
+12,
+jsonBytes.length,
+true
+);
+
+view.setUint32(
+16,
+0x4E4F534A,
+true
+);
+
+glb.set(
+jsonBytes,
+20
+);
+
+return glb;
+
+}
+
+
+
+function generate3GB0(){
+
+const stacURL=BASE.replace(/\/+$/,"");
+
+if(!stacURL)return;
+
+const glb=createGLB(stacURL);
+
+const encodedGLB=
+uint8ArrayToBase64(glb);
+
+const finalURL=
+window.location.origin+
+window.location.pathname+
+"?3gb0="+
+encodeURIComponent(encodedGLB);
+
+console.log(
+"URL 3GB0:",
+finalURL
+);
+
+addDataModel(finalURL);
+
+return finalURL;
+
+}
+
+
+
+function addDataModel(url){
+
+dataModelCount++;
+
+const menu=document.getElementById("janus-data-models");
+
+if(!menu)return;
+
+if(!document.getElementById("janus-data-models-title")){
+
+const title=document.createElement("div");
+
+title.id="janus-data-models-title";
+title.textContent="DATA MODELS";
+
+menu.appendChild(title);
+
+}
+
+const model=document.createElement("div");
+
+model.className="janus-data-model";
+
+const header=document.createElement("div");
+
+header.className="janus-data-model-header";
+
+const name=document.createElement("div");
+
+name.className="janus-data-model-name";
+name.textContent="Data Model "+dataModelCount;
+
+const open=document.createElement("button");
+
+open.className="janus-data-model-open";
+open.textContent="Open";
+
+open.onclick=function(e){
+
+e.stopPropagation();
+
+window.open(url,"_blank");
+
+};
+
+header.appendChild(name);
+header.appendChild(open);
+
+const actions=document.createElement("div");
+
+actions.className="janus-data-model-actions";
+
+const share=document.createElement("button");
+
+share.className="janus-data-model-share";
+share.textContent="Share";
+
+share.onclick=function(e){
+
+e.stopPropagation();
+
+shareDataModel(url);
+
+};
+
+actions.appendChild(share);
+
+model.appendChild(header);
+model.appendChild(actions);
+
+model.onclick=function(){
+
+window.open(url,"_blank");
+
+};
+
+menu.appendChild(model);
+
+}
+
+
+async function shareDataModel(url){
+
+if(navigator.share){
+
+try{
+
+await navigator.share({
+title:"Janus Data Model",
+url:url
+});
+
+return;
+
+}catch(e){
+
+if(e.name==="AbortError")return;
+
+}
+
+}
+
+try{
+
+await navigator.clipboard.writeText(url);
+
+showShareFeedback();
+
+}catch(e){
+
+console.error(
+"Error copiando URL:",
+e
+);
+
+}
+
+}
+
+
+
+function showShareFeedback(){
+
+const button=
+document.querySelector(
+".janus-data-model-share:last-child"
+);
+
+if(!button)return;
+
+const original=button.textContent;
+
+button.textContent="Copied";
+
+setTimeout(function(){
+
+button.textContent=original;
+
+},1200);
+
+}
+
+
+
+// ===============================
+// INITIAL URL
+// ===============================
+
+const currentURL=
+new URL(window.location.href);
+
+if(
+currentURL.searchParams.has("3gb0")||
+currentURL.searchParams.has("3dt0")
+){
+
+document.getElementById("stac-url").value=
+window.location.href;
+
+document.getElementById("load-stac-url").click();
+
+}else{
+
+load();
+
+}
+
+
+
+// ===============================
+// GENERATE 3GB0
+// ===============================
+
+document.getElementById(
+"generate-3gb0"
+).onclick=function(){
+
+const url=generate3GB0();
+
+if(!url)return;
+
+document.getElementById(
+"stac-url"
+).value=url;
+
+};
+
+
+
+// ===============================
+// CUSTOM STAC
+// ===============================
+
+const stacCustomToggle=
+document.getElementById(
+"janus-stac-custom-toggle"
+);
+
+const stacCustomPanel=
+document.getElementById(
+"janus-stac-custom-panel"
+);
+
+const stacCustomInput=
+document.getElementById(
+"janus-stac-custom-input"
+);
+
+const stacCustomLoad=
+document.getElementById(
+"janus-stac-custom-load"
+);
+
+
+stacCustomToggle.onclick=function(){
+
+const open=
+stacCustomPanel.style.display==="flex";
+
+if(open){
+
+stacCustomPanel.style.display="none";
+stacCustomToggle.textContent="Share collection (only PRO counts)";
+
+}else{
+
+stacCustomPanel.style.display="flex";
+stacCustomToggle.textContent="Close";
+stacCustomInput.focus();
+
+}
+
+};
+
+
+stacCustomLoad.onclick=function(){
+
+const url=
+stacCustomInput.value.trim();
+
+if(!url)return;
+
+const realInput=
+document.getElementById("stac-url");
+
+const realLoad=
+document.getElementById("load-stac-url");
+
+if(!realInput||!realLoad)return;
+
+realInput.value=url;
+
+realLoad.click();
+
+};
+
+
+
+// ===============================
+// PUBLIC DATA STAC
+// ===============================
+
+const STAC_DATA_URLS={
+
+"ESA MAAP":{
+url:"https://catalog.maap.eo.esa.int/catalogue",
+root:"collections"
+},
+
+"Google Earth Engine":{
+url:"https://storage.googleapis.com/earthengine-stac/catalog/catalog.json",
+root:""
+},
+
+"AWS Earth Search":{
+url:"https://earth-search.aws.element84.com/v1",
+root:"collections"
+},
+
+"Microsoft Planetary Computer":{
+url:"https://planetarycomputer.microsoft.com/api/stac/v1",
+root:"collections"
+},
+
+"NASA CMR":{
+url:"https://cmr.earthdata.nasa.gov/stac",
+root:""
+}
+
+};
+
+
+function createSTACSelector(){
+
+const container=
+document.getElementById("janus-stac-public");
+
+if(!container)return;
+
+const select=document.createElement("select");
+
+select.id="janus-stac-public-select";
+
+const defaultOption=
+document.createElement("option");
+
+defaultOption.value="";
+defaultOption.textContent="Select a public library";
+
+select.appendChild(defaultOption);
+
+Object.entries(STAC_DATA_URLS).forEach(
+([name,config])=>{
+
+const option=
+document.createElement("option");
+
+option.value=JSON.stringify(config);
+option.textContent=name;
+
+select.appendChild(option);
+
+}
+);
+
+select.onchange=function(){
+
+const value=this.value;
+
+if(!value)return;
+
+const config=JSON.parse(value);
+
+const input=
+document.getElementById(
+"janus-stac-custom-input"
+);
+
+const load=
+document.getElementById(
+"janus-stac-custom-load"
+);
+
+if(!input||!load)return;
+
+input.value=config.url;
+
+window.JANUS_CUSTOM_ROOT=config.root;
+
+load.click();
+
+};
+
+container.appendChild(select);
+
+}
+
+
+createSTACSelector();
+
+
+// ===============================
+// LOAD CATALOG
+// ===============================
+
+document.getElementById("load").onclick=load;
+
+
+async function load(){
+
+const q=
+document.getElementById("search").value.trim();
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+try{
+
+const root=
+typeof window.JANUS_CUSTOM_ROOT!=="undefined"
+?window.JANUS_CUSTOM_ROOT
+:"collections";
+
+if(root){
+
+const endpoint=
+`${BASE.replace(/\/+$/,"")}/${root}`;
+
+const params=new URLSearchParams();
+
+if(q)params.set("q",q);
+
+params.set("limit","1000");
+
+   console.log(
+"STAC REQUEST:",
+`${endpoint}?${params.toString()}`
+);
+
+const res=await fetch(
+`${endpoint}?${params.toString()}`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+collections=data.collections||[];
+
+}else{
+
+collections=
+await loadCatalogTree(
+BASE.replace(/\/+$/,"")
+);
+
+}
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+}catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+}
+
+}
+
+
+// ===============================
+// LOAD STAC CATALOG TREE
+// ===============================
+
+async function loadCatalogTree(url,visited=new Set()){
+
+if(visited.has(url))
+return[];
+
+visited.add(url);
+
+const res=await fetch(
+`${url}${url.includes("?")?"&":"?"}limit=1000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+if(Array.isArray(data.collections))
+return data.collections;
+
+if(Array.isArray(data.links)){
+
+return data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+url
+).href
+
+}));
+
+}
+
+return[];
+
+}
+
+
+
+// ===============================
+// RENDER COLLECTION SELECTOR
+// ===============================
+
+function renderCollectionSelector(){
+
+const select=
+document.getElementById(
+"collectionSelector"
+);
+
+if(!select)return;
+
+select.innerHTML=
+`<option value="">Select collection...</option>`;
+
+collections.forEach(collection=>{
+
+const option=
+document.createElement("option");
+
+option.value=collection.id;
+
+option.textContent=
+collection.title||collection.id;
+
+select.appendChild(option);
+
+});
+
+}
+
+
+document.getElementById(
+"collectionSelector"
+).onchange=function(){
+
+document.getElementById(
+"search"
+).value=this.value;
+
+};
+
+
+
+// ===============================
+// RENDER COLLECTION CARDS
+// ===============================
+
+function renderCards(){
+
+const c=
+document.getElementById("cards");
+
+c.innerHTML="";
+
+collections.forEach(col=>{
+
+const d=
+document.createElement("div");
+
+d.className="card";
+
+d.innerHTML=`
+
+<h3>${col.id}</h3>
+
+<p><b>${col.title||""}</b></p>
+
+<p>
+${(col.description||"").substring(0,180)}...
+</p>
+
+<button class="open">
+OPEN
+</button>
+
+`;
+
+d.querySelector("button").onclick=
+()=>show(col);
+
+c.appendChild(d);
+
+});
+
+}
+
+
+
+// ===============================
+// SHOW COLLECTION
+// ===============================
+
+async function show(col){
+
+if(col.href){
+
+try{
+
+document.getElementById("status").textContent=
+"Loading catalog...";
+
+const res=await fetch(
+`${col.href}${col.href.includes("?")?"&":"?"}limit=1000`
+);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+const data=await res.json();
+
+
+// =================================
+// ACTUALIZAR RAW CON EL JSON REAL
+// =================================
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+data,
+null,
+2
+);
+
+
+// =================================
+// CATALOG
+// =================================
+
+if(data.type==="Catalog"&&Array.isArray(data.links)){
+
+collections=
+data.links
+.filter(
+link=>link.rel==="child"&&link.href
+)
+.map(link=>({
+
+id:link.title||link.href,
+
+title:link.title||link.href,
+
+href:new URL(
+link.href,
+col.href
+).href
+
+}));
+
+renderCards();
+renderCollectionSelector();
+
+document.getElementById("status").textContent=
+`${collections.length} collections`;
+
+return;
+
+}
+
+
+// =================================
+// COLLECTION
+// =================================
+
+if(data.type==="Collection"){
+
+col=data;
+
+}
+
+}
+
+catch(error){
+
+console.error(
+"Error loading catalog:",
+error
+);
+
+document.getElementById("status").textContent=
+"Catalog unavailable";
+
+return;
+
+}
+
+}
+
+const meta=
+document.getElementById("meta");
+
+meta.innerHTML="";
+
+document.getElementById(
+"queryBox"
+).innerHTML="";
+
+add(meta,"ID",col.id);
+add(meta,"Title",col.title);
+add(meta,"Version",col.version);
+add(meta,"Created",col.created);
+add(meta,"Updated",col.updated);
+add(meta,"Description",col.description);
+
+if(col.keywords)
+add(
+meta,
+"Keywords",
+col.keywords.join(", ")
+);
+
+activeDataset=
+parseCollection(col);
+
+add(
+meta,
+"DATA START",
+activeDataset.startDate||""
+);
+
+add(
+meta,
+"DATA END",
+activeDataset.endDate||""
+);
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+col,
+null,
+2
+);
+
+loadItems(activeDataset);
+
+}
+
+
+
+// ===============================
+// PARSE COLLECTION
+// ===============================
+
+function parseCollection(col){
+
+return{
+
+id:col.id,
+
+title:col.title,
+
+startDate:
+col.extent?.temporal?.interval?.[0]?.[0]||null,
+
+endDate:
+col.extent?.temporal?.interval?.[0]?.[1]||null,
+
+items:
+col.links?.find(
+l=>l.rel==="items"
+)?.href||null
+
+};
+
+}
+
+
+
+
+// ===============================
+// LOAD ITEMS
+// ===============================
+
+async function loadItems(data){
+
+document.getElementById("status").textContent=
+"Reading dataset...";
+
+try{
+
+// =================================
+// EXPLOTAR COLLECTION → ITEMS
+// =================================
+
+const collectionJSON=
+JSON.parse(
+document.getElementById("raw").textContent
+);
+
+const itemsLink=
+collectionJSON.links?.find(
+link=>link.rel==="items"
+);
+
+let itemsJSON=null;
+
+if(itemsLink?.href){
+
+const itemsURL=
+itemsLink.href;
+
+console.log(
+"ITEMS URL FOUND IN COLLECTION:",
+itemsURL
+);
+
+const itemsRes=
+await fetch(itemsURL);
+
+if(!itemsRes.ok)
+throw new Error(
+`HTTP ${itemsRes.status} ${itemsRes.statusText}`
+);
+
+itemsJSON=
+await itemsRes.json();
+
+if(
+!itemsJSON.features ||
+!Array.isArray(itemsJSON.features) ||
+itemsJSON.features.length===0
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+data.items=itemsURL;
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+itemsJSON,
+null,
+2
+);
+
+console.log(
+"RAW UPDATED WITH ITEMS JSON"
+);
+
+}
+
+
+// =================================
+// DETERMINAR FECHA DE REFERENCIA
+// =================================
+
+let referenceDate=null;
+
+// =================================
+// SI ACABAMOS DE EXPLOTAR /ITEMS
+// USAR SUS OBSERVACIONES
+// =================================
+
+if(itemsJSON){
+
+const dates=
+itemsJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found in Items"
+);
+
+}
+
+referenceDate=dates[0];
+
+console.log(
+"USING LATEST OBSERVATION FROM ITEMS:",
+referenceDate
+);
+
+}
+
+// misión terminada
+else if(data.endDate){
+
+referenceDate=data.endDate;
+
+console.log(
+"USING DATASET END DATE:",
+referenceDate
+);
+
+}
+
+// misión activa
+else{
+
+const latestJSON=
+JSON.parse(
+document.getElementById("raw").textContent
+);
+
+if(
+!latestJSON.features ||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+const dates=
+latestJSON.features
+.map(
+item=>item.properties?.datetime
+)
+.filter(Boolean)
+.sort(
+(a,b)=>
+new Date(b)-new Date(a)
+);
+
+if(!dates.length){
+
+throw new Error(
+"No datetime found"
+);
+
+}
+
+referenceDate=dates[0];
+
+console.log(
+"USING LATEST OBSERVATION:",
+referenceDate
+);
+
+}
+
+// =================================
+// LIMPIAR PRECISIÓN TEMPORAL
+// =================================
+
+referenceDate=
+referenceDate.replace(/\.\d+Z$/,"Z");
+
+// =================================
+// PEDIR VENTANA DE DATOS
+// =================================
+
+const url =
+`${data.items}?limit=1000&datetime=../${referenceDate}`;
+
+console.log(
+"ITEM QUERY:",
+url
+);
+
+let json=null;
+
+// =================================
+// INTENTO NORMAL — 2000 OBSERVACIONES
+// =================================
+
+try{
+
+const res =
+await fetch(url);
+
+if(!res.ok)
+throw new Error(
+`HTTP ${res.status} ${res.statusText}`
+);
+
+json =
+await res.json();
+
+if(
+!json.features ||
+!Array.isArray(json.features) ||
+json.features.length===0
+){
+
+throw new Error(
+"Items query did not return FeatureCollection"
+);
+
+}
+
+console.log(
+"ITEM QUERY SUCCESS:",
+json.features.length
+);
+
+}
+
+// =================================
+// FALLBACK — PAGINACIÓN
+// =================================
+
+catch(e){
+
+console.log(
+"ITEM QUERY FAILED, USING PAGINATION:",
+e.message
+);
+
+const features=[];
+let pageURL=data.items;
+let numberMatched=0;
+
+while(
+pageURL &&
+features.length<2000
+){
+
+console.log(
+"ITEM PAGE:",
+pageURL
+);
+
+const pageRes=
+await fetch(pageURL);
+
+if(!pageRes.ok)
+throw new Error(
+`HTTP ${pageRes.status} ${pageRes.statusText}`
+);
+
+const page=
+await pageRes.json();
+
+if(
+!page.features ||
+!Array.isArray(page.features)
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+features.push(
+...page.features
+);
+
+numberMatched=
+page.numberMatched||
+page.context?.matched||
+numberMatched;
+
+console.log(
+"ITEMS ACCUMULATED:",
+features.length
+);
+
+pageURL=
+page.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+}
+
+json={
+type:"FeatureCollection",
+features:features,
+numberMatched:numberMatched,
+numberReturned:features.length
+};
+
+console.log(
+"PAGINATED ITEMS:",
+json.features.length
+);
+
+}
+
+// =================================
+// GUARDAR PAGINACIÓN
+// =================================
+
+activeDataset.nextPage =
+json.links?.find(
+l=>l.rel==="next"
+)?.href || null;
+
+// =================================
+// ORDENAR POR FECHA DESCENDENTE
+// =================================
+
+if(json.features){
+
+json.features.sort((a,b)=>{
+
+return new Date(
+b.properties?.datetime
+)
+-
+new Date(
+a.properties?.datetime
+);
+
+});
+
+}
+
+// =================================
+// CONTINUAR FLUJO NORMAL
+// =================================
+
+console.log(
+"ITEMS:",
+json
+);
+
+renderAvailableData(json);
+
+document.getElementById("raw").textContent=
+JSON.stringify(
+json,
+null,
+2
+);
+
+document.getElementById("status").textContent=
+`${json.numberMatched||json.features.length} products indexed`;
+
+}
+
+catch(e){
+
+console.error(e);
+
+document.getElementById("status").textContent=
+"Items error";
+
+}
+
+}
+
+
+
+
+   
+   
+// ===============================
+// AVAILABLE DATA + SPATIAL GRID
+// ===============================
+
+function renderAvailableData(json){
+
+const box=document.getElementById("queryBox");
+
+
+box.innerHTML=`
+
+<h3 style="color:#ffb04d;margin-bottom:12px">
+AVAILABLE DATA
+</h3>
+
+`;
+
+
+
+if(!json.features||json.features.length===0){
+
+box.innerHTML+=`
+<p>No products found</p>
+`;
+
+return;
+
+}
+
+
+currentItems=json.features;
+
+
+// resumen fechas
+
+const dates={};
+
+
+
+json.features.forEach(item=>{
+
+
+const dt=item.properties?.datetime;
+
+
+if(!dt)
+return;
+
+
+const day=dt.split("T")[0];
+
+
+if(!dates[day])
+dates[day]=0;
+
+
+dates[day]++;
+
+
+});
+
+
+Object.keys(dates)
+.sort()
+.forEach(date=>{
+
+
+const r=document.createElement("div");
+
+
+r.className="row";
+
+r.innerHTML=`
+
+<div class="key">
+${date}
+</div>
+
+<div class="value">
+${dates[date]} observations
+</div>
+
+`;
+
+
+box.appendChild(r);
+
+
+});
+
+
+
+
+// ===============================
+// SPATIAL CELLS
+// ===============================
+
+
+const title=document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginTop="20px";
+
+title.textContent=
+"SPATIAL DATA CELLS";
+
+
+box.appendChild(title);
+
+const grid=document.createElement("div");
+
+grid.id="dataGrid";
+
+box.appendChild(grid);
+
+createSpatialGrid(json.features);
+
+//test exploracion espacial
+   const explorationContainer=document.createElement("div");
+explorationContainer.id="explorationContainer";
+explorationContainer.style.marginTop="25px";
+box.appendChild(explorationContainer);
+
+
+}
+
+
+
+
+
+  
+
+// ===============================
+// CREATE SPATIAL GRID
+// ===============================
+
+function createSpatialGrid(items){
+
+const grid=document.getElementById("dataGrid");
+
+grid.innerHTML="";
+
+observationGrid=[];
+
+
+// resolución inicial del mapa
+
+const rows=18;
+const cols=36;
+
+
+for(let y=0;y<rows;y++){
+
+for(let x=0;x<cols;x++){
+
+const cell={
+
+    id:y*cols+x,
+
+    x,
+    y,
+
+    state:-1,
+
+    latMin:90-(y+1)*(180/rows),
+    latMax:90-y*(180/rows),
+
+    lonMin:-180+x*(360/cols),
+    lonMax:-180+(x+1)*(360/cols),
+
+    items:[]
+
+};
+   
+observationGrid.push(cell);
+
+const div=document.createElement("div");
+
+div.className="dataCell";
+
+div.textContent="";
+
+div.onclick=()=>{
+    clearGridSearch();
+    showCellData(cell);
+};
+
+grid.appendChild(div);
+
+}
+}
+
+
+// ===============================
+// DISTRIBUIR OBSERVACIONES
+// ===============================
+
+items.forEach(item=>{
+let coords=null;
+const geom=item.geometry;
+
+// ------------------------------------------------
+// 1. POINT (STAC)
+// ------------------------------------------------
+
+if(geom && geom.type==="Point"){
+coords=geom.coordinates;
+}
+
+
+
+// ------------------------------------------------
+// 2. LAT/LON EN PROPERTIES
+// ------------------------------------------------
+
+if(!coords &&
+item.properties &&
+item.properties.latitude!==undefined &&
+item.properties.longitude!==undefined){
+
+coords=[
+
+item.properties.longitude,
+item.properties.latitude
+
+];
+
+}
+
+
+
+if(!coords &&
+item.properties &&
+item.properties.lat!==undefined &&
+item.properties.lon!==undefined){
+
+coords=[
+
+item.properties.lon,
+
+item.properties.lat
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 3. BBOX
+// ------------------------------------------------
+
+if(!coords && item.bbox){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 4. POLYGON
+// ------------------------------------------------
+
+if(!coords &&
+geom &&
+geom.type==="Polygon"){
+
+const ring=geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+coords=[
+
+lon/ring.length,
+
+lat/ring.length
+
+];
+
+}
+
+
+
+// ------------------------------------------------
+// 5. MULTIPOLYGON
+// ------------------------------------------------
+
+if(!coords &&
+geom &&
+geom.type==="MultiPolygon"){
+
+const ring=geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+coords=[
+
+lon/ring.length,
+
+lat/ring.length
+
+];
+
+}
+
+
+// ------------------------------------------------
+// 6. SIN SOPORTE
+// ------------------------------------------------
+
+if(!coords){
+
+console.log(
+
+"Unsupported geometry:",
+
+geom?.type,
+
+item
+
+);
+
+return;
+
+}
+
+
+
+const lon=coords[0];
+const lat=coords[1];
+
+
+
+const cell=observationGrid.find(c=>
+
+lat>=c.latMin &&
+lat<c.latMax &&
+
+lon>=c.lonMin &&
+lon<c.lonMax
+
+);
+
+
+
+if(cell){
+
+cell.state=0;
+
+cell.items.push(item);
+
+}
+
+});
+
+
+updateGrid();
+updateSpatialCoverage();
+createGridSearch();
+createBlueMarble();
+
+}
+
+
+
+
+// ===============================
+// UPDATE SPATIAL COVERAGE contador janus 
+// ===============================
+
+function updateSpatialCoverage(){
+
+    const discoveredCells=observationGrid.filter(
+        cell=>cell.state===0
+    ).length;
+
+    const totalCells=observationGrid.length;
+
+    const coveragePercentage=totalCells>0
+        ? (discoveredCells/totalCells)*100
+        : 0;
+
+    const totalObservations=observationGrid.reduce(
+        (total,cell)=>total+cell.items.length,
+        0
+    );
+
+    const discoveredElement=document.getElementById("spatialCoverageCells");
+    const percentageElement=document.getElementById("spatialCoveragePercentage");
+    const observationsElement=document.getElementById("spatialCoverageObservations");
+
+    if(discoveredElement){
+        discoveredElement.textContent=`${discoveredCells} / ${totalCells}`;
+    }
+
+    if(percentageElement){
+        percentageElement.textContent=`${coveragePercentage.toFixed(1)}%`;
+    }
+
+    if(observationsElement){
+        observationsElement.textContent=
+            totalObservations.toLocaleString();
+    }
+
+    const container=document.getElementById("spatialCoverage");
+
+    if(container){
+        container.style.display="block";
+    }
+
+}
+
+
+
+function clearGridSearch(){
+    document
+        .querySelectorAll(".dataCell.searchMatch")
+        .forEach(div => {
+            div.classList.remove("searchMatch");
+        });
+
+    observationGrid.forEach(cell => {
+        cell.searchMatch = false;
+    });
+}
+
+
+
+   
+function createBlueMarble(){
+    const grid = document.getElementById("dataGrid");
+    if(!grid){
+        console.warn("Blue Marble: dataGrid not found");
+        return;
+    }
+
+    let marble = document.getElementById("blueMarble");
+
+    if(!marble){
+        marble = document.createElement("img");
+        marble.id = "blueMarble";
+        marble.src = "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
+        marble.alt = "";
+        grid.insertBefore(marble, grid.firstChild);
+    }
+}
+
+
+   
+// ===============================
+// SEARCH LAT LON
+// ===============================
+
+function createGridSearch(){
+const box=document.getElementById("queryBox");
+const div=document.createElement("div");
+div.innerHTML=`
+
+<div style="margin-top:15px">
+
+Lat:
+
+<input id="gridLat" value="0">
+
+Lon:
+
+<input id="gridLon" value="0">
+
+<button onclick="searchGrid()">
+
+SEARCH POSITION
+
+</button>
+
+</div>
+
+`;
+
+box.appendChild(div);
+
+}
+
+
+
+
+// ===============================
+// SEARCH LAT LON
+// ===============================
+
+function searchGrid(){
+    const lat =
+        Number(document.getElementById("gridLat").value);
+    const lon =
+        Number(document.getElementById("gridLon").value);
+
+
+    // ===============================
+    // LIMPIAR BÚSQUEDA ANTERIOR
+    // ===============================
+
+    observationGrid.forEach(cell => {
+        cell.searchMatch = false;
+    });
+
+
+    // ===============================
+    // BUSCAR CELDA
+    // ===============================
+
+    const targetCell = observationGrid.find(cell =>
+        lat >= cell.latMin &&
+        lat < cell.latMax &&
+        lon >= cell.lonMin &&
+        lon < cell.lonMax
+
+    );
+
+    // ===============================
+    // MARCAR CELDA
+    // ===============================
+
+    if(targetCell){
+        targetCell.searchMatch = true;
+        console.log(
+            "Grid position:",
+            targetCell.latMin,
+            targetCell.latMax,
+            targetCell.lonMin,
+            targetCell.lonMax
+        );
+    }
+
+    updateGrid();
+
+
+    // ===============================
+    // APLICAR HIGHLIGHT VISUAL
+    // ===============================
+
+    const cells =
+        document.querySelectorAll(".dataCell");
+
+    cells.forEach((div, index) => {
+        div.classList.remove("searchMatch");
+
+    });
+
+    if(targetCell){
+        const div = cells[targetCell.id];
+        if(div){
+            div.classList.add("searchMatch");
+
+        }
+
+    }
+
+}
+
+
+// ===============================
+// UPDATE VISUAL STATES
+// ===============================
+
+function updateGrid(){
+const cells=document.querySelectorAll(".dataCell");
+cells.forEach((div,index)=>{
+const cell=observationGrid[index];
+const label=`<div style="font-size:9px;opacity:.6;">${cell.id}</div><div>${cell.items.length}</div>`;
+   
+if(cell.discovered){
+div.style.background="#ff66cc";
+div.innerHTML=label;
+return;
+
+}
+
+if(cell.state===-1){
+div.style.background="#222";
+div.textContent="";
+return;
+
+}
+
+if(cell.state===0){
+div.style.background="#16803c";
+div.innerHTML=label;
+return;
+
+}
+
+if(cell.state===1){
+div.style.background="#ff8c00";
+div.innerHTML=label;
+return;
+
+}
+
+});
+
+}
+
+
+
+
+   // ===============================
+// SHOW CELL DATA generico
+// ===============================
+
+function showCellData(cell){
+
+const dataset={
+CELL_INFO:{
+id:cell.id,
+latRange:`${cell.latMin} / ${cell.latMax}`,
+lonRange:`${cell.lonMin} / ${cell.lonMax}`,
+state:cell.state,
+observations:cell.items.length
+},
+OBSERVATIONS:cell.items
+};
+
+document.getElementById("raw").textContent=
+JSON.stringify(dataset,null,2);
+
+renderDataset(dataset);
+
+   
+
+
+   
+// ===============================
+// EXPLORE SPACE fase 2 de observacion espacial
+// ===============================
+
+const observations=
+document.getElementById("observations");
+
+if(!observations)
+return;
+
+const oldButton=
+document.getElementById("exploreCellButton");
+
+if(oldButton)
+oldButton.remove();
+
+if(cell.state===0 && cell.items.length>0){
+
+const button=document.createElement("button");
+
+button.id="exploreCellButton";
+button.textContent="EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background="rgba(102,204,255,.08)";
+button.style.border="1px solid rgba(102,204,255,.35)";
+button.style.borderRadius="6px";
+button.style.color="#66ccff";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+exploreCell(cell);
+};
+
+observations.insertBefore(
+button,
+observations.firstChild
+);
+
+}
+
+}
+
+
+// ===============================
+// EXPLORE CELL
+// ===============================
+
+async function exploreCell(cell){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+container.innerHTML=`
+
+<h3 style="color:#66ccff;margin-bottom:8px">
+SPACE EXPLORATION · CELL ${cell.id}
+</h3>
+
+<div style="font-size:11px;color:#999;margin-bottom:12px">
+LAT ${cell.latMin.toFixed(6)} → ${cell.latMax.toFixed(6)}
+<br>
+LON ${cell.lonMin.toFixed(6)} → ${cell.lonMax.toFixed(6)}
+</div>
+
+<div style="color:#ffb04d">
+QUERYING STAC...
+</div>
+
+`;
+
+try{
+
+let referenceDate=
+activeDataset.endDate;
+
+
+// =================================
+// SI NO HAY FECHA FINAL
+// =================================
+
+if(!referenceDate){
+
+const latestURL=
+`${activeDataset.items}?limit=1&sortby=-datetime`;
+
+const latestRes=
+await fetch(latestURL);
+
+if(!latestRes.ok){
+
+throw new Error(
+`STAC HTTP ${latestRes.status}`
+);
+
+}
+
+const latestJSON=
+await latestRes.json();
+
+if(
+!latestJSON.features||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+referenceDate=
+latestJSON.features[0]
+.properties
+.datetime;
+
+}
+
+
+// =================================
+// CONSULTA ESPACIAL INICIAL
+// =================================
+
+const url=
+`${activeDataset.items}?limit=1000`+
+`&datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${cell.lonMin},${cell.latMin},`+
+`${cell.lonMax},${cell.latMax}`;
+
+console.log(
+"==================================="
+);
+
+console.log(
+"SPACE EXPLORATION START"
+);
+
+console.log(
+"PARENT CELL:",
+cell.id
+);
+
+console.log(
+"BBOX:",
+cell.lonMin,
+cell.latMin,
+cell.lonMax,
+cell.latMax
+);
+
+console.log(
+"INITIAL LIMIT:",
+2000
+);
+
+console.log(
+"SPACE QUERY:",
+url
+);
+
+let json=null;
+let nextPage=null;
+
+
+// =================================
+// INTENTO NORMAL — 2000
+// =================================
+
+try{
+
+const res=
+await fetch(url);
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+json=
+await res.json();
+
+nextPage=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||null;
+
+console.log(
+"SPACE QUERY SUCCESS:",
+json.features?.length||0
+);
+
+}
+
+
+// =================================
+// FALLBACK — PAGINACIÓN
+// =================================
+
+catch(error){
+
+if(error.message!=="Failed to fetch"){
+
+throw error;
+
+}
+
+console.log(
+"SPACE QUERY FAILED — USING PAGINATION"
+);
+
+container.querySelector(
+"div[style*='color:#ffb04d']"
+).textContent=
+"SPATIAL QUERY UNAVAILABLE · READING PAGINATED DATA...";
+
+const features=[];
+let pageURL=
+`${activeDataset.items}`+
+`?datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${cell.lonMin},${cell.latMin},`+
+`${cell.lonMax},${cell.latMax}`;
+
+let numberMatched=0;
+let pages=0;
+
+while(
+pageURL&&
+features.length<1000
+){
+
+pages++;
+
+console.log(
+"SPACE PAGE:",
+pages
+);
+
+console.log(
+"SPACE PAGE URL:",
+pageURL
+);
+
+const pageRes=
+await fetch(pageURL);
+
+if(!pageRes.ok){
+
+throw new Error(
+`STAC HTTP ${pageRes.status}`
+);
+
+}
+
+const page=
+await pageRes.json();
+
+if(
+!page.features||
+!Array.isArray(page.features)
+){
+
+throw new Error(
+"Items endpoint did not return FeatureCollection"
+);
+
+}
+
+features.push(
+...page.features
+);
+
+numberMatched=
+page.numberMatched||
+page.context?.matched||
+numberMatched;
+
+console.log(
+"SPACE ITEMS ACCUMULATED:",
+features.length
+);
+
+container.querySelector(
+"div[style*='color:#ffb04d']"
+).textContent=
+`READING PAGINATED DATA · ${features.length.toLocaleString()} OBSERVATIONS`;
+
+pageURL=
+page.links?.find(
+l=>l.rel==="next"
+)?.href||null;
+
+}
+
+json={
+
+type:"FeatureCollection",
+
+features:features,
+
+numberMatched:numberMatched,
+
+numberReturned:features.length
+
+};
+
+nextPage=
+pageURL;
+
+console.log(
+"PAGINATED SPACE ITEMS:",
+json.features.length
+);
+
+}
+
+
+// =================================
+// RESULTADO ESPACIAL
+// =================================
+
+const received=
+json.features?.length||0;
+
+const matched=
+json.numberMatched??"unknown";
+
+console.log(
+"SPACE RESULT"
+);
+
+console.log(
+"MATCHED:",
+matched
+);
+
+console.log(
+"RECEIVED:",
+received
+);
+
+console.log(
+"NEXT PAGE:",
+nextPage
+);
+
+
+// =================================
+// SIN RESULTADOS
+// =================================
+
+if(
+!json.features||
+json.features.length===0
+){
+
+container.innerHTML=`
+
+<h3 style="color:#66ccff">
+SPACE EXPLORATION · CELL ${cell.id}
+</h3>
+
+<div style="color:#ff7777">
+No products found in this spatial area.
+</div>
+
+`;
+
+return;
+
+}
+
+
+// =================================
+// GUARDAR HISTORIAL
+// =================================
+
+// si hemos vuelto atrás y exploramos
+// desde ese punto, eliminamos FORWARD
+
+if(
+explorationIndex<
+explorationHistory.length-1
+){
+
+explorationHistory=
+explorationHistory.slice(
+0,
+explorationIndex+1
+);
+
+}
+
+
+// =================================
+// CREAR NUEVA EXPLORACIÓN
+// =================================
+
+const exploration=
+createExplorationGrid(
+json.features,
+cell,
+nextPage
+);
+
+
+// =================================
+// GUARDAR EXPLORACIÓN
+// =================================
+
+explorationHistory.push(
+exploration
+);
+
+explorationIndex=
+explorationHistory.length-1;
+
+
+// =================================
+// MOSTRAR RESULTADO
+// =================================
+
+renderSavedExploration(
+exploration
+);
+
+renderExplorationNavigation();
+
+console.log(
+"INITIAL LOCAL GRID CREATED"
+);
+
+console.log(
+"OBSERVATIONS:",
+received
+);
+
+console.log(
+"NEXT PAGE AVAILABLE:",
+!!nextPage
+);
+
+console.log(
+"==================================="
+);
+
+document.getElementById("status").textContent=
+`Space exploration ready · ${received.toLocaleString()} observations`;
+
+}catch(error){
+
+console.error(
+"SPACE EXPLORATION ERROR:",
+error
+);
+
+container.innerHTML+=`
+
+<div style="color:#ff7777;margin-top:10px">
+Spatial query error: ${error.message}
+</div>
+
+`;
+
+}
+
+}
+
+
+
+
+// ===============================
+// CREATE EXPLORATION GRID
+// ===============================
+
+function createExplorationGrid(
+items,
+parentCell,
+nextPage
+){
+
+const container=
+document.getElementById(
+"explorationContainer"
+);
+
+if(!container)
+return null;
+
+container.innerHTML="";
+
+
+const title=
+document.createElement("h3");
+
+title.style.color="#66ccff";
+title.style.marginBottom="12px";
+
+title.textContent=
+`SPATIAL DATA · CELL ${parentCell.id}`;
+
+container.appendChild(title);
+
+
+// =================================
+// RE-EXPLORE BUTTON
+// =================================
+
+const button=
+document.createElement("button");
+
+button.id=
+"reExploreSpaceButton";
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background=
+"rgba(255,176,77,.08)";
+button.style.border=
+"1px solid rgba(255,176,77,.35)";
+button.style.borderRadius="6px";
+button.style.color="#ffb04d";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+
+reExploreSpace(
+explorationHistory[
+explorationIndex
+]
+);
+
+};
+
+container.appendChild(button);
+
+
+// =================================
+// GRID
+// =================================
+
+const grid=
+document.createElement("div");
+
+grid.id=
+"explorationGrid";
+
+grid.style.display="grid";
+grid.style.gridTemplateColumns=
+"repeat(18,1fr)";
+grid.style.aspectRatio="1/1";
+grid.style.width="100%";
+grid.style.gap="2px";
+
+container.appendChild(grid);
+   
+const rows=18;
+const cols=18;
+
+const latStep=
+(parentCell.latMax-parentCell.latMin)/
+rows;
+
+const lonStep=
+(parentCell.lonMax-parentCell.lonMin)/
+cols;
+
+
+const cells=[];
+
+
+// =================================
+// CREAR CELDAS
+// =================================
+
+for(let y=0;y<rows;y++){
+
+for(let x=0;x<cols;x++){
+
+const geographicY=rows-1-y;
+
+const cell={
+
+id:y*cols+x,
+
+x,
+y,
+
+state:-1,
+
+latMin:
+parentCell.latMin+
+geographicY*latStep,
+
+latMax:
+parentCell.latMin+
+(geographicY+1)*latStep,
+
+lonMin:
+parentCell.lonMin+
+x*lonStep,
+
+lonMax:
+parentCell.lonMin+
+(x+1)*lonStep,
+
+items:[]
+
+};
+
+cells.push(cell);
+
+const div=
+document.createElement("div");
+
+div.className=
+"dataCell";
+
+div.onclick=()=>{
+
+clearGridSearch();
+
+showCellData(cell);
+
+};
+
+grid.appendChild(div);
+
+}
+
+}
+
+
+// =================================
+// DISTRIBUIR ITEMS INICIALES
+// =================================
+
+appendExplorationSpatialData(
+items,
+{
+grid:cells
+}
+);
+
+
+// =================================
+// ACTUALIZAR VISUAL
+// =================================
+
+updateExplorationGridVisual(
+cells,
+grid
+);
+
+
+// =================================
+// DEVOLVER ESTADO
+// =================================
+
+return{
+
+parentCell:parentCell,
+
+grid:cells,
+
+items:items,
+
+bbox:{
+
+latMin:
+parentCell.latMin,
+
+latMax:
+parentCell.latMax,
+
+lonMin:
+parentCell.lonMin,
+
+lonMax:
+parentCell.lonMax
+
+},
+
+nextPage:nextPage
+
+};
+
+}
+
+
+// ===============================
+// UPDATE EXPLORATION GRID VISUAL
+// ===============================
+function updateExplorationGridVisual(cells,grid){
+    if(!grid)return;
+    const cellDivs=grid.querySelectorAll(".dataCell");
+    cells.forEach((cell,index)=>{
+        const div=cellDivs[index];
+        if(!div)return;
+        div.style.border="1px solid rgba(255,255,255,.25)";
+        div.style.boxSizing="border-box";
+        div.style.background=cell.state===0?(cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)"):"transparent";
+        div.style.color="#000";
+        div.innerHTML=`
+<div style="font-size:9px;color:#000;font-weight:bold;line-height:1">
+${cell.id}
+</div>
+<div style="font-size:11px;color:#000;font-weight:bold;line-height:1.2">
+${cell.items.length}
+</div>
+`;
+    });
+}
+
+// ===============================
+// RE-EXPLORE SPACE
+// ===============================
+
+async function reExploreSpace(
+exploration
+){
+
+if(!exploration)
+return;
+
+
+const grid=
+exploration.grid;
+
+
+// =================================
+// COMPROBAR REFERENCIAS
+// =================================
+
+const seeds=
+grid.filter(
+c=>c.state===0
+);
+
+
+if(seeds.length===0){
+
+console.log(
+"LOCAL REDISCOVERY:"
+);
+
+console.log(
+"No reference cells in exploration."
+);
+
+document.getElementById(
+"status"
+).textContent=
+"No reference cells.";
+
+return;
+
+}
+
+
+// =================================
+// CREAR BBOX SI NO EXISTE
+// =================================
+
+if(!exploration.bbox){
+
+exploration.bbox={
+
+latMin:
+exploration.parentCell.latMin,
+
+latMax:
+exploration.parentCell.latMax,
+
+lonMin:
+exploration.parentCell.lonMin,
+
+lonMax:
+exploration.parentCell.lonMax
+
+};
+
+}
+
+
+// =================================
+// BOTÓN
+// =================================
+
+const button=
+document.getElementById(
+"reExploreSpaceButton"
+);
+
+if(button){
+
+button.disabled=true;
+
+button.textContent=
+"RE-EXPLORING SPACE...";
+
+}
+
+
+// =================================
+// CONTADORES
+// =================================
+
+let pages=0;
+
+let receivedTotal=0;
+
+let newObservations=0;
+
+let updatedCells=0;
+
+let newCells=0;
+
+
+// =================================
+// ESTADO ANTERIOR
+// =================================
+
+const initialCounts=
+new Map();
+
+grid.forEach(cell=>{
+
+initialCounts.set(
+cell.id,
+cell.items.length
+);
+
+});
+
+
+// =================================
+// PRIMERA NUEVA BÚSQUEDA
+// =================================
+
+// IMPORTANTE:
+//
+// RE-EXPLORE NO DEPENDE DE QUE
+// EL EXPLORE INICIAL TUVIESE NEXT.
+//
+// Si no tenemos cursor,
+// hacemos una nueva consulta sobre
+// el mismo BBOX.
+//
+// Si ya tenemos cursor,
+// continuamos desde él.
+//
+
+let pageURL=
+exploration.rediscoveryNextPage||
+null;
+
+
+// =================================
+// FECHA
+// =================================
+
+let referenceDate=
+activeDataset.endDate;
+
+
+try{
+
+if(!referenceDate){
+
+const latestURL=
+`${activeDataset.items}?limit=1&sortby=-datetime`;
+
+const latestRes=
+await fetch(latestURL);
+
+if(!latestRes.ok){
+
+throw new Error(
+`STAC HTTP ${latestRes.status}`
+);
+
+}
+
+const latestJSON=
+await latestRes.json();
+
+if(
+!latestJSON.features||
+latestJSON.features.length===0
+){
+
+throw new Error(
+"No latest observation"
+);
+
+}
+
+referenceDate=
+latestJSON.features[0]
+.properties
+.datetime;
+
+}
+
+
+// =================================
+// NUEVA CONSULTA SI NO TENEMOS CURSOR
+// =================================
+
+if(!pageURL){
+
+const bbox=
+exploration.bbox;
+
+pageURL=
+`${activeDataset.items}?limit=1000`+
+`&datetime=../${encodeURIComponent(referenceDate)}`+
+`&bbox=`+
+`${bbox.lonMin},${bbox.latMin},`+
+`${bbox.lonMax},${bbox.latMax}`;
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY NEW SEARCH"
+);
+
+console.log(
+"BBOX:",
+bbox.lonMin,
+bbox.latMin,
+bbox.lonMax,
+bbox.latMax
+);
+
+console.log(
+"LIMIT:",
+1500
+);
+
+console.log(
+"QUERY:",
+pageURL
+);
+
+}else{
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY CONTINUE"
+);
+
+console.log(
+"NEXT PAGE:",
+pageURL
+);
+
+}
+
+
+// =================================
+// CONSUMIR PÁGINAS
+// =================================
+
+while(pageURL){
+
+pages++;
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · PAGE ${pages} · querying...`;
+
+console.log(
+"-----------------------------------"
+);
+
+console.log(
+"LOCAL REDISCOVERY PAGE:",
+pages
+);
+
+console.log(
+"URL:",
+pageURL
+);
+
+
+const res=
+await fetch(pageURL);
+
+if(!res.ok){
+
+throw new Error(
+`STAC HTTP ${res.status}`
+);
+
+}
+
+
+const json=
+await res.json();
+
+
+const pageItems=
+json.features||[];
+
+const pageReceived=
+pageItems.length;
+
+const pageMatched=
+json.numberMatched??
+"unknown";
+
+
+const next=
+json.links?.find(
+l=>l.rel==="next"
+)?.href||
+null;
+
+
+console.log(
+"PAGE MATCHED:",
+pageMatched
+);
+
+console.log(
+"PAGE RECEIVED:",
+pageReceived
+);
+
+console.log(
+"PAGE NEXT:",
+next
+);
+
+
+// =================================
+// GUARDAR ITEMS ANTES
+// =================================
+
+const beforeCounts=
+new Map();
+
+grid.forEach(cell=>{
+
+beforeCounts.set(
+cell.id,
+cell.items.length
+);
+
+});
+
+
+// =================================
+// DISTRIBUIR PÁGINA COMPLETA
+// =================================
+
+appendExplorationSpatialData(
+pageItems,
+exploration
+);
+
+
+// =================================
+// MEDIR CAMBIOS
+// =================================
+
+let pageNewObservations=0;
+
+let pageUpdatedCells=0;
+
+let pageNewCells=0;
+
+
+grid.forEach(cell=>{
+
+const before=
+beforeCounts.get(
+cell.id
+)||0;
+
+const after=
+cell.items.length;
+
+const added=
+after-before;
+
+
+if(added>0){
+
+pageNewObservations+=
+added;
+
+pageUpdatedCells++;
+
+if(before===0){
+
+pageNewCells++;
+
+}
+
+}
+
+});
+
+
+// =================================
+// ACUMULAR
+// =================================
+
+receivedTotal+=
+pageReceived;
+
+newObservations+=
+pageNewObservations;
+
+updatedCells+=
+pageUpdatedCells;
+
+newCells+=
+pageNewCells;
+
+
+// =================================
+// GUARDAR CURSOR
+// =================================
+
+exploration.rediscoveryNextPage=
+next;
+
+
+// =================================
+// ACTUALIZAR VISUAL
+// =================================
+
+const visualGrid=
+document.getElementById(
+"explorationGrid"
+);
+
+updateExplorationGridVisual(
+grid,
+visualGrid
+);
+
+renderExplorationNavigation();
+
+
+// =================================
+// LOG
+// =================================
+
+console.log(
+"PAGE NEW OBSERVATIONS:",
+pageNewObservations
+);
+
+console.log(
+"PAGE UPDATED CELLS:",
+pageUpdatedCells
+);
+
+console.log(
+"PAGE NEW CELLS:",
+pageNewCells
+);
+
+console.log(
+"PAGE REMAINING:",
+!!next
+);
+
+
+// =================================
+// STATUS
+// =================================
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · PAGE ${pages} · ${pageReceived.toLocaleString()} received · +${pageNewObservations.toLocaleString()} observations`;
+
+
+// =================================
+// SIGUIENTE
+// =================================
+
+pageURL=
+next;
+
+}
+
+
+// =================================
+// RESULTADO FINAL
+// =================================
+
+let finalObservations=0;
+
+grid.forEach(cell=>{
+
+finalObservations+=
+cell.items.length;
+
+});
+
+
+console.log(
+"==================================="
+);
+
+console.log(
+"LOCAL REDISCOVERY FINISHED"
+);
+
+console.log(
+"PAGES:",
+pages
+);
+
+console.log(
+"RECEIVED TOTAL:",
+receivedTotal
+);
+
+console.log(
+"NEW OBSERVATIONS:",
+newObservations
+);
+
+console.log(
+"UPDATED CELLS:",
+updatedCells
+);
+
+console.log(
+"NEW CELLS:",
+newCells
+);
+
+console.log(
+"FINAL OBSERVATIONS IN GRID:",
+finalObservations
+);
+
+console.log(
+"NEXT PAGE:",
+exploration.rediscoveryNextPage
+);
+
+console.log(
+"==================================="
+);
+
+
+// =================================
+// ESTADO DEL BOTÓN
+// =================================
+
+if(button){
+
+if(
+exploration.rediscoveryNextPage
+){
+
+button.disabled=false;
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
+}else{
+
+button.disabled=true;
+
+button.textContent=
+"NO MORE DATA";
+
+}
+
+}
+
+
+// =================================
+// STATUS FINAL
+// =================================
+
+if(
+exploration.rediscoveryNextPage
+){
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery · +${newObservations.toLocaleString()} observations · +${newCells} cells · ${pages} pages · MORE DATA AVAILABLE`;
+
+}else{
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery complete · +${newObservations.toLocaleString()} observations · +${newCells} cells · ${pages} pages`;
+
+}
+
+
+}catch(e){
+
+console.error(
+"LOCAL REDISCOVERY ERROR:",
+e
+);
+
+document.getElementById(
+"status"
+).textContent=
+`Local rediscovery error: ${e.message}`;
+
+if(button){
+
+button.disabled=false;
+
+button.textContent=
+"RE-EXPLORE SPACE";
+
+}
+
+}
+
+}
+
+
+// ===============================
+// GET EXPLORATION NEIGHBOURS
+// ===============================
+
+function getExplorationNeighbours(
+cell,
+grid
+){
+
+const result=[];
+
+const dirs=[
+
+[-1,-1],[0,-1],[1,-1],
+
+[-1,0],[1,0],
+
+[-1,1],[0,1],[1,1]
+
+];
+
+
+dirs.forEach(d=>{
+
+const x=
+cell.x+d[0];
+
+const y=
+cell.y+d[1];
+
+
+const neighbour=
+grid.find(c=>
+c.x===x&&
+c.y===y
+);
+
+
+if(neighbour)
+result.push(neighbour);
+
+});
+
+
+return result;
+
+}
+
+
+// ===============================
+// APPEND EXPLORATION SPATIAL DATA
+// ===============================
+
+function appendExplorationSpatialData(
+items,
+exploration
+){
+
+const grid=
+exploration.grid;
+
+
+items.forEach(item=>{
+
+let coords=null;
+
+const geom=
+item.geometry;
+
+
+// =================================
+// POINT
+// =================================
+
+if(
+geom&&
+geom.type==="Point"
+){
+
+coords=
+geom.coordinates;
+
+}
+
+
+// =================================
+// LAT / LON
+// =================================
+
+if(
+!coords&&
+item.properties&&
+item.properties.latitude!==undefined&&
+item.properties.longitude!==undefined
+){
+
+coords=[
+
+item.properties.longitude,
+item.properties.latitude
+
+];
+
+}
+
+
+// =================================
+// LAT / LON ALTERNATIVOS
+// =================================
+
+if(
+!coords&&
+item.properties&&
+item.properties.lat!==undefined&&
+item.properties.lon!==undefined
+){
+
+coords=[
+
+item.properties.lon,
+item.properties.lat
+
+];
+
+}
+
+
+// =================================
+// BBOX
+// =================================
+
+if(
+!coords&&
+item.bbox
+){
+
+coords=[
+
+(item.bbox[0]+item.bbox[2])/2,
+
+(item.bbox[1]+item.bbox[3])/2
+
+];
+
+}
+
+
+// =================================
+// POLYGON
+// =================================
+
+if(
+!coords&&
+geom&&
+geom.type==="Polygon"
+){
+
+const ring=
+geom.coordinates[0];
+
+let lon=0;
+let lat=0;
+
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+
+coords=[
+
+lon/ring.length,
+lat/ring.length
+
+];
+
+}
+
+
+// =================================
+// MULTIPOLYGON
+// =================================
+
+if(
+!coords&&
+geom&&
+geom.type==="MultiPolygon"
+){
+
+const ring=
+geom.coordinates[0][0];
+
+let lon=0;
+let lat=0;
+
+
+ring.forEach(c=>{
+
+lon+=c[0];
+lat+=c[1];
+
+});
+
+
+coords=[
+
+lon/ring.length,
+lat/ring.length
+
+];
+
+}
+
+
+if(!coords)
+return;
+
+
+const lon=
+coords[0];
+
+const lat=
+coords[1];
+
+
+// =================================
+// BUSCAR CELDA LOCAL
+// =================================
+
+const cell=
+grid.find(c=>
+
+lat>=c.latMin&&
+lat<c.latMax&&
+
+lon>=c.lonMin&&
+lon<c.lonMax
+
+);
+
+
+if(!cell)
+return;
+
+
+// =================================
+// EVITAR DUPLICADOS
+// =================================
+
+const exists=
+cell.items.some(
+x=>x.id===item.id
+);
+
+
+if(exists)
+return;
+
+
+// =================================
+// INSERTAR OBSERVACIÓN
+// =================================
+
+const wasEmpty=
+cell.items.length===0;
+
+
+cell.items.push(item);
+
+cell.state=0;
+
+
+// =================================
+// MARCAR NUEVA COBERTURA
+// =================================
+
+if(wasEmpty){
+
+cell.discovered=true;
+
+}
+
+});
+
+}
+
+   // ===============================
+// EXPLORATION NAVIGATION adelante y atras en el estado
+// ===============================
+
+function renderExplorationNavigation(){
+
+const container=
+document.getElementById("explorationContainer");
+
+if(!container)
+return;
+
+
+const old=
+document.getElementById(
+"explorationNavigation"
+);
+
+if(old)
+old.remove();
+
+
+const nav=
+document.createElement("div");
+
+nav.id=
+"explorationNavigation";
+
+nav.style.display="flex";
+nav.style.gap="8px";
+nav.style.marginBottom="12px";
+
+
+const back=
+document.createElement("button");
+
+back.textContent="← BACK";
+
+back.disabled=
+explorationIndex<=0;
+
+back.onclick=()=>{
+goBackExploration();
+};
+
+
+const forward=
+document.createElement("button");
+
+forward.textContent="FORWARD →";
+
+forward.disabled=
+explorationIndex>=
+explorationHistory.length-1;
+
+forward.onclick=()=>{
+goForwardExploration();
+};
+
+
+nav.appendChild(back);
+nav.appendChild(forward);
+
+
+container.insertBefore(
+nav,
+container.firstChild
+);
+
+}
+
+
+
+
+
+   
+
+   // ===============================
+// BACK
+// ===============================
+
+function goBackExploration(){
+
+if(explorationIndex<=0)
+return;
+
+explorationIndex--;
+
+renderSavedExploration(
+explorationHistory[
+explorationIndex
+]
+);
+
+renderExplorationNavigation();
+
+}
+
+   // ===============================
+// FORWARD
+// ===============================
+
+function goForwardExploration(){
+
+if(
+explorationIndex>=
+explorationHistory.length-1
+)
+return;
+
+explorationIndex++;
+
+renderSavedExploration(
+explorationHistory[
+explorationIndex
+]
+);
+
+renderExplorationNavigation();
+
+}
+
+
+   
+   // ===============================
+// RESTORE SAVED EXPLORATION
+// ===============================
+
+function renderSavedExploration(exploration){
+const container=document.getElementById("explorationContainer");
+if(!container)return;
+container.innerHTML="";
+
+const title=document.createElement("h3");
+title.style.color="#66ccff";
+title.style.marginBottom="12px";
+title.textContent=`SPATIAL DATA · CELL ${exploration.parentCell.id}`;
+container.appendChild(title);
+
+// =================================
+// RE-EXPLORE SPACE
+// =================================
+
+const button=document.createElement("button");
+
+button.id="reExploreSpaceButton";
+button.textContent="RE-EXPLORE SPACE";
+
+button.style.marginBottom="15px";
+button.style.width="100%";
+button.style.padding="10px";
+button.style.background="rgba(255,176,77,.08)";
+button.style.border="1px solid rgba(255,176,77,.35)";
+button.style.borderRadius="6px";
+button.style.color="#ffb04d";
+button.style.cursor="pointer";
+button.style.fontSize="11px";
+
+button.onclick=()=>{
+reExploreSpace(exploration);
+};
+
+container.appendChild(button);
+
+// =================================
+// CREAR GRID VISUAL
+// =================================
+
+const grid=document.createElement("div");
+grid.id="explorationGrid";
+grid.style.display="grid";
+grid.style.gridTemplateColumns="repeat(18,1fr)";
+grid.style.aspectRatio="1/1";
+grid.style.width="100%";
+grid.style.gap="2px";
+
+container.appendChild(grid);
+
+createExplorationBlueMarble(grid,exploration.parentCell);
+
+// =================================
+// RESTAURAR CELDAS
+// =================================
+
+exploration.grid.forEach(cell=>{
+
+const div=document.createElement("div");
+
+div.className="dataCell";
+
+div.onclick=()=>{
+clearGridSearch();
+showCellData(cell);
+};
+
+if(cell.state===0){
+    div.style.background=cell.discovered?"rgba(255,79,163,.45)":"rgba(22,128,60,.45)";
+}else{
+    div.style.background="transparent";
+}
+
+div.style.border="1px solid rgba(255,255,255,.25)";
+div.style.boxSizing="border-box";
+div.style.color="#000";
+
+div.innerHTML=`
+<div style="font-size:9px;color:#000;font-weight:bold;line-height:1">
+${cell.id}
+</div>
+<div style="font-size:11px;color:#000;font-weight:bold;line-height:1.2">
+${cell.items.length}
+</div>
+`;
+
+grid.appendChild(div);
+
+});
+
+}
+
+
+
+
+
+
+
+
+   
+function createExplorationBlueMarble(grid,parentCell){
+    if(!grid||!parentCell)return;
+
+    grid.style.position="relative";
+    grid.style.overflow="hidden";
+
+    // ==========================================
+    // DETECTAR CUERPO DESDE LA CELDA
+    // ==========================================
+
+    const cellText=
+        JSON.stringify(parentCell).toLowerCase();
+
+    const isMoon=
+        cellText.includes("moon")||
+        cellText.includes("luna");
+
+    const isMars=
+        cellText.includes("mars")||
+        cellText.includes("marte");
+
+    const body=
+        isMoon
+        ?"moon"
+        :
+        isMars
+        ?"mars"
+        :
+        "earth";
+
+    console.log(
+        "EXPLORATION BODY:",
+        body
+    );
+
+    // ==========================================
+    // LUNA / MARTE
+    // ==========================================
+
+    if(body==="moon"||body==="mars"){
+
+        const marble=document.createElement("img");
+
+        marble.className="explorationBlueMarble";
+        marble.alt="";
+
+        marble.style.position="absolute";
+        marble.style.pointerEvents="none";
+        marble.style.zIndex="0";
+        marble.style.imageRendering="auto";
+        marble.style.maxWidth="none";
+        marble.style.maxHeight="none";
+
+        const textureURL=
+            body==="moon"
+            ?
+            "https://3d.staratlas.es/Moonmap_from_clementine_data.png"
+            :
+            "https://astrogeology.usgs.gov/ckan/dataset/7131d503-cdc9-45a5-8f83-5126c0fd397e/resource/6afad901-1caa-48a7-8b62-3911da0004c2/download/mars_viking_mdim21_clrmosaic_global_1024.jpg";
+
+        marble.onload=()=>{
+
+            const gridWidth=
+                grid.clientWidth;
+
+            const gridHeight=
+                grid.clientHeight;
+
+            const latMin=
+                Number(parentCell.latMin);
+
+            const latMax=
+                Number(parentCell.latMax);
+
+            const lonMin=
+                Number(parentCell.lonMin);
+
+            const lonMax=
+                Number(parentCell.lonMax);
+
+            if(
+                !gridWidth||
+                !gridHeight||
+                !marble.naturalWidth||
+                !marble.naturalHeight||
+                ![
+                    latMin,
+                    latMax,
+                    lonMin,
+                    lonMax
+                ].every(Number.isFinite)
+            ){
+                console.warn(
+                    "PLANET MAP: invalid geometry"
+                );
+                return;
+            }
+
+            // ==========================================
+            // MAPA GLOBAL EQUIRECTANGULAR
+            //
+            // X: -180 ... +180
+            // Y: +90  ... -90
+            // ==========================================
+
+            const imageWidth=
+                marble.naturalWidth;
+
+            const imageHeight=
+                marble.naturalHeight;
+
+            const cellWidth=
+                Math.max(
+                    0.0001,
+                    lonMax-lonMin
+                );
+
+            const cellHeight=
+                Math.max(
+                    0.0001,
+                    latMax-latMin
+                );
+
+            // ==========================================
+            // PIXELES QUE CORRESPONDEN A LA CELDA
+            // ==========================================
+
+            const sourceX=
+                ((lonMin+180)/360)*
+                imageWidth;
+
+            const sourceY=
+                ((90-latMax)/180)*
+                imageHeight;
+
+            const sourceWidth=
+                (cellWidth/360)*
+                imageWidth;
+
+            const sourceHeight=
+                (cellHeight/180)*
+                imageHeight;
+
+            // ==========================================
+            // ESCALA PARA QUE LA CELDA LLENE EL GRID
+            // ==========================================
+
+            const scaleX=
+                gridWidth/sourceWidth;
+
+            const scaleY=
+                gridHeight/sourceHeight;
+
+            const scale=
+                Math.max(
+                    scaleX,
+                    scaleY
+                );
+
+            const renderedWidth=
+                imageWidth*scale;
+
+            const renderedHeight=
+                imageHeight*scale;
+
+            // ==========================================
+            // POSICIÓN DEL RECORTE
+            // ==========================================
+
+            marble.style.width=
+                renderedWidth+"px";
+
+            marble.style.height=
+                renderedHeight+"px";
+
+            marble.style.left=
+                (-sourceX*scale)+"px";
+
+            marble.style.top=
+                (-sourceY*scale)+"px";
+
+            console.log(
+                body.toUpperCase()+" MAP:",
+                {
+                    latMin,
+                    latMax,
+                    lonMin,
+                    lonMax,
+                    sourceX,
+                    sourceY,
+                    sourceWidth,
+                    sourceHeight,
+                    scale
+                }
+            );
+
+        };
+
+        marble.onerror=()=>{
+            console.error(
+                body.toUpperCase()+
+                " MAP: texture unavailable"
+            );
+        };
+
+        marble.src=textureURL;
+
+        grid.insertBefore(
+            marble,
+            grid.firstChild
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // TIERRA — NOAA ACTUAL
+    // ==========================================
+
+    const getDateUTC=offset=>{
+        const d=new Date();
+        d.setUTCDate(d.getUTCDate()+offset);
+        return d.toISOString().split("T")[0];
+    };
+
+    const createURL=date=>{
+
+        const bbox=[
+            parentCell.latMin,
+            parentCell.lonMin,
+            parentCell.latMax,
+            parentCell.lonMax
+        ].join(",");
+
+        const latCenter=
+            (parentCell.latMin+
+             parentCell.latMax)/2;
+
+        const latKm=
+            (parentCell.latMax-
+             parentCell.latMin)*111.32;
+
+        const lonKm=
+            (parentCell.lonMax-
+             parentCell.lonMin)*
+            111.32*
+            Math.cos(
+                latCenter*Math.PI/180
+            );
+
+        const areaKm=
+            Math.max(
+                latKm,
+                lonKm
+            );
+
+        // =================================
+        // ESCALA DEL GRID 18 × 18
+        // =================================
+
+        const gridCellKm=
+            areaKm/18;
+
+        // =================================
+        // RESOLUCIÓN VISUAL
+        // =================================
+
+        const pixelsPerCell=32;
+
+        let resolution=
+            18*pixelsPerCell;
+
+        resolution=
+            Math.min(
+                resolution,
+                8200
+            );
+
+        // =================================
+        // ESCALA RESULTANTE
+        // =================================
+
+        const pixelSizeKm=
+            areaKm/resolution;
+
+        const pixelsPerGridCell=
+            gridCellKm/pixelSizeKm;
+
+        console.log(
+            "NASA MAP SCALE:",
+            {
+                bboxKm:areaKm.toFixed(3),
+                gridCellKm:gridCellKm.toFixed(4),
+                resolution,
+                pixelSizeKm:
+                    pixelSizeKm.toFixed(4),
+                pixelsPerGridCell:
+                    pixelsPerGridCell.toFixed(2)
+            }
+        );
+
+        return "https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
+        "?REQUEST=GetSnapshot"+
+        "&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
+        "&CRS=EPSG:4326"+
+        `&TIME=${date}`+
+        "&WRAP=DAY,X"+
+        `&BBOX=${bbox}`+
+        "&FORMAT=image/jpeg"+
+        `&WIDTH=${resolution}`+
+        `&HEIGHT=${resolution}`+
+        "&AUTOSCALE=TRUE";
+    };
+
+    const today=
+        getDateUTC(0);
+
+    const yesterday=
+        getDateUTC(-1);
+
+    const marble=
+        document.createElement("img");
+
+    marble.className=
+        "explorationBlueMarble";
+
+    marble.alt="";
+
+    marble.style.position=
+        "absolute";
+
+    marble.style.left="0";
+    marble.style.top="0";
+    marble.style.width="100%";
+    marble.style.height="100%";
+    marble.style.pointerEvents="none";
+    marble.style.zIndex="0";
+    marble.style.imageRendering="auto";
+
+    let usingDate=today;
+
+    marble.onerror=()=>{
+
+        if(usingDate===today){
+
+            usingDate=yesterday;
+
+            console.log(
+                "NASA SNAPSHOT: today unavailable, trying previous day:",
+                yesterday
+            );
+
+            marble.src=
+                createURL(yesterday);
+
+        }else{
+
+            console.error(
+                "NASA SNAPSHOT: today and previous day unavailable"
+            );
+
+        }
+
+    };
+
+    marble.onload=()=>{
+
+        console.log(
+            "NASA SNAPSHOT LOADED:",
+            usingDate
+        );
+
+    };
+
+    marble.src=
+        createURL(today);
+
+    console.log(
+        "NASA SNAPSHOT TODAY:",
+        createURL(today)
+    );
+
+    grid.insertBefore(
+        marble,
+        grid.firstChild
+    );
+}
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+   
+// ===============================
+// ADD ROW
+// ===============================
+
+function add(container,key,value){
+   
+if(value===undefined)
+return;
+const r=document.createElement("div");
+
+r.className="row";
+
+r.innerHTML=`
+
+<div class="key">${key}</div>
+<div class="value">${value}</div>
+
+`;
+
+container.appendChild(r);
+
+}
+
+
+
+// ===================================
+// REDISCOVER MAP fase 1
+// ===================================
+
+async function expandObservationMap(){
+    const seeds =
+    observationGrid.filter(c=>c.state===0);
+
+    if(seeds.length===0){
+        console.log("No reference cells.");
+        return;
+    }
+
+    if(!activeDataset.nextPage){
+        console.log(
+            "No more catalog pages."
+        );
+
+        document.getElementById("status").textContent =
+        "No more data pages.";
+
+        return;
+
+    }
+
+
+    document.getElementById("status").textContent =
+    "Expanding observation map...";
+
+    const discovered =
+    await discoverNeighbourCells();
+
+    updateGrid();
+   updateSpatialCoverage();
+
+    console.log(
+        "NEW CELLS:",
+        discovered
+    );
+
+
+    document.getElementById("status").textContent =
+    `Expansion complete. ${discovered} new cells`;
+
+}
+
+
+
+
+// ===================================
+// DISCOVER NEIGHBOUR CELLS
+// ===================================
+
+async function discoverNeighbourCells(){
+    const visited=new Set();
+    const queue=[];
+
+    observationGrid.forEach(cell=>{
+        if(cell.state===0){
+            queue.push(cell);
+            visited.add(cell.id);
+        }
+
+
+    });
+
+
+
+    let discovered=0;
+    while(queue.length){
+
+        const cell =
+        queue.shift();
+        const neighbours =
+        getNeighbours(cell);
+
+        for(const n of neighbours){
+            if(visited.has(n.id))
+                continue;
+
+            visited.add(n.id);
+
+            if(n.state!==-1)
+                continue;
+
+            const found =
+            await inspectCell(n);
+
+            if(found){
+
+                discovered++;
+                queue.push(n);
+
+            }
+
+            updateGrid();
+
+        }
+
+    }
+
+    return discovered;
+
+}
+
+
+
+
+// ===================================
+// GET NEIGHBOURS
+// ===================================
+
+function getNeighbours(cell){
+    const result=[];
+
+    const dirs=[
+
+        [-1,-1],[0,-1],[1,-1],
+
+        [-1,0],[1,0],
+
+        [-1,1],[0,1],[1,1]
+
+    ];
+
+    dirs.forEach(d=>{
+
+        const x = cell.x+d[0];
+
+        const y = cell.y+d[1];
+
+        const neighbour =
+        observationGrid.find(c=>
+            c.x===x &&
+            c.y===y
+        );
+
+        if(neighbour)
+            result.push(neighbour);
+
+    });
+
+    return result;
+
+}
+
+
+
+// ===================================
+// INSPECT NEXT CATALOG PAGE
+// ===================================
+
+async function inspectCell(cell){
+
+
+    if(!activeDataset.nextPage)
+        return false;
+
+    try{ console.log(
+            "READING NEXT PAGE:",
+            activeDataset.nextPage
+        );
+
+
+        const res =
+        await fetch(activeDataset.nextPage);
+
+        const json =
+        await res.json();
+
+
+        // guardar siguiente página
+
+        activeDataset.nextPage =
+        json.links?.find(
+            l=>l.rel==="next"
+        )?.href || null;
+
+        if(
+            !json.features ||
+            json.features.length===0
+        ){
+
+            return false;
+
+        }
+
+        const before =
+        cell.items.length;
+
+        appendSpatialData(
+            json.features
+        );
+
+
+        return (
+            cell.items.length > before
+        );
+
+
+    }
+
+
+    catch(e){
+        console.log(
+            "PAGE ERROR",
+            e
+        );
+
+        return false;
+
+    }
+
+
+}
+
+  // ===================================
+// APPEND SPATIAL DATA
+// ===================================
+
+function appendSpatialData(items){
+
+    items.forEach(item=>{
+        let coords=null;
+
+
+        if(
+            item.geometry &&
+            item.geometry.type==="Point"
+        ){
+            coords =
+            item.geometry.coordinates;
+
+        }
+
+        if(
+            !coords &&
+            item.bbox
+        ){
+            coords=[
+
+                (item.bbox[0]+item.bbox[2])/2,
+                (item.bbox[1]+item.bbox[3])/2
+
+            ];
+        }
+
+
+
+        if(!coords) return;
+
+        const lon = coords[0];
+
+        const lat = coords[1];
+
+        const cell =
+        observationGrid.find(c=>
+
+            lat>=c.latMin &&
+            lat<c.latMax &&
+
+            lon>=c.lonMin &&
+            lon<c.lonMax
+
+
+        );
+
+
+
+        if(cell){
+
+            const exists =
+            cell.items.some(
+                x=>x.id===item.id
+            );
+
+
+            if(!exists){
+
+                // comprobar si era una celda vacía
+
+                const wasEmpty =
+                cell.items.length===0;
+                cell.items.push(item);
+                cell.state=0;
+
+
+                // nueva cobertura descubierta
+
+                if(wasEmpty){
+                    cell.discovered=true;
+                }
+
+            }
+
+        }
+
+    });
+
+
+}
+  
+</script>
+
+  <script>
+
+function loadJanusDataset(json){
+    if(!json) return;
+    renderDataset(json);
+}
+
+
+// ==========================================
+// RENDER DATASET
+// ==========================================
+
+function renderDataset(json){
+
+const info=json.CELL_INFO||{};
+const observations=json.OBSERVATIONS||[];
+
+
+    updateOpeFromCell(json);
+
+
+// ==========================================
+// UPDATE CESIUM FROM CELL
+// ==========================================
+
+const latParts=
+String(info.latRange||"").split("/");
+
+const lonParts=
+String(info.lonRange||"").split("/");
+
+if(
+latParts.length===2 &&
+lonParts.length===2
+){
+
+const lat1=
+Number(latParts[0].trim());
+
+const lat2=
+Number(latParts[1].trim());
+
+const lon1=
+Number(lonParts[0].trim());
+
+const lon2=
+Number(lonParts[1].trim());
+
+if(
+Number.isFinite(lat1) &&
+Number.isFinite(lat2) &&
+Number.isFinite(lon1) &&
+Number.isFinite(lon2)
+){
+
+updateJanusContextCell(
+lat1,
+lat2,
+lon1,
+lon2
+);
+
+}
+
+}
+
+   
+
+
+document.getElementById("janusStatus").textContent=
+"Dataset Loaded";
+
+document.getElementById("count").textContent=
+observations.length;
+
+document.getElementById("cellId").textContent=
+info.id||"-";
+
+document.getElementById("latRange").textContent=
+info.latRange||"-";
+
+document.getElementById("lonRange").textContent=
+info.lonRange||"-";
+
+document.getElementById("cellState").textContent=
+info.state??"-";
+
+
+
+const totalAssets=
+observations.reduce((t,o)=>{
+
+return t+Object.keys(o.assets||{}).length;
+
+},0);
+
+
+document.getElementById("assetCount").textContent=
+totalAssets;
+
+
+const container=
+document.getElementById("observations");
+
+container.innerHTML="";
+
+
+observations.forEach((obs,index)=>{
+
+const assets=
+Object.keys(obs.assets||{}).length;
+
+
+
+const card=
+document.createElement("div");
+
+card.className="card";
+
+
+
+card.innerHTML=`
+
+<h2>Observation ${index+1}</h2>
+
+<div class="row">
+<div class="label">ID</div>
+<div class="value">${obs.id||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Collection</div>
+<div class="value">${obs.collection||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Datetime</div>
+<div class="value">${obs.properties?.datetime||"-"}</div>
+</div>
+
+<div class="row">
+<div class="label">Assets</div>
+<div class="value">${assets}</div>
+</div>
+
+<div id="assets${index}"></div>
+
+<button onclick="toggleRaw(${index})">
+RAW JSON
+</button>
+
+<pre id="raw${index}" style="display:none"></pre>
+
+`;
+
+container.appendChild(card);
+
+document.getElementById("raw"+index).textContent=
+JSON.stringify(obs,null,2);
+
+renderAssets(obs,index);
+
+});
+
+}
+
+
+
+
+
+async function renderCOGAsset(asset,obs,div){
+
+    const href=
+        String(asset?.href||"").trim();
+
+    if(!href)
+        return;
+
+
+    let url=href;
+
+    const options={};
+
+
+    if(href.startsWith("s3://")){
+
+        const parts=
+            href.slice(5).split("/");
+
+        const bucket=
+            parts.shift();
+
+        const key=
+            parts.join("/");
+
+        if(!bucket || !key)
+            return;
+
+
+        const region=
+            obs?.properties?.["storage:region"] ||
+            "us-east-1";
+
+
+        url=
+            "https://" +
+            bucket +
+            ".s3." +
+            region +
+            ".amazonaws.com/" +
+            key
+                .split("/")
+                .map(encodeURIComponent)
+                .join("/");
+
+
+        if(
+            obs?.properties?.["storage:requester_pays"] === true
+        ){
+
+            options.headers={
+                "x-amz-request-payer":
+                    "requester"
+            };
+
+        }
+
+    }
+
+
+    if(
+        typeof GeoTIFF==="undefined" ||
+        typeof GeoTIFF.fromUrl!=="function"
+    ){
+
+        console.warn(
+            "GeoTIFF library not available"
+        );
+
+        return;
+    }
+
+
+    try{
+
+     console.log("COG TYPE:", asset.type);
+console.log("COG ORIGINAL HREF:", href);
+console.log("COG FETCH URL:", url);
+
+const tiff=
+    await GeoTIFF.fromUrl(
+        url,
+        options
+    );
+
+       
+        const image=
+            await tiff.getImage();
+
+
+        const width=
+            image.getWidth();
+
+        const height=
+            image.getHeight();
+
+
+        const maxSize=600;
+
+        const scale=
+            Math.min(
+                1,
+                maxSize/
+                Math.max(width,height)
+            );
+
+
+        const outWidth=
+            Math.max(
+                1,
+                Math.round(width*scale)
+            );
+
+        const outHeight=
+            Math.max(
+                1,
+                Math.round(height*scale)
+            );
+
+
+        const rgb=
+            await image.readRGB({
+
+                width:outWidth,
+                height:outHeight,
+                resampleMethod:"bilinear"
+
+            });
+
+
+        const canvas=
+            document.createElement("canvas");
+
+        canvas.className="assetPreview";
+
+        canvas.width=outWidth;
+        canvas.height=outHeight;
+
+
+        const ctx=
+            canvas.getContext("2d");
+
+        const imageData=
+            ctx.createImageData(
+                outWidth,
+                outHeight
+            );
+
+
+        for(
+            let i=0,j=0;
+            i<rgb.length;
+            i+=3,j+=4
+        ){
+
+            imageData.data[j]=rgb[i];
+            imageData.data[j+1]=rgb[i+1];
+            imageData.data[j+2]=rgb[i+2];
+            imageData.data[j+3]=255;
+
+        }
+
+
+        ctx.putImageData(
+            imageData,
+            0,
+            0
+        );
+
+
+        canvas.onclick=()=>{
+
+            window.open(
+                url,
+                "_blank"
+            );
+
+        };
+
+
+        div.appendChild(canvas);
+
+
+    }catch(error){
+
+        console.warn(
+            "COG render failed:",
+            error
+        );
+
+    }
+
+}
+
+
+
+
+
+
+
+
+// ==========================================
+// RENDER ASSETS
+// ==========================================
+
+function renderAssets(obs,index){
+
+const box=
+document.getElementById("assets"+index);
+
+if(!obs.assets)
+return;
+
+
+Object.entries(obs.assets).forEach(([name,asset])=>{
+
+const div=
+document.createElement("div");
+
+div.className="asset";
+
+const type=asset.type||"Unknown";
+
+let html=`
+
+<div class="assetHeader">
+<div>
+
+<div class="assetName">${name}</div>
+<div class="assetType">${type}</div>
+
+</div>
+
+<a href="${asset.href}" target="_blank">
+Open
+</a>
+
+</div>
+
+`;
+
+
+if(
+/^image\/(jpeg|jpg|png|webp|gif|svg\+xml)/i.test(type)
+){
+
+html+=`
+
+<img
+class="assetPreview"
+src="${asset.href}"
+loading="lazy"
+onclick="window.open('${asset.href}','_blank')"
+onerror="this.style.display='none';"
+>
+
+`;
+
+}
+
+
+div.innerHTML=html;
+box.appendChild(div);
+
+   
+
+   if(
+    String(asset?.type||"")
+        .toLowerCase()
+        .includes("image/tiff")
+){
+
+    renderCOGAsset(
+        asset,
+        obs,
+        div
+    );
+
+}
+
+});
+
+
+// ==========================================
+// EXPLOIT BUTTON
+// ==========================================
+
+const exploitable=
+!!obs.geometry ||
+!!obs.bbox ||
+Object.values(obs.assets||{}).some(asset=>
+/^image\//i.test(asset.type||"") ||
+/wms|wmts/i.test(asset.href||"") ||
+(asset.roles||[]).some(role=>
+/wms|wmts|thumbnail|overview|visual/i.test(role)
+)
+) ||
+(obs.links||[]).some(link=>
+/wms|wmts|thumbnail|preview|overview/i.test(
+link.rel||""
+)
+);
+
+if(exploitable){
+
+const exploitButton=
+document.createElement("button");
+
+exploitButton.className="exploitButton";
+exploitButton.textContent="EXPLOIT";
+
+exploitButton.onclick=()=>{
+
+exploitObservation(obs);
+
+};
+
+box.appendChild(exploitButton);
+
+}
+
+}
+
+
+// ==========================================
+// EXPLOIT OBSERVATION
+// ==========================================
+
+function exploitObservation(obs){
+
+updateJanusContextFromObservation(obs);
+
+const container=
+document.getElementById("itemExploitation");
+
+if(!container)
+return;
+
+
+container.innerHTML="";
+
+
+const exploitation=
+document.createElement("div");
+
+exploitation.className=
+"exploitationContainer";
+
+exploitation.innerHTML=`
+
+<div class="exploitationHeader">
+
+<div class="exploitationTitle">
+ITEM EXPLOITATION
+</div>
+
+<div class="exploitationInfo">
+${obs.id||"Observation"}
+</div>
+
+</div>
+
+<div class="exploitationControls">
+
+<button type="button" data-action="zoomIn">
++
+</button>
+
+<button type="button" data-action="zoomOut">
+−
+</button>
+
+<button type="button" data-action="reset">
+RESET
+</button>
+
+<span class="exploitationCoordinates">
+Lon: — | Lat: —
+</span>
+
+</div>
+
+<div class="exploitationMap">
+
+<svg
+class="exploitationMapSvg"
+viewBox="0 0 1000 600"
+preserveAspectRatio="none"
+>
+
+<g class="exploitationBaseLayer"></g>
+
+<g class="exploitationImageLayer"></g>
+
+<g class="exploitationGridLayer"></g>
+
+<g class="exploitationBBoxLayer"></g>
+
+<g class="exploitationFootprintLayer"></g>
+
+</svg>
+
+<div class="exploitationMapMessage">
+Loading...
+</div>
+
+</div>
+
+<div class="exploitationData"></div>
+
+`;
+
+container.appendChild(exploitation);
+
+
+// ==========================================
+// EXTENT
+// ==========================================
+
+const extent=
+getObservationExtent(obs);
+
+   updateJanusContextFromObservation(obs);
+
+
+// ==========================================
+// ELEMENTS
+// ==========================================
+
+const map=
+exploitation.querySelector(
+".exploitationMapSvg"
+);
+
+const baseLayer=
+exploitation.querySelector(
+".exploitationBaseLayer"
+);
+
+const imageLayer=
+exploitation.querySelector(
+".exploitationImageLayer"
+);
+
+const gridLayer=
+exploitation.querySelector(
+".exploitationGridLayer"
+);
+
+const bboxLayer=
+exploitation.querySelector(
+".exploitationBBoxLayer"
+);
+
+const footprintLayer=
+exploitation.querySelector(
+".exploitationFootprintLayer"
+);
+
+const message=
+exploitation.querySelector(
+".exploitationMapMessage"
+);
+
+const coordinates=
+exploitation.querySelector(
+".exploitationCoordinates"
+);
+
+const data=
+exploitation.querySelector(
+".exploitationData"
+);
+
+
+// ==========================================
+// MAP STATE
+// ==========================================
+
+const state={
+
+zoom:1,
+panX:0,
+panY:0,
+
+dragging:false,
+startX:0,
+startY:0,
+startPanX:0,
+startPanY:0
+
+};
+
+
+// ==========================================
+// VISUAL-ONLY MODE
+// ==========================================
+
+if(!extent){
+
+message.textContent=
+"Visual resource available — no geographic extent";
+
+
+const thumbnail=
+findObservationThumbnail(obs);
+
+const image=
+findObservationImage(obs);
+
+
+const visual=
+thumbnail||image;
+
+
+if(visual){
+
+addVisualImage(
+imageLayer,
+visual,
+()=>{
+
+message.textContent=
+"Visual resource loaded";
+
+}
+);
+
+}else{
+
+message.textContent=
+"No geographic extent or visual resource available.";
+
+}
+
+
+setupMapInteraction(
+map,
+exploitation,
+state,
+null,
+coordinates
+);
+
+renderExploitationData(
+data,
+obs,
+null
+);
+
+return;
+
+}
+
+
+// ==========================================
+// GEOGRAPHIC RANGE
+// ==========================================
+
+const lonMin=
+extent[0];
+
+const latMin=
+extent[1];
+
+const lonMax=
+extent[2];
+
+const latMax=
+extent[3];
+
+const lonRange=
+Math.max(
+lonMax-lonMin,
+0.000001
+);
+
+const latRange=
+Math.max(
+latMax-latMin,
+0.000001
+);
+
+
+// ==========================================
+// PROJECT
+// ==========================================
+
+function project(lon,lat){
+
+return{
+
+x:
+((lon-lonMin)/lonRange)*1000,
+
+y:
+600-
+((lat-latMin)/latRange)*600
+
+};
+
+}
+
+
+// ==========================================
+// TRANSFORM
+// ==========================================
+
+function applyMapTransform(){
+
+const transform=
+`translate(${state.panX} ${state.panY}) scale(${state.zoom})`;
+
+baseLayer.setAttribute(
+"transform",
+transform
+);
+
+imageLayer.setAttribute(
+"transform",
+transform
+);
+
+gridLayer.setAttribute(
+"transform",
+transform
+);
+
+bboxLayer.setAttribute(
+"transform",
+transform
+);
+
+footprintLayer.setAttribute(
+"transform",
+transform
+);
+
+}
+
+
+// ==========================================
+// BASE MAP
+// ==========================================
+
+const baseImage=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+baseImage.setAttribute(
+"x",
+"0"
+);
+
+baseImage.setAttribute(
+"y",
+"0"
+);
+
+baseImage.setAttribute(
+"width",
+"1000"
+);
+
+baseImage.setAttribute(
+"height",
+"600"
+);
+
+baseImage.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+baseImage.classList.add(
+"exploitationBaseImage"
+);
+
+
+const baseUrl=
+"https://wvs.earthdata.nasa.gov/api/v1/snapshot"+
+"?REQUEST=GetSnapshot"+
+"&LAYERS=MODIS_Terra_CorrectedReflectance_TrueColor,Reference_Features_15m"+
+"&CRS=EPSG:4326"+
+"&TIME="+
+encodeURIComponent(
+obs.properties?.datetime||
+new Date().toISOString().slice(0,10)
+)+
+"&WRAP=DAY,X"+
+"&BBOX="+
+extent.join(",")+
+"&FORMAT=image/jpeg"+
+"&WIDTH=1000"+
+"&HEIGHT=600"+
+"&AUTOSCALE=TRUE";
+
+
+baseImage.setAttribute(
+"href",
+baseUrl
+);
+
+baseImage.onload=()=>{
+
+message.textContent=
+"Base map loaded";
+
+};
+
+baseImage.onerror=()=>{
+
+message.textContent=
+"Base map unavailable";
+
+};
+
+baseLayer.appendChild(
+baseImage
+);
+
+
+// ==========================================
+// GRID
+// ==========================================
+
+function getGridStep(range){
+
+if(range>120)
+return 20;
+
+if(range>60)
+return 10;
+
+if(range>30)
+return 5;
+
+if(range>10)
+return 2;
+
+if(range>5)
+return 1;
+
+if(range>2)
+return 0.5;
+
+if(range>1)
+return 0.2;
+
+if(range>0.5)
+return 0.1;
+
+return 0.05;
+
+}
+
+
+function formatCoordinate(value,longitude){
+
+const suffix=
+longitude
+?value>=0?"E":"W"
+:value>=0?"N":"S";
+
+return(
+Math.abs(value).toFixed(2)+
+"°"+
+suffix
+);
+
+}
+
+
+const lonStep=
+getGridStep(lonRange);
+
+const latStep=
+getGridStep(latRange);
+
+
+let lonStart=
+Math.ceil(lonMin/lonStep)*lonStep;
+
+for(
+let lon=lonStart;
+lon<=lonMax;
+lon+=lonStep
+){
+
+const p1=
+project(lon,latMin);
+
+const p2=
+project(lon,latMax);
+
+const line=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"line"
+);
+
+line.setAttribute(
+"x1",
+p1.x
+);
+
+line.setAttribute(
+"y1",
+p1.y
+);
+
+line.setAttribute(
+"x2",
+p2.x
+);
+
+line.setAttribute(
+"y2",
+p2.y
+);
+
+line.classList.add(
+"exploitationGrid"
+);
+
+gridLayer.appendChild(line);
+
+
+const label=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"text"
+);
+
+label.setAttribute(
+"x",
+p1.x+5
+);
+
+label.setAttribute(
+"y",
+20
+);
+
+label.classList.add(
+"exploitationGridLabel"
+);
+
+label.textContent=
+formatCoordinate(lon,true);
+
+gridLayer.appendChild(label);
+
+}
+
+
+let latStart=
+Math.ceil(latMin/latStep)*latStep;
+
+for(
+let lat=latStart;
+lat<=latMax;
+lat+=latStep
+){
+
+const p1=
+project(lonMin,lat);
+
+const p2=
+project(lonMax,lat);
+
+const line=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"line"
+);
+
+line.setAttribute(
+"x1",
+p1.x
+);
+
+line.setAttribute(
+"y1",
+p1.y
+);
+
+line.setAttribute(
+"x2",
+p2.x
+);
+
+line.setAttribute(
+"y2",
+p2.y
+);
+
+line.classList.add(
+"exploitationGrid"
+);
+
+gridLayer.appendChild(line);
+
+
+const label=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"text"
+);
+
+label.setAttribute(
+"x",
+"8"
+);
+
+label.setAttribute(
+"y",
+p1.y-6
+);
+
+label.classList.add(
+"exploitationGridLabel"
+);
+
+label.textContent=
+formatCoordinate(lat,false);
+
+gridLayer.appendChild(label);
+
+}
+
+
+// ==========================================
+// BBOX
+// ==========================================
+
+const bboxRect=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"rect"
+);
+
+bboxRect.setAttribute(
+"x",
+"0"
+);
+
+bboxRect.setAttribute(
+"y",
+"0"
+);
+
+bboxRect.setAttribute(
+"width",
+"1000"
+);
+
+bboxRect.setAttribute(
+"height",
+"600"
+);
+
+bboxRect.classList.add(
+"exploitationBBox"
+);
+
+bboxLayer.appendChild(
+bboxRect
+);
+
+
+// ==========================================
+// FOOTPRINT
+// ==========================================
+
+drawObservationGeometry(
+footprintLayer,
+obs,
+project
+);
+
+
+// ==========================================
+// CONTENT RESOLUTION
+// ==========================================
+
+resolveObservationContent(
+obs,
+extent,
+imageLayer,
+message
+);
+
+
+// ==========================================
+// CONTROLS
+// ==========================================
+
+exploitation
+.querySelector(
+'[data-action="zoomIn"]'
+)
+.onclick=()=>{
+
+state.zoom=
+Math.min(
+state.zoom*1.4,
+8
+);
+
+applyMapTransform();
+
+};
+
+
+exploitation
+.querySelector(
+'[data-action="zoomOut"]'
+)
+.onclick=()=>{
+
+state.zoom=
+Math.max(
+state.zoom/1.4,
+1
+);
+
+if(state.zoom===1){
+
+state.panX=0;
+state.panY=0;
+
+}
+
+applyMapTransform();
+
+};
+
+
+exploitation
+.querySelector(
+'[data-action="reset"]'
+)
+.onclick=()=>{
+
+state.zoom=1;
+state.panX=0;
+state.panY=0;
+
+applyMapTransform();
+
+};
+
+
+// ==========================================
+// WHEEL ZOOM
+// ==========================================
+
+map.addEventListener(
+"wheel",
+event=>{
+
+event.preventDefault();
+
+const oldZoom=
+state.zoom;
+
+state.zoom=
+event.deltaY<0
+?Math.min(
+state.zoom*1.2,
+8
+)
+:Math.max(
+state.zoom/1.2,
+1
+);
+
+if(oldZoom!==state.zoom){
+
+const rect=
+map.getBoundingClientRect();
+
+const x=
+((event.clientX-rect.left)/
+rect.width)*1000;
+
+const y=
+((event.clientY-rect.top)/
+rect.height)*600;
+
+state.panX=
+x-
+(x-state.panX)*
+(state.zoom/oldZoom);
+
+state.panY=
+y-
+(y-state.panY)*
+(state.zoom/oldZoom);
+
+applyMapTransform();
+
+}
+
+},
+{passive:false}
+);
+
+
+// ==========================================
+// DRAG
+// ==========================================
+
+map.addEventListener(
+"mousedown",
+event=>{
+
+state.dragging=true;
+
+state.startX=
+event.clientX;
+
+state.startY=
+event.clientY;
+
+state.startPanX=
+state.panX;
+
+state.startPanY=
+state.panY;
+
+map.classList.add(
+"dragging"
+);
+
+}
+);
+
+
+const stopDrag=()=>{
+
+state.dragging=false;
+
+map.classList.remove(
+"dragging"
+);
+
+};
+
+
+window.addEventListener(
+"mouseup",
+stopDrag
+);
+
+
+window.addEventListener(
+"mousemove",
+event=>{
+
+if(!state.dragging)
+return;
+
+const rect=
+map.getBoundingClientRect();
+
+const dx=
+((event.clientX-state.startX)/
+rect.width)*1000;
+
+const dy=
+((event.clientY-state.startY)/
+rect.height)*600;
+
+state.panX=
+state.startPanX+dx;
+
+state.panY=
+state.startPanY+dy;
+
+applyMapTransform();
+
+}
+);
+
+
+// ==========================================
+// CURSOR COORDINATES
+// ==========================================
+
+map.addEventListener(
+"mousemove",
+event=>{
+
+const rect=
+map.getBoundingClientRect();
+
+const sx=
+((event.clientX-rect.left)/
+rect.width)*1000;
+
+const sy=
+((event.clientY-rect.top)/
+rect.height)*600;
+
+const x=
+(sx-state.panX)/state.zoom;
+
+const y=
+(sy-state.panY)/state.zoom;
+
+const lon=
+lonMin+
+(x/1000)*lonRange;
+
+const lat=
+latMin+
+((600-y)/600)*latRange;
+
+coordinates.textContent=
+`Lon: ${lon.toFixed(5)} | Lat: ${lat.toFixed(5)}`;
+
+}
+);
+
+
+// ==========================================
+// DATA
+// ==========================================
+
+renderExploitationData(
+data,
+obs,
+extent
+);
+
+applyMapTransform();
+
+}
+
+
+// ==========================================
+// RESOLVE OBSERVATION CONTENT
+// ==========================================
+
+function resolveObservationContent(
+obs,
+extent,
+imageLayer,
+message
+){
+
+const wms=
+findObservationWMS(obs);
+
+
+if(wms){
+
+const wmsUrl=
+buildObservationWMS(
+wms,
+extent,
+obs
+);
+
+if(wmsUrl){
+
+const wmsImage=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+wmsImage.setAttribute(
+"x",
+"0"
+);
+
+wmsImage.setAttribute(
+"y",
+"0"
+);
+
+wmsImage.setAttribute(
+"width",
+"1000"
+);
+
+wmsImage.setAttribute(
+"height",
+"600"
+);
+
+wmsImage.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+wmsImage.setAttribute(
+"href",
+wmsUrl
+);
+
+wmsImage.classList.add(
+"exploitationWMSImage"
+);
+
+wmsImage.onload=()=>{
+
+message.textContent=
+"WMS loaded";
+
+};
+
+wmsImage.onerror=()=>{
+
+wmsImage.remove();
+
+resolveObservationVisualFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+};
+
+imageLayer.appendChild(
+wmsImage
+);
+
+return;
+
+}
+
+}
+
+
+resolveObservationVisualFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+}
+
+
+// ==========================================
+// VISUAL FALLBACK
+// ==========================================
+
+function resolveObservationVisualFallback(
+obs,
+extent,
+imageLayer,
+message
+){
+
+const image=
+findObservationImage(obs);
+
+if(image){
+
+addGeographicImage(
+imageLayer,
+image,
+()=>{
+
+message.textContent=
+"Image loaded";
+
+},
+()=>{
+
+resolveObservationThumbnailFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+}
+);
+
+return;
+
+}
+
+
+resolveObservationThumbnailFallback(
+obs,
+extent,
+imageLayer,
+message
+);
+
+}
+
+
+// ==========================================
+// THUMBNAIL FALLBACK
+// ==========================================
+
+function resolveObservationThumbnailFallback(
+obs,
+extent,
+imageLayer,
+message
+){
+
+const thumbnail=
+findObservationThumbnail(obs);
+
+if(!thumbnail){
+
+message.textContent=
+"Footprint loaded — no visual resource available";
+
+return;
+
+}
+
+
+addGeographicImage(
+imageLayer,
+thumbnail,
+()=>{
+
+message.textContent=
+"Thumbnail loaded";
+
+},
+()=>{
+
+message.textContent=
+"Footprint loaded — thumbnail unavailable";
+
+}
+);
+
+}
+
+
+// ==========================================
+// FIND IMAGE
+// ==========================================
+
+function findObservationImage(obs){
+
+const assets=
+Object.values(
+obs.assets||{}
+);
+
+
+return assets.find(
+asset=>{
+
+const type=
+(asset.type||"").toLowerCase();
+
+const href=
+(asset.href||"").toLowerCase();
+
+if(
+!/^https?:\/\//i.test(
+asset.href||""
+)
+)
+return false;
+
+
+if(
+!/^image\/(jpeg|jpg|png|webp|gif|svg\+xml)/i.test(type)
+)
+return false;
+
+
+if(
+/thumbnail|preview|overview/i.test(
+asset.roles?.join(" ")||""
+)
+)
+return false;
+
+
+if(
+/thumbnail|preview|overview/i.test(
+asset.title||""
+)
+)
+return false;
+
+
+if(
+/\.tif(f)?(\?|$)/i.test(href)
+)
+return false;
+
+
+return true;
+
+}
+);
+
+}
+
+
+// ==========================================
+// FIND THUMBNAIL
+// ==========================================
+
+function findObservationThumbnail(obs){
+
+const links=
+obs.links||[];
+
+
+const thumbnailLink=
+links.find(
+link=>{
+
+const rel=
+(link.rel||"").toLowerCase();
+
+return(
+rel==="thumbnail" ||
+rel==="preview" ||
+rel==="overview"
+);
+
+}
+);
+
+if(
+thumbnailLink?.href
+){
+
+return{
+href:thumbnailLink.href,
+type:thumbnailLink.type||"image/jpeg",
+title:thumbnailLink.title||"Thumbnail"
+};
+
+}
+
+
+const assets=
+Object.values(
+obs.assets||{}
+);
+
+
+const thumbnailAsset=
+assets.find(
+asset=>{
+
+const roles=
+(asset.roles||[])
+.join(" ")
+.toLowerCase();
+
+const title=
+(asset.title||"").toLowerCase();
+
+const type=
+(asset.type||"").toLowerCase();
+
+return(
+roles.includes("thumbnail") ||
+roles.includes("overview") ||
+roles.includes("visual") ||
+title.includes("thumbnail") ||
+title.includes("preview") ||
+title.includes("overview")
+) &&
+/^https?:\/\//i.test(
+asset.href||""
+) &&
+(
+type.startsWith("image/") ||
+/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(
+asset.href||""
+)
+);
+
+}
+);
+
+if(
+thumbnailAsset
+)
+return thumbnailAsset;
+
+
+return null;
+
+}
+
+
+// ==========================================
+// ADD GEOGRAPHIC IMAGE
+// ==========================================
+
+function addGeographicImage(
+layer,
+resource,
+onload,
+onerror
+){
+
+if(
+!resource||
+!resource.href
+)
+return;
+
+
+const image=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+image.setAttribute(
+"x",
+"0"
+);
+
+image.setAttribute(
+"y",
+"0"
+);
+
+image.setAttribute(
+"width",
+"1000"
+);
+
+image.setAttribute(
+"height",
+"600"
+);
+
+image.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+image.setAttribute(
+"href",
+resource.href
+);
+
+image.classList.add(
+"exploitationContentImage"
+);
+
+image.onload=()=>{
+
+if(onload)
+onload();
+
+};
+
+image.onerror=()=>{
+
+image.remove();
+
+if(onerror)
+onerror();
+
+};
+
+layer.appendChild(
+image
+);
+
+}
+
+
+// ==========================================
+// ADD VISUAL IMAGE
+// ==========================================
+
+function addVisualImage(
+layer,
+resource,
+onload
+){
+
+if(
+!resource||
+!resource.href
+)
+return;
+
+
+const image=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"image"
+);
+
+image.setAttribute(
+"x",
+"0"
+);
+
+image.setAttribute(
+"y",
+"0"
+);
+
+image.setAttribute(
+"width",
+"1000"
+);
+
+image.setAttribute(
+"height",
+"600"
+);
+
+image.setAttribute(
+"preserveAspectRatio",
+"none"
+);
+
+image.setAttribute(
+"href",
+resource.href
+);
+
+image.classList.add(
+"exploitationVisualImage"
+);
+
+image.onload=()=>{
+
+if(onload)
+onload();
+
+};
+
+image.onerror=()=>{
+
+image.remove();
+
+};
+
+layer.appendChild(
+image
+);
+
+}
+
+
+// ==========================================
+// FIND 3D RESOURCES
+// ==========================================
+
+function findObservation3D(obs){
+
+const resources=[
+...Object.values(obs.assets||{}),
+...(obs.links||[])
+];
+
+const found=[];
+
+resources.forEach(resource=>{
+
+const href=
+(resource.href||"").toLowerCase();
+
+const type=
+(resource.type||"").toLowerCase();
+
+const roles=
+(resource.roles||[])
+.join(" ")
+.toLowerCase();
+
+const title=
+(resource.title||"").toLowerCase();
+
+
+// ==========================================
+// GLB
+// ==========================================
+
+if(
+/\.glb(\?|$)/i.test(href) ||
+type==="model/gltf-binary"
+){
+
+if(!found.some(item=>item.type==="GLB"))
+found.push({
+type:"GLB",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// GLTF
+// ==========================================
+
+if(
+/\.gltf(\?|$)/i.test(href) ||
+type==="model/gltf+json"
+){
+
+if(!found.some(item=>item.type==="GLTF"))
+found.push({
+type:"GLTF",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// 3D TILES
+// ==========================================
+
+if(
+/3dtiles/i.test(href) ||
+/3dtiles/i.test(type) ||
+/3d\s*tiles/i.test(roles) ||
+/3d\s*tiles/i.test(title)
+){
+
+if(!found.some(item=>item.type==="3D TILES"))
+found.push({
+type:"3D TILES",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// COPC
+// ==========================================
+
+if(
+/\.copc\.laz(\?|$)/i.test(href) ||
+/copc/i.test(type) ||
+/copc/i.test(roles) ||
+/copc/i.test(title)
+){
+
+if(!found.some(item=>item.type==="COPC"))
+found.push({
+type:"COPC",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// LAZ
+// ==========================================
+
+if(
+/\.laz(\?|$)/i.test(href) ||
+/laszip/i.test(type) ||
+/laz/i.test(type)
+){
+
+if(!found.some(item=>item.type==="LAZ"))
+found.push({
+type:"LAZ",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// LAS
+// ==========================================
+
+if(
+/\.las(\?|$)/i.test(href) ||
+/las/i.test(type)
+){
+
+if(!found.some(item=>item.type==="LAS"))
+found.push({
+type:"LAS",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// EPT
+// ==========================================
+
+if(
+/ept\.json(\?|$)/i.test(href) ||
+/ept/i.test(type) ||
+/ept/i.test(roles) ||
+/ept/i.test(title)
+){
+
+if(!found.some(item=>item.type==="EPT"))
+found.push({
+type:"EPT",
+resource:resource
+});
+
+return;
+
+}
+
+
+// ==========================================
+// POINT CLOUD
+// ==========================================
+
+if(
+/point[\s_-]*cloud/i.test(type) ||
+/point[\s_-]*cloud/i.test(roles) ||
+/point[\s_-]*cloud/i.test(title)
+){
+
+if(!found.some(item=>item.type==="POINT CLOUD"))
+found.push({
+type:"POINT CLOUD",
+resource:resource
+});
+
+}
+
+});
+
+return found;
+
+}
+
+
+// ==========================================
+// FIND WMS
+// ==========================================
+
+function findObservationWMS(obs){
+
+const assets=
+Object.values(
+obs.assets||{}
+);
+
+const asset=
+assets.find(
+candidate=>{
+
+const roles=
+(candidate.roles||[]).join(" ").toLowerCase();
+
+const href=
+(candidate.href||"").toLowerCase();
+
+const title=
+(candidate.title||"").toLowerCase();
+
+return(
+roles.includes("/wms#") ||
+roles.includes("wms") ||
+title.includes("getmap") ||
+(
+href.includes("service=wms")&&
+href.includes("request=getmap")
+)
+);
+
+}
+);
+
+if(asset)
+return asset.href;
+
+
+// ==========================================
+// STAC LINKS
+// ==========================================
+
+const link=
+(obs.links||[]).find(
+candidate=>{
+
+const rel=
+(candidate.rel||"").toLowerCase();
+
+return(
+rel==="wms" ||
+rel==="wmts"
+);
+
+}
+);
+
+if(link)
+return link.href;
+
+
+return null;
+
+}
+
+
+// ==========================================
+// BUILD WMS
+// ==========================================
+
+function buildObservationWMS(
+href,
+extent,
+obs
+){
+
+if(!href)
+return null;
+
+
+let url=
+href;
+
+
+// ==========================================
+// TEMPLATE VALUES
+// ==========================================
+
+const bbox=
+extent.join(",");
+
+const width=
+1200;
+
+const height=
+720;
+
+const time=
+obs.properties?.datetime||
+"";
+
+
+// ==========================================
+// PLACEHOLDERS
+// ==========================================
+
+url=
+url.replace(
+/\{BoundingBox\}/gi,
+bbox
+);
+
+url=
+url.replace(
+/\{bbox\}/gi,
+bbox
+);
+
+url=
+url.replace(
+/\{Width\}/gi,
+String(width)
+);
+
+url=
+url.replace(
+/\{width\}/gi,
+String(width)
+);
+
+url=
+url.replace(
+/\{Height\}/gi,
+String(height)
+);
+
+url=
+url.replace(
+/\{height\}/gi,
+String(height)
+);
+
+url=
+url.replace(
+/\{Styles\}/gi,
+""
+);
+
+url=
+url.replace(
+/\{DimRange\}/gi,
+""
+);
+
+url=
+url.replace(
+/\{crs\}/gi,
+"EPSG:4326"
+);
+
+url=
+url.replace(
+/\{srs\}/gi,
+"EPSG:4326"
+);
+
+url=
+url.replace(
+/\{time\}/gi,
+encodeURIComponent(time)
+);
+
+
+// ==========================================
+// EXISTING GETMAP
+// ==========================================
+
+if(
+/request=getmap/i.test(url)
+){
+
+if(
+!/[?&]bbox=/i.test(url)
+){
+
+url+=
+"&bbox="+
+encodeURIComponent(bbox);
+
+}
+
+if(
+!/[?&]width=/i.test(url)
+){
+
+url+=
+"&width="+
+width;
+
+}
+
+if(
+!/[?&]height=/i.test(url)
+){
+
+url+=
+"&height="+
+height;
+
+}
+
+if(
+!/[?&](srs|crs)=/i.test(url)
+){
+
+url+=
+"&SRS=EPSG:4326";
+
+}
+
+if(
+!/[?&]format=/i.test(url)
+){
+
+url+=
+"&format=image/png";
+
+}
+
+return url;
+
+}
+
+
+// ==========================================
+// GENERIC WMS
+// ==========================================
+
+url+=
+(url.includes("?")?"&":"?")+
+"service=WMS"+
+"&version=1.1.1"+
+"&request=GetMap"+
+"&SRS=EPSG:4326"+
+"&bbox="+encodeURIComponent(bbox)+
+"&width="+width+
+"&height="+height+
+"&format=image/png"+
+"&transparent=true";
+
+return url;
+
+}
+
+
+// ==========================================
+// MAP INTERACTION
+// ==========================================
+
+function setupMapInteraction(
+map,
+exploitation,
+state,
+extent,
+coordinates
+){
+
+map.addEventListener(
+"wheel",
+event=>{
+
+event.preventDefault();
+
+const oldZoom=
+state.zoom;
+
+state.zoom=
+event.deltaY<0
+?Math.min(
+state.zoom*1.2,
+8
+)
+:Math.max(
+state.zoom/1.2,
+1
+);
+
+if(oldZoom!==state.zoom){
+
+const rect=
+map.getBoundingClientRect();
+
+const x=
+((event.clientX-rect.left)/
+rect.width)*1000;
+
+const y=
+((event.clientY-rect.top)/
+rect.height)*600;
+
+state.panX=
+x-
+(x-state.panX)*
+(state.zoom/oldZoom);
+
+state.panY=
+y-
+(y-state.panY)*
+(state.zoom/oldZoom);
+
+const layers=
+map.querySelectorAll(
+"g"
+);
+
+const transform=
+`translate(${state.panX} ${state.panY}) scale(${state.zoom})`;
+
+layers.forEach(
+layer=>
+layer.setAttribute(
+"transform",
+transform
+)
+);
+
+}
+
+},
+{passive:false}
+);
+
+
+map.addEventListener(
+"mousedown",
+event=>{
+
+state.dragging=true;
+
+state.startX=
+event.clientX;
+
+state.startY=
+event.clientY;
+
+state.startPanX=
+state.panX;
+
+state.startPanY=
+state.panY;
+
+map.classList.add(
+"dragging"
+);
+
+}
+);
+
+
+const stopDrag=()=>{
+
+state.dragging=false;
+
+map.classList.remove(
+"dragging"
+);
+
+};
+
+
+window.addEventListener(
+"mouseup",
+stopDrag
+);
+
+
+window.addEventListener(
+"mousemove",
+event=>{
+
+if(!state.dragging)
+return;
+
+const rect=
+map.getBoundingClientRect();
+
+const dx=
+((event.clientX-state.startX)/
+rect.width)*1000;
+
+const dy=
+((event.clientY-state.startY)/
+rect.height)*600;
+
+state.panX=
+state.startPanX+dx;
+
+state.panY=
+state.startPanY+dy;
+
+const layers=
+map.querySelectorAll(
+"g"
+);
+
+const transform=
+`translate(${state.panX} ${state.panY}) scale(${state.zoom})`;
+
+layers.forEach(
+layer=>
+layer.setAttribute(
+"transform",
+transform
+)
+);
+
+}
+);
+
+}
+
+
+// ==========================================
+// DRAW GEOMETRY
+// ==========================================
+
+function drawObservationGeometry(
+layer,
+obs,
+project
+){
+
+if(!obs.geometry)
+return;
+
+
+const geometry=
+obs.geometry;
+
+
+if(
+geometry.type==="Point"
+){
+
+const p=
+project(
+geometry.coordinates[0],
+geometry.coordinates[1]
+);
+
+const circle=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"circle"
+);
+
+circle.setAttribute(
+"cx",
+p.x
+);
+
+circle.setAttribute(
+"cy",
+p.y
+);
+
+circle.setAttribute(
+"r",
+"7"
+);
+
+circle.classList.add(
+"exploitationInteractivePoint"
+);
+
+circle.addEventListener(
+"click",
+event=>{
+
+event.stopPropagation();
+
+showFootprintInteraction(
+event.target,
+obs,
+geometry.coordinates
+);
+
+}
+);
+
+layer.appendChild(
+circle
+);
+
+return;
+
+}
+
+
+if(
+geometry.type==="Polygon"
+){
+
+drawPolygon(
+layer,
+geometry.coordinates?.[0],
+project,
+obs
+);
+
+return;
+
+}
+
+
+if(
+geometry.type==="MultiPolygon"
+){
+
+geometry.coordinates.forEach(
+polygon=>{
+
+drawPolygon(
+layer,
+polygon?.[0],
+project,
+obs
+);
+
+}
+);
+
+}
+
+}
+
+
+// ==========================================
+// DRAW POLYGON
+// ==========================================
+
+function drawPolygon(
+layer,
+coordinates,
+project,
+obs
+){
+
+if(
+!coordinates||
+!coordinates.length
+)
+return;
+
+
+const points=
+coordinates.map(
+coord=>{
+
+const p=
+project(
+coord[0],
+coord[1]
+);
+
+return `${p.x},${p.y}`;
+
+}
+).join(" ");
+
+
+const polygon=
+document.createElementNS(
+"http://www.w3.org/2000/svg",
+"polygon"
+);
+
+polygon.setAttribute(
+"points",
+points
+);
+
+polygon.classList.add(
+"exploitationInteractivePolygon"
+);
+
+polygon.addEventListener(
+"mouseenter",
+()=>{
+
+polygon.classList.add(
+"active"
+);
+
+}
+);
+
+polygon.addEventListener(
+"mouseleave",
+()=>{
+
+polygon.classList.remove(
+"active"
+);
+
+}
+);
+
+polygon.addEventListener(
+"click",
+event=>{
+
+event.stopPropagation();
+
+showFootprintInteraction(
+polygon,
+obs,
+coordinates[0]
+);
+
+}
+);
+
+layer.appendChild(
+polygon
+);
+
+}
+
+
+// ==========================================
+// FOOTPRINT INTERACTION
+// ==========================================
+
+function showFootprintInteraction(
+element,
+obs,
+coordinates
+){
+
+const viewer=
+element.closest(
+".exploitationContainer"
+);
+
+if(!viewer)
+return;
+
+
+const previous=
+viewer.querySelector(
+".footprintInteraction"
+);
+
+if(previous)
+previous.remove();
+
+
+const panel=
+document.createElement("div");
+
+panel.className=
+"footprintInteraction";
+
+const coordText=
+Array.isArray(coordinates)
+?`${Number(coordinates[0]).toFixed(5)}, ${Number(coordinates[1]).toFixed(5)}`
+:"—";
+
+
+panel.innerHTML=`
+
+<div class="footprintInteractionTitle">
+FOOTPRINT
+</div>
+
+<div class="footprintInteractionRow">
+<span>Item</span>
+<strong>${obs.id||"—"}</strong>
+</div>
+
+<div class="footprintInteractionRow">
+<span>Coordinate</span>
+<strong>${coordText}</strong>
+</div>
+
+<div class="footprintInteractionRow">
+<span>Geometry</span>
+<strong>${obs.geometry?.type||"—"}</strong>
+</div>
+
+`;
+
+viewer.appendChild(
+panel
+);
+
+}
+
+
+// ==========================================
+// OBSERVATION EXTENT
+// ==========================================
+
+function getObservationExtent(obs){
+
+if(
+Array.isArray(obs.bbox)&&
+obs.bbox.length>=4
+){
+
+return[
+Number(obs.bbox[0]),
+Number(obs.bbox[1]),
+Number(obs.bbox[2]),
+Number(obs.bbox[3])
+];
+
+}
+
+
+if(obs.geometry){
+
+const bbox=
+getGeometryBBoxFromGeometry(
+obs.geometry
+);
+
+if(bbox)
+return bbox;
+
+}
+
+return null;
+
+}
+
+
+// ==========================================
+// GEOMETRY BBOX
+// ==========================================
+
+function getGeometryBBoxFromGeometry(
+geometry
+){
+
+const coords=[];
+
+
+function collect(value){
+
+if(
+Array.isArray(value)&&
+typeof value[0]==="number"
+){
+
+coords.push(value);
+
+return;
+
+}
+
+if(
+Array.isArray(value)
+){
+
+value.forEach(
+collect
+);
+
+}
+
+}
+
+
+collect(
+geometry.coordinates
+);
+
+
+if(!coords.length)
+return null;
+
+
+return getGeometryBBox(
+coords
+);
+
+}
+
+
+// ==========================================
+// GEOMETRY BBOX
+// ==========================================
+
+function getGeometryBBox(coords){
+
+let minLon=Infinity;
+let minLat=Infinity;
+let maxLon=-Infinity;
+let maxLat=-Infinity;
+
+coords.forEach(coord=>{
+
+minLon=
+Math.min(
+minLon,
+Number(coord[0])
+);
+
+minLat=
+Math.min(
+minLat,
+Number(coord[1])
+);
+
+maxLon=
+Math.max(
+maxLon,
+Number(coord[0])
+);
+
+maxLat=
+Math.max(
+maxLat,
+Number(coord[1])
+);
+
+});
+
+return[
+minLon,
+minLat,
+maxLon,
+maxLat
+];
+
+}
+
+
+// ==========================================
+// EXPLOITATION DATA
+// ==========================================
+
+function renderExploitationData(
+container,
+obs,
+extent
+){
+
+const properties=
+obs.properties||{};
+
+const resource3D=
+findObservation3D(obs);
+
+const resource3DText=
+resource3D.length
+?`YES — ${resource3D.map(item=>item.type).join(", ")}`
+:"";
+
+const modelResource3D=
+resource3D.find(item=>
+item.resource?.href
+);
+
+const modelURL=
+modelResource3D?.resource?.href||"";
+
+let spatialHTML="";
+
+if(extent){
+
+const centerLon=
+(extent[0]+extent[2])/2;
+
+const centerLat=
+(extent[1]+extent[3])/2;
+
+const crs=
+properties["proj:code"]||
+properties["proj:epsg"]||
+obs.crs?.properties?.name||
+"EPSG:4326";
+
+spatialHTML=`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+SPATIAL DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>BBOX</span>
+<strong>
+${extent.map(v=>Number(v).toFixed(5)).join(", ")}
+</strong>
+</div>
+
+<div>
+<span>CENTER</span>
+<strong>
+${centerLat.toFixed(5)}°, ${centerLon.toFixed(5)}°
+</strong>
+</div>
+
+<div>
+<span>CRS</span>
+<strong>${crs}</strong>
+</div>
+
+<div>
+<span>GEOMETRY</span>
+<strong>${obs.geometry?.type||"—"}</strong>
+</div>
+
+<div>
+<span>WIDTH</span>
+<strong>${Math.abs(extent[2]-extent[0]).toFixed(5)}°</strong>
+</div>
+
+<div>
+<span>HEIGHT</span>
+<strong>${Math.abs(extent[3]-extent[1]).toFixed(5)}°</strong>
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}else{
+
+spatialHTML=`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+SPATIAL DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>EXTENT</span>
+<strong>
+Not available
+</strong>
+</div>
+
+<div>
+<span>GEOMETRY</span>
+<strong>
+${obs.geometry?.type||"—"}
+</strong>
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+container.innerHTML=`
+
+${spatialHTML}
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+ITEM DATA
+</div>
+
+<div class="exploitationDataGrid">
+
+<div>
+<span>COLLECTION</span>
+<strong>${obs.collection||"—"}</strong>
+</div>
+
+<div>
+<span>DATETIME</span>
+<strong>${properties.datetime||"—"}</strong>
+</div>
+
+<div>
+<span>PLATFORM</span>
+<strong>${properties.platform||"—"}</strong>
+</div>
+
+<div>
+<span>INSTRUMENT</span>
+<strong>
+${
+Array.isArray(properties.instruments)
+?properties.instruments.join(", ")
+:properties.instruments||"—"
+}
+</strong>
+</div>
+
+<div>
+<span>ORBIT</span>
+<strong>${properties["sat:absolute_orbit"]||"—"}</strong>
+</div>
+
+<div>
+<span>PROCESSING</span>
+<strong>${properties["processing:level"]||"—"}</strong>
+</div>
+
+<div>
+<span>3D RESOURCE</span>
+<strong>${resource3DText||"NO"}</strong>
+</div>
+
+</div>
+
+</div>
+
+${
+modelURL
+?`
+
+<div class="exploitationSection">
+
+<div class="exploitationSectionTitle">
+3D MODEL
+</div>
+
+<div>
+
+<button
+id="open3DModel"
+class="exploitButton"
+>
+VIEW 3D MODEL
+</button>
+
+</div>
+
+<div
+id="three3DViewer"
+style="
+display:none;
+margin-top:12px;
+width:100%;
+"
+data-model-url="${modelURL.replace(/"/g,"&quot;")}"
+>
+
+<div
+id="three3DCanvas"
+style="
+width:100%;
+height:420px;
+background:#111;
+position:relative;
+overflow:hidden;
+"
+></div>
+
+<div
+id="three3DStatus"
+style="
+padding:8px 0;
+font-size:11px;
+letter-spacing:.08em;
+"
+>
+INITIALIZING
+</div>
+
+</div>
+
+</div>
+
+`
+:""
+
+}
+
+`;
+
+if(modelURL){
+
+const button=
+document.getElementById("open3DModel");
+
+if(button){
+
+button.onclick=()=>{
+
+const viewer=
+document.getElementById("three3DViewer");
+
+if(!viewer)
+return;
+
+viewer.style.display="block";
+
+create3DViewer(
+viewer,
+modelURL
+);
+
+};
+
+}
+
+}
+
+}
+
+
+
+     
+     
+     
+     
+// ==========================================
+// CREATE 3D VIEWER
+// ==========================================
+
+function create3DViewer(
+viewer,
+modelURL
+){
+
+const canvasContainer=
+document.getElementById("three3DCanvas");
+
+const status=
+document.getElementById("three3DStatus");
+
+if(!canvasContainer)
+return;
+
+if(canvasContainer.dataset.initialized==="true")
+return;
+
+canvasContainer.dataset.initialized="true";
+
+if(!window.THREE){
+
+status.textContent=
+"THREE.JS NOT AVAILABLE";
+
+return;
+
+}
+
+const scene=
+new THREE.Scene();
+
+scene.background=
+new THREE.Color(0x111111);
+
+const camera=
+new THREE.PerspectiveCamera(
+45,
+canvasContainer.clientWidth/
+canvasContainer.clientHeight,
+0.1,
+100000000
+);
+
+camera.position.set(
+0,
+0,
+4
+);
+
+const renderer=
+new THREE.WebGLRenderer({
+antialias:true
+});
+
+renderer.setPixelRatio(
+window.devicePixelRatio
+);
+
+renderer.setSize(
+canvasContainer.clientWidth,
+canvasContainer.clientHeight
+);
+
+canvasContainer.innerHTML="";
+
+canvasContainer.appendChild(
+renderer.domElement
+);
+
+
+// ==========================================
+// MODEL GROUP
+// ==========================================
+
+const modelGroup=
+new THREE.Group();
+
+scene.add(
+modelGroup
+);
+
+
+// ==========================================
+// LIGHTS
+// ==========================================
+
+const ambientLight=
+new THREE.AmbientLight(
+0xffffff,
+1.5
+);
+
+scene.add(
+ambientLight
+);
+
+const directionalLight=
+new THREE.DirectionalLight(
+0xffffff,
+2
+);
+
+directionalLight.position.set(
+3,
+4,
+5
+);
+
+scene.add(
+directionalLight
+);
+
+
+// ==========================================
+// FALLBACK CUBE
+// ==========================================
+
+const geometry=
+new THREE.BoxGeometry(
+1,
+1,
+1
+);
+
+const material=
+new THREE.MeshStandardMaterial();
+
+const cube=
+new THREE.Mesh(
+geometry,
+material
+);
+
+modelGroup.add(
+cube
+);
+
+
+// ==========================================
+// MODEL STATE
+// ==========================================
+
+let realModel=null;
+
+let pointCloud=null;
+
+let pointCloudViewer=null;
+
+let cesiumViewer=null;
+
+let cesiumTileset=null;
+
+let lazGeometry=null;
+
+let lazMaterial=null;
+
+let lazPoints=null;
+
+let lazPositions=null;
+
+let lazColors=null;
+
+let lazPointCount=0;
+
+let lazBudget=1000000;
+
+let lazBoundingBox=null;
+
+let modelSize=1;
+
+
+// ==========================================
+// MODEL TYPE
+// ==========================================
+
+function getModelType(url){
+
+const cleanURL=
+url.split("?")[0]
+.toLowerCase();
+
+if(cleanURL.endsWith(".glb"))
+return "GLB";
+
+if(cleanURL.endsWith(".gltf"))
+return "GLTF";
+
+if(cleanURL.endsWith(".copc.laz"))
+return "COPC";
+
+if(cleanURL.endsWith(".ept.json"))
+return "EPT";
+
+if(cleanURL.endsWith(".laz"))
+return "LAZ";
+
+if(cleanURL.endsWith(".las"))
+return "LAS";
+
+if(
+cleanURL.includes(
+"application/3dtiles"
+)
+)
+return "3DTILES";
+
+if(
+cleanURL.includes(
+"api.cesium.com/v1/assets/"
+)
+)
+return "3DTILES";
+
+if(
+cleanURL.includes(
+"app.iconem.com/external/"
+)
+)
+return "3DTILES";
+
+return "UNKNOWN";
+
+}
+
+const modelType=
+getModelType(modelURL);
+
+
+// ==========================================
+// STATUS
+// ==========================================
+
+status.textContent=
+"FILE AVAILABLE";
+
+
+// ==========================================
+// REMOVE CUBE
+// ==========================================
+
+function removeCube(){
+
+if(!cube.parent)
+return;
+
+modelGroup.remove(
+cube
+);
+
+cube.geometry.dispose();
+
+cube.material.dispose();
+
+}
+
+
+// ==========================================
+// LOAD GLTF / GLB
+// ==========================================
+
+function loadGLTF(){
+
+status.textContent=
+"PROCESSING MODEL";
+
+const script=
+document.createElement("script");
+
+script.type=
+"module";
+
+script.textContent=`
+
+import {
+GLTFLoader
+}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+
+window.__JanusGLTFLoader=
+GLTFLoader;
+
+`;
+
+script.onload=()=>{
+
+const Loader=
+window.__JanusGLTFLoader;
+
+if(!Loader){
+
+status.textContent=
+"GLTF LOADER ERROR";
+
+return;
+
+}
+
+const loader=
+new Loader();
+
+loader.load(
+
+modelURL,
+
+gltf=>{
+
+realModel=
+gltf.scene;
+
+const box=
+new THREE.Box3()
+.setFromObject(
+realModel
+);
+
+const center=
+box.getCenter(
+new THREE.Vector3()
+);
+
+const size=
+box.getSize(
+new THREE.Vector3()
+);
+
+realModel.position.sub(
+center
+);
+
+modelGroup.add(
+realModel
+);
+
+const maxSize=
+Math.max(
+size.x,
+size.y,
+size.z
+);
+
+modelSize=
+Math.max(
+maxSize,
+0.001
+);
+
+distance=
+modelSize*
+1.8;
+
+minimumDistance=
+Math.max(
+modelSize*0.05,
+0.001
+);
+
+maximumDistance=
+Math.max(
+modelSize*20,
+minimumDistance*10
+);
+
+camera.near=
+Math.max(
+modelSize/10000,
+0.001
+);
+
+camera.far=
+Math.max(
+modelSize*100,
+100
+);
+
+camera.updateProjectionMatrix();
+
+removeCube();
+
+status.textContent=
+"READY";
+
+},
+
+progress=>{
+
+if(progress.total){
+
+const percent=
+Math.round(
+progress.loaded/
+progress.total*
+100
+);
+
+status.textContent=
+"PROCESSING MODEL "+
+percent+
+"%";
+
+}else{
+
+status.textContent=
+"PROCESSING MODEL";
+
+}
+
+},
+
+error=>{
+
+console.error(
+"GLTF LOAD ERROR",
+error
+);
+
+status.textContent=
+"LOAD ERROR";
+
+}
+
+);
+
+};
+
+script.onerror=()=>{
+
+status.textContent=
+"GLTF LOADER ERROR";
+
+};
+
+document.head.appendChild(
+script
+);
+
+}
+
+
+// ==========================================
+// POINT BUDGET CONTROL
+// ==========================================
+
+function createPointBudgetControl(){
+
+if(
+document.getElementById(
+"pointBudgetControl"
+)
+)
+return;
+
+const control=
+document.createElement("div");
+
+control.id=
+"pointBudgetControl";
+
+control.style.cssText=`
+
+margin-top:10px;
+padding:8px 0;
+font-size:11px;
+letter-spacing:.08em;
+
+`;
+
+control.innerHTML=`
+
+<div>
+
+POINT BUDGET:
+<span id="pointBudgetValue">
+1,000,000
+</span>
+
+</div>
+
+<input
+id="pointBudgetSlider"
+type="range"
+min="500000"
+max="5000000"
+step="250000"
+value="1000000"
+style="
+width:100%;
+margin-top:6px;
+"
+>
+
+`;
+
+status.parentElement.appendChild(
+control
+);
+
+const slider=
+document.getElementById(
+"pointBudgetSlider"
+);
+
+const value=
+document.getElementById(
+"pointBudgetValue"
+);
+
+slider.oninput=()=>{
+
+const budget=
+Number(
+slider.value
+);
+
+value.textContent=
+budget.toLocaleString();
+
+if(pointCloudViewer){
+
+pointCloudViewer.setPointBudget(
+budget
+);
+
+}
+
+if(
+lazPositions &&
+lazPoints
+){
+
+lazBudget=
+budget;
+
+updateLAZPoints(
+budget
+);
+
+}
+
+};
+
+}
+
+
+// ==========================================
+// BUILD LAZ POINT CLOUD
+// ==========================================
+
+function updateLAZPoints(
+budget
+){
+
+if(
+!lazPositions ||
+!lazPoints
+)
+return;
+
+const totalPoints=
+lazPointCount;
+
+const visiblePoints=
+Math.min(
+budget,
+totalPoints
+);
+
+const sourceStride=
+totalPoints/
+visiblePoints;
+
+const positions=
+new Float32Array(
+visiblePoints*3
+);
+
+let colors=null;
+
+if(
+lazColors &&
+lazColors.length>=totalPoints*3
+){
+
+colors=
+new Float32Array(
+visiblePoints*3
+);
+
+}
+
+for(
+let i=0;
+i<visiblePoints;
+i++
+){
+
+const sourceIndex=
+Math.min(
+Math.floor(
+i*sourceStride
+),
+totalPoints-1
+);
+
+positions[i*3]=
+lazPositions[sourceIndex*3];
+
+positions[i*3+1]=
+lazPositions[sourceIndex*3+1];
+
+positions[i*3+2]=
+lazPositions[sourceIndex*3+2];
+
+if(colors){
+
+colors[i*3]=
+lazColors[sourceIndex*3];
+
+colors[i*3+1]=
+lazColors[sourceIndex*3+1];
+
+colors[i*3+2]=
+lazColors[sourceIndex*3+2];
+
+}
+
+}
+
+lazGeometry.setAttribute(
+"position",
+new THREE.BufferAttribute(
+positions,
+3
+)
+);
+
+if(colors){
+
+lazGeometry.setAttribute(
+"color",
+new THREE.BufferAttribute(
+colors,
+3
+)
+);
+
+lazMaterial.vertexColors=
+true;
+
+}else{
+
+if(
+lazGeometry.getAttribute(
+"color"
+)
+){
+
+lazGeometry.deleteAttribute(
+"color"
+);
+
+}
+
+lazMaterial.vertexColors=
+false;
+
+}
+
+lazGeometry.computeBoundingBox();
+
+lazGeometry.computeBoundingSphere();
+
+lazMaterial.needsUpdate=
+true;
+
+status.textContent=
+"READY — "+
+visiblePoints.toLocaleString()+
+" / "+
+totalPoints.toLocaleString()+
+" POINTS";
+
+}
+
+
+// ==========================================
+// AUTO FRAME LAZ
+// ==========================================
+
+function frameLAZ(){
+
+if(
+!lazPoints
+)
+return;
+
+let box;
+
+if(
+lazBoundingBox
+){
+
+const min=
+lazBoundingBox.min||
+lazBoundingBox[0];
+
+const max=
+lazBoundingBox.max||
+lazBoundingBox[1];
+
+if(
+min &&
+max
+){
+
+box=
+new THREE.Box3(
+new THREE.Vector3(
+min[0]??min.x,
+min[1]??min.y,
+min[2]??min.z
+),
+new THREE.Vector3(
+max[0]??max.x,
+max[1]??max.y,
+max[2]??max.z
+)
+);
+
+}
+
+}
+
+if(!box){
+
+box=
+new THREE.Box3()
+.setFromObject(
+lazPoints
+);
+
+}
+
+if(box.isEmpty())
+return;
+
+const center=
+box.getCenter(
+new THREE.Vector3()
+);
+
+const size=
+box.getSize(
+new THREE.Vector3()
+);
+
+const maxSize=
+Math.max(
+size.x,
+size.y,
+size.z
+);
+
+modelSize=
+Math.max(
+maxSize,
+0.001
+);
+
+
+// ==========================================
+// CENTER CLOUD AT ORIGIN
+// ==========================================
+
+lazPoints.position.set(
+-center.x,
+-center.y,
+-center.z
+);
+
+
+// ==========================================
+// CAMERA FIT
+// ==========================================
+
+distance=
+modelSize*
+1.8;
+
+minimumDistance=
+Math.max(
+modelSize*0.05,
+0.001
+);
+
+maximumDistance=
+Math.max(
+modelSize*20,
+minimumDistance*10
+);
+
+camera.near=
+Math.max(
+modelSize/100000,
+0.001
+);
+
+camera.far=
+Math.max(
+modelSize*100,
+100
+);
+
+camera.updateProjectionMatrix();
+
+camera.position.set(
+0,
+0,
+distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
+
+}
+
+
+// ==========================================
+// LOAD LAZ
+// ==========================================
+
+async function loadLAZ(){
+
+status.textContent=
+"PROCESSING MODEL";
+
+createPointBudgetControl();
+
+lazBudget=
+1000000;
+
+try{
+
+const core=
+await import(
+"https://esm.sh/@loaders.gl/core@4.4.0"
+);
+
+const lasModule=
+await import(
+"https://esm.sh/@loaders.gl/las@4.4.0"
+);
+
+const load=
+core.load;
+
+const LASLoader=
+lasModule.LASLoader;
+
+if(
+!load ||
+!LASLoader
+){
+
+throw new Error(
+"LAS LOADER NOT AVAILABLE"
+);
+
+}
+
+status.textContent=
+"CARGANDO PUNTOS 1M";
+
+const data=
+await load(
+modelURL,
+LASLoader,
+{
+core:{
+worker:false
+},
+las:{
+shape:"mesh",
+skip:1,
+fp64:false,
+colorDepth:"auto"
+}
+}
+);
+
+const attributes=
+data?.attributes||{};
+
+const positionAttribute=
+attributes.POSITION;
+
+const colorAttribute=
+attributes.COLOR_0;
+
+if(
+!positionAttribute ||
+!positionAttribute.value
+){
+
+throw new Error(
+"POSITION ATTRIBUTE NOT FOUND"
+);
+
+}
+
+lazPositions=
+positionAttribute.value;
+
+lazPointCount=
+Math.floor(
+lazPositions.length/3
+);
+
+if(
+lazPointCount===0
+){
+
+throw new Error(
+"EMPTY POINT CLOUD"
+);
+
+}
+
+
+// ==========================================
+// BOUNDING BOX
+// ==========================================
+
+if(
+data.header &&
+data.header.boundingBox
+){
+
+lazBoundingBox=
+data.header.boundingBox;
+
+}
+
+
+// ==========================================
+// OPTIONAL RGB
+// ==========================================
+
+lazColors=null;
+
+if(
+colorAttribute &&
+colorAttribute.value
+){
+
+const sourceColors=
+colorAttribute.value;
+
+const colorSize=
+colorAttribute.size||3;
+
+const sourceColorCount=
+Math.floor(
+sourceColors.length/
+colorSize
+);
+
+if(
+sourceColorCount>=lazPointCount
+){
+
+let colorScale=255;
+
+if(
+sourceColors instanceof Uint16Array ||
+sourceColors instanceof Uint32Array
+){
+
+colorScale=65535;
+
+}else if(
+sourceColors instanceof Float32Array ||
+sourceColors instanceof Float64Array
+){
+
+let maxColorValue=0;
+
+for(
+let i=0;
+i<Math.min(
+sourceColors.length,
+300
+);
+i++
+){
+
+if(
+sourceColors[i]>
+maxColorValue
+){
+
+maxColorValue=
+sourceColors[i];
+
+}
+
+}
+
+if(maxColorValue<=1){
+
+colorScale=1;
+
+}else if(maxColorValue<=255){
+
+colorScale=255;
+
+}else{
+
+colorScale=65535;
+
+}
+
+}
+
+lazColors=
+new Float32Array(
+lazPointCount*3
+);
+
+for(
+let i=0;
+i<lazPointCount;
+i++
+){
+
+const r=
+sourceColors[i*colorSize];
+
+const g=
+sourceColors[i*colorSize+1];
+
+const b=
+sourceColors[i*colorSize+2];
+
+if(colorScale===1){
+
+lazColors[i*3]=
+r;
+
+lazColors[i*3+1]=
+g;
+
+lazColors[i*3+2]=
+b;
+
+}else{
+
+lazColors[i*3]=
+Math.min(
+1,
+r/colorScale
+);
+
+lazColors[i*3+1]=
+Math.min(
+1,
+g/colorScale
+);
+
+lazColors[i*3+2]=
+Math.min(
+1,
+b/colorScale
+);
+
+}
+
+}
+
+}
+
+}
+
+
+// ==========================================
+// POINT MATERIAL
+// ==========================================
+
+lazMaterial=
+new THREE.PointsMaterial({
+
+color:
+0xffffff,
+
+size:
+0.1,
+
+sizeAttenuation:
+false,
+
+vertexColors:
+false
+
+});
+
+
+// ==========================================
+// CREATE GEOMETRY
+// ==========================================
+
+lazGeometry=
+new THREE.BufferGeometry();
+
+lazPoints=
+new THREE.Points(
+lazGeometry,
+lazMaterial
+);
+
+modelGroup.add(
+lazPoints
+);
+
+
+// ==========================================
+// INITIAL SAMPLE
+// ==========================================
+
+updateLAZPoints(
+lazBudget
+);
+
+
+// ==========================================
+// AUTO FRAME
+// ==========================================
+
+frameLAZ();
+
+
+// ==========================================
+// REAL MODEL READY
+// ==========================================
+
+removeCube();
+
+status.textContent=
+"READY — "+
+Math.min(
+lazBudget,
+lazPointCount
+).toLocaleString()+
+" / "+
+lazPointCount.toLocaleString()+
+" POINTS";
+
+console.log(
+"JANUS LAZ POINTS:",
+lazPointCount
+);
+
+console.log(
+"JANUS LAZ BOUNDING BOX:",
+lazBoundingBox
+);
+
+console.log(
+"JANUS LAZ COLORS:",
+!!lazColors
+);
+
+console.log(
+"JANUS LAZ COLOR ATTRIBUTE:",
+colorAttribute
+);
+
+if(colorAttribute){
+
+console.log(
+"JANUS LAZ COLOR ARRAY:",
+colorAttribute.value?.constructor?.name
+);
+
+console.log(
+"JANUS LAZ COLOR SIZE:",
+colorAttribute.size
+);
+
+}
+
+}catch(error){
+
+console.error(
+"LAZ LOAD ERROR",
+error
+);
+
+status.textContent=
+"LOAD ERROR";
+
+}
+
+}
+
+
+// ==========================================
+// LOAD POINT CLOUD
+// ==========================================
+
+function loadPointCloud(){
+
+status.textContent=
+"PROCESSING MODEL";
+
+if(!window.Potree){
+
+status.textContent=
+"POTREE NOT AVAILABLE";
+
+return;
+
+}
+
+createPointBudgetControl();
+
+const budget=
+500000;
+
+pointCloudViewer=
+new Potree.Viewer(
+canvasContainer
+);
+
+pointCloudViewer.setEDLEnabled(
+true
+);
+
+pointCloudViewer.setFOV(
+60
+);
+
+pointCloudViewer.setPointBudget(
+budget
+);
+
+pointCloudViewer.setBackground(
+"black"
+);
+
+status.textContent=
+"PROCESSING MODEL";
+
+Potree.loadPointCloud(
+
+modelURL,
+
+"JanusPointCloud",
+
+event=>{
+
+pointCloud=
+event.pointcloud;
+
+pointCloudViewer.scene.addPointCloud(
+pointCloud
+);
+
+const material=
+pointCloud.material;
+
+material.size=
+1;
+
+material.pointSizeType=
+Potree.PointSizeType.ADAPTIVE;
+
+pointCloudViewer.fitToScreen(
+0.5
+);
+
+removeCube();
+
+status.textContent=
+"READY";
+
+},
+
+error=>{
+
+console.error(
+"POINT CLOUD LOAD ERROR",
+error
+);
+
+status.textContent=
+"LOAD ERROR";
+
+}
+
+);
+
+}
+
+
+// ==========================================
+// LOAD 3D TILES
+// ==========================================
+
+function load3DTiles(){
+
+status.textContent=
+"PROCESSING 3D TILES";
+
+const loadCesium=()=>{
+
+if(!window.Cesium){
+
+status.textContent=
+"CESIUM NOT AVAILABLE";
+
+return;
+
+}
+
+renderer.domElement.style.display=
+"none";
+
+canvasContainer.style.position=
+"relative";
+
+const cesiumContainer=
+document.createElement("div");
+
+cesiumContainer.id=
+"janusCesiumContainer";
+
+cesiumContainer.style.cssText=`
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+overflow:hidden;
+`;
+
+canvasContainer.appendChild(
+cesiumContainer
+);
+
+try{
+
+cesiumViewer=
+new Cesium.Viewer(
+cesiumContainer,
+{
+animation:true,
+timeline:true,
+baseLayerPicker:true,
+geocoder:true,
+homeButton:false,
+sceneModePicker:true,
+navigationHelpButton:false,
+fullscreenButton:false,
+infoBox:true,
+selectionIndicator:true
+}
+);
+
+Cesium.Cesium3DTileset.fromUrl(
+modelURL
+)
+.then(tileset=>{
+
+cesiumTileset=
+tileset;
+
+cesiumViewer.scene.primitives.add(
+tileset
+);
+
+removeCube();
+
+cesiumViewer.zoomTo(
+tileset
+);
+
+status.textContent=
+"READY — 3D TILES";
+
+console.log(
+"JANUS 3D TILES:",
+modelURL
+);
+
+})
+.catch(error=>{
+
+console.error(
+"3D TILES LOAD ERROR",
+error
+);
+
+status.textContent=
+"3D TILES LOAD ERROR";
+
+});
+
+}catch(error){
+
+console.error(
+"CESIUM VIEWER ERROR",
+error
+);
+
+status.textContent=
+"CESIUM VIEWER ERROR";
+
+}
+
+};
+
+
+// ==========================================
+// LOAD CESIUMJS
+// ==========================================
+
+if(window.Cesium){
+
+loadCesium();
+
+return;
+
+}
+
+const cssId=
+"janusCesiumCSS";
+
+if(
+!document.getElementById(cssId)
+){
+
+const css=
+document.createElement("link");
+
+css.id=
+cssId;
+
+css.rel=
+"stylesheet";
+
+css.href=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/widgets.css";
+
+document.head.appendChild(
+css
+);
+
+}
+
+window.CESIUM_BASE_URL=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/";
+
+const script=
+document.createElement("script");
+
+script.src=
+"https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Cesium.js";
+
+script.onload=()=>{
+
+loadCesium();
+
+};
+
+script.onerror=()=>{
+
+console.error(
+"CESIUMJS LOAD ERROR"
+);
+
+status.textContent=
+"CESIUMJS LOAD ERROR";
+
+};
+
+document.head.appendChild(
+script
+);
+
+}
+
+
+// ==========================================
+// RESOURCE DISPATCH
+// ==========================================
+
+if(
+modelType==="GLB" ||
+modelType==="GLTF"
+){
+
+loadGLTF();
+
+}else if(
+modelType==="LAZ"
+){
+
+loadLAZ();
+
+}else if(
+modelType==="COPC" ||
+modelType==="EPT"
+){
+
+loadPointCloud();
+
+}else if(
+modelType==="3DTILES"
+){
+
+load3DTiles();
+
+}else if(
+modelType==="LAS"
+){
+
+loadLAZ();
+
+}else{
+
+status.textContent=
+"UNKNOWN 3D RESOURCE";
+
+}
+
+
+// ==========================================
+// MODEL INTERACTION
+// ==========================================
+
+let isDragging=false;
+
+let previousX=0;
+
+let previousY=0;
+
+let rotationX=0;
+
+let rotationY=0;
+
+let dragOffsetX=0;
+
+let dragOffsetY=0;
+
+let dragButton=0;
+
+
+// ==========================================
+// CAMERA DISTANCE
+// ==========================================
+
+let distance=4;
+
+let minimumDistance=0.1;
+
+let maximumDistance=100;
+
+
+// ==========================================
+// CANVAS INTERACTION
+// ==========================================
+
+const canvas=
+renderer.domElement;
+
+canvas.style.touchAction=
+"none";
+
+canvas.style.userSelect=
+"none";
+
+
+// ==========================================
+// POINTER DOWN
+// ==========================================
+
+canvas.addEventListener(
+"pointerdown",
+event=>{
+
+if(pointCloudViewer)
+return;
+
+if(
+event.button!==0 &&
+event.button!==2
+)
+return;
+
+event.preventDefault();
+
+event.stopPropagation();
+
+isDragging=true;
+
+dragButton=
+event.button;
+
+previousX=
+event.clientX;
+
+previousY=
+event.clientY;
+
+canvas.setPointerCapture(
+event.pointerId
+);
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// POINTER MOVE
+// ==========================================
+
+canvas.addEventListener(
+"pointermove",
+event=>{
+
+if(
+!isDragging ||
+pointCloudViewer
+)
+return;
+
+if(
+dragButton===0 &&
+(event.buttons&1)!==1
+)
+return;
+
+if(
+dragButton===2 &&
+(event.buttons&2)!==2
+)
+return;
+
+event.preventDefault();
+
+event.stopPropagation();
+
+const deltaX=
+event.clientX-
+previousX;
+
+const deltaY=
+event.clientY-
+previousY;
+
+previousX=
+event.clientX;
+
+previousY=
+event.clientY;
+
+
+// ==========================================
+// LEFT BUTTON = ROTATE
+// ==========================================
+
+if(
+dragButton===0
+){
+
+rotationY+=
+deltaX*0.01;
+
+rotationX+=
+deltaY*0.01;
+
+rotationX=
+Math.max(
+-1.5,
+Math.min(
+1.5,
+rotationX
+)
+);
+
+}
+
+
+// ==========================================
+// RIGHT BUTTON = PAN
+// ==========================================
+
+if(
+dragButton===2
+){
+
+const canvasWidth=
+Math.max(
+canvasContainer.clientWidth,
+1
+);
+
+const canvasHeight=
+Math.max(
+canvasContainer.clientHeight,
+1
+);
+
+const panScale=
+modelSize/
+Math.min(
+canvasWidth,
+canvasHeight
+)*
+2;
+
+dragOffsetX+=
+deltaX*
+panScale;
+
+dragOffsetY-=
+deltaY*
+panScale;
+
+}
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// POINTER UP
+// ==========================================
+
+canvas.addEventListener(
+"pointerup",
+event=>{
+
+if(
+event.button!==0 &&
+event.button!==2
+)
+return;
+
+event.preventDefault();
+
+event.stopPropagation();
+
+isDragging=false;
+
+dragButton=0;
+
+if(
+canvas.hasPointerCapture(
+event.pointerId
+)
+){
+
+canvas.releasePointerCapture(
+event.pointerId
+);
+
+}
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// POINTER CANCEL
+// ==========================================
+
+canvas.addEventListener(
+"pointercancel",
+event=>{
+
+event.preventDefault();
+
+event.stopPropagation();
+
+isDragging=false;
+
+dragButton=0;
+
+if(
+canvas.hasPointerCapture(
+event.pointerId
+)
+){
+
+canvas.releasePointerCapture(
+event.pointerId
+);
+
+}
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// WHEEL ZOOM
+// ==========================================
+
+canvas.addEventListener(
+"wheel",
+event=>{
+
+if(pointCloudViewer)
+return;
+
+if(isDragging){
+
+event.preventDefault();
+
+event.stopPropagation();
+
+return;
+
+}
+
+event.preventDefault();
+
+event.stopPropagation();
+
+if(modelSize<=0)
+return;
+
+const zoomFactor=
+event.deltaY>0
+?1.1
+:0.9;
+
+distance*=
+zoomFactor;
+
+minimumDistance=
+Math.max(
+modelSize*0.05,
+0.001
+);
+
+maximumDistance=
+Math.max(
+modelSize*20,
+minimumDistance*10
+);
+
+distance=
+Math.max(
+minimumDistance,
+Math.min(
+maximumDistance,
+distance
+)
+);
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// CONTEXT MENU
+// ==========================================
+
+canvas.addEventListener(
+"contextmenu",
+event=>{
+
+event.preventDefault();
+
+event.stopPropagation();
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// DOUBLE CLICK RESET
+// ==========================================
+
+canvas.addEventListener(
+"dblclick",
+event=>{
+
+if(pointCloudViewer)
+return;
+
+event.preventDefault();
+
+event.stopPropagation();
+
+distance=
+Math.max(
+minimumDistance,
+Math.min(
+maximumDistance,
+modelSize*1.8
+)
+);
+
+rotationX=
+0;
+
+rotationY=
+0;
+
+dragOffsetX=
+0;
+
+dragOffsetY=
+0;
+
+modelGroup.position.set(
+0,
+0,
+0
+);
+
+camera.position.set(
+0,
+0,
+distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
+
+},
+{
+passive:false
+}
+);
+
+
+// ==========================================
+// ANIMATION
+// ==========================================
+
+function animate(){
+
+requestAnimationFrame(
+animate
+);
+
+if(!pointCloudViewer){
+
+modelGroup.rotation.x=
+rotationX;
+
+modelGroup.rotation.y=
+rotationY;
+
+modelGroup.position.x=
+dragOffsetX;
+
+modelGroup.position.y=
+dragOffsetY;
+
+camera.position.set(
+0,
+0,
+distance
+);
+
+camera.lookAt(
+0,
+0,
+0
+);
+
+renderer.render(
+scene,
+camera
+);
+
+}
+
+}
+
+animate();
+
+
+// ==========================================
+// RESIZE
+// ==========================================
+
+function resize(){
+
+const width=
+canvasContainer.clientWidth;
+
+const height=
+canvasContainer.clientHeight;
+
+if(!pointCloudViewer){
+
+camera.aspect=
+width/height;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+width,
+height
+);
+
+}
+
+if(cesiumViewer){
+
+cesiumViewer.resize();
+
+}
+
+}
+
+window.addEventListener(
+"resize",
+resize
+);
+
+
+// ==========================================
+// READY
+// ==========================================
+
+viewer.dataset.modelUrl=
+modelURL;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// JANUS SPATIAL CONTEXT VIEWER
+// ==========================================
+
+let janusContextViewer=null;
+let janusContextReady=false;
+
+
+function initJanusContextViewer(){
+
+const container=
+document.getElementById(
+"janusContextViewer"
+);
+
+if(!container)
+return;
+
+if(janusContextViewer)
+return;
+
+if(!window.Cesium){
+
+console.error(
+"JANUS CONTEXT: CESIUM NOT AVAILABLE"
+);
+
+return;
+
+}
+
+try{
+
+janusContextViewer=
+new Cesium.Viewer(
+container,
+{
+animation:false,
+timeline:true,
+baseLayerPicker:true,
+geocoder:true,
+homeButton:false,
+sceneModePicker:true,
+navigationHelpButton:false,
+fullscreenButton:false,
+infoBox:false,
+selectionIndicator:false
+}
+);
+
+janusContextReady=true;
+
+console.log(
+"JANUS CONTEXT VIEWER READY"
+);
+
+}catch(error){
+
+console.error(
+"JANUS CONTEXT VIEWER ERROR",
+error
+);
+
+}
+
+}
+
+
+// ==========================================
+// UPDATE CESIUM FROM CELL
+// ==========================================
+
+function updateJanusContextCell(
+lat1,
+lat2,
+lon1,
+lon2
+){
+
+if(!janusContextReady){
+
+initJanusContextViewer();
+
+}
+
+if(!janusContextViewer)
+return;
+
+lat1=Number(lat1);
+lat2=Number(lat2);
+lon1=Number(lon1);
+lon2=Number(lon2);
+
+if(
+!Number.isFinite(lat1) ||
+!Number.isFinite(lat2) ||
+!Number.isFinite(lon1) ||
+!Number.isFinite(lon2)
+){
+
+console.warn(
+"JANUS CONTEXT: INVALID CELL RANGE",
+lat1,
+lat2,
+lon1,
+lon2
+);
+
+return;
+
+}
+
+const centerLat=
+(lat1+lat2)/2;
+
+const centerLon=
+(lon1+lon2)/2;
+
+const coords=
+document.getElementById(
+"janusContextCoords"
+);
+
+if(coords){
+
+coords.textContent=
+centerLat.toFixed(6)+
+"°  "+
+centerLon.toFixed(6)+
+"°  | CELL";
+
+}
+
+janusContextViewer.camera.flyTo({
+
+destination:
+Cesium.Rectangle.fromDegrees(
+lon1,
+lat1,
+lon2,
+lat2
+),
+
+duration:1.2
+
+});
+
+console.log(
+"JANUS CONTEXT CELL:",
+lat1,
+lat2,
+lon1,
+lon2
+);
+
+}
+
+
+// ==========================================
+// UPDATE CESIUM FROM ITEM
+// ==========================================
+
+function updateJanusContext(
+lat,
+lon
+){
+
+if(!janusContextReady){
+
+initJanusContextViewer();
+
+}
+
+if(!janusContextViewer)
+return;
+
+lat=Number(lat);
+lon=Number(lon);
+
+if(
+!Number.isFinite(lat) ||
+!Number.isFinite(lon)
+){
+
+console.warn(
+"JANUS CONTEXT: INVALID COORDINATES",
+lat,
+lon
+);
+
+return;
+
+}
+
+const coords=
+document.getElementById(
+"janusContextCoords"
+);
+
+if(coords){
+
+coords.textContent=
+lat.toFixed(6)+
+"°  "+
+lon.toFixed(6)+
+"°  | ITEM";
+
+}
+
+janusContextViewer.camera.flyTo({
+
+destination:
+Cesium.Cartesian3.fromDegrees(
+lon,
+lat,
+800
+),
+
+duration:1.2
+
+});
+
+console.log(
+"JANUS CONTEXT ITEM:",
+lat,
+lon
+);
+
+}
+
+
+// ==========================================
+// UPDATE FROM STAC OBSERVATION
+// ==========================================
+
+function updateJanusContextFromObservation(obs){
+
+const centroid=
+obs.properties?.["proj:centroid"];
+
+if(
+centroid &&
+Number.isFinite(Number(centroid.lat)) &&
+Number.isFinite(Number(centroid.lon))
+){
+
+updateJanusContext(
+Number(centroid.lat),
+Number(centroid.lon)
+);
+
+return;
+
+}
+
+if(
+obs.geometry?.coordinates &&
+obs.geometry.type==="Point"
+){
+
+const lon=
+Number(obs.geometry.coordinates[0]);
+
+const lat=
+Number(obs.geometry.coordinates[1]);
+
+if(
+Number.isFinite(lat) &&
+Number.isFinite(lon)
+){
+
+updateJanusContext(
+lat,
+lon
+);
+
+}
+
+}
+
+}
+
+
+// ==========================================
+// INITIALIZE
+// ==========================================
+
+setTimeout(
+()=>{
+
+initJanusContextViewer();
+
+},
+100
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     
+     
+// ==========================================
+// RAW
+// ==========================================
+
+function toggleRaw(i){
+
+const pre=
+document.getElementById("raw"+i);
+
+pre.style.display=
+pre.style.display==="none"
+?
+"block"
+:
+"none";
+
+}
+
+
+    // ===============================
+// THEME TOGGLE
+// ===============================
+
+const themes = ["lunar", "terra"];
+
+let currentTheme = 0;
+
+document.documentElement.setAttribute("data-theme", themes[currentTheme]);
+document.getElementById("themeToggle").addEventListener("click", () => {
+    currentTheme = (currentTheme + 1) % themes.length;
+    const theme = themes[currentTheme];
+    document.documentElement.setAttribute("data-theme", theme);
+    document.getElementById("themeToggle").textContent =
+        theme === "lunar"
+            ? "🌙"
+            : "☀";
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+function updateJanusGridMap(body){
+
+    const marble =
+        document.getElementById("blueMarble");
+
+    if(!marble){
+        return;
+    }
+
+    if(body === "moon"){
+
+        marble.src =
+            "https://3d.staratlas.es/Moonmap_from_clementine_data.png";
+
+    }else if(body === "mars"){
+
+      marble.src =
+    "https://astrogeology.usgs.gov/ckan/dataset/7131d503-cdc9-45a5-8f83-5126c0fd397e/resource/6afad901-1caa-48a7-8b62-3911da0004c2/download/mars_viking_mdim21_clrmosaic_global_1024.jpg";
+       
+    }else{
+
+        marble.src =
+            "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-topography-bathymetry/september/world.topo.bathy.200409.3x21600x10800.jpg";
+
+    }
+
+}
+
+
+
+
+
+
+     
+function updateOpeFromCell(data){
+
+    if(
+        !data ||
+        !data.CELL_INFO
+    ){
+        return;
+    }
+
+    const cell = data.CELL_INFO;
+
+    if(
+        typeof cell.latRange !== "string" ||
+        typeof cell.lonRange !== "string"
+    ){
+        return;
+    }
+
+    const latValues =
+        cell.latRange
+            .split("/")
+            .map(v => Number(v.trim()));
+
+    const lonValues =
+        cell.lonRange
+            .split("/")
+            .map(v => Number(v.trim()));
+
+    if(
+        latValues.length !== 2 ||
+        lonValues.length !== 2 ||
+        !latValues.every(Number.isFinite) ||
+        !lonValues.every(Number.isFinite)
+    ){
+        return;
+    }
+
+    const lat =
+        (latValues[0] + latValues[1]) / 2;
+
+    const lon =
+        (lonValues[0] + lonValues[1]) / 2;
+
+
+    // ==========================================
+    // DETECT BODY
+    // ==========================================
+
+    const raw =
+        JSON.stringify(data).toLowerCase();
+
+    const isMoon =
+        raw.includes("moon") ||
+        raw.includes("luna");
+
+    const isMars =
+        raw.includes("mars") ||
+        raw.includes("marte");
+
+    let body = "earth";
+
+    if(isMoon){
+
+        body = "moon";
+
+    }else if(isMars){
+
+        body = "mars";
+
+    }
+
+
+    // ==========================================
+    // UPDATE JANUS GRID MAP
+    // ==========================================
+
+    updateJanusGridMap(body);
+
+
+    // ==========================================
+    // ZOOM
+    //
+    // Tierra → más cerca
+    // Luna   → más lejos
+    // Marte  → más lejos
+    // ==========================================
+
+let zoom = 1.2;
+
+if(body === "moon"){
+
+    zoom = 0.7;
+
+}else if(body === "mars"){
+
+    zoom = 1.2;
+
+}
+
+    // ==========================================
+    // BUILD OPE URL
+    // ==========================================
+
+    const params =
+        new URLSearchParams({
+            body: body,
+            lat: lat,
+            lon: lon,
+            zoom: zoom
+        });
+
+
+    const opeFrame =
+        document.getElementById("janusOpeFrame");
+
+    if(!opeFrame){
+        return;
+    }
+
+
+    opeFrame.src =
+        "https://3d.staratlas.es/spaceatlas.html?" +
+        params.toString();
+
+
+    console.log(
+        "JANUS OPE:",
+        {
+            cell: cell.id,
+            lat,
+            lon,
+            body,
+            zoom,
+            moonDetected: isMoon,
+            marsDetected: isMars
+        }
+    );
+
+}
+     
+
+</script>
+
+   
+</body>
+</html>
