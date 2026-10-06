@@ -2249,7 +2249,28 @@ height:100%;
 
 
 
+.available-data summary{
+color:#ffb04d;
+margin-bottom:12px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:space-between;
+list-style:none;
+}
 
+.available-data summary::-webkit-details-marker{
+display:none;
+}
+
+.available-data .arrow{
+font-size:11px;
+transition:transform .2s ease;
+}
+
+.available-data[open] .arrow{
+transform:rotate(90deg);
+}
 
 
 
@@ -4071,9 +4092,7 @@ document.getElementById("status").textContent=
 
 
 
-   
-   
-// ===============================
+   // ===============================
 // AVAILABLE DATA + SPATIAL GRID
 // ===============================
 
@@ -4081,15 +4100,20 @@ function renderAvailableData(json){
 
 const box=document.getElementById("queryBox");
 
-
 box.innerHTML=`
 
-<h3 style="color:#ffb04d;margin-bottom:12px">
-AVAILABLE DATA
-</h3>
+<details class="available-data">
+
+<summary>
+<span>AVAILABLE DATA</span>
+<span class="arrow">▶</span>
+</summary>
+
+<div id="availableDataList"></div>
+
+</details>
 
 `;
-
 
 
 if(!json.features||json.features.length===0){
@@ -4111,37 +4135,33 @@ currentItems=json.features;
 const dates={};
 
 
-
 json.features.forEach(item=>{
 
-
 const dt=item.properties?.datetime;
-
 
 if(!dt)
 return;
 
-
 const day=dt.split("T")[0];
-
 
 if(!dates[day])
 dates[day]=0;
 
-
 dates[day]++;
 
-
 });
+
+
+// listado
+
+const list=document.getElementById("availableDataList");
 
 
 Object.keys(dates)
 .sort()
 .forEach(date=>{
 
-
 const r=document.createElement("div");
-
 
 r.className="row";
 
@@ -4157,13 +4177,11 @@ ${dates[date]} observations
 
 `;
 
-
-box.appendChild(r);
-
+list.appendChild(r);
 
 });
 
-
+}
 
 
 // ===============================
