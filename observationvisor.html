@@ -2249,28 +2249,7 @@ height:100%;
 
 
 
-.available-data summary{
-color:#ffb04d;
-margin-bottom:12px;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:space-between;
-list-style:none;
-}
 
-.available-data summary::-webkit-details-marker{
-display:none;
-}
-
-.available-data .arrow{
-font-size:11px;
-transition:transform .2s ease;
-}
-
-.available-data[open] .arrow{
-transform:rotate(90deg);
-}
 
 
 
@@ -4092,6 +4071,8 @@ document.getElementById("status").textContent=
 
 
 
+   
+   
 // ===============================
 // AVAILABLE DATA + SPATIAL GRID
 // ===============================
@@ -4103,18 +4084,12 @@ const box=document.getElementById("queryBox");
 
 box.innerHTML=`
 
-<details open>
-
-<summary style="color:#ffb04d;margin-bottom:12px;cursor:pointer">
+<h3 style="color:#ffb04d;margin-bottom:12px">
 AVAILABLE DATA
-<span style="font-size:11px;margin-left:6px">▶</span>
-</summary>
-
-<div id="availableDataContent"></div>
-
-</details>
+</h3>
 
 `;
+
 
 
 if(!json.features||json.features.length===0){
@@ -4160,9 +4135,6 @@ dates[day]++;
 });
 
 
-const availableDataContent=document.getElementById("availableDataContent");
-
-
 Object.keys(dates)
 .sort()
 .forEach(date=>{
@@ -4186,12 +4158,12 @@ ${dates[date]} observations
 `;
 
 
-availableDataContent.appendChild(r);
+box.appendChild(r);
 
 
 });
 
-}
+
 
 
 // ===============================
