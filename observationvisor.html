@@ -2697,6 +2697,8 @@ const metadata=readGLBMetadata(glb);
 if(metadata?.nodes?.[0]?.extras?.d1){
 
 const valueD1=metadata.nodes[0].extras.d1;
+const valueRoot=metadata.nodes[0].extras.root;
+
 const decoded=atob(valueD1);
 
 if(
@@ -2705,6 +2707,7 @@ decoded.startsWith("https://")
 ){
 
 stacURL=decoded;
+window.JANUS_CUSTOM_ROOT=valueRoot ?? "";
 input.value=stacURL;
 
 }
