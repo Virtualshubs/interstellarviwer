@@ -4092,7 +4092,7 @@ document.getElementById("status").textContent=
 
 
 
-   // ===============================
+// ===============================
 // AVAILABLE DATA + SPATIAL GRID
 // ===============================
 
@@ -4100,16 +4100,17 @@ function renderAvailableData(json){
 
 const box=document.getElementById("queryBox");
 
+
 box.innerHTML=`
 
-<details class="available-data">
+<details open>
 
-<summary>
-<span>AVAILABLE DATA</span>
-<span class="arrow">▶</span>
+<summary style="color:#ffb04d;margin-bottom:12px;cursor:pointer">
+AVAILABLE DATA
+<span style="font-size:11px;margin-left:6px">▶</span>
 </summary>
 
-<div id="availableDataList"></div>
+<div id="availableDataContent"></div>
 
 </details>
 
@@ -4135,33 +4136,40 @@ currentItems=json.features;
 const dates={};
 
 
+
 json.features.forEach(item=>{
 
+
 const dt=item.properties?.datetime;
+
 
 if(!dt)
 return;
 
+
 const day=dt.split("T")[0];
+
 
 if(!dates[day])
 dates[day]=0;
 
+
 dates[day]++;
+
 
 });
 
 
-// listado
-
-const list=document.getElementById("availableDataList");
+const availableDataContent=document.getElementById("availableDataContent");
 
 
 Object.keys(dates)
 .sort()
 .forEach(date=>{
 
+
 const r=document.createElement("div");
+
 
 r.className="row";
 
@@ -4177,7 +4185,9 @@ ${dates[date]} observations
 
 `;
 
-list.appendChild(r);
+
+availableDataContent.appendChild(r);
+
 
 });
 
