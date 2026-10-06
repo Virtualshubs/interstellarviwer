@@ -2697,6 +2697,8 @@ const metadata=readGLBMetadata(glb);
 if(metadata?.nodes?.[0]?.extras?.d1){
 
 const valueD1=metadata.nodes[0].extras.d1;
+const valueRoot=metadata.nodes[0].extras.root;
+
 const decoded=atob(valueD1);
 
 if(
@@ -2705,6 +2707,7 @@ decoded.startsWith("https://")
 ){
 
 stacURL=decoded;
+window.JANUS_CUSTOM_ROOT=valueRoot ?? "";
 input.value=stacURL;
 
 }
@@ -2831,7 +2834,7 @@ throw new Error("No se encontró JSON en el GLB");
 
 
 
-function createGLB(stacURL){
+function createGLB(stacURL,root){
 
 const d1=btoa(stacURL);
 
@@ -2855,7 +2858,8 @@ nodes:[
 name:"Janus Data Particle",
 
 extras:{
-d1:d1
+d1:d1,
+root:root
 }
 
 }
@@ -2950,16 +2954,17 @@ const stacURL=BASE.replace(/\/+$/,"");
 
 if(!stacURL)return;
 
-const glb=createGLB(stacURL);
+const root=
+window.JANUS_CUSTOM_ROOT!==undefined
+?window.JANUS_CUSTOM_ROOT
+:/\.json(?:[?#].*)?$/i.test(stacURL)
+?""
+:"collections";
+
+const glb=createGLB(stacURL,root);
 
 const encodedGLB=
 uint8ArrayToBase64(glb);
-
-//const finalURL=
-//window.location.origin+
-//window.location.pathname+
-//"?3gb0="+
-//encodeURIComponent(encodedGLB);
 
 const finalURL=
 "https://3d.staratlas.es/observationvisor.html"+
@@ -2978,6 +2983,7 @@ return finalURL;
 }
 
 
+   
 
 function addDataModel(url){
 
