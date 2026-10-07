@@ -2470,7 +2470,35 @@ height:100%;
 }
 
 
+#jsonQuestionsPanel{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid #333;
+}
 
+#jsonQuestionsPanel h3{
+    margin:0 0 10px 0;
+}
+
+#jsonQuestions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.jsonQuestion{
+    padding:8px 12px;
+    border:1px solid #444;
+    border-radius:5px;
+    background:#181818;
+    color:#ddd;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.jsonQuestion:hover{
+    background:#252525;
+}
    
    
 </style>
@@ -2673,6 +2701,16 @@ Waiting for cell selection
         <div id="naturalReport">
             No report created.
         </div>
+
+       <div id="jsonQuestionsPanel">
+
+    <h3>QUESTIONS</h3>
+
+    <div id="jsonQuestions">
+        No questions available.
+    </div>
+
+</div>
 
     </div>
 
@@ -14289,6 +14327,7 @@ JANUS_INTERPRETED_JSON
 );
 
 const sentences=[];
+const questions=[];
 
 const observations=
 data.structure?.featureCount ||
@@ -14331,6 +14370,14 @@ if(geometryCount){
 
 sentences.push(
 `Spatial information is available through ${geometryCount} geometries of type ${geometryTypes.join(", ")}.`
+);
+
+questions.push(
+"Where are the observations located?"
+);
+
+questions.push(
+"What spatial reference system is used?"
 );
 
 }
@@ -14393,6 +14440,10 @@ sentences.push(
 
 }
 
+questions.push(
+"What is the spatial resolution?"
+);
+
 }
 
 const centroidLat=
@@ -14424,6 +14475,10 @@ temporal.fields.includes("datetime")
 
 sentences.push(
 `Temporal acquisition information is available through observation datetime fields.`
+);
+
+questions.push(
+"What temporal information is available?"
 );
 
 }
@@ -14466,6 +14521,10 @@ sentences.push(
 
 }
 
+questions.push(
+"What types of assets are available?"
+);
+
 }
 
 if(
@@ -14490,6 +14549,16 @@ sentences.push(
 );
 
 }
+
+}
+
+if(
+Object.keys(statistics).length
+){
+
+questions.push(
+"What numerical fields can be analysed?"
+);
 
 }
 
@@ -14566,6 +14635,62 @@ if(container){
 container.textContent=
 report||
 "No interpretable information available.";
+
+}
+
+const questionsContainer=
+document.getElementById(
+"jsonQuestions"
+);
+
+if(questionsContainer){
+
+questionsContainer.innerHTML="";
+
+const uniqueQuestions=
+[
+...new Set(questions)
+];
+
+if(!uniqueQuestions.length){
+
+questionsContainer.textContent=
+"No questions available.";
+
+}
+else{
+
+uniqueQuestions.forEach(
+question=>{
+
+const button=
+document.createElement("button");
+
+button.className=
+"jsonQuestion";
+
+button.type=
+"button";
+
+button.textContent=
+question;
+
+button.onclick=()=>{
+
+console.log(
+"JANUS QUESTION:",
+question
+);
+
+};
+
+questionsContainer.appendChild(
+button
+);
+
+});
+
+}
 
 }
 
