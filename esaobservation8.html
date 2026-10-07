@@ -2499,6 +2499,46 @@ height:100%;
 .jsonQuestion:hover{
     background:#252525;
 }
+
+   #jsonAnswerPanel{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid #333;
+}
+
+#jsonAnswerPanel h3{
+    margin:0 0 10px 0;
+}
+
+#jsonAnswer{
+    padding:14px 16px;
+    min-height:24px;
+    border:1px solid #333;
+    border-radius:6px;
+    background:#0c0c0c;
+    color:#ddd;
+    font-size:14px;
+    line-height:1.6;
+    white-space:normal;
+    overflow-wrap:anywhere;
+}
+
+#jsonAnswer:empty{
+    display:none;
+}
+
+.jsonQuestion.active{
+    border-color:#777;
+    background:#252525;
+    color:#fff;
+}
+
+.jsonQuestion{
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
    
    
 </style>
