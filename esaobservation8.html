@@ -14332,7 +14332,7 @@ fields
 
 
 
-     function createNaturalReport(){
+function createNaturalReport(){
 
 if(!JANUS_INTERPRETED_JSON)
 return;
@@ -14344,6 +14344,20 @@ JANUS_INTERPRETED_JSON
 
 const sentences=[];
 const questions=[];
+
+function addQuestion(
+id,
+text,
+capability
+){
+
+questions.push({
+id,
+text,
+capability
+});
+
+}
 
 const observations=
 data.structure?.featureCount ||
@@ -14388,12 +14402,16 @@ sentences.push(
 `Spatial information is available through ${geometryCount} geometries of type ${geometryTypes.join(", ")}.`
 );
 
-questions.push(
-"Where are the observations located?"
+addQuestion(
+"spatial_extent",
+"Where are the observations located?",
+"spatial"
 );
 
-questions.push(
-"What spatial reference system is used?"
+addQuestion(
+"projection",
+"What spatial reference system is used?",
+"projection"
 );
 
 }
@@ -14434,6 +14452,12 @@ statistics[
 ] ||
 statistics[
 "OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution"
+] ||
+statistics[
+"features[*].properties.gsd"
+] ||
+statistics[
+"features[*].assets.image.raster:bands[*].spatial_resolution"
 ];
 
 if(resolution){
@@ -14456,8 +14480,10 @@ sentences.push(
 
 }
 
-questions.push(
-"What is the spatial resolution?"
+addQuestion(
+"resolution",
+"What is the spatial resolution?",
+"resolution"
 );
 
 }
@@ -14493,8 +14519,10 @@ sentences.push(
 `Temporal acquisition information is available through observation datetime fields.`
 );
 
-questions.push(
-"What temporal information is available?"
+addQuestion(
+"temporal",
+"What temporal information is available?",
+"temporal"
 );
 
 }
@@ -14537,8 +14565,10 @@ sentences.push(
 
 }
 
-questions.push(
-"What types of assets are available?"
+addQuestion(
+"assets",
+"What types of assets are available?",
+"assets"
 );
 
 }
@@ -14568,21 +14598,28 @@ sentences.push(
 
 }
 
-if(
-Object.keys(statistics).length
-){
+const numericalFields=
+Object.entries(statistics)
+.filter(
+([path])=>
+!path.startsWith("context.") &&
+!path.startsWith("numberMatched") &&
+!path.startsWith("numberReturned")
+);
 
-questions.push(
-"What numerical fields can be analysed?"
+if(numericalFields.length){
+
+addQuestion(
+"statistics",
+"What numerical fields can be analysed?",
+"statistics"
 );
 
 }
 
 const available=[];
 
-if(
-geometryCount
-){
+if(geometryCount){
 
 available.push(
 "spatial analysis"
@@ -14601,9 +14638,7 @@ available.push(
 
 }
 
-if(
-Object.keys(statistics).length
-){
+if(numericalFields.length){
 
 available.push(
 "numerical statistics"
@@ -14664,9 +14699,16 @@ if(questionsContainer){
 questionsContainer.innerHTML="";
 
 const uniqueQuestions=
-[
-...new Set(questions)
-];
+Array.from(
+new Map(
+questions.map(
+question=>[
+question.id,
+question
+]
+)
+).values()
+);
 
 if(!uniqueQuestions.length){
 
@@ -14689,7 +14731,7 @@ button.type=
 "button";
 
 button.textContent=
-question;
+question.text;
 
 button.onclick=()=>{
 
@@ -14722,11 +14764,21 @@ document.getElementById(
 "jsonAnswer"
 );
 
-if(!answerContainer || !data)
+if(
+!answerContainer ||
+!data ||
+!question
+)
 return;
 
 answerContainer.textContent=
 "Analysing JSON...";
+
+const interpreted=
+interpretJSON(data);
+
+const statistics=
+interpreted.statistics || {};
 
 const values={
 
@@ -14874,16 +14926,10 @@ walk
 
 walk(data);
 
-const interpreted=
-interpretJSON(data);
-
-const statistics=
-interpreted.statistics || {};
-
 let answer="";
 
 if(
-question==="Where are the observations located?"
+question.capability==="spatial"
 ){
 
 if(values.bboxes.length){
@@ -14943,7 +14989,7 @@ answer=
 }
 
 else if(
-question==="What spatial reference system is used?"
+question.capability==="projection"
 ){
 
 if(values.epsg.size){
@@ -14964,7 +15010,7 @@ answer=
 }
 
 else if(
-question==="What temporal information is available?"
+question.capability==="temporal"
 ){
 
 if(values.datetimes.length){
@@ -14993,7 +15039,7 @@ answer=
 }
 
 else if(
-question==="What types of assets are available?"
+question.capability==="assets"
 ){
 
 if(values.assets.size){
@@ -15012,7 +15058,7 @@ answer=
 }
 
 else if(
-question==="What numerical fields can be analysed?"
+question.capability==="statistics"
 ){
 
 const fields=
@@ -15154,14 +15200,19 @@ answer=
 }
 
 else if(
-question==="What is the spatial resolution?"
+question.capability==="resolution"
 ){
 
 const resolutionCandidates=[
+
 "OBSERVATIONS[*].properties.gsd",
+
 "features[*].properties.gsd",
+
 "OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution",
+
 "features[*].assets.image.raster:bands[*].spatial_resolution"
+
 ];
 
 let resolution=null;
@@ -15212,7 +15263,7 @@ answer=
 else{
 
 answer=
-"No specific answer is available for this question yet.";
+"No resolver is currently available for this capability.";
 
 }
 
