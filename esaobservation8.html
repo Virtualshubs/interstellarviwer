@@ -14740,8 +14740,6 @@ assets:new Set(),
 
 assetCount:0,
 
-coordinates:[],
-
 bboxes:[]
 
 };
@@ -14875,6 +14873,12 @@ walk
 }
 
 walk(data);
+
+const interpreted=
+interpretJSON(data);
+
+const statistics=
+interpreted.statistics || {};
 
 let answer="";
 
@@ -15011,15 +15015,133 @@ else if(
 question==="What numerical fields can be analysed?"
 ){
 
-const numericalFields=
-Object.keys(
-interpretJSON(data).statistics || {}
+const fields=
+Object.entries(
+statistics
+)
+.filter(
+([path])=>
+!path.startsWith("context.") &&
+!path.startsWith("numberMatched") &&
+!path.startsWith("numberReturned")
 );
 
-if(numericalFields.length){
+if(fields.length){
+
+const descriptions=[];
+
+fields.forEach(
+([path,stat])=>{
+
+let field=
+path
+.replace(
+"OBSERVATIONS[*].",
+""
+)
+.replace(
+"features[*].",
+""
+)
+.replace(
+"properties.",
+""
+)
+.replace(
+"assets.",
+""
+);
+
+field=
+field
+.replace(
+"[*].",
+"."
+)
+.replace(
+"[*]",
+""
+);
+
+if(
+field.startsWith("CELL_INFO.")
+){
+
+field=
+field.replace(
+"CELL_INFO.",
+""
+);
+
+}
+
+if(
+field.includes("raster:bands.")
+){
+
+field=
+field.replace(
+"raster:bands.",
+""
+);
+
+}
+
+if(
+field.includes(".")
+){
+
+const parts=
+field.split(".");
+
+if(
+parts.length>2
+){
+
+field=
+parts
+.slice(-2)
+.join(".");
+
+}
+
+}
+
+let description=
+field;
+
+if(
+stat.minimum!==null &&
+stat.maximum!==null
+){
+
+if(
+stat.minimum===
+stat.maximum
+){
+
+description+=
+` (${stat.minimum})`;
+
+}
+else{
+
+description+=
+` (${stat.minimum}–${stat.maximum})`;
+
+}
+
+}
+
+descriptions.push(
+description
+);
+
+}
+);
 
 answer=
-`The following numerical fields can be analysed: ${numericalFields.join(", ")}.`;
+`The following numerical fields are available for analysis: ${descriptions.join(", ")}.`;
 
 }
 else{
@@ -15035,19 +15157,29 @@ else if(
 question==="What is the spatial resolution?"
 ){
 
-const interpreted=
-interpretJSON(data);
-
-const stats=
-interpreted.statistics || {};
-
-const resolution=
-stats[
-"OBSERVATIONS[*].properties.gsd"
-] ||
-stats[
-"OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution"
+const resolutionCandidates=[
+"OBSERVATIONS[*].properties.gsd",
+"features[*].properties.gsd",
+"OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution",
+"features[*].assets.image.raster:bands[*].spatial_resolution"
 ];
+
+let resolution=null;
+
+for(
+const path of resolutionCandidates
+){
+
+if(statistics[path]){
+
+resolution=
+statistics[path];
+
+break;
+
+}
+
+}
 
 if(resolution){
 
