@@ -14290,43 +14290,155 @@ JANUS_INTERPRETED_JSON
 
 const sentences=[];
 
-if(data.type){
+const observations=
+data.structure?.featureCount ||
+data.structure?.length ||
+data.fields?.OBSERVATIONS?.size ||
+null;
+
+const geometryCount=
+data.spatial?.count || 0;
+
+const geometryTypes=
+data.spatial?.types || [];
+
+if(
+JANUS_INTERPRETED_JSON.CELL_INFO &&
+JANUS_INTERPRETED_JSON.OBSERVATIONS
+){
 
 sentences.push(
-`The resource has been identified as ${data.type}.`
+`The resource contains ${JANUS_INTERPRETED_JSON.OBSERVATIONS.length} observations within a spatial cell.`
+);
+
+}
+else if(observations!==null){
+
+sentences.push(
+`The resource contains ${observations} observations.`
+);
+
+}
+else if(data.type){
+
+sentences.push(
+`The resource has been identified as a ${data.type} resource.`
+);
+
+}
+
+if(geometryCount){
+
+sentences.push(
+`Spatial information is available through ${geometryCount} geometries of type ${geometryTypes.join(", ")}.`
+);
+
+}
+
+const statistics=
+data.statistics || {};
+
+const epsg=
+statistics[
+"OBSERVATIONS[*].properties.proj:epsg"
+];
+
+if(epsg){
+
+if(
+epsg.minimum===
+epsg.maximum
+){
+
+sentences.push(
+`The observations use spatial reference system EPSG:${epsg.minimum}.`
+);
+
+}
+else{
+
+sentences.push(
+`The observations use spatial reference systems including EPSG:${epsg.minimum} to EPSG:${epsg.maximum}.`
+);
+
+}
+
+}
+
+const resolution=
+statistics[
+"OBSERVATIONS[*].properties.gsd"
+] ||
+statistics[
+"OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution"
+];
+
+if(resolution){
+
+if(
+resolution.minimum===
+resolution.maximum
+){
+
+sentences.push(
+`The reported spatial resolution is ${resolution.minimum} metres.`
+);
+
+}
+else{
+
+sentences.push(
+`Reported spatial resolution ranges from ${resolution.minimum} to ${resolution.maximum} metres.`
+);
+
+}
+
+}
+
+const centroidLat=
+statistics[
+"OBSERVATIONS[*].properties.proj:centroid.lat"
+];
+
+const centroidLon=
+statistics[
+"OBSERVATIONS[*].properties.proj:centroid.lon"
+];
+
+if(centroidLat && centroidLon){
+
+sentences.push(
+`Observation centroids cover approximately ${centroidLat.minimum.toFixed(2)} to ${centroidLat.maximum.toFixed(2)} degrees latitude and ${centroidLon.minimum.toFixed(2)} to ${centroidLon.maximum.toFixed(2)} degrees longitude.`
+);
+
+}
+
+const temporal=
+data.temporal;
+
+if(
+temporal &&
+temporal.fields &&
+temporal.fields.includes("datetime")
+){
+
+sentences.push(
+`Temporal acquisition information is available through observation datetime fields.`
 );
 
 }
 
 if(
-data.structure &&
-typeof data.structure.featureCount==="number"
+temporal &&
+temporal.fields &&
+(
+temporal.fields.includes("created") ||
+temporal.fields.includes("updated")
+)
 ){
 
 sentences.push(
-`It contains ${data.structure.featureCount} features.`
-);
-
-}
-
-if(
-data.spatial &&
-data.spatial.count
-){
-
-sentences.push(
-`Spatial information is available through ${data.spatial.count} geometries of type ${data.spatial.types.join(", ")}.`
-);
-
-}
-
-if(
-data.temporal &&
-data.temporal.min
-){
-
-sentences.push(
-`Temporal information is available from ${data.temporal.min} to ${data.temporal.max}.`
+`Additional creation and update timestamps are available.`
 );
 
 }
@@ -14336,9 +14448,23 @@ data.assets &&
 data.assets.count
 ){
 
+const assetTypes=
+data.assets.types || [];
+
+if(assetTypes.length){
+
+sentences.push(
+`The resource contains ${data.assets.count} assets, including ${assetTypes.join(" and ")}.`
+);
+
+}
+else{
+
 sentences.push(
 `The resource contains ${data.assets.count} assets.`
 );
+
+}
 
 }
 
@@ -14347,19 +14473,74 @@ data.links &&
 data.links.count
 ){
 
+const relations=
+data.links.relations || [];
+
+if(relations.length){
+
 sentences.push(
-`It also exposes ${data.links.count} linked resources.`
+`It exposes ${data.links.count} linked resources with relationships including ${relations.join(", ")}.`
+);
+
+}
+else{
+
+sentences.push(
+`It exposes ${data.links.count} linked resources.`
+);
+
+}
+
+}
+
+const available=[];
+
+if(
+geometryCount
+){
+
+available.push(
+"spatial analysis"
 );
 
 }
 
 if(
-data.extensions &&
-data.extensions.length
+temporal &&
+temporal.count
 ){
 
+available.push(
+"temporal analysis"
+);
+
+}
+
+if(
+Object.keys(statistics).length
+){
+
+available.push(
+"numerical statistics"
+);
+
+}
+
+if(
+data.assets &&
+data.assets.count
+){
+
+available.push(
+"asset exploration"
+);
+
+}
+
+if(available.length){
+
 sentences.push(
-`The resource declares ${data.extensions.length} extensions.`
+`Available analysis includes ${available.join(", ")}.`
 );
 
 }
