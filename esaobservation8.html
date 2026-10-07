@@ -3759,14 +3759,14 @@ const data=await res.json();
 // ACTUALIZAR RAW CON EL JSON REAL
 // =================================
 
-//document.getElementById("raw").textContent=
-//JSON.stringify(
-//data,
-//null,
-//2
-//);
+document.getElementById("raw").textContent=
+JSON.stringify(
+data,
+null,
+2
+);
 
-updateRAW(data);
+updateJSONInterpreter(data);
 
 // =================================
 // CATALOG
@@ -3869,14 +3869,14 @@ meta,
 activeDataset.endDate||""
 );
 
-//document.getElementById("raw").textContent=
-//JSON.stringify(
-//col,
-//null,
-//2
-//);
+document.getElementById("raw").textContent=
+JSON.stringify(
+col,
+null,
+2
+);
 
-   updateRAW(col);
+updateJSONInterpreter(data);
 
 loadItems(activeDataset);
 
@@ -3977,14 +3977,14 @@ throw new Error(
 
 data.items=itemsURL;
 
-//document.getElementById("raw").textContent=
-//JSON.stringify(
-//itemsJSON,
-//null,
-//2
-//);
+document.getElementById("raw").textContent=
+JSON.stringify(
+itemsJSON,
+null,
+2
+);
 
-   updateRAW(itemsJSON);
+  updateJSONInterpreter(data);
 
 console.log(
 "RAW UPDATED WITH ITEMS JSON"
@@ -13461,29 +13461,7 @@ if(body === "moon"){
 
 
 
-
-
 let JANUS_INTERPRETED_JSON=null;
-
-function updateRAW(data){
-
-if(!data)return;
-
-const raw=
-document.getElementById("raw");
-
-if(!raw)return;
-
-raw.textContent=
-JSON.stringify(
-data,
-null,
-2
-);
-
-updateJSONInterpreter(data);
-
-}
 
 function updateJSONInterpreter(data){
 
@@ -14257,7 +14235,6 @@ createReportButton.onclick=
 createNaturalReport;
 
 }
-
      
 
 </script>
