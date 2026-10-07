@@ -13518,10 +13518,7 @@ if(body === "moon"){
 
 
 
-
-
-
-     let JANUS_INTERPRETED_JSON=null;
+let JANUS_INTERPRETED_JSON=null;
 
 function updateJSONInterpreter(data){
 
@@ -13529,11 +13526,11 @@ if(!data)return;
 
 try{
 
+JANUS_INTERPRETED_JSON=
+data;
+
 const interpreted=
 interpretJSON(data);
-
-JANUS_INTERPRETED_JSON=
-interpreted;
 
 const container=
 document.getElementById(
@@ -14180,7 +14177,9 @@ if(!JANUS_INTERPRETED_JSON)
 return;
 
 const data=
-JANUS_INTERPRETED_JSON;
+interpretJSON(
+JANUS_INTERPRETED_JSON
+);
 
 const sentences=[];
 
