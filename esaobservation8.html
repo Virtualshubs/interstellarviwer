@@ -2710,6 +2710,16 @@ Waiting for cell selection
         No questions available.
     </div>
 
+          <div id="jsonAnswerPanel">
+
+    <h3>ANSWER</h3>
+
+    <div id="jsonAnswer">
+        Select a question.
+    </div>
+
+</div>
+
 </div>
 
     </div>
@@ -14316,7 +14326,13 @@ fields
 
 }
 
-function createNaturalReport(){
+
+
+
+
+
+
+     function createNaturalReport(){
 
 if(!JANUS_INTERPRETED_JSON)
 return;
@@ -14677,8 +14693,7 @@ question;
 
 button.onclick=()=>{
 
-console.log(
-"JANUS QUESTION:",
+answerJSONQuestion(
 question
 );
 
@@ -14693,6 +14708,384 @@ button
 }
 
 }
+
+}
+
+
+function answerJSONQuestion(question){
+
+const data=
+JANUS_INTERPRETED_JSON;
+
+const answerContainer=
+document.getElementById(
+"jsonAnswer"
+);
+
+if(!answerContainer || !data)
+return;
+
+answerContainer.textContent=
+"Analysing JSON...";
+
+const values={
+
+geometries:[],
+
+epsg:new Set(),
+
+datetimes:[],
+
+assets:new Set(),
+
+assetCount:0,
+
+coordinates:[],
+
+bboxes:[]
+
+};
+
+function walk(value){
+
+if(
+value===null ||
+value===undefined
+)
+return;
+
+if(Array.isArray(value)){
+
+value.forEach(walk);
+
+return;
+
+}
+
+if(typeof value!=="object")
+return;
+
+if(
+typeof value.type==="string" &&
+[
+"Point",
+"LineString",
+"Polygon",
+"MultiPoint",
+"MultiLineString",
+"MultiPolygon",
+"GeometryCollection"
+].includes(value.type)
+){
+
+values.geometries.push(
+value.type
+);
+
+}
+
+if(
+typeof value["proj:epsg"]==="number"
+){
+
+values.epsg.add(
+value["proj:epsg"]
+);
+
+}
+
+if(
+typeof value.epsg==="number"
+){
+
+values.epsg.add(
+value.epsg
+);
+
+}
+
+if(
+typeof value.datetime==="string"
+){
+
+const timestamp=
+Date.parse(
+value.datetime
+);
+
+if(!isNaN(timestamp)){
+
+values.datetimes.push(
+timestamp
+);
+
+}
+
+}
+
+if(
+Array.isArray(value.bbox) &&
+value.bbox.length>=4 &&
+value.bbox.every(
+v=>typeof v==="number"
+)
+){
+
+values.bboxes.push(
+value.bbox
+);
+
+}
+
+if(
+value.assets &&
+typeof value.assets==="object"
+){
+
+Object.values(
+value.assets
+).forEach(
+asset=>{
+
+if(
+!asset ||
+typeof asset!=="object"
+)
+return;
+
+values.assetCount++;
+
+if(asset.type){
+
+values.assets.add(
+asset.type
+);
+
+}
+
+}
+);
+
+}
+
+Object.values(value).forEach(
+walk
+);
+
+}
+
+walk(data);
+
+let answer="";
+
+if(
+question==="Where are the observations located?"
+){
+
+if(values.bboxes.length){
+
+let minLon=Infinity;
+let minLat=Infinity;
+let maxLon=-Infinity;
+let maxLat=-Infinity;
+
+values.bboxes.forEach(
+bbox=>{
+
+minLon=
+Math.min(
+minLon,
+bbox[0]
+);
+
+minLat=
+Math.min(
+minLat,
+bbox[1]
+);
+
+maxLon=
+Math.max(
+maxLon,
+bbox[2]
+);
+
+maxLat=
+Math.max(
+maxLat,
+bbox[3]
+);
+
+}
+);
+
+answer=
+`The observations are distributed across approximately ${minLat.toFixed(2)} to ${maxLat.toFixed(2)} degrees latitude and ${minLon.toFixed(2)} to ${maxLon.toFixed(2)} degrees longitude.`;
+
+}
+else if(values.geometries.length){
+
+answer=
+`The resource contains ${values.geometries.length} spatial observations with geometry types ${[...new Set(values.geometries)].join(", ")}.`;
+
+}
+else{
+
+answer=
+"No spatial extent could be determined from the available JSON.";
+
+}
+
+}
+
+else if(
+question==="What spatial reference system is used?"
+){
+
+if(values.epsg.size){
+
+answer=
+`The observations use ${[...values.epsg].map(
+code=>`EPSG:${code}`
+).join(", ")}.`;
+
+}
+else{
+
+answer=
+"No EPSG spatial reference system was found in the available JSON.";
+
+}
+
+}
+
+else if(
+question==="What temporal information is available?"
+){
+
+if(values.datetimes.length){
+
+const min=
+new Date(
+Math.min(...values.datetimes)
+).toISOString();
+
+const max=
+new Date(
+Math.max(...values.datetimes)
+).toISOString();
+
+answer=
+`Observation datetime information is available for ${values.datetimes.length} records, ranging from ${min} to ${max}.`;
+
+}
+else{
+
+answer=
+"No observation datetime values were found in the available JSON.";
+
+}
+
+}
+
+else if(
+question==="What types of assets are available?"
+){
+
+if(values.assets.size){
+
+answer=
+`The resource provides ${values.assetCount} assets. The detected asset types are ${[...values.assets].join(", ")}.`;
+
+}
+else{
+
+answer=
+"No asset types were detected in the available JSON.";
+
+}
+
+}
+
+else if(
+question==="What numerical fields can be analysed?"
+){
+
+const numericalFields=
+Object.keys(
+interpretJSON(data).statistics || {}
+);
+
+if(numericalFields.length){
+
+answer=
+`The following numerical fields can be analysed: ${numericalFields.join(", ")}.`;
+
+}
+else{
+
+answer=
+"No numerical fields were detected for statistical analysis.";
+
+}
+
+}
+
+else if(
+question==="What is the spatial resolution?"
+){
+
+const interpreted=
+interpretJSON(data);
+
+const stats=
+interpreted.statistics || {};
+
+const resolution=
+stats[
+"OBSERVATIONS[*].properties.gsd"
+] ||
+stats[
+"OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution"
+];
+
+if(resolution){
+
+if(
+resolution.minimum===
+resolution.maximum
+){
+
+answer=
+`The reported spatial resolution is ${resolution.minimum} metres.`;
+
+}
+else{
+
+answer=
+`The reported spatial resolution ranges from ${resolution.minimum} to ${resolution.maximum} metres.`;
+
+}
+
+}
+else{
+
+answer=
+"No spatial resolution was found in the available JSON.";
+
+}
+
+}
+
+else{
+
+answer=
+"No specific answer is available for this question yet.";
+
+}
+
+answerContainer.textContent=
+answer;
 
 }
 
