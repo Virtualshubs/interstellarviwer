@@ -13596,10 +13596,6 @@ if(body === "moon"){
 
 
 
-
-
-
-
 let JANUS_INTERPRETED_JSON=null;
 
 function updateJSONInterpreter(data){
@@ -13665,6 +13661,7 @@ error
 
 }
 
+
 function interpretJSON(data){
 
 const result={
@@ -13677,6 +13674,28 @@ structure:{},
 fields:{},
 
 statistics:{},
+
+analysis:{
+
+counts:{},
+
+uniqueValues:{},
+
+missing:{},
+
+extremes:{},
+
+temporal:{},
+
+spatial:{},
+
+assets:{},
+
+provenance:{},
+
+distribution:{}
+
+},
 
 spatial:{},
 
@@ -13789,9 +13808,15 @@ data,
 result.statistics
 );
 
+collectAnalysis(
+data,
+result.analysis
+);
+
 return result;
 
 }
+
 
 function detectJSONType(value){
 
@@ -13807,6 +13832,7 @@ return"object";
 return typeof value;
 
 }
+
 
 function analyzeObject(
 value,
@@ -13940,6 +13966,7 @@ currentPath
 
 }
 
+
 function collectGeometryInfo(
 data,
 result
@@ -13996,6 +14023,7 @@ result.types=
 ];
 
 }
+
 
 function collectTemporalInfo(
 data,
@@ -14101,6 +14129,7 @@ result.fields=
 
 }
 
+
 function collectLinks(
 data,
 result
@@ -14161,6 +14190,7 @@ result.relations=
 
 }
 
+
 function collectAssets(
 data,
 result
@@ -14199,7 +14229,8 @@ asset.type
 
 }
 
-});
+}
+);
 
 }
 
@@ -14225,6 +14256,7 @@ result.types=
 
 }
 
+
 function collectExtensions(
 data,
 result
@@ -14243,6 +14275,7 @@ result.push(
 }
 
 }
+
 
 function collectStatistics(
 data,
@@ -14367,10 +14400,1298 @@ fields
 }
 
 
+/* =========================================================
+   ADVANCED ANALYSIS
+   ========================================================= */
+
+function collectAnalysis(
+data,
+result
+){
+
+const numeric={};
+
+const categorical={};
+
+const missing={};
+
+const timestamps=[];
+
+const dates=new Map;
+
+const platforms=new Map;
+const collections=new Map;
+const sensors=new Map;
+const instruments=new Map;
+const processing=new Map;
+const regions=new Map;
+
+const assetTypes=new Map;
+const assetRoles=new Map;
+
+const geometryTypes=new Map;
+
+let observationCount=0;
+let geometryCount=0;
+let assetCount=0;
+let imageCount=0;
+let metadataAssetCount=0;
+let linkCount=0;
+
+let minLat=Infinity;
+let maxLat=-Infinity;
+let minLon=Infinity;
+let maxLon=-Infinity;
+
+let sumLat=0;
+let sumLon=0;
+let centroidCount=0;
 
 
+function incrementMap(
+map,
+key
+){
+
+if(
+key===null ||
+key===undefined ||
+key===""
+)
+return;
+
+const value=
+String(key);
+
+map.set(
+value,
+(map.get(value)||0)+1
+);
+
+}
 
 
+function isGeometryType(
+type
+){
+
+return[
+"Point",
+"LineString",
+"Polygon",
+"MultiPoint",
+"MultiLineString",
+"MultiPolygon",
+"GeometryCollection"
+].includes(
+type
+);
+
+}
+
+
+function isAdministrativeNumeric(
+key,
+path
+){
+
+const k=
+String(key)
+.toLowerCase();
+
+const p=
+String(path)
+.toLowerCase();
+
+if(
+[
+"id",
+"epsg",
+"proj:epsg",
+"numbermatched",
+"numberreturned",
+"limit",
+"offset"
+].includes(k)
+){
+
+return true;
+
+}
+
+if(
+p.includes("cell_info.id") ||
+p.includes("context.") ||
+p.includes("numbermatched") ||
+p.includes("numberreturned")
+){
+
+return true;
+
+}
+
+return false;
+
+}
+
+
+function isCategoricalField(
+key
+){
+
+return[
+"platform",
+"collection",
+"sensor",
+"instrument",
+"mission",
+"constellation",
+"region",
+"grid:code",
+"processing:software",
+"processing_software",
+"storage:region"
+].includes(
+String(key).toLowerCase()
+);
+
+}
+
+
+function getObservationReference(
+observation
+){
+
+const properties=
+observation.properties||
+{};
+
+const centroid=
+properties["proj:centroid"]||
+{};
+
+let latitude=
+Number.isFinite(
+centroid.lat
+)?
+centroid.lat:
+null;
+
+let longitude=
+Number.isFinite(
+centroid.lon
+)?
+centroid.lon:
+null;
+
+if(
+(
+latitude===null ||
+longitude===null
+) &&
+Array.isArray(
+observation.bbox
+) &&
+observation.bbox.length>=4
+){
+
+if(latitude===null){
+
+latitude=
+(
+observation.bbox[1]+
+observation.bbox[3]
+)/2;
+
+}
+
+if(longitude===null){
+
+longitude=
+(
+observation.bbox[0]+
+observation.bbox[2]
+)/2;
+
+}
+
+}
+
+return{
+
+id:
+observation.id||
+null,
+
+datetime:
+observation.datetime||
+properties.datetime||
+null,
+
+latitude,
+
+longitude
+
+};
+
+}
+
+
+function registerObservation(
+observation
+){
+
+observationCount++;
+
+const properties=
+observation.properties||
+{};
+
+const reference=
+getObservationReference(
+observation
+);
+
+if(
+Number.isFinite(
+reference.latitude
+) &&
+Number.isFinite(
+reference.longitude
+)
+){
+
+sumLat+=
+reference.latitude;
+
+sumLon+=
+reference.longitude;
+
+centroidCount++;
+
+minLat=
+Math.min(
+minLat,
+reference.latitude
+);
+
+maxLat=
+Math.max(
+maxLat,
+reference.latitude
+);
+
+minLon=
+Math.min(
+minLon,
+reference.longitude
+);
+
+maxLon=
+Math.max(
+maxLon,
+reference.longitude
+);
+
+}
+
+const datetime=
+observation.datetime||
+properties.datetime;
+
+if(
+typeof datetime==="string"
+){
+
+const timestamp=
+Date.parse(
+datetime
+);
+
+if(!isNaN(timestamp)){
+
+timestamps.push(
+timestamp
+);
+
+const day=
+datetime.slice(
+0,
+10
+);
+
+incrementMap(
+dates,
+day
+);
+
+}
+
+}
+
+if(
+properties.platform!==undefined
+){
+
+if(
+Array.isArray(
+properties.platform
+)
+){
+
+properties.platform.forEach(
+value=>
+incrementMap(
+platforms,
+value
+)
+);
+
+}
+else{
+
+incrementMap(
+platforms,
+properties.platform
+);
+
+}
+
+}
+
+if(
+observation.collection!==undefined
+){
+
+incrementMap(
+collections,
+observation.collection
+);
+
+}
+
+if(
+properties.sensor!==undefined
+){
+
+incrementMap(
+sensors,
+properties.sensor
+);
+
+}
+
+if(
+properties.instrument!==undefined
+){
+
+incrementMap(
+instruments,
+properties.instrument
+);
+
+}
+
+const software=
+properties["processing:software"]||
+properties["processing_software"];
+
+if(
+software
+){
+
+if(
+typeof software==="object" &&
+!Array.isArray(software)
+){
+
+Object.keys(
+software
+).forEach(
+key=>
+incrementMap(
+processing,
+key
+)
+);
+
+}
+else if(
+Array.isArray(software)
+){
+
+software.forEach(
+value=>
+incrementMap(
+processing,
+value
+)
+);
+
+}
+else{
+
+incrementMap(
+processing,
+software
+);
+
+}
+
+}
+
+const region=
+properties["storage:region"];
+
+if(region){
+
+incrementMap(
+regions,
+region
+);
+
+}
+
+}
+
+
+function registerNumeric(
+path,
+value,
+observation
+){
+
+if(
+!Number.isFinite(value)
+)
+return;
+
+const lastKey=
+path
+.split(".")
+.pop();
+
+if(
+isAdministrativeNumeric(
+lastKey,
+path
+)
+)
+return;
+
+if(
+!numeric[path]
+){
+
+numeric[path]={
+count:0,
+minimum:value,
+maximum:value,
+sum:0,
+sumSquares:0,
+values:[],
+minimumObservation:null,
+maximumObservation:null
+};
+
+}
+
+const stat=
+numeric[path];
+
+stat.count++;
+
+stat.sum+=
+value;
+
+stat.sumSquares+=
+value*value;
+
+stat.values.push(
+value
+);
+
+if(
+value<
+stat.minimum
+){
+
+stat.minimum=
+value;
+
+stat.minimumObservation=
+observation;
+
+}
+
+if(
+value>
+stat.maximum
+){
+
+stat.maximum=
+value;
+
+stat.maximumObservation=
+observation;
+
+}
+
+}
+
+
+function registerCategorical(
+path,
+value
+){
+
+if(
+value===null ||
+value===undefined ||
+value===""
+)
+return;
+
+if(
+!categorical[path]
+){
+
+categorical[path]=
+new Map;
+
+}
+
+incrementMap(
+categorical[path],
+value
+);
+
+}
+
+
+function registerAsset(
+asset
+){
+
+if(
+!asset ||
+typeof asset!=="object"
+)
+return;
+
+assetCount++;
+
+const type=
+asset.type||
+"unknown";
+
+incrementMap(
+assetTypes,
+type
+);
+
+if(
+Array.isArray(
+asset.roles
+)
+){
+
+asset.roles.forEach(
+role=>
+incrementMap(
+assetRoles,
+role
+)
+);
+
+}
+
+const mime=
+String(type)
+.toLowerCase();
+
+if(
+mime.startsWith(
+"image/"
+)
+){
+
+imageCount++;
+
+}
+
+if(
+mime.includes("xml") ||
+mime.includes("json") ||
+mime.startsWith("text/")
+){
+
+metadataAssetCount++;
+
+}
+
+}
+
+
+function registerGeometry(
+value
+){
+
+if(
+!value ||
+typeof value!=="object"
+)
+return;
+
+if(
+isGeometryType(
+value.type
+)
+){
+
+geometryCount++;
+
+incrementMap(
+geometryTypes,
+value.type
+);
+
+}
+
+}
+
+
+function registerMissing(
+path
+){
+
+missing[path]=
+(missing[path]||0)+1;
+
+}
+
+
+function walk(
+value,
+path="",
+insideObservation=false,
+observationReference=null
+){
+
+if(
+value===null ||
+value===undefined
+)
+return;
+
+if(Array.isArray(value)){
+
+value.forEach(
+item=>
+walk(
+item,
+path,
+insideObservation,
+observationReference
+)
+);
+
+return;
+
+}
+
+if(typeof value!=="object")
+return;
+
+const isObservation=
+value.type==="Feature" ||
+(
+value.properties &&
+(
+value.datetime ||
+value.properties.datetime ||
+value.assets
+)
+);
+
+let currentObservation=
+observationReference;
+
+if(isObservation){
+
+currentObservation=
+getObservationReference(
+value
+);
+
+registerObservation(
+value
+);
+
+insideObservation=true;
+
+}
+
+registerGeometry(
+value
+);
+
+if(
+Array.isArray(
+value.links
+)
+){
+
+linkCount+=
+value.links.length;
+
+}
+
+if(
+value.assets &&
+typeof value.assets==="object"
+){
+
+Object.values(
+value.assets
+).forEach(
+registerAsset
+);
+
+}
+
+Object.entries(value).forEach(
+([key,val])=>{
+
+const currentPath=
+path?
+`${path}.${key}`:
+key;
+
+if(
+typeof val==="number" &&
+Number.isFinite(val)
+){
+
+if(
+insideObservation
+){
+
+registerNumeric(
+currentPath,
+val,
+currentObservation
+);
+
+}
+
+}
+
+if(
+typeof val==="string" &&
+isCategoricalField(key)
+){
+
+registerCategorical(
+key,
+val
+);
+
+}
+
+if(
+val===null ||
+val===undefined ||
+val===""
+){
+
+registerMissing(
+currentPath
+);
+
+}
+
+if(
+val &&
+typeof val==="object"
+){
+
+walk(
+val,
+currentPath,
+insideObservation,
+currentObservation
+);
+
+}
+
+});
+
+}
+
+walk(data);
+
+
+/* =========================================================
+   NUMERICAL ANALYSIS
+   ========================================================= */
+
+const numericalOutput={};
+
+Object.entries(
+numeric
+).forEach(
+([path,stat])=>{
+
+const values=
+stat.values.sort(
+(a,b)=>a-b
+);
+
+const average=
+stat.sum/stat.count;
+
+const variance=
+Math.max(
+0,
+(
+stat.sumSquares/stat.count
+)-
+(
+average*average
+)
+);
+
+const standardDeviation=
+Math.sqrt(
+variance
+);
+
+function percentile(
+percentage
+){
+
+if(!values.length)
+return null;
+
+const index=
+(
+percentage/100
+)*
+(
+values.length-1
+);
+
+const lower=
+Math.floor(index);
+
+const upper=
+Math.ceil(index);
+
+if(
+lower===upper
+){
+
+return values[lower];
+
+}
+
+return(
+values[lower]+
+(
+values[upper]-
+values[lower]
+)*
+(
+index-lower
+)
+);
+
+}
+
+const uniqueCount=
+new Set(
+values
+).size;
+
+numericalOutput[path]={
+
+count:
+stat.count,
+
+minimum:
+stat.minimum,
+
+maximum:
+stat.maximum,
+
+average,
+
+range:
+stat.maximum-
+stat.minimum,
+
+standardDeviation,
+
+percentiles:{
+
+p25:
+percentile(25),
+
+p50:
+percentile(50),
+
+p75:
+percentile(75),
+
+p90:
+percentile(90),
+
+p95:
+percentile(95),
+
+p99:
+percentile(99)
+
+},
+
+uniqueCount,
+
+variable:
+uniqueCount>1,
+
+missing:
+missing[path]||
+0,
+
+minimumObservation:
+stat.minimumObservation,
+
+maximumObservation:
+stat.maximumObservation
+
+};
+
+});
+
+
+/* =========================================================
+   TEMPORAL ANALYSIS
+   ========================================================= */
+
+timestamps.sort(
+(a,b)=>a-b
+);
+
+const firstTimestamp=
+timestamps.length?
+timestamps[0]:
+null;
+
+const lastTimestamp=
+timestamps.length?
+timestamps[timestamps.length-1]:
+null;
+
+const uniqueDates=
+[
+...dates.keys()
+].sort();
+
+const gaps=[];
+
+for(
+let i=1;
+i<timestamps.length;
+i++
+){
+
+const gap=
+(
+timestamps[i]-
+timestamps[i-1]
+)/
+86400000;
+
+if(gap>0){
+
+gaps.push(
+gap
+);
+
+}
+
+}
+
+
+/* =========================================================
+   SPATIAL ANALYSIS
+   ========================================================= */
+
+let bbox=null;
+
+if(
+Number.isFinite(minLat) &&
+Number.isFinite(maxLat) &&
+Number.isFinite(minLon) &&
+Number.isFinite(maxLon)
+){
+
+bbox=[
+
+minLon,
+minLat,
+maxLon,
+maxLat
+
+];
+
+}
+
+
+/* =========================================================
+   OUTPUT
+   ========================================================= */
+
+function mapToObject(
+map
+){
+
+return Object.fromEntries(
+map.entries()
+);
+
+}
+
+result.counts={
+
+observations:
+observationCount,
+
+geometries:
+geometryCount,
+
+assets:
+assetCount,
+
+images:
+imageCount,
+
+metadataAssets:
+metadataAssetCount,
+
+links:
+linkCount,
+
+uniqueDates:
+uniqueDates.length
+
+};
+
+result.uniqueValues=
+categorical;
+
+result.missing=
+missing;
+
+result.extremes=
+numericalOutput;
+
+result.temporal={
+
+first:
+firstTimestamp!==null?
+new Date(
+firstTimestamp
+).toISOString():
+null,
+
+last:
+lastTimestamp!==null?
+new Date(
+lastTimestamp
+).toISOString():
+null,
+
+durationDays:
+firstTimestamp!==null &&
+lastTimestamp!==null?
+(
+lastTimestamp-
+firstTimestamp
+)/86400000:
+0,
+
+uniqueDates,
+
+frequency:
+uniqueDates.length?
+observationCount/
+uniqueDates.length:
+0,
+
+gaps:{
+
+count:
+gaps.length,
+
+maximum:
+gaps.length?
+Math.max(...gaps):
+0,
+
+average:
+gaps.length?
+gaps.reduce(
+(a,b)=>a+b,
+0
+)/
+gaps.length:
+0
+
+},
+
+observationsByDate:
+mapToObject(
+dates
+)
+
+};
+
+result.spatial={
+
+geometryCount,
+
+geometryTypes:
+Object.keys(
+mapToObject(
+geometryTypes
+)
+),
+
+bbox,
+
+center:
+centroidCount?
+{
+
+latitude:
+sumLat/
+centroidCount,
+
+longitude:
+sumLon/
+centroidCount
+
+}:
+bbox?
+{
+
+latitude:
+(
+bbox[1]+
+bbox[3]
+)/2,
+
+longitude:
+(
+bbox[0]+
+bbox[2]
+)/2
+
+}:
+null
+
+};
+
+result.assets={
+
+count:
+assetCount,
+
+images:
+imageCount,
+
+metadata:
+metadataAssetCount,
+
+perObservation:
+observationCount?
+assetCount/
+observationCount:
+0,
+
+types:
+mapToObject(
+assetTypes
+),
+
+roles:
+mapToObject(
+assetRoles
+)
+
+};
+
+result.provenance={
+
+platforms:
+mapToObject(
+platforms
+),
+
+collections:
+mapToObject(
+collections
+),
+
+sensors:
+mapToObject(
+sensors
+),
+
+instruments:
+mapToObject(
+instruments
+),
+
+processing:
+mapToObject(
+processing
+),
+
+storageRegions:
+mapToObject(
+regions
+)
+
+};
+
+result.distribution={
+
+observationsByPlatform:
+mapToObject(
+platforms
+),
+
+observationsByCollection:
+mapToObject(
+collections
+),
+
+observationsByGeometry:
+mapToObject(
+geometryTypes
+)
+
+};
+
+}
+
+
+/* =========================================================
+   NATURAL REPORT
+   ========================================================= */
 
 function createNaturalReport(){
 
@@ -14382,8 +15703,13 @@ interpretJSON(
 JANUS_INTERPRETED_JSON
 );
 
+const analysis=
+data.analysis||
+{};
+
 const sentences=[];
 const questions=[];
+
 
 function addQuestion(
 id,
@@ -14392,24 +15718,48 @@ capability
 ){
 
 questions.push({
+
 id,
 text,
 capability
+
 });
 
 }
 
+
+const counts=
+analysis.counts||
+{};
+
+const spatial=
+analysis.spatial||
+{};
+
+const temporal=
+analysis.temporal||
+{};
+
+const assets=
+analysis.assets||
+{};
+
+const provenance=
+analysis.provenance||
+{};
+
+const extremes=
+analysis.extremes||
+{};
+
+
 const observations=
+counts.observations ||
 data.structure?.featureCount ||
 data.structure?.length ||
 data.fields?.OBSERVATIONS?.size ||
 null;
 
-const geometryCount=
-data.spatial?.count || 0;
-
-const geometryTypes=
-data.spatial?.types || [];
 
 if(
 JANUS_INTERPRETED_JSON.CELL_INFO &&
@@ -14421,7 +15771,9 @@ sentences.push(
 );
 
 }
-else if(observations!==null){
+else if(
+observations!==null
+){
 
 sentences.push(
 `The resource contains ${observations} observations.`
@@ -14436,10 +15788,15 @@ sentences.push(
 
 }
 
-if(geometryCount){
+
+/* SPATIAL */
+
+if(
+counts.geometries
+){
 
 sentences.push(
-`Spatial information is available through ${geometryCount} geometries of type ${geometryTypes.join(", ")}.`
+`Spatial information is available through ${counts.geometries} geometries of type ${spatial.geometryTypes?.join(", ") || "unknown"}.`
 );
 
 addQuestion(
@@ -14448,16 +15805,34 @@ addQuestion(
 "spatial"
 );
 
-addQuestion(
-"projection",
-"What spatial reference system is used?",
-"projection"
+}
+
+if(
+spatial.bbox
+){
+
+sentences.push(
+`The spatial extent covers approximately ${spatial.bbox[1].toFixed(2)} to ${spatial.bbox[3].toFixed(2)} degrees latitude and ${spatial.bbox[0].toFixed(2)} to ${spatial.bbox[2].toFixed(2)} degrees longitude.`
 );
 
 }
 
+if(
+spatial.center
+){
+
+sentences.push(
+`The approximate spatial centre is ${spatial.center.latitude.toFixed(2)}° latitude and ${spatial.center.longitude.toFixed(2)}° longitude.`
+);
+
+}
+
+
+/* PROJECTION */
+
 const statistics=
-data.statistics || {};
+data.statistics||
+{};
 
 const epsg=
 statistics[
@@ -14484,7 +15859,16 @@ sentences.push(
 
 }
 
+addQuestion(
+"projection",
+"What spatial reference system is used?",
+"projection"
+);
+
 }
+
+
+/* RESOLUTION */
 
 const resolution=
 statistics[
@@ -14528,82 +15912,53 @@ addQuestion(
 
 }
 
-const centroidLat=
-statistics[
-"OBSERVATIONS[*].properties.proj:centroid.lat"
-];
 
-const centroidLon=
-statistics[
-"OBSERVATIONS[*].properties.proj:centroid.lon"
-];
-
-if(centroidLat && centroidLon){
-
-sentences.push(
-`Observation centroids cover approximately ${centroidLat.minimum.toFixed(2)} to ${centroidLat.maximum.toFixed(2)} degrees latitude and ${centroidLon.minimum.toFixed(2)} to ${centroidLon.maximum.toFixed(2)} degrees longitude.`
-);
-
-}
-
-const temporal=
-data.temporal;
+/* TEMPORAL */
 
 if(
-temporal &&
-temporal.fields &&
-temporal.fields.includes("datetime")
+temporal.first &&
+temporal.last
 ){
 
 sentences.push(
-`Temporal acquisition information is available through observation datetime fields.`
+`Observation dates range from ${temporal.first} to ${temporal.last}, covering approximately ${temporal.durationDays.toFixed(1)} days.`
+);
+
+sentences.push(
+`The observations span ${temporal.uniqueDates.length} unique acquisition dates.`
 );
 
 addQuestion(
 "temporal",
-"What temporal information is available?",
+"What is the temporal coverage?",
 "temporal"
 );
 
+if(
+temporal.gaps &&
+temporal.gaps.count
+){
+
+addQuestion(
+"temporal_gaps",
+"Are there gaps in the observations?",
+"temporal_gaps"
+);
+
 }
 
+}
+
+
+/* ASSETS */
+
 if(
-temporal &&
-temporal.fields &&
-(
-temporal.fields.includes("created") ||
-temporal.fields.includes("updated")
-)
+counts.assets
 ){
 
 sentences.push(
-`Additional creation and update timestamps are available.`
+`The resource contains ${counts.assets} assets, including ${counts.images || 0} image assets and ${counts.metadataAssets || 0} metadata assets.`
 );
-
-}
-
-if(
-data.assets &&
-data.assets.count
-){
-
-const assetTypes=
-data.assets.types || [];
-
-if(assetTypes.length){
-
-sentences.push(
-`The resource contains ${data.assets.count} assets, including ${assetTypes.join(" and ")}.`
-);
-
-}
-else{
-
-sentences.push(
-`The resource contains ${data.assets.count} assets.`
-);
-
-}
 
 addQuestion(
 "assets",
@@ -14611,43 +15966,109 @@ addQuestion(
 "assets"
 );
 
-}
-
-if(
-data.links &&
-data.links.count
-){
-
-const relations=
-data.links.relations || [];
-
-if(relations.length){
-
-sentences.push(
-`It exposes ${data.links.count} linked resources with relationships including ${relations.join(", ")}.`
+addQuestion(
+"asset_distribution",
+"How are the assets distributed?",
+"asset_distribution"
 );
 
-}
-else{
-
-sentences.push(
-`It exposes ${data.links.count} linked resources.`
+addQuestion(
+"asset_ratio",
+"How many assets are available per observation?",
+"asset_ratio"
 );
 
 }
 
+
+/* PROVENANCE */
+
+const platforms=
+Object.keys(
+provenance.platforms||
+{}
+);
+
+if(platforms.length){
+
+sentences.push(
+`The observations come from ${platforms.length} platform${platforms.length>1?"s":""}: ${platforms.join(", ")}.`
+);
+
+addQuestion(
+"platforms",
+"Which platforms are represented?",
+"platforms"
+);
+
 }
+
+const collections=
+Object.keys(
+provenance.collections||
+{}
+);
+
+if(collections.length){
+
+addQuestion(
+"collections",
+"Which collections are represented?",
+"collections"
+);
+
+}
+
+const sensors=
+Object.keys(
+provenance.sensors||
+{}
+);
+
+if(sensors.length){
+
+addQuestion(
+"sensors",
+"Which sensors are represented?",
+"sensors"
+);
+
+}
+
+const processing=
+Object.keys(
+provenance.processing||
+{}
+);
+
+if(processing.length){
+
+addQuestion(
+"processing",
+"What processing software or workflows are identified?",
+"processing"
+);
+
+}
+
+
+/* NUMERICAL */
 
 const numericalFields=
-Object.entries(statistics)
-.filter(
-([path])=>
-!path.startsWith("context.") &&
-!path.startsWith("numberMatched") &&
-!path.startsWith("numberReturned")
+Object.entries(
+extremes
 );
 
-if(numericalFields.length){
+const usefulNumericalFields=
+numericalFields.filter(
+([,stat])=>
+stat.variable &&
+stat.count>1
+);
+
+if(
+usefulNumericalFields.length
+){
 
 addQuestion(
 "statistics",
@@ -14655,11 +16076,90 @@ addQuestion(
 "statistics"
 );
 
+usefulNumericalFields
+.slice(
+0,
+8
+)
+.forEach(
+([path])=>{
+
+addQuestion(
+`numeric_${path}`,
+`What are the statistics for ${path}?`,
+"numeric_field"
+);
+
+});
+
+addQuestion(
+"extreme_observations",
+"Which observations contain the highest and lowest values?",
+"extreme_observations"
+);
+
 }
+
+
+/* COUNTS */
+
+if(
+observations!==null
+){
+
+addQuestion(
+"counts",
+"What are the main counts in this resource?",
+"counts"
+);
+
+}
+
+if(
+counts.images
+){
+
+addQuestion(
+"images",
+"How many images are available?",
+"images"
+);
+
+}
+
+if(
+analysis.missing &&
+Object.keys(
+analysis.missing
+).length
+){
+
+addQuestion(
+"missing",
+"Which fields contain missing values?",
+"missing"
+);
+
+}
+
+
+/* AVAILABLE ANALYSIS */
 
 const available=[];
 
-if(geometryCount){
+if(
+counts.observations
+){
+
+available.push(
+"observation analysis"
+);
+
+}
+
+if(
+counts.geometries
+){
 
 available.push(
 "spatial analysis"
@@ -14668,8 +16168,7 @@ available.push(
 }
 
 if(
-temporal &&
-temporal.count
+temporal.first
 ){
 
 available.push(
@@ -14678,7 +16177,9 @@ available.push(
 
 }
 
-if(numericalFields.length){
+if(
+usefulNumericalFields.length
+){
 
 available.push(
 "numerical statistics"
@@ -14687,12 +16188,22 @@ available.push(
 }
 
 if(
-data.assets &&
-data.assets.count
+counts.assets
 ){
 
 available.push(
-"asset exploration"
+"asset analysis"
+);
+
+}
+
+if(
+platforms.length ||
+collections.length
+){
+
+available.push(
+"provenance analysis"
 );
 
 }
@@ -14713,6 +16224,9 @@ data.description
 
 }
 
+
+/* RENDER REPORT */
+
 const report=
 sentences.join(" ");
 
@@ -14728,6 +16242,9 @@ report||
 "No interpretable information available.";
 
 }
+
+
+/* RENDER QUESTIONS */
 
 const questionsContainer=
 document.getElementById(
@@ -14762,7 +16279,9 @@ uniqueQuestions.forEach(
 question=>{
 
 const button=
-document.createElement("button");
+document.createElement(
+"button"
+);
 
 button.className=
 "jsonQuestion";
@@ -14774,6 +16293,22 @@ button.textContent=
 question.text;
 
 button.onclick=()=>{
+
+document
+.querySelectorAll(
+".jsonQuestion"
+)
+.forEach(
+item=>{
+item.classList.remove(
+"active"
+);
+}
+);
+
+button.classList.add(
+"active"
+);
 
 answerJSONQuestion(
 question
@@ -14794,7 +16329,13 @@ button
 }
 
 
-function answerJSONQuestion(question){
+/* =========================================================
+   QUESTIONS / ANSWERS
+   ========================================================= */
+
+function answerJSONQuestion(
+question
+){
 
 const data=
 JANUS_INTERPRETED_JSON;
@@ -14815,208 +16356,75 @@ answerContainer.textContent=
 "Analysing JSON...";
 
 const interpreted=
-interpretJSON(data);
+interpretJSON(
+data
+);
+
+const analysis=
+interpreted.analysis||
+{};
 
 const statistics=
-interpreted.statistics || {};
+interpreted.statistics||
+{};
 
-const values={
+const counts=
+analysis.counts||
+{};
 
-geometries:[],
+const extremes=
+analysis.extremes||
+{};
 
-epsg:new Set(),
+const temporal=
+analysis.temporal||
+{};
 
-datetimes:[],
+const spatial=
+analysis.spatial||
+{};
 
-assets:new Set(),
+const assets=
+analysis.assets||
+{};
 
-assetCount:0,
-
-bboxes:[]
-
-};
-
-function walk(value){
-
-if(
-value===null ||
-value===undefined
-)
-return;
-
-if(Array.isArray(value)){
-
-value.forEach(walk);
-
-return;
-
-}
-
-if(typeof value!=="object")
-return;
-
-if(
-typeof value.type==="string" &&
-[
-"Point",
-"LineString",
-"Polygon",
-"MultiPoint",
-"MultiLineString",
-"MultiPolygon",
-"GeometryCollection"
-].includes(value.type)
-){
-
-values.geometries.push(
-value.type
-);
-
-}
-
-if(
-typeof value["proj:epsg"]==="number"
-){
-
-values.epsg.add(
-value["proj:epsg"]
-);
-
-}
-
-if(
-typeof value.epsg==="number"
-){
-
-values.epsg.add(
-value.epsg
-);
-
-}
-
-if(
-typeof value.datetime==="string"
-){
-
-const timestamp=
-Date.parse(
-value.datetime
-);
-
-if(!isNaN(timestamp)){
-
-values.datetimes.push(
-timestamp
-);
-
-}
-
-}
-
-if(
-Array.isArray(value.bbox) &&
-value.bbox.length>=4 &&
-value.bbox.every(
-v=>typeof v==="number"
-)
-){
-
-values.bboxes.push(
-value.bbox
-);
-
-}
-
-if(
-value.assets &&
-typeof value.assets==="object"
-){
-
-Object.values(
-value.assets
-).forEach(
-asset=>{
-
-if(
-!asset ||
-typeof asset!=="object"
-)
-return;
-
-values.assetCount++;
-
-if(asset.type){
-
-values.assets.add(
-asset.type
-);
-
-}
-
-}
-);
-
-}
-
-Object.values(value).forEach(
-walk
-);
-
-}
-
-walk(data);
+const provenance=
+analysis.provenance||
+{};
 
 let answer="";
+
+
+/* SPATIAL */
 
 if(
 question.capability==="spatial"
 ){
 
-if(values.bboxes.length){
+if(spatial.bbox){
 
-let minLon=Infinity;
-let minLat=Infinity;
-let maxLon=-Infinity;
-let maxLat=-Infinity;
-
-values.bboxes.forEach(
-bbox=>{
-
-minLon=
-Math.min(
-minLon,
-bbox[0]
-);
-
-minLat=
-Math.min(
-minLat,
-bbox[1]
-);
-
-maxLon=
-Math.max(
-maxLon,
-bbox[2]
-);
-
-maxLat=
-Math.max(
-maxLat,
-bbox[3]
-);
-
-}
-);
+const bbox=
+spatial.bbox;
 
 answer=
-`The observations are distributed across approximately ${minLat.toFixed(2)} to ${maxLat.toFixed(2)} degrees latitude and ${minLon.toFixed(2)} to ${maxLon.toFixed(2)} degrees longitude.`;
+`The observations are distributed across approximately ${bbox[1].toFixed(2)} to ${bbox[3].toFixed(2)} degrees latitude and ${bbox[0].toFixed(2)} to ${bbox[2].toFixed(2)} degrees longitude.`;
+
+if(spatial.center){
+
+answer+=
+` The approximate centre is ${spatial.center.latitude.toFixed(2)}° latitude and ${spatial.center.longitude.toFixed(2)}° longitude.`;
 
 }
-else if(values.geometries.length){
 
-answer=
-`The resource contains ${values.geometries.length} spatial observations with geometry types ${[...new Set(values.geometries)].join(", ")}.`;
+if(
+spatial.geometryTypes &&
+spatial.geometryTypes.length
+){
+
+answer+=
+` Geometry types include ${spatial.geometryTypes.join(", ")}.`;
+
+}
 
 }
 else{
@@ -15028,16 +16436,25 @@ answer=
 
 }
 
+
+/* PROJECTION */
+
 else if(
 question.capability==="projection"
 ){
 
-if(values.epsg.size){
+const epsg=
+statistics[
+"OBSERVATIONS[*].properties.proj:epsg"
+];
+
+if(epsg){
 
 answer=
-`The observations use ${[...values.epsg].map(
-code=>`EPSG:${code}`
-).join(", ")}.`;
+epsg.minimum===
+epsg.maximum?
+`The observations use EPSG:${epsg.minimum}.`:
+`The observations use spatial reference systems ranging from EPSG:${epsg.minimum} to EPSG:${epsg.maximum}.`;
 
 }
 else{
@@ -15049,201 +16466,14 @@ answer=
 
 }
 
-else if(
-question.capability==="temporal"
-){
 
-if(values.datetimes.length){
-
-const min=
-new Date(
-Math.min(...values.datetimes)
-).toISOString();
-
-const max=
-new Date(
-Math.max(...values.datetimes)
-).toISOString();
-
-answer=
-`Observation datetime information is available for ${values.datetimes.length} records, ranging from ${min} to ${max}.`;
-
-}
-else{
-
-answer=
-"No observation datetime values were found in the available JSON.";
-
-}
-
-}
-
-else if(
-question.capability==="assets"
-){
-
-if(values.assets.size){
-
-answer=
-`The resource provides ${values.assetCount} assets. The detected asset types are ${[...values.assets].join(", ")}.`;
-
-}
-else{
-
-answer=
-"No asset types were detected in the available JSON.";
-
-}
-
-}
-
-else if(
-question.capability==="statistics"
-){
-
-const fields=
-Object.entries(
-statistics
-)
-.filter(
-([path])=>
-!path.startsWith("context.") &&
-!path.startsWith("numberMatched") &&
-!path.startsWith("numberReturned")
-);
-
-if(fields.length){
-
-const descriptions=[];
-
-fields.forEach(
-([path,stat])=>{
-
-let field=
-path
-.replace(
-"OBSERVATIONS[*].",
-""
-)
-.replace(
-"features[*].",
-""
-)
-.replace(
-"properties.",
-""
-)
-.replace(
-"assets.",
-""
-);
-
-field=
-field
-.replace(
-"[*].",
-"."
-)
-.replace(
-"[*]",
-""
-);
-
-if(
-field.startsWith("CELL_INFO.")
-){
-
-field=
-field.replace(
-"CELL_INFO.",
-""
-);
-
-}
-
-if(
-field.includes("raster:bands.")
-){
-
-field=
-field.replace(
-"raster:bands.",
-""
-);
-
-}
-
-if(
-field.includes(".")
-){
-
-const parts=
-field.split(".");
-
-if(
-parts.length>2
-){
-
-field=
-parts
-.slice(-2)
-.join(".");
-
-}
-
-}
-
-let description=
-field;
-
-if(
-stat.minimum!==null &&
-stat.maximum!==null
-){
-
-if(
-stat.minimum===
-stat.maximum
-){
-
-description+=
-` (${stat.minimum})`;
-
-}
-else{
-
-description+=
-` (${stat.minimum}–${stat.maximum})`;
-
-}
-
-}
-
-descriptions.push(
-description
-);
-
-}
-);
-
-answer=
-`The following numerical fields are available for analysis: ${descriptions.join(", ")}.`;
-
-}
-else{
-
-answer=
-"No numerical fields were detected for statistical analysis.";
-
-}
-
-}
+/* RESOLUTION */
 
 else if(
 question.capability==="resolution"
 ){
 
-const resolutionCandidates=[
+const candidates=[
 
 "OBSERVATIONS[*].properties.gsd",
 
@@ -15258,7 +16488,7 @@ const resolutionCandidates=[
 let resolution=null;
 
 for(
-const path of resolutionCandidates
+const path of candidates
 ){
 
 if(statistics[path]){
@@ -15274,21 +16504,11 @@ break;
 
 if(resolution){
 
-if(
+answer=
 resolution.minimum===
-resolution.maximum
-){
-
-answer=
-`The reported spatial resolution is ${resolution.minimum} metres.`;
-
-}
-else{
-
-answer=
+resolution.maximum?
+`The reported spatial resolution is ${resolution.minimum} metres.`:
 `The reported spatial resolution ranges from ${resolution.minimum} to ${resolution.maximum} metres.`;
-
-}
 
 }
 else{
@@ -15299,6 +16519,550 @@ answer=
 }
 
 }
+
+
+/* TEMPORAL */
+
+else if(
+question.capability==="temporal"
+){
+
+if(
+temporal.first &&
+temporal.last
+){
+
+answer=
+`Observation dates range from ${temporal.first} to ${temporal.last}, covering approximately ${temporal.durationDays.toFixed(1)} days across ${temporal.uniqueDates.length} unique dates.`;
+
+if(
+temporal.frequency
+){
+
+answer+=
+` The average number of observations per acquisition date is ${temporal.frequency.toFixed(2)}.`;
+
+}
+
+}
+else{
+
+answer=
+"No observation datetime values were found in the available JSON.";
+
+}
+
+}
+
+
+/* TEMPORAL GAPS */
+
+else if(
+question.capability==="temporal_gaps"
+){
+
+const gaps=
+temporal.gaps||
+{};
+
+if(
+gaps.count
+){
+
+answer=
+`The temporal record contains ${gaps.count} gaps between consecutive observations. The largest detected gap is approximately ${gaps.maximum.toFixed(1)} days and the average gap is ${gaps.average.toFixed(1)} days.`;
+
+}
+else{
+
+answer=
+"No temporal gaps were detected between the available observation timestamps.";
+
+}
+
+}
+
+
+/* ASSETS */
+
+else if(
+question.capability==="assets"
+){
+
+const types=
+Object.entries(
+assets.types||
+{}
+);
+
+if(types.length){
+
+answer=
+`The resource contains ${assets.count} assets, including ${assets.images || 0} image assets and ${assets.metadata || 0} metadata assets. Asset types include ${types.map(([type,count])=>`${type} (${count})`).join(", ")}.`;
+
+}
+else{
+
+answer=
+"No asset types were detected in the available JSON.";
+
+}
+
+}
+
+
+/* ASSET DISTRIBUTION */
+
+else if(
+question.capability==="asset_distribution"
+){
+
+const types=
+Object.entries(
+assets.types||
+{}
+);
+
+const roles=
+Object.entries(
+assets.roles||
+{}
+);
+
+answer=
+`There are ${assets.count || 0} total assets across ${counts.observations || 0} observations, averaging ${(assets.perObservation || 0).toFixed(2)} assets per observation.`;
+
+if(types.length){
+
+answer+=
+` By type: ${types.map(([type,count])=>`${type} (${count})`).join(", ")}.`;
+
+}
+
+if(roles.length){
+
+answer+=
+` By role: ${roles.map(([role,count])=>`${role} (${count})`).join(", ")}.`;
+
+}
+
+}
+
+
+/* ASSET RATIO */
+
+else if(
+question.capability==="asset_ratio"
+){
+
+answer=
+`The resource contains ${(assets.perObservation || 0).toFixed(2)} assets per observation on average. There are ${assets.count || 0} assets across ${counts.observations || 0} observations.`;
+
+}
+
+
+/* IMAGES */
+
+else if(
+question.capability==="images"
+){
+
+answer=
+`The resource contains ${counts.images || 0} image assets out of ${counts.assets || 0} total assets.`;
+
+}
+
+
+/* PLATFORMS */
+
+else if(
+question.capability==="platforms"
+){
+
+const entries=
+Object.entries(
+provenance.platforms||
+{}
+);
+
+answer=
+entries.length?
+`The represented platforms are ${entries.map(([name,count])=>`${name} (${count} observations)`).join(", ")}.`:
+"No platform information was detected.";
+
+}
+
+
+/* COLLECTIONS */
+
+else if(
+question.capability==="collections"
+){
+
+const entries=
+Object.entries(
+provenance.collections||
+{}
+);
+
+answer=
+entries.length?
+`The represented collections are ${entries.map(([name,count])=>`${name} (${count} observations)`).join(", ")}.`:
+"No collection information was detected.";
+
+}
+
+
+/* SENSORS */
+
+else if(
+question.capability==="sensors"
+){
+
+const entries=
+Object.entries(
+provenance.sensors||
+{}
+);
+
+answer=
+entries.length?
+`The represented sensors are ${entries.map(([name,count])=>`${name} (${count} observations)`).join(", ")}.`:
+"No sensor information was detected.";
+
+}
+
+
+/* PROCESSING */
+
+else if(
+question.capability==="processing"
+){
+
+const entries=
+Object.entries(
+provenance.processing||
+{}
+);
+
+answer=
+entries.length?
+`The detected processing information includes ${entries.map(([name,count])=>`${name} (${count})`).join(", ")}.`:
+"No processing software information was detected.";
+
+}
+
+
+/* COUNTS */
+
+else if(
+question.capability==="counts"
+){
+
+answer=
+`The resource contains ${counts.observations || 0} observations, ${counts.geometries || 0} geometries, ${counts.assets || 0} assets and ${counts.images || 0} images.`;
+
+if(
+counts.metadataAssets
+){
+
+answer+=
+` ${counts.metadataAssets} assets are classified as metadata.`;
+
+}
+
+if(
+counts.uniqueDates
+){
+
+answer+=
+` The observations span ${counts.uniqueDates} unique acquisition dates.`;
+
+}
+
+}
+
+
+/* STATISTICS */
+
+else if(
+question.capability==="statistics"
+){
+
+const fields=
+Object.entries(
+extremes
+)
+.filter(
+([,stat])=>
+stat.variable &&
+stat.count>1
+);
+
+if(fields.length){
+
+answer=
+`The variable numerical fields available for analysis are: ${fields.map(([path,stat])=>{
+
+return `${path} (${stat.minimum}–${stat.maximum}, average ${stat.average.toFixed(2)}, standard deviation ${stat.standardDeviation.toFixed(2)})`;
+
+}).join("; ")}.`;
+
+}
+else{
+
+answer=
+"No variable numerical fields were detected for statistical analysis.";
+
+}
+
+}
+
+
+/* NUMERIC FIELD */
+
+else if(
+question.capability==="numeric_field"
+){
+
+const prefix=
+question.id.replace(
+"numeric_",
+""
+);
+
+const stat=
+extremes[prefix];
+
+if(stat){
+
+answer=
+`${prefix}: minimum ${stat.minimum}, maximum ${stat.maximum}, average ${stat.average.toFixed(2)}, range ${stat.range}, standard deviation ${stat.standardDeviation.toFixed(2)}. `+
+`Percentiles: P25 ${stat.percentiles.p25}, P50 ${stat.percentiles.p50}, P75 ${stat.percentiles.p75}, P90 ${stat.percentiles.p90}, P95 ${stat.percentiles.p95}, P99 ${stat.percentiles.p99}. `+
+`The field contains ${stat.uniqueCount} unique values across ${stat.count} records.`;
+
+if(
+stat.minimumObservation
+){
+
+answer+=
+` Minimum value occurs in ${stat.minimumObservation.id || "an observation"}`;
+
+if(
+stat.minimumObservation.datetime
+){
+
+answer+=
+` at ${stat.minimumObservation.datetime}`;
+
+}
+
+if(
+Number.isFinite(
+stat.minimumObservation.latitude
+) &&
+Number.isFinite(
+stat.minimumObservation.longitude
+)
+){
+
+answer+=
+` (${stat.minimumObservation.latitude.toFixed(4)}, ${stat.minimumObservation.longitude.toFixed(4)})`;
+
+}
+
+answer+=".";
+
+}
+
+if(
+stat.maximumObservation
+){
+
+answer+=
+` Maximum value occurs in ${stat.maximumObservation.id || "an observation"}`;
+
+if(
+stat.maximumObservation.datetime
+){
+
+answer+=
+` at ${stat.maximumObservation.datetime}`;
+
+}
+
+if(
+Number.isFinite(
+stat.maximumObservation.latitude
+) &&
+Number.isFinite(
+stat.maximumObservation.longitude
+)
+){
+
+answer+=
+` (${stat.maximumObservation.latitude.toFixed(4)}, ${stat.maximumObservation.longitude.toFixed(4)})`;
+
+}
+
+answer+=".";
+
+}
+
+}
+else{
+
+answer=
+`No statistics were found for ${prefix}.`;
+
+}
+
+}
+
+
+/* EXTREME OBSERVATIONS */
+
+else if(
+question.capability==="extreme_observations"
+){
+
+const fields=
+Object.entries(
+extremes
+)
+.filter(
+([,stat])=>
+stat.variable &&
+(
+stat.minimumObservation ||
+stat.maximumObservation
+)
+);
+
+if(fields.length){
+
+answer=
+fields.map(
+([path,stat])=>{
+
+let text=
+`${path}: minimum ${stat.minimum} and maximum ${stat.maximum}`;
+
+if(
+stat.minimumObservation
+){
+
+const observation=
+stat.minimumObservation;
+
+text+=
+`. Minimum from ${observation.id || "unknown observation"}`;
+
+if(observation.datetime){
+
+text+=
+` at ${observation.datetime}`;
+
+}
+
+if(
+Number.isFinite(
+observation.latitude
+) &&
+Number.isFinite(
+observation.longitude
+)
+){
+
+text+=
+` (${observation.latitude.toFixed(4)}, ${observation.longitude.toFixed(4)})`;
+
+}
+
+}
+
+if(
+stat.maximumObservation
+){
+
+const observation=
+stat.maximumObservation;
+
+text+=
+`; maximum from ${observation.id || "unknown observation"}`;
+
+if(observation.datetime){
+
+text+=
+` at ${observation.datetime}`;
+
+}
+
+if(
+Number.isFinite(
+observation.latitude
+) &&
+Number.isFinite(
+observation.longitude
+)
+){
+
+text+=
+` (${observation.latitude.toFixed(4)}, ${observation.longitude.toFixed(4)})`;
+
+}
+
+}
+
+return text;
+
+}
+).join(". ");
+
+}
+else{
+
+answer=
+"No variable numerical fields with identifiable extreme observations were found.";
+
+}
+
+}
+
+
+/* MISSING */
+
+else if(
+question.capability==="missing"
+){
+
+const entries=
+Object.entries(
+analysis.missing||
+{}
+)
+.filter(
+([,count])=>
+count>0
+);
+
+if(entries.length){
+
+answer=
+`Missing or empty values were detected in ${entries.length} fields: ${entries.map(([path,count])=>`${path} (${count})`).join(", ")}.`;
+
+}
+else{
+
+answer=
+"No missing or empty values were detected.";
+
+}
+
+}
+
+
+/* FALLBACK */
 
 else{
 
@@ -15312,6 +17076,11 @@ answer;
 
 }
 
+
+/* =========================================================
+   CREATE REPORT BUTTON
+   ========================================================= */
+
 const createReportButton=
 document.getElementById(
 "createReportButton"
@@ -15323,6 +17092,8 @@ createReportButton.onclick=
 createNaturalReport;
 
 }
+
+
 
 </script>
 
