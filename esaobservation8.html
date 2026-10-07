@@ -13515,9 +13515,6 @@ if(body === "moon"){
 
 
 
-
-
-
 let JANUS_INTERPRETED_JSON=null;
 
 function updateJSONInterpreter(data){
@@ -13604,9 +13601,15 @@ spatial:{},
 
 temporal:{},
 
-links:[],
+links:{
+count:0,
+relations:[]
+},
 
-assets:[],
+assets:{
+count:0,
+types:[]
+},
 
 extensions:[],
 
@@ -13732,7 +13735,8 @@ target,
 path
 ){
 
-if(value===null)return;
+if(value===null)
+return;
 
 if(Array.isArray(value)){
 
@@ -13740,23 +13744,51 @@ target[path||"root"]={
 
 type:"array",
 
-length:value.length
+length:value.length,
+
+source:
+path||"root"
 
 };
 
-value.slice(
-0,
-100
-).forEach(
-(item,index)=>{
+if(!value.length)
+return;
 
-analyzeObject(
-item,
-target,
-`${path}[${index}]`
+const objectItems=
+value.filter(
+item=>
+item &&
+typeof item==="object" &&
+!Array.isArray(item)
 );
 
-});
+if(objectItems.length){
+
+analyzeObject(
+objectItems[0],
+target,
+`${path}[*]`
+);
+
+return;
+
+}
+
+const first=
+value[0];
+
+if(
+first!==null &&
+typeof first==="object"
+){
+
+analyzeObject(
+first,
+target,
+`${path}[*]`
+);
+
+}
 
 return;
 
@@ -13786,7 +13818,10 @@ detectJSONType(val),
 size:
 Array.isArray(val)?
 val.length:
-Object.keys(val).length
+Object.keys(val).length,
+
+source:
+currentPath
 
 };
 
@@ -13802,7 +13837,10 @@ else{
 target[currentPath]={
 
 type:
-detectJSONType(val)
+detectJSONType(val),
+
+source:
+currentPath
 
 };
 
@@ -13817,7 +13855,9 @@ data,
 result
 ){
 
-const geometries=[];
+let count=0;
+
+const types=new Set;
 
 function walk(value){
 
@@ -13834,8 +13874,10 @@ value.type==="MultiPolygon" ||
 value.type==="GeometryCollection"
 ){
 
-geometries.push(
-value
+count++;
+
+types.add(
+value.type
 );
 
 }
@@ -13856,15 +13898,11 @@ Object.values(value).forEach(walk);
 walk(data);
 
 result.count=
-geometries.length;
+count;
 
 result.types=
 [
-...new Set(
-geometries.map(
-g=>g.type
-)
-)
+...types
 ];
 
 }
@@ -13874,7 +13912,13 @@ data,
 result
 ){
 
-const dates=[];
+let count=0;
+
+let min=null;
+
+let max=null;
+
+const fields=new Set;
 
 function walk(value){
 
@@ -13898,15 +13942,32 @@ key.toLowerCase()
 )
 ){
 
-if(!isNaN(Date.parse(val))){
+const timestamp=
+Date.parse(val);
 
-dates.push({
+if(!isNaN(timestamp)){
 
-field:key,
+count++;
 
-value:val
+fields.add(key);
 
-});
+if(
+min===null ||
+timestamp<min
+){
+
+min=timestamp;
+
+}
+
+if(
+max===null ||
+timestamp>max
+){
+
+max=timestamp;
+
+}
 
 }
 
@@ -13927,38 +13988,25 @@ walk(val);
 
 walk(data);
 
-if(!dates.length)
+if(!count)
 return;
 
-const timestamps=
-dates.map(
-d=>new Date(
-d.value
-).getTime()
-).sort(
-(a,b)=>a-b
-);
-
 result.count=
-dates.length;
+count;
 
 result.min=
 new Date(
-timestamps[0]
+min
 ).toISOString();
 
 result.max=
 new Date(
-timestamps[timestamps.length-1]
+max
 ).toISOString();
 
 result.fields=
 [
-...new Set(
-dates.map(
-d=>d.field
-)
-)
+...fields
 ];
 
 }
@@ -13967,6 +14015,8 @@ function collectLinks(
 data,
 result
 ){
+
+const relations=new Set;
 
 function walk(value){
 
@@ -13977,30 +14027,21 @@ if(
 Array.isArray(value.links)
 ){
 
+result.count+=
+value.links.length;
+
 value.links.forEach(
 link=>{
 
 if(
 link &&
 typeof link==="object" &&
-link.href
+link.rel
 ){
 
-result.push({
-
-rel:
-link.rel||null,
-
-href:
-link.href,
-
-type:
-link.type||null,
-
-title:
-link.title||null
-
-});
+relations.add(
+link.rel
+);
 
 }
 
@@ -14023,12 +14064,19 @@ Object.values(value).forEach(walk);
 
 walk(data);
 
+result.relations=
+[
+...relations
+];
+
 }
 
 function collectAssets(
 data,
 result
 ){
+
+const types=new Set;
 
 function walk(value){
 
@@ -14040,10 +14088,10 @@ value.assets &&
 typeof value.assets==="object"
 ){
 
-Object.entries(
+Object.values(
 value.assets
 ).forEach(
-([key,asset])=>{
+asset=>{
 
 if(
 !asset ||
@@ -14051,23 +14099,15 @@ typeof asset!=="object"
 )
 return;
 
-result.push({
+result.count++;
 
-key:key,
+if(asset.type){
 
-title:
-asset.title||null,
+types.add(
+asset.type
+);
 
-type:
-asset.type||null,
-
-roles:
-asset.roles||[],
-
-href:
-asset.href||null
-
-});
+}
 
 });
 
@@ -14087,6 +14127,11 @@ Object.values(value).forEach(walk);
 }
 
 walk(data);
+
+result.types=
+[
+...types
+];
 
 }
 
@@ -14114,7 +14159,13 @@ data,
 result
 ){
 
-const numbers=[];
+let count=0;
+
+let minimum=null;
+
+let maximum=null;
+
+let sum=0;
 
 function walk(value){
 
@@ -14123,7 +14174,27 @@ typeof value==="number" &&
 Number.isFinite(value)
 ){
 
-numbers.push(value);
+count++;
+
+sum+=value;
+
+if(
+minimum===null ||
+value<minimum
+){
+
+minimum=value;
+
+}
+
+if(
+maximum===null ||
+value>maximum
+){
+
+maximum=value;
+
+}
 
 return;
 
@@ -14150,24 +14221,20 @@ Object.values(value).forEach(walk);
 
 walk(data);
 
-if(!numbers.length)
+if(!count)
 return;
 
 result.numericValues=
-numbers.length;
+count;
 
 result.minimum=
-Math.min(...numbers);
+minimum;
 
 result.maximum=
-Math.max(...numbers);
+maximum;
 
 result.average=
-numbers.reduce(
-(sum,value)=>sum+value,
-0
-)/
-numbers.length;
+sum/count;
 
 }
 
@@ -14226,22 +14293,22 @@ sentences.push(
 
 if(
 data.assets &&
-data.assets.length
+data.assets.count
 ){
 
 sentences.push(
-`The resource contains ${data.assets.length} assets.`
+`The resource contains ${data.assets.count} assets.`
 );
 
 }
 
 if(
 data.links &&
-data.links.length
+data.links.count
 ){
 
 sentences.push(
-`It also exposes ${data.links.length} linked resources.`
+`It also exposes ${data.links.count} linked resources.`
 );
 
 }
