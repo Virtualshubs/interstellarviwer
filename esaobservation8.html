@@ -2404,7 +2404,71 @@ height:100%;
 
 
 
+#jsonInterpreterPanel{
+    margin-top:20px;
+    padding:16px;
+    border:1px solid #333;
+    border-radius:8px;
+    background:#111;
+}
 
+.jsonInterpreterHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.jsonInterpreterHeader h3{
+    margin:0;
+}
+
+#jsonInterpreterStatus{
+    font-size:12px;
+    opacity:.65;
+}
+
+#jsonInterpreter{
+    margin:0;
+    padding:14px;
+    max-height:500px;
+    overflow:auto;
+    white-space:pre-wrap;
+    font-size:12px;
+    line-height:1.45;
+    background:#080808;
+    border-radius:6px;
+}
+
+#createReportButton{
+    margin-top:12px;
+    padding:8px 14px;
+    border:1px solid #555;
+    border-radius:5px;
+    background:#222;
+    color:#fff;
+    cursor:pointer;
+}
+
+#createReportButton:hover{
+    background:#333;
+}
+
+#naturalReportPanel{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px solid #333;
+}
+
+#naturalReportPanel h3{
+    margin:0 0 10px 0;
+}
+
+#naturalReport{
+    line-height:1.6;
+    font-size:14px;
+}
 
 
    
@@ -2582,8 +2646,40 @@ Waiting for cell selection
         </div>
 
         <div id="janusReader" >
+
+
+
+
+<div id="jsonInterpreterPanel">
+
+    <div class="jsonInterpreterHeader">
+        <h3>JSON INTERPRETER</h3>
+        <span id="jsonInterpreterStatus">Waiting for JSON...</span>
+    </div>
+
+    <pre id="jsonInterpreter"></pre>
+
+    <button
+        id="createReportButton"
+        type="button"
+        style="display:none;"
+    >
+        CREATE REPORT
+    </button>
+
+    <div id="naturalReportPanel">
+        <h3>REPORT</h3>
+        <div id="naturalReport">
+            No report created.
+        </div>
+    </div>
+
+</div>
+
+
+           
             <div id="summary" class="card">
-                <h2>Dataset Overview</h2>
+                <h2>Dataset Overview</h2>     
 
                 <div class="stats">
 
@@ -3670,6 +3766,8 @@ null,
 2
 );
 
+   updateJSONInterpreter(data);
+
 
 // =================================
 // CATALOG
@@ -3780,6 +3878,8 @@ null,
 );
 
 loadItems(activeDataset);
+
+   updateJSONInterpreter(data);
 
 }
 
@@ -13335,6 +13435,923 @@ if(body === "moon"){
     );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// JSON INTERPRETER
+// ==========================================
+
+let JANUS_INTERPRETED_JSON=null;
+
+
+function updateJSONInterpreter(data){
+
+if(!data)return;
+
+try{
+
+const interpreted=
+interpretJSON(data);
+
+JANUS_INTERPRETED_JSON=
+interpreted;
+
+const container=
+document.getElementById(
+"jsonInterpreter"
+);
+
+const status=
+document.getElementById(
+"jsonInterpreterStatus"
+);
+
+const button=
+document.getElementById(
+"createReportButton"
+);
+
+if(!container)return;
+
+container.textContent=
+JSON.stringify(
+interpreted,
+null,
+2
+);
+
+if(status){
+
+status.textContent=
+"JSON interpreted";
+
+}
+
+if(button){
+
+button.style.display=
+"inline-block";
+
+}
+
+console.log(
+"JANUS JSON INTERPRETED:",
+interpreted
+);
+
+}
+catch(error){
+
+console.error(
+"JSON interpreter error:",
+error
+);
+
+}
+
+}
+
+
+// ==========================================
+// INTERPRET JSON
+// ==========================================
+
+function interpretJSON(data){
+
+const result={
+    type:detectJSONType(data),
+    structure:{},
+    fields:{},
+    statistics:{},
+    spatial:{},
+    temporal:{},
+    links:[],
+    assets:[],
+    extensions:[],
+    description:null
+};
+
+if(data===null){
+
+return result;
+
+}
+
+
+// ==========================================
+// DESCRIPTION
+// ==========================================
+
+if(typeof data.description==="string"){
+
+result.description=
+data.description;
+
+}
+
+
+// ==========================================
+// ROOT STRUCTURE
+// ==========================================
+
+if(Array.isArray(data)){
+
+result.structure.length=
+data.length;
+
+result.structure.elementTypes=
+[
+...new Set(
+data.map(
+item=>detectJSONType(item)
+)
+)
+];
+
+}
+else if(typeof data==="object"){
+
+result.structure.keys=
+Object.keys(data);
+
+result.structure.keyCount=
+Object.keys(data).length;
+
+}
+
+
+// ==========================================
+// GENERIC FIELD ANALYSIS
+// ==========================================
+
+analyzeObject(
+data,
+result.fields,
+""
+);
+
+
+// ==========================================
+// FEATURE COLLECTION
+// ==========================================
+
+if(
+data.type==="FeatureCollection" &&
+Array.isArray(data.features)
+){
+
+result.structure.featureCount=
+data.features.length;
+
+result.structure.featureTypes=
+[
+...new Set(
+data.features.map(
+feature=>feature?.type
+).filter(Boolean)
+)
+];
+
+}
+
+
+// ==========================================
+// GEOMETRY
+// ==========================================
+
+collectGeometryInfo(
+data,
+result.spatial
+);
+
+
+// ==========================================
+// TEMPORAL
+// ==========================================
+
+collectTemporalInfo(
+data,
+result.temporal
+);
+
+
+// ==========================================
+// LINKS
+// ==========================================
+
+collectLinks(
+data,
+result.links
+);
+
+
+// ==========================================
+// ASSETS
+// ==========================================
+
+collectAssets(
+data,
+result.assets
+);
+
+
+// ==========================================
+// EXTENSIONS
+// ==========================================
+
+collectExtensions(
+data,
+result.extensions
+);
+
+
+// ==========================================
+// STATISTICS
+// ==========================================
+
+collectStatistics(
+data,
+result.statistics
+);
+
+
+return result;
+
+}
+
+
+// ==========================================
+// TYPE
+// ==========================================
+
+function detectJSONType(value){
+
+if(value===null)
+return"null";
+
+if(Array.isArray(value))
+return"array";
+
+if(typeof value==="object")
+return"object";
+
+return typeof value;
+
+}
+
+
+// ==========================================
+// OBJECT ANALYSIS
+// ==========================================
+
+function analyzeObject(
+value,
+target,
+path
+){
+
+if(value===null)return;
+
+if(Array.isArray(value)){
+
+target[path||"root"]={
+    type:"array",
+    length:value.length
+};
+
+value.slice(
+0,
+100
+).forEach(
+(item,index)=>{
+
+analyzeObject(
+item,
+target,
+`${path}[${index}]`
+);
+
+});
+
+return;
+
+}
+
+if(typeof value!=="object")
+return;
+
+Object.entries(value).forEach(
+([key,val])=>{
+
+const currentPath=
+path?
+`${path}.${key}`
+:key;
+
+if(
+val!==null &&
+typeof val==="object"
+){
+
+target[currentPath]={
+    type:detectJSONType(val),
+    size:Array.isArray(val)?
+        val.length:
+        Object.keys(val).length
+};
+
+analyzeObject(
+val,
+target,
+currentPath
+);
+
+}
+else{
+
+target[currentPath]={
+    type:detectJSONType(val)
+};
+
+}
+
+});
+
+}
+
+
+// ==========================================
+// GEOMETRY
+// ==========================================
+
+function collectGeometryInfo(
+data,
+result
+){
+
+const geometries=[];
+
+function walk(value){
+
+if(!value||typeof value!=="object")
+return;
+
+if(
+value.type==="Point" ||
+value.type==="LineString" ||
+value.type==="Polygon" ||
+value.type==="MultiPoint" ||
+value.type==="MultiLineString" ||
+value.type==="MultiPolygon" ||
+value.type==="GeometryCollection"
+){
+
+geometries.push(
+value
+);
+
+}
+
+if(Array.isArray(value)){
+
+value.forEach(walk);
+
+}
+else{
+
+Object.values(value).forEach(walk);
+
+}
+
+}
+
+walk(data);
+
+result.count=
+geometries.length;
+
+result.types=
+[
+...new Set(
+geometries.map(
+g=>g.type
+)
+)
+];
+
+}
+
+
+// ==========================================
+// TEMPORAL
+// ==========================================
+
+function collectTemporalInfo(
+data,
+result
+){
+
+const dates=[];
+
+function walk(value){
+
+if(!value||typeof value!=="object")
+return;
+
+Object.entries(value).forEach(
+([key,val])=>{
+
+if(
+typeof val==="string" &&
+(
+key.toLowerCase()
+.includes("datetime") ||
+key.toLowerCase()
+==="date" ||
+key.toLowerCase()
+.includes("created") ||
+key.toLowerCase()
+.includes("updated")
+)
+){
+
+if(!isNaN(Date.parse(val))){
+
+dates.push({
+    field:key,
+    value:val
+});
+
+}
+
+}
+
+if(
+val &&
+typeof val==="object"
+){
+
+walk(val);
+
+}
+
+});
+
+}
+
+walk(data);
+
+if(!dates.length)
+return;
+
+const timestamps=
+dates.map(
+d=>new Date(d.value).getTime()
+).sort(
+(a,b)=>a-b
+);
+
+result.count=
+dates.length;
+
+result.min=
+new Date(
+timestamps[0]
+).toISOString();
+
+result.max=
+new Date(
+timestamps[timestamps.length-1]
+).toISOString();
+
+result.fields=
+[
+...new Set(
+dates.map(
+d=>d.field
+)
+)
+];
+
+}
+
+
+// ==========================================
+// LINKS
+// ==========================================
+
+function collectLinks(
+data,
+result
+){
+
+function walk(value){
+
+if(!value||typeof value!=="object")
+return;
+
+if(
+Array.isArray(value.links)
+){
+
+value.links.forEach(
+link=>{
+
+if(
+link &&
+typeof link==="object" &&
+link.href
+){
+
+result.push({
+    rel:link.rel||null,
+    href:link.href,
+    type:link.type||null,
+    title:link.title||null
+});
+
+}
+
+});
+
+}
+
+if(Array.isArray(value)){
+
+value.forEach(walk);
+
+}
+else{
+
+Object.values(value).forEach(walk);
+
+}
+
+}
+
+walk(data);
+
+}
+
+
+// ==========================================
+// ASSETS
+// ==========================================
+
+function collectAssets(
+data,
+result
+){
+
+function walk(value){
+
+if(!value||typeof value!=="object")
+return;
+
+if(
+value.assets &&
+typeof value.assets==="object"
+){
+
+Object.entries(
+value.assets
+).forEach(
+([key,asset])=>{
+
+if(!asset||typeof asset!=="object")
+return;
+
+result.push({
+
+key:key,
+
+title:asset.title||null,
+
+type:asset.type||null,
+
+roles:asset.roles||[],
+
+href:asset.href||null
+
+});
+
+});
+
+}
+
+if(Array.isArray(value)){
+
+value.forEach(walk);
+
+}
+else{
+
+Object.values(value).forEach(walk);
+
+}
+
+}
+
+walk(data);
+
+}
+
+
+// ==========================================
+// EXTENSIONS
+// ==========================================
+
+function collectExtensions(
+data,
+result
+){
+
+if(
+Array.isArray(
+data.stac_extensions
+)
+){
+
+result.push(
+...data.stac_extensions
+);
+
+}
+
+}
+
+
+// ==========================================
+// NUMERIC STATISTICS
+// ==========================================
+
+function collectStatistics(
+data,
+result
+){
+
+const numbers=[];
+
+function walk(value){
+
+if(typeof value==="number" &&
+Number.isFinite(value)
+){
+
+numbers.push(value);
+
+return;
+
+}
+
+if(!value||typeof value!=="object")
+return;
+
+if(Array.isArray(value)){
+
+value.forEach(walk);
+
+}
+else{
+
+Object.values(value).forEach(walk);
+
+}
+
+}
+
+walk(data);
+
+if(!numbers.length)
+return;
+
+result.numericValues=numbers.length;
+
+result.minimum=
+Math.min(...numbers);
+
+result.maximum=
+Math.max(...numbers);
+
+result.average=
+numbers.reduce(
+(sum,value)=>sum+value,
+0
+)/numbers.length;
+
+}
+
+
+
+
+
+
+
+
+
+// ==========================================
+// CREATE NATURAL REPORT
+// ==========================================
+
+function createNaturalReport(){
+
+if(!JANUS_INTERPRETED_JSON)
+return;
+
+const data=
+JANUS_INTERPRETED_JSON;
+
+const sentences=[];
+
+
+// ==========================================
+// TYPE
+// ==========================================
+
+if(data.type){
+
+sentences.push(
+`The resource has been identified as ${data.type}.`
+);
+
+}
+
+
+// ==========================================
+// FEATURES
+// ==========================================
+
+if(
+data.structure &&
+typeof data.structure.featureCount==="number"
+){
+
+sentences.push(
+`It contains ${data.structure.featureCount} features.`
+);
+
+}
+
+
+// ==========================================
+// GEOMETRY
+// ==========================================
+
+if(
+data.spatial &&
+data.spatial.count
+){
+
+sentences.push(
+`Spatial information is available through ${data.spatial.count} geometries of type ${data.spatial.types.join(", ")}.`
+);
+
+}
+
+
+// ==========================================
+// TEMPORAL
+// ==========================================
+
+if(
+data.temporal &&
+data.temporal.min
+){
+
+sentences.push(
+`Temporal information is available from ${data.temporal.min} to ${data.temporal.max}.`
+);
+
+}
+
+
+// ==========================================
+// ASSETS
+// ==========================================
+
+if(
+data.assets &&
+data.assets.length
+){
+
+sentences.push(
+`The resource contains ${data.assets.length} assets.`
+);
+
+}
+
+
+// ==========================================
+// LINKS
+// ==========================================
+
+if(
+data.links &&
+data.links.length
+){
+
+sentences.push(
+`It also exposes ${data.links.length} linked resources.`
+);
+
+}
+
+
+// ==========================================
+// EXTENSIONS
+// ==========================================
+
+if(
+data.extensions &&
+data.extensions.length
+){
+
+sentences.push(
+`The resource declares ${data.extensions.length} extensions.`
+);
+
+}
+
+
+// ==========================================
+// DESCRIPTION
+// ==========================================
+
+if(data.description){
+
+sentences.push(
+data.description
+);
+
+}
+
+
+// ==========================================
+// OUTPUT
+// ==========================================
+
+const report=
+sentences.join(" ");
+
+const container=
+document.getElementById(
+"naturalReport"
+);
+
+if(container){
+
+container.textContent=
+report||
+"No interpretable information available.";
+
+}
+
+}
+
+
+
+
+
+// ==========================================
+// CREATE REPORT BUTTON
+// ==========================================
+
+document.getElementById(
+"createReportButton"
+).onclick=
+createNaturalReport;
+
+
+
+
+
+
+
      
 
 </script>
