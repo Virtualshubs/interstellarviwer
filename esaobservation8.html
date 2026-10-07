@@ -13512,9 +13512,6 @@ if(body === "moon"){
 
 
 
-
-
-
 let JANUS_INTERPRETED_JSON=null;
 
 function updateJSONInterpreter(data){
@@ -13554,17 +13551,13 @@ null,
 );
 
 if(status){
-
 status.textContent=
 "JSON interpreted";
-
 }
 
 if(button){
-
 button.style.display=
 "inline-block";
-
 }
 
 console.log(
@@ -13618,9 +13611,7 @@ description:null
 };
 
 if(data===null){
-
 return result;
-
 }
 
 if(typeof data.description==="string"){
@@ -13754,33 +13745,14 @@ path||"root"
 if(!value.length)
 return;
 
-const objectItems=
-value.filter(
-item=>
-item &&
-typeof item==="object" &&
-!Array.isArray(item)
-);
-
-if(objectItems.length){
-
-analyzeObject(
-objectItems[0],
-target,
-`${path}[*]`
-);
-
-return;
-
-}
-
 const first=
-value[0];
+value.find(
+item=>
+item!==null &&
+typeof item==="object"
+);
 
-if(
-first!==null &&
-typeof first==="object"
-){
+if(first){
 
 analyzeObject(
 first,
@@ -13810,7 +13782,7 @@ val!==null &&
 typeof val==="object"
 ){
 
-target[currentPath]={
+const entry={
 
 type:
 detectJSONType(val),
@@ -13825,11 +13797,41 @@ currentPath
 
 };
 
+target[currentPath]=entry;
+
+if(Array.isArray(val)){
+
+if(val.length){
+
+const first=
+val.find(
+item=>
+item!==null &&
+typeof item==="object"
+);
+
+if(first){
+
+analyzeObject(
+first,
+target,
+`${currentPath}[*]`
+);
+
+}
+
+}
+
+}
+else{
+
 analyzeObject(
 val,
 target,
 currentPath
 );
+
+}
 
 }
 else{
@@ -14159,46 +14161,9 @@ data,
 result
 ){
 
-let count=0;
+const fields={};
 
-let minimum=null;
-
-let maximum=null;
-
-let sum=0;
-
-function walk(value){
-
-if(
-typeof value==="number" &&
-Number.isFinite(value)
-){
-
-count++;
-
-sum+=value;
-
-if(
-minimum===null ||
-value<minimum
-){
-
-minimum=value;
-
-}
-
-if(
-maximum===null ||
-value>maximum
-){
-
-maximum=value;
-
-}
-
-return;
-
-}
+function walk(value,path){
 
 if(
 !value ||
@@ -14208,33 +14173,108 @@ return;
 
 if(Array.isArray(value)){
 
-value.forEach(walk);
+value.forEach(
+item=>{
 
-}
-else{
+walk(
+item,
+`${path}[*]`
+);
 
-Object.values(value).forEach(walk);
+});
 
-}
-
-}
-
-walk(data);
-
-if(!count)
 return;
 
-result.numericValues=
-count;
+}
 
-result.minimum=
-minimum;
+Object.entries(value).forEach(
+([key,val])=>{
 
-result.maximum=
-maximum;
+const currentPath=
+path?
+`${path}.${key}`
+:key;
 
-result.average=
-sum/count;
+if(
+typeof val==="number" &&
+Number.isFinite(val)
+){
+
+if(!fields[currentPath]){
+
+fields[currentPath]={
+count:0,
+minimum:null,
+maximum:null,
+sum:0
+};
+
+}
+
+const stat=
+fields[currentPath];
+
+stat.count++;
+
+stat.sum+=
+val;
+
+if(
+stat.minimum===null ||
+val<stat.minimum
+){
+
+stat.minimum=
+val;
+
+}
+
+if(
+stat.maximum===null ||
+val>stat.maximum
+){
+
+stat.maximum=
+val;
+
+}
+
+return;
+
+}
+
+if(
+val &&
+typeof val==="object"
+){
+
+walk(
+val,
+currentPath
+);
+
+}
+
+});
+
+}
+
+walk(data,"");
+
+Object.entries(fields).forEach(
+([path,stat])=>{
+
+stat.average=
+stat.sum/stat.count;
+
+delete stat.sum;
+
+});
+
+Object.assign(
+result,
+fields
+);
 
 }
 
