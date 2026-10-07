@@ -3759,15 +3759,14 @@ const data=await res.json();
 // ACTUALIZAR RAW CON EL JSON REAL
 // =================================
 
-document.getElementById("raw").textContent=
-JSON.stringify(
-data,
-null,
-2
-);
+//document.getElementById("raw").textContent=
+//JSON.stringify(
+//data,
+//null,
+//2
+//);
 
-   updateJSONInterpreter(data);
-
+updateRAW(data);
 
 // =================================
 // CATALOG
@@ -3870,16 +3869,17 @@ meta,
 activeDataset.endDate||""
 );
 
-document.getElementById("raw").textContent=
-JSON.stringify(
-col,
-null,
-2
-);
+//document.getElementById("raw").textContent=
+//JSON.stringify(
+//col,
+//null,
+//2
+//);
+
+   updateRAW(col);
 
 loadItems(activeDataset);
 
-   updateJSONInterpreter(data);
 
 }
 
@@ -3977,12 +3977,14 @@ throw new Error(
 
 data.items=itemsURL;
 
-document.getElementById("raw").textContent=
-JSON.stringify(
-itemsJSON,
-null,
-2
-);
+//document.getElementById("raw").textContent=
+//JSON.stringify(
+//itemsJSON,
+//null,
+//2
+//);
+
+   updateRAW(itemsJSON);
 
 console.log(
 "RAW UPDATED WITH ITEMS JSON"
@@ -4944,8 +4946,10 @@ observations:cell.items.length
 OBSERVATIONS:cell.items
 };
 
-document.getElementById("raw").textContent=
-JSON.stringify(dataset,null,2);
+//document.getElementById("raw").textContent=
+//JSON.stringify(dataset,null,2);
+
+   updateRAW(json);
 
 renderDataset(dataset);
 
@@ -13459,15 +13463,27 @@ if(body === "moon"){
 
 
 
-
-
-
-// ==========================================
-// JSON INTERPRETER
-// ==========================================
-
 let JANUS_INTERPRETED_JSON=null;
 
+function updateRAW(data){
+
+if(!data)return;
+
+const raw=
+document.getElementById("raw");
+
+if(!raw)return;
+
+raw.textContent=
+JSON.stringify(
+data,
+null,
+2
+);
+
+updateJSONInterpreter(data);
+
+}
 
 function updateJSONInterpreter(data){
 
@@ -13536,24 +13552,31 @@ error
 
 }
 
-
-// ==========================================
-// INTERPRET JSON
-// ==========================================
-
 function interpretJSON(data){
 
 const result={
-    type:detectJSONType(data),
-    structure:{},
-    fields:{},
-    statistics:{},
-    spatial:{},
-    temporal:{},
-    links:[],
-    assets:[],
-    extensions:[],
-    description:null
+
+type:
+detectJSONType(data),
+
+structure:{},
+
+fields:{},
+
+statistics:{},
+
+spatial:{},
+
+temporal:{},
+
+links:[],
+
+assets:[],
+
+extensions:[],
+
+description:null
+
 };
 
 if(data===null){
@@ -13562,22 +13585,12 @@ return result;
 
 }
 
-
-// ==========================================
-// DESCRIPTION
-// ==========================================
-
 if(typeof data.description==="string"){
 
 result.description=
 data.description;
 
 }
-
-
-// ==========================================
-// ROOT STRUCTURE
-// ==========================================
 
 if(Array.isArray(data)){
 
@@ -13604,21 +13617,11 @@ Object.keys(data).length;
 
 }
 
-
-// ==========================================
-// GENERIC FIELD ANALYSIS
-// ==========================================
-
 analyzeObject(
 data,
 result.fields,
 ""
 );
-
-
-// ==========================================
-// FEATURE COLLECTION
-// ==========================================
 
 if(
 data.type==="FeatureCollection" &&
@@ -13639,75 +13642,39 @@ feature=>feature?.type
 
 }
 
-
-// ==========================================
-// GEOMETRY
-// ==========================================
-
 collectGeometryInfo(
 data,
 result.spatial
 );
-
-
-// ==========================================
-// TEMPORAL
-// ==========================================
 
 collectTemporalInfo(
 data,
 result.temporal
 );
 
-
-// ==========================================
-// LINKS
-// ==========================================
-
 collectLinks(
 data,
 result.links
 );
-
-
-// ==========================================
-// ASSETS
-// ==========================================
 
 collectAssets(
 data,
 result.assets
 );
 
-
-// ==========================================
-// EXTENSIONS
-// ==========================================
-
 collectExtensions(
 data,
 result.extensions
 );
-
-
-// ==========================================
-// STATISTICS
-// ==========================================
 
 collectStatistics(
 data,
 result.statistics
 );
 
-
 return result;
 
 }
-
-
-// ==========================================
-// TYPE
-// ==========================================
 
 function detectJSONType(value){
 
@@ -13724,11 +13691,6 @@ return typeof value;
 
 }
 
-
-// ==========================================
-// OBJECT ANALYSIS
-// ==========================================
-
 function analyzeObject(
 value,
 target,
@@ -13740,8 +13702,11 @@ if(value===null)return;
 if(Array.isArray(value)){
 
 target[path||"root"]={
-    type:"array",
-    length:value.length
+
+type:"array",
+
+length:value.length
+
 };
 
 value.slice(
@@ -13779,10 +13744,15 @@ typeof val==="object"
 ){
 
 target[currentPath]={
-    type:detectJSONType(val),
-    size:Array.isArray(val)?
-        val.length:
-        Object.keys(val).length
+
+type:
+detectJSONType(val),
+
+size:
+Array.isArray(val)?
+val.length:
+Object.keys(val).length
+
 };
 
 analyzeObject(
@@ -13795,7 +13765,10 @@ currentPath
 else{
 
 target[currentPath]={
-    type:detectJSONType(val)
+
+type:
+detectJSONType(val)
+
 };
 
 }
@@ -13803,11 +13776,6 @@ target[currentPath]={
 });
 
 }
-
-
-// ==========================================
-// GEOMETRY
-// ==========================================
 
 function collectGeometryInfo(
 data,
@@ -13866,11 +13834,6 @@ g=>g.type
 
 }
 
-
-// ==========================================
-// TEMPORAL
-// ==========================================
-
 function collectTemporalInfo(
 data,
 result
@@ -13903,8 +13866,11 @@ key.toLowerCase()
 if(!isNaN(Date.parse(val))){
 
 dates.push({
-    field:key,
-    value:val
+
+field:key,
+
+value:val
+
 });
 
 }
@@ -13931,7 +13897,9 @@ return;
 
 const timestamps=
 dates.map(
-d=>new Date(d.value).getTime()
+d=>new Date(
+d.value
+).getTime()
 ).sort(
 (a,b)=>a-b
 );
@@ -13960,11 +13928,6 @@ d=>d.field
 
 }
 
-
-// ==========================================
-// LINKS
-// ==========================================
-
 function collectLinks(
 data,
 result
@@ -13989,10 +13952,19 @@ link.href
 ){
 
 result.push({
-    rel:link.rel||null,
-    href:link.href,
-    type:link.type||null,
-    title:link.title||null
+
+rel:
+link.rel||null,
+
+href:
+link.href,
+
+type:
+link.type||null,
+
+title:
+link.title||null
+
 });
 
 }
@@ -14017,11 +13989,6 @@ Object.values(value).forEach(walk);
 walk(data);
 
 }
-
-
-// ==========================================
-// ASSETS
-// ==========================================
 
 function collectAssets(
 data,
@@ -14043,20 +14010,27 @@ value.assets
 ).forEach(
 ([key,asset])=>{
 
-if(!asset||typeof asset!=="object")
+if(
+!asset ||
+typeof asset!=="object"
+)
 return;
 
 result.push({
 
 key:key,
 
-title:asset.title||null,
+title:
+asset.title||null,
 
-type:asset.type||null,
+type:
+asset.type||null,
 
-roles:asset.roles||[],
+roles:
+asset.roles||[],
 
-href:asset.href||null
+href:
+asset.href||null
 
 });
 
@@ -14080,11 +14054,6 @@ Object.values(value).forEach(walk);
 walk(data);
 
 }
-
-
-// ==========================================
-// EXTENSIONS
-// ==========================================
 
 function collectExtensions(
 data,
@@ -14105,11 +14074,6 @@ result.push(
 
 }
 
-
-// ==========================================
-// NUMERIC STATISTICS
-// ==========================================
-
 function collectStatistics(
 data,
 result
@@ -14119,7 +14083,8 @@ const numbers=[];
 
 function walk(value){
 
-if(typeof value==="number" &&
+if(
+typeof value==="number" &&
 Number.isFinite(value)
 ){
 
@@ -14129,7 +14094,10 @@ return;
 
 }
 
-if(!value||typeof value!=="object")
+if(
+!value ||
+typeof value!=="object"
+)
 return;
 
 if(Array.isArray(value)){
@@ -14150,7 +14118,8 @@ walk(data);
 if(!numbers.length)
 return;
 
-result.numericValues=numbers.length;
+result.numericValues=
+numbers.length;
 
 result.minimum=
 Math.min(...numbers);
@@ -14162,21 +14131,10 @@ result.average=
 numbers.reduce(
 (sum,value)=>sum+value,
 0
-)/numbers.length;
+)/
+numbers.length;
 
 }
-
-
-
-
-
-
-
-
-
-// ==========================================
-// CREATE NATURAL REPORT
-// ==========================================
 
 function createNaturalReport(){
 
@@ -14188,11 +14146,6 @@ JANUS_INTERPRETED_JSON;
 
 const sentences=[];
 
-
-// ==========================================
-// TYPE
-// ==========================================
-
 if(data.type){
 
 sentences.push(
@@ -14200,11 +14153,6 @@ sentences.push(
 );
 
 }
-
-
-// ==========================================
-// FEATURES
-// ==========================================
 
 if(
 data.structure &&
@@ -14217,11 +14165,6 @@ sentences.push(
 
 }
 
-
-// ==========================================
-// GEOMETRY
-// ==========================================
-
 if(
 data.spatial &&
 data.spatial.count
@@ -14232,11 +14175,6 @@ sentences.push(
 );
 
 }
-
-
-// ==========================================
-// TEMPORAL
-// ==========================================
 
 if(
 data.temporal &&
@@ -14249,11 +14187,6 @@ sentences.push(
 
 }
 
-
-// ==========================================
-// ASSETS
-// ==========================================
-
 if(
 data.assets &&
 data.assets.length
@@ -14264,11 +14197,6 @@ sentences.push(
 );
 
 }
-
-
-// ==========================================
-// LINKS
-// ==========================================
 
 if(
 data.links &&
@@ -14281,11 +14209,6 @@ sentences.push(
 
 }
 
-
-// ==========================================
-// EXTENSIONS
-// ==========================================
-
 if(
 data.extensions &&
 data.extensions.length
@@ -14297,11 +14220,6 @@ sentences.push(
 
 }
 
-
-// ==========================================
-// DESCRIPTION
-// ==========================================
-
 if(data.description){
 
 sentences.push(
@@ -14309,11 +14227,6 @@ data.description
 );
 
 }
-
-
-// ==========================================
-// OUTPUT
-// ==========================================
 
 const report=
 sentences.join(" ");
@@ -14333,24 +14246,17 @@ report||
 
 }
 
-
-
-
-
-// ==========================================
-// CREATE REPORT BUTTON
-// ==========================================
-
+const createReportButton=
 document.getElementById(
 "createReportButton"
-).onclick=
+);
+
+if(createReportButton){
+
+createReportButton.onclick=
 createNaturalReport;
 
-
-
-
-
-
+}
 
      
 
