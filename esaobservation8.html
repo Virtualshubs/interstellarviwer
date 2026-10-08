@@ -2539,6 +2539,44 @@ height:100%;
         border-color .15s ease,
         color .15s ease;
 }
+
+
+
+
+#reportCharts{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+    margin:20px 0;
+}
+
+#reportChart1,
+#reportChart2{
+    min-height:220px;
+}
+
+#reportNotebook{
+    margin-top:20px;
+}
+
+.reportQuestion{
+    margin-top:18px;
+    font-weight:600;
+}
+
+.reportAnswer{
+    margin-top:6px;
+    line-height:1.6;
+}
+
+@media(max-width:800px){
+
+    #reportCharts{
+        grid-template-columns:1fr;
+    }
+
+}
+
    
    
 </style>
@@ -2742,6 +2780,14 @@ Waiting for cell selection
             No report created.
         </div>
 
+       <div id="reportCharts">
+    <div id="reportChart1"></div>
+    <div id="reportChart2"></div>
+</div>
+
+
+       <div id="reportNotebook"></div>
+
        <div id="jsonQuestionsPanel">
 
     <h3>QUESTIONS</h3>
@@ -2761,6 +2807,9 @@ Waiting for cell selection
 </div>
 
 </div>
+
+
+       
 
     </div>
 
@@ -13633,10 +13682,14 @@ if(body === "moon"){
 
 
 
-
-
-
 let JANUS_INTERPRETED_JSON=null;
+
+let JANUS_REPORT_QUESTIONS=[];
+
+
+/* =========================================================
+   JSON INTERPRETER
+   ========================================================= */
 
 function updateJSONInterpreter(data){
 
@@ -13703,6 +13756,10 @@ error
 
 }
 
+
+/* =========================================================
+   INTERPRET JSON
+   ========================================================= */
 
 function interpretJSON(data){
 
@@ -13860,6 +13917,10 @@ return result;
 }
 
 
+/* =========================================================
+   TYPE
+   ========================================================= */
+
 function detectJSONType(value){
 
 if(value===null)
@@ -13875,6 +13936,10 @@ return typeof value;
 
 }
 
+
+/* =========================================================
+   OBJECT ANALYSIS
+   ========================================================= */
 
 function analyzeObject(
 value,
@@ -14009,6 +14074,10 @@ currentPath
 }
 
 
+/* =========================================================
+   GEOMETRY
+   ========================================================= */
+
 function collectGeometryInfo(
 data,
 result
@@ -14066,6 +14135,10 @@ result.types=
 
 }
 
+
+/* =========================================================
+   TEMPORAL
+   ========================================================= */
 
 function collectTemporalInfo(
 data,
@@ -14172,6 +14245,10 @@ result.fields=
 }
 
 
+/* =========================================================
+   LINKS
+   ========================================================= */
+
 function collectLinks(
 data,
 result
@@ -14232,6 +14309,10 @@ result.relations=
 
 }
 
+
+/* =========================================================
+   ASSETS
+   ========================================================= */
 
 function collectAssets(
 data,
@@ -14299,6 +14380,10 @@ result.types=
 }
 
 
+/* =========================================================
+   EXTENSIONS
+   ========================================================= */
+
 function collectExtensions(
 data,
 result
@@ -14318,6 +14403,10 @@ result.push(
 
 }
 
+
+/* =========================================================
+   BASIC STATISTICS
+   ========================================================= */
 
 function collectStatistics(
 data,
@@ -14355,8 +14444,8 @@ Object.entries(value).forEach(
 
 const currentPath=
 path?
-`${path}.${key}`
-:key;
+`${path}.${key}`:
+key;
 
 if(
 typeof val==="number" &&
@@ -15244,7 +15333,6 @@ href.endsWith(".tiff") ||
 href.endsWith(".jpg") ||
 href.endsWith(".jpeg") ||
 href.endsWith(".png") ||
-href.endsWith(".jp2") ||
 href.endsWith(".jp2")
 ){
 
@@ -15497,7 +15585,8 @@ const numericalOutput={};
 
 Object.entries(
 numeric
-).forEach(
+)
+.forEach(
 ([path,stat])=>{
 
 const values=
@@ -15944,11 +16033,6 @@ dates
 
 };
 
-
-/* =========================================================
-   ADVANCED ANALYSIS
-   ========================================================= */
-
 const analysis={
 
 counts,
@@ -15982,11 +16066,6 @@ mapToObject(map)
 )
 
 };
-
-
-/* =========================================================
-   BACKWARD COMPATIBILITY
-   ========================================================= */
 
 result.counts=
 counts;
@@ -16022,6 +16101,724 @@ analysis;
 
 
 /* =========================================================
+   REPORT CHART HELPERS
+   ========================================================= */
+
+function escapeHTML(
+value
+){
+
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+function formatMetricValue(
+value
+){
+
+if(
+typeof value!=="number" ||
+!Number.isFinite(value)
+)
+return String(value);
+
+return new Intl.NumberFormat(
+"en-US",
+{
+maximumFractionDigits:2
+}
+).format(value);
+
+}
+
+
+/* =========================================================
+   TEMPORAL SVG
+   ========================================================= */
+
+function createTemporalChart(
+temporal
+){
+
+const values=
+Object.entries(
+temporal.observationsByDate||
+{}
+);
+
+if(!values.length)
+return"";
+
+const width=760;
+const height=260;
+
+const paddingLeft=55;
+const paddingRight=20;
+const paddingTop=25;
+const paddingBottom=40;
+
+const chartWidth=
+width-
+paddingLeft-
+paddingRight;
+
+const chartHeight=
+height-
+paddingTop-
+paddingBottom;
+
+const maxValue=
+Math.max(
+...values.map(
+([,value])=>Number(value)
+)
+);
+
+if(
+!Number.isFinite(maxValue) ||
+maxValue<=0
+)
+return"";
+
+const points=
+values.map(
+([date,value],index)=>{
+
+const x=
+paddingLeft+
+(
+values.length===1?
+chartWidth/2:
+(index/(values.length-1))*chartWidth
+);
+
+const y=
+paddingTop+
+chartHeight-
+(
+Number(value)/maxValue
+)*chartHeight;
+
+return{
+x,
+y,
+date,
+value:Number(value)
+};
+
+});
+
+const path=
+points
+.map(
+(point,index)=>
+`${index===0?"M":"L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`
+)
+.join(" ");
+
+const areaPath=
+`${path} L ${points[points.length-1].x.toFixed(2)} ${paddingTop+chartHeight} L ${points[0].x.toFixed(2)} ${paddingTop+chartHeight} Z`;
+
+const firstDate=
+values[0][0];
+
+const middleDate=
+values[
+Math.floor(
+(values.length-1)/2
+)
+][0];
+
+const lastDate=
+values[
+values.length-1
+][0];
+
+const lastPoint=
+points[
+points.length-1
+];
+
+return`
+
+<div class="janusChart">
+
+<div class="janusChartTitle">
+Observations by acquisition date
+</div>
+
+<div class="janusChartSubtitle">
+${values.length} unique acquisition dates
+</div>
+
+<svg
+viewBox="0 0 ${width} ${height}"
+class="janusChartSvg"
+role="img"
+aria-label="Observations by acquisition date"
+>
+
+<line
+x1="${paddingLeft}"
+y1="${paddingTop}"
+x2="${paddingLeft}"
+y2="${paddingTop+chartHeight}"
+class="janusChartAxis"
+/>
+
+<line
+x1="${paddingLeft}"
+y1="${paddingTop+chartHeight}"
+x2="${paddingLeft+chartWidth}"
+y2="${paddingTop+chartHeight}"
+class="janusChartAxis"
+/>
+
+<line
+x1="${paddingLeft}"
+y1="${paddingTop+chartHeight/2}"
+x2="${paddingLeft+chartWidth}"
+y2="${paddingTop+chartHeight/2}"
+class="janusChartGrid"
+/>
+
+<path
+d="${areaPath}"
+class="janusChartArea"
+/>
+
+<path
+d="${path}"
+class="janusChartLine"
+/>
+
+${points.map(
+point=>`
+
+<circle
+cx="${point.x}"
+cy="${point.y}"
+r="2.5"
+class="janusChartPoint"
+>
+<title>
+${escapeHTML(point.date)}: ${formatMetricValue(point.value)} observations
+</title>
+</circle>
+
+`
+).join("")}
+
+<text
+x="${paddingLeft-8}"
+y="${paddingTop+5}"
+text-anchor="end"
+class="janusChartLabel"
+>
+${formatMetricValue(maxValue)}
+</text>
+
+<text
+x="${paddingLeft-8}"
+y="${paddingTop+chartHeight+4}"
+text-anchor="end"
+class="janusChartLabel"
+>
+0
+</text>
+
+<text
+x="${paddingLeft}"
+y="${height-12}"
+text-anchor="start"
+class="janusChartLabel"
+>
+${escapeHTML(firstDate)}
+</text>
+
+<text
+x="${paddingLeft+chartWidth/2}"
+y="${height-12}"
+text-anchor="middle"
+class="janusChartLabel"
+>
+${escapeHTML(middleDate)}
+</text>
+
+<text
+x="${paddingLeft+chartWidth}"
+y="${height-12}"
+text-anchor="end"
+class="janusChartLabel"
+>
+${escapeHTML(lastDate)}
+</text>
+
+</svg>
+
+<div class="janusChartFooter">
+Average: ${formatMetricValue(temporal.frequency || 0)} observations per acquisition date
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   ASSET SVG
+   ========================================================= */
+
+function createAssetChart(
+assets
+){
+
+const entries=
+Object.entries(
+assets.types||
+{}
+)
+.filter(
+([,value])=>
+Number(value)>0
+);
+
+if(!entries.length)
+return"";
+
+const width=760;
+const rowHeight=42;
+const height=
+Math.max(
+170,
+entries.length*rowHeight+80
+);
+
+const labelWidth=260;
+const valueWidth=70;
+
+const maxValue=
+Math.max(
+...entries.map(
+([,value])=>Number(value)
+)
+);
+
+if(
+!Number.isFinite(maxValue) ||
+maxValue<=0
+)
+return"";
+
+return`
+
+<div class="janusChart">
+
+<div class="janusChartTitle">
+Assets by type
+</div>
+
+<div class="janusChartSubtitle">
+${formatMetricValue(assets.count || 0)} total assets
+</div>
+
+<svg
+viewBox="0 0 ${width} ${height}"
+class="janusChartSvg"
+role="img"
+aria-label="Assets by type"
+>
+
+${entries.map(
+([type,value],index)=>{
+
+const numericValue=
+Number(value);
+
+const y=
+35+
+index*rowHeight;
+
+const barWidth=
+(
+numericValue/maxValue
+)*
+(
+width-
+labelWidth-
+valueWidth-
+30
+);
+
+return`
+
+<text
+x="10"
+y="${y+15}"
+class="janusChartLabel"
+>
+${escapeHTML(type)}
+</text>
+
+<rect
+x="${labelWidth}"
+y="${y}"
+width="${Math.max(barWidth,2)}"
+height="22"
+rx="3"
+class="janusChartBar"
+>
+<title>
+${escapeHTML(type)}: ${formatMetricValue(numericValue)}
+</title>
+</rect>
+
+<text
+x="${labelWidth+barWidth+8}"
+y="${y+15}"
+class="janusChartLabel"
+>
+${formatMetricValue(numericValue)}
+</text>
+
+`;
+
+}
+).join("")}
+
+</svg>
+
+<div class="janusChartFooter">
+Average: ${formatMetricValue(assets.perObservation || 0)} assets per observation
+</div>
+
+</div>
+
+`;
+
+}
+
+
+/* =========================================================
+   REPORT VISUAL STYLE
+   ========================================================= */
+
+function ensureJanusReportStyles(){
+
+if(
+document.getElementById(
+"janusReportStyles"
+)
+)
+return;
+
+const style=
+document.createElement(
+"style"
+);
+
+style.id=
+"janusReportStyles";
+
+style.textContent=`
+
+.janusReportCharts{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:16px;
+margin-top:20px;
+margin-bottom:20px;
+}
+
+.janusChart{
+border:1px solid rgba(127,127,127,.25);
+border-radius:10px;
+padding:14px;
+box-sizing:border-box;
+background:rgba(127,127,127,.04);
+min-width:0;
+}
+
+.janusChartTitle{
+font-weight:600;
+font-size:14px;
+margin-bottom:3px;
+}
+
+.janusChartSubtitle{
+font-size:12px;
+opacity:.65;
+margin-bottom:8px;
+}
+
+.janusChartSvg{
+display:block;
+width:100%;
+height:auto;
+overflow:visible;
+}
+
+.janusChartAxis{
+stroke:currentColor;
+stroke-width:1;
+opacity:.35;
+}
+
+.janusChartGrid{
+stroke:currentColor;
+stroke-width:1;
+opacity:.12;
+stroke-dasharray:4 4;
+}
+
+.janusChartLine{
+fill:none;
+stroke:currentColor;
+stroke-width:2;
+}
+
+.janusChartArea{
+fill:currentColor;
+opacity:.08;
+}
+
+.janusChartPoint{
+fill:currentColor;
+opacity:.7;
+}
+
+.janusChartBar{
+fill:currentColor;
+opacity:.65;
+}
+
+.janusChartLabel{
+fill:currentColor;
+font-size:11px;
+}
+
+.janusChartFooter{
+font-size:11px;
+opacity:.6;
+margin-top:4px;
+}
+
+.janusReportNotebook{
+margin-top:24px;
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+
+.janusReportQuestion{
+border-top:1px solid rgba(127,127,127,.25);
+padding-top:14px;
+}
+
+.janusReportQuestionTitle{
+font-size:12px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.05em;
+opacity:.6;
+margin-bottom:5px;
+}
+
+.janusReportQuestionText{
+font-weight:600;
+margin-bottom:7px;
+}
+
+.janusReportAnswer{
+line-height:1.55;
+}
+
+@media(max-width:800px){
+
+.janusReportCharts{
+grid-template-columns:1fr;
+}
+
+}
+
+`;
+
+document.head.appendChild(
+style
+);
+
+}
+
+
+/* =========================================================
+   REPORT QUESTIONS
+   ========================================================= */
+
+function renderReportQuestions(
+container
+){
+
+if(
+!JANUS_REPORT_QUESTIONS.length
+)
+return;
+
+const notebook=
+document.createElement(
+"div"
+);
+
+notebook.className=
+"janusReportNotebook";
+
+JANUS_REPORT_QUESTIONS.forEach(
+entry=>{
+
+const block=
+document.createElement(
+"div"
+);
+
+block.className=
+"janusReportQuestion";
+
+const title=
+document.createElement(
+"div"
+);
+
+title.className=
+"janusReportQuestionTitle";
+
+title.textContent=
+"Question";
+
+const question=
+document.createElement(
+"div"
+);
+
+question.className=
+"janusReportQuestionText";
+
+question.textContent=
+entry.question;
+
+const answerTitle=
+document.createElement(
+"div"
+);
+
+answerTitle.className=
+"janusReportQuestionTitle";
+
+answerTitle.textContent=
+"Answer";
+
+const answer=
+document.createElement(
+"div"
+);
+
+answer.className=
+"janusReportAnswer";
+
+answer.textContent=
+entry.answer;
+
+block.appendChild(
+title
+);
+
+block.appendChild(
+question
+);
+
+block.appendChild(
+answerTitle
+);
+
+block.appendChild(
+answer
+);
+
+notebook.appendChild(
+block
+);
+
+});
+
+container.appendChild(
+notebook
+);
+
+}
+
+
+/* =========================================================
+   ADD QUESTION TO REPORT
+   ========================================================= */
+
+function addQuestionToReport(
+question,
+answer
+){
+
+if(
+!question ||
+!answer
+)
+return;
+
+const id=
+question.id||
+question.text;
+
+const alreadyExists=
+JANUS_REPORT_QUESTIONS.some(
+entry=>
+entry.id===id
+);
+
+if(alreadyExists)
+return;
+
+JANUS_REPORT_QUESTIONS.push({
+
+id,
+
+question:
+question.text,
+
+answer
+
+});
+
+const container=
+document.getElementById(
+"naturalReport"
+);
+
+if(container){
+
+renderReportQuestions(
+container
+);
+
+}
+
+}
+
+
+/* =========================================================
    NATURAL REPORT
    ========================================================= */
 
@@ -16029,6 +16826,8 @@ function createNaturalReport(){
 
 if(!JANUS_INTERPRETED_JSON)
 return;
+
+ensureJanusReportStyles();
 
 const data=
 interpretJSON(
@@ -16419,14 +17218,6 @@ stat.variable &&
 stat.count>1
 );
 
-
-/*
- * One question per analyzable numerical variable.
- *
- * The semantic identity of the field is carried
- * by question.field, not by the visible text.
- */
-
 if(
 usefulNumericalFields.length
 ){
@@ -16612,9 +17403,68 @@ document.getElementById(
 
 if(container){
 
-container.textContent=
+container.innerHTML="";
+
+const text=
+document.createElement(
+"div"
+);
+
+text.className=
+"janusReportText";
+
+text.textContent=
 report||
 "No interpretable information available.";
+
+container.appendChild(
+text
+);
+
+
+/* =========================================================
+   REPORT CHARTS
+   ========================================================= */
+
+const chartsHTML=
+[
+createTemporalChart(
+temporal
+),
+createAssetChart(
+assets
+)
+]
+.filter(Boolean)
+.join("");
+
+if(chartsHTML){
+
+const charts=
+document.createElement(
+"div"
+);
+
+charts.className=
+"janusReportCharts";
+
+charts.innerHTML=
+chartsHTML;
+
+container.appendChild(
+charts
+);
+
+}
+
+
+/* =========================================================
+   REPORT NOTEBOOK
+   ========================================================= */
+
+renderReportQuestions(
+container
+);
 
 }
 
@@ -17265,9 +18115,6 @@ field
 " "
 );
 
-
-/* SUMMARY */
-
 answer=
 `${name}: minimum ${stat.minimum}, maximum ${stat.maximum}, average ${stat.average.toFixed(2)}, range ${stat.range}, standard deviation ${stat.standardDeviation.toFixed(2)}. `;
 
@@ -17285,9 +18132,6 @@ answer+=
 ` ${stat.missing} records have missing values.`;
 
 }
-
-
-/* MINIMUM OBSERVATION */
 
 if(
 stat.minimumObservation
@@ -17322,9 +18166,6 @@ answer+=
 answer+=".";
 
 }
-
-
-/* MAXIMUM OBSERVATION */
 
 if(
 stat.maximumObservation
@@ -17533,8 +18374,22 @@ answer=
 }
 
 
+/* =========================================================
+   SHOW ANSWER
+   ========================================================= */
+
 answerContainer.textContent=
 answer;
+
+
+/* =========================================================
+   ADD TO REPORT
+   ========================================================= */
+
+addQuestionToReport(
+question,
+answer
+);
 
 }
 
