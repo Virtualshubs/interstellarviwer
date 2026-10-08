@@ -13657,6 +13657,12 @@ if(!data)return;
 
 try{
 
+/* ---------------------------------------------------------
+   NEW JSON = NEW REPORT CONTEXT
+   --------------------------------------------------------- */
+
+JANUS_REPORT_QUESTIONS=[];
+
 JANUS_INTERPRETED_JSON=
 data;
 
@@ -13715,7 +13721,6 @@ error
 }
 
 }
-
 
 /* =========================================================
    INTERPRET JSON
@@ -16799,11 +16804,11 @@ return;
 
 
 /* ---------------------------------------------------------
-   PREVENT DUPLICATE QUESTIONS
+   FIND EXISTING QUESTION
    --------------------------------------------------------- */
 
-const alreadyExists=
-JANUS_REPORT_QUESTIONS.some(
+const existing=
+JANUS_REPORT_QUESTIONS.find(
 entry=>
 String(
 entry.question ||
@@ -16813,12 +16818,40 @@ questionText
 );
 
 
-if(alreadyExists)
+/* ---------------------------------------------------------
+   UPDATE EXISTING QUESTION
+   --------------------------------------------------------- */
+
+if(existing){
+
+existing.answer=
+answer;
+
+existing.id=
+question.id||
+existing.id||
+questionText;
+
+const container=
+document.getElementById(
+"naturalReport"
+);
+
+if(container){
+
+renderReportQuestions(
+container
+);
+
+}
+
 return;
+
+}
 
 
 /* ---------------------------------------------------------
-   ADD QUESTION
+   ADD NEW QUESTION
    --------------------------------------------------------- */
 
 JANUS_REPORT_QUESTIONS.push({
