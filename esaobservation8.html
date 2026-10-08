@@ -16511,6 +16511,15 @@ box-sizing:border-box;
 background:rgba(127,127,127,.04);
 min-width:0;
 width:100%;
+cursor:zoom-in;
+transition:
+transform .15s ease,
+border-color .15s ease,
+background .15s ease;
+}
+
+.janusChart:hover{
+border-color:rgba(127,127,127,.45);
 }
 
 .janusChartTitle{
@@ -16607,14 +16616,325 @@ margin-bottom:7px;
 line-height:1.55;
 }
 
+
+/* =========================================================
+   CHART ZOOM
+   ========================================================= */
+
+.janusChartZoomOverlay{
+position:fixed;
+inset:0;
+z-index:99999;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:24px;
+box-sizing:border-box;
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(4px);
+-webkit-backdrop-filter:blur(4px);
+cursor:zoom-out;
+}
+
+.janusChartZoomContent{
+position:relative;
+width:min(1500px,96vw);
+max-height:94vh;
+overflow:auto;
+box-sizing:border-box;
+padding:28px;
+border-radius:14px;
+border:1px solid rgba(127,127,127,.35);
+background:var(--janus-chart-zoom-background,Canvas);
+color:CanvasText;
+box-shadow:0 20px 80px rgba(0,0,0,.45);
+cursor:default;
+}
+
+.janusChartZoomContent .janusChart{
+width:100%;
+box-sizing:border-box;
+border:0;
+padding:0;
+background:transparent;
+cursor:default;
+}
+
+.janusChartZoomContent .janusChartTitle{
+font-size:18px;
+margin-bottom:5px;
+}
+
+.janusChartZoomContent .janusChartSubtitle{
+font-size:13px;
+margin-bottom:18px;
+}
+
+.janusChartZoomContent .janusChartSvg{
+width:100%;
+height:auto;
+max-height:78vh;
+}
+
+.janusChartZoomContent .janusChartLabel{
+font-size:12px;
+}
+
+.janusChartZoomContent .janusChartFooter{
+font-size:12px;
+margin-top:10px;
+}
+
+.janusChartZoomClose{
+position:absolute;
+top:10px;
+right:12px;
+width:34px;
+height:34px;
+border:0;
+border-radius:50%;
+background:rgba(127,127,127,.14);
+color:currentColor;
+font-size:24px;
+line-height:30px;
+text-align:center;
+cursor:pointer;
+padding:0;
+z-index:2;
+}
+
+.janusChartZoomClose:hover{
+background:rgba(127,127,127,.25);
+}
+
+body.janusChartZoomOpen{
+overflow:hidden;
+}
+
+@media(max-width:700px){
+
+.janusChartZoomOverlay{
+padding:10px;
+}
+
+.janusChartZoomContent{
+width:98vw;
+max-height:96vh;
+padding:20px 14px 16px;
+border-radius:10px;
+}
+
+.janusChartZoomContent .janusChartSvg{
+max-height:none;
+}
+
+.janusChartZoomContent .janusChartTitle{
+font-size:16px;
+}
+
+}
+
 `;
 
 document.head.appendChild(
 style
 );
 
+
+/* =========================================================
+   INSTALL ZOOM HANDLER ONCE
+   ========================================================= */
+
+if(
+!document.body.dataset.janusChartZoomReady
+){
+
+document.body.dataset.janusChartZoomReady=
+"true";
+
+
+document.addEventListener(
+"click",
+function(event){
+
+const chart=
+event.target.closest(
+".janusChart"
+);
+
+
+/* -------------------------------------------------------
+   CLICK INSIDE ZOOMED CHART
+   ------------------------------------------------------- */
+
+if(
+chart &&
+chart.closest(
+".janusChartZoomContent"
+)
+){
+return;
 }
 
+
+/* -------------------------------------------------------
+   CLICK ORIGINAL CHART
+   ------------------------------------------------------- */
+
+if(
+chart &&
+!chart.closest(
+".janusChartZoomOverlay"
+)
+){
+
+const overlay=
+document.createElement(
+"div"
+);
+
+overlay.className=
+"janusChartZoomOverlay";
+
+
+const content=
+document.createElement(
+"div"
+);
+
+content.className=
+"janusChartZoomContent";
+
+
+const close=
+document.createElement(
+"button"
+);
+
+close.type=
+"button";
+
+close.className=
+"janusChartZoomClose";
+
+close.setAttribute(
+"aria-label",
+"Close chart"
+);
+
+close.textContent=
+"×";
+
+
+const clone=
+chart.cloneNode(
+true
+);
+
+clone.classList.add(
+"janusChartZoomed"
+);
+
+
+content.appendChild(
+close
+);
+
+content.appendChild(
+clone
+);
+
+overlay.appendChild(
+content
+);
+
+document.body.appendChild(
+overlay
+);
+
+document.body.classList.add(
+"janusChartZoomOpen"
+);
+
+
+close.focus();
+
+
+close.addEventListener(
+"click",
+function(event){
+
+event.stopPropagation();
+
+overlay.remove();
+
+document.body.classList.remove(
+"janusChartZoomOpen"
+);
+
+}
+);
+
+return;
+
+}
+
+
+/* -------------------------------------------------------
+   CLICK OUTSIDE CONTENT
+   ------------------------------------------------------- */
+
+if(
+event.target.classList.contains(
+"janusChartZoomOverlay"
+)
+){
+
+event.target.remove();
+
+document.body.classList.remove(
+"janusChartZoomOpen"
+);
+
+}
+
+}
+);
+
+
+/* ---------------------------------------------------------
+   ESCAPE TO CLOSE
+   --------------------------------------------------------- */
+
+document.addEventListener(
+"keydown",
+function(event){
+
+if(
+event.key!=="Escape"
+)
+return;
+
+const overlay=
+document.querySelector(
+".janusChartZoomOverlay"
+);
+
+if(!overlay)
+return;
+
+overlay.remove();
+
+document.body.classList.remove(
+"janusChartZoomOpen"
+);
+
+}
+);
+
+}
+
+}
 
 /* =========================================================
    REPORT QUESTIONS
