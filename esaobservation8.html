@@ -16115,18 +16115,28 @@ const values=
 Object.entries(
 temporal.observationsByDate||
 {}
+)
+.filter(
+([date,value])=>
+date &&
+Number.isFinite(Number(value)) &&
+Number(value)>=0
+)
+.sort(
+([dateA],[dateB])=>
+dateA.localeCompare(dateB)
 );
 
 if(!values.length)
 return"";
 
-const width=760;
-const height=260;
+const width=1000;
+const height=320;
 
-const paddingLeft=55;
-const paddingRight=20;
-const paddingTop=25;
-const paddingBottom=40;
+const paddingLeft=65;
+const paddingRight=25;
+const paddingTop=30;
+const paddingBottom=55;
 
 const chartWidth=
 width-
@@ -16179,6 +16189,11 @@ value:Number(value)
 
 });
 
+
+/* ---------------------------------------------------------
+   LINE AND AREA
+   --------------------------------------------------------- */
+
 const path=
 points
 .map(
@@ -16190,25 +16205,175 @@ points
 const areaPath=
 `${path} L ${points[points.length-1].x.toFixed(2)} ${paddingTop+chartHeight} L ${points[0].x.toFixed(2)} ${paddingTop+chartHeight} Z`;
 
+
+/* ---------------------------------------------------------
+   X-AXIS LABEL INTERVAL
+   --------------------------------------------------------- */
+
+const maxLabels=7;
+
+const labelStep=
+Math.max(
+1,
+Math.ceil(
+(values.length-1)/(maxLabels-1)
+)
+);
+
+const labelIndexes=
+new Set([
+0,
+values.length-1
+]);
+
+for(
+let i=labelStep;
+i<values.length-1;
+i+=labelStep
+){
+
+labelIndexes.add(i);
+
+}
+
+
+/* ---------------------------------------------------------
+   Y-AXIS GRID
+   --------------------------------------------------------- */
+
+const gridSteps=4;
+
+const gridHTML=
+Array.from(
+{length:gridSteps+1},
+(_,index)=>{
+
+const value=
+maxValue-
+(maxValue/gridSteps)*index;
+
+const y=
+paddingTop+
+(chartHeight/gridSteps)*index;
+
+return`
+
+<line
+x1="${paddingLeft}"
+y1="${y}"
+x2="${paddingLeft+chartWidth}"
+y2="${y}"
+class="janusChartGrid"
+/>
+
+<text
+x="${paddingLeft-10}"
+y="${y+4}"
+text-anchor="end"
+class="janusChartLabel"
+>
+${formatMetricValue(value)}
+</text>
+
+`;
+
+}
+).join(" ");
+
+
+/* ---------------------------------------------------------
+   X-AXIS LABELS
+   --------------------------------------------------------- */
+
+const labelsHTML=
+points.map(
+(point,index)=>{
+
+if(
+!labelIndexes.has(index)
+)
+return"";
+
+const anchor=
+index===0?
+"start":
+index===values.length-1?
+"end":
+"middle";
+
+return`
+
+<text
+x="${point.x}"
+y="${height-20}"
+text-anchor="${anchor}"
+class="janusChartLabel"
+>
+${escapeHTML(point.date)}
+</text>
+
+`;
+
+}
+).join("");
+
+
+/* ---------------------------------------------------------
+   POINTS
+   --------------------------------------------------------- */
+
+const pointsHTML=
+points.map(
+point=>`
+
+<circle
+cx="${point.x}"
+cy="${point.y}"
+r="7"
+fill="transparent"
+>
+<title>
+${escapeHTML(point.date)}: ${formatMetricValue(point.value)} observations
+</title>
+</circle>
+
+<circle
+cx="${point.x}"
+cy="${point.y}"
+r="${values.length>100?1.8:3}"
+class="janusChartPoint"
+>
+<title>
+${escapeHTML(point.date)}: ${formatMetricValue(point.value)} observations
+</title>
+</circle>
+
+`
+).join("");
+
+
+/* ---------------------------------------------------------
+   SUMMARY
+   --------------------------------------------------------- */
+
+const totalObservations=
+values.reduce(
+(total,[,value])=>
+total+Number(value),
+0
+);
+
+const average=
+values.length?
+totalObservations/values.length:
+0;
+
 const firstDate=
 values[0][0];
 
-const middleDate=
-values[
-Math.floor(
-(values.length-1)/2
-)
-][0];
-
 const lastDate=
-values[
-values.length-1
-][0];
+values[values.length-1][0];
 
-const lastPoint=
-points[
-points.length-1
-];
 
 return`
 
@@ -16219,15 +16384,17 @@ Observations by acquisition date
 </div>
 
 <div class="janusChartSubtitle">
-${values.length} unique acquisition dates
+${formatMetricValue(values.length)} unique acquisition dates
 </div>
 
 <svg
 viewBox="0 0 ${width} ${height}"
 class="janusChartSvg"
 role="img"
-aria-label="Observations by acquisition date"
+aria-label="Observations by acquisition date, ordered from oldest to newest"
 >
+
+${gridHTML}
 
 <line
 x1="${paddingLeft}"
@@ -16245,14 +16412,6 @@ y2="${paddingTop+chartHeight}"
 class="janusChartAxis"
 />
 
-<line
-x1="${paddingLeft}"
-y1="${paddingTop+chartHeight/2}"
-x2="${paddingLeft+chartWidth}"
-y2="${paddingTop+chartHeight/2}"
-class="janusChartGrid"
-/>
-
 <path
 d="${areaPath}"
 class="janusChartArea"
@@ -16263,72 +16422,16 @@ d="${path}"
 class="janusChartLine"
 />
 
-${points.map(
-point=>`
+${pointsHTML}
 
-<circle
-cx="${point.x}"
-cy="${point.y}"
-r="2.5"
-class="janusChartPoint"
->
-<title>
-${escapeHTML(point.date)}: ${formatMetricValue(point.value)} observations
-</title>
-</circle>
-
-`
-).join("")}
-
-<text
-x="${paddingLeft-8}"
-y="${paddingTop+5}"
-text-anchor="end"
-class="janusChartLabel"
->
-${formatMetricValue(maxValue)}
-</text>
-
-<text
-x="${paddingLeft-8}"
-y="${paddingTop+chartHeight+4}"
-text-anchor="end"
-class="janusChartLabel"
->
-0
-</text>
-
-<text
-x="${paddingLeft}"
-y="${height-12}"
-text-anchor="start"
-class="janusChartLabel"
->
-${escapeHTML(firstDate)}
-</text>
-
-<text
-x="${paddingLeft+chartWidth/2}"
-y="${height-12}"
-text-anchor="middle"
-class="janusChartLabel"
->
-${escapeHTML(middleDate)}
-</text>
-
-<text
-x="${paddingLeft+chartWidth}"
-y="${height-12}"
-text-anchor="end"
-class="janusChartLabel"
->
-${escapeHTML(lastDate)}
-</text>
+${labelsHTML}
 
 </svg>
 
 <div class="janusChartFooter">
-Average: ${formatMetricValue(temporal.frequency || 0)} observations per acquisition date
+${escapeHTML(firstDate)} → ${escapeHTML(lastDate)}
+&nbsp; · &nbsp;
+Average: ${formatMetricValue(average)} observations per acquisition date
 </div>
 
 </div>
