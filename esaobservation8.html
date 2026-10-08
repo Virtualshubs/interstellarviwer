@@ -2658,27 +2658,7 @@ Load
                
                 <div id="meta"></div>
 
-<div id="spatialCoverage" class="spatialCoverage">
-    <div class="spatialCoverageTitle">
-        SPATIAL COVERAGE
-    </div>
-    <div class="spatialCoverageValue">
-        <span id="spatialCoveragePercentage">0.0%</span>
-    </div>
-    <div class="spatialCoverageDetails">
-        <span id="spatialCoverageCells">0 / 0</span>
-        <span>cells discovered</span>
-    </div>
-    <div class="spatialCoverageDetails">
-        <span id="spatialCoverageObservations">0</span>
-        <span>observations explored</span>
-    </div>
-         <button id="expandMapBtn" onclick="expandObservationMap()">
-                    REDISCOVER MAP
-                </button>
 
-
-</div>
 
                
  <div id="queryBox"></div>
@@ -2724,10 +2704,35 @@ Waiting for cell selection
 
         <div id="janusReader" >
 
+           
      <div id="jsonInterpreterPanel">
-
     <div class="jsonInterpreterHeader">
         <h3>Investigation content</h3>
+
+       
+
+       <div id="spatialCoverage" class="spatialCoverage">
+    <div class="spatialCoverageTitle">
+        SPATIAL COVERAGE
+    </div>
+    <div class="spatialCoverageValue">
+        <span id="spatialCoveragePercentage">0.0%</span>
+    </div>
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageCells">0 / 0</span>
+        <span>cells discovered</span>
+    </div>
+    <div class="spatialCoverageDetails">
+        <span id="spatialCoverageObservations">0</span>
+        <span>observations explored</span>
+    </div>
+         <button id="expandMapBtn" onclick="expandObservationMap()">
+                    REDISCOVER MAP
+                </button>
+</div>
+
+
+       
 
         <span id="jsonInterpreterStatus">
             Waiting for JSON...
