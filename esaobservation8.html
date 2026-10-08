@@ -2542,7 +2542,100 @@ height:100%;
 
 
 
+.janusCellRanking {
+    margin-top: 24px;
+    padding: 20px;
+    background: #111418;
+    color: #e8edf2;
+    border: 1px solid #303740;
+    border-radius: 10px;
+    font-family: inherit;
+}
 
+.janusCellRankHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.janusCellRankHeader h3 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.janusCellRankHeader p,
+.janusCellRankList small {
+    color: #929eaa;
+    font-size: 12px;
+}
+
+.janusCellRankControls {
+    display: flex;
+    gap: 6px;
+}
+
+.janusCellRankControls button {
+    padding: 7px 11px;
+    border: 1px solid #3b444e;
+    border-radius: 4px;
+    background: transparent;
+    color: #aeb8c2;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.janusCellRankControls button.active {
+    background: #dce3e9;
+    color: #111418;
+}
+
+.janusCellRankRow {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-top: 1px solid #293039;
+}
+
+.janusCellRankPosition {
+    color: #84919e;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.janusCellRankInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.janusCellRankInfo strong {
+    font-size: 13px;
+}
+
+.janusCellRankInfo small {
+    font-size: 11px;
+}
+
+.janusCellRankValue {
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.janusCellRanking footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #293039;
+    color: #84919e;
+    font-size: 11px;
+}
 
 
    
@@ -13646,6 +13739,9 @@ let JANUS_INTERPRETED_JSON=null;
 
 let JANUS_REPORT_QUESTIONS=[];
 
+     let JANUS_CELL_INDEX = new Map();
+let JANUS_CELL_SORT = "desc";
+
 
 /* =========================================================
    JSON INTERPRETER
@@ -13665,6 +13761,8 @@ JANUS_REPORT_QUESTIONS=[];
 
 JANUS_INTERPRETED_JSON=
 data;
+
+   registerJanusCell(data);
 
 const interpreted=
 interpretJSON(data);
@@ -13720,6 +13818,20 @@ error
 
 }
 
+}
+
+
+     function registerJanusCell(data) {
+    const cell = data?.CELL_INFO;
+
+    if (!cell || cell.id == null) return;
+
+    JANUS_CELL_INDEX.set(String(cell.id), {
+        id: cell.id,
+        latRange: cell.latRange ?? "—",
+        lonRange: cell.lonRange ?? "—",
+        observations: Number(cell.observations) || 0
+    });
 }
 
 /* =========================================================
@@ -17777,6 +17889,75 @@ addQuestion(
 "processing"
 );
 
+
+
+
+const ranking = document.createElement("div");
+ranking.innerHTML = createJanusCellRanking();
+container.appendChild(ranking.firstElementChild);
+
+ranking.firstElementChild
+    .querySelectorAll("[data-cell-sort]")
+    .forEach(button => {
+        button.addEventListener("click", () => {
+            JANUS_CELL_SORT = button.dataset.cellSort;
+            createNaturalReport();
+        });
+    });
+
+
+
+
+
+}
+
+
+
+
+   function createJanusCellRanking() {
+    const cells = [...JANUS_CELL_INDEX.values()].sort((a, b) =>
+        JANUS_CELL_SORT === "desc"
+            ? b.observations - a.observations
+            : a.observations - b.observations
+    );
+
+    const rows = cells.map((cell, index) => `
+        <div class="janusCellRankRow">
+            <span class="janusCellRankPosition">${index + 1}</span>
+            <div class="janusCellRankInfo">
+                <strong>Cell ${cell.id}</strong>
+                <small>Lat ${cell.latRange} · Lon ${cell.lonRange}</small>
+            </div>
+            <strong class="janusCellRankValue">
+                ${cell.observations.toLocaleString("en-US")}
+            </strong>
+        </div>
+    `).join("");
+
+    return `
+        <section class="janusCellRanking">
+            <header class="janusCellRankHeader">
+                <div>
+                    <h3>Cell Activity Index</h3>
+                    <p>Ranking by number of observations</p>
+                </div>
+                <div class="janusCellRankControls">
+                    <button type="button" data-cell-sort="desc"
+                        class="${JANUS_CELL_SORT === "desc" ? "active" : ""}">
+                        MOST
+                    </button>
+                    <button type="button" data-cell-sort="asc"
+                        class="${JANUS_CELL_SORT === "asc" ? "active" : ""}">
+                        LEAST
+                    </button>
+                </div>
+            </header>
+            <div class="janusCellRankList">
+                ${rows || "<p>No cell data available yet.</p>"}
+            </div>
+            <footer>${cells.length} cells indexed in this session</footer>
+        </section>
+    `;
 }
 
 
