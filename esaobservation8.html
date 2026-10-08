@@ -2545,7 +2545,7 @@ height:100%;
 
 #reportCharts{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:1fr;
     gap:16px;
     margin:20px 0;
 }
@@ -2553,6 +2553,7 @@ height:100%;
 #reportChart1,
 #reportChart2{
     min-height:220px;
+    width:100%;
 }
 
 #reportNotebook{
@@ -2569,13 +2570,7 @@ height:100%;
     line-height:1.6;
 }
 
-@media(max-width:800px){
 
-    #reportCharts{
-        grid-template-columns:1fr;
-    }
-
-}
 
    
    
@@ -2709,11 +2704,6 @@ Load
                 </button>
 
 
-     <div id="reportCharts">
-    <div id="reportChart1"></div>
-    <div id="reportChart2"></div>
-</div>
-   
 </div>
 
                
@@ -2789,6 +2779,11 @@ Waiting for cell selection
 
   
 
+     <div id="reportCharts">
+    <div id="reportChart1"></div>
+    <div id="reportChart2"></div>
+</div>
+   
 
        <div id="reportNotebook"></div>
 
