@@ -7351,15 +7351,23 @@ container.appendChild(r);
 // ===================================
 
 async function expandObservationMap(){
+
     const seeds =
     observationGrid.filter(c=>c.state===0);
 
     if(seeds.length===0){
-        console.log("No reference cells.");
+
+        console.log(
+            "No reference cells."
+        );
+
         return;
+
     }
 
+
     if(!activeDataset.nextPage){
+
         console.log(
             "No more catalog pages."
         );
@@ -7375,11 +7383,48 @@ async function expandObservationMap(){
     document.getElementById("status").textContent =
     "Expanding observation map...";
 
+
     const discovered =
     await discoverNeighbourCells();
 
+
+    // ===================================
+    // FINAL JSON INTERPRETATION
+    // ===================================
+
+    const finalItems=[];
+
+    observationGrid.forEach(cell=>{
+
+        cell.items.forEach(item=>{
+
+            finalItems.push(item);
+
+        });
+
+    });
+
+
+    const finalJSON={
+        type:"FeatureCollection",
+        features:finalItems,
+        numberReturned:finalItems.length
+    };
+
+
+    updateJSONInterpreter(
+        finalJSON
+    );
+
+
+    // ===================================
+    // ACTUALIZAR MAPA
+    // ===================================
+
     updateGrid();
-   updateSpatialCoverage();
+
+    updateSpatialCoverage();
+
 
     console.log(
         "NEW CELLS:",
@@ -7391,8 +7436,6 @@ async function expandObservationMap(){
     `Expansion complete. ${discovered} new cells`;
 
 }
-
-
 
 
 // ===================================
