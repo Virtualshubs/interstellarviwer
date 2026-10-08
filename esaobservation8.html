@@ -14490,6 +14490,10 @@ type
 }
 
 
+/* =========================================================
+   FIELD CLASSIFICATION
+   ========================================================= */
+
 function isAdministrativeNumeric(
 key,
 path
@@ -14511,7 +14515,8 @@ if(
 "numbermatched",
 "numberreturned",
 "limit",
-"offset"
+"offset",
+"count"
 ].includes(k)
 ){
 
@@ -14523,7 +14528,104 @@ if(
 p.includes("cell_info.id") ||
 p.includes("context.") ||
 p.includes("numbermatched") ||
-p.includes("numberreturned")
+p.includes("numberreturned") ||
+p.includes(".links.") ||
+p.includes(".assets.")
+){
+
+return true;
+
+}
+
+return false;
+
+}
+
+
+function isSpatialNumeric(
+key,
+path
+){
+
+const k=
+String(key)
+.toLowerCase();
+
+const p=
+String(path)
+.toLowerCase();
+
+if(
+[
+"lat",
+"latitude",
+"lon",
+"lng",
+"longitude",
+"minlat",
+"maxlat",
+"minlon",
+"maxlon"
+].includes(k)
+){
+
+return true;
+
+}
+
+if(
+k==="bbox" ||
+p.includes("bbox") ||
+p.includes("centroid") ||
+p.includes("geometry.coordinates") ||
+p.includes(".geometry.")
+){
+
+return true;
+
+}
+
+if(
+p.includes("proj:centroid")
+){
+
+return true;
+
+}
+
+return false;
+
+}
+
+
+function isResolutionNumeric(
+key,
+path
+){
+
+const k=
+String(key)
+.toLowerCase();
+
+const p=
+String(path)
+.toLowerCase();
+
+if(
+[
+"gsd",
+"spatial_resolution",
+"resolution"
+].includes(k)
+){
+
+return true;
+
+}
+
+if(
+p.includes("spatial_resolution") ||
+p.includes("raster:bands")
 ){
 
 return true;
@@ -14558,6 +14660,10 @@ String(key).toLowerCase()
 }
 
 
+/* =========================================================
+   OBSERVATION REFERENCE
+   ========================================================= */
+
 function getObservationReference(
 observation
 ){
@@ -14572,16 +14678,24 @@ properties["proj:centroid"]||
 
 let latitude=
 Number.isFinite(
+Number(
 centroid.lat
+)
 )?
-centroid.lat:
+Number(
+centroid.lat
+):
 null;
 
 let longitude=
 Number.isFinite(
+Number(
 centroid.lon
+)
 )?
-centroid.lon:
+Number(
+centroid.lon
+):
 null;
 
 if(
@@ -14599,8 +14713,8 @@ if(latitude===null){
 
 latitude=
 (
-observation.bbox[1]+
-observation.bbox[3]
+Number(observation.bbox[1])+
+Number(observation.bbox[3])
 )/2;
 
 }
@@ -14609,8 +14723,8 @@ if(longitude===null){
 
 longitude=
 (
-observation.bbox[0]+
-observation.bbox[2]
+Number(observation.bbox[0])+
+Number(observation.bbox[2])
 )/2;
 
 }
@@ -14636,6 +14750,10 @@ longitude
 
 }
 
+
+/* =========================================================
+   OBSERVATION REGISTRATION
+   ========================================================= */
 
 function registerObservation(
 observation
@@ -14771,6 +14889,17 @@ observation.collection
 }
 
 if(
+properties.collection!==undefined
+){
+
+incrementMap(
+collections,
+properties.collection
+);
+
+}
+
+if(
 properties.sensor!==undefined
 ){
 
@@ -14855,6 +14984,10 @@ region
 }
 
 
+/* =========================================================
+   NUMERIC FIELD REGISTRATION
+   ========================================================= */
+
 function registerNumeric(
 path,
 value,
@@ -14873,6 +15006,22 @@ path
 
 if(
 isAdministrativeNumeric(
+lastKey,
+path
+)
+)
+return;
+
+if(
+isSpatialNumeric(
+lastKey,
+path
+)
+)
+return;
+
+if(
+isResolutionNumeric(
 lastKey,
 path
 )
@@ -14940,6 +15089,10 @@ observation;
 }
 
 
+/* =========================================================
+   CATEGORICAL REGISTRATION
+   ========================================================= */
+
 function registerCategorical(
 path,
 value
@@ -14961,6 +15114,23 @@ new Map;
 
 }
 
+if(
+Array.isArray(value)
+){
+
+value.forEach(
+item=>
+incrementMap(
+categorical[path],
+item
+)
+);
+
+}
+else if(
+typeof value!=="object"
+){
+
 incrementMap(
 categorical[path],
 value
@@ -14968,6 +15138,12 @@ value
 
 }
 
+}
+
+
+/* =========================================================
+   ASSET REGISTRATION
+   ========================================================= */
 
 function registerAsset(
 asset
@@ -15010,10 +15186,24 @@ const mime=
 String(type)
 .toLowerCase();
 
+const href=
+String(
+asset.href||
+""
+)
+.toLowerCase();
+
 if(
 mime.startsWith(
 "image/"
-)
+) ||
+href.endsWith(".tif") ||
+href.endsWith(".tiff") ||
+href.endsWith(".jpg") ||
+href.endsWith(".jpeg") ||
+href.endsWith(".png") ||
+href.endsWith(".jp2") ||
+href.endsWith(".jp2")
 ){
 
 imageCount++;
@@ -15023,7 +15213,8 @@ imageCount++;
 if(
 mime.includes("xml") ||
 mime.includes("json") ||
-mime.startsWith("text/")
+mime.startsWith("text/") ||
+asset.roles?.includes("metadata")
 ){
 
 metadataAssetCount++;
@@ -15032,6 +15223,10 @@ metadataAssetCount++;
 
 }
 
+
+/* =========================================================
+   GEOMETRY
+   ========================================================= */
 
 function registerGeometry(
 value
@@ -15061,6 +15256,10 @@ value.type
 }
 
 
+/* =========================================================
+   MISSING
+   ========================================================= */
+
 function registerMissing(
 path
 ){
@@ -15070,6 +15269,10 @@ missing[path]=
 
 }
 
+
+/* =========================================================
+   GENERIC WALK
+   ========================================================= */
 
 function walk(
 value,
@@ -15189,6 +15392,18 @@ currentObservation
 
 if(
 typeof val==="string" &&
+isCategoricalField(key)
+){
+
+registerCategorical(
+key,
+val
+);
+
+}
+
+if(
+Array.isArray(val) &&
 isCategoricalField(key)
 ){
 
@@ -15450,7 +15665,7 @@ maxLat
 
 
 /* =========================================================
-   OUTPUT
+   OUTPUT HELPERS
    ========================================================= */
 
 function mapToObject(
@@ -15463,7 +15678,12 @@ map.entries()
 
 }
 
-result.counts={
+
+/* =========================================================
+   RESULT OBJECTS
+   ========================================================= */
+
+const counts={
 
 observations:
 observationCount,
@@ -15488,16 +15708,7 @@ uniqueDates.length
 
 };
 
-result.uniqueValues=
-categorical;
-
-result.missing=
-missing;
-
-result.extremes=
-numericalOutput;
-
-result.temporal={
+const temporal={
 
 first:
 firstTimestamp!==null?
@@ -15558,7 +15769,7 @@ dates
 
 };
 
-result.spatial={
+const spatial={
 
 geometryCount,
 
@@ -15604,7 +15815,7 @@ null
 
 };
 
-result.assets={
+const assetAnalysis={
 
 count:
 assetCount,
@@ -15633,7 +15844,7 @@ assetRoles
 
 };
 
-result.provenance={
+const provenance={
 
 platforms:
 mapToObject(
@@ -15667,7 +15878,7 @@ regions
 
 };
 
-result.distribution={
+const distribution={
 
 observationsByPlatform:
 mapToObject(
@@ -15682,9 +15893,88 @@ collections
 observationsByGeometry:
 mapToObject(
 geometryTypes
+),
+
+observationsByDate:
+mapToObject(
+dates
 )
 
 };
+
+
+/* =========================================================
+   ADVANCED ANALYSIS
+   ========================================================= */
+
+const analysis={
+
+counts,
+
+missing,
+
+extremes:
+numericalOutput,
+
+temporal,
+
+spatial,
+
+assets:
+assetAnalysis,
+
+provenance,
+
+distribution,
+
+categorical:
+Object.fromEntries(
+Object.entries(
+categorical
+).map(
+([path,map])=>[
+path,
+mapToObject(map)
+]
+)
+)
+
+};
+
+
+/* =========================================================
+   BACKWARD COMPATIBILITY
+   ========================================================= */
+
+result.counts=
+counts;
+
+result.uniqueValues=
+categorical;
+
+result.missing=
+missing;
+
+result.extremes=
+numericalOutput;
+
+result.temporal=
+temporal;
+
+result.spatial=
+spatial;
+
+result.assets=
+assetAnalysis;
+
+result.provenance=
+provenance;
+
+result.distribution=
+distribution;
+
+result.analysis=
+analysis;
 
 }
 
@@ -15714,14 +16004,18 @@ const questions=[];
 function addQuestion(
 id,
 text,
-capability
+capability,
+field=null,
+mode=null
 ){
 
 questions.push({
 
 id,
 text,
-capability
+capability,
+field,
+mode
 
 });
 
@@ -15761,6 +16055,10 @@ data.fields?.OBSERVATIONS?.size ||
 null;
 
 
+/* =========================================================
+   OBSERVATIONS
+   ========================================================= */
+
 if(
 JANUS_INTERPRETED_JSON.CELL_INFO &&
 JANUS_INTERPRETED_JSON.OBSERVATIONS
@@ -15789,7 +16087,9 @@ sentences.push(
 }
 
 
-/* SPATIAL */
+/* =========================================================
+   SPATIAL
+   ========================================================= */
 
 if(
 counts.geometries
@@ -15828,7 +16128,9 @@ sentences.push(
 }
 
 
-/* PROJECTION */
+/* =========================================================
+   PROJECTION
+   ========================================================= */
 
 const statistics=
 data.statistics||
@@ -15868,7 +16170,9 @@ addQuestion(
 }
 
 
-/* RESOLUTION */
+/* =========================================================
+   RESOLUTION
+   ========================================================= */
 
 const resolution=
 statistics[
@@ -15913,7 +16217,9 @@ addQuestion(
 }
 
 
-/* TEMPORAL */
+/* =========================================================
+   TEMPORAL
+   ========================================================= */
 
 if(
 temporal.first &&
@@ -15950,7 +16256,9 @@ addQuestion(
 }
 
 
-/* ASSETS */
+/* =========================================================
+   ASSETS
+   ========================================================= */
 
 if(
 counts.assets
@@ -15981,7 +16289,9 @@ addQuestion(
 }
 
 
-/* PROVENANCE */
+/* =========================================================
+   PROVENANCE
+   ========================================================= */
 
 const platforms=
 Object.keys(
@@ -16052,19 +16362,28 @@ addQuestion(
 }
 
 
-/* NUMERICAL */
-
-const numericalFields=
-Object.entries(
-extremes
-);
+/* =========================================================
+   DYNAMIC NUMERICAL FIELDS
+   ========================================================= */
 
 const usefulNumericalFields=
-numericalFields.filter(
+Object.entries(
+extremes
+)
+.filter(
 ([,stat])=>
+stat &&
 stat.variable &&
 stat.count>1
 );
+
+
+/*
+ * One question per analyzable numerical variable.
+ *
+ * The semantic identity of the field is carried
+ * by question.field, not by the visible text.
+ */
 
 if(
 usefulNumericalFields.length
@@ -16077,20 +16396,28 @@ addQuestion(
 );
 
 usefulNumericalFields
-.slice(
-0,
-8
-)
 .forEach(
 ([path])=>{
 
-addQuestion(
-`numeric_${path}`,
-`What are the statistics for ${path}?`,
-"numeric_field"
+const field=
+path
+.split(".")
+.pop()
+.replaceAll(
+"_",
+" "
 );
 
-});
+addQuestion(
+`numeric_${path}`,
+`What can be determined about ${field}?`,
+"numeric_field",
+path,
+"summary"
+);
+
+}
+);
 
 addQuestion(
 "extreme_observations",
@@ -16101,7 +16428,9 @@ addQuestion(
 }
 
 
-/* COUNTS */
+/* =========================================================
+   COUNTS
+   ========================================================= */
 
 if(
 observations!==null
@@ -16143,7 +16472,9 @@ addQuestion(
 }
 
 
-/* AVAILABLE ANALYSIS */
+/* =========================================================
+   AVAILABLE ANALYSIS
+   ========================================================= */
 
 const available=[];
 
@@ -16225,7 +16556,9 @@ data.description
 }
 
 
-/* RENDER REPORT */
+/* =========================================================
+   RENDER REPORT
+   ========================================================= */
 
 const report=
 sentences.join(" ");
@@ -16244,14 +16577,17 @@ report||
 }
 
 
-/* RENDER QUESTIONS */
+/* =========================================================
+   RENDER QUESTIONS
+   ========================================================= */
 
 const questionsContainer=
 document.getElementById(
 "jsonQuestions"
 );
 
-if(questionsContainer){
+if(!questionsContainer)
+return;
 
 questionsContainer.innerHTML="";
 
@@ -16272,8 +16608,9 @@ if(!uniqueQuestions.length){
 questionsContainer.textContent=
 "No questions available.";
 
+return;
+
 }
-else{
 
 uniqueQuestions.forEach(
 question=>{
@@ -16321,10 +16658,6 @@ button
 );
 
 });
-
-}
-
-}
 
 }
 
@@ -16395,7 +16728,9 @@ analysis.provenance||
 let answer="";
 
 
-/* SPATIAL */
+/* =========================================================
+   SPATIAL
+   ========================================================= */
 
 if(
 question.capability==="spatial"
@@ -16437,7 +16772,9 @@ answer=
 }
 
 
-/* PROJECTION */
+/* =========================================================
+   PROJECTION
+   ========================================================= */
 
 else if(
 question.capability==="projection"
@@ -16467,7 +16804,9 @@ answer=
 }
 
 
-/* RESOLUTION */
+/* =========================================================
+   RESOLUTION
+   ========================================================= */
 
 else if(
 question.capability==="resolution"
@@ -16521,7 +16860,9 @@ answer=
 }
 
 
-/* TEMPORAL */
+/* =========================================================
+   TEMPORAL
+   ========================================================= */
 
 else if(
 question.capability==="temporal"
@@ -16555,7 +16896,9 @@ answer=
 }
 
 
-/* TEMPORAL GAPS */
+/* =========================================================
+   TEMPORAL GAPS
+   ========================================================= */
 
 else if(
 question.capability==="temporal_gaps"
@@ -16583,7 +16926,9 @@ answer=
 }
 
 
-/* ASSETS */
+/* =========================================================
+   ASSETS
+   ========================================================= */
 
 else if(
 question.capability==="assets"
@@ -16611,7 +16956,9 @@ answer=
 }
 
 
-/* ASSET DISTRIBUTION */
+/* =========================================================
+   ASSET DISTRIBUTION
+   ========================================================= */
 
 else if(
 question.capability==="asset_distribution"
@@ -16649,7 +16996,9 @@ answer+=
 }
 
 
-/* ASSET RATIO */
+/* =========================================================
+   ASSET RATIO
+   ========================================================= */
 
 else if(
 question.capability==="asset_ratio"
@@ -16661,7 +17010,9 @@ answer=
 }
 
 
-/* IMAGES */
+/* =========================================================
+   IMAGES
+   ========================================================= */
 
 else if(
 question.capability==="images"
@@ -16673,7 +17024,9 @@ answer=
 }
 
 
-/* PLATFORMS */
+/* =========================================================
+   PLATFORMS
+   ========================================================= */
 
 else if(
 question.capability==="platforms"
@@ -16693,7 +17046,9 @@ entries.length?
 }
 
 
-/* COLLECTIONS */
+/* =========================================================
+   COLLECTIONS
+   ========================================================= */
 
 else if(
 question.capability==="collections"
@@ -16713,7 +17068,9 @@ entries.length?
 }
 
 
-/* SENSORS */
+/* =========================================================
+   SENSORS
+   ========================================================= */
 
 else if(
 question.capability==="sensors"
@@ -16733,7 +17090,9 @@ entries.length?
 }
 
 
-/* PROCESSING */
+/* =========================================================
+   PROCESSING
+   ========================================================= */
 
 else if(
 question.capability==="processing"
@@ -16753,7 +17112,9 @@ entries.length?
 }
 
 
-/* COUNTS */
+/* =========================================================
+   COUNTS
+   ========================================================= */
 
 else if(
 question.capability==="counts"
@@ -16783,7 +17144,9 @@ answer+=
 }
 
 
-/* STATISTICS */
+/* =========================================================
+   GENERAL NUMERICAL STATISTICS
+   ========================================================= */
 
 else if(
 question.capability==="statistics"
@@ -16795,6 +17158,7 @@ extremes
 )
 .filter(
 ([,stat])=>
+stat &&
 stat.variable &&
 stat.count>1
 );
@@ -16804,7 +17168,16 @@ if(fields.length){
 answer=
 `The variable numerical fields available for analysis are: ${fields.map(([path,stat])=>{
 
-return `${path} (${stat.minimum}–${stat.maximum}, average ${stat.average.toFixed(2)}, standard deviation ${stat.standardDeviation.toFixed(2)})`;
+const name=
+path
+.split(".")
+.pop()
+.replaceAll(
+"_",
+" "
+);
+
+return `${name} (${stat.minimum}–${stat.maximum}, average ${stat.average.toFixed(2)}, standard deviation ${stat.standardDeviation.toFixed(2)})`;
 
 }).join("; ")}.`;
 
@@ -16819,27 +17192,60 @@ answer=
 }
 
 
-/* NUMERIC FIELD */
+/* =========================================================
+   DYNAMIC NUMERICAL FIELD
+   ========================================================= */
 
 else if(
 question.capability==="numeric_field"
 ){
 
-const prefix=
-question.id.replace(
-"numeric_",
-""
-);
+const field=
+question.field;
 
 const stat=
-extremes[prefix];
+extremes[field];
 
-if(stat){
+if(!stat){
 
 answer=
-`${prefix}: minimum ${stat.minimum}, maximum ${stat.maximum}, average ${stat.average.toFixed(2)}, range ${stat.range}, standard deviation ${stat.standardDeviation.toFixed(2)}. `+
-`Percentiles: P25 ${stat.percentiles.p25}, P50 ${stat.percentiles.p50}, P75 ${stat.percentiles.p75}, P90 ${stat.percentiles.p90}, P95 ${stat.percentiles.p95}, P99 ${stat.percentiles.p99}. `+
+`No statistics were found for ${field}.`;
+
+}
+else{
+
+const name=
+field
+.split(".")
+.pop()
+.replaceAll(
+"_",
+" "
+);
+
+
+/* SUMMARY */
+
+answer=
+`${name}: minimum ${stat.minimum}, maximum ${stat.maximum}, average ${stat.average.toFixed(2)}, range ${stat.range}, standard deviation ${stat.standardDeviation.toFixed(2)}. `;
+
+answer+=
+`Percentiles: P25 ${stat.percentiles.p25}, P50 ${stat.percentiles.p50}, P75 ${stat.percentiles.p75}, P90 ${stat.percentiles.p90}, P95 ${stat.percentiles.p95}, P99 ${stat.percentiles.p99}. `;
+
+answer+=
 `The field contains ${stat.uniqueCount} unique values across ${stat.count} records.`;
+
+if(
+stat.missing
+){
+
+answer+=
+` ${stat.missing} records have missing values.`;
+
+}
+
+
+/* MINIMUM OBSERVATION */
 
 if(
 stat.minimumObservation
@@ -16874,6 +17280,9 @@ answer+=
 answer+=".";
 
 }
+
+
+/* MAXIMUM OBSERVATION */
 
 if(
 stat.maximumObservation
@@ -16910,17 +17319,13 @@ answer+=".";
 }
 
 }
-else{
-
-answer=
-`No statistics were found for ${prefix}.`;
-
-}
 
 }
 
 
-/* EXTREME OBSERVATIONS */
+/* =========================================================
+   EXTREME OBSERVATIONS
+   ========================================================= */
 
 else if(
 question.capability==="extreme_observations"
@@ -16932,6 +17337,7 @@ extremes
 )
 .filter(
 ([,stat])=>
+stat &&
 stat.variable &&
 (
 stat.minimumObservation ||
@@ -16945,8 +17351,17 @@ answer=
 fields.map(
 ([path,stat])=>{
 
+const name=
+path
+.split(".")
+.pop()
+.replaceAll(
+"_",
+" "
+);
+
 let text=
-`${path}: minimum ${stat.minimum} and maximum ${stat.maximum}`;
+`${name}: minimum ${stat.minimum} and maximum ${stat.maximum}`;
 
 if(
 stat.minimumObservation
@@ -17030,7 +17445,9 @@ answer=
 }
 
 
-/* MISSING */
+/* =========================================================
+   MISSING
+   ========================================================= */
 
 else if(
 question.capability==="missing"
@@ -17062,7 +17479,9 @@ answer=
 }
 
 
-/* FALLBACK */
+/* =========================================================
+   FALLBACK
+   ========================================================= */
 
 else{
 
@@ -17070,6 +17489,7 @@ answer=
 "No resolver is currently available for this capability.";
 
 }
+
 
 answerContainer.textContent=
 answer;
