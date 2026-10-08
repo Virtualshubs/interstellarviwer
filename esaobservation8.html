@@ -16456,22 +16456,42 @@ assets.types||
 )
 .filter(
 ([,value])=>
+Number.isFinite(Number(value)) &&
 Number(value)>0
 );
 
 if(!entries.length)
 return"";
 
-const width=760;
-const rowHeight=42;
+const width=1000;
+const rowHeight=46;
+const paddingTop=35;
+const paddingBottom=25;
+
 const height=
 Math.max(
 170,
-entries.length*rowHeight+80
+entries.length*rowHeight+
+paddingTop+
+paddingBottom
 );
 
-const labelWidth=260;
-const valueWidth=70;
+
+/* ---------------------------------------------------------
+   LAYOUT
+   --------------------------------------------------------- */
+
+const labelX=10;
+const labelWidth=340;
+const barX=labelWidth+15;
+const valueGap=12;
+const rightPadding=85;
+
+const barMaxWidth=
+width-
+barX-
+valueGap-
+rightPadding;
 
 const maxValue=
 Math.max(
@@ -16485,6 +16505,31 @@ if(
 maxValue<=0
 )
 return"";
+
+
+/* ---------------------------------------------------------
+   DISTINCT BAR COLORS
+   --------------------------------------------------------- */
+
+const colors=[
+"#4E79A7",
+"#F28E2B",
+"#59A14F",
+"#E15759",
+"#B07AA1",
+"#76B7B2",
+"#EDC948",
+"#FF9DA7",
+"#9C755F",
+"#BAB0AC",
+"#5B8FF9",
+"#61DDAA"
+];
+
+
+/* ---------------------------------------------------------
+   SVG
+   --------------------------------------------------------- */
 
 return`
 
@@ -16512,47 +16557,72 @@ const numericValue=
 Number(value);
 
 const y=
-35+
+paddingTop+
 index*rowHeight;
 
 const barWidth=
+Math.max(
 (
 numericValue/maxValue
-)*
-(
-width-
-labelWidth-
-valueWidth-
-30
+)*barMaxWidth,
+2
+);
+
+const color=
+colors[index%colors.length];
+
+const label=
+String(type);
+
+const maxLabelLength=43;
+
+const shortLabel=
+label.length>maxLabelLength?
+label.slice(
+0,
+maxLabelLength-1
+)+"…":
+label;
+
+const valueX=
+Math.min(
+barX+barWidth+valueGap,
+width-rightPadding+barMaxWidth
 );
 
 return`
 
 <text
-x="10"
-y="${y+15}"
+x="${labelX}"
+y="${y+16}"
 class="janusChartLabel"
 >
-${escapeHTML(type)}
+<title>${escapeHTML(label)}</title>
+${escapeHTML(shortLabel)}
 </text>
 
 <rect
-x="${labelWidth}"
+x="${barX}"
 y="${y}"
-width="${Math.max(barWidth,2)}"
-height="22"
-rx="3"
-class="janusChartBar"
+width="${barWidth}"
+height="24"
+rx="4"
+fill="${color}"
+class="janusChartBar janusChartBarColored"
 >
 <title>
-${escapeHTML(type)}: ${formatMetricValue(numericValue)}
+${escapeHTML(label)}: ${formatMetricValue(numericValue)}
 </title>
 </rect>
 
 <text
-x="${labelWidth+barWidth+8}"
-y="${y+15}"
-class="janusChartLabel"
+x="${Math.min(
+barX+barWidth+valueGap,
+width-8
+)}"
+y="${y+16}"
+text-anchor="start"
+class="janusChartLabel janusChartValueLabel"
 >
 ${formatMetricValue(numericValue)}
 </text>
@@ -16835,6 +16905,19 @@ max-height:none;
 font-size:16px;
 }
 
+}
+
+.janusChartBarColored{
+opacity:.9;
+transition:opacity .15s ease;
+}
+
+.janusChartBarColored:hover{
+opacity:1;
+}
+
+.janusChartValueLabel{
+font-weight:600;
 }
 
 `;
