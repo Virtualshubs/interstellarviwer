@@ -13592,6 +13592,10 @@ if(body === "moon"){
 
 
 
+
+
+
+
 let JANUS_INTERPRETED_JSON=null;
 
 function updateJSONInterpreter(data){
@@ -13658,10 +13662,6 @@ error
 }
 
 
-/* =========================================================
-   JSON INTERPRETER
-   ========================================================= */
-
 function interpretJSON(data){
 
 const result={
@@ -13693,13 +13693,7 @@ assets:{},
 
 provenance:{},
 
-distribution:{},
-
-metadata:{},
-
-links:{},
-
-extensions:{}
+distribution:{}
 
 },
 
@@ -13727,9 +13721,7 @@ if(data===null){
 return result;
 }
 
-if(
-typeof data.description==="string"
-){
+if(typeof data.description==="string"){
 
 result.description=
 data.description;
@@ -13751,9 +13743,7 @@ item=>detectJSONType(item)
 ];
 
 }
-else if(
-typeof data==="object"
-){
+else if(typeof data==="object"){
 
 result.structure.keys=
 Object.keys(data);
@@ -13828,10 +13818,6 @@ return result;
 }
 
 
-/* =========================================================
-   TYPE DETECTION
-   ========================================================= */
-
 function detectJSONType(value){
 
 if(value===null)
@@ -13847,10 +13833,6 @@ return typeof value;
 
 }
 
-
-/* =========================================================
-   STRUCTURE ANALYSIS
-   ========================================================= */
 
 function analyzeObject(
 value,
@@ -13906,8 +13888,8 @@ Object.entries(value).forEach(
 
 const currentPath=
 path?
-`${path}.${key}`:
-key;
+`${path}.${key}`
+:key;
 
 if(
 val!==null &&
@@ -13929,8 +13911,7 @@ currentPath
 
 };
 
-target[currentPath]=
-entry;
+target[currentPath]=entry;
 
 if(Array.isArray(val)){
 
@@ -13985,10 +13966,6 @@ currentPath
 
 }
 
-
-/* =========================================================
-   GEOMETRY
-   ========================================================= */
 
 function collectGeometryInfo(
 data,
@@ -14048,10 +14025,6 @@ result.types=
 }
 
 
-/* =========================================================
-   TEMPORAL BASE ANALYSIS
-   ========================================================= */
-
 function collectTemporalInfo(
 data,
 result
@@ -14101,8 +14074,7 @@ min===null ||
 timestamp<min
 ){
 
-min=
-timestamp;
+min=timestamp;
 
 }
 
@@ -14111,8 +14083,7 @@ max===null ||
 timestamp>max
 ){
 
-max=
-timestamp;
+max=timestamp;
 
 }
 
@@ -14159,16 +14130,12 @@ result.fields=
 }
 
 
-/* =========================================================
-   LINKS
-   ========================================================= */
-
 function collectLinks(
 data,
 result
 ){
 
-const relations=new Map;
+const relations=new Set;
 
 function walk(value){
 
@@ -14191,8 +14158,7 @@ typeof link==="object" &&
 link.rel
 ){
 
-incrementMap(
-relations,
+relations.add(
 link.rel
 );
 
@@ -14218,30 +14184,19 @@ Object.values(value).forEach(walk);
 walk(data);
 
 result.relations=
-Object.keys(
-Object.fromEntries(
-relations
-)
-);
-
-result.distribution=
-Object.fromEntries(
-relations
-);
+[
+...relations
+];
 
 }
 
-
-/* =========================================================
-   ASSETS BASE ANALYSIS
-   ========================================================= */
 
 function collectAssets(
 data,
 result
 ){
 
-const types=new Map;
+const types=new Set;
 
 function walk(value){
 
@@ -14264,16 +14219,15 @@ typeof asset!=="object"
 )
 return;
 
-const type=
-asset.type||
-"unknown";
+result.count++;
 
-incrementMap(
-types,
-type
+if(asset.type){
+
+types.add(
+asset.type
 );
 
-result.count++;
+}
 
 }
 );
@@ -14296,72 +14250,32 @@ Object.values(value).forEach(walk);
 walk(data);
 
 result.types=
-Object.keys(
-Object.fromEntries(
-types
-)
-);
+[
+...types
+];
 
 }
 
-
-/* =========================================================
-   EXTENSIONS
-   ========================================================= */
 
 function collectExtensions(
 data,
 result
 ){
 
-const extensions=
-new Set;
-
-function walk(value){
-
-if(!value||typeof value!=="object")
-return;
-
 if(
 Array.isArray(
-value.stac_extensions
+data.stac_extensions
 )
 ){
 
-value.stac_extensions.forEach(
-extension=>
-extensions.add(
-extension
-)
-);
-
-}
-
-if(Array.isArray(value)){
-
-value.forEach(walk);
-
-}
-else{
-
-Object.values(value).forEach(walk);
-
-}
-
-}
-
-walk(data);
-
 result.push(
-...extensions
+...data.stac_extensions
 );
 
 }
 
+}
 
-/* =========================================================
-   GENERIC NUMERIC STATISTICS
-   ========================================================= */
 
 function collectStatistics(
 data,
@@ -14370,10 +14284,7 @@ result
 
 const fields={};
 
-function walk(
-value,
-path
-){
+function walk(value,path){
 
 if(
 !value ||
@@ -14385,12 +14296,13 @@ if(Array.isArray(value)){
 
 value.forEach(
 item=>{
+
 walk(
 item,
 `${path}[*]`
 );
-}
-);
+
+});
 
 return;
 
@@ -14401,8 +14313,8 @@ Object.entries(value).forEach(
 
 const currentPath=
 path?
-`${path}.${key}`:
-key;
+`${path}.${key}`
+:key;
 
 if(
 typeof val==="number" &&
@@ -14511,63 +14423,13 @@ const platforms=new Map;
 const collections=new Map;
 const sensors=new Map;
 const instruments=new Map;
-const missions=new Map;
-const constellations=new Map;
 const processing=new Map;
 const regions=new Map;
 
 const assetTypes=new Map;
 const assetRoles=new Map;
-const assetMediaTypes=new Map;
-const assetFormats=new Map;
-const assetUnits=new Map;
-const assetResolutions=new Map;
 
 const geometryTypes=new Map;
-
-const metadata={
-
-title:null,
-
-description:null,
-
-license:null,
-
-keywords:[],
-
-providers:[],
-
-version:null,
-
-stacVersion:null,
-
-conformsTo:[],
-
-id:null,
-
-type:null,
-
-created:null,
-
-updated:null,
-
-deprecated:null,
-
-platform:null,
-
-constellation:null,
-
-instruments:[],
-
-mission:null
-
-};
-
-const metadataFields={};
-
-const assetDetails=[];
-
-const assetNumeric={};
 
 let observationCount=0;
 let geometryCount=0;
@@ -14586,10 +14448,6 @@ let sumLon=0;
 let centroidCount=0;
 
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
-
 function incrementMap(
 map,
 key
@@ -14599,11 +14457,6 @@ if(
 key===null ||
 key===undefined ||
 key===""
-)
-return;
-
-if(
-typeof key==="object"
 )
 return;
 
@@ -14637,6 +14490,10 @@ type
 }
 
 
+/* =========================================================
+   FIELD CLASSIFICATION
+   ========================================================= */
+
 function isAdministrativeNumeric(
 key,
 path
@@ -14658,7 +14515,8 @@ if(
 "numbermatched",
 "numberreturned",
 "limit",
-"offset"
+"offset",
+"count"
 ].includes(k)
 ){
 
@@ -14668,17 +14526,11 @@ return true;
 
 if(
 p.includes("cell_info.id") ||
-p.includes("context.numbermatched") ||
-p.includes("context.numberreturned") ||
+p.includes("context.") ||
+p.includes("numbermatched") ||
+p.includes("numberreturned") ||
 p.includes(".links.") ||
-p.includes(".assets.") &&
-(
-k==="count" ||
-k==="index" ||
-k==="size" ||
-k==="offset" ||
-k==="limit"
-)
+p.includes(".assets.")
 ){
 
 return true;
@@ -14755,6 +14607,10 @@ const k=
 String(key)
 .toLowerCase();
 
+const p=
+String(path)
+.toLowerCase();
+
 if(
 [
 "gsd",
@@ -14767,392 +14623,39 @@ return true;
 
 }
 
-return false;
-
-}
-
-
-function isLikelyCategorical(
-key,
-value,
-path
+if(
+p.includes("spatial_resolution") ||
+p.includes("raster:bands")
 ){
-
-if(
-typeof value!=="string"
-)
-return false;
-
-const k=
-String(key)
-.toLowerCase();
-
-const p=
-String(path)
-.toLowerCase();
-
-if(
-!value ||
-value.length>120
-)
-return false;
-
-if(
-k==="id" ||
-k==="href" ||
-k==="url" ||
-k==="uri" ||
-k==="description" ||
-k==="title" ||
-k==="datetime" ||
-k==="start_datetime" ||
-k==="end_datetime" ||
-k==="created" ||
-k==="updated" ||
-k==="license"
-){
-
-return false;
-
-}
-
-if(
-k.includes("url") ||
-k.includes("href") ||
-k.includes("description") ||
-k.includes("datetime")
-){
-
-return false;
-
-}
-
-if(
-p.includes(".links.") ||
-p.includes(".assets.") &&
-(
-k==="href" ||
-k==="title" ||
-k==="description"
-)
-){
-
-return false;
-
-}
 
 return true;
 
 }
 
-
-function registerMetadataField(
-path,
-value
-){
-
-if(
-value===null ||
-value===undefined
-)
-return;
-
-metadataFields[path]=
-{
-
-type:
-detectJSONType(value),
-
-value:
-typeof value==="string" ||
-typeof value==="number" ||
-typeof value==="boolean"?
-value:
-undefined,
-
-size:
-Array.isArray(value)?
-value.length:
-typeof value==="object"?
-Object.keys(value).length:
-undefined
-
-};
+return false;
 
 }
 
 
-function registerMetadata(
-object
-){
-
-if(
-!object ||
-typeof object!=="object"
-)
-return;
-
-if(
-typeof object.id==="string"
-){
-
-metadata.id=
-object.id;
-
-}
-
-if(
-typeof object.type==="string"
-){
-
-metadata.type=
-object.type;
-
-}
-
-if(
-typeof object.title==="string"
-){
-
-metadata.title=
-object.title;
-
-}
-
-if(
-typeof object.description==="string"
-){
-
-metadata.description=
-object.description;
-
-}
-
-if(
-typeof object.license==="string"
-){
-
-metadata.license=
-object.license;
-
-}
-
-if(
-typeof object.version==="string"
-){
-
-metadata.version=
-object.version;
-
-}
-
-if(
-typeof object.stac_version==="string"
-){
-
-metadata.stacVersion=
-object.stac_version;
-
-}
-
-if(
-typeof object.created==="string"
-){
-
-metadata.created=
-object.created;
-
-}
-
-if(
-typeof object.updated==="string"
-){
-
-metadata.updated=
-object.updated;
-
-}
-
-if(
-typeof object.deprecated==="boolean"
-){
-
-metadata.deprecated=
-object.deprecated;
-
-}
-
-if(
-Array.isArray(object.keywords)
-){
-
-metadata.keywords=
-[
-...new Set(
-[
-...metadata.keywords,
-...object.keywords
-]
-.filter(
-value=>
-typeof value==="string"
-)
-)
-];
-
-}
-
-if(
-Array.isArray(object.providers)
-){
-
-object.providers.forEach(
-provider=>{
-
-if(
-typeof provider==="string"
-){
-
-metadata.providers.push(
-provider
-);
-
-}
-else if(
-provider &&
-typeof provider==="object"
-){
-
-const name=
-provider.name||
-provider.url||
-provider.id;
-
-if(name){
-
-metadata.providers.push(
-String(name)
-);
-
-}
-
-}
-
-}
-);
-
-metadata.providers=
-[
-...new Set(
-metadata.providers
-)
-];
-
-}
-
-if(
-Array.isArray(object.conformsTo)
-){
-
-metadata.conformsTo=
-[
-...new Set(
-[
-...metadata.conformsTo,
-...object.conformsTo
-]
-.filter(
-value=>
-typeof value==="string"
-)
-)
-];
-
-}
-
-if(
-typeof object.platform==="string"
-){
-
-metadata.platform=
-object.platform;
-
-}
-
-if(
-typeof object.constellation==="string"
-){
-
-metadata.constellation=
-object.constellation;
-
-}
-
-if(
-typeof object.mission==="string"
-){
-
-metadata.mission=
-object.mission;
-
-}
-
-if(
-Array.isArray(object.instruments)
-){
-
-metadata.instruments=
-[
-...new Set(
-[
-...metadata.instruments,
-...object.instruments
-]
-.filter(
-value=>
-typeof value==="string"
-)
-)
-];
-
-}
-
-[
-"id",
-"type",
-"title",
-"description",
-"license",
-"version",
-"stac_version",
-"created",
-"updated",
-"deprecated",
-"keywords",
-"providers",
-"conformsTo",
-"platform",
-"constellation",
-"mission",
-"instruments"
-].forEach(
-key=>{
-
-if(
-Object.prototype.hasOwnProperty.call(
-object,
+function isCategoricalField(
 key
-)
 ){
 
-registerMetadataField(
-key,
-object[key]
+return[
+"platform",
+"collection",
+"sensor",
+"instrument",
+"mission",
+"constellation",
+"region",
+"grid:code",
+"processing:software",
+"processing_software",
+"storage:region"
+].includes(
+String(key).toLowerCase()
 );
-
-}
-
-});
 
 }
 
@@ -15411,50 +14914,9 @@ if(
 properties.instrument!==undefined
 ){
 
-if(
-Array.isArray(
-properties.instrument
-)
-){
-
-properties.instrument.forEach(
-value=>
-incrementMap(
-instruments,
-value
-)
-);
-
-}
-else{
-
 incrementMap(
 instruments,
 properties.instrument
-);
-
-}
-
-}
-
-if(
-properties.mission!==undefined
-){
-
-incrementMap(
-missions,
-properties.mission
-);
-
-}
-
-if(
-properties.constellation!==undefined
-){
-
-incrementMap(
-constellations,
-properties.constellation
 );
 
 }
@@ -15680,70 +15142,11 @@ value
 
 
 /* =========================================================
-   ASSET NUMERIC REGISTRATION
-   ========================================================= */
-
-function registerAssetNumeric(
-path,
-value
-){
-
-if(
-!Number.isFinite(value)
-)
-return;
-
-if(
-!assetNumeric[path]
-){
-
-assetNumeric[path]={
-count:0,
-minimum:value,
-maximum:value,
-sum:0
-};
-
-}
-
-const stat=
-assetNumeric[path];
-
-stat.count++;
-
-stat.sum+=
-value;
-
-if(
-value<
-stat.minimum
-){
-
-stat.minimum=
-value;
-
-}
-
-if(
-value>
-stat.maximum
-){
-
-stat.maximum=
-value;
-
-}
-
-}
-
-
-/* =========================================================
    ASSET REGISTRATION
    ========================================================= */
 
 function registerAsset(
-asset,
-assetId
+asset
 ){
 
 if(
@@ -15780,11 +15183,7 @@ role
 }
 
 const mime=
-String(
-asset.type||
-asset["media_type"]||
-""
-)
+String(type)
 .toLowerCase();
 
 const href=
@@ -15803,6 +15202,7 @@ href.endsWith(".tiff") ||
 href.endsWith(".jpg") ||
 href.endsWith(".jpeg") ||
 href.endsWith(".png") ||
+href.endsWith(".jp2") ||
 href.endsWith(".jp2")
 ){
 
@@ -15820,237 +15220,6 @@ asset.roles?.includes("metadata")
 metadataAssetCount++;
 
 }
-
-if(
-asset["media_type"]
-){
-
-incrementMap(
-assetMediaTypes,
-asset["media_type"]
-);
-
-}
-
-if(
-asset.format
-){
-
-incrementMap(
-assetFormats,
-asset.format
-);
-
-}
-
-if(
-asset.unit
-){
-
-incrementMap(
-assetUnits,
-asset.unit
-);
-
-}
-
-if(
-asset["spatial_resolution"]!==undefined
-){
-
-incrementMap(
-assetResolutions,
-asset["spatial_resolution"]
-);
-
-}
-
-if(
-asset.gsd!==undefined
-){
-
-incrementMap(
-assetResolutions,
-asset.gsd
-);
-
-}
-
-if(
-asset.raster &&
-typeof asset.raster==="object"
-){
-
-const raster=
-asset.raster;
-
-if(
-Array.isArray(
-raster.bands
-)
-){
-
-raster.bands.forEach(
-band=>{
-
-if(
-!band ||
-typeof band!=="object"
-)
-return;
-
-if(
-band.unit
-){
-
-incrementMap(
-assetUnits,
-band.unit
-);
-
-}
-
-if(
-band.spatial_resolution!==undefined
-){
-
-incrementMap(
-assetResolutions,
-band.spatial_resolution
-);
-
-}
-
-if(
-Number.isFinite(
-band.scale
-)
-){
-
-registerAssetNumeric(
-"raster.bands.scale",
-band.scale
-);
-
-}
-
-if(
-Number.isFinite(
-band.offset
-)
-){
-
-registerAssetNumeric(
-"raster.bands.offset",
-band.offset
-);
-
-}
-
-if(
-Number.isFinite(
-band.nodata
-)
-){
-
-registerAssetNumeric(
-"raster.bands.nodata",
-band.nodata
-);
-
-}
-
-}
-);
-
-}
-
-}
-
-Object.entries(
-asset
-).forEach(
-([key,value])=>{
-
-if(
-typeof value==="number" &&
-Number.isFinite(value)
-){
-
-registerAssetNumeric(
-key,
-value
-);
-
-}
-
-});
-
-assetDetails.push({
-
-id:
-assetId||
-null,
-
-type:
-asset.type||
-null,
-
-mediaType:
-asset["media_type"]||
-asset.type||
-null,
-
-href:
-asset.href||
-null,
-
-title:
-asset.title||
-null,
-
-description:
-asset.description||
-null,
-
-roles:
-Array.isArray(asset.roles)?
-[
-...asset.roles
-]:
-[],
-
-format:
-asset.format||
-null,
-
-unit:
-asset.unit||
-null,
-
-size:
-asset.file_size||
-asset.size||
-null,
-
-checksum:
-asset.checksum||
-null,
-
-raster:
-asset.raster||
-null,
-
-statistics:
-asset.statistics||
-null,
-
-bands:
-asset.raster?.bands||
-asset.bands||
-null
-
-});
 
 }
 
@@ -16137,10 +15306,6 @@ return;
 if(typeof value!=="object")
 return;
 
-registerMetadata(
-value
-);
-
 const isObservation=
 value.type==="Feature" ||
 (
@@ -16190,14 +15355,10 @@ value.assets &&
 typeof value.assets==="object"
 ){
 
-Object.entries(
+Object.values(
 value.assets
 ).forEach(
-([assetId,asset])=>
-registerAsset(
-asset,
-assetId
-)
+registerAsset
 );
 
 }
@@ -16231,16 +15392,11 @@ currentObservation
 
 if(
 typeof val==="string" &&
-isLikelyCategorical(
-key,
-val,
-currentPath
-) &&
-insideObservation
+isCategoricalField(key)
 ){
 
 registerCategorical(
-currentPath,
+key,
 val
 );
 
@@ -16248,20 +15404,11 @@ val
 
 if(
 Array.isArray(val) &&
-insideObservation &&
-(
-key==="platform" ||
-key==="sensor" ||
-key==="instrument" ||
-key==="mission" ||
-key==="constellation" ||
-key==="collection" ||
-key==="keywords"
-)
+isCategoricalField(key)
 ){
 
 registerCategorical(
-currentPath,
+key,
 val
 );
 
@@ -16444,40 +15591,6 @@ stat.maximumObservation
 
 
 /* =========================================================
-   ASSET NUMERICAL OUTPUT
-   ========================================================= */
-
-const assetNumericalOutput={};
-
-Object.entries(
-assetNumeric
-).forEach(
-([path,stat])=>{
-
-assetNumericalOutput[path]={
-
-count:
-stat.count,
-
-minimum:
-stat.minimum,
-
-maximum:
-stat.maximum,
-
-average:
-stat.sum/stat.count,
-
-range:
-stat.maximum-
-stat.minimum
-
-};
-
-});
-
-
-/* =========================================================
    TEMPORAL ANALYSIS
    ========================================================= */
 
@@ -16552,7 +15665,7 @@ maxLat
 
 
 /* =========================================================
-   MAP HELPER
+   OUTPUT HELPERS
    ========================================================= */
 
 function mapToObject(
@@ -16567,7 +15680,7 @@ map.entries()
 
 
 /* =========================================================
-   COUNTS
+   RESULT OBJECTS
    ========================================================= */
 
 const counts={
@@ -16594,11 +15707,6 @@ uniqueDates:
 uniqueDates.length
 
 };
-
-
-/* =========================================================
-   TEMPORAL OBJECT
-   ========================================================= */
 
 const temporal={
 
@@ -16661,18 +15769,15 @@ dates
 
 };
 
-
-/* =========================================================
-   SPATIAL OBJECT
-   ========================================================= */
-
 const spatial={
 
 geometryCount,
 
 geometryTypes:
+Object.keys(
 mapToObject(
 geometryTypes
+)
 ),
 
 bbox,
@@ -16710,11 +15815,6 @@ null
 
 };
 
-
-/* =========================================================
-   ASSET OBJECT
-   ========================================================= */
-
 const assetAnalysis={
 
 count:
@@ -16740,40 +15840,9 @@ assetTypes
 roles:
 mapToObject(
 assetRoles
-),
-
-mediaTypes:
-mapToObject(
-assetMediaTypes
-),
-
-formats:
-mapToObject(
-assetFormats
-),
-
-units:
-mapToObject(
-assetUnits
-),
-
-resolutions:
-mapToObject(
-assetResolutions
-),
-
-numeric:
-assetNumericalOutput,
-
-details:
-assetDetails
+)
 
 };
-
-
-/* =========================================================
-   PROVENANCE
-   ========================================================= */
 
 const provenance={
 
@@ -16797,16 +15866,6 @@ mapToObject(
 instruments
 ),
 
-missions:
-mapToObject(
-missions
-),
-
-constellations:
-mapToObject(
-constellations
-),
-
 processing:
 mapToObject(
 processing
@@ -16818,11 +15877,6 @@ regions
 )
 
 };
-
-
-/* =========================================================
-   DISTRIBUTION
-   ========================================================= */
 
 const distribution={
 
@@ -16836,26 +15890,6 @@ mapToObject(
 collections
 ),
 
-observationsBySensor:
-mapToObject(
-sensors
-),
-
-observationsByInstrument:
-mapToObject(
-instruments
-),
-
-observationsByMission:
-mapToObject(
-missions
-),
-
-observationsByConstellation:
-mapToObject(
-constellations
-),
-
 observationsByGeometry:
 mapToObject(
 geometryTypes
@@ -16864,139 +15898,13 @@ geometryTypes
 observationsByDate:
 mapToObject(
 dates
-),
-
-assetsByType:
-mapToObject(
-assetTypes
-),
-
-assetsByRole:
-mapToObject(
-assetRoles
 )
 
 };
 
 
 /* =========================================================
-   METADATA
-   ========================================================= */
-
-const metadataOutput={
-
-...metadata,
-
-providers:
-[
-...new Set(
-metadata.providers
-)
-],
-
-instruments:
-[
-...new Set(
-metadata.instruments
-)
-],
-
-fields:
-metadataFields
-
-};
-
-
-/* =========================================================
-   LINKS
-   ========================================================= */
-
-const links={
-
-count:
-linkCount,
-
-relations:
-Object.keys(
-Object.fromEntries(
-collectMapFromObject(
-data,
-"links"
-)
-)
-)
-
-};
-
-
-/* =========================================================
-   EXTENSIONS
-   ========================================================= */
-
-const extensionSet=
-new Set;
-
-function collectExtensionValues(
-value
-){
-
-if(
-!value ||
-typeof value!=="object"
-)
-return;
-
-if(
-Array.isArray(
-value.stac_extensions
-)
-){
-
-value.stac_extensions.forEach(
-extension=>
-extensionSet.add(
-extension
-)
-);
-
-}
-
-if(Array.isArray(value)){
-
-value.forEach(
-collectExtensionValues
-);
-
-}
-else{
-
-Object.values(value).forEach(
-collectExtensionValues
-);
-
-}
-
-}
-
-collectExtensionValues(
-data
-);
-
-const extensions={
-
-count:
-extensionSet.size,
-
-values:
-[
-...extensionSet
-]
-
-};
-
-
-/* =========================================================
-   ADVANCED ANALYSIS OBJECT
+   ADVANCED ANALYSIS
    ========================================================= */
 
 const analysis={
@@ -17029,14 +15937,7 @@ path,
 mapToObject(map)
 ]
 )
-),
-
-metadata:
-metadataOutput,
-
-links,
-
-extensions
+)
 
 };
 
@@ -17074,70 +15975,6 @@ distribution;
 
 result.analysis=
 analysis;
-
-}
-
-
-/* =========================================================
-   SMALL MAP HELPERS
-   ========================================================= */
-
-function collectMapFromObject(
-data,
-key
-){
-
-const map=
-new Map;
-
-function walk(value){
-
-if(
-!value ||
-typeof value!=="object"
-)
-return;
-
-if(
-Array.isArray(value[key])
-){
-
-value[key].forEach(
-item=>{
-
-if(
-item &&
-typeof item==="object" &&
-item.rel
-){
-
-incrementMap(
-map,
-item.rel
-);
-
-}
-
-});
-
-}
-
-if(Array.isArray(value)){
-
-value.forEach(walk);
-
-}
-else{
-
-Object.values(value).forEach(walk);
-
-}
-
-}
-
-walk(data);
-
-return map;
 
 }
 
@@ -17209,18 +16046,6 @@ const extremes=
 analysis.extremes||
 {};
 
-const metadata=
-analysis.metadata||
-{};
-
-const links=
-analysis.links||
-{};
-
-const extensions=
-analysis.extensions||
-{};
-
 
 const observations=
 counts.observations ||
@@ -17231,7 +16056,7 @@ null;
 
 
 /* =========================================================
-   CORE IDENTITY
+   OBSERVATIONS
    ========================================================= */
 
 if(
@@ -17261,20 +16086,9 @@ sentences.push(
 
 }
 
-if(
-metadata.title &&
-metadata.title!==metadata.description
-){
-
-sentences.push(
-`The resource is titled "${metadata.title}".`
-);
-
-}
-
 
 /* =========================================================
-   SPATIAL SUMMARY
+   SPATIAL
    ========================================================= */
 
 if(
@@ -17282,7 +16096,13 @@ counts.geometries
 ){
 
 sentences.push(
-`Spatial information is available through ${counts.geometries} geometries of type ${Object.keys(spatial.geometryTypes||{}).join(", ") || "unknown"}.`
+`Spatial information is available through ${counts.geometries} geometries of type ${spatial.geometryTypes?.join(", ") || "unknown"}.`
+);
+
+addQuestion(
+"spatial_extent",
+"Where are the observations located?",
+"spatial"
 );
 
 }
@@ -17341,6 +16161,12 @@ sentences.push(
 
 }
 
+addQuestion(
+"projection",
+"What spatial reference system is used?",
+"projection"
+);
+
 }
 
 
@@ -17382,11 +16208,17 @@ sentences.push(
 
 }
 
+addQuestion(
+"resolution",
+"What is the spatial resolution?",
+"resolution"
+);
+
 }
 
 
 /* =========================================================
-   TEMPORAL SUMMARY
+   TEMPORAL
    ========================================================= */
 
 if(
@@ -17402,233 +16234,11 @@ sentences.push(
 `The observations span ${temporal.uniqueDates.length} unique acquisition dates.`
 );
 
-}
-
-
-/* =========================================================
-   ASSET SUMMARY
-   ========================================================= */
-
-if(
-counts.assets
-){
-
-sentences.push(
-`The resource contains ${counts.assets} assets, including ${counts.images || 0} image assets and ${counts.metadataAssets || 0} metadata assets.`
-);
-
-}
-
-
-/* =========================================================
-   PROVENANCE SUMMARY
-   ========================================================= */
-
-const platforms=
-Object.keys(
-provenance.platforms||
-{}
-);
-
-if(platforms.length){
-
-sentences.push(
-`The observations come from ${platforms.length} platform${platforms.length>1?"s":""}: ${platforms.join(", ")}.`
-);
-
-}
-
-
-/* =========================================================
-   ANALYSIS CAPABILITIES
-   ========================================================= */
-
-const available=[];
-
-if(
-counts.observations
-){
-
-available.push(
-"observation analysis"
-);
-
-}
-
-if(
-counts.geometries
-){
-
-available.push(
-"spatial analysis"
-);
-
-}
-
-if(
-temporal.first
-){
-
-available.push(
-"temporal analysis"
-);
-
-}
-
-const usefulNumericalFields=
-Object.entries(
-extremes
-)
-.filter(
-([,stat])=>
-stat &&
-stat.variable &&
-stat.count>1
-);
-
-if(
-usefulNumericalFields.length
-){
-
-available.push(
-"numerical statistics"
-);
-
-}
-
-if(
-counts.assets
-){
-
-available.push(
-"asset analysis"
-);
-
-}
-
-if(
-platforms.length ||
-Object.keys(
-provenance.collections||
-{}
-).length
-){
-
-available.push(
-"provenance analysis"
-);
-
-}
-
-if(
-Object.keys(
-analysis.categorical||
-{}
-).length
-){
-
-available.push(
-"categorical analysis"
-);
-
-}
-
-if(
-Object.keys(
-metadata.fields||
-{}
-).length
-){
-
-available.push(
-"metadata analysis"
-);
-
-}
-
-if(
-links.count
-){
-
-available.push(
-"link analysis"
-);
-
-}
-
-if(
-extensions.count
-){
-
-available.push(
-"STAC extension analysis"
-);
-
-}
-
-if(available.length){
-
-sentences.push(
-`Available analysis includes ${available.join(", ")}.`
-);
-
-}
-
-if(data.description){
-
-sentences.push(
-data.description
-);
-
-}
-
-
-/* =========================================================
-   QUESTIONS
-   ========================================================= */
-
-/*
- * Questions deliberately avoid repeating information already
- * stated directly in REPORT.
- */
-
-
-/* SPATIAL */
-
-if(
-counts.geometries &&
-(
-Object.keys(
-spatial.geometryTypes||
-{}
-).length>1 ||
-counts.geometries!==observations
-)
-){
-
 addQuestion(
-"spatial_distribution",
-"How are the geometries distributed?",
-"spatial_distribution"
+"temporal",
+"What is the temporal coverage?",
+"temporal"
 );
-
-}
-
-
-/* TEMPORAL */
-
-if(
-temporal.uniqueDates &&
-temporal.uniqueDates.length>1
-){
-
-addQuestion(
-"temporal_distribution",
-"How are observations distributed over time?",
-"temporal_distribution"
-);
-
-}
 
 if(
 temporal.gaps &&
@@ -17643,65 +16253,65 @@ addQuestion(
 
 }
 
+}
 
-/* ASSETS */
+
+/* =========================================================
+   ASSETS
+   ========================================================= */
 
 if(
 counts.assets
 ){
 
+sentences.push(
+`The resource contains ${counts.assets} assets, including ${counts.images || 0} image assets and ${counts.metadataAssets || 0} metadata assets.`
+);
+
 addQuestion(
 "assets",
-"What types and roles of assets are available?",
+"What types of assets are available?",
 "assets"
 );
 
-if(
-Object.keys(
-assets.mediaTypes||
-{}
-).length>1 ||
-Object.keys(
-assets.formats||
-{}
-).length ||
-Object.keys(
-assets.units||
-{}
-).length ||
-Object.keys(
-assets.resolutions||
-{}
-).length
-){
+addQuestion(
+"asset_distribution",
+"How are the assets distributed?",
+"asset_distribution"
+);
 
 addQuestion(
-"asset_metadata",
-"What metadata is available for the assets?",
-"asset_metadata"
+"asset_ratio",
+"How many assets are available per observation?",
+"asset_ratio"
 );
 
 }
 
-if(
-assets.numeric &&
+
+/* =========================================================
+   PROVENANCE
+   ========================================================= */
+
+const platforms=
 Object.keys(
-assets.numeric
-).length
-){
+provenance.platforms||
+{}
+);
+
+if(platforms.length){
+
+sentences.push(
+`The observations come from ${platforms.length} platform${platforms.length>1?"s":""}: ${platforms.join(", ")}.`
+);
 
 addQuestion(
-"asset_numeric",
-"What numerical properties are available in the assets?",
-"asset_numeric"
+"platforms",
+"Which platforms are represented?",
+"platforms"
 );
 
 }
-
-}
-
-
-/* PROVENANCE */
 
 const collections=
 Object.keys(
@@ -17709,25 +16319,11 @@ provenance.collections||
 {}
 );
 
-if(
-collections.length>1
-){
+if(collections.length){
 
 addQuestion(
 "collections",
 "Which collections are represented?",
-"collections"
-);
-
-}
-else if(
-collections.length===1 &&
-platforms.length>1
-){
-
-addQuestion(
-"collections",
-"Which collection is associated with the observations?",
 "collections"
 );
 
@@ -17739,68 +16335,12 @@ provenance.sensors||
 {}
 );
 
-if(
-sensors.length
-){
+if(sensors.length){
 
 addQuestion(
 "sensors",
 "Which sensors are represented?",
 "sensors"
-);
-
-}
-
-const instruments=
-Object.keys(
-provenance.instruments||
-{}
-);
-
-if(
-instruments.length
-){
-
-addQuestion(
-"instruments",
-"Which instruments are represented?",
-"instruments"
-);
-
-}
-
-const missions=
-Object.keys(
-provenance.missions||
-{}
-);
-
-if(
-missions.length
-){
-
-addQuestion(
-"missions",
-"Which missions are represented?",
-"missions"
-);
-
-}
-
-const constellations=
-Object.keys(
-provenance.constellations||
-{}
-);
-
-if(
-constellations.length
-){
-
-addQuestion(
-"constellations",
-"Which constellations are represented?",
-"constellations"
 );
 
 }
@@ -17811,9 +16351,7 @@ provenance.processing||
 {}
 );
 
-if(
-processing.length
-){
+if(processing.length){
 
 addQuestion(
 "processing",
@@ -17823,88 +16361,29 @@ addQuestion(
 
 }
 
-const regions=
-Object.keys(
-provenance.storageRegions||
-{}
-);
 
-if(
-regions.length
-){
+/* =========================================================
+   DYNAMIC NUMERICAL FIELDS
+   ========================================================= */
 
-addQuestion(
-"storage_regions",
-"Where is the data stored?",
-"storage_regions"
-);
-
-}
-
-
-/* CATEGORICAL */
-
-const categoricalFields=
+const usefulNumericalFields=
 Object.entries(
-analysis.categorical||
-{}
+extremes
 )
 .filter(
-([,values])=>
-values &&
-Object.keys(values).length>0
-);
-
-categoricalFields.forEach(
-([path,values])=>{
-
-const field=
-path
-.split(".")
-.pop()
-.replaceAll(
-"_",
-" "
-);
-
-const known=[
-"platform",
-"collection",
-"sensor",
-"instrument",
-"mission",
-"constellation",
-"processing:software",
-"processing_software",
-"storage:region",
-"keywords"
-];
-
-if(
-known.includes(
-field.toLowerCase()
-)
-)
-return;
-
-if(
-Object.keys(values).length>1
-){
-
-addQuestion(
-`categorical_${path}`,
-`How is ${field} distributed?`,
-"categorical_field",
-path
-);
-
-}
-
-}
+([,stat])=>
+stat &&
+stat.variable &&
+stat.count>1
 );
 
 
-/* NUMERICAL */
+/*
+ * One question per analyzable numerical variable.
+ *
+ * The semantic identity of the field is carried
+ * by question.field, not by the visible text.
+ */
 
 if(
 usefulNumericalFields.length
@@ -17912,7 +16391,7 @@ usefulNumericalFields.length
 
 addQuestion(
 "statistics",
-"What numerical variables are available for analysis?",
+"What numerical fields can be analysed?",
 "statistics"
 );
 
@@ -17949,7 +16428,33 @@ addQuestion(
 }
 
 
-/* MISSING */
+/* =========================================================
+   COUNTS
+   ========================================================= */
+
+if(
+observations!==null
+){
+
+addQuestion(
+"counts",
+"What are the main counts in this resource?",
+"counts"
+);
+
+}
+
+if(
+counts.images
+){
+
+addQuestion(
+"images",
+"How many images are available?",
+"images"
+);
+
+}
 
 if(
 analysis.missing &&
@@ -17960,73 +16465,92 @@ analysis.missing
 
 addQuestion(
 "missing",
-"Which fields contain missing or empty values?",
+"Which fields contain missing values?",
 "missing"
 );
 
 }
 
 
-/* METADATA */
+/* =========================================================
+   AVAILABLE ANALYSIS
+   ========================================================= */
 
-const metadataQuestionable=
-[
-metadata.license,
-metadata.version,
-metadata.stacVersion,
-metadata.created,
-metadata.updated,
-metadata.deprecated,
-metadata.keywords?.length,
-metadata.providers?.length,
-metadata.conformsTo?.length
-]
-.some(
-value=>
-value!==null &&
-value!==undefined &&
-value!==false &&
-value!==0
-);
+const available=[];
 
 if(
-metadataQuestionable
+counts.observations
 ){
 
-addQuestion(
-"metadata",
-"What metadata and provenance information is available?",
-"metadata"
+available.push(
+"observation analysis"
 );
 
 }
 
-
-/* LINKS */
-
 if(
-links.count
+counts.geometries
 ){
 
-addQuestion(
-"links",
-"What relationships and linked resources are available?",
-"links"
+available.push(
+"spatial analysis"
 );
 
 }
 
-
-/* EXTENSIONS */
-
 if(
-extensions.count
+temporal.first
 ){
 
-addQuestion(
-"extensions",
-"Which STAC extensions are in use?",
-"extensions"
+available.push(
+"temporal analysis"
+);
+
+}
+
+if(
+usefulNumericalFields.length
+){
+
+available.push(
+"numerical statistics"
+);
+
+}
+
+if(
+counts.assets
+){
+
+available.push(
+"asset analysis"
+);
+
+}
+
+if(
+platforms.length ||
+collections.length
+){
+
+available.push(
+"provenance analysis"
+);
+
+}
+
+if(available.length){
+
+sentences.push(
+`Available analysis includes ${available.join(", ")}.`
+);
+
+}
+
+if(data.description){
+
+sentences.push(
+data.description
 );
 
 }
@@ -18082,7 +16606,7 @@ question
 if(!uniqueQuestions.length){
 
 questionsContainer.textContent=
-"No additional analytical questions available.";
+"No questions available.";
 
 return;
 
@@ -18201,46 +16725,39 @@ const provenance=
 analysis.provenance||
 {};
 
-const metadata=
-analysis.metadata||
-{};
-
-const links=
-analysis.links||
-{};
-
-const extensions=
-analysis.extensions||
-{};
-
 let answer="";
 
 
 /* =========================================================
-   SPATIAL DISTRIBUTION
+   SPATIAL
    ========================================================= */
 
 if(
-question.capability==="spatial_distribution"
+question.capability==="spatial"
 ){
 
-const geometries=
-Object.entries(
-spatial.geometryTypes||
-{}
-);
+if(spatial.bbox){
 
-if(geometries.length){
+const bbox=
+spatial.bbox;
 
 answer=
-`The resource contains ${counts.geometries || 0} geometries. By type: ${geometries.map(([type,count])=>`${type} (${count})`).join(", ")}.`;
+`The observations are distributed across approximately ${bbox[1].toFixed(2)} to ${bbox[3].toFixed(2)} degrees latitude and ${bbox[0].toFixed(2)} to ${bbox[2].toFixed(2)} degrees longitude.`;
+
+if(spatial.center){
+
+answer+=
+` The approximate centre is ${spatial.center.latitude.toFixed(2)}° latitude and ${spatial.center.longitude.toFixed(2)}° longitude.`;
+
+}
 
 if(
-counts.observations
+spatial.geometryTypes &&
+spatial.geometryTypes.length
 ){
 
 answer+=
-` This corresponds to ${(counts.geometries/counts.observations).toFixed(2)} geometries per observation.`;
+` Geometry types include ${spatial.geometryTypes.join(", ")}.`;
 
 }
 
@@ -18248,7 +16765,7 @@ answer+=
 else{
 
 answer=
-"No geometry distribution could be determined from the available JSON.";
+"No spatial extent could be determined from the available JSON.";
 
 }
 
@@ -18256,38 +16773,115 @@ answer=
 
 
 /* =========================================================
-   TEMPORAL DISTRIBUTION
+   PROJECTION
    ========================================================= */
 
 else if(
-question.capability==="temporal_distribution"
+question.capability==="projection"
 ){
 
-const entries=
-Object.entries(
-temporal.observationsByDate||
-{}
-);
+const epsg=
+statistics[
+"OBSERVATIONS[*].properties.proj:epsg"
+];
 
-if(entries.length){
-
-const sorted=
-entries.sort(
-(a,b)=>b[1]-a[1]
-);
+if(epsg){
 
 answer=
-`Observations are distributed across ${entries.length} acquisition dates. `;
+epsg.minimum===
+epsg.maximum?
+`The observations use EPSG:${epsg.minimum}.`:
+`The observations use spatial reference systems ranging from EPSG:${epsg.minimum} to EPSG:${epsg.maximum}.`;
 
-answer+=
-`The highest concentration is ${sorted[0][1]} observations on ${sorted[0][0]}.`;
+}
+else{
+
+answer=
+"No EPSG spatial reference system was found in the available JSON.";
+
+}
+
+}
+
+
+/* =========================================================
+   RESOLUTION
+   ========================================================= */
+
+else if(
+question.capability==="resolution"
+){
+
+const candidates=[
+
+"OBSERVATIONS[*].properties.gsd",
+
+"features[*].properties.gsd",
+
+"OBSERVATIONS[*].assets.image.raster:bands[*].spatial_resolution",
+
+"features[*].assets.image.raster:bands[*].spatial_resolution"
+
+];
+
+let resolution=null;
+
+for(
+const path of candidates
+){
+
+if(statistics[path]){
+
+resolution=
+statistics[path];
+
+break;
+
+}
+
+}
+
+if(resolution){
+
+answer=
+resolution.minimum===
+resolution.maximum?
+`The reported spatial resolution is ${resolution.minimum} metres.`:
+`The reported spatial resolution ranges from ${resolution.minimum} to ${resolution.maximum} metres.`;
+
+}
+else{
+
+answer=
+"No spatial resolution was found in the available JSON.";
+
+}
+
+}
+
+
+/* =========================================================
+   TEMPORAL
+   ========================================================= */
+
+else if(
+question.capability==="temporal"
+){
 
 if(
-sorted.length>1
+temporal.first &&
+temporal.last
+){
+
+answer=
+`Observation dates range from ${temporal.first} to ${temporal.last}, covering approximately ${temporal.durationDays.toFixed(1)} days across ${temporal.uniqueDates.length} unique dates.`;
+
+if(
+temporal.frequency
 ){
 
 answer+=
-` The distribution by date is ${sorted.map(([date,count])=>`${date}: ${count}`).join(", ")}.`;
+` The average number of observations per acquisition date is ${temporal.frequency.toFixed(2)}.`;
 
 }
 
@@ -18295,7 +16889,7 @@ answer+=
 else{
 
 answer=
-"No temporal distribution could be determined.";
+"No observation datetime values were found in the available JSON.";
 
 }
 
@@ -18346,6 +16940,36 @@ assets.types||
 {}
 );
 
+if(types.length){
+
+answer=
+`The resource contains ${assets.count} assets, including ${assets.images || 0} image assets and ${assets.metadata || 0} metadata assets. Asset types include ${types.map(([type,count])=>`${type} (${count})`).join(", ")}.`;
+
+}
+else{
+
+answer=
+"No asset types were detected in the available JSON.";
+
+}
+
+}
+
+
+/* =========================================================
+   ASSET DISTRIBUTION
+   ========================================================= */
+
+else if(
+question.capability==="asset_distribution"
+){
+
+const types=
+Object.entries(
+assets.types||
+{}
+);
+
 const roles=
 Object.entries(
 assets.roles||
@@ -18353,7 +16977,7 @@ assets.roles||
 );
 
 answer=
-`The resource contains ${assets.count || 0} assets across ${counts.observations || 0} observations.`;
+`There are ${assets.count || 0} total assets across ${counts.observations || 0} observations, averaging ${(assets.perObservation || 0).toFixed(2)} assets per observation.`;
 
 if(types.length){
 
@@ -18369,121 +16993,33 @@ answer+=
 
 }
 
-if(
-assets.perObservation
+}
+
+
+/* =========================================================
+   ASSET RATIO
+   ========================================================= */
+
+else if(
+question.capability==="asset_ratio"
 ){
 
-answer+=
-` The average is ${assets.perObservation.toFixed(2)} assets per observation.`;
-
-}
+answer=
+`The resource contains ${(assets.perObservation || 0).toFixed(2)} assets per observation on average. There are ${assets.count || 0} assets across ${counts.observations || 0} observations.`;
 
 }
 
 
 /* =========================================================
-   ASSET METADATA
+   IMAGES
    ========================================================= */
 
 else if(
-question.capability==="asset_metadata"
+question.capability==="images"
 ){
 
-const parts=[];
-
-const mediaTypes=
-Object.entries(
-assets.mediaTypes||
-{}
-);
-
-const formats=
-Object.entries(
-assets.formats||
-{}
-);
-
-const units=
-Object.entries(
-assets.units||
-{}
-);
-
-const resolutions=
-Object.entries(
-assets.resolutions||
-{}
-);
-
-if(mediaTypes.length){
-
-parts.push(
-`media types: ${mediaTypes.map(([value,count])=>`${value} (${count})`).join(", ")}`
-);
-
-}
-
-if(formats.length){
-
-parts.push(
-`formats: ${formats.map(([value,count])=>`${value} (${count})`).join(", ")}`
-);
-
-}
-
-if(units.length){
-
-parts.push(
-`units: ${units.map(([value,count])=>`${value} (${count})`).join(", ")}`
-);
-
-}
-
-if(resolutions.length){
-
-parts.push(
-`reported resolutions: ${resolutions.map(([value,count])=>`${value} (${count})`).join(", ")}`
-);
-
-}
-
 answer=
-parts.length?
-`The assets expose ${parts.join("; ")}.`:
-"No additional asset metadata could be determined.";
-
-}
-
-
-/* =========================================================
-   ASSET NUMERIC
-   ========================================================= */
-
-else if(
-question.capability==="asset_numeric"
-){
-
-const entries=
-Object.entries(
-assets.numeric||
-{}
-);
-
-answer=
-entries.length?
-`Numerical asset properties include ${entries.map(([path,stat])=>{
-
-const name=
-path
-.replaceAll(
-"_",
-" "
-);
-
-return `${name}: ${stat.minimum}–${stat.maximum}, average ${stat.average.toFixed(2)}`;
-
-}).join("; ")}.`:
-"No numerical asset properties were detected.";
+`The resource contains ${counts.images || 0} image assets out of ${counts.assets || 0} total assets.`;
 
 }
 
@@ -18555,72 +17091,6 @@ entries.length?
 
 
 /* =========================================================
-   INSTRUMENTS
-   ========================================================= */
-
-else if(
-question.capability==="instruments"
-){
-
-const entries=
-Object.entries(
-provenance.instruments||
-{}
-);
-
-answer=
-entries.length?
-`The represented instruments are ${entries.map(([name,count])=>`${name} (${count} observations)`).join(", ")}.`:
-"No instrument information was detected.";
-
-}
-
-
-/* =========================================================
-   MISSIONS
-   ========================================================= */
-
-else if(
-question.capability==="missions"
-){
-
-const entries=
-Object.entries(
-provenance.missions||
-{}
-);
-
-answer=
-entries.length?
-`The represented missions are ${entries.map(([name,count])=>`${name} (${count} observations)`).join(", ")}.`:
-"No mission information was detected.";
-
-}
-
-
-/* =========================================================
-   CONSTELLATIONS
-   ========================================================= */
-
-else if(
-question.capability==="constellations"
-){
-
-const entries=
-Object.entries(
-provenance.constellations||
-{}
-);
-
-answer=
-entries.length?
-`The represented constellations are ${entries.map(([name,count])=>`${name} (${count} observations)`).join(", ")}.`:
-"No constellation information was detected.";
-
-}
-
-
-/* =========================================================
    PROCESSING
    ========================================================= */
 
@@ -18643,64 +17113,31 @@ entries.length?
 
 
 /* =========================================================
-   STORAGE REGIONS
+   COUNTS
    ========================================================= */
 
 else if(
-question.capability==="storage_regions"
+question.capability==="counts"
 ){
 
-const entries=
-Object.entries(
-provenance.storageRegions||
-{}
-);
-
 answer=
-entries.length?
-`The detected storage regions are ${entries.map(([name,count])=>`${name} (${count})`).join(", ")}.`:
-"No storage region information was detected.";
+`The resource contains ${counts.observations || 0} observations, ${counts.geometries || 0} geometries, ${counts.assets || 0} assets and ${counts.images || 0} images.`;
+
+if(
+counts.metadataAssets
+){
+
+answer+=
+` ${counts.metadataAssets} assets are classified as metadata.`;
 
 }
 
-
-/* =========================================================
-   CATEGORICAL FIELD
-   ========================================================= */
-
-else if(
-question.capability==="categorical_field"
+if(
+counts.uniqueDates
 ){
 
-const field=
-question.field;
-
-const values=
-analysis.categorical?.[field]||
-{};
-
-const entries=
-Object.entries(values);
-
-const name=
-field
-.split(".")
-.pop()
-.replaceAll(
-"_",
-" "
-);
-
-if(entries.length){
-
-answer=
-`${name} is distributed across ${entries.length} values: ${entries.map(([value,count])=>`${value} (${count})`).join(", ")}.`;
-
-}
-else{
-
-answer=
-`No categorical values were detected for ${name}.`;
+answer+=
+` The observations span ${counts.uniqueDates} unique acquisition dates.`;
 
 }
 
@@ -18708,7 +17145,7 @@ answer=
 
 
 /* =========================================================
-   NUMERICAL STATISTICS
+   GENERAL NUMERICAL STATISTICS
    ========================================================= */
 
 else if(
@@ -18786,6 +17223,9 @@ field
 " "
 );
 
+
+/* SUMMARY */
+
 answer=
 `${name}: minimum ${stat.minimum}, maximum ${stat.maximum}, average ${stat.average.toFixed(2)}, range ${stat.range}, standard deviation ${stat.standardDeviation.toFixed(2)}. `;
 
@@ -18803,6 +17243,9 @@ answer+=
 ` ${stat.missing} records have missing values.`;
 
 }
+
+
+/* MINIMUM OBSERVATION */
 
 if(
 stat.minimumObservation
@@ -18837,6 +17280,9 @@ answer+=
 answer+=".";
 
 }
+
+
+/* MAXIMUM OBSERVATION */
 
 if(
 stat.maximumObservation
@@ -19034,150 +17480,6 @@ answer=
 
 
 /* =========================================================
-   METADATA
-   ========================================================= */
-
-else if(
-question.capability==="metadata"
-){
-
-const parts=[];
-
-if(metadata.license){
-
-parts.push(
-`license: ${metadata.license}`
-);
-
-}
-
-if(metadata.version){
-
-parts.push(
-`version: ${metadata.version}`
-);
-
-}
-
-if(metadata.stacVersion){
-
-parts.push(
-`STAC version: ${metadata.stacVersion}`
-);
-
-}
-
-if(metadata.created){
-
-parts.push(
-`created: ${metadata.created}`
-);
-
-}
-
-if(metadata.updated){
-
-parts.push(
-`updated: ${metadata.updated}`
-);
-
-}
-
-if(metadata.deprecated!==null){
-
-parts.push(
-`deprecated: ${metadata.deprecated}`
-);
-
-}
-
-if(
-metadata.keywords &&
-metadata.keywords.length
-){
-
-parts.push(
-`keywords: ${metadata.keywords.join(", ")}`
-);
-
-}
-
-if(
-metadata.providers &&
-metadata.providers.length
-){
-
-parts.push(
-`providers: ${metadata.providers.join(", ")}`
-);
-
-}
-
-if(
-metadata.conformsTo &&
-metadata.conformsTo.length
-){
-
-parts.push(
-`conformance declarations: ${metadata.conformsTo.length}`
-);
-
-}
-
-answer=
-parts.length?
-`The resource exposes the following metadata: ${parts.join("; ")}.`:
-"No additional metadata could be determined.";
-
-}
-
-
-/* =========================================================
-   LINKS
-   ========================================================= */
-
-else if(
-question.capability==="links"
-){
-
-const relations=
-links.relations||
-[];
-
-if(relations.length){
-
-answer=
-`The resource exposes ${links.count} links across the following relation types: ${relations.join(", ")}.`;
-
-}
-else{
-
-answer=
-"No linked-resource relationships were detected.";
-
-}
-
-}
-
-
-/* =========================================================
-   EXTENSIONS
-   ========================================================= */
-
-else if(
-question.capability==="extensions"
-){
-
-answer=
-extensions.values &&
-extensions.values.length?
-`The resource uses ${extensions.values.length} STAC extensions: ${extensions.values.join(", ")}.`:
-"No STAC extensions were detected.";
-
-}
-
-
-/* =========================================================
    FALLBACK
    ========================================================= */
 
@@ -19210,6 +17512,8 @@ createReportButton.onclick=
 createNaturalReport;
 
 }
+
+
 
 </script>
 
