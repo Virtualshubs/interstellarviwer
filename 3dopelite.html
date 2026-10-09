@@ -496,6 +496,56 @@ input:not(.heroInputBox input) {
   color: rgba(255,255,255,.4);
 }
 
+/* GLOBAL NASA GALLERY */
+
+#nasaGlobalGallery {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  text-align: left;
+}
+
+#nasaGlobalGallery .nasa-heading {
+  align-items: flex-start;
+}
+
+#nasaGlobalGallery .nasa-heading .btn {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 10px;
+}
+
+#nasaGlobalGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-height: 48vh;
+}
+
+#nasaGlobalGrid .nasa-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+}
+
+.nasa-global-count {
+  font-size: 10px;
+  opacity: .6;
+  line-height: 1.5;
+}
+
+.nasa-global-path {
+  display: block;
+  margin-top: 4px;
+  font-size: 9px;
+  line-height: 1.4;
+  color: rgba(255,255,255,.38);
+  overflow-wrap: anywhere;
+}
+
 .settingGroup {
   margin-top: 14px;
   padding: 14px;
@@ -805,6 +855,12 @@ input:not(.heroInputBox input) {
     max-height: 300px;
   }
 
+  #nasaGlobalGrid { max-height: 58vh; }
+
+  #nasaGlobalGallery .nasa-heading {
+    flex-wrap: wrap;
+  }
+
   .nasa-card-info { padding: 7px; }
   .nasa-card-name { font-size: 10px; }
   .nasa-card-type { font-size: 9px; }
@@ -917,6 +973,37 @@ if (new URLSearchParams(location.search).get("scene")) {
         <div class="nasa-footer">
           Models are loaded from NASA's public GitHub repository.
           Some GLTF files may reference additional assets.
+        </div>
+      </div>
+
+      <!-- NEW: GLOBAL NASA GALLERY -->
+      <div id="nasaGlobalGallery" hidden>
+        <div class="nasa-heading">
+          <div>
+            <div class="nasa-heading-title">NASA 3D MODEL GALLERY</div>
+            <div class="nasa-heading-caption">
+              Browse GLB and GLTF files across the repository
+            </div>
+          </div>
+
+          <button class="btn btn-secondary"
+                  type="button"
+                  onclick="showNASAExplorer()">
+            Back to explorer
+          </button>
+        </div>
+
+        <div id="nasaGlobalStatus"
+             class="nasa-status"
+             aria-live="polite">
+          The repository scan will start when you open the gallery.
+        </div>
+
+        <div id="nasaGlobalGrid" class="nasa-asset-grid"></div>
+
+        <div class="nasa-footer">
+          The gallery indexes model paths from NASA's public GitHub repository.
+          Models load only when selected.
         </div>
       </div>
     </div>
@@ -1094,10 +1181,19 @@ const NASA_BASE_URL =
 const NASA_API_URL =
   "https://api.github.com/repos/nasa/NASA-3D-Resources/contents/3D%20Models?ref=master";
 
+const NASA_TREE_API_URL =
+  "https://api.github.com/repos/nasa/NASA-3D-Resources/git/trees/master?recursive=1";
+
 let nasaFoldersLoaded = false;
 let nasaFolderCache = new Map();
 let nasaRequestId = 0;
 let nasaAssetView = "list";
+
+/* GLOBAL GALLERY STATE */
+let nasaGlobalAssets = [];
+let nasaGlobalScanPromise = null;
+let nasaGlobalScanned = false;
+let nasaGlobalScanTruncated = false;
 
 init();
 checkURL();
@@ -1392,21 +1488,213 @@ function setNASAAssetView(view) {
     ?.classList.toggle("active", nasaAssetView === "grid");
 }
 
+/*
+ * First click: open the original folder explorer.
+ * Second click: hide the explorer and open the global gallery.
+ * The gallery's Back button returns to the folder explorer.
+ */
 async function toggleNASAExplorer() {
   const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
   const toggle = document.getElementById("nasaToggle");
 
-  explorer.hidden = !explorer.hidden;
+  if (!explorer.hidden) {
+    explorer.hidden = true;
+    gallery.hidden = false;
+    toggle.textContent = "Hide NASA Gallery";
 
-  if (explorer.hidden) {
+    if (!nasaGlobalScanned) {
+      await loadNASAGlobalGallery();
+    }
+
+    return;
+  }
+
+  if (!gallery.hidden) {
+    gallery.hidden = true;
     toggle.textContent = "Explore NASA 3D Models";
     return;
   }
 
+  explorer.hidden = false;
+  gallery.hidden = true;
   toggle.textContent = "Hide NASA Explorer";
 
-  if (!nasaFoldersLoaded) await loadNASAFolders();
+  if (!nasaFoldersLoaded) {
+    await loadNASAFolders();
+  }
 }
+
+async function showNASAExplorer() {
+  const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
+  const toggle = document.getElementById("nasaToggle");
+
+  gallery.hidden = true;
+  explorer.hidden = false;
+  toggle.textContent = "Hide NASA Explorer";
+
+  if (!nasaFoldersLoaded) {
+    await loadNASAFolders();
+  }
+}
+
+/* ================= NASA GLOBAL GALLERY ================= */
+
+async function loadNASAGlobalGallery() {
+  if (nasaGlobalScanned) {
+    renderNASAGlobalGallery(nasaGlobalAssets);
+    return;
+  }
+
+  if (nasaGlobalScanPromise) {
+    return nasaGlobalScanPromise;
+  }
+
+  const status = document.getElementById("nasaGlobalStatus");
+  const grid = document.getElementById("nasaGlobalGrid");
+
+  status.classList.remove("error");
+  status.textContent = "Scanning the NASA repository for GLB and GLTF files…";
+  grid.replaceChildren();
+
+  nasaGlobalScanPromise = (async () => {
+    try {
+      const response = await fetch(NASA_TREE_API_URL, {
+        headers: {
+          Accept: "application/vnd.github+json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          response.status === 403 || response.status === 429
+            ? "GitHub API rate limit reached. Try again later."
+            : "Could not scan the NASA repository (" +
+              response.status + ")."
+        );
+      }
+
+      const data = await response.json();
+
+      if (!Array.isArray(data.tree)) {
+        throw new Error("The repository tree could not be read.");
+      }
+
+      const assets = data.tree
+        .filter((entry) =>
+          entry.type === "blob" &&
+          /^3D Models\//i.test(entry.path) &&
+          /\.(glb|gltf)$/i.test(entry.path)
+        )
+        .map((entry) => ({
+          name: entry.path.split("/").pop(),
+          path: entry.path,
+          download_url: null
+        }))
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+      nasaGlobalAssets = assets;
+      nasaGlobalScanned = true;
+      nasaGlobalScanTruncated = Boolean(data.truncated);
+
+      renderNASAGlobalGallery(assets);
+
+      const countText =
+        assets.length + " model file" +
+        (assets.length === 1 ? "" : "s") +
+        " found across the repository.";
+
+      if (nasaGlobalScanTruncated) {
+        status.textContent =
+          countText +
+          " GitHub returned a truncated repository tree, so the list may be incomplete.";
+      } else {
+        status.textContent = countText;
+      }
+    } catch (error) {
+      console.error("NASA global gallery scan failed:", error);
+
+      status.textContent = error.message;
+      status.classList.add("error");
+
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "btn btn-secondary";
+      retry.textContent = "Retry scan";
+
+      retry.addEventListener("click", () => {
+        nasaGlobalScanPromise = null;
+        loadNASAGlobalGallery();
+      });
+
+      grid.replaceChildren(retry);
+    } finally {
+      nasaGlobalScanPromise = null;
+    }
+  })();
+
+  return nasaGlobalScanPromise;
+}
+
+function renderNASAGlobalGallery(assets) {
+  const grid = document.getElementById("nasaGlobalGrid");
+  const fragment = document.createDocumentFragment();
+
+  if (!assets.length) {
+    const empty = document.createElement("div");
+    empty.className = "nasa-status";
+    empty.textContent = "No GLB or GLTF files were found.";
+    grid.replaceChildren(empty);
+    return;
+  }
+
+  assets.forEach((asset) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "nasa-card";
+    card.setAttribute("aria-label", "Load model " + asset.name);
+    card.title = asset.path;
+
+    const preview = document.createElement("div");
+    preview.className = "nasa-card-preview";
+
+    const placeholder = document.createElement("div");
+    placeholder.className = "nasa-card-placeholder";
+    placeholder.textContent = "▧";
+    preview.appendChild(placeholder);
+
+    const info = document.createElement("div");
+    info.className = "nasa-card-info";
+
+    const name = document.createElement("div");
+    name.className = "nasa-card-name";
+    name.textContent = asset.name;
+
+    const type = document.createElement("div");
+    type.className = "nasa-card-type";
+    type.textContent =
+      (asset.name.toLowerCase().endsWith(".glb") ? "GLB" : "GLTF") +
+      " model";
+
+    const path = document.createElement("span");
+    path.className = "nasa-global-path";
+    path.textContent = asset.path.replace(/^3D Models\//i, "");
+
+    info.append(name, type, path);
+    card.append(preview, info);
+
+    card.addEventListener("click", () => {
+      selectNASAAsset(asset);
+    });
+
+    fragment.appendChild(card);
+  });
+
+  grid.replaceChildren(fragment);
+}
+
+/* ================= NASA FOLDER LOADER ================= */
 
 async function loadNASAFolders() {
   const select = document.getElementById("nasaFolderSelect");
