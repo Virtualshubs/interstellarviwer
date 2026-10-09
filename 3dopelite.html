@@ -1436,88 +1436,37 @@ function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
   );
 }
 
-function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
-  state.backgroundImage = Boolean(enabled);
-
-  const checkbox = document.getElementById("backgroundImageInput");
-  if (checkbox) checkbox.checked = state.backgroundImage;
-
+function applyCustomBackgroundImage() {
   const input = document.getElementById("backgroundImageUrlInput");
+  const rawURL = input.value.trim();
 
-  if (input && customURL) {
-    input.value = customURL;
-  }
-
-  if (!state.backgroundImage) {
-    backgroundLoadId++;
-    scene.background = new THREE.Color(state.bg);
-    document.body.style.background = state.bg;
+  // Empty input restores the default image.
+  if (!rawURL) {
+    state.backgroundImageUrl = null;
+    applyBackgroundImage(true, null);
     return;
   }
 
-  const url = normalizeBackgroundURL(customURL) ||
-    DEFAULT_BACKGROUND_IMAGE.url;
+  let parsedURL;
 
-  state.backgroundImageUrl = normalizeBackgroundURL(customURL);
+  try {
+    parsedURL = new URL(rawURL);
+  } catch {
+    alert("Enter a valid HTTPS image URL.");
+    input.focus();
+    return;
+  }
 
-  const requestId = ++backgroundLoadId;
+  if (parsedURL.protocol !== "https:") {
+    alert("The background image URL must use HTTPS.");
+    input.focus();
+    return;
+  }
 
-  backgroundTextureLoader.load(
-    url,
-    (texture) => {
-      if (requestId !== backgroundLoadId) {
-        texture.dispose();
-        return;
-      }
+  const customURL = normalizeBackgroundURL(parsedURL.href);
 
-      texture.encoding = THREE.sRGBEncoding;
-
-      // Adaptar la imagen al tamaño del visor sin deformarla.
-      const image = texture.image;
-
-      if (image && image.width && image.height) {
-        const imageAspect = image.width / image.height;
-        const viewAspect = window.innerWidth / window.innerHeight;
-
-        texture.matrixAutoUpdate = false;
-
-        if (viewAspect > imageAspect) {
-          // Pantalla relativamente más ancha: recortar arriba y abajo.
-          const scaleY = imageAspect / viewAspect;
-
-          texture.repeat.set(1, scaleY);
-          texture.offset.set(0, (1 - scaleY) / 2);
-        } else {
-          // Pantalla relativamente más alta: recortar los laterales.
-          const scaleX = viewAspect / imageAspect;
-
-          texture.repeat.set(scaleX, 1);
-          texture.offset.set((1 - scaleX) / 2, 0);
-        }
-
-        texture.matrix.setUvTransform(
-          texture.offset.x,
-          texture.offset.y,
-          texture.repeat.x,
-          texture.repeat.y,
-          0,
-          0,
-          0
-        );
-      }
-
-      scene.background = texture;
-      document.body.style.background = "#000";
-    },
-    undefined,
-    (error) => {
-      if (requestId !== backgroundLoadId) return;
-
-      console.error("Could not load background image:", url, error);
-      scene.background = new THREE.Color(state.bg);
-      document.body.style.background = state.bg;
-    }
-  );
+  state.backgroundImageUrl = customURL;
+  applyBackgroundImage(true, customURL);
 }
 
 /* ================= ROTATION ================= */
