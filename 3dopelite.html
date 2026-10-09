@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +9,8 @@
 
 <style>
 * { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -258,6 +261,40 @@ input:not(.heroInputBox input) {
   outline: none;
 }
 
+.nasa-view-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 3px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 9px;
+  background: rgba(255,255,255,.025);
+}
+
+.nasa-view-toggle button {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255,255,255,.58);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.nasa-view-toggle button:hover {
+  background: rgba(255,255,255,.06);
+  color: #fff;
+}
+
+.nasa-view-toggle button.active {
+  color: #fff;
+  background: rgba(77,163,255,.14);
+  border-color: rgba(77,163,255,.35);
+}
+
 .nasa-slot {
   display: flex;
   flex-direction: column;
@@ -304,6 +341,143 @@ input:not(.heroInputBox input) {
   opacity: .45;
   font-size: 10px;
   margin-top: 3px;
+}
+
+.nasa-asset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2px 3px 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.2) transparent;
+}
+
+.nasa-asset-grid:empty { display: none; }
+
+.nasa-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 10px;
+  background: rgba(255,255,255,.035);
+  color: #fff;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+  outline: none;
+}
+
+.nasa-card:hover,
+.nasa-card:focus-visible {
+  background: rgba(77,163,255,.09);
+  border-color: rgba(77,163,255,.5);
+}
+
+.nasa-card:focus-visible {
+  box-shadow: 0 0 0 2px rgba(77,163,255,.25);
+}
+
+.nasa-card-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,255,255,.07),
+    rgba(255,255,255,.015) 70%
+  );
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.nasa-card-preview img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 5px;
+}
+
+.nasa-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: rgba(255,255,255,.2);
+  font-size: 34px;
+  pointer-events: none;
+}
+
+.nasa-carousel-control {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 34px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 7px;
+  background: rgba(0,0,0,.68);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nasa-carousel-control:hover {
+  background: rgba(77,163,255,.8);
+}
+
+.nasa-carousel-prev { left: 5px; }
+.nasa-carousel-next { right: 5px; }
+
+.nasa-carousel-count {
+  position: absolute;
+  z-index: 2;
+  right: 6px;
+  bottom: 6px;
+  padding: 3px 6px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 5px;
+  background: rgba(0,0,0,.72);
+  color: rgba(255,255,255,.9);
+  font-size: 9px;
+  line-height: 1.3;
+  pointer-events: none;
+}
+
+.nasa-card-info {
+  min-width: 0;
+  padding: 9px;
+  text-align: left;
+}
+
+.nasa-card-name {
+  overflow-wrap: anywhere;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(255,255,255,.9);
+}
+
+.nasa-card-type {
+  margin-top: 5px;
+  color: rgba(255,255,255,.43);
+  font-size: 9px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .nasa-status {
@@ -458,6 +632,51 @@ input:not(.heroInputBox input) {
 
 .stepDot.active { background: #4da3ff; }
 
+.lightingControl { margin-top: 13px; }
+
+.lightingControl label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,.8);
+}
+
+.lightingControl label span {
+  color: #8ec5ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.lightingControl input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  accent-color: #4da3ff;
+  cursor: pointer;
+}
+
+.lightingGroup .backgroundImageHint { margin-top: 12px; }
+
+.nasa-slot::-webkit-scrollbar,
+.nasa-asset-grid::-webkit-scrollbar { width: 5px; }
+
+.nasa-slot::-webkit-scrollbar-thumb,
+.nasa-asset-grid::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgba(255,255,255,.18);
+}
+
+.nasa-slot::-webkit-scrollbar-track,
+.nasa-asset-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 @media (max-width: 1024px) {
   #ui:not(.ui-fullscreen) {
     width: 300px;
@@ -580,47 +799,27 @@ input:not(.heroInputBox input) {
   }
 
   .nasa-slot { max-height: 140px; }
+
+  .nasa-asset-grid {
+    gap: 7px;
+    max-height: 300px;
+  }
+
+  .nasa-card-info { padding: 7px; }
+  .nasa-card-name { font-size: 10px; }
+  .nasa-card-type { font-size: 9px; }
+
+  .nasa-carousel-control {
+    width: 25px;
+    height: 32px;
+  }
 }
 
-
-
-
-.lightingControl {
-  margin-top: 13px;
+@media (prefers-reduced-motion: reduce) {
+  .nasa-card,
+  .nasa-view-toggle button,
+  .nasa-carousel-control { transition: none; }
 }
-
-.lightingControl label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 5px;
-  font-size: 11px;
-  color: rgba(255,255,255,.8);
-}
-
-.lightingControl label span {
-  color: #8ec5ff;
-  font-variant-numeric: tabular-nums;
-}
-
-.lightingControl input[type="range"] {
-  display: block;
-  width: 100%;
-  height: 18px;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  background: transparent;
-  accent-color: #4da3ff;
-  cursor: pointer;
-}
-
-.lightingGroup .backgroundImageHint {
-  margin-top: 12px;
-}
-
-  
 </style>
 
 <script>
@@ -631,7 +830,6 @@ if (new URLSearchParams(location.search).get("scene")) {
 </head>
 
 <body>
-
 <div id="ui">
   <div class="stepNav">
     <div class="stepDot active" id="dot1"></div>
@@ -640,13 +838,11 @@ if (new URLSearchParams(location.search).get("scene")) {
   </div>
 
   <div id="step1" class="step active step-hero">
-    <div id="title">3D OPE Little</div>
+    <div id="title">3D OPE Lite</div>
 
-    <img
-      class="titleGif"
-      src="https://demo.3dtwins.eu/leopard3dtwinslittle.gif"
-      alt="3D Twins"
-    />
+    <img class="titleGif"
+         src="https://demo.3dtwins.eu/leopard3dtwinslittle.gif"
+         alt="3D Twins" />
 
     <div class="heroTitle">Create your 3D scene</div>
 
@@ -655,16 +851,12 @@ if (new URLSearchParams(location.search).get("scene")) {
     </div>
 
     <div class="heroInputBox">
-      <input
-        id="urlInput"
-        type="url"
-        placeholder="https://demo.3dtwins.eu/Mantra.glb"
-        autocomplete="url"
-      />
+      <input id="urlInput"
+             type="url"
+             placeholder="https://demo.3dtwins.eu/Mantra.glb"
+             autocomplete="url" />
 
-      <div class="heroHint">
-        Supports GLB / GLTF files hosted online
-      </div>
+      <div class="heroHint">Supports GLB / GLTF files hosted online</div>
 
       <button class="btn btn-primary" onclick="goStep(2)">
         Load model
@@ -672,12 +864,10 @@ if (new URLSearchParams(location.search).get("scene")) {
 
       <div class="nasa-divider"></div>
 
-      <button
-        id="nasaToggle"
-        class="btn btn-secondary"
-        type="button"
-        onclick="toggleNASAExplorer()"
-      >
+      <button id="nasaToggle"
+              class="btn btn-secondary"
+              type="button"
+              onclick="toggleNASAExplorer()">
         Explore NASA 3D Models
       </button>
 
@@ -698,11 +888,28 @@ if (new URLSearchParams(location.search).get("scene")) {
 
         <div>
           <div class="nasa-label">Available assets</div>
+
+          <div class="nasa-view-toggle">
+            <button id="nasaListViewButton"
+                    class="active"
+                    type="button"
+                    onclick="setNASAAssetView('list')">
+              List
+            </button>
+            <button id="nasaGridViewButton"
+                    type="button"
+                    onclick="setNASAAssetView('grid')">
+              Gallery
+            </button>
+          </div>
+
           <div id="nasaAssetSlot" class="nasa-slot">
             <div class="nasa-status">
               Open the explorer to retrieve the NASA folders.
             </div>
           </div>
+
+          <div id="nasaAssetGrid" class="nasa-asset-grid" hidden></div>
         </div>
 
         <div id="nasaStatus" class="nasa-status" aria-live="polite"></div>
@@ -721,7 +928,6 @@ if (new URLSearchParams(location.search).get("scene")) {
 
       <div class="colorPickerRow">
         <div id="colorWheel"></div>
-
         <div id="colorPalette">
           <div class="color-swatch" data-color="#0e0f13" style="background:#0e0f13"></div>
           <div class="color-swatch" data-color="#c2ceff" style="background:#c2ceff"></div>
@@ -744,18 +950,14 @@ if (new URLSearchParams(location.search).get("scene")) {
       </label>
 
       <div class="backgroundImageControls">
-        <input
-          id="backgroundImageUrlInput"
-          type="url"
-          placeholder="https://example.com/space-image.jpg"
-          autocomplete="url"
-        />
+        <input id="backgroundImageUrlInput"
+               type="url"
+               placeholder="https://example.com/space-image.jpg"
+               autocomplete="url" />
 
-        <button
-          class="btn btn-secondary"
-          type="button"
-          onclick="applyCustomBackgroundImage()"
-        >
+        <button class="btn btn-secondary"
+                type="button"
+                onclick="applyCustomBackgroundImage()">
           Apply image URL
         </button>
 
@@ -768,72 +970,50 @@ if (new URLSearchParams(location.search).get("scene")) {
 
     <div class="settingGroup">
       <div class="label">Auto rotate</div>
-
       <label style="display:flex;align-items:center;gap:8px;font-size:12px;">
         <input id="rotateInput" type="checkbox">
         Enable rotation
       </label>
     </div>
 
-
     <div class="settingGroup lightingGroup">
-  <div class="label">Lighting & shadows</div>
+      <div class="label">Lighting &amp; shadows</div>
 
-  <label class="backgroundImageToggle">
-    <input id="shadowsInput" type="checkbox" checked>
-    <span>Enable shadows</span>
-  </label>
+      <label class="backgroundImageToggle">
+        <input id="shadowsInput" type="checkbox" checked>
+        <span>Enable shadows</span>
+      </label>
 
-  <div class="lightingControl">
-    <label for="lightIntensityInput">
-      Light intensity
-      <span id="lightIntensityValue">0.8</span>
-    </label>
-    <input id="lightIntensityInput"
-           type="range" min="0" max="3" step="0.1" value="0.8">
-  </div>
+      <div class="lightingControl">
+        <label for="lightIntensityInput">Light intensity <span id="lightIntensityValue">0.8</span></label>
+        <input id="lightIntensityInput" type="range" min="0" max="3" step="0.1" value="0.8">
+      </div>
 
-  <div class="lightingControl">
-    <label for="lightXInput">
-      Light position X
-      <span id="lightXValue">5</span>
-    </label>
-    <input id="lightXInput"
-           type="range" min="-10" max="10" step="0.5" value="5">
-  </div>
+      <div class="lightingControl">
+        <label for="lightXInput">Light position X <span id="lightXValue">5</span></label>
+        <input id="lightXInput" type="range" min="-10" max="10" step="0.5" value="5">
+      </div>
 
-  <div class="lightingControl">
-    <label for="lightYInput">
-      Light position Y
-      <span id="lightYValue">10</span>
-    </label>
-    <input id="lightYInput"
-           type="range" min="-10" max="10" step="0.5" value="10">
-  </div>
+      <div class="lightingControl">
+        <label for="lightYInput">Light position Y <span id="lightYValue">10</span></label>
+        <input id="lightYInput" type="range" min="-10" max="10" step="0.5" value="10">
+      </div>
 
-  <div class="lightingControl">
-    <label for="lightZInput">
-      Light position Z
-      <span id="lightZValue">5</span>
-    </label>
-    <input id="lightZInput"
-           type="range" min="-10" max="10" step="0.5" value="5">
-  </div>
+      <div class="lightingControl">
+        <label for="lightZInput">Light position Z <span id="lightZValue">5</span></label>
+        <input id="lightZInput" type="range" min="-10" max="10" step="0.5" value="5">
+      </div>
 
-  <div class="lightingControl">
-    <label for="shadowSoftnessInput">
-      Shadow softness
-      <span id="shadowSoftnessValue">3</span>
-    </label>
-    <input id="shadowSoftnessInput"
-           type="range" min="0" max="8" step="1" value="3">
-  </div>
+      <div class="lightingControl">
+        <label for="shadowSoftnessInput">Shadow softness <span id="shadowSoftnessValue">3</span></label>
+        <input id="shadowSoftnessInput" type="range" min="0" max="8" step="1" value="3">
+      </div>
 
-  <div class="backgroundImageHint">
-    Adjust the light direction and intensity. Shadow softness depends
-    on the renderer and the model geometry.
-  </div>
-</div>
+      <div class="backgroundImageHint">
+        Adjust the light direction and intensity. Shadow softness depends
+        on the renderer and the model geometry.
+      </div>
+    </div>
 
     <div class="stepNav">
       <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
@@ -842,17 +1022,13 @@ if (new URLSearchParams(location.search).get("scene")) {
   </div>
 
   <div id="step3" class="step">
-    <button class="btn btn-primary" onclick="exportScene()">
-      Publish Scene
-    </button>
+    <button class="btn btn-primary" onclick="exportScene()">Publish Scene</button>
 
     <div class="label">Share link</div>
     <div id="linkBox">No scene generated yet</div>
 
-    <div
-      id="exportActions"
-      style="display:none;margin-top:12px;gap:8px;flex-direction:column;"
-    >
+    <div id="exportActions"
+         style="display:none;margin-top:12px;gap:8px;flex-direction:column;">
       <button class="btn btn-secondary" onclick="openScene()">Go to scene</button>
       <button class="btn btn-secondary" onclick="copyURL()">Copy URL</button>
       <button class="btn btn-secondary" onclick="generateQR()">Generate QR</button>
@@ -867,11 +1043,8 @@ if (new URLSearchParams(location.search).get("scene")) {
 <canvas id="c"></canvas>
 
 <a id="watermark" href="https://3dtwins.es" target="_blank" rel="noopener">
-  <img
-    src="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png"
-    class="watermarkLogo"
-    alt=""
-  />
+  <img src="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png"
+       class="watermarkLogo" alt="" />
   Made with 3D Twins Little
 </a>
 
@@ -880,7 +1053,8 @@ if (new URLSearchParams(location.search).get("scene")) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/DRACOLoader.js"></script>
 
-<script>/* ================= CONFIG ================= */
+<script>
+/* ================= CONFIG ================= */
 
 const DEFAULT_BACKGROUND_IMAGE = {
   enabled: true,
@@ -923,6 +1097,7 @@ const NASA_API_URL =
 let nasaFoldersLoaded = false;
 let nasaFolderCache = new Map();
 let nasaRequestId = 0;
+let nasaAssetView = "list";
 
 init();
 checkURL();
@@ -937,12 +1112,8 @@ function init() {
   backgroundTextureLoader = new THREE.TextureLoader();
 
   camera = new THREE.PerspectiveCamera(
-    60,
-    innerWidth / innerHeight,
-    0.01,
-    1000
+    60, innerWidth / innerHeight, 0.01, 1000
   );
-
   camera.position.set(2, 2, 3);
 
   renderer = new THREE.WebGLRenderer({
@@ -960,9 +1131,7 @@ function init() {
   controls.autoRotate = state.autoRotate;
   controls.addEventListener("change", updateCameraClipping);
 
-  scene.add(
-    new THREE.HemisphereLight(0xffffff, 0x222233, 1)
-  );
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1));
 
   keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
   keyLight.castShadow = true;
@@ -976,27 +1145,21 @@ function init() {
   window.addEventListener("resize", onResize);
 
   const rotateInput = document.getElementById("rotateInput");
-
   if (rotateInput) {
     rotateInput.checked = state.autoRotate;
-
     rotateInput.addEventListener("change", (e) => {
       applyRotation(e.target.checked);
     });
   }
 
   const bgInput = document.getElementById("bgInput");
-
   if (bgInput) {
     bgInput.addEventListener("input", (e) => {
       const color = e.target.value;
       applySceneStyle(color);
 
       document.querySelectorAll(".color-swatch").forEach((swatch) => {
-        swatch.classList.toggle(
-          "active",
-          swatch.dataset.color === color
-        );
+        swatch.classList.toggle("active", swatch.dataset.color === color);
       });
     });
   }
@@ -1004,7 +1167,6 @@ function init() {
   document.querySelectorAll(".color-swatch").forEach((swatch) => {
     swatch.addEventListener("click", () => {
       const color = swatch.dataset.color;
-
       bgInput.value = color;
       applySceneStyle(color);
 
@@ -1020,12 +1182,9 @@ function init() {
     bgInput.click();
   });
 
-  const backgroundImageInput =
-    document.getElementById("backgroundImageInput");
-
+  const backgroundImageInput = document.getElementById("backgroundImageInput");
   if (backgroundImageInput) {
     backgroundImageInput.checked = state.backgroundImage;
-
     backgroundImageInput.addEventListener("change", (e) => {
       applyBackgroundImage(e.target.checked);
     });
@@ -1039,18 +1198,14 @@ function init() {
       }
     });
 
-  /* Lighting controls */
-
-  const lightingInputIds = [
+  [
     "lightIntensityInput",
     "lightXInput",
     "lightYInput",
     "lightZInput",
     "shadowSoftnessInput",
     "shadowsInput"
-  ];
-
-  lightingInputIds.forEach((id) => {
+  ].forEach((id) => {
     document.getElementById(id)?.addEventListener("input", () => {
       applyLighting(readLightingControls());
     });
@@ -1063,8 +1218,6 @@ function init() {
 
   updateCameraClipping();
   applyLighting();
-
-  // Enable the default cosmic image when the scene starts.
   applyBackgroundImage(DEFAULT_BACKGROUND_IMAGE.enabled);
 }
 
@@ -1079,8 +1232,6 @@ function frameModel(object) {
   }
 
   const center = box.getCenter(new THREE.Vector3());
-
-  // Preserve the model's original scale.
   object.position.sub(center);
   object.updateMatrixWorld(true);
 
@@ -1090,18 +1241,13 @@ function frameModel(object) {
   modelRadius = Math.max(sphere.radius, 1e-9);
 
   const direction = camera.position.clone();
-
-  if (direction.lengthSq() === 0) {
-    direction.set(2, 2, 3);
-  }
-
+  if (direction.lengthSq() === 0) direction.set(2, 2, 3);
   direction.normalize();
 
   const halfFov = THREE.MathUtils.degToRad(camera.fov * 0.5);
   const fitDistance = (modelRadius / Math.sin(halfFov)) * 1.25;
 
   camera.position.copy(direction.multiplyScalar(fitDistance));
-
   controls.target.set(0, 0, 0);
   controls.minDistance = Math.max(modelRadius * 1e-8, 1e-10);
   controls.maxDistance = Math.max(modelRadius * 1e6, fitDistance * 100);
@@ -1115,23 +1261,17 @@ function updateCameraClipping() {
   if (!camera || !controls) return;
 
   const distance = Math.max(
-    camera.position.distanceTo(controls.target),
-    1e-10
+    camera.position.distanceTo(controls.target), 1e-10
   );
 
   const radius = Math.max(modelRadius, 1e-9);
   const nearFloor = Math.max(radius * 1e-9, 1e-10);
 
   const near = Math.max(
-    Math.min(distance * 0.01, radius * 0.001),
-    nearFloor
+    Math.min(distance * 0.01, radius * 0.001), nearFloor
   );
 
-  const far = Math.max(
-    distance + radius * 4,
-    radius * 10,
-    near * 1000
-  );
+  const far = Math.max(distance + radius * 4, radius * 10, near * 1000);
 
   if (
     Math.abs(camera.near - near) > near * 0.01 ||
@@ -1163,15 +1303,12 @@ function loadModel(url) {
   dracoLoader.setDecoderPath(
     "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
   );
-
   loader.setDRACOLoader(dracoLoader);
 
   loader.load(
     url,
     (gltf) => {
-      if (model) {
-        scene.remove(model);
-      }
+      if (model) scene.remove(model);
 
       model = gltf.scene;
       scene.add(model);
@@ -1180,7 +1317,6 @@ function loadModel(url) {
       applyLighting();
 
       state.modelUrl = url;
-
       setCompactUI();
       goStep(2);
       setNASAStatus("");
@@ -1191,9 +1327,7 @@ function loadModel(url) {
     (error) => {
       console.error("Error loading model:", url, error);
 
-      if (state.modelUrl === url) {
-        state.modelUrl = null;
-      }
+      if (state.modelUrl === url) state.modelUrl = null;
 
       setNASAStatus(
         "Could not load this model. Check the file URL and its external resources.",
@@ -1242,6 +1376,22 @@ function goStep(step) {
 
 /* ================= NASA EXPLORER ================= */
 
+function setNASAAssetView(view) {
+  nasaAssetView = view === "grid" ? "grid" : "list";
+
+  const list = document.getElementById("nasaAssetSlot");
+  const grid = document.getElementById("nasaAssetGrid");
+
+  list.hidden = nasaAssetView !== "list";
+  grid.hidden = nasaAssetView !== "grid";
+
+  document.getElementById("nasaListViewButton")
+    ?.classList.toggle("active", nasaAssetView === "list");
+
+  document.getElementById("nasaGridViewButton")
+    ?.classList.toggle("active", nasaAssetView === "grid");
+}
+
 async function toggleNASAExplorer() {
   const explorer = document.getElementById("nasaExplorer");
   const toggle = document.getElementById("nasaToggle");
@@ -1255,26 +1405,20 @@ async function toggleNASAExplorer() {
 
   toggle.textContent = "Hide NASA Explorer";
 
-  if (!nasaFoldersLoaded) {
-    await loadNASAFolders();
-  }
+  if (!nasaFoldersLoaded) await loadNASAFolders();
 }
 
 async function loadNASAFolders() {
   const select = document.getElementById("nasaFolderSelect");
-  const slot = document.getElementById("nasaAssetSlot");
-
   select.disabled = true;
   select.innerHTML = '<option value="">Loading folders…</option>';
 
-  slot.replaceChildren();
+  clearNASAAssets();
   setNASAStatus("Connecting to the NASA public repository…");
 
   try {
     const response = await fetch(NASA_API_URL, {
-      headers: {
-        Accept: "application/vnd.github+json"
-      }
+      headers: { Accept: "application/vnd.github+json" }
     });
 
     if (!response.ok) {
@@ -1286,7 +1430,6 @@ async function loadNASAFolders() {
     }
 
     const entries = await response.json();
-
     const folders = entries
       .filter((entry) => entry.type === "dir")
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -1316,18 +1459,16 @@ async function loadNASAFolders() {
       if (select.value) {
         loadNASAAssets(select.value);
       } else {
-        slot.replaceChildren();
+        clearNASAAssets();
+        setNASAStatus("Choose a folder to browse its model files.");
       }
     };
 
     setNASAStatus("Choose a folder to browse its model files.");
-
   } catch (error) {
     console.error("NASA folder listing failed:", error);
-
     select.innerHTML = '<option value="">Could not load folders</option>';
     select.disabled = true;
-
     setNASAStatus(
       error.message + " You can still paste a direct model URL above.",
       true
@@ -1335,11 +1476,65 @@ async function loadNASAFolders() {
   }
 }
 
+function clearNASAAssets() {
+  document.getElementById("nasaAssetSlot").replaceChildren();
+  document.getElementById("nasaAssetGrid").replaceChildren();
+}
+
+function isNASAImage(entry) {
+  return entry.type === "file" &&
+    /\.(png|jpe?g|webp|gif)$/i.test(entry.name);
+}
+
+function getNASAImageURL(entry) {
+  return entry.download_url || (
+    NASA_BASE_URL +
+    entry.path.replace(/^3D Models\//, "")
+      .split("/")
+      .map(encodeURIComponent)
+      .join("/")
+  );
+}
+
+function getNASAAssetURL(asset) {
+  return asset.download_url || (
+    NASA_BASE_URL +
+    asset.path.replace(/^3D Models\//, "")
+      .split("/")
+      .map(encodeURIComponent)
+      .join("/")
+  );
+}
+
+function getNASAImagePreviews(asset, images) {
+  const modelBase = asset.name.replace(/\.(glb|gltf)$/i, "").toLowerCase();
+
+  const exactMatches = images.filter((image) => {
+    const imageBase = image.name.replace(/\.(png|jpe?g|webp|gif)$/i, "")
+      .toLowerCase();
+
+    return imageBase === modelBase ||
+      imageBase.startsWith(modelBase + "_") ||
+      imageBase.startsWith(modelBase + "-");
+  });
+
+  const candidates = exactMatches.length ? exactMatches : images;
+
+  return candidates
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((image) => ({
+      name: image.name,
+      url: getNASAImageURL(image)
+    }));
+}
+
 async function loadNASAAssets(folderPath) {
-  const slot = document.getElementById("nasaAssetSlot");
+  const list = document.getElementById("nasaAssetSlot");
+  const grid = document.getElementById("nasaAssetGrid");
   const requestId = ++nasaRequestId;
 
-  slot.replaceChildren();
+  clearNASAAssets();
   showNASAStatusInSlot("Loading assets…");
   setNASAStatus("Reading folder contents…");
 
@@ -1353,9 +1548,7 @@ async function loadNASAAssets(folderPath) {
         "?ref=master";
 
       const response = await fetch(apiURL, {
-        headers: {
-          Accept: "application/vnd.github+json"
-        }
+        headers: { Accept: "application/vnd.github+json" }
       });
 
       if (!response.ok) {
@@ -1372,18 +1565,22 @@ async function loadNASAAssets(folderPath) {
 
     if (requestId !== nasaRequestId) return;
 
-    const assets = entries.filter((entry) => {
-      return entry.type === "file" && /\.(glb|gltf)$/i.test(entry.name);
-    });
+    const assets = entries
+      .filter((entry) =>
+        entry.type === "file" && /\.(glb|gltf)$/i.test(entry.name)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
 
-    slot.replaceChildren();
+    const images = entries.filter(isNASAImage);
 
     if (!assets.length) {
       const message = document.createElement("div");
       message.className = "nasa-status";
       message.textContent =
         "No .glb or .gltf files found directly in this folder.";
-      slot.appendChild(message);
+
+      list.replaceChildren(message);
+      grid.replaceChildren();
 
       setNASAStatus(
         "This folder may contain nested folders or supporting files instead of a model."
@@ -1391,73 +1588,185 @@ async function loadNASAAssets(folderPath) {
       return;
     }
 
-    assets.sort((a, b) => a.name.localeCompare(b.name));
-
     assets.forEach((asset) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "nasa-asset";
+      const previews = getNASAImagePreviews(asset, images);
 
-      const icon = document.createElement("span");
-      icon.className = "nasa-asset-icon";
-      icon.textContent = "▧";
-
-      const name = document.createElement("span");
-      name.className = "nasa-asset-name";
-
-      const filename = document.createElement("span");
-      filename.textContent = asset.name;
-
-      const type = document.createElement("span");
-      type.className = "nasa-asset-type";
-      type.textContent = asset.name.toLowerCase().endsWith(".glb")
-        ? "GLB model"
-        : "GLTF model";
-
-      name.append(filename, type);
-
-      const arrow = document.createElement("span");
-      arrow.textContent = "↗";
-
-      button.append(icon, name, arrow);
-
-      button.addEventListener("click", () => {
-        selectNASAAsset(asset);
-      });
-
-      slot.appendChild(button);
+      list.appendChild(createNASAAssetListItem(asset));
+      grid.appendChild(createNASAAssetCard(asset, previews));
     });
+
+    setNASAAssetView(nasaAssetView);
 
     setNASAStatus(
       assets.length + " model file" +
       (assets.length === 1 ? "" : "s") +
       " found. Select one to load it."
     );
-
   } catch (error) {
     if (requestId !== nasaRequestId) return;
 
     console.error("NASA asset listing failed:", error);
-
-    slot.replaceChildren();
+    clearNASAAssets();
     showNASAStatusInSlot("Could not retrieve assets for this folder.");
-
+    showNASAStatusInGrid("Could not retrieve assets for this folder.");
     setNASAStatus(error.message, true);
   }
 }
 
+function createNASAAssetListItem(asset) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "nasa-asset";
+
+  const icon = document.createElement("span");
+  icon.className = "nasa-asset-icon";
+  icon.textContent = "▧";
+
+  const name = document.createElement("span");
+  name.className = "nasa-asset-name";
+
+  const filename = document.createElement("span");
+  filename.textContent = asset.name;
+
+  const type = document.createElement("span");
+  type.className = "nasa-asset-type";
+  type.textContent = asset.name.toLowerCase().endsWith(".glb")
+    ? "GLB model"
+    : "GLTF model";
+
+  name.append(filename, type);
+
+  const arrow = document.createElement("span");
+  arrow.textContent = "↗";
+
+  button.append(icon, name, arrow);
+  button.addEventListener("click", () => selectNASAAsset(asset));
+
+  return button;
+}
+
+function createNASAAssetCard(asset, previews) {
+  const card = document.createElement("div");
+  card.className = "nasa-card";
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
+  card.setAttribute("aria-label", "Load model " + asset.name);
+
+  const preview = document.createElement("div");
+  preview.className = "nasa-card-preview";
+
+  const placeholder = document.createElement("div");
+  placeholder.className = "nasa-card-placeholder";
+  placeholder.textContent = "▧";
+  preview.appendChild(placeholder);
+
+  const imageList = previews.length ? previews : [];
+  let imageIndex = 0;
+  let currentImage = null;
+
+  const counter = document.createElement("span");
+  counter.className = "nasa-carousel-count";
+
+  function showPreview(index) {
+    if (!imageList.length) {
+      if (currentImage) currentImage.remove();
+      currentImage = null;
+      placeholder.hidden = false;
+      counter.hidden = true;
+      return;
+    }
+
+    imageIndex = (index + imageList.length) % imageList.length;
+
+    if (currentImage) currentImage.remove();
+
+    const img = document.createElement("img");
+    img.alt = imageList[imageIndex].name;
+    img.loading = "lazy";
+    img.src = imageList[imageIndex].url;
+
+    img.addEventListener("load", () => {
+      if (currentImage === img) placeholder.hidden = true;
+    });
+
+    img.addEventListener("error", () => {
+      if (currentImage === img) {
+        img.remove();
+        currentImage = null;
+        placeholder.hidden = false;
+      }
+    });
+
+    currentImage = img;
+    preview.appendChild(img);
+    placeholder.hidden = false;
+
+    counter.textContent = (imageIndex + 1) + " / " + imageList.length;
+    counter.hidden = imageList.length < 2;
+  }
+
+  if (imageList.length > 1) {
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "nasa-carousel-control nasa-carousel-prev";
+    prev.textContent = "‹";
+    prev.setAttribute("aria-label", "Previous preview");
+
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "nasa-carousel-control nasa-carousel-next";
+    next.textContent = "›";
+    next.setAttribute("aria-label", "Next preview");
+
+    prev.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showPreview(imageIndex - 1);
+    });
+
+    next.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showPreview(imageIndex + 1);
+    });
+
+    preview.append(prev, next);
+  }
+
+  preview.appendChild(counter);
+
+  const info = document.createElement("div");
+  info.className = "nasa-card-info";
+
+  const name = document.createElement("div");
+  name.className = "nasa-card-name";
+  name.textContent = asset.name;
+
+  const type = document.createElement("div");
+  type.className = "nasa-card-type";
+  type.textContent = asset.name.toLowerCase().endsWith(".glb")
+    ? "GLB model"
+    : "GLTF model";
+
+  info.append(name, type);
+  card.append(preview, info);
+
+  card.addEventListener("click", () => selectNASAAsset(asset));
+  card.addEventListener("keydown", (event) => {
+    if (event.target !== card) return;
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectNASAAsset(asset);
+    }
+  });
+
+  showPreview(0);
+  return card;
+}
+
 function selectNASAAsset(asset) {
-  const url = asset.download_url || (
-    NASA_BASE_URL +
-    asset.path
-      .replace(/^3D Models\//, "")
-      .split("/")
-      .map(encodeURIComponent)
-      .join("/")
-  );
+  const url = getNASAAssetURL(asset);
 
   document.getElementById("urlInput").value = url;
-
   setNASAStatus("Loading " + asset.name + "…");
   loadModel(url);
 }
@@ -1468,12 +1777,21 @@ function showNASAStatusInSlot(message) {
 
   status.className = "nasa-status";
   status.textContent = message;
-
   slot.replaceChildren(status);
+}
+
+function showNASAStatusInGrid(message) {
+  const grid = document.getElementById("nasaAssetGrid");
+  const status = document.createElement("div");
+
+  status.className = "nasa-status";
+  status.textContent = message;
+  grid.replaceChildren(status);
 }
 
 function setNASAStatus(message, isError = false) {
   const status = document.getElementById("nasaStatus");
+  if (!status) return;
 
   status.textContent = message;
   status.classList.toggle("error", isError);
@@ -1492,7 +1810,6 @@ function applySceneStyle(bg, disableImage = true) {
   }
 
   backgroundLoadId++;
-
   scene.background = new THREE.Color(bg);
   document.body.style.background = bg;
 }
@@ -1504,19 +1821,12 @@ function normalizeBackgroundURL(url) {
 
   try {
     const parsed = new URL(url);
-
-    if (parsed.protocol !== "https:") {
-      return null;
-    }
+    if (parsed.protocol !== "https:") return null;
 
     const normalized = parsed.href;
-
-    if (normalized === DEFAULT_BACKGROUND_IMAGE.url) {
-      return null;
-    }
+    if (normalized === DEFAULT_BACKGROUND_IMAGE.url) return null;
 
     return normalized;
-
   } catch {
     return null;
   }
@@ -1529,10 +1839,7 @@ function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
   if (checkbox) checkbox.checked = state.backgroundImage;
 
   const input = document.getElementById("backgroundImageUrlInput");
-
-  if (input && customURL) {
-    input.value = customURL;
-  }
+  if (input && customURL) input.value = customURL;
 
   if (!state.backgroundImage) {
     backgroundLoadId++;
@@ -1545,7 +1852,6 @@ function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
     DEFAULT_BACKGROUND_IMAGE.url;
 
   state.backgroundImageUrl = normalizeBackgroundURL(customURL);
-
   const requestId = ++backgroundLoadId;
 
   backgroundTextureLoader.load(
@@ -1598,7 +1904,6 @@ function applyCustomBackgroundImage() {
   }
 
   const customURL = normalizeBackgroundURL(parsedURL.href);
-
   state.backgroundImageUrl = customURL;
   applyBackgroundImage(true, customURL);
 }
@@ -1654,7 +1959,6 @@ function applyLighting(values = state.lighting) {
   if (!keyLight || !renderer) return;
 
   keyLight.intensity = light.intensity;
-
   keyLight.position.set(
     light.x * modelRadius,
     light.y * modelRadius,
@@ -1662,12 +1966,8 @@ function applyLighting(values = state.lighting) {
   );
 
   keyLight.target.position.set(0, 0, 0);
-
   keyLight.castShadow = light.shadows;
   renderer.shadowMap.enabled = light.shadows;
-
-  // PCFSoftShadowMap softness is primarily controlled by shadow map
-  // resolution and light frustum. Radius is supported but has limited effect.
   keyLight.shadow.radius = light.softness;
 
   const shadowExtent = Math.max(modelRadius * 2, 0.001);
@@ -1697,16 +1997,10 @@ function applyLighting(values = state.lighting) {
 
 function applyRotation(value) {
   state.autoRotate = value;
-
-  if (controls) {
-    controls.autoRotate = value;
-  }
+  if (controls) controls.autoRotate = value;
 
   const rotateInput = document.getElementById("rotateInput");
-
-  if (rotateInput) {
-    rotateInput.checked = value;
-  }
+  if (rotateInput) rotateInput.checked = value;
 }
 
 /* ================= EXPORT ================= */
@@ -1735,7 +2029,6 @@ function exportScene() {
   const link = `${location.origin}${location.pathname}?scene=${encoded}`;
 
   lastGeneratedURL = link;
-
   document.getElementById("linkBox").textContent = link;
 
   const actions = document.getElementById("exportActions");
@@ -1799,21 +2092,15 @@ function checkURL() {
     applyRotation(data.autoRotate ?? false);
 
     const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
-
     const imageEnabled =
       data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
 
     state.backgroundImageUrl = customURL;
 
-    const imageURLInput =
-      document.getElementById("backgroundImageUrlInput");
-
-    if (imageURLInput) {
-      imageURLInput.value = customURL || "";
-    }
+    const imageURLInput = document.getElementById("backgroundImageUrlInput");
+    if (imageURLInput) imageURLInput.value = customURL || "";
 
     applyBackgroundImage(imageEnabled, customURL);
-
     applyLighting(data.lighting || state.lighting);
 
     if (data.modelUrl) {
@@ -1822,7 +2109,6 @@ function checkURL() {
     }
 
     lastGeneratedURL = window.location.href;
-
   } catch (error) {
     console.error("Could not decode scene URL:", error);
   }
@@ -1838,11 +2124,9 @@ function animate() {
   requestAnimationFrame(animate);
 
   if (isLoadingFromURL) return;
-
   if (controls) controls.update();
 
   updateCameraClipping();
-
   renderer.render(scene, camera);
 }
 
@@ -1855,6 +2139,5 @@ function onResize() {
   updateCameraClipping();
 }
 </script>
-
 </body>
 </html>
