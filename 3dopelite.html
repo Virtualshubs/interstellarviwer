@@ -1712,8 +1712,7 @@ function applyRotation(value) {
 /* ================= EXPORT ================= */
 
 function exportScene() {
-  const url = state.modelUrl ||
-    document.getElementById("urlInput").value.trim();
+  const url = document.getElementById("urlInput").value.trim();
 
   if (!url) {
     setNASAStatus("Load a model before publishing the scene.", true);
