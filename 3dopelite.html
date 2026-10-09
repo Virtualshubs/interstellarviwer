@@ -388,6 +388,47 @@ input:not(.heroInputBox input) {
   pointer-events: none;
 }
 
+.backgroundImageToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.backgroundImageToggle input {
+  width: auto !important;
+  margin: 0 !important;
+  accent-color: #4da3ff;
+}
+
+.backgroundImageControls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.backgroundImageControls input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  color: #fff;
+  outline: none;
+  font: inherit;
+  font-size: 11px;
+  margin: 0;
+}
+
+.backgroundImageHint {
+  font-size: 10px;
+  line-height: 1.5;
+  opacity: .45;
+}
+
 #linkBox {
   margin-top: 12px;
   padding: 10px;
@@ -655,6 +696,37 @@ if (new URLSearchParams(location.search).get("scene")) {
     </div>
 
     <div class="settingGroup">
+      <div class="label">Background image</div>
+
+      <label class="backgroundImageToggle">
+        <input id="backgroundImageInput" type="checkbox" checked>
+        <span>Enable deep-space background</span>
+      </label>
+
+      <div class="backgroundImageControls">
+        <input
+          id="backgroundImageUrlInput"
+          type="url"
+          placeholder="https://example.com/space-image.jpg"
+          autocomplete="url"
+        />
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          onclick="applyCustomBackgroundImage()"
+        >
+          Apply image URL
+        </button>
+
+        <div class="backgroundImageHint">
+          Leave the URL empty to use the default NASA Hubble Deep Field image.
+          Selecting a background color disables the image.
+        </div>
+      </div>
+    </div>
+
+    <div class="settingGroup">
       <div class="label">Auto rotate</div>
 
       <label style="display:flex;align-items:center;gap:8px;font-size:12px;">
@@ -709,15 +781,26 @@ if (new URLSearchParams(location.search).get("scene")) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/DRACOLoader.js"></script>
 
 <script>
+/* ================= CONFIG ================= */
+
+const DEFAULT_BACKGROUND_IMAGE = {
+  enabled: true,
+  url: "https://science.nasa.gov/wp-content/uploads/2023/06/hubble-deep-field-jpeg.webp"
+};
+
 /* ================= STATE ================= */
 
 let scene, camera, renderer, controls, model;
 let modelRadius = 1;
+let backgroundTextureLoader;
+let backgroundLoadId = 0;
 
 let state = {
   modelUrl: null,
-  bg: "#000000",
-  autoRotate: false
+  bg: "#0e0f13",
+  autoRotate: false,
+  backgroundImage: DEFAULT_BACKGROUND_IMAGE.enabled,
+  backgroundImageUrl: null
 };
 
 let lastGeneratedURL = null;
@@ -742,6 +825,8 @@ animate();
 function init() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(state.bg);
+
+  backgroundTextureLoader = new THREE.TextureLoader();
 
   camera = new THREE.PerspectiveCamera(
     60,
@@ -777,6 +862,7 @@ function init() {
 
   if (rotateInput) {
     rotateInput.checked = state.autoRotate;
+
     rotateInput.addEventListener("change", (e) => {
       applyRotation(e.target.checked);
     });
@@ -817,12 +903,34 @@ function init() {
     bgInput.click();
   });
 
+  const backgroundImageInput =
+    document.getElementById("backgroundImageInput");
+
+  if (backgroundImageInput) {
+    backgroundImageInput.checked = state.backgroundImage;
+
+    backgroundImageInput.addEventListener("change", (e) => {
+      applyBackgroundImage(e.target.checked);
+    });
+  }
+
+  document.getElementById("backgroundImageUrlInput")
+    ?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        applyCustomBackgroundImage();
+      }
+    });
+
   const actions = document.getElementById("exportActions");
   if (actions) actions.style.display = "none";
 
   document.getElementById("ui")?.classList.add("ui-fullscreen");
 
   updateCameraClipping();
+
+  // Enable the default cosmic image when the scene starts.
+  applyBackgroundImage(DEFAULT_BACKGROUND_IMAGE.enabled);
 }
 
 /* ================= CAMERA / SCALE ================= */
@@ -837,7 +945,7 @@ function frameModel(object) {
 
   const center = box.getCenter(new THREE.Vector3());
 
-  // Keep the established centering behavior; never change model.scale.
+  // Preserve the model's original scale.
   object.position.sub(center);
   object.updateMatrixWorld(true);
 
@@ -1234,12 +1342,131 @@ function setNASAStatus(message, isError = false) {
   status.classList.toggle("error", isError);
 }
 
-/* ================= STYLE ================= */
+/* ================= BACKGROUND COLOR ================= */
 
-function applySceneStyle(bg) {
+function applySceneStyle(bg, disableImage = true) {
   state.bg = bg;
+
+  if (disableImage) {
+    state.backgroundImage = false;
+
+    const imageToggle = document.getElementById("backgroundImageInput");
+    if (imageToggle) imageToggle.checked = false;
+  }
+
+  // Invalidate any image request still in progress.
+  backgroundLoadId++;
+
   scene.background = new THREE.Color(bg);
   document.body.style.background = bg;
+}
+
+/* ================= BACKGROUND IMAGE ================= */
+
+function normalizeBackgroundURL(url) {
+  if (!url) return null;
+
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.protocol !== "https:") {
+      return null;
+    }
+
+    const normalized = parsed.href;
+
+    // The default image is represented by the boolean alone.
+    if (normalized === DEFAULT_BACKGROUND_IMAGE.url) {
+      return null;
+    }
+
+    return normalized;
+
+  } catch {
+    return null;
+  }
+}
+
+function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
+  state.backgroundImage = Boolean(enabled);
+
+  const checkbox = document.getElementById("backgroundImageInput");
+  if (checkbox) checkbox.checked = state.backgroundImage;
+
+  const input = document.getElementById("backgroundImageUrlInput");
+
+  if (input && customURL) {
+    input.value = customURL;
+  }
+
+  if (!state.backgroundImage) {
+    backgroundLoadId++;
+    scene.background = new THREE.Color(state.bg);
+    document.body.style.background = state.bg;
+    return;
+  }
+
+  const url = normalizeBackgroundURL(customURL) ||
+    DEFAULT_BACKGROUND_IMAGE.url;
+
+  state.backgroundImageUrl = normalizeBackgroundURL(customURL);
+
+  const requestId = ++backgroundLoadId;
+
+  backgroundTextureLoader.load(
+    url,
+    (texture) => {
+      if (requestId !== backgroundLoadId) {
+        texture.dispose();
+        return;
+      }
+
+      texture.encoding = THREE.sRGBEncoding;
+      scene.background = texture;
+      document.body.style.background = "#000";
+    },
+    undefined,
+    (error) => {
+      if (requestId !== backgroundLoadId) return;
+
+      console.error("Could not load background image:", url, error);
+      scene.background = new THREE.Color(state.bg);
+      document.body.style.background = state.bg;
+    }
+  );
+}
+
+function applyCustomBackgroundImage() {
+  const input = document.getElementById("backgroundImageUrlInput");
+  const rawURL = input.value.trim();
+
+  // Empty input restores the default image.
+  if (!rawURL) {
+    state.backgroundImageUrl = null;
+    applyBackgroundImage(true, null);
+    return;
+  }
+
+  let parsedURL;
+
+  try {
+    parsedURL = new URL(rawURL);
+  } catch {
+    alert("Enter a valid HTTPS image URL.");
+    input.focus();
+    return;
+  }
+
+  if (parsedURL.protocol !== "https:") {
+    alert("The background image URL must use HTTPS.");
+    input.focus();
+    return;
+  }
+
+  const customURL = normalizeBackgroundURL(parsedURL.href);
+
+  state.backgroundImageUrl = customURL;
+  applyBackgroundImage(true, customURL);
 }
 
 /* ================= ROTATION ================= */
@@ -1271,9 +1498,15 @@ function exportScene() {
 
   const payload = {
     modelUrl: url,
-    bg: document.getElementById("bgInput").value,
-    autoRotate: state.autoRotate
+    bg: state.bg,
+    autoRotate: state.autoRotate,
+    backgroundImage: state.backgroundImage
   };
+
+  // Only store the URL when the active image is custom.
+  if (state.backgroundImage && state.backgroundImageUrl) {
+    payload.backgroundImageUrl = state.backgroundImageUrl;
+  }
 
   const encoded = btoa(JSON.stringify(payload));
   const link = `${location.origin}${location.pathname}?scene=${encoded}`;
@@ -1339,10 +1572,28 @@ function checkURL() {
 
     document.getElementById("ui").style.display = "none";
 
-    applySceneStyle(data.bg || state.bg);
+    applySceneStyle(data.bg || state.bg, false);
     applyRotation(data.autoRotate ?? false);
 
+    const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
+
+    // Older shared URLs without this property use the default background.
+    const imageEnabled =
+      data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
+
+    state.backgroundImageUrl = customURL;
+
+    const imageURLInput =
+      document.getElementById("backgroundImageUrlInput");
+
+    if (imageURLInput) {
+      imageURLInput.value = customURL || "";
+    }
+
+    applyBackgroundImage(imageEnabled, customURL);
+
     if (data.modelUrl) {
+      document.getElementById("urlInput").value = data.modelUrl;
       loadModel(data.modelUrl);
     }
 
