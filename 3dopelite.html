@@ -403,11 +403,6 @@ if (new URLSearchParams(location.search).get("scene")) {
 </div>
 
 <canvas id="c"></canvas>
-<a id="watermark" href="https://3dtwins.es" target="_blank" rel="noopener">
-  <img src="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png" class="watermarkLogo" alt="" />
-  Made with 3D Twins Little
-</a>
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -1536,6 +1531,33 @@ function checkURL() {
     isLoadingFromURL = false;
   });
 }
+
+
+
+  
+/* ================= 3D TWINS WATERMARK ================= */
+
+function createWatermark() {
+  if (document.getElementById("watermark")) return;
+
+  const watermark = document.createElement("a");
+  watermark.id = "watermark";
+  watermark.href = "https://3dtwins.es";
+  watermark.target = "_blank";
+  watermark.rel = "noopener";
+
+  const logo = document.createElement("img");
+  logo.src = "https://viewer.3dtwins.tech/puntero_3dtwinsStar.png";
+  logo.className = "watermarkLogo";
+  logo.alt = "";
+
+  watermark.appendChild(logo);
+  watermark.appendChild(document.createTextNode(" Made with 3D Twins Lite"));
+
+  document.body.appendChild(watermark);
+}
+
+createWatermark();
 
 /* ================= LOOP ================= */
 
