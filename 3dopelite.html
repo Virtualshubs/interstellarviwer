@@ -581,6 +581,46 @@ input:not(.heroInputBox input) {
 
   .nasa-slot { max-height: 140px; }
 }
+
+
+
+
+.lightingControl {
+  margin-top: 13px;
+}
+
+.lightingControl label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,.8);
+}
+
+.lightingControl label span {
+  color: #8ec5ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.lightingControl input[type="range"] {
+  display: block;
+  width: 100%;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  accent-color: #4da3ff;
+  cursor: pointer;
+}
+
+.lightingGroup .backgroundImageHint {
+  margin-top: 12px;
+}
+
+  
 </style>
 
 <script>
@@ -735,6 +775,66 @@ if (new URLSearchParams(location.search).get("scene")) {
       </label>
     </div>
 
+
+    <div class="settingGroup lightingGroup">
+  <div class="label">Lighting & shadows</div>
+
+  <label class="backgroundImageToggle">
+    <input id="shadowsInput" type="checkbox" checked>
+    <span>Enable shadows</span>
+  </label>
+
+  <div class="lightingControl">
+    <label for="lightIntensityInput">
+      Light intensity
+      <span id="lightIntensityValue">0.8</span>
+    </label>
+    <input id="lightIntensityInput"
+           type="range" min="0" max="3" step="0.1" value="0.8">
+  </div>
+
+  <div class="lightingControl">
+    <label for="lightXInput">
+      Light position X
+      <span id="lightXValue">5</span>
+    </label>
+    <input id="lightXInput"
+           type="range" min="-10" max="10" step="0.5" value="5">
+  </div>
+
+  <div class="lightingControl">
+    <label for="lightYInput">
+      Light position Y
+      <span id="lightYValue">10</span>
+    </label>
+    <input id="lightYInput"
+           type="range" min="-10" max="10" step="0.5" value="10">
+  </div>
+
+  <div class="lightingControl">
+    <label for="lightZInput">
+      Light position Z
+      <span id="lightZValue">5</span>
+    </label>
+    <input id="lightZInput"
+           type="range" min="-10" max="10" step="0.5" value="5">
+  </div>
+
+  <div class="lightingControl">
+    <label for="shadowSoftnessInput">
+      Shadow softness
+      <span id="shadowSoftnessValue">3</span>
+    </label>
+    <input id="shadowSoftnessInput"
+           type="range" min="0" max="8" step="1" value="3">
+  </div>
+
+  <div class="backgroundImageHint">
+    Adjust the light direction and intensity. Shadow softness depends
+    on the renderer and the model geometry.
+  </div>
+</div>
+
     <div class="stepNav">
       <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
       <button class="btn btn-secondary" onclick="goStep(3)">Continue</button>
@@ -780,8 +880,7 @@ if (new URLSearchParams(location.search).get("scene")) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/DRACOLoader.js"></script>
 
-<script>
-/* ================= CONFIG ================= */
+<script>/* ================= CONFIG ================= */
 
 const DEFAULT_BACKGROUND_IMAGE = {
   enabled: true,
@@ -791,6 +890,7 @@ const DEFAULT_BACKGROUND_IMAGE = {
 /* ================= STATE ================= */
 
 let scene, camera, renderer, controls, model;
+let keyLight;
 let modelRadius = 1;
 let backgroundTextureLoader;
 let backgroundLoadId = 0;
@@ -800,7 +900,15 @@ let state = {
   bg: "#0e0f13",
   autoRotate: false,
   backgroundImage: DEFAULT_BACKGROUND_IMAGE.enabled,
-  backgroundImageUrl: null
+  backgroundImageUrl: null,
+  lighting: {
+    shadows: true,
+    intensity: 0.8,
+    x: 5,
+    y: 10,
+    z: 5,
+    softness: 3
+  }
 };
 
 let lastGeneratedURL = null;
@@ -844,17 +952,26 @@ function init() {
 
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.autoRotate = state.autoRotate;
   controls.addEventListener("change", updateCameraClipping);
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1));
+  scene.add(
+    new THREE.HemisphereLight(0xffffff, 0x222233, 1)
+  );
 
-  const d = new THREE.DirectionalLight(0xffffff, 0.8);
-  d.position.set(5, 10, 5);
-  scene.add(d);
+  keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.bias = -0.0001;
+  keyLight.shadow.normalBias = 0.02;
+
+  scene.add(keyLight);
+  scene.add(keyLight.target);
 
   window.addEventListener("resize", onResize);
 
@@ -922,12 +1039,30 @@ function init() {
       }
     });
 
+  /* Lighting controls */
+
+  const lightingInputIds = [
+    "lightIntensityInput",
+    "lightXInput",
+    "lightYInput",
+    "lightZInput",
+    "shadowSoftnessInput",
+    "shadowsInput"
+  ];
+
+  lightingInputIds.forEach((id) => {
+    document.getElementById(id)?.addEventListener("input", () => {
+      applyLighting(readLightingControls());
+    });
+  });
+
   const actions = document.getElementById("exportActions");
   if (actions) actions.style.display = "none";
 
   document.getElementById("ui")?.classList.add("ui-fullscreen");
 
   updateCameraClipping();
+  applyLighting();
 
   // Enable the default cosmic image when the scene starts.
   applyBackgroundImage(DEFAULT_BACKGROUND_IMAGE.enabled);
@@ -1042,6 +1177,8 @@ function loadModel(url) {
       scene.add(model);
 
       frameModel(model);
+      applyLighting();
+
       state.modelUrl = url;
 
       setCompactUI();
@@ -1354,7 +1491,6 @@ function applySceneStyle(bg, disableImage = true) {
     if (imageToggle) imageToggle.checked = false;
   }
 
-  // Invalidate any image request still in progress.
   backgroundLoadId++;
 
   scene.background = new THREE.Color(bg);
@@ -1375,7 +1511,6 @@ function normalizeBackgroundURL(url) {
 
     const normalized = parsed.href;
 
-    // The default image is represented by the boolean alone.
     if (normalized === DEFAULT_BACKGROUND_IMAGE.url) {
       return null;
     }
@@ -1440,7 +1575,6 @@ function applyCustomBackgroundImage() {
   const input = document.getElementById("backgroundImageUrlInput");
   const rawURL = input.value.trim();
 
-  // Empty input restores the default image.
   if (!rawURL) {
     state.backgroundImageUrl = null;
     applyBackgroundImage(true, null);
@@ -1467,6 +1601,96 @@ function applyCustomBackgroundImage() {
 
   state.backgroundImageUrl = customURL;
   applyBackgroundImage(true, customURL);
+}
+
+/* ================= LIGHTING & SHADOWS ================= */
+
+function readLightingControls() {
+  return {
+    shadows: document.getElementById("shadowsInput")?.checked ?? state.lighting.shadows,
+    intensity: document.getElementById("lightIntensityInput")?.value ?? state.lighting.intensity,
+    x: document.getElementById("lightXInput")?.value ?? state.lighting.x,
+    y: document.getElementById("lightYInput")?.value ?? state.lighting.y,
+    z: document.getElementById("lightZInput")?.value ?? state.lighting.z,
+    softness: document.getElementById("shadowSoftnessInput")?.value ?? state.lighting.softness
+  };
+}
+
+function applyLighting(values = state.lighting) {
+  state.lighting = {
+    shadows: Boolean(values.shadows ?? true),
+    intensity: THREE.MathUtils.clamp(Number(values.intensity ?? 0.8), 0, 3),
+    x: THREE.MathUtils.clamp(Number(values.x ?? 5), -10, 10),
+    y: THREE.MathUtils.clamp(Number(values.y ?? 10), -10, 10),
+    z: THREE.MathUtils.clamp(Number(values.z ?? 5), -10, 10),
+    softness: THREE.MathUtils.clamp(Number(values.softness ?? 3), 0, 8)
+  };
+
+  const light = state.lighting;
+
+  [
+    ["shadowsInput", light.shadows],
+    ["lightIntensityInput", light.intensity],
+    ["lightXInput", light.x],
+    ["lightYInput", light.y],
+    ["lightZInput", light.z],
+    ["shadowSoftnessInput", light.softness]
+  ].forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.value = value;
+  });
+
+  [
+    ["lightIntensityValue", light.intensity],
+    ["lightXValue", light.x],
+    ["lightYValue", light.y],
+    ["lightZValue", light.z],
+    ["shadowSoftnessValue", light.softness]
+  ].forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  });
+
+  if (!keyLight || !renderer) return;
+
+  keyLight.intensity = light.intensity;
+
+  keyLight.position.set(
+    light.x * modelRadius,
+    light.y * modelRadius,
+    light.z * modelRadius
+  );
+
+  keyLight.target.position.set(0, 0, 0);
+
+  keyLight.castShadow = light.shadows;
+  renderer.shadowMap.enabled = light.shadows;
+
+  // PCFSoftShadowMap softness is primarily controlled by shadow map
+  // resolution and light frustum. Radius is supported but has limited effect.
+  keyLight.shadow.radius = light.softness;
+
+  const shadowExtent = Math.max(modelRadius * 2, 0.001);
+  const shadowCamera = keyLight.shadow.camera;
+
+  shadowCamera.left = -shadowExtent;
+  shadowCamera.right = shadowExtent;
+  shadowCamera.top = shadowExtent;
+  shadowCamera.bottom = -shadowExtent;
+  shadowCamera.near = 0.1;
+  shadowCamera.far = Math.max(modelRadius * 30, 1);
+  shadowCamera.updateProjectionMatrix();
+
+  keyLight.shadow.needsUpdate = true;
+
+  if (model) {
+    model.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = light.shadows;
+        object.receiveShadow = light.shadows;
+      }
+    });
+  }
 }
 
 /* ================= ROTATION ================= */
@@ -1500,10 +1724,10 @@ function exportScene() {
     modelUrl: url,
     bg: state.bg,
     autoRotate: state.autoRotate,
-    backgroundImage: state.backgroundImage
+    backgroundImage: state.backgroundImage,
+    lighting: state.lighting
   };
 
-  // Only store the URL when the active image is custom.
   if (state.backgroundImage && state.backgroundImageUrl) {
     payload.backgroundImageUrl = state.backgroundImageUrl;
   }
@@ -1577,7 +1801,6 @@ function checkURL() {
 
     const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
 
-    // Older shared URLs without this property use the default background.
     const imageEnabled =
       data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
 
@@ -1591,6 +1814,8 @@ function checkURL() {
     }
 
     applyBackgroundImage(imageEnabled, customURL);
+
+    applyLighting(data.lighting || state.lighting);
 
     if (data.modelUrl) {
       document.getElementById("urlInput").value = data.modelUrl;
