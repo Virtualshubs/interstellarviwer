@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png" type="image/x-icon" />
-<title>3D OPE Lite</title>
+<title>3D OPE Lite SAPACE</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -260,16 +260,8 @@ if (new URLSearchParams(location.search).get("scene")) {
     <div class="heroSubtitle">Paste a GLB model URL or explore NASA's 3D model collection.</div>
 
     <div class="heroInputBox">
-    
-<div class="model-file-upload">
-  <label for="modelFileInput">Or load a local 3D model</label>
-  <input
-    id="modelFileInput"
-    type="file"
-    accept=".glb,.gltf,.stl,.fbx"
-  >
-  <small>Supported formats: GLB, GLTF, STL and FBX.</small>
-</div>
+      <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url" />
+      <div class="heroHint">Supports GLB / GLTF files hosted online</div>
  
 
       
@@ -654,187 +646,42 @@ function setCompactUI() {
 
 /* ================= MODEL LOADER ================= */
 
-
-/* ================= MODEL LOADER ================= */
-
 function loadModel(url) {
   if (!url) {
     setNASAStatus("Select a model or enter a valid model URL.", true);
     return;
   }
 
-  const extension = url.split(/[?#]/)[0].split(".").pop().toLowerCase();
-
-  if (extension === "stl") {
-    new THREE.STLLoader().load(
-      url,
-      (geometry) => {
-        const material = geometry.hasColors
-          ? new THREE.MeshPhongMaterial({
-              vertexColors: true,
-              opacity: geometry.alpha ?? 1,
-              transparent: (geometry.alpha ?? 1) < 1
-            })
-          : new THREE.MeshPhongMaterial({
-              color: 0xb8c2cc,
-              specular: 0x333333,
-              shininess: 35
-            });
-
-        const mesh = new THREE.Mesh(geometry, material);
-        finishLoadingModel(mesh, url);
-      },
-      undefined,
-      (error) => handleModelLoadError(url, error)
-    );
-
-    return;
-  }
-
-  if (extension === "fbx") {
-    new THREE.FBXLoader().load(
-      url,
-      (object) => finishLoadingModel(object, url),
-      undefined,
-      (error) => handleModelLoadError(url, error)
-    );
-
-    return;
-  }
-
-  if (extension !== "glb" && extension !== "gltf") {
-    setNASAStatus("Unsupported format. Use GLB, GLTF, STL or FBX.", true);
-    return;
-  }
-
   const loader = new THREE.GLTFLoader();
   const dracoLoader = new THREE.DRACOLoader();
 
-  dracoLoader.setDecoderPath(
-    "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
-  );
-
+  dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
   loader.setDRACOLoader(dracoLoader);
 
   loader.load(
     url,
     (gltf) => {
-      finishLoadingModel(gltf.scene, url);
+      if (model) scene.remove(model);
+      model = gltf.scene;
+      scene.add(model);
+      frameModel(model);
+      applyLighting();
+      state.modelUrl = url;
+      setCompactUI();
+      goStep(2);
+      setNASAStatus("");
       dracoLoader.dispose();
     },
     undefined,
     (error) => {
-      handleModelLoadError(url, error);
+      console.error("Error loading model:", url, error);
+      if (state.modelUrl === url) state.modelUrl = null;
+      setNASAStatus("Could not load this model. Check the file URL and its external resources.", true);
       dracoLoader.dispose();
     }
   );
 }
 
-function loadLocalModel(file) {
-  if (!file) return;
-
-  const extension = file.name.split(".").pop().toLowerCase();
-
-  if (!["glb", "gltf", "stl", "fbx"].includes(extension)) {
-    setNASAStatus("Unsupported file format.", true);
-    return;
-  }
-
-  const objectURL = URL.createObjectURL(file);
-
-  if (extension === "glb" || extension === "gltf") {
-    loadModel(objectURL);
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    try {
-      let object;
-
-      if (extension === "stl") {
-        const geometry = new THREE.STLLoader().parse(reader.result);
-
-        const material = geometry.hasColors
-          ? new THREE.MeshPhongMaterial({
-              vertexColors: true,
-              opacity: geometry.alpha ?? 1,
-              transparent: (geometry.alpha ?? 1) < 1
-            })
-          : new THREE.MeshPhongMaterial({
-              color: 0xb8c2cc,
-              specular: 0x333333,
-              shininess: 35
-            });
-
-        object = new THREE.Mesh(geometry, material);
-      } else {
-        object = new THREE.FBXLoader().parse(reader.result, "");
-      }
-
-      finishLoadingModel(object, objectURL);
-      state.localModelName = file.name;
-    } catch (error) {
-      console.error("Could not parse local model:", error);
-      URL.revokeObjectURL(objectURL);
-      setNASAStatus("Could not read this file. Check that the model is valid.", true);
-    }
-  };
-
-  reader.onerror = () => {
-    URL.revokeObjectURL(objectURL);
-    setNASAStatus("Could not read the selected file.", true);
-  };
-
-  reader.readAsArrayBuffer(file);
-}
-
-function finishLoadingModel(object, url) {
-  if (model) {
-    scene.remove(model);
-
-    model.traverse((child) => {
-      if (child.geometry) child.geometry.dispose();
-
-      if (child.material) {
-        const materials = Array.isArray(child.material)
-          ? child.material
-          : [child.material];
-
-        materials.forEach((material) => material.dispose());
-      }
-    });
-  }
-
-  model = object;
-  scene.add(model);
-
-  model.traverse((child) => {
-    if (child.isMesh) {
-      child.castShadow = state.lighting.shadows;
-      child.receiveShadow = state.lighting.shadows;
-    }
-  });
-
-  frameModel(model);
-  applyLighting();
-
-  state.modelUrl = url;
-
-  setCompactUI();
-  goStep(2);
-  setNASAStatus("");
-}
-
-function handleModelLoadError(url, error) {
-  console.error("Error loading model:", url, error);
-
-  setNASAStatus(
-    "Could not load this model. Check the URL, file format and external resources.",
-    true
-  );
-}
 /* ================= STEPS ================= */
 
 function goStep(step) {
@@ -1690,20 +1537,6 @@ function checkURL() {
   });
 }
 
-
-
-
-
-
-const modelFileInput = document.getElementById("modelFileInput");
-
-if (modelFileInput) {
-  modelFileInput.addEventListener("change", (event) => {
-    const file = event.target.files?.[0];
-    if (file) loadLocalModel(file);
-  });
-}
-  
 /* ================= LOOP ================= */
 
 function animate() {
