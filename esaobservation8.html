@@ -1135,54 +1135,76 @@ background: transparent;
   color: var(--text);
 }
 
-/* =========================================================
-   EXPLORATION GRID
-========================================================= */
+/* =======================================================
+   GRID
+=======================================================*/
 
-#explorationGrid {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(18, minmax(0, 1fr));
-  grid-template-rows: repeat(18, minmax(0, 1fr));
-  gap: 2px;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  background: var(--grid-bg);
-}
-
-#explorationGrid .dataCell {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  min-height: 0;
-  box-sizing: border-box;
-  border: 1px solid var(--border) !important;
-  background: var(--grid-cell);
-  color: var(--text) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-}
-
-#explorationGrid .dataCell div {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  color: inherit !important;
-}
-
-#explorationGrid .dataCell:hover {
-  opacity: 1 !important;
-  visibility: visible !important;
-  background: var(--grid-hover);
+#dataGrid{
+position: relative;
+display:grid;
+grid-template-columns:repeat(36,1fr);
+grid-template-rows:repeat(18,1fr);
+aspect-ratio:2/1;
+width:100%;
+max-width:1100px;
+margin:24px auto;
+gap:1px;
+background: transparent;
+border:1px solid var(--border);
 }
 
 
+/* =======================================================
+   DATA CELLS
+=======================================================*/
+
+.dataCell{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+aspect-ratio:1;
+background: transparent;
+border:1px solid rgba(255,255,255,.04);
+font-size:10px;
+color:#dbe6f5;
+cursor:pointer;
+transition:background .15s,border-color .15s;
+overflow:hidden;
+line-height:1.05;
+
+}
+
+.dataCell:hover{
+border-color:var(--blue2);
+background:#233245;
+transform:none;
+z-index:1;
+
+}
+
+
+#blueMarble {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 0;
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+ .dataCell.searchMatch{
+    outline:2px solid #ffffff;
+    box-shadow:
+        0 0 0 2px rgba(80,190,255,.8),
+        0 0 18px rgba(80,190,255,.6);
+
+    z-index:5;
+
+}  
    
 
 /* =========================================================
