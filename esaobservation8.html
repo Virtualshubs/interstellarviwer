@@ -783,44 +783,20 @@ font-size:7px;
 
 
 /* =======================================================
-   HEADER — BLUE MARBLE
-======================================================= */
+   HEADER
+=======================================================*/
 
-#header {
-    position: relative;
-    isolation: isolate;
-    top: 64px;
-    height: 58px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 0 18px;
-    background: transparent;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    overflow: hidden;
-}
+#header{
+top: 64px;
+height:58px;
+display:flex;
+align-items:center;
+gap:14px;
+padding:0 18px;
+background:var(--surface);
+border-bottom:1px solid var(--border);
+flex-shrink:0;
 
-/* Imagen de fondo */
-#header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background-image: url("https://3d.staratlas.es/bluemarble.jpg");
-    background-size: cover;
-    background-position: center 48%;
-    background-repeat: no-repeat;
-}
-
-/* Velo blanco para mantener la legibilidad */
-#header::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: rgba(255, 255, 255, 0.84);
-    pointer-events: none;
 }
 
 
