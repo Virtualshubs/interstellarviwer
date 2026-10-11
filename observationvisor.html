@@ -565,11 +565,8 @@ top:0;
 left:0;
 width:100%;
 z-index:9990;
-
 background:#1e1e1e;
-
 border-bottom:1px solid rgba(255,255,255,0.12);
-
 box-sizing:border-box;
 }
 
@@ -577,15 +574,23 @@ box-sizing:border-box;
 .janus-sector-inner{
 max-width:1500px;
 margin:0 auto;
-
 padding:18px 28px 16px;
-
 text-align:center;
-
 box-sizing:border-box;
 }
 
+   .janus-sector-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.janus-sector-logo img {
+  display: block;
+  width: 250px;
+  height: auto;
+  object-fit: contain;
+}
 /* =======================================================
    TITLES
 =======================================================*/
@@ -594,10 +599,8 @@ box-sizing:border-box;
 display:flex;
 justify-content:center;
 align-items:baseline;
-
 gap:14px;
 flex-wrap:wrap;
-
 line-height:1.2;
 }
 
@@ -607,14 +610,11 @@ font-family:
 Arial,
 Helvetica,
 sans-serif;
-
 font-size:15px;
 font-weight:600;
-
 letter-spacing:0.12em;
 text-transform:uppercase;
-
-color:#f2f2f2;
+color:#1e1e1e;
 }
 
 
@@ -623,13 +623,10 @@ font-family:
 Arial,
 Helvetica,
 sans-serif;
-
 font-size:13px;
 font-weight:400;
-
 letter-spacing:0.04em;
-
-color:#a8a8a8;
+color:#1e1e1e;
 }
 
 
@@ -639,20 +636,15 @@ color:#a8a8a8;
 
 .janus-sector-subtitle{
 margin-top:7px;
-
 font-family:
 Arial,
 Helvetica,
 sans-serif;
-
 font-size:11px;
 font-style:normal;
 font-weight:400;
-
 letter-spacing:0.05em;
-
-color:#858585;
-
+color:#1e1e1e;
 line-height:1.4;
 }
 
@@ -663,28 +655,19 @@ line-height:1.4;
 
 .janus-sector-list{
 display:flex;
-
 justify-content:center;
 align-items:center;
-
 flex-wrap:wrap;
-
 gap:0;
-
 margin-top:14px;
-
 font-family:
 Arial,
 Helvetica,
 sans-serif;
-
 font-size:10px;
 font-weight:500;
-
 letter-spacing:0.09em;
-
 text-transform:uppercase;
-
 color:#c4c4c4;
 }
 
@@ -2422,9 +2405,11 @@ height:100%;
    
  <div class="janus-sector-strip">
   <div class="janus-sector-inner">
+       <div class="janus-sector-logo">
+      <img src="https://3d.staratlas.es/opelogov3.png" alt="3DTwins">
+    </div>
 <div class="janus-sector-title">
   <span class="janus-main-title">Technology transfer across sectors</span>
-  <span class="janus-transfer-title">By 3DTwins</span>
 </div>
     <div class="janus-sector-list">
       <span>Forestry</span>
