@@ -14,7 +14,7 @@
 :root {
   color-scheme: dark;
 
-  --bg: #010604;
+  --bg: #f5f5f5;
   --panel: rgba(16, 19, 24, 1);
   --panel-soft: rgba(255, 255, 255, 0.025);
   --panel-hover: rgba(255, 255, 255, 0.055);
@@ -248,10 +248,10 @@ select:focus-visible {
 
 .titleGif {
   display: block;
-  width: min(100vh, 69vh);
+  width: min(300px, 200px);
   height: auto;
   margin: 0 auto 3px;
-  opacity: 0.96;
+  opacity: 1;
 }
 
 .heroTitle {
@@ -1458,10 +1458,10 @@ if (new URLSearchParams(location.search).get("scene")) {
   </div>
 
   <div id="step1" class="step active step-hero">
-    <div id="title">Create your 3D scene</div>
+    <div id="title"></div>
     <img class="titleGif" src="https://3d.staratlas.es/opelogov3.png" alt="3D Twins" />
-    <div class="heroTitle">3D OPE LITE SPACE</div>
-    <div class="heroSubtitle">By 3D Twins Team</div>
+    <div class="heroTitle"></div>
+    <div class="heroSubtitle">Create your 3D scene</div>
 
     <div class="heroInputBox">
       <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url" hidden/>
