@@ -2404,141 +2404,164 @@ height:100%;
 
 
 
-#jsonInterpreterPanel{
-    margin-top:20px;
-    padding:16px;
-    border:1px solid #333;
-    border-radius:8px;
-    background:#111;
+```css
+/* =======================================================
+   JANUS — JSON INTERPRETER & NATURAL REPORT
+======================================================= */
+
+#jsonInterpreterPanel {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ded8ca;
+    border-radius: 8px;
+    background: #f4f0e6;
+    color: #292d32;
 }
 
-.jsonInterpreterHeader{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    margin-bottom:10px;
+.jsonInterpreterHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
 }
 
-.jsonInterpreterHeader h3{
-    margin:0;
+.jsonInterpreterHeader h3 {
+    margin: 0;
+    color: #292d32;
 }
 
-#jsonInterpreterStatus{
-    font-size:12px;
-    opacity:.65;
+#jsonInterpreterStatus {
+    font-size: 12px;
+    color: #686963;
+    opacity: 1;
 }
 
-#jsonInterpreter{
-    margin:0;
-    padding:14px;
-    max-height:500px;
-    overflow:auto;
-    white-space:pre-wrap;
-    font-size:12px;
-    line-height:1.45;
-    background:#080808;
-    border-radius:6px;
+#jsonInterpreter {
+    margin: 0;
+    padding: 14px;
+    max-height: 500px;
+    overflow: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+    line-height: 1.55;
+    background: #eae5d9;
+    color: #34383d;
+    border: 1px solid #ded8ca;
+    border-radius: 6px;
 }
 
-#createReportButton{
-    margin-top:12px;
-    padding:8px 14px;
-    border:1px solid #555;
-    border-radius:5px;
-    background:#222;
-    color:#fff;
-    cursor:pointer;
+/* REPORT BUTTON */
+
+#createReportButton {
+    margin-top: 12px;
+    padding: 9px 15px;
+    border: 1px solid #315d83;
+    border-radius: 5px;
+    background: #315d83;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
 }
 
-#createReportButton:hover{
-    background:#333;
+#createReportButton:hover {
+    background: #264b6b;
+    border-color: #264b6b;
 }
 
-#naturalReportPanel{
-    margin-top:18px;
-    padding-top:14px;
-    border-top:1px solid #333;
+/* NATURAL REPORT */
+
+#naturalReportPanel {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #d8d1c3;
 }
 
-#naturalReportPanel h3{
-    margin:0 0 10px 0;
+#naturalReportPanel h3 {
+    margin: 0 0 10px 0;
+    color: #292d32;
 }
 
-#naturalReport{
-    line-height:1.6;
-    font-size:14px;
+#naturalReport {
+    color: #3b3e41;
+    line-height: 1.7;
+    font-size: 14px;
 }
 
+/* SUGGESTED QUESTIONS */
 
-#jsonQuestionsPanel{
-    margin-top:18px;
-    padding-top:14px;
-    border-top:1px solid #333;
+#jsonQuestionsPanel {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #d8d1c3;
 }
 
-#jsonQuestionsPanel h3{
-    margin:0 0 10px 0;
+#jsonQuestionsPanel h3 {
+    margin: 0 0 10px 0;
+    color: #292d32;
 }
 
-#jsonQuestions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
+#jsonQuestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.jsonQuestion{
-    padding:8px 12px;
-    border:1px solid #444;
-    border-radius:5px;
-    background:#181818;
-    color:#ddd;
-    cursor:pointer;
-    font-size:13px;
-}
-
-.jsonQuestion:hover{
-    background:#252525;
-}
-
-   #jsonAnswerPanel{
-    margin-top:18px;
-    padding-top:14px;
-    border-top:1px solid #333;
-}
-
-#jsonAnswerPanel h3{
-    margin:0 0 10px 0;
-}
-
-#jsonAnswer{
-    padding:14px 16px;
-    min-height:24px;
-    border:1px solid #333;
-    border-radius:6px;
-    background:#0c0c0c;
-    color:#ddd;
-    font-size:14px;
-    line-height:1.6;
-    white-space:normal;
-    overflow-wrap:anywhere;
-}
-
-#jsonAnswer:empty{
-    display:none;
-}
-
-.jsonQuestion.active{
-    border-color:#777;
-    background:#252525;
-    color:#fff;
-}
-
-.jsonQuestion{
+.jsonQuestion {
+    padding: 8px 12px;
+    border: 1px solid #315d83;
+    border-radius: 5px;
+    background: #315d83;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
     transition:
         background .15s ease,
         border-color .15s ease,
         color .15s ease;
+}
+
+.jsonQuestion:hover {
+    background: #264b6b;
+    border-color: #264b6b;
+    color: #ffffff;
+}
+
+.jsonQuestion.active {
+    border-color: #1e3d59;
+    background: #1e3d59;
+    color: #ffffff;
+}
+
+/* ANSWER PANEL */
+
+#jsonAnswerPanel {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #d8d1c3;
+}
+
+#jsonAnswerPanel h3 {
+    margin: 0 0 10px 0;
+    color: #292d32;
+}
+
+#jsonAnswer {
+    padding: 14px 16px;
+    min-height: 24px;
+    border: 1px solid #ded8ca;
+    border-radius: 6px;
+    background: #eae5d9;
+    color: #34383d;
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+#jsonAnswer:empty {
+    display: none;
 }
 
 
