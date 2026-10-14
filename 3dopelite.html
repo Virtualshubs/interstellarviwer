@@ -6,37 +6,48 @@
 <link rel="icon" href="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png" type="image/x-icon" />
 <title>3D OPE Lite SAPACE</title>
 
-<style>
-/* ================= TOKENS ================= */
+<style>/* ================= TOKENS ================= */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
   color-scheme: light;
 
-  --bg: #f5f5f5;
-  --panel: #ffffff;
-  --panel-soft: #f7f7f7;
-  --panel-hover: #eeeeee;
+  --bg: #F3F1EA;
+  --panel: #EAE7DE;
+  --panel-soft: #F7F5EF;
+  --panel-hover: #E3E0D7;
 
-  --line: rgba(30, 30, 30, 0.14);
-  --line-strong: rgba(30, 30, 30, 0.28);
+  --line: rgba(36, 37, 34, 0.14);
+  --line-strong: rgba(36, 37, 34, 0.28);
 
-  --text: #1e1e1e;
-  --text-soft: #303030;
-  --text-muted: #595959;
+  --text: #242522;
+  --text-soft: #3F403A;
+  --text-muted: #686A63;
 
-  --accent: #1e1e1e;
-  --accent-strong: #333333;
-  --accent-bg: rgba(30, 30, 30, 0.08);
-  --accent-line: rgba(30, 30, 30, 0.35);
+  --accent: #416D80;
+  --accent-strong: #34596A;
+  --accent-bg: rgba(65, 109, 128, 0.08);
+  --accent-line: rgba(65, 109, 128, 0.35);
 
-  --danger: #a32626;
+  --danger: #A32626;
 
-  --radius-sm: 5px;
-  --radius-md: 8px;
+  --orange: #E5682E;
+  --graphite: #242522;
+  --black: #111210;
+  --blue: #416D80;
+  --green: #657B54;
+
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius-sm: 12px;
+  --radius-md: 12px;
   --radius-lg: 12px;
 
   --space-line: 1px solid var(--line);
-  --shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.12);
+  --shadow-panel: 0 20px 60px rgba(36, 37, 34, 0.10);
 
   --ease: 180ms ease;
 }
@@ -59,8 +70,7 @@ html {
 body {
   margin: 0;
   overflow: hidden;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.5;
   color: var(--text);
@@ -93,8 +103,8 @@ select:focus-visible {
 }
 
 ::selection {
-  color: #ffffff;
-  background: #444444;
+  color: #FFFFFF;
+  background: var(--accent);
 }
 
 /* ================= WATERMARK ================= */
@@ -111,14 +121,15 @@ select:focus-visible {
 
   padding: 8px 12px;
 
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(243, 241, 234, 0.92);
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.07em;
   text-decoration: none;
 
-  background: rgba(30, 30, 30, 0.94);
-  border: 1px solid #444444;
+  background: rgba(36, 37, 34, 0.96);
+  border: 1px solid #41423D;
   border-radius: var(--radius-sm);
 
   backdrop-filter: blur(14px);
@@ -131,9 +142,9 @@ select:focus-visible {
 }
 
 #watermark:hover {
-  color: #ffffff;
-  border-color: #777777;
-  background: #333333;
+  color: #FFFFFF;
+  border-color: var(--blue);
+  background: var(--blue);
 }
 
 .watermarkLogo {
@@ -167,10 +178,10 @@ select:focus-visible {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: rgba(30, 30, 30, 0.25) transparent;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 
   color: var(--text);
-  background: #ffffff;
+  background: var(--bg);
 
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -200,7 +211,7 @@ select:focus-visible {
   border-radius: 0;
   box-shadow: none;
 
-  background: #f5f5f5;
+  background: var(--bg);
 
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
@@ -230,14 +241,15 @@ select:focus-visible {
 
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(30, 30, 30, 0.25) transparent;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 
   text-align: center;
 }
 
 #title {
   margin: 0;
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -256,7 +268,8 @@ select:focus-visible {
 .heroTitle {
   margin: 0;
 
-  color: #1e1e1e;
+  color: var(--graphite);
+  font-family: var(--font-heading);
   font-size: clamp(27px, 4vw, 38px);
   font-weight: 650;
   line-height: 1.08;
@@ -268,7 +281,8 @@ select:focus-visible {
   max-width: 440px;
   margin: 0 auto;
 
-  color: #454545;
+  color: var(--text-soft);
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 400;
   line-height: 1.75;
@@ -287,11 +301,11 @@ select:focus-visible {
 
   text-align: left;
 
-  background: #ffffff;
+  background: var(--panel-soft);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 8px 24px rgba(36, 37, 34, 0.06);
 
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -299,7 +313,8 @@ select:focus-visible {
 
 .heroHint {
   margin-top: 1px;
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-body);
   font-size: 10px;
   line-height: 1.6;
   letter-spacing: 0.025em;
@@ -320,12 +335,13 @@ select:focus-visible {
   margin: 0 0 8px;
   padding: 11px 12px;
 
-  color: #1e1e1e;
+  color: var(--graphite);
+  font-family: var(--font-body);
   font-size: 12px;
   line-height: 1.5;
 
-  background: #ffffff;
-  border: 1px solid #b8b8b8;
+  background: #FFFFFF;
+  border: 1px solid #C4C1B8;
   border-radius: var(--radius-sm);
 
   outline: none;
@@ -346,7 +362,7 @@ select:focus-visible {
 }
 
 #ui input::placeholder {
-  color: #686868;
+  color: var(--text-muted);
   opacity: 1;
 }
 
@@ -356,7 +372,7 @@ select:focus-visible {
 #ui input[type="email"]:hover,
 #ui input[type="number"]:hover,
 #ui input[type="password"]:hover {
-  border-color: #777777;
+  border-color: var(--blue);
 }
 
 #ui input[type="url"]:focus,
@@ -365,9 +381,9 @@ select:focus-visible {
 #ui input[type="email"]:focus,
 #ui input[type="number"]:focus,
 #ui input[type="password"]:focus {
-  border-color: #555555;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(30, 30, 30, 0.08);
+  border-color: var(--blue);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(65, 109, 128, 0.12);
 }
 
 /* ================= BUTTONS ================= */
@@ -385,6 +401,7 @@ select:focus-visible {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
 
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 650;
   line-height: 1.4;
@@ -411,27 +428,27 @@ select:focus-visible {
 }
 
 .btn-primary {
-  color: #ffffff;
-  background: #1e1e1e;
-  border-color: #1e1e1e;
+  color: #FFFFFF;
+  background: var(--orange);
+  border-color: var(--orange);
 }
 
 .btn-primary:hover {
-  color: #ffffff;
-  background: #383838;
-  border-color: #383838;
+  color: #FFFFFF;
+  background: #CC5725;
+  border-color: #CC5725;
 }
 
 .btn-secondary {
-  color: #1e1e1e;
-  background: #ffffff;
-  border-color: #b8b8b8;
+  color: var(--graphite);
+  background: transparent;
+  border-color: var(--line-strong);
 }
 
 .btn-secondary:hover {
-  color: #111111;
-  background: #eeeeee;
-  border-color: #777777;
+  color: #FFFFFF;
+  background: var(--blue);
+  border-color: var(--blue);
 }
 
 /* ================= NASA SECTION ================= */
@@ -465,7 +482,8 @@ select:focus-visible {
 }
 
 .nasa-heading-title {
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-heading);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.105em;
@@ -475,16 +493,18 @@ select:focus-visible {
 
 .nasa-heading-caption {
   margin-top: 4px;
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-body);
   font-size: 10px;
   line-height: 1.5;
 }
 
 .nasa-label {
   margin-bottom: 6px;
-  color: #444444;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
   font-size: 9px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: 0.13em;
   line-height: 1.5;
   text-transform: uppercase;
@@ -495,12 +515,13 @@ select:focus-visible {
   min-height: 39px;
   padding: 9px 11px;
 
-  color: #1e1e1e;
-  background: #ffffff;
+  color: var(--graphite);
+  background: #FFFFFF;
 
-  border: 1px solid #b8b8b8;
+  border: 1px solid #C4C1B8;
   border-radius: var(--radius-sm);
 
+  font-family: var(--font-body);
   font-size: 11px;
   outline: none;
 
@@ -509,12 +530,12 @@ select:focus-visible {
 
 .nasa-select:hover,
 .nasa-select:focus {
-  border-color: #555555;
+  border-color: var(--blue);
 }
 
 .nasa-select option {
-  color: #1e1e1e;
-  background: #ffffff;
+  color: var(--graphite);
+  background: #FFFFFF;
 }
 
 /* ================= LIST / GRID SWITCH ================= */
@@ -526,7 +547,7 @@ select:focus-visible {
   margin-bottom: 8px;
   padding: 4px;
 
-  background: #eeeeee;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
 }
@@ -537,11 +558,12 @@ select:focus-visible {
   min-height: 33px;
   padding: 7px 10px;
 
-  color: #444444;
+  color: var(--text-soft);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 550;
   cursor: pointer;
@@ -553,14 +575,14 @@ select:focus-visible {
 }
 
 .nasa-view-toggle button:hover {
-  color: #111111;
-  background: #e3e3e3;
+  color: var(--graphite);
+  background: var(--panel-hover);
 }
 
 .nasa-view-toggle button.active {
-  color: #ffffff;
-  background: #1e1e1e;
-  border-color: #1e1e1e;
+  color: #FFFFFF;
+  background: var(--blue);
+  border-color: var(--blue);
 }
 
 /* ================= NASA ASSET LIST ================= */
@@ -576,7 +598,7 @@ select:focus-visible {
   overscroll-behavior: contain;
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(30, 30, 30, 0.25) transparent;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 }
 
 .nasa-asset {
@@ -588,11 +610,11 @@ select:focus-visible {
   min-width: 0;
   padding: 10px;
 
-  color: #303030;
+  color: var(--text-soft);
   text-align: left;
   overflow-wrap: anywhere;
 
-  background: #ffffff;
+  background: #FFFFFF;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
 
@@ -604,30 +626,32 @@ select:focus-visible {
 }
 
 .nasa-asset:hover {
-  background: #f0f0f0;
-  border-color: #777777;
+  background: var(--panel-soft);
+  border-color: var(--blue);
 }
 
 .nasa-asset-icon {
   flex: 0 0 auto;
-  color: #1e1e1e;
+  color: var(--blue);
   font-size: 16px;
 }
 
 .nasa-asset-name {
   flex: 1;
   min-width: 0;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 500;
   line-height: 1.5;
-  color: #303030;
+  color: var(--text-soft);
 }
 
 .nasa-asset-type {
   display: block;
   margin-top: 3px;
 
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.025em;
@@ -649,7 +673,7 @@ select:focus-visible {
   overscroll-behavior: contain;
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(30, 30, 30, 0.25) transparent;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 }
 
 .nasa-asset-grid:empty {
@@ -660,8 +684,8 @@ select:focus-visible {
   min-width: 0;
   overflow: hidden;
 
-  color: #1e1e1e;
-  background: #ffffff;
+  color: var(--graphite);
+  background: #FFFFFF;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
 
@@ -675,12 +699,12 @@ select:focus-visible {
 
 .nasa-card:hover,
 .nasa-card:focus-visible {
-  background: #f0f0f0;
-  border-color: #777777;
+  background: var(--panel-soft);
+  border-color: var(--blue);
 }
 
 .nasa-card:focus-visible {
-  box-shadow: 0 0 0 2px rgba(30, 30, 30, 0.14);
+  box-shadow: 0 0 0 2px rgba(65, 109, 128, 0.18);
 }
 
 /* ================= MODEL PREVIEWS ================= */
@@ -699,7 +723,7 @@ select:focus-visible {
   background:
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(ellipse at center, #30343a 0%, #1e1e1e 72%, #111111 100%);
+    radial-gradient(ellipse at center, #30343A 0%, #1E1E1E 72%, #111210 100%);
 
   background-size: 22px 22px, 22px 22px, auto;
 
@@ -726,7 +750,8 @@ select:focus-visible {
   width: 100%;
   height: 100%;
 
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(243, 241, 234, 0.5);
+  font-family: var(--font-mono);
   font-size: 32px;
 
   pointer-events: none;
@@ -749,11 +774,12 @@ select:focus-visible {
 
   transform: translateY(-50%);
 
-  color: #ffffff;
-  background: rgba(30, 30, 30, 0.94);
-  border: 1px solid #555555;
-  border-radius: 4px;
+  color: #FFFFFF;
+  background: rgba(36, 37, 34, 0.94);
+  border: 1px solid rgba(243, 241, 234, 0.3);
+  border-radius: var(--radius-sm);
 
+  font-family: var(--font-body);
   font-size: 20px;
   line-height: 1;
 
@@ -765,8 +791,8 @@ select:focus-visible {
 }
 
 .nasa-carousel-control:hover {
-  background: #444444;
-  border-color: #777777;
+  background: var(--blue);
+  border-color: var(--blue);
 }
 
 .nasa-carousel-prev {
@@ -785,11 +811,12 @@ select:focus-visible {
 
   padding: 3px 6px;
 
-  color: #ffffff;
-  background: rgba(30, 30, 30, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  color: #FFFFFF;
+  background: rgba(36, 37, 34, 0.94);
+  border: 1px solid rgba(243, 241, 234, 0.2);
+  border-radius: var(--radius-sm);
 
+  font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
@@ -806,7 +833,8 @@ select:focus-visible {
 }
 
 .nasa-card-name {
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-body);
   font-size: 10px;
   font-weight: 550;
   line-height: 1.55;
@@ -816,7 +844,8 @@ select:focus-visible {
 .nasa-card-type {
   margin-top: 5px;
 
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.5;
 
@@ -824,7 +853,8 @@ select:focus-visible {
 }
 
 .nasa-global-count {
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1.6;
 }
@@ -833,7 +863,8 @@ select:focus-visible {
   display: block;
   margin-top: 5px;
 
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.5;
 
@@ -880,7 +911,7 @@ select:focus-visible {
   overscroll-behavior: contain;
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(30, 30, 30, 0.25) transparent;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 }
 
 #nasaGlobalGrid .nasa-card {
@@ -895,7 +926,8 @@ select:focus-visible {
 /* ================= STATUS / MESSAGES ================= */
 
 .nasa-status {
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-body);
   font-size: 10px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -906,17 +938,18 @@ select:focus-visible {
 }
 
 .nasa-status a {
-  color: #1e1e1e;
-  text-decoration-color: rgba(30, 30, 30, 0.45);
+  color: var(--blue);
+  text-decoration-color: rgba(65, 109, 128, 0.5);
   text-underline-offset: 3px;
 }
 
 .nasa-status a:hover {
-  color: #555555;
+  color: var(--accent-strong);
 }
 
 .nasa-footer {
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-body);
   font-size: 10px;
   line-height: 1.7;
 }
@@ -927,7 +960,7 @@ select:focus-visible {
   margin-top: 12px;
   padding: 14px;
 
-  background: #f8f8f8;
+  background: var(--panel-soft);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
 }
@@ -939,9 +972,10 @@ select:focus-visible {
 .settingGroup .label {
   margin-bottom: 12px;
 
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1.5;
   text-transform: uppercase;
@@ -964,7 +998,7 @@ select:focus-visible {
   padding: 0;
 
   border-radius: 50%;
-  border: 2px solid rgba(30, 30, 30, 0.22);
+  border: 2px solid rgba(36, 37, 34, 0.22);
 
   cursor: pointer;
 
@@ -976,12 +1010,12 @@ select:focus-visible {
 
 .color-swatch:hover {
   transform: scale(1.08);
-  border-color: #555555;
+  border-color: var(--blue);
 }
 
 .color-swatch.active {
-  border-color: #1e1e1e;
-  box-shadow: 0 0 0 3px rgba(30, 30, 30, 0.13);
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(229, 104, 46, 0.16);
 }
 
 #colorWheel {
@@ -992,16 +1026,16 @@ select:focus-visible {
   padding: 0;
 
   background: conic-gradient(
-    #e65c5c,
-    #e7bc56,
-    #86c878,
-    #67c9c7,
-    #6e9ce8,
-    #b18be0,
-    #e65c5c
+    #E65C5C,
+    #E7BC56,
+    #86C878,
+    #67C9C7,
+    #6E9CE8,
+    #B18BE0,
+    #E65C5C
   );
 
-  border: 2px solid rgba(30, 30, 30, 0.22);
+  border: 2px solid rgba(36, 37, 34, 0.22);
   border-radius: 50%;
 
   cursor: pointer;
@@ -1013,7 +1047,7 @@ select:focus-visible {
 
 #colorWheel:hover {
   transform: scale(1.08);
-  border-color: #555555;
+  border-color: var(--blue);
 }
 
 #bgInput {
@@ -1033,7 +1067,8 @@ select:focus-visible {
   align-items: center;
   gap: 9px;
 
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-body);
   font-size: 11px;
   line-height: 1.6;
 
@@ -1062,25 +1097,27 @@ select:focus-visible {
   margin: 0;
   padding: 9px 11px;
 
-  color: #1e1e1e;
-  background: #ffffff;
-  border: 1px solid #b8b8b8;
+  color: var(--graphite);
+  background: #FFFFFF;
+  border: 1px solid #C4C1B8;
   border-radius: var(--radius-sm);
 
   outline: none;
+  font-family: var(--font-body);
   font-size: 11px;
 
   transition: border-color var(--ease);
 }
 
 .backgroundImageControls input:focus {
-  border-color: #555555;
+  border-color: var(--blue);
 }
 
 .backgroundImageHint {
   margin-top: 2px;
 
-  color: #595959;
+  color: var(--text-muted);
+  font-family: var(--font-body);
   font-size: 10px;
   line-height: 1.65;
 }
@@ -1091,11 +1128,12 @@ select:focus-visible {
   margin-top: 12px;
   padding: 11px;
 
-  color: #303030;
-  background: #f0f0f0;
+  color: var(--text-soft);
+  background: var(--panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
 
+  font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1.65;
   overflow-wrap: anywhere;
@@ -1136,14 +1174,14 @@ select:focus-visible {
   flex: 1;
   height: 3px;
 
-  background: #d5d5d5;
+  background: #D5D1C7;
   border-radius: 2px;
 
   transition: background var(--ease);
 }
 
 .stepDot.active {
-  background: #1e1e1e;
+  background: var(--orange);
 }
 
 /* ================= LIGHTING CONTROLS ================= */
@@ -1160,13 +1198,15 @@ select:focus-visible {
 
   margin-bottom: 7px;
 
-  color: #303030;
+  color: var(--text-soft);
+  font-family: var(--font-body);
   font-size: 10px;
   line-height: 1.5;
 }
 
 .lightingControl label span {
-  color: #1e1e1e;
+  color: var(--graphite);
+  font-family: var(--font-mono);
   font-size: 10px;
   font-variant-numeric: tabular-nums;
 }
@@ -1216,7 +1256,7 @@ select:focus-visible {
 .nasa-slot::-webkit-scrollbar-thumb,
 .nasa-asset-grid::-webkit-scrollbar-thumb,
 #nasaGlobalGrid::-webkit-scrollbar-thumb {
-  background: rgba(30, 30, 30, 0.25);
+  background: rgba(36, 37, 34, 0.25);
   border-radius: 5px;
 }
 
