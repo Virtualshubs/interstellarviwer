@@ -1694,22 +1694,23 @@ width:100%;
   
 <div id="earthLayersPanel">
 
-<div id="contcatalogstac"></div>
+<div id="contcatalogstac" hidden></div>
 
-<div id="stacExplorerTest" style="overflow-y:auto;overflow-x:hidden;max-height:85vh;">
+<div id="stacExplorerTest" style="overflow-y:auto;overflow-x:hidden;max-height:85vh;" hidden>
 
 <h3>STAC Explorer Test</h3>
 
-<div id="stacURLRow" style="display:flex;flex-direction:column;gap:10px;">
+<div id="stacURLRow" style="display:flex;flex-direction:column;gap:10px;" hidden>
 
 <input
 id="stacURL"
 type="url"
 placeholder="https://example.com/stac/"
 autocomplete="off"
+  
 >
 
-<button id="stacLoad">
+<button id="stacLoad" >
 Load STAC
 </button>
 
