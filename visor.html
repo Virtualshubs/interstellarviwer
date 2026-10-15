@@ -5,6 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<meta name="theme-color" content="#F3F1EA">
+<meta name="description" content="JANUS — Scientific Observation Reader. Explore spatial observations, dataset metadata and associated assets.">
+
 <title>JANUS | Scientific Observation Reader</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,9 +20,11 @@
   --surface: #FAF9F5;
   --surface-hover: #EFEEE7;
   --border: #D8D6CD;
+  --border-strong: #A9A294;
 
   --text: #242522;
   --text-soft: #686963;
+  --black: #111210;
 
   --blue: #416D80;
   --blue-hover: #345969;
@@ -35,7 +40,13 @@
   --heading: "Space Grotesk", sans-serif;
   --body: "IBM Plex Sans", sans-serif;
   --mono: "IBM Plex Mono", monospace;
+
+  --page-width: 1700px;
 }
+
+/* =========================================
+   BASE
+========================================= */
 
 * {
   margin: 0;
@@ -51,40 +62,219 @@ body {
   font-family: var(--body);
   background: var(--bg);
   color: var(--text);
-  padding: clamp(22px, 4vw, 60px);
-  max-width: 1700px;
+  padding: clamp(22px, 4.5vw, 68px);
+  max-width: var(--page-width);
   margin: auto;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(65, 109, 128, .18);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
 }
 
 /* =========================================
    EDITORIAL HEADER
 ========================================= */
 
-h1 {
-  font-family: var(--heading);
-  font-size: clamp(38px, 5vw, 66px);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -.055em;
-  margin-bottom: 16px;
+header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 36px;
+  padding-bottom: 27px;
+  border-bottom: 1px solid var(--border-strong);
+  margin-bottom: 32px;
 }
 
-h1::after {
-  content: "";
-  display: block;
-  width: 58px;
-  height: 3px;
-  margin-top: 22px;
+.header-main {
+  min-width: 0;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.eyebrow-mark {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
   background: var(--orange);
 }
 
+h1 {
+  font-family: var(--heading);
+  font-size: clamp(48px, 7vw, 88px);
+  font-weight: 600;
+  line-height: .92;
+  letter-spacing: -.075em;
+  color: var(--text);
+}
+
 .subtitle {
+  margin-top: 19px;
   color: var(--text-soft);
-  font-size: 16px;
-  margin-bottom: 42px;
-  max-width: 700px;
-  letter-spacing: .01em;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.5;
+  letter-spacing: .005em;
+}
+
+.header-index {
+  padding-bottom: 5px;
+  color: var(--text-soft);
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.9;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.header-index strong {
+  display: block;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* =========================================
+   DATA SOURCE
+========================================= */
+
+.source-panel {
+  display: grid;
+  grid-template-columns: minmax(170px, .7fr) minmax(0, 2fr);
+  column-gap: 32px;
+  row-gap: 16px;
+  align-items: start;
+  padding: 21px 0 24px;
+  margin-bottom: 38px;
+  border-bottom: 1px solid var(--border);
+}
+
+.source-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.source-index {
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.source-description {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.source-controls {
+  min-width: 0;
+}
+
+.source-form {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+#datasetUrl {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 43px;
+  padding: 0 14px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+#datasetUrl::placeholder {
+  color: #929187;
+}
+
+#datasetUrl:hover {
+  border-color: var(--blue);
+}
+
+#datasetUrl:focus {
+  outline: none;
+  border-color: var(--blue);
+  background: #FFFFFF;
+}
+
+#loadDatasetButton {
+  flex-shrink: 0;
+  min-height: 43px;
+  padding: 0 18px;
+  white-space: nowrap;
+  background: var(--blue);
+  color: #FFFFFF;
+  border: 1px solid var(--blue);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 600;
+  transition: background .18s ease, border-color .18s ease, opacity .18s ease;
+}
+
+#loadDatasetButton:hover:not(:disabled) {
+  background: var(--blue-hover);
+  border-color: var(--blue-hover);
+}
+
+#loadDatasetButton:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.source-message {
+  margin-top: 10px;
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.source-message[data-state="success"] {
+  color: var(--success);
+}
+
+.source-message[data-state="error"] {
+  color: var(--danger);
 }
 
 /* =========================================
@@ -92,35 +282,63 @@ h1::after {
 ========================================= */
 
 h2 {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .13em;
-  text-transform: uppercase;
   color: var(--blue);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  line-height: 1.6;
+  text-transform: uppercase;
   margin-bottom: 20px;
 }
 
+.section-number {
+  color: var(--orange);
+  margin-right: 9px;
+}
+
 /* =========================================
-   CARDS
+   EDITORIAL PANELS
 ========================================= */
 
 .card {
   min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: clamp(20px, 2.4vw, 32px);
-  margin-bottom: 24px;
-  transition: border-color .18s ease, background .18s ease;
+  border-radius: 2px;
+  padding: clamp(20px, 2.5vw, 34px);
+  transition: border-color .18s ease;
 }
 
 .card:hover {
-  border-color: #B8C2C2;
+  border-color: var(--border-strong);
 }
 
 #summary {
-  margin-bottom: 42px;
+  margin-bottom: 46px;
+}
+
+.summary-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+
+.summary-heading h2 {
+  margin-bottom: 0;
+}
+
+.summary-note {
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .06em;
+  text-align: right;
+  text-transform: uppercase;
 }
 
 /* =========================================
@@ -130,85 +348,108 @@ h2 {
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 28px;
+  gap: 0;
+  margin-bottom: 29px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .stat {
   min-width: 0;
-  padding: 18px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 19px 20px 20px 0;
+}
+
+.stat + .stat {
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
 }
 
 .statTitle {
+  color: var(--text-soft);
   font-family: var(--mono);
   font-size: 9px;
   font-weight: 500;
-  letter-spacing: .13em;
-  color: var(--text-soft);
-  margin-bottom: 10px;
+  letter-spacing: .12em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
 }
 
 .statValue {
   font-family: var(--heading);
-  font-size: clamp(20px, 2.2vw, 30px);
+  font-size: clamp(20px, 2.3vw, 32px);
   font-weight: 600;
   line-height: 1.2;
+  letter-spacing: -.045em;
   overflow-wrap: anywhere;
 }
 
 #status {
   font-family: var(--body);
-  font-size: 15px;
+  font-size: clamp(13px, 1.2vw, 16px);
   font-weight: 600;
+  letter-spacing: -.02em;
 }
-
-/* =========================================
-   METADATA ROWS
-========================================= */
 
 .details {
-  border-top: 1px solid var(--border);
-  padding-top: 8px;
+  max-width: 1000px;
 }
 
-.row {
+.details .row {
   display: flex;
   gap: 24px;
-  align-items: flex-start;
-  padding: 13px 0;
-  border-bottom: 1px solid rgba(36,37,34,.09);
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(36, 37, 34, .09);
 }
 
-.row:last-child {
-  border: none;
+.details .row:last-child {
+  border-bottom: none;
   padding-bottom: 0;
 }
 
 .label {
-  width: 170px;
+  width: 145px;
   flex-shrink: 0;
+  color: var(--text-soft);
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: .09em;
   text-transform: uppercase;
-  color: var(--text-soft);
 }
 
 .value {
   flex: 1;
   min-width: 0;
-  overflow-wrap: anywhere;
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
 /* =========================================
-   OBSERVATIONS GRID
+   OBSERVATIONS
 ========================================= */
+
+.observations-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  padding-bottom: 15px;
+  margin-bottom: 21px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.observations-heading h2 {
+  margin-bottom: 0;
+}
+
+#observationsCount {
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 10px;
+  text-align: right;
+}
 
 #observations {
   display: grid;
@@ -224,25 +465,53 @@ h2 {
 
 #observations > .card h2 {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 15px;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.observation-index {
+  color: var(--orange);
+  font-family: var(--heading);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -.05em;
+}
+
+.observation-title {
+  color: var(--blue);
 }
 
 #observations > .card .row {
+  display: flex;
+  align-items: baseline;
   gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(36, 37, 34, .08);
+}
+
+#observations > .card .row:last-of-type {
+  border-bottom: none;
 }
 
 #observations > .card .label {
-  width: 105px;
+  width: 92px;
   font-size: 9px;
 }
 
 #observations > .card .value {
   font-family: var(--mono);
-  font-size: 11px;
-  line-height: 1.7;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.empty-observations {
+  grid-column: 1 / -1;
+  padding: 35px 0;
+  color: var(--text-soft);
+  font-size: 14px;
 }
 
 /* =========================================
@@ -254,17 +523,17 @@ h2 {
   flex-direction: column;
   align-items: stretch;
   gap: 12px;
-  padding: 16px;
-  margin-top: 12px;
+  padding: 15px;
+  margin-top: 11px;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
   transition: background .18s ease, border-color .18s ease;
 }
 
 .asset:hover {
   background: var(--surface-hover);
-  border-color: #B8C2C2;
+  border-color: var(--border-strong);
 }
 
 .assetHeader {
@@ -277,26 +546,28 @@ h2 {
 .assetInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  min-width: 0;
 }
 
 .assetName {
   min-width: 0;
-  overflow-wrap: anywhere;
-  font-size: 13px;
+  color: var(--text);
+  font-size: 12px;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .assetType {
   color: var(--text-soft);
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 9px;
   overflow-wrap: anywhere;
 }
 
 .asset a {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .assetPreview {
@@ -307,8 +578,8 @@ h2 {
   margin-top: 2px;
   object-fit: cover;
   object-position: center;
-  border-radius: 6px;
   border: 1px solid var(--border);
+  border-radius: 2px;
   background: #E6E4DC;
   cursor: pointer;
   transition: opacity .18s ease;
@@ -319,7 +590,7 @@ h2 {
 }
 
 /* =========================================
-   BUTTONS
+   BUTTONS AND LINKS
 ========================================= */
 
 button {
@@ -344,23 +615,9 @@ button:hover {
   border-color: var(--blue-hover);
 }
 
-button:active {
+button:active:not(:disabled) {
   transform: translateY(1px);
 }
-
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--orange);
-  outline-offset: 3px;
-}
-
-#observations button {
-  margin-top: 18px;
-}
-
-/* =========================================
-   LINKS
-========================================= */
 
 a {
   color: var(--blue);
@@ -373,6 +630,10 @@ a:hover {
   text-decoration: underline;
 }
 
+#observations button {
+  margin-top: 18px;
+}
+
 /* =========================================
    RAW JSON
 ========================================= */
@@ -382,12 +643,12 @@ pre {
   padding: 18px;
   background: #202522;
   border: 1px solid #414943;
-  border-radius: 8px;
+  border-radius: 2px;
   overflow: auto;
   max-height: 450px;
   font-family: var(--mono);
-  font-size: 11px;
-  line-height: 1.7;
+  font-size: 10px;
+  line-height: 1.75;
   color: #D4E1D5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -421,13 +682,24 @@ pre {
 
 @media (min-width: 1400px) {
   #observations {
-    gap: 24px;
+    column-gap: 24px;
+    row-gap: 24px;
   }
 }
 
 @media (max-width: 1000px) {
   body {
     padding: 28px;
+  }
+
+  header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 20px;
+  }
+
+  .source-panel {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   #observations {
@@ -437,46 +709,132 @@ pre {
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .stat:nth-child(3) {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .stat:nth-child(n+3) {
+    border-top: 1px solid var(--border);
+  }
 }
 
 @media (max-width: 600px) {
   body {
-    padding: 18px 14px;
+    padding: 22px 16px;
+  }
+
+  header {
+    grid-template-columns: 1fr;
+    gap: 17px;
+    padding-bottom: 22px;
+    margin-bottom: 24px;
   }
 
   h1 {
-    font-size: 40px;
+    font-size: 52px;
+  }
+
+  .eyebrow {
+    font-size: 9px;
   }
 
   .subtitle {
     font-size: 14px;
-    margin-bottom: 30px;
+    margin-top: 15px;
+  }
+
+  .header-index {
+    display: flex;
+    gap: 12px;
+    text-align: left;
+    padding: 0;
+  }
+
+  .header-index strong {
+    display: inline;
+  }
+
+  .source-panel {
+    padding: 18px 0 20px;
+    margin-bottom: 28px;
+  }
+
+  .source-form {
+    flex-direction: column;
+  }
+
+  #datasetUrl,
+  #loadDatasetButton {
+    width: 100%;
+  }
+
+  #datasetUrl {
+    font-size: 10px;
   }
 
   .card {
-    padding: 18px;
-    border-radius: 10px;
+    padding: 19px;
+  }
+
+  #summary {
+    margin-bottom: 35px;
+  }
+
+  .summary-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .summary-note {
+    text-align: left;
   }
 
   .stats {
-    gap: 8px;
+    gap: 0;
   }
 
   .stat {
-    padding: 13px;
+    padding: 15px 10px 15px 0;
+  }
+
+  .stat + .stat {
+    padding-left: 12px;
+  }
+
+  .stat:nth-child(3) {
+    padding-left: 0;
+  }
+
+  .statTitle {
+    font-size: 8px;
+    letter-spacing: .08em;
   }
 
   .statValue {
-    font-size: 22px;
+    font-size: 23px;
   }
 
-  .row {
+  #status {
+    font-size: 12px;
+  }
+
+  .details .row {
     flex-direction: column;
-    gap: 5px;
+    align-items: flex-start;
+    gap: 4px;
   }
 
   .label {
     width: auto;
+  }
+
+  .observations-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 
   #observations > .card .row {
@@ -498,6 +856,20 @@ pre {
   .assetPreview {
     max-width: 100%;
   }
+
+  pre {
+    padding: 12px;
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
 }
 </style>
 </head>
@@ -505,33 +877,90 @@ pre {
 <body>
 
 <header>
-  <h1>JANUS</h1>
-  <p class="subtitle">Scientific Observation Reader</p>
+  <div class="header-main">
+    <div class="eyebrow">
+      <span class="eyebrow-mark" aria-hidden="true"></span>
+      <span>Spatial Data Exploitation</span>
+    </div>
+
+    <h1>JANUS</h1>
+    <p class="subtitle">Scientific Observation Reader</p>
+  </div>
+
+  <div class="header-index" aria-label="Reader information">
+    <strong>JANUS / READER</strong>
+    <span>Scientific data interface</span>
+  </div>
 </header>
+
+<!-- =========================================
+     DATA SOURCE
+========================================= -->
+
+<section class="source-panel" aria-label="Dataset source">
+  <div class="source-heading">
+    <span class="source-index">Data source / 01</span>
+    <span class="source-description">STAC JSON endpoint</span>
+  </div>
+
+  <div class="source-controls">
+    <form id="sourceForm" class="source-form">
+      <input
+        id="datasetUrl"
+        type="url"
+        inputmode="url"
+        placeholder="https://example.org/renderdata.json"
+        aria-label="JSON dataset URL"
+        autocomplete="url"
+        spellcheck="false"
+      >
+
+      <button type="submit" id="loadDatasetButton">
+        Load dataset
+      </button>
+    </form>
+
+    <div
+      id="sourceMessage"
+      class="source-message"
+      aria-live="polite"
+      data-state="info"
+    >
+      Default source: renderdata.json
+    </div>
+  </div>
+</section>
+
+<!-- =========================================
+     DATASET OVERVIEW
+========================================= -->
 
 <section id="summary" class="card">
 
-  <h2>Dataset Overview</h2>
+  <div class="summary-heading">
+    <h2><span class="section-number">01</span>Dataset Overview</h2>
+    <span class="summary-note">Spatial metadata / Summary</span>
+  </div>
 
   <div class="stats">
 
     <div class="stat">
-      <div class="statTitle">STATUS</div>
+      <div class="statTitle">Status</div>
       <div class="statValue" id="status">Loading...</div>
     </div>
 
     <div class="stat">
-      <div class="statTitle">OBSERVATIONS</div>
+      <div class="statTitle">Observations</div>
       <div class="statValue" id="count">-</div>
     </div>
 
     <div class="stat">
-      <div class="statTitle">CELL</div>
+      <div class="statTitle">Cell</div>
       <div class="statValue" id="cellId">-</div>
     </div>
 
     <div class="stat">
-      <div class="statTitle">ASSETS</div>
+      <div class="statTitle">Assets</div>
       <div class="statValue" id="assetCount">-</div>
     </div>
 
@@ -558,34 +987,134 @@ pre {
 
 </section>
 
-<section id="observations"></section>
+<!-- =========================================
+     OBSERVATIONS
+========================================= -->
+
+<section aria-labelledby="observationsSectionTitle">
+  <div class="observations-heading">
+    <h2 id="observationsSectionTitle">
+      <span class="section-number">02</span>Observations
+    </h2>
+
+    <span id="observationsCount" aria-live="polite">
+      Awaiting dataset
+    </span>
+  </div>
+
+  <div id="observations"></div>
+</section>
 
 <script>
-const DATASET = "https://3d.staratlas.es/renderdata.json";
+"use strict";
 
-async function load() {
+// ==========================================
+// DATA SOURCE
+// ==========================================
+
+const DEFAULT_DATASET = "https://3d.staratlas.es/renderdata.json";
+
+const sourceForm = document.getElementById("sourceForm");
+const datasetUrlInput = document.getElementById("datasetUrl");
+const loadDatasetButton = document.getElementById("loadDatasetButton");
+const sourceMessage = document.getElementById("sourceMessage");
+
+let currentDatasetUrl = DEFAULT_DATASET;
+
+// Show the default source in the input.
+datasetUrlInput.value = DEFAULT_DATASET;
+
+
+// ==========================================
+// LOAD DATASET
+// ==========================================
+
+async function load(url = DEFAULT_DATASET) {
+  const status = document.getElementById("status");
+
+  // Keep the last successfully rendered dataset visible if
+  // a new URL fails to load.
+  status.textContent = "Loading...";
+
+  sourceMessage.textContent = "Fetching JSON dataset...";
+  sourceMessage.dataset.state = "info";
+
+  loadDatasetButton.disabled = true;
+  loadDatasetButton.textContent = "Loading...";
+
   try {
-    const res = await fetch(DATASET);
+    const requestedUrl = new URL(url);
 
-    if (!res.ok) {
-      throw new Error("HTTP " + res.status);
+    if (!["http:", "https:"].includes(requestedUrl.protocol)) {
+      throw new Error("Use an HTTP or HTTPS URL.");
     }
 
-    const text = await res.text();
-    const json = JSON.parse(text);
+    const response = await fetch(requestedUrl.href, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
 
-    console.log("JSON OK");
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status);
+    }
+
+    const json = await response.json();
+
+    if (
+      !json ||
+      typeof json !== "object" ||
+      !Array.isArray(json.OBSERVATIONS)
+    ) {
+      throw new Error(
+        "Invalid dataset: an OBSERVATIONS array was not found."
+      );
+    }
+
+    // Render first; update the active source only after success.
     renderDataset(json);
 
-  } catch (e) {
-    console.error(e);
+    currentDatasetUrl = requestedUrl.href;
+    datasetUrlInput.value = currentDatasetUrl;
 
-    document.getElementById("status").textContent =
-      "Unable to load dataset";
+    sourceMessage.textContent = "Loaded source: " + currentDatasetUrl;
+    sourceMessage.dataset.state = "success";
+
+    console.log("JANUS JSON loaded:", currentDatasetUrl);
+
+  } catch (error) {
+    console.error("JANUS dataset error:", error);
+
+    status.textContent = "Unable to load dataset";
+
+    sourceMessage.textContent =
+      "Load failed: " + (error.message || "Unknown error");
+
+    sourceMessage.dataset.state = "error";
+
+  } finally {
+    loadDatasetButton.disabled = false;
+    loadDatasetButton.textContent = "Load dataset";
   }
 }
 
-load();
+
+// ==========================================
+// SOURCE FORM
+// ==========================================
+
+sourceForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const url = datasetUrlInput.value.trim();
+
+  load(url || DEFAULT_DATASET);
+});
+
+
+// Load the default dataset on startup.
+load(DEFAULT_DATASET);
 
 
 // ==========================================
@@ -594,50 +1123,75 @@ load();
 
 function renderDataset(json) {
   const info = json.CELL_INFO || {};
-  const observations = json.OBSERVATIONS || [];
+  const observations = json.OBSERVATIONS;
 
-  document.getElementById("status").textContent =
-    "Dataset Loaded";
+  document.getElementById("status").textContent = "Dataset Loaded";
 
   document.getElementById("count").textContent =
-    observations.length;
+    observations.length.toLocaleString();
 
   document.getElementById("cellId").textContent =
-    info.id || "-";
+    info.id ?? "-";
 
   document.getElementById("latRange").textContent =
-    info.latRange || "-";
+    info.latRange ?? "-";
 
   document.getElementById("lonRange").textContent =
-    info.lonRange || "-";
+    info.lonRange ?? "-";
 
   document.getElementById("cellState").textContent =
     info.state ?? "-";
 
-  const totalAssets = observations.reduce((total, obs) => {
-    return total + Object.keys(obs.assets || {}).length;
+  const totalAssets = observations.reduce((total, observation) => {
+    return total + Object.keys(observation.assets || {}).length;
   }, 0);
 
   document.getElementById("assetCount").textContent =
-    totalAssets;
+    totalAssets.toLocaleString();
+
+  document.getElementById("observationsCount").textContent =
+    observations.length.toLocaleString() +
+    (observations.length === 1 ? " observation" : " observations");
 
   const container = document.getElementById("observations");
-  container.innerHTML = "";
+
+  // Replace the previous observations only after the new
+  // dataset has been successfully fetched and validated.
+  container.replaceChildren();
+
+  if (observations.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "empty-observations";
+    emptyMessage.textContent = "No observations are available in this dataset.";
+    container.appendChild(emptyMessage);
+    return;
+  }
 
   observations.forEach((obs, index) => {
     const assets = Object.keys(obs.assets || {}).length;
 
-    const card = document.createElement("div");
+    const card = document.createElement("article");
     card.className = "card";
 
+    // Observation heading
     const title = document.createElement("h2");
-    title.textContent = "Observation " + (index + 1);
+
+    const number = document.createElement("span");
+    number.className = "observation-index";
+    number.textContent = String(index + 1).padStart(2, "0");
+
+    const titleText = document.createElement("span");
+    titleText.className = "observation-title";
+    titleText.textContent = "Observation";
+
+    title.append(number, titleText);
     card.appendChild(title);
 
+    // Observation metadata
     const fields = [
-      ["ID", obs.id || "-"],
-      ["Collection", obs.collection || "-"],
-      ["Datetime", obs.properties?.datetime || "-"],
+      ["ID", obs.id ?? "-"],
+      ["Collection", obs.collection ?? "-"],
+      ["Datetime", obs.properties?.datetime ?? "-"],
       ["Assets", assets]
     ];
 
@@ -651,28 +1205,37 @@ function renderDataset(json) {
 
       const value = document.createElement("div");
       value.className = "value";
-      value.textContent = valueText;
+      value.textContent = String(valueText);
 
       row.append(label, value);
       card.appendChild(row);
     });
 
+    // Assets container
     const assetsContainer = document.createElement("div");
     assetsContainer.id = "assets" + index;
     card.appendChild(assetsContainer);
 
+    // RAW JSON toggle
     const rawButton = document.createElement("button");
     rawButton.type = "button";
     rawButton.textContent = "RAW JSON";
-    rawButton.addEventListener("click", () => toggleRaw(index));
+    rawButton.setAttribute("aria-expanded", "false");
+    rawButton.setAttribute("aria-controls", "raw" + index);
+
+    rawButton.addEventListener("click", () => {
+      toggleRaw(index);
+    });
+
     card.appendChild(rawButton);
 
     const raw = document.createElement("pre");
     raw.id = "raw" + index;
     raw.style.display = "none";
     raw.textContent = JSON.stringify(obs, null, 2);
-    card.appendChild(raw);
+    raw.setAttribute("aria-label", "Raw observation JSON");
 
+    card.appendChild(raw);
     container.appendChild(card);
 
     renderAssets(obs, index);
@@ -687,7 +1250,7 @@ function renderDataset(json) {
 function renderAssets(obs, index) {
   const box = document.getElementById("assets" + index);
 
-  if (!obs.assets) return;
+  if (!box || !obs.assets) return;
 
   Object.entries(obs.assets).forEach(([name, asset]) => {
     const div = document.createElement("div");
@@ -710,27 +1273,42 @@ function renderAssets(obs, index) {
     info.append(title, type);
     header.appendChild(info);
 
-    const link = document.createElement("a");
-    link.href = asset.href || "#";
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = "Open";
-    header.appendChild(link);
+    // Open asset link
+    if (asset.href) {
+      const link = document.createElement("a");
+      link.href = asset.href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Open ↗";
+      header.appendChild(link);
+    }
 
     div.appendChild(header);
 
-    if ((asset.type || "").startsWith("image/") && asset.href) {
+    // Image preview
+    if (
+      typeof asset.type === "string" &&
+      asset.type.startsWith("image/") &&
+      asset.href
+    ) {
       const preview = document.createElement("img");
+
       preview.className = "assetPreview";
       preview.src = asset.href;
       preview.alt = "Preview: " + name;
       preview.loading = "lazy";
+      preview.decoding = "async";
+
       preview.onerror = () => {
         preview.style.display = "none";
       };
 
       preview.addEventListener("click", () => {
-        window.open(asset.href, "_blank", "noopener,noreferrer");
+        window.open(
+          asset.href,
+          "_blank",
+          "noopener,noreferrer"
+        );
       });
 
       div.appendChild(preview);
@@ -747,11 +1325,22 @@ function renderAssets(obs, index) {
 
 function toggleRaw(i) {
   const pre = document.getElementById("raw" + i);
+  const card = pre?.closest(".card");
+  const button = card?.querySelector('button[aria-controls="raw' + i + '"]');
 
-  pre.style.display =
-    pre.style.display === "none" ? "block" : "none";
+  if (!pre) return;
+
+  const isHidden = pre.style.display === "none";
+
+  pre.style.display = isHidden ? "block" : "none";
+
+  if (button) {
+    button.setAttribute("aria-expanded", String(isHidden));
+    button.textContent = isHidden ? "HIDE JSON" : "RAW JSON";
+  }
 }
 </script>
 
 </body>
 </html>
+
