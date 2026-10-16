@@ -1,1110 +1,595 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>STAC Web Index</title>
+<title>LiteSpace Analitycs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-*{
-box-sizing:border-box;
+:root{
+  --mineral:#F3F1EA;
+  --surface:#FAF9F5;
+  --panel:#EAE7DE;
+  --line:#D9D4C8;
+  --graphite:#242522;
+  --black:#111210;
+  --muted:#686963;
+  --blue:#416D80;
+  --orange:#E5682E;
+  --green:#657B54;
+  --red:#B94A23;
+  --radius:12px;
 }
-
+*{box-sizing:border-box}
 body{
-margin:0;
-padding:40px;
-background:#f4f4f4;
-color:#111;
-font-family:Arial,Helvetica,sans-serif;
+  margin:0;background:var(--mineral);color:var(--graphite);
+  font:15px/1.55 "IBM Plex Sans",sans-serif
 }
-
-main{
-max-width:1100px;
-margin:auto;
+main{max-width:1440px;margin:auto;padding:38px clamp(18px,4vw,60px) 70px}
+header{
+  display:flex;justify-content:space-between;gap:20px;
+  border-bottom:1px solid var(--graphite);padding-bottom:15px;margin-bottom:38px
 }
-
+.mono,.eyebrow,.status,.test-status,.details,.collection-id,.asset-meta,.count,pre{
+  font-family:"IBM Plex Mono",monospace
+}
+.mono,.eyebrow,.count{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.muted{color:var(--muted)}
+.hero{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:40px;
+  align-items:end;margin-bottom:42px
+}
+h1,h2,h3,p{margin-top:0}
 h1{
-margin:0 0 10px;
-font-size:28px;
-font-weight:600;
+  font:500 clamp(44px,7vw,82px)/.98 "Space Grotesk",sans-serif;
+  letter-spacing:-.055em;margin-bottom:0
 }
-
-.subtitle{
-margin:0 0 30px;
-color:#666;
+h2{
+  font:500 clamp(23px,3vw,32px)/1.1 "Space Grotesk",sans-serif;
+  letter-spacing:-.035em;margin-bottom:18px
 }
-
+h3{font:500 18px/1.2 "Space Grotesk",sans-serif;margin-bottom:5px}
+.hero-copy{max-width:480px;color:var(--muted);font-size:16px;margin-bottom:4px}
+.eyebrow{color:var(--blue);margin-bottom:12px}
 .panel{
-background:#fff;
-border:1px solid #ddd;
-padding:24px;
-margin-bottom:20px;
+  border:1px solid var(--line);background:var(--surface);
+  padding:clamp(18px,2.6vw,30px);margin-bottom:22px;min-width:0
 }
-
+.source{background:var(--panel)}
 label{
-display:block;
-font-size:13px;
-font-weight:600;
-margin-bottom:8px;
+  display:block;margin-bottom:8px;color:var(--muted);
+  font:500 11px "IBM Plex Mono",monospace;text-transform:uppercase
 }
-
+.source-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px}
 input{
-width:100%;
-padding:12px;
-border:1px solid #bbb;
-font-size:14px;
+  width:100%;min-width:0;padding:14px;border:1px solid #B9B5AA;
+  border-radius:var(--radius);background:var(--surface);
+  font:13px "IBM Plex Mono",monospace;color:var(--graphite)
 }
-
-button{
-margin-top:14px;
-padding:11px 18px;
-border:1px solid #111;
-background:#111;
-color:#fff;
-cursor:pointer;
-font-size:14px;
+button,.open-link{
+  border:1px solid var(--black);border-radius:var(--radius);
+  padding:11px 16px;background:var(--black);color:white;
+  font:500 13px "IBM Plex Sans",sans-serif;cursor:pointer;
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px
 }
-
-button:hover{
-background:#333;
-}
-
-.status{
-margin-top:18px;
-font-family:monospace;
-font-size:13px;
-white-space:pre-wrap;
-}
-
-.tests{
-display:grid;
-grid-template-columns:1fr;
-gap:10px;
-}
-
-.test{
-border:1px solid #ddd;
-padding:15px;
-background:#fafafa;
-}
-
-.test-head{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:20px;
-}
-
-.test-name{
-font-weight:600;
-}
-
-.test-status{
-font-family:monospace;
-font-size:13px;
-}
-
-.pending{
-color:#777;
-}
-
-.ok{
-color:#087a28;
-}
-
-.fail{
-color:#b00020;
-}
-
-.details{
-margin-top:10px;
-font-family:monospace;
-font-size:12px;
-white-space:pre-wrap;
-word-break:break-word;
-color:#555;
-}
-
-.hidden{
-display:none;
-}
-
-.collections{
-margin-top:20px;
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-gap:12px;
-}
-
+button:hover,.open-link:hover{background:var(--blue);border-color:var(--blue)}
+button:focus-visible,a:focus-visible{outline:3px solid #416D8066;outline-offset:2px}
+.status{font-size:12px;color:var(--muted);margin-top:16px;overflow-wrap:anywhere}
+.tests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.test{border-top:1px solid var(--line);padding:14px 0;min-width:0}
+.test-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.test-name{font-weight:600;font-size:13px}
+.test-status{font-size:10px}
+.pending{color:#777}.ok{color:var(--green)}.fail{color:var(--red)}
+.details{font-size:11px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--muted);margin-top:8px}
+.hidden{display:none!important}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:20px}
+.section-heading p{color:var(--muted);font-size:13px;max-width:500px;margin-bottom:0}
+.count{color:var(--muted);white-space:nowrap}
+.collections{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:12px}
 .collection{
-border:1px solid #ddd;
-padding:15px;
-background:#fafafa;
-cursor:pointer;
+  display:block;text-align:left;width:100%;min-height:145px;
+  border:1px solid var(--line);border-radius:0;background:var(--surface);
+  color:var(--graphite);padding:18px
 }
-
-.collection:hover{
-background:#f0f0f0;
+.collection:hover{background:#F0EEE7;border-color:var(--blue)}
+.collection.active{border-color:var(--orange);box-shadow:inset 3px 0 var(--orange);background:#F8F2E9}
+.collection-title{display:block;font:500 18px/1.25 "Space Grotesk",sans-serif;margin:12px 0;overflow-wrap:anywhere}
+.collection-id{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.collection-description{display:block;color:var(--muted);font-size:12px;margin-top:10px}
+.reader-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:18px;align-items:start}
+.column{min-width:0}
+.subpanel{padding:19px;border:1px solid var(--line);background:var(--surface);margin-bottom:16px;min-width:0}
+.subpanel-head{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:15px}
+.subpanel-head p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.items-list{border-top:1px solid var(--line)}
+.item-row{
+  display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;
+  text-align:left;align-items:center;gap:10px;
+  border:0;border-bottom:1px solid var(--line);border-radius:0;
+  background:transparent;color:var(--graphite);padding:13px 3px
 }
-
-.collection-id{
-font-family:monospace;
-font-size:12px;
-color:#555;
-margin-top:6px;
-word-break:break-word;
-}
-
+.item-row:hover{background:#F0EEE7;color:var(--blue)}
+.item-row.active{color:var(--orange);background:#F8F2E9}
+.item-row strong{font-size:13px;overflow-wrap:anywhere}
+.item-id{display:block;font-size:10px;color:var(--muted);overflow-wrap:anywhere;margin-top:3px}
+.empty{border:1px dashed var(--line);padding:17px;color:var(--muted);font-size:13px}
+.json-label{font:10px "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:9px}
 pre{
-background:#111;
-color:#eee;
-padding:18px;
-overflow:auto;
-font-size:12px;
-line-height:1.5;
+  margin:0;background:var(--black);color:#E7E5DE;padding:18px;
+  overflow:auto;max-height:580px;font-size:11px;line-height:1.65;
+  overflow-wrap:normal;white-space:pre
 }
-
-@media(max-width:700px){
-body{
-padding:20px;
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,215px),1fr));gap:12px}
+.asset-card{border:1px solid var(--line);background:#F6F4EE;min-width:0}
+.asset-preview{
+  aspect-ratio:16/10;min-height:120px;background:#E9E6DD;
+  border-bottom:1px solid var(--line);display:flex;align-items:center;
+  justify-content:center;overflow:hidden
 }
+.asset-preview img{display:block;width:100%;height:100%;object-fit:contain}
+.asset-placeholder{
+  padding:18px;text-align:center;color:var(--muted);
+  font:11px "IBM Plex Mono",monospace;overflow-wrap:anywhere
 }
+.asset-body{padding:13px;display:flex;flex-direction:column;gap:8px}
+.asset-title{font:500 16px/1.25 "Space Grotesk",sans-serif;overflow-wrap:anywhere}
+.asset-meta{font-size:10px;color:var(--blue);overflow-wrap:anywhere}
+.asset-role,.asset-description{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.asset-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
+.open-link{font-size:11px;padding:8px 10px;min-height:0}
+.small-button{background:transparent;color:var(--graphite);border-color:var(--line);padding:7px 10px;font-size:11px;min-height:0}
+.table-wrap{overflow:auto;margin-top:10px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+th{background:var(--panel);font:10px "IBM Plex Mono",monospace}
+.feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:20px}
+.feature{background:var(--surface);padding:12px;min-width:0}
+.feature-key{display:block;font:10px "IBM Plex Mono",monospace;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.feature-value{font-size:12px;overflow-wrap:anywhere;word-break:break-word}
+.pagination{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+footer{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--line);padding-top:16px;margin-top:35px;color:var(--muted);font:10px "IBM Plex Mono",monospace}
+@media(max-width:850px){.hero{grid-template-columns:1fr;gap:20px}.reader-grid{grid-template-columns:1fr}}
+@media(max-width:600px){main{padding-top:22px}.tests{grid-template-columns:1fr}.source-row{grid-template-columns:1fr}.source-row button{width:100%}.section-heading{align-items:start;flex-direction:column;gap:8px}.feature-grid{grid-template-columns:1fr}footer{flex-direction:column}}
 </style>
 </head>
 
 <body>
-
 <main>
+<header>
+  <div class="mono">Spatial data / STAC index</div>
+  <div class="mono muted" style="text-align:right">CATALOGUE READER<br>OPEN DATA INTERFACE</div>
+</header>
 
-<h1>STAC Web Index</h1>
+<section class="hero">
+  <div><p class="eyebrow">01 / Catalogue access</p><h1>STAC<br>Web Index</h1></div>
+  <p class="hero-copy">Explore a STAC API, inspect its collections and items, and preview supported assets. Original metadata remains available as JSON.</p>
+</section>
 
-<p class="subtitle">
-STAC API browser compatibility and structure test
-</p>
+<section class="panel source">
+  <p class="eyebrow">01.1 / Connection</p>
+  <h2>Connect to a catalogue</h2>
+  <label for="stac-url">STAC API</label>
+  <div class="source-row">
+    <input id="stac-url" type="url" value="https://planetarycomputer.microsoft.com/api/stac/v1">
+    <button id="run-tests" type="button">Run tests ↗</button>
+  </div>
+  <div id="status" class="status" role="status" aria-live="polite">Ready.</div>
+</section>
 
-<div class="panel">
+<section class="panel">
+  <div class="section-heading">
+    <div><p class="eyebrow">02 / Diagnostics</p><h2>Web access</h2></div>
+    <p>Eight endpoint checks. Availability depends on the API and its browser CORS policy.</p>
+  </div>
+  <div class="tests">
+    <div class="test" id="test-root"><div class="test-head"><span class="test-name">1. Landing Page</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-conformance"><div class="test-head"><span class="test-name">2. Conformance</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-collections"><div class="test-head"><span class="test-name">3. Collections</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-collection"><div class="test-head"><span class="test-name">4. Collection</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-items"><div class="test-head"><span class="test-name">5. Items</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-item"><div class="test-head"><span class="test-name">6. Item</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-search"><div class="test-head"><span class="test-name">7. Search</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+    <div class="test" id="test-queryables"><div class="test-head"><span class="test-name">8. Queryables</span><span class="test-status pending">WAITING</span></div><div class="details"></div></div>
+  </div>
+</section>
 
-<label for="stac-url">STAC API</label>
+<section id="collections-panel" class="panel hidden">
+  <div class="section-heading">
+    <div><p class="eyebrow">03 / Catalogue contents</p><h2>Collections</h2></div>
+    <span id="collections-count" class="count"></span>
+  </div>
+  <div id="collections" class="collections"></div>
+</section>
 
-<input
-id="stac-url"
-type="url"
-value="https://planetarycomputer.microsoft.com/api/stac/v1"
->
+<section id="collection-panel" class="panel hidden">
+  <div class="section-heading">
+    <div><p class="eyebrow">04 / Collection explorer</p><h2>Selected collection</h2></div>
+    <span id="selected-collection-id" class="count"></span>
+  </div>
+  <div class="reader-grid">
+    <div class="column">
+      <section class="subpanel">
+        <div class="subpanel-head"><div><h3>Items</h3><p>Select an item to inspect its assets.</p></div><span id="items-count" class="count"></span></div>
+        <div id="items-list" class="items-list"><div class="empty">Select a collection.</div></div>
+        <div id="items-pagination" class="pagination"></div>
+      </section>
+      <section class="subpanel">
+        <div class="json-label">Collection JSON</div>
+        <pre id="collection-data">{}</pre>
+      </section>
+    </div>
+    <div class="column">
+      <section class="subpanel">
+        <div class="subpanel-head"><div><h3>Asset viewer</h3><p id="viewer-description">Choose an item to display its assets.</p></div><span class="count">LIVE VIEW</span></div>
+        <div id="asset-viewer"><div class="empty">Assets will appear here when an item is selected.</div></div>
+      </section>
+      <section class="subpanel">
+        <div class="json-label">Selected Item JSON</div>
+        <pre id="item-data">{}</pre>
+      </section>
+    </div>
+  </div>
+</section>
 
-<button id="run-tests">
-Run tests
-</button>
-
-<div id="status" class="status">
-Ready.
-</div>
-
-</div>
-
-<div class="panel">
-
-<h2>Web access</h2>
-
-<div id="tests" class="tests">
-
-<div class="test" id="test-root">
-<div class="test-head">
-<div class="test-name">1. Landing Page</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-conformance">
-<div class="test-head">
-<div class="test-name">2. Conformance</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-collections">
-<div class="test-head">
-<div class="test-name">3. Collections</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-collection">
-<div class="test-head">
-<div class="test-name">4. Collection</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-items">
-<div class="test-head">
-<div class="test-name">5. Items</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-item">
-<div class="test-head">
-<div class="test-name">6. Item</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-search">
-<div class="test-head">
-<div class="test-name">7. Search</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-<div class="test" id="test-queryables">
-<div class="test-head">
-<div class="test-name">8. Queryables</div>
-<div class="test-status pending">WAITING</div>
-</div>
-<div class="details"></div>
-</div>
-
-</div>
-
-</div>
-
-<div id="collections-panel" class="panel hidden">
-
-<h2>Collections</h2>
-
-<div id="collections" class="collections"></div>
-
-</div>
-
-<div id="collection-panel" class="panel hidden">
-
-<h2>Selected collection</h2>
-
-<pre id="collection-data"></pre>
-
-</div>
-
-<div id="item-panel" class="panel hidden">
-
-<h2>Items</h2>
-
-<pre id="item-data"></pre>
-
-</div>
-
+<footer><span>STAC WEB INDEX / SPATIAL DATA READER</span><span>METADATA · COLLECTIONS · ASSETS</span></footer>
 </main>
 
 <script>
-
-const DEFAULT_BASE=
-"https://planetarycomputer.microsoft.com/api/stac/v1";
-
+const DEFAULT_BASE="https://planetarycomputer.microsoft.com/api/stac/v1";
 let BASE=DEFAULT_BASE;
-
 let collections=[];
 let selectedCollection=null;
 let selectedItem=null;
+let loadedItems=[];
+let nextItemsUrl=null;
+let prevItemsUrl=null;
+let selectionToken=0;
+let activeCollectionButton=null;
+let activeItemButton=null;
 
-const statusElement=
-document.getElementById("status");
-
-const testsElement=
-document.getElementById("tests");
-
-const collectionsPanel=
-document.getElementById("collections-panel");
-
-const collectionPanel=
-document.getElementById("collection-panel");
-
-const itemPanel=
-document.getElementById("item-panel");
-
-const collectionsElement=
-document.getElementById("collections");
-
-const collectionData=
-document.getElementById("collection-data");
-
-const itemData=
-document.getElementById("item-data");
-
+const $=id=>document.getElementById(id);
+const statusElement=$("status");
+const collectionsPanel=$("collections-panel");
+const collectionPanel=$("collection-panel");
+const collectionsElement=$("collections");
+const collectionData=$("collection-data");
+const itemData=$("item-data");
+const itemsList=$("items-list");
+const assetViewer=$("asset-viewer");
 
 function setTest(id,status,details=""){
-
-const element=
-document.getElementById(id);
-
-const statusElement=
-element.querySelector(".test-status");
-
-const detailsElement=
-element.querySelector(".details");
-
-statusElement.className=
-"test-status "+(
-status==="OK"
-?"ok"
-:
-status==="FAIL"
-?"fail"
-:
-"pending"
-);
-
-statusElement.textContent=status;
-
-detailsElement.textContent=details;
-
+  const element=$(id);
+  element.querySelector(".test-status").className="test-status "+(status==="OK"?"ok":status==="FAIL"?"fail":"pending");
+  element.querySelector(".test-status").textContent=status;
+  element.querySelector(".details").textContent=details;
 }
-
-
+function setDetails(id,status,lines){setTest(id,status,lines.join("\n"))}
 function resetTests(){
-
-document
-.querySelectorAll(".test-status")
-.forEach(element=>{
-element.className="test-status pending";
-element.textContent="WAITING";
-});
-
-document
-.querySelectorAll(".details")
-.forEach(element=>{
-element.textContent="";
-});
-
-collections=[];
-selectedCollection=null;
-selectedItem=null;
-
-collectionsElement.innerHTML="";
-collectionData.textContent="";
-itemData.textContent="";
-
-collectionsPanel.classList.add("hidden");
-collectionPanel.classList.add("hidden");
-itemPanel.classList.add("hidden");
-
+  document.querySelectorAll(".test-status").forEach(el=>{el.className="test-status pending";el.textContent="WAITING"});
+  document.querySelectorAll(".details").forEach(el=>el.textContent="");
+  collections=[];selectedCollection=null;selectedItem=null;loadedItems=[];nextItemsUrl=null;prevItemsUrl=null;selectionToken++;
+  collectionsElement.replaceChildren();itemsList.replaceChildren();assetViewer.replaceChildren();
+  collectionData.textContent="{}";itemData.textContent="{}";$("items-pagination").replaceChildren();
+  $("collections-count").textContent="";$("selected-collection-id").textContent="";$("items-count").textContent="";
+  $("viewer-description").textContent="Choose an item to display its assets.";
+  collectionsPanel.classList.add("hidden");collectionPanel.classList.add("hidden");
+  activeCollectionButton=null;activeItemButton=null;
 }
-
-
-function normalizeBase(url){
-
-return url.trim().replace(/\/+$/,"");
-
-}
-
-
-function endpoint(path){
-
-return `${BASE}/${path}`;
-
-}
-
-
+function normalizeBase(url){return url.trim().replace(/\/+$/,"")}
+function endpoint(path){return `${BASE}/${path}`}
+function resolveHref(href,base=BASE){try{return new URL(href,base.endsWith("/")?base:base+"/").href}catch{return href}}
+function findLink(links,rel){return Array.isArray(links)?links.find(link=>link.rel===rel&&link.href):null}
 async function request(url,options={}){
-
-const response=
-await fetch(
-url,
-{
-method:"GET",
-mode:"cors",
-cache:"no-store",
-...options
+  const response=await fetch(url,{method:"GET",mode:"cors",cache:"no-store",...options});
+  if(!response.ok)throw new Error(`HTTP ${response.status} ${response.statusText}`);
+  const contentType=response.headers.get("content-type")||"";
+  const text=await response.text();
+  let data;
+  try{data=JSON.parse(text)}catch{throw new Error(`Response is not valid JSON.\nContent-Type: ${contentType}`)}
+  return{response,data,contentType};
 }
-);
-
-if(!response.ok){
-
-throw new Error(
-`HTTP ${response.status} ${response.statusText}`
-);
-
+function note(text){const el=document.createElement("div");el.className="empty";el.textContent=text;return el}
+function actionButton(text,callback){
+  const b=document.createElement("button");b.type="button";b.className="small-button";b.textContent=text;b.addEventListener("click",callback);return b;
 }
-
-const contentType=
-response.headers.get("content-type")||"";
-
-const text=
-await response.text();
-
-let data=null;
-
-try{
-
-data=JSON.parse(text);
-
-}catch(e){
-
-throw new Error(
-`Response is not valid JSON.\nContent-Type: ${contentType}`
-);
-
-}
-
-return{
-response,
-data,
-contentType
-};
-
-}
-
 
 async function testRoot(){
-
-const url=
-`${BASE}/`;
-
-try{
-
-const result=
-await request(url);
-
-const data=result.data;
-
-if(
-!data||
-typeof data!=="object"
-){
-
-throw new Error(
-"Landing Page is not a JSON object."
-);
-
+  const url=`${BASE}/`;
+  try{
+    const r=await request(url),d=r.data;
+    if(!d||typeof d!=="object")throw new Error("Landing Page is not a JSON object.");
+    setDetails("test-root","OK",[`URL: ${url}`,`HTTP: ${r.response.status}`,`Content-Type: ${r.contentType}`,`type: ${d.type||"not declared"}`,`id: ${d.id||"not declared"}`]);
+    return d;
+  }catch(e){
+    setDetails("test-root","FAIL",[`URL: ${url}`,`Error: ${e.name}`,`Message: ${e.message}`,"JavaScript could not obtain a readable response."]);throw e;
+  }
 }
-
-setTest(
-"test-root",
-"OK",
-[
-`URL: ${url}`,
-`HTTP: ${result.response.status}`,
-`Content-Type: ${result.contentType}`,
-`type: ${data.type||"not declared"}`,
-`id: ${data.id||"not declared"}`
-].join("\n")
-);
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-root",
-"FAIL",
-[
-`URL: ${url}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`,
-"",
-"JavaScript could not obtain a readable response."
-].join("\n")
-);
-
-throw error;
-
-}
-
-}
-
-
 async function testConformance(){
-
-const url=
-endpoint("conformance");
-
-try{
-
-const result=
-await request(url);
-
-const data=result.data;
-
-const conforms=
-Array.isArray(data.conforms)
-?data.conforms.length
-:0;
-
-setTest(
-"test-conformance",
-"OK",
-[
-`URL: ${url}`,
-`HTTP: ${result.response.status}`,
-`Conformance classes: ${conforms}`
-].join("\n")
-);
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-conformance",
-"FAIL",
-[
-`URL: ${url}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
-return null;
-
+  const url=endpoint("conformance");
+  try{
+    const r=await request(url),d=r.data;
+    setDetails("test-conformance","OK",[`URL: ${url}`,`HTTP: ${r.response.status}`,`Conformance classes: ${Array.isArray(d.conforms)?d.conforms.length:0}`]);return d;
+  }catch(e){setDetails("test-conformance","FAIL",[`URL: ${url}`,`Error: ${e.name}`,`Message: ${e.message}`]);return null}
 }
-
-}
-
-
 async function testCollections(){
-
-const url=
-endpoint("collections");
-
-try{
-
-const result=
-await request(url);
-
-const data=result.data;
-
-if(!Array.isArray(data.collections)){
-
-throw new Error(
-"Response does not contain a collections array."
-);
-
+  const url=endpoint("collections");
+  try{
+    const r=await request(url),d=r.data;
+    if(!Array.isArray(d.collections))throw new Error("Response does not contain a collections array.");
+    collections=d.collections;
+    setDetails("test-collections","OK",[`URL: ${url}`,`HTTP: ${r.response.status}`,`Collections: ${collections.length}`]);
+    renderCollections();return d;
+  }catch(e){setDetails("test-collections","FAIL",[`URL: ${url}`,`Error: ${e.name}`,`Message: ${e.message}`]);return null}
 }
-
-collections=
-data.collections;
-
-setTest(
-"test-collections",
-"OK",
-[
-`URL: ${url}`,
-`HTTP: ${result.response.status}`,
-`Collections: ${collections.length}`
-].join("\n")
-);
-
-renderCollections();
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-collections",
-"FAIL",
-[
-`URL: ${url}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
-return null;
-
-}
-
-}
-
-
 function renderCollections(){
+  collectionsElement.replaceChildren();collectionsPanel.classList.remove("hidden");
+  $("collections-count").textContent=`${collections.length} COLLECTION${collections.length===1?"":"S"}`;
+  if(!collections.length){collectionsElement.appendChild(note("No collections returned."));return}
+  collections.forEach((c,i)=>{
+    const b=document.createElement("button");b.type="button";b.className="collection";
+    const eyebrow=document.createElement("span");eyebrow.className="mono";eyebrow.style.color="var(--orange)";eyebrow.textContent=`${String(i+1).padStart(2,"0")} / COLLECTION`;
+    const title=document.createElement("span");title.className="collection-title";title.textContent=c.title||c.id||"Collection";
+    const id=document.createElement("span");id.className="collection-id";id.textContent=c.id||"";
+    const desc=document.createElement("span");desc.className="collection-description";desc.textContent=c.description||"Select to inspect metadata and assets.";
+    b.append(eyebrow,title,id,desc);b.addEventListener("click",()=>loadCollection(c,b));collectionsElement.appendChild(b);
+  });
+}
+function collectionUrl(c){const self=findLink(c.links,"self");return self?resolveHref(self.href):`${BASE}/collections/${encodeURIComponent(c.id)}`}
 
-collectionsElement.innerHTML="";
-
-collectionsPanel.classList.remove("hidden");
-
-if(!collections.length){
-
-collectionsElement.textContent=
-"No collections returned.";
-
-return;
-
+async function loadCollection(c,button){
+  selectedCollection=c;selectedItem=null;loadedItems=[];nextItemsUrl=null;prevItemsUrl=null;
+  const token=++selectionToken;
+  if(activeCollectionButton)activeCollectionButton.classList.remove("active");
+  activeCollectionButton=button;button.classList.add("active");activeItemButton=null;
+  collectionPanel.classList.remove("hidden");
+  $("selected-collection-id").textContent=c.id||"";
+  collectionData.textContent="Loading collection…";itemData.textContent="{}";
+  itemsList.replaceChildren(note("Loading items…"));assetViewer.replaceChildren(note("Loading assets…"));
+  $("viewer-description").textContent="Loading collection metadata and items…";
+  $("items-pagination").replaceChildren();
+  // Clear prior collection-level assets without touching the collection JSON panel.
+  collectionPanel.querySelectorAll(".collection-assets-section").forEach(el=>el.remove());
+  collectionPanel.scrollIntoView({behavior:"smooth",block:"start"});
+  const href=collectionUrl(c);
+  try{
+    const r=await request(href);if(token!==selectionToken)return;
+    const data=r.data;collectionData.textContent=JSON.stringify(data,null,2);
+    setDetails("test-collection","OK",[`URL: ${href}`,`HTTP: ${r.response.status}`,`ID: ${data.id||c.id}`,`Title: ${data.title||""}`]);
+    renderCollectionAssets(data);
+    const itemResponse=await testItems(data,token);
+    if(token!==selectionToken)return;
+    if(itemResponse&&itemResponse.features.length)await selectItem(itemResponse.features[0],null,token);
+    else{
+      itemData.textContent="{}";assetViewer.replaceChildren(note("No items were returned, or the Items endpoint could not be read. Collection-level assets may still be available."));
+      $("viewer-description").textContent="No item selected.";
+    }
+    await testQueryables(data);
+  }catch(e){
+    if(token!==selectionToken)return;
+    collectionData.textContent=e.message;
+    setDetails("test-collection","FAIL",[`URL: ${href}`,`Error: ${e.name}`,`Message: ${e.message}`]);
+    itemsList.replaceChildren(note("Could not load collection items."));
+    assetViewer.replaceChildren(note("Collection unavailable. Check the endpoint and CORS permissions."));
+  }
+}
+function renderCollectionAssets(collection){
+  const assets=collection.assets&&typeof collection.assets==="object"?collection.assets:null;
+  if(!assets||!Object.keys(assets).length)return;
+  const section=document.createElement("section");section.className="subpanel collection-assets-section";
+  const head=document.createElement("div");head.className="subpanel-head";
+  const title=document.createElement("div");const h=document.createElement("h3");h.textContent="Collection-level assets";
+  const p=document.createElement("p");p.textContent="Resources declared directly on the collection.";title.append(h,p);
+  const count=document.createElement("span");count.className="count";count.textContent=`${Object.keys(assets).length} ASSETS`;head.append(title,count);
+  const grid=document.createElement("div");grid.className="asset-grid";
+  Object.entries(assets).forEach(([key,asset])=>grid.appendChild(createAssetCard(key,asset)));
+  section.append(head,grid);collectionPanel.querySelector(".column").prepend(section);
 }
 
-collections.forEach((collection,index)=>{
-
-const element=
-document.createElement("div");
-
-element.className="collection";
-
-element.innerHTML=`
-<strong>${escapeHTML(
-collection.title||collection.id||"Collection"
-)}</strong>
-<div class="collection-id">
-${escapeHTML(collection.id||"")}
-</div>
-`;
-
-element.onclick=
-()=>loadCollection(collection,index);
-
-collectionsElement.appendChild(element);
-
-});
-
+async function testItems(collection,token){
+  const link=findLink(collection.links,"items");
+  if(!link){
+    setTest("test-items","FAIL",'Collection does not expose a rel="items" link.');
+    itemsList.replaceChildren(note('Collection does not expose a rel="items" link.'));$("items-count").textContent="0 ITEMS";return null;
+  }
+  const href=resolveHref(link.href,collectionUrl(collection));
+  try{
+    const r=await request(href);if(token!==selectionToken)return null;
+    const d=r.data;if(!Array.isArray(d.features))throw new Error("Items response does not contain a features array.");
+    loadedItems=d.features;
+    nextItemsUrl=findLink(d.links,"next")?resolveHref(findLink(d.links,"next").href,href):null;
+    prevItemsUrl=findLink(d.links,"prev")?resolveHref(findLink(d.links,"prev").href,href):null;
+    setDetails("test-items","OK",[`URL: ${href}`,`HTTP: ${r.response.status}`,`Items returned: ${d.features.length}`,`Next page: ${nextItemsUrl?"available":"not declared"}`]);
+    renderItems();return d;
+  }catch(e){
+    if(token!==selectionToken)return null;
+    setDetails("test-items","FAIL",[`URL: ${href}`,`Error: ${e.name}`,`Message: ${e.message}`]);
+    itemsList.replaceChildren(note(e.message));$("items-count").textContent="ITEMS UNAVAILABLE";return null;
+  }
+}
+function renderItems(){
+  itemsList.replaceChildren();$("items-count").textContent=`${loadedItems.length} ITEM${loadedItems.length===1?"":"S"}`;
+  if(!loadedItems.length)itemsList.appendChild(note("No items returned on this page."));
+  loadedItems.forEach((item,i)=>{
+    const b=document.createElement("button");b.type="button";b.className="item-row";
+    const wrap=document.createElement("span"),title=document.createElement("strong"),id=document.createElement("span");
+    title.textContent=item.properties?.title||item.id||`Item ${i+1}`;
+    id.className="item-id";id.textContent=`${item.id||"ID not declared"}${item.properties?.datetime?" · "+item.properties.datetime:""}`;
+    wrap.append(title,id);const arrow=document.createElement("span");arrow.textContent="↗";b.append(wrap,arrow);
+    b.addEventListener("click",()=>selectItem(item,b));itemsList.appendChild(b);
+  });
+  $("items-pagination").replaceChildren();
+  if(prevItemsUrl)$("items-pagination").appendChild(actionButton("← Previous page",()=>loadItemsPage(prevItemsUrl)));
+  if(nextItemsUrl)$("items-pagination").appendChild(actionButton("Next page →",()=>loadItemsPage(nextItemsUrl)));
+}
+async function loadItemsPage(url){
+  const token=selectionToken;itemsList.replaceChildren(note("Loading items…"));
+  try{
+    const r=await request(url);if(token!==selectionToken)return;
+    if(!Array.isArray(r.data.features))throw new Error("Items response does not contain a features array.");
+    loadedItems=r.data.features;
+    const next=findLink(r.data.links,"next"),prev=findLink(r.data.links,"prev");
+    nextItemsUrl=next?resolveHref(next.href,url):null;prevItemsUrl=prev?resolveHref(prev.href,url):null;
+    setDetails("test-items","OK",[`URL: ${url}`,`HTTP: ${r.response.status}`,`Items returned: ${loadedItems.length}`]);
+    renderItems();if(loadedItems.length)await selectItem(loadedItems[0],null,token);
+  }catch(e){if(token===selectionToken)itemsList.replaceChildren(note(e.message))}
+}
+async function selectItem(item,button,token=selectionToken){
+  selectedItem=item;if(activeItemButton)activeItemButton.classList.remove("active");
+  activeItemButton=button;if(button)button.classList.add("active");
+  let href=findLink(item.links,"self")?.href;
+  if(!href&&item.id&&selectedCollection?.id)href=`${BASE}/collections/${encodeURIComponent(selectedCollection.id)}/items/${encodeURIComponent(item.id)}`;
+  if(!href){renderItem(item);setTest("test-item","FAIL","Cannot determine a URL for this Item.");return}
+  href=resolveHref(href,collectionUrl(selectedCollection));
+  itemData.textContent="Loading item…";assetViewer.replaceChildren(note("Loading item details and assets…"));
+  try{
+    const r=await request(href);if(token!==selectionToken)return;
+    selectedItem=r.data;renderItem(r.data);
+    setDetails("test-item","OK",[`URL: ${href}`,`HTTP: ${r.response.status}`,`ID: ${r.data.id||"not declared"}`,`Type: ${r.data.type||"not declared"}`,`Assets: ${Object.keys(r.data.assets||{}).length}`]);
+  }catch(e){
+    if(token!==selectionToken)return;
+    renderItem(item);setDetails("test-item","FAIL",[`URL: ${href}`,`Error: ${e.name}`,`Message: ${e.message}`,"Showing the Item returned by the collection endpoint, if available."]);
+  }
+}
+function renderItem(item){
+  itemData.textContent=JSON.stringify(item,null,2);assetViewer.replaceChildren();
+  const props=item.properties||{},assets=item.assets&&typeof item.assets==="object"?Object.entries(item.assets):[];
+  const facts=document.createElement("div");facts.className="feature-grid";
+  [["Item ID",item.id||"Not declared"],["Acquired",props.datetime||props.start_datetime||props.date||"Not declared"],["Collection",item.collection||selectedCollection?.id||"Not declared"],["Asset count",String(assets.length)]].forEach(([key,value])=>{
+    const cell=document.createElement("div");cell.className="feature";
+    const k=document.createElement("span");k.className="feature-key";k.textContent=key;
+    const v=document.createElement("span");v.className="feature-value";v.textContent=value;
+    cell.append(k,v);facts.appendChild(cell);
+  });
+  assetViewer.appendChild(facts);
+  const heading=document.createElement("div");heading.className="subpanel-head";
+  const text=document.createElement("div"),h=document.createElement("h3"),p=document.createElement("p");
+  h.textContent="Item assets";p.textContent=assets.length?"Preview supported resources or open the original asset.":"This Item does not declare assets.";text.append(h,p);
+  const count=document.createElement("span");count.className="count";count.textContent=`${assets.length} ASSET${assets.length===1?"":"S"}`;
+  heading.append(text,count);assetViewer.appendChild(heading);
+  if(!assets.length)assetViewer.appendChild(note("No assets declared. Full metadata remains available in the Item JSON."));
+  else{
+    const grid=document.createElement("div");grid.className="asset-grid";
+    assets.forEach(([key,asset])=>grid.appendChild(createAssetCard(key,asset)));
+    assetViewer.appendChild(grid);
+  }
+  if(item.geometry){
+    const geo=document.createElement("p");geo.className="muted";geo.style.fontSize="12px";
+    geo.textContent=`Spatial geometry available: ${item.geometry.type||"GeoJSON geometry"}. Coordinates remain accessible in the Item JSON.`;
+    assetViewer.appendChild(geo);
+  }
+  $("viewer-description").textContent=item.id?`Selected Item: ${item.id}`:"Selected Item assets";
 }
 
-
-async function loadCollection(collection,index){
-
-selectedCollection=collection;
-
-const href=
-collection.links?.find(
-link=>link.rel==="self"
-)?.href
-||
-`${BASE}/collections/${encodeURIComponent(
-collection.id
-)}`;
-
-collectionPanel.classList.remove("hidden");
-
-collectionData.textContent=
-"Loading collection...";
-
-try{
-
-const result=
-await request(href);
-
-const data=
-result.data;
-
-collectionData.textContent=
-JSON.stringify(data,null,2);
-
-setTest(
-"test-collection",
-"OK",
-[
-`URL: ${href}`,
-`HTTP: ${result.response.status}`,
-`ID: ${data.id||collection.id}`,
-`Title: ${data.title||""}`
-].join("\n")
-);
-
-await testItems(data);
-
-await testItem(data);
-
-await testQueryables(data);
-
-}catch(error){
-
-collectionData.textContent=
-error.message;
-
-setTest(
-"test-collection",
-"FAIL",
-[
-`URL: ${href}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
+function createAssetCard(key,asset={}){
+  const card=document.createElement("article");card.className="asset-card";
+  const href=asset.href?resolveHref(asset.href,selectedItem?.links?.find(l=>l.rel==="self")?.href||BASE):"";
+  const type=String(asset.type||"").toLowerCase(),roles=Array.isArray(asset.roles)?asset.roles:[];
+  const titleText=asset.title||key;
+  const preview=document.createElement("div");preview.className="asset-preview";
+  const imageLike=type.startsWith("image/")||/thumbnail|overview|visual|rendered_preview/i.test(`${key} ${roles.join(" ")}`)||/\.(png|jpe?g|webp|gif|avif)(?:$|[?#])/i.test(href);
+  if(href&&imageLike){
+    const img=document.createElement("img");img.loading="lazy";img.alt=titleText;img.src=href;
+    img.addEventListener("error",()=>{preview.replaceChildren();const msg=document.createElement("div");msg.className="asset-placeholder";msg.textContent="Preview unavailable. Open the asset to inspect it.";preview.appendChild(msg)},{once:true});
+    preview.appendChild(img);
+  }else{
+    const ph=document.createElement("div");ph.className="asset-placeholder";
+    ph.textContent=/csv/i.test(type)||/\.csv(?:$|[?#])/i.test(href)?"TABULAR DATA · CSV":
+      /json|geo\+json/i.test(type)||/\.geo?json(?:$|[?#])/i.test(href)?"STRUCTURED DATA · JSON":
+      /geotiff|tiff/i.test(type)||/\.(tif|tiff)(?:$|[?#])/i.test(href)?"RASTER DATA · GEOTIFF":
+      /netcdf/i.test(type)||/\.(nc|netcdf)(?:$|[?#])/i.test(href)?"SCIENTIFIC DATA · NETCDF":
+      /pdf/i.test(type)||/\.pdf(?:$|[?#])/i.test(href)?"DOCUMENT · PDF":type?type.toUpperCase():"ASSET RESOURCE";
+    preview.appendChild(ph);
+  }
+  const body=document.createElement("div");body.className="asset-body";
+  const title=document.createElement("div");title.className="asset-title";title.textContent=titleText;
+  const media=document.createElement("div");media.className="asset-meta";media.textContent=asset.type||"Media type not declared";
+  body.append(title,media);
+  if(roles.length){const role=document.createElement("div");role.className="asset-role";role.textContent="ROLES · "+roles.join(" · ");body.appendChild(role)}
+  if(asset.description){const desc=document.createElement("div");desc.className="asset-description";desc.textContent=asset.description;body.appendChild(desc)}
+  const actions=document.createElement("div");actions.className="asset-actions";
+  if(href){
+    const link=document.createElement("a");link.href=href;link.target="_blank";link.rel="noopener noreferrer";link.className="open-link";link.textContent="Open asset ↗";actions.appendChild(link);
+    if(/csv/i.test(type)||/\.csv(?:$|[?#])/i.test(href))actions.appendChild(actionButton("Preview table",()=>previewCSV(href,card)));
+    if(/json|geo\+json/i.test(type)||/\.geo?json(?:$|[?#])/i.test(href))actions.appendChild(actionButton("Preview JSON",()=>previewJSON(href,card)));
+  }else{const missing=document.createElement("span");missing.className="asset-description";missing.textContent="No href declared.";actions.appendChild(missing)}
+  body.appendChild(actions);card.append(preview,body);return card;
 }
-
+async function previewCSV(url,card){
+  const button=[...card.querySelectorAll("button")].find(b=>b.textContent.includes("Preview table")||b.textContent.includes("Refresh table"));
+  if(button){button.disabled=true;button.textContent="Loading…"}
+  try{
+    const response=await fetch(url,{mode:"cors",cache:"no-store"});if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    const text=await response.text(),rows=parseCSV(text).slice(0,21);if(!rows.length)throw new Error("No tabular rows found.");
+    let wrap=card.querySelector(".table-wrap");if(!wrap){wrap=document.createElement("div");wrap.className="table-wrap";card.querySelector(".asset-body").appendChild(wrap)}
+    const table=document.createElement("table"),thead=document.createElement("thead"),hr=document.createElement("tr");
+    rows[0].forEach(v=>{const th=document.createElement("th");th.textContent=v;hr.appendChild(th)});thead.appendChild(hr);
+    const tbody=document.createElement("tbody");
+    rows.slice(1).forEach(row=>{const tr=document.createElement("tr");row.forEach(v=>{const td=document.createElement("td");td.textContent=v;td.title=v;tr.appendChild(td)});tbody.appendChild(tr)});
+    table.append(thead,tbody);wrap.replaceChildren(table);
+    if(button)button.textContent="Refresh table";
+  }catch(e){const msg=document.createElement("p");msg.className="asset-description";msg.textContent=`Could not preview CSV: ${e.message}. The original link remains available.`;card.querySelector(".asset-body").appendChild(msg);if(button)button.textContent="Preview unavailable"}
+  finally{if(button)button.disabled=false}
 }
-
-
-async function testItems(collection){
-
-const itemLink=
-collection.links?.find(
-link=>link.rel==="items"
-);
-
-if(!itemLink){
-
-setTest(
-"test-items",
-"FAIL",
-"Collection does not expose a rel=\"items\" link."
-);
-
-return null;
-
+function parseCSV(text){
+  const rows=[];let row=[],field="",quoted=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i],next=text[i+1];
+    if(c==='"'&&quoted&&next==='"'){field+='"';i++}
+    else if(c==='"')quoted=!quoted;
+    else if(c===","&&!quoted){row.push(field);field=""}
+    else if((c==="\n"||c==="\r")&&!quoted){if(c==="\r"&&next==="\n")i++;row.push(field);if(row.some(v=>v.length))rows.push(row);row=[];field=""}
+    else field+=c;
+  }
+  row.push(field);if(row.some(v=>v.length))rows.push(row);return rows;
 }
-
-const href=itemLink.href;
-
-try{
-
-const result=
-await request(href);
-
-const data=result.data;
-
-if(
-!Array.isArray(data.features)
-){
-
-throw new Error(
-"Items response does not contain a features array."
-);
-
+async function previewJSON(url,card){
+  const button=[...card.querySelectorAll("button")].find(b=>b.textContent.includes("Preview JSON")||b.textContent.includes("Refresh JSON"));
+  if(button){button.disabled=true;button.textContent="Loading…"}
+  try{
+    const r=await request(url);let wrap=card.querySelector(".json-asset-preview");
+    if(!wrap){wrap=document.createElement("div");wrap.className="json-asset-preview";const pre=document.createElement("pre");pre.style.maxHeight="260px";pre.style.marginTop="12px";wrap.appendChild(pre);card.querySelector(".asset-body").appendChild(wrap)}
+    wrap.querySelector("pre").textContent=JSON.stringify(r.data,null,2);if(button)button.textContent="Refresh JSON";
+  }catch(e){const msg=document.createElement("p");msg.className="asset-description";msg.textContent=`Could not preview JSON: ${e.message}. The original link remains available.`;card.querySelector(".asset-body").appendChild(msg);if(button)button.textContent="Preview unavailable"}
+  finally{if(button)button.disabled=false}
 }
-
-setTest(
-"test-items",
-"OK",
-[
-`URL: ${href}`,
-`HTTP: ${result.response.status}`,
-`Items returned: ${data.features.length}`
-].join("\n")
-);
-
-if(data.features.length){
-
-selectedItem=
-data.features[0];
-
-}
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-items",
-"FAIL",
-[
-`URL: ${href}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
-return null;
-
-}
-
-}
-
-
-async function testItem(collection){
-
-if(!selectedItem){
-
-setTest(
-"test-item",
-"FAIL",
-"No Item available to test."
-);
-
-return null;
-
-}
-
-let href=
-selectedItem.links?.find(
-link=>link.rel==="self"
-)?.href;
-
-if(!href){
-
-const itemId=
-selectedItem.id;
-
-const collectionId=
-collection.id;
-
-if(!itemId||!collectionId){
-
-setTest(
-"test-item",
-"FAIL",
-"Cannot construct Item URL."
-);
-
-return null;
-
-}
-
-href=
-`${BASE}/collections/`+
-`${encodeURIComponent(collectionId)}/items/`+
-`${encodeURIComponent(itemId)}`;
-
-}
-
-try{
-
-const result=
-await request(href);
-
-const data=result.data;
-
-itemPanel.classList.remove("hidden");
-
-itemData.textContent=
-JSON.stringify(data,null,2);
-
-setTest(
-"test-item",
-"OK",
-[
-`URL: ${href}`,
-`HTTP: ${result.response.status}`,
-`ID: ${data.id||"not declared"}`,
-`Type: ${data.type||"not declared"}`
-].join("\n")
-);
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-item",
-"FAIL",
-[
-`URL: ${href}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
-return null;
-
-}
-
-}
-
-
 async function testSearch(){
-
-const url=
-endpoint("search");
-
-try{
-
-const result=
-await request(
-url
-);
-
-const data=
-result.data;
-
-setTest(
-"test-search",
-"OK",
-[
-`URL: ${url}`,
-`HTTP: ${result.response.status}`,
-`Response type: ${data.type||"not declared"}`,
-`Features: ${
-Array.isArray(data.features)
-?data.features.length
-:"not declared"
-}`
-].join("\n")
-);
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-search",
-"FAIL",
-[
-`URL: ${url}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
-return null;
-
+  const url=endpoint("search");
+  try{
+    const r=await request(url),d=r.data;
+    setDetails("test-search","OK",[`URL: ${url}`,`HTTP: ${r.response.status}`,`Response type: ${d.type||"not declared"}`,`Features: ${Array.isArray(d.features)?d.features.length:"not declared"}`]);return d;
+  }catch(e){
+    setDetails("test-search","FAIL",[`URL: ${url}`,`Error: ${e.name}`,`Message: ${e.message}`,"Some STAC APIs support Search through POST only; this GET check may fail even when search is available."]);return null;
+  }
 }
-
-}
-
-
 async function testQueryables(collection){
-
-if(!collection){
-
-setTest(
-"test-queryables",
-"FAIL",
-"No collection available."
-);
-
-return null;
-
+  if(!collection){setTest("test-queryables","FAIL","No collection available.");return null}
+  const url=`${BASE}/collections/${encodeURIComponent(collection.id)}/queryables`;
+  try{
+    const r=await request(url),d=r.data;
+    setDetails("test-queryables","OK",[`URL: ${url}`,`HTTP: ${r.response.status}`,`Type: ${d.type||"not declared"}`]);return d;
+  }catch(e){setDetails("test-queryables","FAIL",[`URL: ${url}`,`Error: ${e.name}`,`Message: ${e.message}`]);return null}
 }
-
-const collectionId=
-collection.id;
-
-const href=
-`${BASE}/collections/`+
-`${encodeURIComponent(collectionId)}/queryables`;
-
-try{
-
-const result=
-await request(href);
-
-const data=
-result.data;
-
-setTest(
-"test-queryables",
-"OK",
-[
-`URL: ${href}`,
-`HTTP: ${result.response.status}`,
-`Type: ${data.type||"not declared"}`
-].join("\n")
-);
-
-return data;
-
-}catch(error){
-
-setTest(
-"test-queryables",
-"FAIL",
-[
-`URL: ${href}`,
-`Error: ${error.name}`,
-`Message: ${error.message}`
-].join("\n")
-);
-
-return null;
-
-}
-
-}
-
-
-function escapeHTML(value){
-
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-
 async function runTests(){
-
-resetTests();
-
-BASE=
-normalizeBase(
-document
-.getElementById("stac-url")
-.value
-);
-
-if(!BASE){
-
-statusElement.textContent=
-"STAC URL required.";
-
-return;
-
+  resetTests();BASE=normalizeBase($("stac-url").value);
+  if(!BASE){statusElement.textContent="STAC URL required.";return}
+  try{new URL(BASE)}catch{statusElement.textContent="Enter a valid absolute URL.";return}
+  statusElement.textContent=`Testing ${BASE} …`;
+  try{await testRoot()}catch{statusElement.textContent="Landing Page failed. Check the URL, network access and CORS policy.";return}
+  await testConformance();
+  const data=await testCollections();
+  statusElement.textContent=data&&collections.length
+    ?`Web access OK. ${collections.length} collections available. Select a collection below.`
+    :"Landing Page readable, but Collections failed.";
+  await testSearch();
 }
-
-statusElement.textContent=
-`Testing ${BASE} ...`;
-
-let root;
-
-try{
-
-root=
-await testRoot();
-
-}catch(error){
-
-statusElement.textContent=
-"Landing Page failed. Browser cannot read the STAC API.";
-
-return;
-
-}
-
-await testConformance();
-
-const collectionsData=
-await testCollections();
-
-if(
-collectionsData&&
-collections.length
-){
-
-statusElement.textContent=
-`Web access OK. ${collections.length} collections available. Select a collection below.`;
-
-}else{
-
-statusElement.textContent=
-"Landing Page readable, but Collections failed.";
-
-}
-
-await testSearch();
-
-}
-
-
-document
-.getElementById("run-tests")
-.onclick=
-runTests;
-
-
-document
-.getElementById("stac-url")
-.addEventListener(
-"keydown",
-event=>{
-
-if(event.key==="Enter"){
-
-runTests();
-
-}
-
-}
-);
-
+$("run-tests").addEventListener("click",runTests);
+$("stac-url").addEventListener("keydown",e=>{if(e.key==="Enter")runTests()});
 </script>
-
 </body>
 </html>
+
