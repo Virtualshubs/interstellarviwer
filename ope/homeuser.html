@@ -913,6 +913,7 @@ body:has(.workspace.visible) .footer {
 </footer>
 
 <script>
+  
 /* TOOL CONFIGURATION */
 
 const TOOL_CONFIG = [
@@ -949,7 +950,9 @@ const navHome = document.getElementById("navHome");
 const navUser = document.getElementById("navUser");
 const brandHome = document.getElementById("brandHome");
 
-const toolFrame = document.getElementById("toolFrame");
+/* IMPORTANT: let allows iframe replacement */
+let toolFrame = document.getElementById("toolFrame");
+
 const frameMessage = document.getElementById("frameMessage");
 const workspaceIndex = document.getElementById("workspaceIndex");
 const workspaceTitle = document.getElementById("workspaceTitle");
@@ -969,6 +972,32 @@ function isValidToolURL(value) {
   } catch {
     return false;
   }
+}
+
+/* TOOL LIFECYCLE: DESTROY PREVIOUS IFRAME */
+
+function destroyToolFrame() {
+  if (!toolFrame || !toolFrame.isConnected) return;
+
+  /*
+   * Create a clean iframe with the same HTML attributes.
+   * Remove the previous document URL before inserting it.
+   * Replacing the old element destroys its browsing context.
+   */
+
+  const replacement = toolFrame.cloneNode(false);
+
+  replacement.removeAttribute("src");
+  replacement.removeAttribute("srcdoc");
+  replacement.style.display = "none";
+
+  toolFrame.replaceWith(replacement);
+
+  /* Keep the reference pointing to the new iframe */
+  toolFrame = replacement;
+
+  /* Restore the workspace's neutral state */
+  frameMessage.style.display = "flex";
 }
 
 /* CREATE SIDEBAR ICONS FROM THE HOME CARDS */
@@ -1001,6 +1030,7 @@ function initialiseToolSidebar() {
 function updateSidebarSelection(index) {
   toolSidebar.querySelectorAll("[data-tool]").forEach(button => {
     const active = Number(button.dataset.tool) === index;
+
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
@@ -1025,20 +1055,26 @@ function setActiveNavigation(view) {
 
 function showHome() {
   closeWorkspace();
+
   settingsView.style.display = "none";
   homeView.style.display = "block";
+
   setActiveNavigation("home");
   systemStatus.textContent = "SYSTEM READY";
-  window.scrollTo({top:0,behavior:"smooth"});
+
+  window.scrollTo({top:0, behavior:"smooth"});
 }
 
 function showSettings() {
   closeWorkspace();
+
   homeView.style.display = "none";
   settingsView.style.display = "block";
+
   setActiveNavigation("settings");
   systemStatus.textContent = "SETTINGS";
-  window.scrollTo({top:0,behavior:"smooth"});
+
+  window.scrollTo({top:0, behavior:"smooth"});
 }
 
 /* OPEN OR SWITCH TOOL */
@@ -1046,6 +1082,12 @@ function showSettings() {
 function openTool(index) {
   const tool = TOOL_CONFIG[index];
   if (!tool) return;
+
+  /*
+   * Always dispose of the previous tool before opening
+   * another one, including when the same tool is selected.
+   */
+  destroyToolFrame();
 
   activeToolIndex = index;
 
@@ -1057,23 +1099,21 @@ function openTool(index) {
   updateSidebarSelection(index);
   setActiveNavigation("home");
 
-  workspaceIndex.textContent = String(index + 1).padStart(2,"0");
+  workspaceIndex.textContent = String(index + 1).padStart(2, "0");
   workspaceTitle.textContent = tool.name;
 
-  toolFrame.removeAttribute("src");
   toolFrame.style.display = "none";
   frameMessage.style.display = "flex";
+  frameMessage.replaceChildren();
 
   if (!isValidToolURL(tool.url)) {
-    frameMessage.innerHTML = "";
-
     const heading = document.createElement("h2");
     heading.textContent = "TOOL URL NOT CONFIGURED";
 
     const message = document.createElement("p");
     message.textContent = "Check the HTTPS address in TOOL_CONFIG.";
 
-    frameMessage.append(heading,message);
+    frameMessage.append(heading, message);
     systemStatus.textContent = "AWAITING CONFIGURATION";
     return;
   }
@@ -1081,18 +1121,20 @@ function openTool(index) {
   toolFrame.title = tool.name + " workspace";
   toolFrame.style.display = "block";
   frameMessage.style.display = "none";
-  toolFrame.src = tool.url;
 
   systemStatus.textContent = "TOOL LOADING";
+  toolFrame.src = tool.url;
 }
 
 /* CLOSE WORKSPACE AND RESTORE HOME CARDS */
 
 function closeWorkspace() {
+  /* Terminate the active tool's browsing context */
+  destroyToolFrame();
+
   workspace.classList.remove("visible");
   hideToolSidebar();
 
-  toolFrame.removeAttribute("src");
   toolFrame.style.display = "none";
   frameMessage.style.display = "flex";
 
@@ -1107,8 +1149,15 @@ function reloadTool() {
   const tool = TOOL_CONFIG[activeToolIndex];
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  toolFrame.src = tool.url;
+  /* Reload using a fresh browsing context */
+  destroyToolFrame();
+
+  toolFrame.title = tool.name + " workspace";
+  toolFrame.style.display = "block";
+  frameMessage.style.display = "none";
+
   systemStatus.textContent = "TOOL RELOADING";
+  toolFrame.src = tool.url;
 }
 
 function openExternal() {
@@ -1117,31 +1166,37 @@ function openExternal() {
   const tool = TOOL_CONFIG[activeToolIndex];
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  window.open(tool.url,"_blank","noopener,noreferrer");
+  window.open(tool.url, "_blank", "noopener,noreferrer");
 }
 
 /* EVENTS */
 
 document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
-  card.addEventListener("click",() => openTool(Number(card.dataset.tool)));
+  card.addEventListener("click", () => {
+    openTool(Number(card.dataset.tool));
+  });
 });
 
-navHome.addEventListener("click",showHome);
-brandHome.addEventListener("click",showHome);
-navUser.addEventListener("click",showSettings);
+navHome.addEventListener("click", showHome);
+brandHome.addEventListener("click", showHome);
+navUser.addEventListener("click", showSettings);
 
-document.getElementById("closeTool").addEventListener("click",showHome);
-document.getElementById("reloadTool").addEventListener("click",reloadTool);
-document.getElementById("openExternal").addEventListener("click",openExternal);
+document.getElementById("closeTool").addEventListener("click", showHome);
+document.getElementById("reloadTool").addEventListener("click", reloadTool);
+document.getElementById("openExternal").addEventListener("click", openExternal);
 
 /* INITIALISE */
 
 initialiseToolSidebar();
 
-const configuredTools = TOOL_CONFIG.filter(tool => isValidToolURL(tool.url)).length;
+const configuredTools = TOOL_CONFIG.filter(
+  tool => isValidToolURL(tool.url)
+).length;
+
 toolCount.textContent =
-  String(configuredTools).padStart(2,"0") + " / " +
-  String(TOOL_CONFIG.length).padStart(2,"0") + " CONFIGURED";
+  String(configuredTools).padStart(2, "0") + " / " +
+  String(TOOL_CONFIG.length).padStart(2, "0") + " CONFIGURED";
+
 </script>
 
 </body>
