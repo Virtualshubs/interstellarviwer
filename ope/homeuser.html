@@ -1,816 +1,689 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#111315">
-<meta name="description" content="OPE User Home — Spatial Operations Interface by 3DTWINS.">
-  
-
 <title>OPE | User Home</title>
-
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  /* OPE — Brand palette */
-  --bg: #F3F1EA;
-  --panel: #EAE7DE;
-  --panel-hover: #E1DED4;
-  --line: #D9D4C8;
-  --line-soft: #E5E1D8;
-
-  --text: #242522;
-  --muted: #716B60;
-
-  --primary: #416D80;
-  --primary-hover: #294A59;
-  --accent: #E5682E;
-  --accent-hover: #B94A23;
-  --secondary: #111210;
-
-  --green: #657B54;
-  --red: #B94A23;
-
-  --font-brand: 'Space Grotesk', sans-serif;
-  --font-body: 'IBM Plex Sans', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-
-  --header-height: 68px;
-  --button-radius: 12px;
+  --bg:#F3F1EA;
+  --panel:#EAE7DE;
+  --panel-hover:#E1DED4;
+  --line:#D9D4C8;
+  --line-soft:#E5E1D8;
+  --text:#242522;
+  --muted:#716B60;
+  --primary:#416D80;
+  --primary-hover:#294A59;
+  --accent:#E5682E;
+  --secondary:#111210;
+  --green:#657B54;
+  --font-brand:'Space Grotesk',sans-serif;
+  --font-body:'IBM Plex Sans',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --header-height:68px;
+  --button-radius:12px;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing:border-box; }
 
-html,
-body {
-  margin: 0;
-  min-height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
+html,body {
+  margin:0;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
 }
 
 body {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
 }
 
-button,
-input {
-  font: inherit;
+button { font:inherit; color:inherit; }
+button:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:3px;
 }
 
-button {
-  color: inherit;
-}
-
-button:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 3px;
-}
-
-/* =========================================
-   HEADER
-========================================= */
+/* HEADER */
 
 .header {
-  height: var(--header-height);
-  min-height: var(--header-height);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(243, 241, 234, 0.97);
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5%;
+  height:var(--header-height);
+  min-height:var(--header-height);
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(243,241,234,.97);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 5%;
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  cursor: pointer;
-  background: none;
-  border: 0;
-  padding: 0;
-  text-align: left;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  cursor:pointer;
+  background:none;
+  border:0;
+  padding:0;
+  text-align:left;
 }
 
 .brand-mark {
-  font-family: var(--font-brand);
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: -2px;
-  line-height: 1;
+  font-family:var(--font-brand);
+  font-size:25px;
+  font-weight:700;
+  letter-spacing:-2px;
+  line-height:1;
 }
 
 .brand-divider {
-  width: 1px;
-  height: 28px;
-  background: var(--line);
+  width:1px;
+  height:28px;
+  background:var(--line);
 }
 
 .brand-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
 }
 
 .brand-name {
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:2px;
 }
 
 .brand-by {
-  color: var(--muted);
-  font-size: 9px;
-  letter-spacing: 1.7px;
+  color:var(--muted);
+  font-size:9px;
+  letter-spacing:1.7px;
 }
 
 .navigation {
-  display: flex;
-  align-items: center;
-  gap: 27px;
-  height: 100%;
+  display:flex;
+  align-items:center;
+  gap:27px;
+  height:100%;
 }
 
 .nav-button {
-  height: 100%;
-  padding: 0;
-  position: relative;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.7px;
-  cursor: pointer;
+  height:100%;
+  padding:0;
+  position:relative;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.7px;
+  cursor:pointer;
 }
 
-.nav-button:hover,
-.nav-button.active {
-  color: var(--text);
-}
+.nav-button:hover,.nav-button.active { color:var(--text); }
 
 .nav-button.active::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent);
-}
-
-.session-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.3px;
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:var(--accent);
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
+  width:6px;
+  height:6px;
+  flex:0 0 6px;
+  border-radius:50%;
+  background:var(--green);
 }
 
-/* =========================================
-   MAIN LAYOUT
-========================================= */
+/* MAIN */
 
 main {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 0 5% 24px;
-  flex: 1 0 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  width:100%;
+  margin:0;
+  padding:0 5% 24px;
+  flex:1 0 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
 }
 
-#homeView,
-.settings-view {
-  padding-top: 48px;
-}
+#homeView,.settings-view { padding-top:48px; }
 
 .eyebrow {
-  color: var(--primary);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 1.2px;
-  margin-bottom: 16px;
-  text-transform: uppercase;
+  color:var(--primary);
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:1.2px;
+  margin-bottom:16px;
+  text-transform:uppercase;
 }
 
 .page-title {
-  font-family: var(--font-brand);
-  font-size: clamp(32px, 4vw, 48px);
-  line-height: 1.12;
-  font-weight: 600;
-  letter-spacing: -1.5px;
-  margin: 0;
+  font-family:var(--font-brand);
+  font-size:clamp(32px,4vw,48px);
+  line-height:1.12;
+  font-weight:600;
+  letter-spacing:-1.5px;
+  margin:0;
 }
 
 .page-description {
-  margin: 16px 0 0;
-  color: var(--muted);
-  font-size: 15px;
-  line-height: 1.7;
-  max-width: 590px;
+  margin:16px 0 0;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.7;
+  max-width:590px;
 }
 
 .section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 48px 0 15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:48px 0 15px;
 }
 
 .section-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
 }
 
 .section-count {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.3px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--muted);
 }
 
-/* =========================================
-   TOOL SLOTS
-========================================= */
+/* HOME TOOL CARDS */
 
 .tool-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
 }
 
 .tool-card {
-  position: relative;
-  min-height: 265px;
-  display: flex;
-  flex-direction: column;
-  padding: 23px;
-  background: transparent;
-  border: 1px solid var(--line);
-  cursor: pointer;
-  text-align: left;
-  transition: background 160ms ease,
-              border-color 160ms ease,
-              transform 160ms ease;
-  overflow: hidden;
+  position:relative;
+  min-width:0;
+  min-height:265px;
+  display:flex;
+  flex-direction:column;
+  padding:23px;
+  background:transparent;
+  border:1px solid var(--line);
+  cursor:pointer;
+  text-align:left;
+  transition:background 160ms ease,border-color 160ms ease,transform 160ms ease;
+  overflow:hidden;
 }
 
 .tool-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 2px;
-  background: var(--accent);
-  transition: width 180ms ease;
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:0;
+  height:2px;
+  background:var(--accent);
+  transition:width 180ms ease;
 }
 
 .tool-card:hover {
-  background: var(--panel);
-  border-color: var(--primary);
-  transform: translateY(-2px);
+  background:var(--panel);
+  border-color:var(--primary);
+  transform:translateY(-2px);
 }
 
-.tool-card:hover::before {
-  width: 100%;
-}
+.tool-card:hover::before { width:100%; }
 
 .tool-number {
-  color: var(--primary);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 1px;
+  color:var(--primary);
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:1px;
 }
 
 .tool-symbol {
-  height: 84px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 13px 0 17px;
-  color: var(--primary);
+  height:84px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:13px 0 17px;
+  color:var(--primary);
 }
 
 .tool-symbol svg {
-  width: 74px;
-  height: 74px;
-  stroke: currentColor;
-  stroke-width: 1;
-  fill: none;
+  width:74px;
+  height:74px;
+  stroke:currentColor;
+  stroke-width:1;
+  fill:none;
 }
 
 .tool-name {
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: 1.35;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
+  font-size:17px;
+  line-height:1.35;
+  font-weight:500;
 }
 
 .tool-description {
-  margin-top: 9px;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
+  margin-top:9px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
 }
 
 .tool-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:auto;
+  padding-top:24px;
 }
 
 .open-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.7px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.7px;
 }
 
-.open-arrow {
-  font-size: 17px;
-  color: var(--primary);
-}
+.open-arrow { font-size:17px; color:var(--primary); }
+.tool-card:hover .open-arrow { color:var(--accent); }
 
-.tool-card:hover .open-arrow {
-  color: var(--accent);
-}
-
-/* =========================================
-   WORKSPACE / IFRAME
-   Dark interior retained for scientific tools.
-========================================= */
+/* WORKSPACE */
 
 .workspace {
-  display: none;
-  flex-direction: column;
-  flex: 1 1 0;
-  min-height: 0;
-  width: 100%;
-  margin-top: 0;
-  border: 1px solid var(--line);
-  background: #111210;
+  display:none;
+  flex-direction:column;
+  flex:1 1 0;
+  min-height:0;
+  width:100%;
+  margin:0;
+  border:1px solid var(--line);
+  background:#111210;
 }
 
-.workspace.visible {
-  display: flex;
-}
+.workspace.visible { display:flex; }
 
 .workspace-toolbar {
-  flex: 0 0 49px;
-  min-height: 49px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 0 17px;
-  border-bottom: 1px solid #343630;
-  background: #242522;
-  color: #F3F1EA;
+  flex:0 0 49px;
+  min-height:49px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 17px;
+  border-bottom:1px solid #343630;
+  background:#242522;
+  color:#F3F1EA;
 }
 
 .workspace-name {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  min-width: 0;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-width:0;
 }
 
 .workspace-index {
-  color: #F3A174;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
+  color:#F3A174;
+  font-family:var(--font-mono);
+  font-size:11px;
 }
 
 .workspace-title {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.4px;
-  overflow-wrap: anywhere;
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.4px;
+  overflow-wrap:anywhere;
 }
 
 .workspace-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display:flex;
+  align-items:center;
+  gap:14px;
 }
 
 .text-button {
-  border: 0;
-  padding: 7px 0;
-  background: none;
-  color: #D9D4C8;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  white-space: nowrap;
+  border:0;
+  padding:7px 0;
+  background:none;
+  color:#D9D4C8;
+  font-size:11px;
+  font-weight:500;
+  cursor:pointer;
+  white-space:nowrap;
 }
 
-.text-button:hover {
-  color: #F3A174;
-}
+.text-button:hover { color:#F3A174; }
 
 .frame-container {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  min-height: 0;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  background: #111210;
+  position:relative;
+  flex:1 1 0;
+  min-width:0;
+  min-height:0;
+  width:100%;
+  overflow:hidden;
+  background:#111210;
 }
 
 #toolFrame {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 0;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  min-height: 0;
-  background: #111210;
+  display:none;
+  position:absolute;
+  inset:0;
+  border:0;
+  width:100%;
+  height:100%;
+  background:#111210;
 }
-  
+
 .frame-message {
-  position: absolute;
-  inset: 0;
-  min-height: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 35px;
-  text-align: center;
-  overflow: auto;
-  color: #F3F1EA;
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:35px;
+  text-align:center;
+  color:#F3F1EA;
 }
 
 .frame-message h2 {
-  font-family: var(--font-brand);
-  font-size: 20px;
-  font-weight: 500;
-  letter-spacing: -0.3px;
+  font-family:var(--font-brand);
+  font-size:20px;
+  font-weight:500;
 }
 
 .frame-message p {
-  max-width: 490px;
-  color: #A5A5A0;
-  font-size: 14px;
-  line-height: 1.7;
+  max-width:490px;
+  color:#A5A5A0;
+  font-size:14px;
+  line-height:1.7;
 }
 
 .message-mark {
-  color: #F3A174;
-  font-family: var(--font-brand);
-  font-size: 30px;
-  margin-bottom: 10px;
-}
-
-.message-url {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  color: #A5A5A0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  margin-top: 8px;
+  color:#F3A174;
+  font-family:var(--font-brand);
+  font-size:30px;
+  margin-bottom:10px;
 }
 
 .primary-button {
-  border: 1px solid transparent;
-  border-radius: var(--button-radius);
-  background: var(--primary);
-  color: #FFFFFF;
-  padding: 11px 17px;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-  cursor: pointer;
-  margin-top: 12px;
-  transition: background 160ms ease;
+  border:1px solid transparent;
+  border-radius:var(--button-radius);
+  background:var(--primary);
+  color:white;
+  padding:11px 17px;
+  font-size:13px;
+  cursor:pointer;
+  margin-top:12px;
 }
 
-.primary-button:hover {
-  background: var(--primary-hover);
+.primary-button:hover { background:var(--primary-hover); }
+
+/* LEFT TOOL ICON MENU */
+
+.tool-sidebar {
+  display:none;
+  flex:0 0 64px;
+  width:64px;
+  min-width:64px;
+  align-self:stretch;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  padding:14px 8px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-right:0;
 }
 
-/* =========================================
-   SETTINGS
-========================================= */
+.tool-sidebar.visible { display:flex; }
 
-.settings-view {
-  display: none;
+.tool-sidebar-button {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  padding:9px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:transparent;
+  color:var(--primary);
+  cursor:pointer;
+  transition:background 160ms ease,color 160ms ease,border-color 160ms ease;
 }
+
+.tool-sidebar-button svg {
+  display:block;
+  width:25px;
+  height:25px;
+  stroke:currentColor;
+  stroke-width:1.5;
+  fill:none;
+}
+
+.tool-sidebar-button:hover {
+  background:var(--panel);
+  border-color:var(--line);
+}
+
+.tool-sidebar-button.active {
+  color:var(--accent);
+  background:var(--panel);
+  border-color:var(--line);
+}
+
+.tool-sidebar-button.active::before {
+  content:"";
+  position:absolute;
+  left:-9px;
+  top:8px;
+  bottom:8px;
+  width:3px;
+  background:var(--accent);
+}
+
+.tool-sidebar-button:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:2px;
+}
+
+/* SETTINGS */
+
+.settings-view { display:none; }
 
 .settings-panel {
-  margin-top: 32px;
-  max-width: 650px;
-  border: 1px solid var(--line);
-  background: var(--panel);
+  margin-top:32px;
+  max-width:650px;
+  border:1px solid var(--line);
+  background:var(--panel);
 }
 
 .settings-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 22px;
-  border-bottom: 1px solid var(--line-soft);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  padding:22px;
+  border-bottom:1px solid var(--line-soft);
 }
 
-.settings-row:last-child {
-  border-bottom: 0;
-}
+.settings-row:last-child { border-bottom:0; }
 
 .settings-key {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0;
+  font-size:13px;
+  font-weight:600;
 }
 
 .settings-help {
-  margin-top: 7px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.7;
+  margin-top:7px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
 }
 
 .settings-value {
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-align: right;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-align:right;
 }
 
-.settings-input {
-  width: 100%;
-  margin-top: 12px;
-  padding: 11px;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  font-size: 13px;
-}
-
-.settings-input:focus-visible {
-  border-color: var(--primary);
-}
-
-.settings-input::placeholder {
-  color: #8A8274;
-}
-
-/* =========================================
-   FOOTER
-========================================= */
+/* FOOTER */
 
 .footer {
-  flex: 0 0 auto;
-  min-height: 53px;
-  border-top: 1px solid var(--line);
-  padding: 0 5%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.2px;
+  flex:0 0 auto;
+  min-height:53px;
+  border-top:1px solid var(--line);
+  padding:0 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
 }
 
 .footer-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
-.footer-status .status-dot {
-  background: var(--green);
-}
+/* FULL HEIGHT WORKSPACE */
 
-/* =========================================
-   FULL-SCREEN WORKSPACE
-========================================= */
-
-@media (min-width: 851px) {
+@media (min-width:851px) {
   body:has(.workspace.visible) {
-    height: 100vh;
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  body:has(.workspace.visible) main {
-    flex: 1 1 0;
-    overflow: hidden;
-    padding-bottom: 0;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
   }
 }
 
-/* =========================================
-   RESPONSIVE
-========================================= */
+/* RESPONSIVE */
 
-@media (max-width: 850px) {
-  main {
-    padding: 0 5% 24px;
-  }
+@media (max-width:1100px) {
+  .tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
 
-  #homeView,
-  .settings-view {
-    padding-top: 35px;
-  }
+@media (max-width:850px) {
+  #homeView,.settings-view { padding-top:35px; }
 
-  .tool-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tool-card {
-    min-height: 215px;
-  }
+  .tool-grid { grid-template-columns:1fr; }
+  .tool-card { min-height:215px; }
 
   .tool-symbol {
-    height: 55px;
-    justify-content: flex-start;
-    margin: 12px 0;
+    height:55px;
+    justify-content:flex-start;
+    margin:12px 0;
   }
 
-  .tool-symbol svg {
-    width: 54px;
-    height: 54px;
-  }
-
-  .tool-footer {
-    padding-top: 18px;
-  }
-
-  .section-heading {
-    margin-top: 35px;
-  }
+  .tool-symbol svg { width:54px; height:54px; }
 
   body:has(.workspace.visible) {
-    height: 100vh;
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
   }
 
   body:has(.workspace.visible) main {
-    flex: 1 1 0;
-    overflow: hidden;
-    padding-bottom: 0;
+    flex:1 1 0;
+    overflow:hidden;
+    padding:0;
   }
 
-  .workspace.visible {
-    min-height: 0;
+  .tool-sidebar {
+    flex-basis:54px;
+    width:54px;
+    min-width:54px;
+    padding:12px 5px;
   }
 
-  .frame-container {
-    min-height: 0;
+  .tool-sidebar-button {
+    width:40px;
+    height:40px;
+    flex-basis:40px;
+    padding:8px;
   }
 
-  #toolFrame {
-    height: 100%;
-    min-height: 0;
-  }
+  .tool-sidebar-button.active::before { left:-6px; }
 }
 
-@media (max-width: 520px) {
-  :root {
-    --header-height: 62px;
+@media (max-width:520px) {
+  :root { --header-height:62px; }
+
+  .header { padding:0 18px; }
+  .brand { gap:9px; }
+  .brand-mark { font-size:22px; }
+  .brand-name { font-size:9px; letter-spacing:1.5px; }
+  .brand-by { font-size:8px; }
+  .navigation { gap:15px; }
+  .nav-button { font-size:9px; letter-spacing:.3px; }
+
+  main { padding:0 18px 25px; }
+  #homeView,.settings-view { padding-top:30px; }
+  .page-title { font-size:35px; }
+
+  .workspace-toolbar { padding:0 10px; gap:6px; }
+  .workspace-actions { gap:10px; }
+  .text-button { font-size:10px; }
+  .workspace-title { font-size:10px; }
+
+  .tool-sidebar {
+    flex-basis:46px;
+    width:46px;
+    min-width:46px;
+    padding:10px 3px;
+    gap:7px;
   }
 
-  .header {
-    padding: 0 18px;
-  }
-
-  .brand {
-    gap: 9px;
-  }
-
-  .brand-mark {
-    font-size: 22px;
-  }
-
-  .brand-name {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-  }
-
-  .brand-by {
-    font-size: 8px;
-  }
-
-  .navigation {
-    gap: 15px;
-  }
-
-  .nav-button {
-    font-size: 9px;
-    letter-spacing: 0.3px;
-  }
-
-  .session-indicator {
-    display: none;
-  }
-
-  main {
-    padding: 0 18px 25px;
-  }
-
-  #homeView,
-  .settings-view {
-    padding-top: 30px;
-  }
-
-  .page-title {
-    font-size: 35px;
-  }
-
-  .workspace-toolbar {
-    padding: 10px;
-  }
-
-  .workspace-actions {
-    gap: 10px;
-  }
-
-  .text-button {
-    font-size: 10px;
-  }
-
-  .workspace-title {
-    font-size: 10px;
-  }
-
-  .frame-message {
-    padding: 20px;
+  .tool-sidebar-button {
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    padding:7px;
   }
 
   .footer {
-    padding: 13px 18px;
-    flex-wrap: wrap;
-    font-size: 9px;
+    padding:13px 18px;
+    flex-wrap:wrap;
+    font-size:9px;
   }
 }
-
 </style>
-
 </head>
 
 <body>
 
-<!-- =======================================
-     PERSISTENT HEADER
-======================================= -->
-
 <header class="header">
-
-  <button class="brand" id="brandHome" aria-label="Return to Home">
+  <button class="brand" id="brandHome" type="button" aria-label="Return to Home">
     <span class="brand-mark">OPE</span>
     <span class="brand-divider"></span>
     <span class="brand-info">
@@ -820,423 +693,217 @@ main {
   </button>
 
   <nav class="navigation" aria-label="Main navigation">
-
-    <button
-      class="nav-button active"
-      id="navHome"
-      type="button">
-      HOME
-    </button>
-
-    <button
-      class="nav-button"
-      id="navUser"
-      type="button">
-      USER / SETTINGS
-    </button>
-
+    <button class="nav-button active" id="navHome" type="button">HOME</button>
+    <button class="nav-button" id="navUser" type="button">USER / SETTINGS</button>
   </nav>
-
 </header>
 
-
-<!-- =======================================
-     MAIN
-======================================= -->
-
-<main>
-
-  <!-- HOME VIEW -->
+<main id="mainLayout">
 
   <section id="homeView">
-
-    <div class="eyebrow">
-      SPATIAL OPERATIONS INTERFACE
-    </div>
-
-    <h1 class="page-title">
-      USER HOME
-    </h1>
-
+    <div class="eyebrow">SPATIAL OPERATIONS INTERFACE</div>
+    <h1 class="page-title">USER HOME</h1>
     <p class="page-description">
       Central access to your spatial tools and operational
       environments. Select a tool to initialise your workspace.
     </p>
 
     <div class="section-heading">
-      <span class="section-label">
-        AVAILABLE TOOLS
-      </span>
-
-      <span class="section-count" id="toolCount">
-        03 / 03 CONFIGURED
-      </span>
+      <span class="section-label">AVAILABLE TOOLS</span>
+      <span class="section-count" id="toolCount">04 / 04 CONFIGURED</span>
     </div>
 
     <div class="tool-grid" id="toolGrid">
 
-      <!-- SLOT 01 -->
-
       <button class="tool-card" data-tool="0" type="button">
-
         <span class="tool-number">01 / TOOL</span>
-
         <span class="tool-symbol" aria-hidden="true">
           <svg viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="24"
-                    stroke-dasharray="2 4"/>
-            <ellipse cx="40" cy="40" rx="35" ry="13"
-                     transform="rotate(-30 40 40)"/>
-            <circle cx="40" cy="40" r="3"
-                    fill="currentColor" stroke="none"/>
-            <circle cx="68" cy="24" r="3"
-                    fill="#e44747" stroke="none"/>
-            <path d="M40 9 V16 M40 64 V71 M9 40 H16 M64 40 H71"
-                  opacity=".6"/>
+            <circle cx="40" cy="40" r="24" stroke-dasharray="2 4"/>
+            <ellipse cx="40" cy="40" rx="35" ry="13" transform="rotate(-30 40 40)"/>
+            <circle cx="40" cy="40" r="3" fill="currentColor" stroke="none"/>
+            <circle cx="68" cy="24" r="3" fill="#E5682E" stroke="none"/>
+            <path d="M40 9 V16 M40 64 V71 M9 40 H16 M64 40 H71" opacity=".6"/>
           </svg>
         </span>
-
-        <span class="tool-name">
-          Orbital Pass Engine Twin
-        </span>
-
-        <span class="tool-description">
-          Orbital operations and spatial environment.
-        </span>
-
+        <span class="tool-name">Orbital Pass Engine Twin</span>
+        <span class="tool-description">Orbital operations and spatial environment.</span>
         <span class="tool-footer">
-          <span class="open-label">OPEN TOOL</span>
-          <span class="open-arrow">↗</span>
+          <span class="open-label">OPEN TOOL</span><span class="open-arrow">↗</span>
         </span>
-
       </button>
 
-
-      <!-- SLOT 02 -->
-
       <button class="tool-card" data-tool="1" type="button">
-
         <span class="tool-number">02 / TOOL</span>
-
         <span class="tool-symbol" aria-hidden="true">
           <svg viewBox="0 0 80 80">
             <circle cx="40" cy="40" r="29"/>
             <ellipse cx="40" cy="40" rx="13" ry="29"/>
             <ellipse cx="40" cy="40" rx="29" ry="11"/>
-            <path d="M13 29 H67 M13 51 H67"
-                  opacity=".6"/>
-            <path d="M40 11 V69" opacity=".6"/>
-            <path d="M53 17 L62 22 L62 32"
-                  stroke="#e44747"/>
+            <path d="M13 29 H67 M13 51 H67 M40 11 V69" opacity=".6"/>
+            <path d="M53 17 L62 22 L62 32" stroke="#E5682E"/>
           </svg>
         </span>
-
-        <span class="tool-name">
-          3D OPE Lite Space
-        </span>
-
-        <span class="tool-description">
-          Lightweight 3D spatial exploration environment.
-        </span>
-
+        <span class="tool-name">3D OPE Lite Space</span>
+        <span class="tool-description">Lightweight 3D spatial exploration environment.</span>
         <span class="tool-footer">
-          <span class="open-label">OPEN TOOL</span>
-          <span class="open-arrow">↗</span>
+          <span class="open-label">OPEN TOOL</span><span class="open-arrow">↗</span>
         </span>
-
       </button>
 
-
-      <!-- SLOT 03 -->
-
       <button class="tool-card" data-tool="2" type="button">
-
         <span class="tool-number">03 / TOOL</span>
-
         <span class="tool-symbol" aria-hidden="true">
           <svg viewBox="0 0 80 80">
             <path d="M15 18 H65 V62 H15 Z"/>
-            <path d="M23 28 H57 M23 36 H49
-                     M23 44 H54 M23 52 H43"/>
-            <circle cx="59" cy="52" r="10"
-                    fill="#17191c"/>
-            <path d="M55 52 L58 55 L64 48"
-                  stroke="#e44747"/>
+            <path d="M23 28 H57 M23 36 H49 M23 44 H54 M23 52 H43"/>
+            <circle cx="59" cy="52" r="10" fill="#242522"/>
+            <path d="M55 52 L58 55 L64 48" stroke="#E5682E"/>
           </svg>
         </span>
-
-        <span class="tool-name">
-          Janus
-        </span>
-
-        <span class="tool-description">
-          Spatial data interpretation and knowledge interface.
-        </span>
-
+        <span class="tool-name">Janus</span>
+        <span class="tool-description">Spatial data interpretation and knowledge interface.</span>
         <span class="tool-footer">
-          <span class="open-label">OPEN TOOL</span>
-          <span class="open-arrow">↗</span>
+          <span class="open-label">OPEN TOOL</span><span class="open-arrow">↗</span>
         </span>
-
       </button>
 
-    
-<!-- SLOT 04 -->
-
-<button class="tool-card" data-tool="3" type="button">
-
-  <span class="tool-number">04 / TOOL</span>
-
-  <span class="tool-symbol" aria-hidden="true">
-    <svg viewBox="0 0 80 80">
-      <circle cx="40" cy="40" r="28"/>
-      <circle cx="40" cy="40" r="18"/>
-      <circle cx="40" cy="40" r="7"/>
-      <path d="M40 5 V18 M40 62 V75"/>
-      <path d="M5 40 H18 M62 40 H75"/>
-      <path d="M20 20 L28 28 M52 52 L60 60"
-            stroke="#E5682E"/>
-      <path d="M60 20 L52 28 M28 52 L20 60"
-            stroke="#E5682E"/>
-    </svg>
-  </span>
-
-  <span class="tool-name">
-    Spatial Viewer
-  </span>
-
-  <span class="tool-description">
-    Interactive spatial visualization and exploration environment.
-  </span>
-
-  <span class="tool-footer">
-    <span class="open-label">OPEN TOOL</span>
-    <span class="open-arrow">↗</span>
-  </span>
-
-</button>
-
+      <button class="tool-card" data-tool="3" type="button">
+        <span class="tool-number">04 / TOOL</span>
+        <span class="tool-symbol" aria-hidden="true">
+          <svg viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="28"/>
+            <circle cx="40" cy="40" r="18"/>
+            <circle cx="40" cy="40" r="7"/>
+            <path d="M40 5 V18 M40 62 V75 M5 40 H18 M62 40 H75"/>
+            <path d="M20 20 L28 28 M52 52 L60 60 M60 20 L52 28 M28 52 L20 60" stroke="#E5682E"/>
+          </svg>
+        </span>
+        <span class="tool-name">Spatial Viewer</span>
+        <span class="tool-description">Interactive spatial visualization and exploration environment.</span>
+        <span class="tool-footer">
+          <span class="open-label">OPEN TOOL</span><span class="open-arrow">↗</span>
+        </span>
+      </button>
 
     </div>
-
   </section>
 
+  <!-- LEFT SIDEBAR: ICONS GENERATED FROM THE TOOL CARDS -->
+  <aside class="tool-sidebar" id="toolSidebar" aria-label="Tool selector" aria-hidden="true"></aside>
 
-  <!-- TOOL WORKSPACE -->
-
-  <section
-    class="workspace"
-    id="workspace"
-    aria-label="Tool workspace">
-
+  <!-- WORKSPACE -->
+  <section class="workspace" id="workspace" aria-label="Tool workspace">
     <div class="workspace-toolbar">
-
       <div class="workspace-name">
-        <span class="workspace-index" id="workspaceIndex">
-          01
-        </span>
-
-        <span class="workspace-title" id="workspaceTitle">
-          TOOL
-        </span>
+        <span class="workspace-index" id="workspaceIndex">01</span>
+        <span class="workspace-title" id="workspaceTitle">TOOL</span>
       </div>
-
       <div class="workspace-actions">
-
-        <button
-          class="text-button"
-          id="reloadTool"
-          type="button">
-          RELOAD
-        </button>
-
-        <button
-          class="text-button"
-          id="openExternal"
-          type="button" hidden>
-          OPEN ↗
-        </button>
-
-        <button
-          class="text-button"
-          id="closeTool"
-          type="button">
-          ✕ CLOSE
-        </button>
-
+        <button class="text-button" id="reloadTool" type="button">RELOAD</button>
+        <button class="text-button" id="openExternal" type="button">OPEN ↗</button>
+        <button class="text-button" id="closeTool" type="button">✕ CLOSE</button>
       </div>
-
     </div>
 
     <div class="frame-container">
-
       <div class="frame-message" id="frameMessage">
         <div class="message-mark">OPE /</div>
         <h2>WORKSPACE INITIALISED</h2>
-        <p>
-          Configure the URL for this tool in the
-          TOOL_CONFIG section of the JavaScript.
-          The tool will load in this workspace.
-        </p>
+        <p>Select a tool from the sidebar to load it in this workspace.</p>
       </div>
-
       <iframe
         id="toolFrame"
         title="OPE tool workspace"
         allow="fullscreen; clipboard-read; clipboard-write"
         allowfullscreen>
       </iframe>
-
     </div>
-
   </section>
 
-
-  <!-- USER / SETTINGS VIEW -->
-
+  <!-- USER SETTINGS -->
   <section class="settings-view" id="settingsView">
-
-    <div class="eyebrow">
-      ACCOUNT ENVIRONMENT
-    </div>
-
-    <h1 class="page-title">
-      USER / SETTINGS
-    </h1>
-
+    <div class="eyebrow">ACCOUNT ENVIRONMENT</div>
+    <h1 class="page-title">USER / SETTINGS</h1>
     <p class="page-description">
       User profile and platform configuration.
       Authentication will be integrated in a later phase.
     </p>
 
     <div class="settings-panel">
-
       <div class="settings-row">
         <div>
           <div class="settings-key">USER STATUS</div>
-          <div class="settings-help">
-            Authentication is not connected in this version.
-          </div>
+          <div class="settings-help">Authentication is not connected in this version.</div>
         </div>
-
-        <div class="settings-value">
-          LOCAL PREVIEW
-        </div>
+        <div class="settings-value">LOCAL PREVIEW</div>
       </div>
-
       <div class="settings-row">
         <div>
           <div class="settings-key">PLATFORM</div>
-          <div class="settings-help">
-            Spatial Operations Interface
-          </div>
+          <div class="settings-help">Spatial Operations Interface</div>
         </div>
-
-        <div class="settings-value">
-          OPE
-        </div>
+        <div class="settings-value">OPE</div>
       </div>
-
       <div class="settings-row">
-        <div style="width:100%">
+        <div>
           <div class="settings-key">SESSION</div>
-          <div class="settings-help">
-            Authentication will be connected here
-            in a later phase.
-          </div>
+          <div class="settings-help">Authentication will be connected here in a later phase.</div>
         </div>
       </div>
-
       <div class="settings-row">
         <div>
           <div class="settings-key">APPLICATION VERSION</div>
-          <div class="settings-help">
-            Initial interface build.
-          </div>
+          <div class="settings-help">Initial interface build.</div>
         </div>
-
-        <div class="settings-value">
-          0.1.0
-        </div>
+        <div class="settings-value">0.1.0</div>
       </div>
-
     </div>
-
   </section>
 
 </main>
 
-
-<!-- =======================================
-     FOOTER
-======================================= -->
-
 <footer class="footer">
-
   <div class="footer-status">
     <span class="status-dot"></span>
     <span id="systemStatus">SYSTEM READY</span>
   </div>
-
   <div>OPE / SPATIAL OPERATIONS</div>
-
   <div>BY 3DTWINS</div>
-
 </footer>
 
-
 <script>
-/* =========================================
-   OPE USER HOME
-   CONFIGURATION
-========================================= */
-
-/*
-  Replace the empty URL strings with the actual
-  HTTPS URLs of your tools.
-
-  Example:
-  url: "https://your-domain.example/tool.html"
-
-  Leave a URL empty while its tool is not ready.
-*/
-
+/* TOOL CONFIGURATION */
 
 const TOOL_CONFIG = [
   {
-    id: "orbital-pass-engine-twin",
-    name: "Orbital Pass Engine Twin",
-    url: "https://3d.staratlas.es/ope25.html",
-    description: "Orbital operations and spatial environment."
+    id:"orbital-pass-engine-twin",
+    name:"Orbital Pass Engine Twin",
+    url:"https://3d.staratlas.es/ope25.html"
   },
   {
-    id: "ope-lite-space",
-    name: "3D OPE Lite Space",
-    url: "https://3d.staratlas.es/opelite.html",
-    description: "Lightweight 3D spatial exploration environment."
+    id:"ope-lite-space",
+    name:"3D OPE Lite Space",
+    url:"https://3d.staratlas.es/opelite.html"
   },
   {
-    id: "janus",
-    name: "Janus",
-    url: "https://3d.staratlas.es/esaobservation8.html",
-    description: "Spatial data interpretation and knowledge interface."
+    id:"janus",
+    name:"Janus",
+    url:"https://3d.staratlas.es/esaobservation8.html"
   },
   {
-    id: "spatial-viewer",
-    name: "Spatial Viewer",
-    url: "https://3d.staratlas.es/planetary.html",
-    description: "Interactive spatial visualization and exploration environment."
+    id:"spatial-viewer",
+    name:"Spatial Viewer",
+    url:"https://3d.staratlas.es/visor.html"
   }
 ];
 
-
-/* =========================================
-   ELEMENTS
-========================================= */
+/* ELEMENTS */
 
 const homeView = document.getElementById("homeView");
 const settingsView = document.getElementById("settingsView");
 const workspace = document.getElementById("workspace");
+const toolSidebar = document.getElementById("toolSidebar");
 
 const navHome = document.getElementById("navHome");
 const navUser = document.getElementById("navUser");
@@ -1244,39 +911,72 @@ const brandHome = document.getElementById("brandHome");
 
 const toolFrame = document.getElementById("toolFrame");
 const frameMessage = document.getElementById("frameMessage");
-
 const workspaceIndex = document.getElementById("workspaceIndex");
 const workspaceTitle = document.getElementById("workspaceTitle");
-
 const systemStatus = document.getElementById("systemStatus");
 const toolCount = document.getElementById("toolCount");
 
 let activeToolIndex = null;
 
-
-/* =========================================
-   URL VALIDATION
-========================================= */
+/* HTTPS URL CHECK */
 
 function isValidToolURL(value) {
   if (!value) return false;
 
   try {
     const parsed = new URL(value, window.location.href);
-
-    return (
-      parsed.protocol === "https:" &&
-      parsed.origin !== "null"
-    );
+    return parsed.protocol === "https:";
   } catch {
     return false;
   }
 }
 
+/* CREATE SIDEBAR ICONS FROM THE HOME CARDS */
 
-/* =========================================
-   VIEW NAVIGATION
-========================================= */
+function initialiseToolSidebar() {
+  toolSidebar.replaceChildren();
+
+  document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
+    const index = Number(card.dataset.tool);
+    const symbol = card.querySelector(".tool-symbol");
+    const name = card.querySelector(".tool-name");
+    const tool = TOOL_CONFIG[index];
+
+    if (!tool || !symbol || !name) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tool-sidebar-button";
+    button.dataset.tool = String(index);
+    button.title = tool.name;
+    button.setAttribute("aria-label", "Open " + tool.name);
+    button.setAttribute("aria-pressed", "false");
+    button.innerHTML = symbol.innerHTML;
+
+    button.addEventListener("click", () => openTool(index));
+    toolSidebar.appendChild(button);
+  });
+}
+
+function updateSidebarSelection(index) {
+  toolSidebar.querySelectorAll("[data-tool]").forEach(button => {
+    const active = Number(button.dataset.tool) === index;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function showToolSidebar() {
+  toolSidebar.classList.add("visible");
+  toolSidebar.setAttribute("aria-hidden", "false");
+}
+
+function hideToolSidebar() {
+  toolSidebar.classList.remove("visible");
+  toolSidebar.setAttribute("aria-hidden", "true");
+}
+
+/* NAVIGATION */
 
 function setActiveNavigation(view) {
   navHome.classList.toggle("active", view === "home");
@@ -1285,36 +985,26 @@ function setActiveNavigation(view) {
 
 function showHome() {
   closeWorkspace();
-
   settingsView.style.display = "none";
   homeView.style.display = "block";
-
   setActiveNavigation("home");
-
   systemStatus.textContent = "SYSTEM READY";
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function showSettings() {
   closeWorkspace();
-
   homeView.style.display = "none";
   settingsView.style.display = "block";
-
   setActiveNavigation("settings");
-
   systemStatus.textContent = "SETTINGS";
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-
-/* =========================================
-   TOOL WORKSPACE
-========================================= */
+/* OPEN OR SWITCH TOOL */
 
 function openTool(index) {
   const tool = TOOL_CONFIG[index];
-
   if (!tool) return;
 
   activeToolIndex = index;
@@ -1323,87 +1013,58 @@ function openTool(index) {
   settingsView.style.display = "none";
   workspace.classList.add("visible");
 
+  showToolSidebar();
+  updateSidebarSelection(index);
   setActiveNavigation("home");
 
-  workspaceIndex.textContent =
-    String(index + 1).padStart(2, "0");
-
+  workspaceIndex.textContent = String(index + 1).padStart(2,"0");
   workspaceTitle.textContent = tool.name;
 
-  toolFrame.style.display = "none";
   toolFrame.removeAttribute("src");
-
+  toolFrame.style.display = "none";
   frameMessage.style.display = "flex";
-  frameMessage.innerHTML = "";
 
-  const mark = document.createElement("div");
-  mark.className = "message-mark";
-  mark.textContent = "OPE /";
+  if (!isValidToolURL(tool.url)) {
+    frameMessage.innerHTML = "";
 
-  const heading = document.createElement("h2");
-  heading.textContent = tool.name.toUpperCase();
+    const heading = document.createElement("h2");
+    heading.textContent = "TOOL URL NOT CONFIGURED";
 
-  const description = document.createElement("p");
+    const message = document.createElement("p");
+    message.textContent = "Check the HTTPS address in TOOL_CONFIG.";
 
-  if (isValidToolURL(tool.url)) {
-    description.textContent =
-      "Loading the selected tool in the OPE workspace.";
-
-    frameMessage.append(mark, heading, description);
-
-    toolFrame.style.display = "block";
-    toolFrame.src = tool.url;
-
-    frameMessage.style.display = "none";
-
-    systemStatus.textContent = "TOOL LOADING";
-  } else {
-    description.textContent =
-      "No valid HTTPS URL is configured for this tool. " +
-      "Add its address in TOOL_CONFIG at the end of this file.";
-
-    const urlHint = document.createElement("div");
-    urlHint.className = "message-url";
-    urlHint.textContent = tool.url
-      ? "Check the configured URL."
-      : "URL: not configured";
-
-    const backButton = document.createElement("button");
-    backButton.className = "primary-button";
-    backButton.type = "button";
-    backButton.textContent = "RETURN TO HOME";
-    backButton.addEventListener("click", showHome);
-
-    frameMessage.append(
-      mark,
-      heading,
-      description,
-      urlHint,
-      backButton
-    );
-
+    frameMessage.append(heading,message);
     systemStatus.textContent = "AWAITING CONFIGURATION";
+    return;
   }
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  toolFrame.title = tool.name + " workspace";
+  toolFrame.style.display = "block";
+  frameMessage.style.display = "none";
+  toolFrame.src = tool.url;
+
+  systemStatus.textContent = "TOOL LOADING";
 }
+
+/* CLOSE WORKSPACE AND RESTORE HOME CARDS */
 
 function closeWorkspace() {
   workspace.classList.remove("visible");
+  hideToolSidebar();
 
   toolFrame.removeAttribute("src");
   toolFrame.style.display = "none";
-
   frameMessage.style.display = "flex";
 
   activeToolIndex = null;
 }
 
+/* TOOL ACTIONS */
+
 function reloadTool() {
   if (activeToolIndex === null) return;
 
   const tool = TOOL_CONFIG[activeToolIndex];
-
   if (!tool || !isValidToolURL(tool.url)) return;
 
   toolFrame.src = tool.url;
@@ -1414,54 +1075,35 @@ function openExternal() {
   if (activeToolIndex === null) return;
 
   const tool = TOOL_CONFIG[activeToolIndex];
-
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  window.open(tool.url, "_blank", "noopener,noreferrer");
+  window.open(tool.url,"_blank","noopener,noreferrer");
 }
 
+/* EVENTS */
 
-/* =========================================
-   EVENTS
-========================================= */
-
-document.querySelectorAll("[data-tool]").forEach(button => {
-  button.addEventListener("click", () => {
-    const index = Number(button.dataset.tool);
-    openTool(index);
-  });
+document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
+  card.addEventListener("click",() => openTool(Number(card.dataset.tool)));
 });
 
-navHome.addEventListener("click", showHome);
-brandHome.addEventListener("click", showHome);
-navUser.addEventListener("click", showSettings);
+navHome.addEventListener("click",showHome);
+brandHome.addEventListener("click",showHome);
+navUser.addEventListener("click",showSettings);
 
-document.getElementById("closeTool")
-  .addEventListener("click", showHome);
+document.getElementById("closeTool").addEventListener("click",showHome);
+document.getElementById("reloadTool").addEventListener("click",reloadTool);
+document.getElementById("openExternal").addEventListener("click",openExternal);
 
-document.getElementById("reloadTool")
-  .addEventListener("click", reloadTool);
+/* INITIALISE */
 
-document.getElementById("openExternal")
-  .addEventListener("click", openExternal);
+initialiseToolSidebar();
 
-
-/* =========================================
-   INITIALISE
-========================================= */
-
-const configuredTools = TOOL_CONFIG.filter(
-  tool => isValidToolURL(tool.url)
-).length;
-
+const configuredTools = TOOL_CONFIG.filter(tool => isValidToolURL(tool.url)).length;
 toolCount.textContent =
-  String(configuredTools).padStart(2, "0") +
-  " / " +
-  String(TOOL_CONFIG.length).padStart(2, "0") +
-  " CONFIGURED";
-
+  String(configuredTools).padStart(2,"0") + " / " +
+  String(TOOL_CONFIG.length).padStart(2,"0") + " CONFIGURED";
 </script>
 
 </body>
 </html>
-</html>
+
