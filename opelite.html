@@ -1396,16 +1396,11 @@ if (new URLSearchParams(location.search).get("scene")) {
     <div id="title"></div>
     <img class="titleGif" src="https://3d.staratlas.es/opelogov3.png" alt="3D Twins" hidden/>
     <div class="heroTitle"></div>
-    <div class="heroSubtitle">Create your 3D scene</div>
-
     <div class="heroInputBox">
-      <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url" hidden/>
-      <div class="heroHint">Supports GLB / GLTF files hosted online</div>
- 
-
-      
+          <div class="heroSubtitle">Create your 3D scene</div>
+      <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url" />
+      <div class="heroHint">Supports GLB / GLTF files hosted online</div>     
       <div class="nasa-divider"></div>
-
       <button id="nasaToggle" class="btn btn-secondary" type="button" onclick="toggleNASAExplorer()">Explore NASA 3D Models</button>
 
       <div id="nasaExplorer" class="nasa-explorer" hidden>
