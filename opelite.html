@@ -114,27 +114,21 @@ select:focus-visible {
   right: 18px;
   bottom: 18px;
   z-index: 20;
-
   display: flex;
   align-items: center;
   gap: 9px;
-
   padding: 8px 12px;
-
   color: rgba(243, 241, 234, 0.92);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.07em;
   text-decoration: none;
-
   background: rgba(36, 37, 34, 0.96);
   border: 1px solid #41423D;
   border-radius: var(--radius-sm);
-
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
   transition:
     color var(--ease),
     border-color var(--ease),
@@ -169,53 +163,43 @@ select:focus-visible {
   top: 20px;
   left: 20px;
   z-index: 10;
-
   width: 340px;
   max-height: calc(100% - 40px);
   padding: 16px;
-
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
-
   color: var(--text);
   background: var(--bg);
-
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-
   box-shadow: var(--shadow-panel);
-
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
+
 #ui.ui-fullscreen {
   position: absolute;
   inset: 0;
-
   width: 100%;
   height: 100%;
   max-height: none;
-  padding: 10vh 24px 28px;
-
+  padding: 24px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-
   overflow: auto;
-
   border: 0;
   border-radius: 0;
   box-shadow: none;
-
   background: var(--bg);
-
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
+
 
 #ui.ui-fullscreen .stepNav,
 #ui.ui-fullscreen .stepDot,
@@ -230,19 +214,16 @@ select:focus-visible {
   width: 100%;
   max-width: 720px;
   min-height: 0;
-  max-height: 86vh;
-
-  margin: 2vh auto 0;
-
+  max-height: calc(100vh - 48px);
+  margin: 0 auto;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 17px;
-
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
-
   text-align: center;
 }
 
@@ -294,19 +275,14 @@ select:focus-visible {
   max-width: 520px;
   margin: 0 auto;
   padding: 20px;
-
   display: flex;
   flex-direction: column;
   gap: 11px;
-
   text-align: left;
-
   background: var(--panel-soft);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
-
   box-shadow: 0 8px 24px rgba(36, 37, 34, 0.06);
-
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -334,18 +310,14 @@ select:focus-visible {
   min-height: 42px;
   margin: 0 0 8px;
   padding: 11px 12px;
-
   color: var(--graphite);
   font-family: var(--font-body);
   font-size: 12px;
   line-height: 1.5;
-
   background: #FFFFFF;
   border: 1px solid #C4C1B8;
   border-radius: var(--radius-sm);
-
   outline: none;
-
   transition:
     border-color var(--ease),
     background var(--ease),
@@ -397,19 +369,15 @@ select:focus-visible {
   min-height: 42px;
   margin-top: 4px;
   padding: 11px 14px;
-
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
-
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 650;
   line-height: 1.4;
   letter-spacing: 0.025em;
   text-align: center;
-
   cursor: pointer;
-
   transition:
     color var(--ease),
     background var(--ease),
@@ -514,17 +482,13 @@ select:focus-visible {
   width: 100%;
   min-height: 39px;
   padding: 9px 11px;
-
   color: var(--graphite);
   background: #FFFFFF;
-
   border: 1px solid #C4C1B8;
   border-radius: var(--radius-sm);
-
   font-family: var(--font-body);
   font-size: 11px;
   outline: none;
-
   transition: border-color var(--ease);
 }
 
@@ -543,10 +507,8 @@ select:focus-visible {
 .nasa-view-toggle {
   display: flex;
   gap: 4px;
-
   margin-bottom: 8px;
   padding: 4px;
-
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -557,17 +519,14 @@ select:focus-visible {
   min-width: 0;
   min-height: 33px;
   padding: 7px 10px;
-
   color: var(--text-soft);
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
-
   font-family: var(--font-body);
   font-size: 10px;
   font-weight: 550;
   cursor: pointer;
-
   transition:
     color var(--ease),
     background var(--ease),
@@ -591,12 +550,10 @@ select:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 5px;
-
   max-height: 200px;
   padding-right: 3px;
   overflow-y: auto;
   overscroll-behavior: contain;
-
   scrollbar-width: thin;
   scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 }
@@ -605,21 +562,16 @@ select:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
-
   width: 100%;
   min-width: 0;
   padding: 10px;
-
   color: var(--text-soft);
   text-align: left;
   overflow-wrap: anywhere;
-
   background: #FFFFFF;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-
   cursor: pointer;
-
   transition:
     background var(--ease),
     border-color var(--ease);
@@ -664,14 +616,11 @@ select:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 9px;
-
   max-height: 360px;
   padding: 2px 3px 4px 0;
-
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-
   scrollbar-width: thin;
   scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
 }
@@ -683,15 +632,12 @@ select:focus-visible {
 .nasa-card {
   min-width: 0;
   overflow: hidden;
-
   color: var(--graphite);
   background: #FFFFFF;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-
   cursor: pointer;
   outline: none;
-
   transition:
     background var(--ease),
     border-color var(--ease);
@@ -711,34 +657,27 @@ select:focus-visible {
 
 .nasa-card-preview {
   position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-
   background:
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     radial-gradient(ellipse at center, #30343A 0%, #1E1E1E 72%, #111210 100%);
-
   background-size: 22px 22px, 22px 22px, auto;
-
   border-bottom: 1px solid var(--line);
 }
 
 .nasa-card-preview img {
   position: absolute;
   inset: 0;
-
   display: block;
   width: 100%;
   height: 100%;
   padding: 7px;
-
   object-fit: contain;
 }
 
@@ -746,10 +685,8 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
   height: 100%;
-
   color: rgba(243, 241, 234, 0.5);
   font-family: var(--font-mono);
   font-size: 32px;
@@ -763,28 +700,21 @@ select:focus-visible {
   position: absolute;
   top: 50%;
   z-index: 2;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 29px;
   height: 34px;
   padding: 0;
-
   transform: translateY(-50%);
-
   color: #FFFFFF;
   background: rgba(36, 37, 34, 0.94);
   border: 1px solid rgba(243, 241, 234, 0.3);
   border-radius: var(--radius-sm);
-
   font-family: var(--font-body);
   font-size: 20px;
   line-height: 1;
-
   cursor: pointer;
-
   transition:
     background var(--ease),
     border-color var(--ease);
@@ -808,19 +738,15 @@ select:focus-visible {
   right: 6px;
   bottom: 6px;
   z-index: 2;
-
   padding: 3px 6px;
-
   color: #FFFFFF;
   background: rgba(36, 37, 34, 0.94);
   border: 1px solid rgba(243, 241, 234, 0.2);
   border-radius: var(--radius-sm);
-
   font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
-
   pointer-events: none;
 }
 
@@ -843,12 +769,10 @@ select:focus-visible {
 
 .nasa-card-type {
   margin-top: 5px;
-
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.5;
-
   overflow-wrap: anywhere;
 }
 
@@ -862,12 +786,10 @@ select:focus-visible {
 .nasa-global-path {
   display: block;
   margin-top: 5px;
-
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 9px;
   line-height: 1.5;
-
   overflow-wrap: anywhere;
 }
 
@@ -875,11 +797,9 @@ select:focus-visible {
 
 #nasaGlobalGallery {
   width: 100%;
-
   display: flex;
   flex-direction: column;
   gap: 10px;
-
   text-align: left;
 }
 
@@ -893,7 +813,6 @@ select:focus-visible {
   min-height: 34px;
   margin: 0;
   padding: 7px 10px;
-
   font-size: 9px;
   white-space: nowrap;
 }
@@ -903,9 +822,7 @@ select:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 9px;
-
   max-height: 48vh;
-
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -918,7 +835,6 @@ select:focus-visible {
   display: block;
   width: 100%;
   padding: 0;
-
   text-align: left;
   font: inherit;
 }
@@ -959,7 +875,6 @@ select:focus-visible {
 .settingGroup {
   margin-top: 12px;
   padding: 14px;
-
   background: var(--panel-soft);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -971,7 +886,6 @@ select:focus-visible {
 
 .settingGroup .label {
   margin-bottom: 12px;
-
   color: var(--text-soft);
   font-family: var(--font-mono);
   font-size: 10px;
@@ -996,12 +910,9 @@ select:focus-visible {
   width: 25px;
   height: 25px;
   padding: 0;
-
   border-radius: 50%;
   border: 2px solid rgba(36, 37, 34, 0.22);
-
   cursor: pointer;
-
   transition:
     transform var(--ease),
     border-color var(--ease),
@@ -1020,11 +931,9 @@ select:focus-visible {
 
 #colorWheel {
   flex: 0 0 auto;
-
   width: 28px;
   height: 28px;
   padding: 0;
-
   background: conic-gradient(
     #E65C5C,
     #E7BC56,
@@ -1037,9 +946,7 @@ select:focus-visible {
 
   border: 2px solid rgba(36, 37, 34, 0.22);
   border-radius: 50%;
-
   cursor: pointer;
-
   transition:
     transform var(--ease),
     border-color var(--ease);
@@ -1066,12 +973,10 @@ select:focus-visible {
   display: flex;
   align-items: center;
   gap: 9px;
-
   color: var(--text-soft);
   font-family: var(--font-body);
   font-size: 11px;
   line-height: 1.6;
-
   cursor: pointer;
 }
 
@@ -1096,16 +1001,13 @@ select:focus-visible {
   min-height: 39px;
   margin: 0;
   padding: 9px 11px;
-
   color: var(--graphite);
   background: #FFFFFF;
   border: 1px solid #C4C1B8;
   border-radius: var(--radius-sm);
-
   outline: none;
   font-family: var(--font-body);
   font-size: 11px;
-
   transition: border-color var(--ease);
 }
 
@@ -1115,7 +1017,6 @@ select:focus-visible {
 
 .backgroundImageHint {
   margin-top: 2px;
-
   color: var(--text-muted);
   font-family: var(--font-body);
   font-size: 10px;
@@ -1127,18 +1028,15 @@ select:focus-visible {
 #linkBox {
   margin-top: 12px;
   padding: 11px;
-
   color: var(--text-soft);
   background: var(--panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1.65;
   overflow-wrap: anywhere;
   word-break: break-all;
-
   user-select: text;
 }
 
@@ -1173,7 +1071,6 @@ select:focus-visible {
 .stepDot {
   flex: 1;
   height: 3px;
-
   background: #D5D1C7;
   border-radius: 2px;
 
