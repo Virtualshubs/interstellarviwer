@@ -716,6 +716,74 @@ body:has(.workspace.visible) .footer {
     font-size:9px;
   }
 }
+
+  
+/* HOME BANNER */
+
+.home-banner {
+  position: relative;
+  width: 100%;
+  height: clamp(190px, 23vw, 280px);
+  margin-top: 30px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.home-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(17,18,16,.72),
+    rgba(17,18,16,.12)
+  );
+}
+
+.home-banner-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 28px;
+  color: var(--bg);
+}
+
+.home-banner-content span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: #F3A174;
+}
+
+.home-banner-content h2 {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: clamp(25px, 3.2vw, 40px);
+  font-weight: 500;
+  letter-spacing: -1px;
+}
+
+@media (max-width: 520px) {
+  .home-banner {
+    height: 190px;
+    margin-top: 22px;
+  }
+
+  .home-banner-content {
+    padding: 18px;
+  }
+}
+
 </style>
 
 </head>
@@ -740,9 +808,26 @@ body:has(.workspace.visible) .footer {
 
 <main id="mainLayout">
 
+
+    <!-- HOME BANNER -->
+    <div class="home-banner">
+      <img
+        src="URL_DE_TU_IMAGEN"
+        alt="OPE spatial intelligence"
+      >
+      <div class="home-banner-overlay"></div>
+      <div class="home-banner-content">
+        <span>OPE / USER ENVIRONMENT</span>
+        <h2>Observe. Interpret. Operate.</h2>
+      </div>
+    </div>
+
+  
+
   <section id="homeView">
     <div class="eyebrow">SPATIAL OPERATIONS INTERFACE</div>
     <h1 class="page-title">USER HOME</h1>
+    
     <p class="page-description">
       Central access to your spatial tools and operational
       environments. Select a tool to initialise your workspace.
@@ -1196,6 +1281,47 @@ const configuredTools = TOOL_CONFIG.filter(
 toolCount.textContent =
   String(configuredTools).padStart(2, "0") + " / " +
   String(TOOL_CONFIG.length).padStart(2, "0") + " CONFIGURED";
+
+
+
+
+  
+/* HOME BANNER: CHANGE IMAGE WHEN CLOSING A TOOL */
+
+const homeBannerImages = [
+  "https://3d.staratlas.es/opelogov3",
+  "https://3d.staratlas.es/opelogov2",
+  "https://3d.staratlas.es/iss.png"
+];
+
+let homeBannerIndex = 0;
+
+const homeBanner = document.querySelector(".home-banner");
+const homeBannerImage = homeBanner
+  ? homeBanner.querySelector("img")
+  : null;
+
+function changeHomeBanner() {
+  if (!homeBannerImage || homeBannerImages.length < 2) return;
+
+  homeBannerIndex =
+    (homeBannerIndex + 1) % homeBannerImages.length;
+
+  const nextImage = new Image();
+
+  nextImage.onload = () => {
+    homeBannerImage.src = nextImage.src;
+  };
+
+  nextImage.src = homeBannerImages[homeBannerIndex];
+}
+
+/* CHANGE THE BANNER WHEN THE USER CLOSES THE WORKSPACE */
+
+document.getElementById("closeTool").addEventListener("click", () => {
+  changeHomeBanner();
+});
+
 
 </script>
 
