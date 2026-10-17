@@ -1375,6 +1375,180 @@ select:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+
+
+/* =====================================================
+   MODEL INFORMATION — EDITOR
+   ===================================================== */
+
+.modelInfoEditor[hidden],
+#publicModelInfo[hidden],
+#editorDescriptionField[hidden],
+#publicDescriptionField[hidden] {
+  display: none !important;
+}
+
+.modelInfoEditor {
+  margin-top: 22px;
+}
+
+.modelInfoCard {
+  padding: 18px;
+  background: var(--panel, #EAE7DE);
+  border: 1px solid var(--line, #D9D4C8);
+  border-radius: 12px;
+}
+
+.modelInfoCard h3 {
+  margin: 0 0 22px;
+  color: var(--text, #242522);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.modelInfoField {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 13px 0;
+  border-top: 1px solid var(--line, #D9D4C8);
+  color: var(--text, #242522);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.modelInfoLabel {
+  color: var(--muted, #716B60);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  line-height: 1.4;
+}
+
+#editorModelSource,
+#editorModelLocation,
+#editorModelDescription {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+#assignModelLocation {
+  margin-top: 5px;
+}
+
+/* =====================================================
+   MODEL INFORMATION — PUBLISHED SCENE
+   ===================================================== */
+
+#publicModelInfo {
+  position: fixed;
+  z-index: 1000;
+  top: 20px;
+  right: 20px;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  color: #F3F1EA;
+  background: rgba(17, 18, 16, 0.94);
+  border: 1px solid rgba(217, 212, 200, 0.24);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.publicInfoToggle {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 12px;
+  color: #F3F1EA;
+  background: transparent;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.publicInfoToggle:hover {
+  background: rgba(243, 241, 234, 0.06);
+}
+
+#publicInfoChevron {
+  color: #A9A294;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.publicInfoContent {
+  padding: 0 16px 12px;
+}
+
+.publicInfoContent[hidden] {
+  display: none !important;
+}
+
+.publicModelName {
+  margin: 2px 0 18px;
+  color: #F3F1EA;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+#publicModelInfo .modelInfoField {
+  border-top-color: rgba(217, 212, 200, 0.18);
+  color: #F3F1EA;
+  font-size: 12px;
+}
+
+#publicModelInfo .modelInfoLabel {
+  color: #A9A294;
+}
+
+#publicModelSource,
+#publicModelLocation,
+#publicModelDescription {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 600px) {
+  #publicModelInfo {
+    top: 12px;
+    right: 12px;
+    width: min(290px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+  }
+
+  .modelInfoCard {
+    padding: 15px;
+  }
+}
+
+  
 </style>
 
 <script>
@@ -1516,6 +1690,42 @@ if (new URLSearchParams(location.search).get("scene")) {
       </div>
       <div class="backgroundImageHint">Adjust the light direction and intensity. Shadow softness depends on the renderer and the model geometry.</div>
     </div>
+
+    
+<!-- MODEL INFORMATION EDITOR -->
+<div class="settingGroup modelInfoEditor" id="modelInfoEditor" hidden>
+  <div class="label">Model information</div>
+
+  <div class="modelInfoCard">
+    <h3 id="editorModelName">Model</h3>
+
+    <div class="modelInfoField">
+      <span class="modelInfoLabel">SOURCE</span>
+      <div id="editorModelSource">Not identified</div>
+    </div>
+
+    <div class="modelInfoField">
+      <span class="modelInfoLabel">GEOLOCATION</span>
+      <div id="editorModelLocation">
+        No geographic position associated
+      </div>
+
+      <button
+        class="btn btn-secondary"
+        id="assignModelLocation"
+        type="button"
+      >
+        + Assign geographic position
+      </button>
+    </div>
+
+    <div class="modelInfoField" id="editorDescriptionField" hidden>
+      <span class="modelInfoLabel">DESCRIPTION</span>
+      <div id="editorModelDescription"></div>
+    </div>
+  </div>
+</div>
+
 
     <div class="stepNav">
       <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
@@ -2711,6 +2921,425 @@ function onResize() {
   renderer.setSize(innerWidth, innerHeight);
   updateCameraClipping();
 }
+
+
+
+
+
+
+var modelInfo;
+
+function getInitialModelInfo(url, suppliedInfo = {}) {
+  let filename = "3D model";
+  let hostname = "";
+
+  try {
+    const parsed = new URL(url, location.href);
+    filename = decodeURIComponent(
+      parsed.pathname.split("/").filter(Boolean).pop() || filename
+    ).replace(/\.(glb|gltf)$/i, "");
+
+    hostname = parsed.hostname.replace(/^www\./i, "");
+  } catch {}
+
+  return {
+    name: suppliedInfo.name || filename,
+    source: suppliedInfo.source || "",
+    description: suppliedInfo.description || "",
+    latitude: suppliedInfo.latitude ?? null,
+    longitude: suppliedInfo.longitude ?? null,
+    _hostname: hostname
+  };
+}
+
+function getGLTFModelInfo(gltf, initialInfo) {
+  const asset = gltf.parser?.json?.asset || {};
+  const assetExtras = asset.extras || {};
+  const sceneExtras = gltf.scene?.userData || {};
+
+  const firstText = (...values) => {
+    const found = values.find(
+      value => typeof value === "string" && value.trim()
+    );
+    return found ? found.trim() : "";
+  };
+
+  const firstNumber = (...values) => {
+    for (const value of values) {
+      if (value === null || value === undefined || value === "") continue;
+      const number = Number(value);
+      if (Number.isFinite(number)) return number;
+    }
+    return null;
+  };
+
+  const geo = assetExtras.geo || sceneExtras.geo || {};
+
+  const latitude = firstNumber(
+    assetExtras.latitude,
+    assetExtras.lat,
+    geo.latitude,
+    geo.lat,
+    sceneExtras.latitude,
+    sceneExtras.lat,
+    initialInfo.latitude
+  );
+
+  const longitude = firstNumber(
+    assetExtras.longitude,
+    assetExtras.lon,
+    assetExtras.lng,
+    geo.longitude,
+    geo.lon,
+    geo.lng,
+    sceneExtras.longitude,
+    sceneExtras.lon,
+    sceneExtras.lng,
+    initialInfo.longitude
+  );
+
+  return {
+    name: firstText(
+      assetExtras.name,
+      sceneExtras.name,
+      initialInfo.name
+    ),
+    source: firstText(
+      assetExtras.author,
+      assetExtras.creator,
+      assetExtras.owner,
+      assetExtras.provider,
+      assetExtras.source,
+      sceneExtras.author,
+      sceneExtras.creator,
+      sceneExtras.owner,
+      initialInfo.source
+    ),
+    description: firstText(
+      assetExtras.description,
+      sceneExtras.description,
+      initialInfo.description
+    ),
+    latitude:
+      latitude !== null && latitude >= -90 && latitude <= 90
+        ? latitude
+        : null,
+    longitude:
+      longitude !== null && longitude >= -180 && longitude <= 180
+        ? longitude
+        : null,
+    _hostname: initialInfo._hostname || ""
+  };
+}
+
+function formatModelLocation(info) {
+  if (info.latitude === null || info.longitude === null) {
+    return "No geographic position associated";
+  }
+
+  return `${info.latitude}, ${info.longitude}`;
+}
+
+function renderModelInfo() {
+  const info = modelInfo || {};
+
+  const editor = document.getElementById("modelInfoEditor");
+  if (editor) editor.hidden = !info.name;
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+
+  const setHidden = (id, hidden) => {
+    const element = document.getElementById(id);
+    if (element) element.hidden = hidden;
+  };
+
+  setText("editorModelName", info.name || "3D model");
+  setText("editorModelSource", info.source || "Not identified");
+  setText("editorModelLocation", formatModelLocation(info));
+  setText("editorModelDescription", info.description || "");
+  setHidden("editorDescriptionField", !info.description);
+
+  setText("publicModelName", info.name || "3D model");
+  setText("publicModelSource", info.source || "Not identified");
+  setText("publicModelLocation", formatModelLocation(info));
+  setText("publicModelDescription", info.description || "");
+  setHidden("publicDescriptionField", !info.description);
+}
+
+function assignModelLocation() {
+  const latitudeText = prompt("Latitude (-90 to 90):");
+  if (latitudeText === null) return;
+
+  const longitudeText = prompt("Longitude (-180 to 180):");
+  if (longitudeText === null) return;
+
+  const latitude = Number(latitudeText.trim());
+  const longitude = Number(longitudeText.trim());
+
+  if (
+    !latitudeText.trim() ||
+    !longitudeText.trim() ||
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    alert("Enter a valid latitude and longitude.");
+    return;
+  }
+
+  modelInfo.latitude = latitude;
+  modelInfo.longitude = longitude;
+  state.modelInfo = { ...modelInfo };
+
+  renderModelInfo();
+}
+
+function createPublicModelInfoPanel() {
+  if (document.getElementById("publicModelInfo")) return;
+
+  const panel = document.createElement("section");
+  panel.id = "publicModelInfo";
+  panel.hidden = true;
+
+  const toggle = document.createElement("button");
+  toggle.className = "publicInfoToggle";
+  toggle.id = "publicInfoToggle";
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded", "true");
+  toggle.setAttribute("aria-controls", "publicInfoContent");
+
+  const toggleLabel = document.createElement("span");
+  toggleLabel.textContent = "Model information";
+
+  const chevron = document.createElement("span");
+  chevron.id = "publicInfoChevron";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.textContent = "⌄";
+
+  toggle.append(toggleLabel, chevron);
+
+  const content = document.createElement("div");
+  content.className = "publicInfoContent";
+  content.id = "publicInfoContent";
+
+  const name = document.createElement("h2");
+  name.className = "publicModelName";
+  name.id = "publicModelName";
+
+  function addField(label, id, fieldId = null) {
+    const field = document.createElement("div");
+    field.className = "modelInfoField";
+
+    if (fieldId) field.id = fieldId;
+
+    const caption = document.createElement("span");
+    caption.className = "modelInfoLabel";
+    caption.textContent = label;
+
+    const value = document.createElement("div");
+    value.id = id;
+
+    field.append(caption, value);
+    return field;
+  }
+
+  content.append(
+    name,
+    addField("SOURCE", "publicModelSource"),
+    addField("GEOLOCATION", "publicModelLocation"),
+    addField("DESCRIPTION", "publicModelDescription", "publicDescriptionField")
+  );
+
+  panel.append(toggle, content);
+  document.body.appendChild(panel);
+
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
+
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    content.hidden = expanded;
+    chevron.textContent = expanded ? "⌃" : "⌄";
+  });
+}
+
+document
+  .getElementById("assignModelLocation")
+  ?.addEventListener("click", assignModelLocation);
+
+/* Sobrescribe loadModel para incorporar los metadatos. */
+function loadModel(url, suppliedInfo = null) {
+  if (!url) {
+    setNASAStatus("Select a model or enter a valid model URL.", true);
+    return;
+  }
+
+  const initialInfo = getInitialModelInfo(url, suppliedInfo || {});
+  const loader = new THREE.GLTFLoader();
+  const dracoLoader = new THREE.DRACOLoader();
+
+  dracoLoader.setDecoderPath(
+    "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
+  );
+
+  loader.setDRACOLoader(dracoLoader);
+
+  loader.load(
+    url,
+    (gltf) => {
+      if (model) scene.remove(model);
+
+      model = gltf.scene;
+      scene.add(model);
+
+      frameModel(model);
+      applyLighting();
+
+      modelInfo = getGLTFModelInfo(gltf, initialInfo);
+      state.modelInfo = { ...modelInfo };
+      state.modelUrl = url;
+
+      renderModelInfo();
+      setCompactUI();
+      goStep(2);
+      setNASAStatus("");
+
+      dracoLoader.dispose();
+    },
+    undefined,
+    (error) => {
+      console.error("Error loading model:", url, error);
+
+      if (state.modelUrl === url) state.modelUrl = null;
+
+      setNASAStatus(
+        "Could not load this model. Check the file URL and its external resources.",
+        true
+      );
+
+      dracoLoader.dispose();
+    }
+  );
+}
+
+/* Conserva la selección de modelos del catálogo NASA. */
+function selectNASAAsset(asset) {
+  const url = getNASAAssetURL(asset);
+
+  document.getElementById("urlInput").value = url;
+  setNASAStatus("Loading " + asset.name + "…");
+
+  loadModel(url, {
+    name: asset.name.replace(/\.(glb|gltf)$/i, ""),
+    source: "NASA"
+  });
+}
+
+/* Incluye la información del modelo en el enlace publicado. */
+function exportScene() {
+  const url = document.getElementById("urlInput").value.trim();
+
+  if (!url) {
+    setNASAStatus("Load a model before publishing the scene.", true);
+    return;
+  }
+
+  const payload = {
+    modelUrl: url,
+    modelInfo: { ...(modelInfo || {}) },
+    bg: state.bg,
+    autoRotate: state.autoRotate,
+    backgroundImage: state.backgroundImage,
+    lighting: state.lighting
+  };
+
+  if (state.backgroundImage && state.backgroundImageUrl) {
+    payload.backgroundImageUrl = state.backgroundImageUrl;
+  }
+
+  const encoded = btoa(JSON.stringify(payload));
+  const link = `${location.origin}${location.pathname}?scene=${encoded}`;
+
+  lastGeneratedURL = link;
+
+  document.getElementById("linkBox").textContent = link;
+
+  const actions = document.getElementById("exportActions");
+  if (actions) actions.style.display = "flex";
+}
+
+/* Recupera los metadatos cuando se abre una escena publicada. */
+function checkURL() {
+  const sceneParam = new URLSearchParams(location.search).get("scene");
+  if (!sceneParam) return;
+
+  isLoadingFromURL = true;
+
+  try {
+    const data = JSON.parse(atob(sceneParam));
+
+    document.getElementById("ui").style.display = "none";
+
+    applySceneStyle(data.bg || state.bg, false);
+    applyRotation(data.autoRotate ?? false);
+
+    const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
+    const imageEnabled =
+      data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
+
+    state.backgroundImageUrl = customURL;
+
+    const imageURLInput = document.getElementById("backgroundImageUrlInput");
+    if (imageURLInput) imageURLInput.value = customURL || "";
+
+    applyBackgroundImage(imageEnabled, customURL);
+    applyLighting(data.lighting || state.lighting);
+
+    const savedInfo = data.modelInfo || {};
+
+    modelInfo = {
+      name: savedInfo.name || "",
+      source: savedInfo.source || "",
+      description: savedInfo.description || "",
+      latitude: savedInfo.latitude ?? null,
+      longitude: savedInfo.longitude ?? null,
+      _hostname: savedInfo._hostname || ""
+    };
+
+    state.modelInfo = { ...modelInfo };
+
+    createPublicModelInfoPanel();
+
+    const panel = document.getElementById("publicModelInfo");
+    if (panel) panel.hidden = false;
+
+    renderModelInfo();
+
+    if (data.modelUrl) {
+      document.getElementById("urlInput").value = data.modelUrl;
+      loadModel(data.modelUrl, modelInfo);
+    }
+
+    lastGeneratedURL = window.location.href;
+  } catch (error) {
+    console.error("Could not decode scene URL:", error);
+  }
+
+  requestAnimationFrame(() => {
+    isLoadingFromURL = false;
+  });
+}
+
+
+
+
+
+  
 </script>
 </body>
 </html>
