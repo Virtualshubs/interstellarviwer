@@ -517,6 +517,13 @@ iframe {
     return {
       started: false,
       finished: false,
+      stopped: false,
+      running: false,
+      paused: false,
+      pauseRequested: false,
+      stopRequested: false,
+      resumeResolver: null,
+      abortController: null,
       endTime: null,
       startTime: null,
       pages: 0,
@@ -556,8 +563,12 @@ iframe {
   function elapsedText(ms) {
     if (ms == null) return "—";
     if (ms < 60000) return (ms / 1000).toFixed(1) + " s";
+
     const mins = Math.floor(ms / 60000);
-    const secs = ((ms % 60000) / 1000).toFixed(0).padStart(2, "0");
+    const secs = ((ms % 60000) / 1000)
+      .toFixed(0)
+      .padStart(2, "0");
+
     return mins + " min " + secs + " s";
   }
 
@@ -574,8 +585,10 @@ iframe {
   function log(id, message) {
     const el = $(id);
     const stamp = new Date().toLocaleTimeString("es-ES");
+
     el.textContent += (el.textContent ? "\n" : "") +
       "[" + stamp + "] " + message;
+
     el.scrollTop = el.scrollHeight;
   }
 
@@ -586,8 +599,68 @@ iframe {
   }
 
   /*
-   * Esta API es no estándar y principalmente está disponible en Chromium.
-   * No representa la memoria total del proceso ni la memoria GPU.
+   * Añade los controles sin exigir cambios en el HTML existente.
+   */
+  function createStacControls() {
+    if ($("stacControls")) return;
+
+    const toolbar = document.createElement("div");
+    toolbar.id = "stacControls";
+
+    Object.assign(toolbar.style, {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "8px",
+      alignItems: "center",
+      marginTop: "10px",
+      marginBottom: "10px"
+    });
+
+    const makeButton = (id, label, background) => {
+      const button = document.createElement("button");
+
+      button.id = id;
+      button.type = "button";
+      button.textContent = label;
+      button.disabled = true;
+
+      Object.assign(button.style, {
+        padding: "9px 14px",
+        borderRadius: "12px",
+        border: "1px solid #D9D4C8",
+        background,
+        color: background === "#111210" ? "#F3F1EA" : "#242522",
+        cursor: "pointer",
+        font: "inherit"
+      });
+
+      return button;
+    };
+
+    toolbar.append(
+      makeButton("stacPause", "Pausar lectura", "#EAE7DE"),
+      makeButton("stacResume", "Reanudar", "#416D80"),
+      makeButton("stacStop", "Detener lectura", "#111210")
+    );
+
+    const startButton = $("stacStart");
+
+    if (!startButton) {
+      throw new Error("No se encontró el control stacStart.");
+    }
+
+    startButton.insertAdjacentElement("afterend", toolbar);
+
+    $("stacResume").style.color = "#F3F1EA";
+
+    $("stacPause").addEventListener("click", pauseStac);
+    $("stacResume").addEventListener("click", resumeStac);
+    $("stacStop").addEventListener("click", stopStac);
+  }
+
+  /*
+   * Esta API no estándar está disponible principalmente en Chromium.
+   * No representa la memoria total de la pestaña ni la memoria GPU.
    */
   function heapSnapshot() {
     const memory = performance.memory;
@@ -640,12 +713,19 @@ iframe {
 
     $("summaryStac").textContent =
       s.endTime == null
-        ? "Pendiente"
-        : elapsedText(s.endTime - s.startTime) + " · " + fmt(s.items) + " ítems";
+        ? (s.running ? "En curso" : "Pendiente")
+        : elapsedText(s.endTime - s.startTime) +
+          " · " + fmt(s.items) + " ítems";
 
     $("summaryStacDetail").textContent =
       s.endTime == null
-        ? "Sin resultados todavía."
+        ? (
+            s.started
+              ? fmt(s.pages) + " páginas; " +
+                fmt(s.items) + " ítems procesados" +
+                (s.paused ? " · lectura pausada." : ".")
+              : "Sin resultados todavía."
+          )
         : fmt(s.pages) + " páginas; " +
           fmt(s.ids.size) + " IDs únicos; " +
           fmt(s.duplicateIds) + " IDs duplicados; " +
@@ -654,7 +734,9 @@ iframe {
             s.memoryStart != null && s.memoryEnd != null
               ? s.memoryEnd - s.memoryStart
               : null
-          ) + ".";
+          ) + (s.finished
+            ? ". Lectura completa."
+            : ". Lectura incompleta.");
 
     $("summaryJanus").textContent =
       j.finished
@@ -672,7 +754,7 @@ iframe {
           ) + ". El heap del iframe puede no estar incluido.";
 
     $("downloadReport").disabled =
-      !(s.endTime != null || j.finished);
+      !(s.started && !s.running || j.finished);
   }
 
   function includeCoordinate(lon, lat) {
@@ -748,7 +830,8 @@ iframe {
       }
     }
 
-    if (item && item.properties && typeof item.properties === "object") {
+    if (item && item.properties &&
+        typeof item.properties === "object") {
       for (const key of Object.keys(item.properties)) {
         s.propertyKeys.add(key);
       }
@@ -756,13 +839,18 @@ iframe {
       scanDates(item.properties);
     }
 
-    if (item && item.assets && typeof item.assets === "object") {
+    if (item && item.assets &&
+        typeof item.assets === "object") {
       s.assetsDeclared += Object.keys(item.assets).length;
     }
 
     if (item && item.geometry && item.geometry.coordinates) {
       scanCoordinates(item.geometry.coordinates);
-    } else if (item && Array.isArray(item.bbox) && item.bbox.length >= 4) {
+    } else if (
+      item &&
+      Array.isArray(item.bbox) &&
+      item.bbox.length >= 4
+    ) {
       includeCoordinate(item.bbox[0], item.bbox[1]);
       includeCoordinate(item.bbox[2], item.bbox[3]);
     }
@@ -777,7 +865,6 @@ iframe {
 
     const path = url.pathname.replace(/\/+$/, "");
 
-    // URL de metadatos de una colección: se intenta acceder a sus ítems.
     if (/\/collections\/[^/]+$/.test(path)) {
       url.pathname = path + "/items";
     } else if (/\/v1$/.test(path) || path === "") {
@@ -790,14 +877,15 @@ iframe {
     return url.href;
   }
 
-  async function fetchStacPage(url, method, body, headers) {
+  async function fetchStacPage(url, method, body, headers, signal) {
     const options = {
       method,
       cache: "no-store",
       headers: {
         "Accept": "application/geo+json, application/json",
         ...headers
-      }
+      },
+      signal
     };
 
     if (method !== "GET" && body != null) {
@@ -828,6 +916,126 @@ iframe {
     ) || null;
   }
 
+  /*
+   * La pausa se aplica entre páginas.
+   * Si ya hay una petición en curso, dejamos que termine y procesamos
+   * esa página antes de esperar. Así no se pierde ni se duplica.
+   */
+  async function waitIfPaused(s) {
+    if (!s.pauseRequested || s.stopRequested) return;
+
+    s.paused = true;
+
+    setStatus("stacStatus", "Lectura pausada", "warn");
+    $("stacPause").disabled = true;
+    $("stacResume").disabled = false;
+    $("stacStop").disabled = false;
+
+    log(
+      "stacLog",
+      "Lectura pausada entre páginas. El progreso se conserva."
+    );
+
+    updateSummary();
+
+    await new Promise(resolve => {
+      s.resumeResolver = resolve;
+    });
+
+    s.resumeResolver = null;
+    s.paused = false;
+
+    if (!s.stopRequested) {
+      setStatus("stacStatus", "Leyendo paginación");
+      log("stacLog", "Lectura reanudada.");
+    }
+
+    updateStacControls();
+  }
+
+  function updateStacControls() {
+    const s = state.stac;
+
+    $("stacPause").disabled =
+      !s.running || s.pauseRequested || s.stopRequested;
+
+    $("stacResume").disabled =
+      !s.running || !s.paused || s.stopRequested;
+
+    $("stacStop").disabled =
+      !s.running || s.stopRequested;
+  }
+
+  function pauseStac() {
+    const s = state.stac;
+
+    if (!s.running || s.stopRequested || s.paused) return;
+
+    s.pauseRequested = true;
+
+    setStatus(
+      "stacStatus",
+      "Pausa solicitada · terminando la página actual",
+      "warn"
+    );
+
+    $("stacPause").disabled = true;
+    $("stacResume").disabled = true;
+
+    log(
+      "stacLog",
+      "Pausa solicitada. Se terminará de procesar la página en curso."
+    );
+  }
+
+  function resumeStac() {
+    const s = state.stac;
+
+    if (!s.running || !s.paused || s.stopRequested) return;
+
+    s.pauseRequested = false;
+
+    if (s.resumeResolver) {
+      const resolve = s.resumeResolver;
+      s.resumeResolver = null;
+      resolve();
+    }
+  }
+
+  function stopStac() {
+    const s = state.stac;
+
+    if (!s.running || s.stopRequested) return;
+
+    if (!confirm(
+      "¿Detener la lectura STAC y conservar las métricas parciales?"
+    )) {
+      return;
+    }
+
+    s.stopRequested = true;
+    s.pauseRequested = false;
+
+    setStatus("stacStatus", "Deteniendo lectura…", "warn");
+    log("stacLog", "Detención solicitada por el usuario.");
+
+    /*
+     * Si estaba pausada, liberamos la espera.
+     * Si había una petición de red, intentamos abortarla.
+     */
+    if (s.resumeResolver) {
+      const resolve = s.resumeResolver;
+      s.resumeResolver = null;
+      resolve();
+    }
+
+    if (s.abortController) {
+      s.abortController.abort();
+    }
+
+    updateStacControls();
+  }
+
   async function crawlStac() {
     const s = state.stac;
     let currentUrl;
@@ -841,6 +1049,7 @@ iframe {
     }
 
     s.started = true;
+    s.running = true;
     s.startTime = performance.now();
 
     recordMemory("stac", s, "memoryStart");
@@ -851,12 +1060,14 @@ iframe {
     $("stacReset").disabled = true;
     $("stacUrl").disabled = true;
 
-    setStatus("stacStatus", "Leyendo paginación");
     $("stacLog").textContent = "";
 
+    setStatus("stacStatus", "Leyendo paginación");
     log("stacLog", "Inicio de lectura.");
     log("stacLog", "Endpoint efectivo: " + currentUrl);
     log("stacLog", "No se descargarán los archivos raster de los assets.");
+
+    updateStacControls();
 
     const visited = new Set();
 
@@ -866,21 +1077,36 @@ iframe {
 
     try {
       while (currentUrl) {
+        await waitIfPaused(s);
+
+        if (s.stopRequested) break;
+
         const visitKey =
           currentUrl + "|" + method + "|" +
           (body == null ? "" : JSON.stringify(body));
 
         if (visited.has(visitKey)) {
           throw new Error(
-            "La API devolvió un enlace ya visitado. Se detiene para evitar un bucle."
+            "La API devolvió un enlace ya visitado. " +
+            "Se detiene para evitar un bucle."
           );
         }
 
         visited.add(visitKey);
 
+        s.abortController = new AbortController();
+
         const page = await fetchStacPage(
-          currentUrl, method, body, headers
+          currentUrl,
+          method,
+          body,
+          headers,
+          s.abortController.signal
         );
+
+        s.abortController = null;
+
+        if (s.stopRequested) break;
 
         if (!page || typeof page !== "object") {
           throw new Error("La respuesta no es un objeto JSON STAC.");
@@ -900,11 +1126,6 @@ iframe {
 
         s.pages++;
 
-        /*
-         * Procesamos los ítems uno a uno.
-         * No guardamos sus objetos en una colección de resultados.
-         * Solo conservamos contadores, estadísticas y el conjunto de IDs.
-         */
         for (const item of features) {
           processItem(item);
         }
@@ -913,12 +1134,15 @@ iframe {
         const next = findNextLink(page.links);
 
         /*
-         * Liberamos las referencias a los objetos de esta página
-         * antes de solicitar la siguiente. El navegador decidirá cuándo
-         * recuperar físicamente esa memoria mediante garbage collection.
+         * Liberamos las referencias a los objetos de esta página.
+         * El garbage collector decide cuándo recuperar físicamente
+         * esa memoria.
          */
         features.length = 0;
-        page.features = null;
+
+        if (Array.isArray(page.features)) {
+          page.features = null;
+        }
 
         updateStacMetrics();
 
@@ -930,8 +1154,11 @@ iframe {
           " · IDs únicos " + fmt(s.ids.size)
         );
 
+        if (s.stopRequested) break;
+
         if (!next) {
           currentUrl = null;
+          s.finished = true;
           break;
         }
 
@@ -944,6 +1171,7 @@ iframe {
         currentUrl = nextUrl.href;
         method = String(next.method || "GET").toUpperCase();
         body = next.body == null ? null : next.body;
+
         headers =
           next.headers && typeof next.headers === "object"
             ? next.headers
@@ -956,13 +1184,51 @@ iframe {
         }
       }
 
-      s.finished = true;
+    } catch (error) {
+      s.abortController = null;
 
-      $("stacElapsed").textContent =
-        elapsedText(performance.now() - s.startTime);
+      if (s.stopRequested && error.name === "AbortError") {
+        log(
+          "stacLog",
+          "Petición cancelada. Se conservan las métricas acumuladas."
+        );
+      } else if (!s.stopRequested) {
+        s.errors++;
+        s.errorMessages.push(String(error.message || error));
 
-      $("stacProgress").style.width = "100%";
+        setStatus("stacStatus", "Lectura detenida por error", "warn");
 
+        log("stacLog", "ERROR: " + (error.message || String(error)));
+
+        log(
+          "stacLog",
+          "Si aparece un error CORS, el navegador puede estar bloqueando " +
+          "el acceso desde el origen donde se aloja este HTML."
+        );
+      }
+    }
+
+    /*
+     * Cierre común para lectura completa, detención manual o error.
+     */
+    s.running = false;
+    s.paused = false;
+    s.pauseRequested = false;
+    s.abortController = null;
+
+    if (s.resumeResolver) {
+      const resolve = s.resumeResolver;
+      s.resumeResolver = null;
+      resolve();
+    }
+
+    $("stacElapsed").textContent =
+      elapsedText(performance.now() - s.startTime);
+
+    $("stacProgress").style.width =
+      s.finished ? "100%" : $("stacProgress").style.width;
+
+    if (s.finished) {
       setStatus("stacStatus", "Proceso finalizado", "good");
 
       log(
@@ -982,41 +1248,40 @@ iframe {
         "stacLog",
         "Pulsa «Fin / registrar medición» para cerrar la fase."
       );
+    } else if (s.stopRequested) {
+      s.stopped = true;
 
-    } catch (error) {
-      s.errors++;
-      s.errorMessages.push(String(error.message || error));
-
-      setStatus("stacStatus", "Lectura detenida por error", "warn");
-
-      log("stacLog", "ERROR: " + (error.message || String(error)));
+      setStatus("stacStatus", "Lectura detenida · datos parciales", "warn");
 
       log(
         "stacLog",
-        "Si aparece un error CORS, el navegador puede estar bloqueando " +
-        "el acceso desde el origen donde se aloja este HTML."
+        "Lectura detenida manualmente. No se ha alcanzado el final " +
+        "de la paginación."
       );
 
-      $("stacElapsed").textContent =
-        elapsedText(performance.now() - s.startTime);
-
-      updateStacMetrics();
+      log(
+        "stacLog",
+        "Pulsa «Fin / registrar medición» para guardar la medición parcial."
+      );
+    } else {
+      setStatus("stacStatus", "Lectura interrumpida por error", "warn");
     }
 
-    /*
-     * El botón Fin se habilita únicamente cuando el proceso acaba
-     * o se detiene por error. Así no se inicia Janus mientras STAC
-     * continúa ejecutándose.
-     */
     $("stacEnd").disabled = false;
     $("stacReset").disabled = false;
+
+    $("stacPause").disabled = true;
+    $("stacResume").disabled = true;
+    $("stacStop").disabled = true;
+
+    updateStacMetrics();
     updateSummary();
   }
 
   function finishStac() {
     const s = state.stac;
 
-    if (!s.started || s.endTime != null) return;
+    if (!s.started || s.endTime != null || s.running) return;
 
     s.endTime = performance.now();
 
@@ -1033,25 +1298,37 @@ iframe {
     if (s.finished) {
       setStatus("stacStatus", "Medición registrada", "good");
     } else {
-      setStatus("stacStatus", "Medición registrada · lectura incompleta", "warn");
+      setStatus(
+        "stacStatus",
+        "Medición registrada · lectura incompleta",
+        "warn"
+      );
     }
 
     log(
       "stacLog",
-      "Medición registrada. Fuente de memoria: " + s.memorySource + "."
+      "Medición registrada. Fuente de memoria: " +
+      s.memorySource + "."
     );
 
     $("janusStart").disabled = !state.janusLoaded;
 
     setStatus(
       "janusStatus",
-      state.janusLoaded ? "Listo para iniciar" : "Carga Janus para continuar"
+      state.janusLoaded
+        ? "Listo para iniciar"
+        : "Carga Janus para continuar"
     );
 
     updateSummary();
   }
 
   function resetStac() {
+    if (state.stac.running) {
+      alert("Primero detén la lectura antes de reiniciar la fase STAC.");
+      return;
+    }
+
     if (
       state.stac.started &&
       state.stac.endTime == null &&
@@ -1077,6 +1354,10 @@ iframe {
     $("stacEnd").disabled = true;
     $("stacReset").disabled = false;
     $("stacUrl").disabled = false;
+
+    $("stacPause").disabled = true;
+    $("stacResume").disabled = true;
+    $("stacStop").disabled = true;
 
     $("janusStart").disabled = true;
     $("janusEnd").disabled = true;
@@ -1179,7 +1460,8 @@ iframe {
 
     log(
       "janusLog",
-      "Medición registrada. Fuente de memoria: " + j.memorySource + "."
+      "Medición registrada. Fuente de memoria: " +
+      j.memorySource + "."
     );
 
     updateSummary();
@@ -1199,17 +1481,31 @@ iframe {
         "La medición del documento anfitrión puede no incluir el heap del iframe Janus.",
         "El lector STAC conserva IDs y estadísticas agregadas, no los objetos STAC completos ni los archivos raster.",
         "La recuperación física de memoria depende del garbage collector del navegador.",
-        "La comparación de tiempos solo es válida si ambos procesos cubren un ámbito de datos comparable."
+        "La comparación de tiempos solo es válida si ambos procesos cubren un ámbito de datos comparable.",
+        "Una lectura detenida manualmente es parcial y no equivale a una paginación completa.",
+        "La pausa se aplica entre páginas; la petición actual puede terminar antes de que se active."
       ],
 
       stac: {
         endpointInput: $("stacUrl").value.trim(),
         started: s.started,
+        running: s.running,
+        paused: s.paused,
+        stoppedManually: s.stopped,
         paginationFinished: s.finished,
+        measurementRegistered: s.endTime != null,
 
         elapsedMs:
           s.startTime != null && s.endTime != null
             ? Math.round(s.endTime - s.startTime)
+            : null,
+
+        elapsedAtExportMs:
+          s.startTime != null
+            ? Math.round(
+                (s.endTime != null ? s.endTime : performance.now()) -
+                s.startTime
+              )
             : null,
 
         pages: s.pages,
@@ -1288,6 +1584,8 @@ iframe {
     setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
   }
 
+  createStacControls();
+
   $("stacStart").addEventListener("click", () => {
     if (state.stac.started) return;
     crawlStac();
@@ -1301,6 +1599,7 @@ iframe {
   $("downloadReport").addEventListener("click", exportReport);
 
 })();
+
 </script>
 
 </body>
