@@ -1585,6 +1585,15 @@ if (new URLSearchParams(location.search).get("scene")) {
           </div>
         </div>
 
+        <button
+  id="rostockToggle"
+  class="btn btn-secondary"
+  type="button"
+  onclick="toggleRostockExplorer()"
+>
+  Explore Rostock 3D Models
+</button>
+
         <div>
           <div class="nasa-label">Model folder</div>
           <select id="nasaFolderSelect" class="nasa-select" disabled>
@@ -1791,6 +1800,15 @@ const NASA_BASE_URL = "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/
 const NASA_API_URL = "https://api.github.com/repos/nasa/NASA-3D-Resources/contents/3D%20Models?ref=master";
 const NASA_TREE_API_URL = "https://api.github.com/repos/nasa/NASA-3D-Resources/git/trees/master?recursive=1";
 
+/* ================= ROSTOCK CATALOG ================= */
+
+const ROSTOCK_CATALOG_URL =
+  "https://raw.githubusercontent.com/rostock/3DModels/main/Rostock_Catalog.json";
+
+let activeCatalogSource = "nasa";
+let rostockCatalog = null;
+let rostockCatalogPromise = null;
+
 let nasaFoldersLoaded = false;
 let nasaFolderCache = new Map();
 let nasaRequestId = 0;
@@ -1892,14 +1910,14 @@ function init() {
   document.querySelectorAll(".color-swatch").forEach((swatch) => {
     swatch.addEventListener("click", () => {
       const color = swatch.dataset.color;
-      bgInput.value = color;
+      if (bgInput) bgInput.value = color;
       applySceneStyle(color);
       document.querySelectorAll(".color-swatch").forEach((item) => item.classList.remove("active"));
       swatch.classList.add("active");
     });
   });
 
-  document.getElementById("colorWheel")?.addEventListener("click", () => bgInput.click());
+  document.getElementById("colorWheel")?.addEventListener("click", () => bgInput?.click());
 
   const backgroundImageInput = document.getElementById("backgroundImageInput");
   if (backgroundImageInput) {
@@ -2042,44 +2060,74 @@ function goStep(step) {
   document.querySelectorAll(".stepDot").forEach((element) => element.classList.remove("active"));
   document.getElementById("dot" + step)?.classList.add("active");
 
-  if (step === 3) applyRotation(document.getElementById("rotateInput").checked);
+  if (step === 3) {
+    const rotateInput = document.getElementById("rotateInput");
+    applyRotation(rotateInput ? rotateInput.checked : state.autoRotate);
+  }
 }
 
-/* ================= NASA EXPLORER ================= */
+/* ================= SHARED MODEL EXPLORER ================= */
 
 function setNASAAssetView(view) {
   nasaAssetView = view === "grid" ? "grid" : "list";
+
   const list = document.getElementById("nasaAssetSlot");
   const grid = document.getElementById("nasaAssetGrid");
-  list.hidden = nasaAssetView !== "list";
-  grid.hidden = nasaAssetView !== "grid";
+
+  if (list) list.hidden = nasaAssetView !== "list";
+  if (grid) grid.hidden = nasaAssetView !== "grid";
+
   document.getElementById("nasaListViewButton")?.classList.toggle("active", nasaAssetView === "list");
   document.getElementById("nasaGridViewButton")?.classList.toggle("active", nasaAssetView === "grid");
 }
+
+/* ================= NASA EXPLORER ================= */
 
 async function toggleNASAExplorer() {
   const explorer = document.getElementById("nasaExplorer");
   const gallery = document.getElementById("nasaGlobalGallery");
   const toggle = document.getElementById("nasaToggle");
 
+  if (!explorer || !gallery) return;
+
+  /* If Rostock is currently open, switch back to NASA. */
+  if (activeCatalogSource === "rostock") {
+    activeCatalogSource = "nasa";
+    nasaRequestId++;
+
+    explorer.hidden = false;
+    gallery.hidden = true;
+
+    if (toggle) toggle.textContent = "Hide NASA Explorer";
+
+    await loadNASAFolders();
+    return;
+  }
+
   if (!explorer.hidden) {
     explorer.hidden = true;
     gallery.hidden = false;
-    toggle.textContent = "Hide NASA Gallery";
+
+    if (toggle) toggle.textContent = "Hide NASA Gallery";
+
     if (!nasaGlobalScanned) await loadNASAGlobalGallery();
     return;
   }
 
   if (!gallery.hidden) {
     gallery.hidden = true;
-    toggle.textContent = "Explore NASA 3D Models";
+
+    if (toggle) toggle.textContent = "Explore NASA 3D Models";
     return;
   }
 
+  activeCatalogSource = "nasa";
   explorer.hidden = false;
   gallery.hidden = true;
-  toggle.textContent = "Hide NASA Explorer";
-  if (!nasaFoldersLoaded) await loadNASAFolders();
+
+  if (toggle) toggle.textContent = "Hide NASA Explorer";
+
+  await loadNASAFolders();
 }
 
 async function showNASAExplorer() {
@@ -2087,10 +2135,356 @@ async function showNASAExplorer() {
   const gallery = document.getElementById("nasaGlobalGallery");
   const toggle = document.getElementById("nasaToggle");
 
+  if (!explorer || !gallery) return;
+
+  activeCatalogSource = "nasa";
+  nasaRequestId++;
+
   gallery.hidden = true;
   explorer.hidden = false;
-  toggle.textContent = "Hide NASA Explorer";
-  if (!nasaFoldersLoaded) await loadNASAFolders();
+
+  if (toggle) toggle.textContent = "Hide NASA Explorer";
+
+  await loadNASAFolders();
+}
+
+/* ================= ROSTOCK EXPLORER ================= */
+
+async function toggleRostockExplorer() {
+  const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
+  const nasaToggle = document.getElementById("nasaToggle");
+  const rostockToggle = document.getElementById("rostockToggle");
+
+  if (!explorer || !gallery) {
+    console.error("Rostock explorer: the existing NASA explorer elements were not found.");
+    return;
+  }
+
+  /* Close Rostock if its explorer is already open. */
+  if (!explorer.hidden && activeCatalogSource === "rostock") {
+    explorer.hidden = true;
+    gallery.hidden = true;
+    activeCatalogSource = "nasa";
+    nasaRequestId++;
+
+    if (nasaToggle) nasaToggle.textContent = "Explore NASA 3D Models";
+    if (rostockToggle) rostockToggle.textContent = "Explore Rostock 3D Models";
+
+    clearNASAAssets();
+    setNASAStatus("");
+    return;
+  }
+
+  activeCatalogSource = "rostock";
+  nasaRequestId++;
+
+  explorer.hidden = false;
+  gallery.hidden = true;
+
+  if (nasaToggle) nasaToggle.textContent = "Explore NASA 3D Models";
+  if (rostockToggle) rostockToggle.textContent = "Hide Rostock Explorer";
+
+  clearNASAAssets();
+
+  const select = document.getElementById("nasaFolderSelect");
+
+  if (!select) {
+    setNASAStatus("The category selector could not be found.", true);
+    return;
+  }
+
+  select.disabled = true;
+  select.innerHTML = '<option value="">Loading Rostock categories…</option>';
+  setNASAStatus("Loading the Rostock model catalog…");
+
+  try {
+    const catalog = await loadRostockCatalog();
+
+    /* Ignore the response if the user switched catalogs while loading. */
+    if (activeCatalogSource !== "rostock") return;
+
+    const categories = getRostockCategories(catalog);
+
+    if (!categories.length) {
+      throw new Error("No categories were found in the Rostock catalog.");
+    }
+
+    select.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select a Rostock category…";
+    select.appendChild(placeholder);
+
+    categories.forEach((category, index) => {
+      const option = document.createElement("option");
+      option.value = String(index);
+      option.textContent = getRostockCategoryTitle(category, index);
+      select.appendChild(option);
+    });
+
+    select.disabled = false;
+
+    select.onchange = () => {
+      if (activeCatalogSource !== "rostock") return;
+
+      if (select.value === "") {
+        clearNASAAssets();
+        setNASAStatus("Choose a Rostock category to browse its models.");
+        return;
+      }
+
+      loadRostockAssets(Number(select.value));
+    };
+
+    setNASAStatus("Choose a Rostock category to browse its models.");
+  } catch (error) {
+    if (activeCatalogSource !== "rostock") return;
+
+    console.error("Rostock catalog loading failed:", error);
+    select.innerHTML = '<option value="">Could not load Rostock catalog</option>';
+    select.disabled = true;
+    setNASAStatus(
+      "Could not load the Rostock catalog. Check the catalog URL and its JSON structure.",
+      true
+    );
+  }
+}
+
+async function loadRostockCatalog() {
+  if (rostockCatalog) return rostockCatalog;
+  if (rostockCatalogPromise) return rostockCatalogPromise;
+
+  rostockCatalogPromise = (async () => {
+    const response = await fetch(ROSTOCK_CATALOG_URL, {
+      headers: { Accept: "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error("Rostock catalog request failed (" + response.status + ").");
+    }
+
+    const data = await response.json();
+
+    if (!data || typeof data !== "object") {
+      throw new Error("The Rostock catalog did not return a valid JSON object.");
+    }
+
+    rostockCatalog = data;
+    return rostockCatalog;
+  })();
+
+  try {
+    return await rostockCatalogPromise;
+  } catch (error) {
+    rostockCatalogPromise = null;
+    throw error;
+  }
+}
+
+function getRostockCategories(catalog) {
+  if (Array.isArray(catalog?.items)) return catalog.items;
+  if (Array.isArray(catalog?.categories)) return catalog.categories;
+  return [];
+}
+
+function getRostockCategoryTitle(category, index = 0) {
+  const title = category?.title;
+
+  if (typeof title === "string" && title.trim()) return title.trim();
+
+  if (title && typeof title === "object") {
+    for (const language of ["en", "de", "es"]) {
+      if (typeof title[language] === "string" && title[language].trim()) {
+        return title[language].trim();
+      }
+    }
+
+    const localizedTitle = Object.values(title).find(
+      value => typeof value === "string" && value.trim()
+    );
+
+    if (localizedTitle) return localizedTitle.trim();
+  }
+
+  return category?.name ||
+    category?.label ||
+    category?.id ||
+    ("Category " + (index + 1));
+}
+
+function getRostockModelURL(item) {
+  const rawURL =
+    item?.properties?.olcs_modelUrl ||
+    item?.olcs_modelUrl ||
+    item?.modelUrl ||
+    item?.model_url ||
+    "";
+
+  if (typeof rawURL !== "string" || !rawURL.trim()) return null;
+
+  try {
+    const parsed = new URL(rawURL.trim());
+
+    if (parsed.protocol !== "https:") return null;
+    if (!/\.(glb|gltf)$/i.test(parsed.pathname)) return null;
+
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
+function getRostockModelName(item, url) {
+  const candidates = [
+    item?.title,
+    item?.name,
+    item?.properties?.name,
+    item?.properties?.title,
+    item?.properties?.displayName,
+    item?.properties?.label,
+    item?.id
+  ];
+
+  const name = candidates.find(
+    value => typeof value === "string" && value.trim()
+  );
+
+  if (name) return name.trim();
+
+  try {
+    return decodeURIComponent(new URL(url).pathname.split("/").pop() || "Rostock model");
+  } catch {
+    return "Rostock model";
+  }
+}
+
+function getRostockPreviewURL(item) {
+  const candidates = [
+    item?.icon,
+    item?.properties?.icon,
+    item?.thumbnail,
+    item?.properties?.thumbnail,
+    item?.properties?.preview
+  ];
+
+  for (const candidate of candidates) {
+    const value = typeof candidate === "string"
+      ? candidate
+      : candidate && typeof candidate === "object"
+        ? candidate.url || candidate.href
+        : null;
+
+    if (typeof value !== "string" || !value.trim()) continue;
+
+    try {
+      const parsed = new URL(value, ROSTOCK_CATALOG_URL);
+      if (parsed.protocol === "https:") return parsed.href;
+    } catch {}
+  }
+
+  return null;
+}
+
+async function loadRostockAssets(categoryIndex) {
+  const list = document.getElementById("nasaAssetSlot");
+  const grid = document.getElementById("nasaAssetGrid");
+  const select = document.getElementById("nasaFolderSelect");
+
+  if (activeCatalogSource !== "rostock") return;
+
+  const requestId = ++nasaRequestId;
+
+  clearNASAAssets();
+  showNASAStatusInSlot("Loading Rostock models…");
+  setNASAStatus("Reading the selected Rostock category…");
+
+  try {
+    const catalog = await loadRostockCatalog();
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "rostock") return;
+
+    const categories = getRostockCategories(catalog);
+    const category = categories[categoryIndex];
+
+    if (!category) {
+      throw new Error("The selected Rostock category could not be found.");
+    }
+
+    const objects = Array.isArray(category.predefinedObjects)
+      ? category.predefinedObjects
+      : Array.isArray(category.objects)
+        ? category.objects
+        : Array.isArray(category.items)
+          ? category.items
+          : [];
+
+    const assets = objects
+      .map((item) => {
+        const url = getRostockModelURL(item);
+        if (!url) return null;
+
+        let name = getRostockModelName(item, url);
+
+        /* Preserve the model extension for the existing GLB/GLTF UI. */
+        if (!/\.(glb|gltf)$/i.test(name)) {
+          const extension = new URL(url).pathname.match(/\.(glb|gltf)$/i)?.[0] || ".glb";
+          name += extension;
+        }
+
+        return {
+          name,
+          path: url,
+          download_url: url,
+          source: "Rostock",
+          preview_url: getRostockPreviewURL(item)
+        };
+      })
+      .filter(Boolean);
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "rostock") return;
+
+    if (!assets.length) {
+      const message = document.createElement("div");
+      message.className = "nasa-status";
+      message.textContent = "No valid GLB or GLTF model URLs were found in this category.";
+
+      list.replaceChildren(message);
+      grid.replaceChildren();
+
+      setNASAStatus(
+        "This category contains no supported model URLs, or its model URL fields use a different format."
+      );
+      return;
+    }
+
+    assets.forEach((asset) => {
+      const previews = asset.preview_url
+        ? [{ name: asset.name, url: asset.preview_url }]
+        : [];
+
+      list.appendChild(createNASAAssetListItem(asset));
+      grid.appendChild(createNASAAssetCard(asset, previews));
+    });
+
+    setNASAAssetView(nasaAssetView);
+
+    setNASAStatus(
+      assets.length + " Rostock model" +
+      (assets.length === 1 ? "" : "s") +
+      " found. Select one to load it."
+    );
+  } catch (error) {
+    if (requestId !== nasaRequestId || activeCatalogSource !== "rostock") return;
+
+    console.error("Rostock model listing failed:", error);
+
+    clearNASAAssets();
+    showNASAStatusInSlot("Could not retrieve Rostock models.");
+    showNASAStatusInGrid("Could not retrieve Rostock models.");
+    setNASAStatus(error.message, true);
+  }
 }
 
 /* ================= NASA GLOBAL GALLERY ================= */
@@ -2139,7 +2533,7 @@ async function loadNASAGlobalGallery() {
           download_url: null
         }));
 
-      /* The global repository scan feeds the shared array. */
+      /* The global repository scan feeds the shared NASA array. */
       addNASAModels(assets);
       nasaGlobalAssets = NASA_MODELS;
       nasaGlobalScanned = true;
@@ -2230,8 +2624,15 @@ function renderNASAGlobalGallery(assets = NASA_MODELS) {
 
 async function loadNASAFolders() {
   const select = document.getElementById("nasaFolderSelect");
+  if (!select) return;
+
+  activeCatalogSource = "nasa";
+
+  const requestId = ++nasaRequestId;
+
   select.disabled = true;
   select.innerHTML = '<option value="">Loading folders…</option>';
+
   clearNASAAssets();
   setNASAStatus("Connecting to the NASA public repository…");
 
@@ -2249,9 +2650,16 @@ async function loadNASAFolders() {
     }
 
     const entries = await response.json();
-    const folders = entries.filter((entry) => entry.type === "dir").sort((a, b) => a.name.localeCompare(b.name));
 
-    if (!folders.length) throw new Error("No folders were found in the NASA 3D Models directory.");
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
+    const folders = entries
+      .filter((entry) => entry.type === "dir")
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    if (!folders.length) {
+      throw new Error("No folders were found in the NASA 3D Models directory.");
+    }
 
     select.replaceChildren();
 
@@ -2271,6 +2679,8 @@ async function loadNASAFolders() {
     nasaFoldersLoaded = true;
 
     select.onchange = () => {
+      if (activeCatalogSource !== "nasa") return;
+
       if (select.value) {
         loadNASAAssets(select.value);
       } else {
@@ -2281,6 +2691,8 @@ async function loadNASAFolders() {
 
     setNASAStatus("Choose a folder to browse its model files.");
   } catch (error) {
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
     console.error("NASA folder listing failed:", error);
     select.innerHTML = '<option value="">Could not load folders</option>';
     select.disabled = true;
@@ -2289,8 +2701,8 @@ async function loadNASAFolders() {
 }
 
 function clearNASAAssets() {
-  document.getElementById("nasaAssetSlot").replaceChildren();
-  document.getElementById("nasaAssetGrid").replaceChildren();
+  document.getElementById("nasaAssetSlot")?.replaceChildren();
+  document.getElementById("nasaAssetGrid")?.replaceChildren();
 }
 
 function isNASAImage(entry) {
@@ -2330,6 +2742,8 @@ function getNASAImagePreviews(asset, images) {
 }
 
 async function loadNASAAssets(folderPath) {
+  if (activeCatalogSource !== "nasa") return;
+
   const list = document.getElementById("nasaAssetSlot");
   const grid = document.getElementById("nasaAssetGrid");
   const requestId = ++nasaRequestId;
@@ -2362,13 +2776,13 @@ async function loadNASAAssets(folderPath) {
       nasaFolderCache.set(folderPath, entries);
     }
 
-    if (requestId !== nasaRequestId) return;
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
 
     const assets = entries
       .filter((entry) => entry.type === "file" && /\.(glb|gltf)$/i.test(entry.name))
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    /* Folder navigation also contributes discovered models to the shared array. */
+    /* Folder navigation also contributes discovered models to the shared NASA array. */
     addNASAModels(assets.map((asset) => ({
       name: asset.name,
       path: asset.path,
@@ -2394,9 +2808,14 @@ async function loadNASAAssets(folderPath) {
     });
 
     setNASAAssetView(nasaAssetView);
-    setNASAStatus(assets.length + " model file" + (assets.length === 1 ? "" : "s") + " found. Select one to load it.");
+    setNASAStatus(
+      assets.length + " model file" +
+      (assets.length === 1 ? "" : "s") +
+      " found. Select one to load it."
+    );
   } catch (error) {
-    if (requestId !== nasaRequestId) return;
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
     console.error("NASA asset listing failed:", error);
     clearNASAAssets();
     showNASAStatusInSlot("Could not retrieve assets for this folder.");
@@ -2434,7 +2853,7 @@ function createNASAAssetListItem(asset) {
   return button;
 }
 
-function createNASAAssetCard(asset, previews) {
+function createNASAAssetCard(asset, previews = []) {
   const card = document.createElement("div");
   card.className = "nasa-card";
   card.tabIndex = 0;
@@ -2547,15 +2966,25 @@ function createNASAAssetCard(asset, previews) {
   return card;
 }
 
+/* ================= ASSET SELECTION ================= */
+
+/* Shared by NASA and Rostock; preserve the catalog source in the model metadata. */
 function selectNASAAsset(asset) {
   const url = getNASAAssetURL(asset);
+
   document.getElementById("urlInput").value = url;
   setNASAStatus("Loading " + asset.name + "…");
-  loadModel(url);
+
+  loadModel(url, {
+    name: asset.name.replace(/\.(glb|gltf)$/i, ""),
+    source: asset.source || "NASA"
+  });
 }
 
 function showNASAStatusInSlot(message) {
   const slot = document.getElementById("nasaAssetSlot");
+  if (!slot) return;
+
   const status = document.createElement("div");
   status.className = "nasa-status";
   status.textContent = message;
@@ -2564,6 +2993,8 @@ function showNASAStatusInSlot(message) {
 
 function showNASAStatusInGrid(message) {
   const grid = document.getElementById("nasaAssetGrid");
+  if (!grid) return;
+
   const status = document.createElement("div");
   status.className = "nasa-status";
   status.textContent = message;
@@ -2573,6 +3004,7 @@ function showNASAStatusInGrid(message) {
 function setNASAStatus(message, isError = false) {
   const status = document.getElementById("nasaStatus");
   if (!status) return;
+
   status.textContent = message;
   status.classList.toggle("error", isError);
 }
@@ -2601,8 +3033,10 @@ function normalizeBackgroundURL(url) {
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:") return null;
+
     const normalized = parsed.href;
     if (normalized === DEFAULT_BACKGROUND_IMAGE.url) return null;
+
     return normalized;
   } catch {
     return null;
@@ -2636,6 +3070,7 @@ function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
         texture.dispose();
         return;
       }
+
       texture.encoding = THREE.sRGBEncoding;
       scene.background = texture;
       document.body.style.background = "#000";
@@ -2643,6 +3078,7 @@ function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
     undefined,
     (error) => {
       if (requestId !== backgroundLoadId) return;
+
       console.error("Could not load background image:", url, error);
       scene.background = new THREE.Color(state.bg);
       document.body.style.background = state.bg;
@@ -2661,6 +3097,7 @@ function applyCustomBackgroundImage() {
   }
 
   let parsedURL;
+
   try {
     parsedURL = new URL(rawURL);
   } catch {
@@ -2739,6 +3176,7 @@ function applyLighting(values = state.lighting) {
 
   const shadowExtent = Math.max(modelRadius * 2, 0.001);
   const shadowCamera = keyLight.shadow.camera;
+
   shadowCamera.left = -shadowExtent;
   shadowCamera.right = shadowExtent;
   shadowCamera.top = shadowExtent;
@@ -2746,6 +3184,7 @@ function applyLighting(values = state.lighting) {
   shadowCamera.near = 0.1;
   shadowCamera.far = Math.max(modelRadius * 30, 1);
   shadowCamera.updateProjectionMatrix();
+
   keyLight.shadow.needsUpdate = true;
 
   if (model) {
@@ -2762,7 +3201,9 @@ function applyLighting(values = state.lighting) {
 
 function applyRotation(value) {
   state.autoRotate = value;
+
   if (controls) controls.autoRotate = value;
+
   const rotateInput = document.getElementById("rotateInput");
   if (rotateInput) rotateInput.checked = value;
 }
@@ -2771,6 +3212,7 @@ function applyRotation(value) {
 
 function exportScene() {
   const url = document.getElementById("urlInput").value.trim();
+
   if (!url) {
     setNASAStatus("Load a model before publishing the scene.", true);
     return;
@@ -2778,6 +3220,7 @@ function exportScene() {
 
   const payload = {
     modelUrl: url,
+    modelInfo: { ...(modelInfo || {}) },
     bg: state.bg,
     autoRotate: state.autoRotate,
     backgroundImage: state.backgroundImage,
@@ -2792,6 +3235,7 @@ function exportScene() {
   const link = `${location.origin}${location.pathname}?scene=${encoded}`;
 
   lastGeneratedURL = link;
+
   document.getElementById("linkBox").textContent = link;
 
   const actions = document.getElementById("exportActions");
@@ -2828,7 +3272,8 @@ function generateQR() {
 
   const img = win.document.createElement("img");
   img.alt = "Scene QR code";
-  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(lastGeneratedURL);
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+    encodeURIComponent(lastGeneratedURL);
 
   win.document.body.style.cssText =
     "display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#fff;";
@@ -2846,6 +3291,7 @@ function checkURL() {
 
   try {
     const data = JSON.parse(atob(sceneParam));
+
     document.getElementById("ui").style.display = "none";
 
     applySceneStyle(data.bg || state.bg, false);
@@ -2853,6 +3299,7 @@ function checkURL() {
 
     const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
     const imageEnabled = data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
+
     state.backgroundImageUrl = customURL;
 
     const imageURLInput = document.getElementById("backgroundImageUrlInput");
@@ -2861,9 +3308,29 @@ function checkURL() {
     applyBackgroundImage(imageEnabled, customURL);
     applyLighting(data.lighting || state.lighting);
 
+    const savedInfo = data.modelInfo || {};
+
+    modelInfo = {
+      name: savedInfo.name || "",
+      source: savedInfo.source || "",
+      description: savedInfo.description || "",
+      latitude: savedInfo.latitude ?? null,
+      longitude: savedInfo.longitude ?? null,
+      _hostname: savedInfo._hostname || ""
+    };
+
+    state.modelInfo = { ...modelInfo };
+
+    createPublicModelInfoPanel();
+
+    const panel = document.getElementById("publicModelInfo");
+    if (panel) panel.hidden = false;
+
+    renderModelInfo();
+
     if (data.modelUrl) {
       document.getElementById("urlInput").value = data.modelUrl;
-      loadModel(data.modelUrl);
+      loadModel(data.modelUrl, modelInfo);
     }
 
     lastGeneratedURL = window.location.href;
@@ -2876,9 +3343,6 @@ function checkURL() {
   });
 }
 
-
-
-  
 /* ================= 3D TWINS WATERMARK ================= */
 
 function createWatermark() {
@@ -2907,8 +3371,11 @@ createWatermark();
 
 function animate() {
   requestAnimationFrame(animate);
+
   if (isLoadingFromURL) return;
+
   if (controls) controls.update();
+
   updateCameraClipping();
   renderer.render(scene, camera);
 }
@@ -2922,10 +3389,7 @@ function onResize() {
   updateCameraClipping();
 }
 
-
-
-
-
+/* ================= MODEL METADATA ================= */
 
 var modelInfo;
 
@@ -2935,6 +3399,7 @@ function getInitialModelInfo(url, suppliedInfo = {}) {
 
   try {
     const parsed = new URL(url, location.href);
+
     filename = decodeURIComponent(
       parsed.pathname.split("/").filter(Boolean).pop() || filename
     ).replace(/\.(glb|gltf)$/i, "");
@@ -2961,15 +3426,18 @@ function getGLTFModelInfo(gltf, initialInfo) {
     const found = values.find(
       value => typeof value === "string" && value.trim()
     );
+
     return found ? found.trim() : "";
   };
 
   const firstNumber = (...values) => {
     for (const value of values) {
       if (value === null || value === undefined || value === "") continue;
+
       const number = Number(value);
       if (Number.isFinite(number)) return number;
     }
+
     return null;
   };
 
@@ -3172,7 +3640,8 @@ document
   .getElementById("assignModelLocation")
   ?.addEventListener("click", assignModelLocation);
 
-/* Sobrescribe loadModel para incorporar los metadatos. */
+/* ================= MODEL LOADER WITH METADATA ================= */
+
 function loadModel(url, suppliedInfo = null) {
   if (!url) {
     setNASAStatus("Select a model or enter a valid model URL.", true);
@@ -3227,20 +3696,8 @@ function loadModel(url, suppliedInfo = null) {
   );
 }
 
-/* Conserva la selección de modelos del catálogo NASA. */
-function selectNASAAsset(asset) {
-  const url = getNASAAssetURL(asset);
+/* ================= PUBLIC SCENE EXPORT ================= */
 
-  document.getElementById("urlInput").value = url;
-  setNASAStatus("Loading " + asset.name + "…");
-
-  loadModel(url, {
-    name: asset.name.replace(/\.(glb|gltf)$/i, ""),
-    source: "NASA"
-  });
-}
-
-/* Incluye la información del modelo en el enlace publicado. */
 function exportScene() {
   const url = document.getElementById("urlInput").value.trim();
 
@@ -3273,7 +3730,8 @@ function exportScene() {
   if (actions) actions.style.display = "flex";
 }
 
-/* Recupera los metadatos cuando se abre una escena publicada. */
+/* ================= PUBLIC SCENE LOAD ================= */
+
 function checkURL() {
   const sceneParam = new URLSearchParams(location.search).get("scene");
   if (!sceneParam) return;
@@ -3334,12 +3792,6 @@ function checkURL() {
     isLoadingFromURL = false;
   });
 }
-
-
-
-
-
-  
 </script>
 </body>
 </html>
