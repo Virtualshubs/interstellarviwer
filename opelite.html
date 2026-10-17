@@ -1576,16 +1576,7 @@ if (new URLSearchParams(location.search).get("scene")) {
       <div class="heroHint">Supports GLB / GLTF files hosted online</div>     
       <div class="nasa-divider"></div>
       <button id="nasaToggle" class="btn btn-secondary" type="button" onclick="toggleNASAExplorer()">Explore NASA 3D Models</button>
-
-      <div id="nasaExplorer" class="nasa-explorer" hidden>
-        <div class="nasa-heading">
-          <div>
-            <div class="nasa-heading-title">NASA MODEL LIBRARY</div>
-            <div class="nasa-heading-caption">Browse folders and load a model</div>
-          </div>
-        </div>
-
-        <button
+     <button
   id="rostockToggle"
   class="btn btn-secondary"
   type="button"
@@ -1594,6 +1585,14 @@ if (new URLSearchParams(location.search).get("scene")) {
   Explore Rostock 3D Models
 </button>
 
+      <div id="nasaExplorer" class="nasa-explorer" hidden>
+        <div class="nasa-heading">
+          <div>
+            <div class="nasa-heading-caption">Browse folders and load a model</div>
+          </div>
+        </div>
+
+   
         <div>
           <div class="nasa-label">Model folder</div>
           <select id="nasaFolderSelect" class="nasa-select" disabled>
