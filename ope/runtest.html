@@ -1,0 +1,1307 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAC · Janus Benchmark</title>
+
+<style>
+:root {
+  color-scheme: light;
+  --bg: #F3F1EA;
+  --panel: #EAE7DE;
+  --line: #D9D4C8;
+  --text: #242522;
+  --muted: #716B60;
+  --blue: #416D80;
+  --orange: #E5682E;
+  --dark: #111210;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+}
+
+header {
+  padding: 26px clamp(18px, 4vw, 48px) 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow, .label, .metric-label {
+  font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 8px 0;
+  font-size: clamp(27px, 3vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -.04em;
+  font-weight: 600;
+}
+
+h2 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: -.025em;
+  font-weight: 600;
+}
+
+p { margin: 7px 0; }
+
+.intro {
+  max-width: 900px;
+  color: var(--muted);
+}
+
+main {
+  padding: 20px clamp(18px, 4vw, 48px) 40px;
+  display: grid;
+  gap: 18px;
+}
+
+.config {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #C6C0B4;
+  background: #FBFAF6;
+  color: var(--text);
+  padding: 11px 12px;
+  border-radius: 8px;
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.hint, .note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.phase {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #F8F7F2;
+}
+
+.phase-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.phase-head p {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 760px;
+}
+
+.phase-body { padding: 18px 20px 20px; }
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+button {
+  border: 0;
+  border-radius: var(--radius);
+  padding: 10px 15px;
+  cursor: pointer;
+  font: 600 13px/1.3 system-ui, sans-serif;
+}
+
+button.primary { background: var(--orange); color: white; }
+button.secondary { background: var(--blue); color: white; }
+button.dark { background: var(--dark); color: white; }
+
+button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #EAE7DE;
+  white-space: nowrap;
+}
+
+.status.good { background: #E2E9DC; color: #3E5735; }
+.status.warn { background: #F4E4D9; color: #8B3E1E; }
+
+.progress-wrap {
+  height: 5px;
+  background: #E5E1D8;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 12px 0 16px;
+}
+
+.progress {
+  height: 100%;
+  width: 0;
+  background: var(--blue);
+  transition: width .2s;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.metric {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.metric-value {
+  display: block;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+.metric-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.log {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: #F0EEE7;
+  border-radius: 8px;
+  max-height: 180px;
+  overflow: auto;
+  color: #4F4C45;
+  font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.warning {
+  border-left: 3px solid var(--orange);
+  padding: 9px 12px;
+  margin-top: 14px;
+  background: #F4E4D9;
+  font-size: 12px;
+}
+
+.frame-wrap {
+  height: min(65vh, 680px);
+  min-height: 320px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #EAE7DE;
+  margin-top: 15px;
+}
+
+iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: white;
+}
+
+.empty-frame {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 25px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.summary {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  background: var(--panel);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.summary-cell {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #F8F7F2;
+}
+
+.summary-cell strong {
+  display: block;
+  font-size: 18px;
+  margin: 5px 0;
+}
+
+@media (max-width: 760px) {
+  .config, .summary-grid { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .phase-head { display: block; }
+  .status { display: inline-block; margin-top: 10px; }
+  .frame-wrap { min-height: 260px; height: 55vh; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="eyebrow">OPE / JANUS · PROTOCOLO DE MEDICIÓN</div>
+  <h1>STAC reading benchmark</h1>
+  <p class="intro">
+    Comparación secuencial entre la lectura clásica de una colección STAC
+    y la exploración de Janus. La lectura clásica procesa la paginación
+    sin conservar los objetos STAC completos.
+  </p>
+</header>
+
+<main>
+
+  <!-- CONFIGURACIÓN -->
+
+  <section class="config">
+    <div class="field">
+      <label class="label" for="stacUrl">01 / URL del catálogo STAC</label>
+      <input
+        id="stacUrl"
+        type="url"
+        placeholder="Pega aquí el endpoint STAC"
+        autocomplete="off"
+      >
+      <div class="hint">
+        Usa un endpoint de ítems, por ejemplo
+        /collections/ID/items, o un endpoint /search.
+        Si pegas /collections/ID, se intentará añadir /items.
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="janusUrl">02 / URL de Janus</label>
+      <input
+        id="janusUrl"
+        type="url"
+        placeholder="Pega aquí la URL completa de Janus"
+        autocomplete="off"
+      >
+      <div class="hint">
+        Se cargará en un iframe. El benchmark no modifica el código de Janus.
+      </div>
+    </div>
+  </section>
+
+  <!-- FASE 1: STAC -->
+
+  <section class="phase">
+    <div class="phase-head">
+      <div>
+        <div class="eyebrow">FASE 01 · BASELINE</div>
+        <h2>Lectura clásica STAC</h2>
+        <p>
+          Recorre las páginas siguiendo los enlaces
+          <code>rel=next</code> de la API. No descarga los archivos raster
+          de los assets. La lectura finaliza cuando no hay siguiente página.
+        </p>
+      </div>
+      <span class="status" id="stacStatus">Pendiente</span>
+    </div>
+
+    <div class="phase-body">
+      <div class="controls">
+        <button class="primary" id="stacStart">Iniciar lectura STAC</button>
+        <button class="dark" id="stacEnd" disabled>Fin / registrar medición</button>
+        <button class="secondary" id="stacReset">Reiniciar fase</button>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress" id="stacProgress"></div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <span class="metric-value" id="stacElapsed">—</span>
+          <span class="metric-label">Tiempo de lectura</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacPages">0</span>
+          <span class="metric-label">Páginas procesadas</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacItems">0</span>
+          <span class="metric-label">Ítems procesados</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacUnique">0</span>
+          <span class="metric-label">IDs únicos</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacMemStart">—</span>
+          <span class="metric-label">Heap JS al inicio</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacMemEnd">—</span>
+          <span class="metric-label">Heap JS al final</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacMemDelta">—</span>
+          <span class="metric-label">Variación observada</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="stacErrors">0</span>
+          <span class="metric-label">Errores de lectura</span>
+        </div>
+      </div>
+
+      <div class="log" id="stacLog" aria-live="polite">Introduce la URL del endpoint STAC para comenzar.</div>
+
+      <div class="warning">
+        El lector conserva un conjunto de identificadores para detectar duplicados,
+        además de estadísticas agregadas. No conserva los objetos STAC completos.
+        La memoria JavaScript puede no estar disponible en todos los navegadores.
+      </div>
+    </div>
+  </section>
+
+  <!-- FASE 2: JANUS -->
+
+  <section class="phase">
+    <div class="phase-head">
+      <div>
+        <div class="eyebrow">FASE 02 · EXPLORACIÓN</div>
+        <h2>Janus</h2>
+        <p>
+          Carga Janus, inicia el cronómetro, realiza tu exploración habitual
+          con <em>Rediscovery Map</em> y pulsa Fin cuando aparezca
+          <em>No More Data Cells</em>.
+        </p>
+      </div>
+      <span class="status" id="janusStatus">Esperando fase STAC</span>
+    </div>
+
+    <div class="phase-body">
+      <div class="controls">
+        <button class="secondary" id="loadJanus">Cargar URL de Janus</button>
+        <button class="primary" id="janusStart" disabled>Iniciar Janus</button>
+        <button class="dark" id="janusEnd" disabled>Fin / registrar medición</button>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <span class="metric-value" id="janusElapsed">—</span>
+          <span class="metric-label">Tiempo de exploración</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="janusMemStart">—</span>
+          <span class="metric-label">Heap JS al inicio</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="janusMemEnd">—</span>
+          <span class="metric-label">Heap JS al final</span>
+        </div>
+        <div class="metric">
+          <span class="metric-value" id="janusMemDelta">—</span>
+          <span class="metric-label">Variación observada</span>
+        </div>
+      </div>
+
+      <div class="frame-wrap" id="frameWrap">
+        <div class="empty-frame" id="framePlaceholder">
+          Pega la URL de Janus arriba y pulsa «Cargar URL de Janus».
+        </div>
+      </div>
+
+      <div class="log" id="janusLog" aria-live="polite">
+        La fase Janus se habilitará al registrar la fase STAC.
+      </div>
+
+      <div class="warning">
+        Por las restricciones de seguridad del navegador, esta página no puede
+        leer normalmente el heap interno de un iframe de otro origen. La medición
+        mostrada corresponde al documento anfitrión y puede no incluir la memoria
+        propia de Janus. Para medir la memoria real de la pestaña, contrasta con
+        el administrador de tareas del navegador.
+      </div>
+    </div>
+  </section>
+
+  <!-- INFORME -->
+
+  <section class="summary">
+    <div class="eyebrow">RESULTADO</div>
+    <h2>Resumen comparativo</h2>
+    <p class="note">
+      Se mantienen separadas las métricas de las dos fases. El tiempo STAC
+      termina al registrar la medición; el cronómetro de Janus es manual.
+    </p>
+
+    <div class="summary-grid">
+      <div class="summary-cell">
+        <span class="metric-label">STAC · tiempo y volumen</span>
+        <strong id="summaryStac">Pendiente</strong>
+        <span class="note" id="summaryStacDetail">Sin resultados todavía.</span>
+      </div>
+      <div class="summary-cell">
+        <span class="metric-label">Janus · tiempo y memoria observada</span>
+        <strong id="summaryJanus">Pendiente</strong>
+        <span class="note" id="summaryJanusDetail">Sin resultados todavía.</span>
+      </div>
+    </div>
+
+    <div class="controls" style="margin-top:14px;margin-bottom:0">
+      <button class="dark" id="downloadReport" disabled>
+        Exportar informe JSON
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const state = {
+    stac: newStacState(),
+    janus: newJanusState(),
+    janusLoaded: false
+  };
+
+  function newStacState() {
+    return {
+      started: false,
+      finished: false,
+      endTime: null,
+      startTime: null,
+      pages: 0,
+      items: 0,
+      ids: new Set(),
+      duplicateIds: 0,
+      errors: 0,
+      errorMessages: [],
+      assetsDeclared: 0,
+      propertyKeys: new Set(),
+      minDate: null,
+      maxDate: null,
+      minLat: null,
+      maxLat: null,
+      minLon: null,
+      maxLon: null,
+      memoryStart: null,
+      memoryEnd: null,
+      memorySource: null
+    };
+  }
+
+  function newJanusState() {
+    return {
+      started: false,
+      finished: false,
+      startTime: null,
+      endTime: null,
+      memoryStart: null,
+      memoryEnd: null,
+      memorySource: null
+    };
+  }
+
+  const fmt = n => Number(n).toLocaleString("es-ES");
+
+  function elapsedText(ms) {
+    if (ms == null) return "—";
+    if (ms < 60000) return (ms / 1000).toFixed(1) + " s";
+    const mins = Math.floor(ms / 60000);
+    const secs = ((ms % 60000) / 1000).toFixed(0).padStart(2, "0");
+    return mins + " min " + secs + " s";
+  }
+
+  function fmtMB(bytes) {
+    if (bytes == null) return "No disponible";
+    return (bytes / 1048576).toFixed(1) + " MB";
+  }
+
+  function signedMB(delta) {
+    if (delta == null) return "No disponible";
+    return (delta >= 0 ? "+" : "") + fmtMB(delta);
+  }
+
+  function log(id, message) {
+    const el = $(id);
+    const stamp = new Date().toLocaleTimeString("es-ES");
+    el.textContent += (el.textContent ? "\n" : "") +
+      "[" + stamp + "] " + message;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function setStatus(id, message, kind = "") {
+    const el = $(id);
+    el.textContent = message;
+    el.className = "status" + (kind ? " " + kind : "");
+  }
+
+  /*
+   * Esta API es no estándar y principalmente está disponible en Chromium.
+   * No representa la memoria total del proceso ni la memoria GPU.
+   */
+  function heapSnapshot() {
+    const memory = performance.memory;
+
+    if (memory && Number.isFinite(memory.usedJSHeapSize)) {
+      return {
+        bytes: memory.usedJSHeapSize,
+        source: "performance.memory.usedJSHeapSize"
+      };
+    }
+
+    return {
+      bytes: null,
+      source: "API de heap no disponible en este navegador"
+    };
+  }
+
+  function recordMemory(prefix, phase, edge) {
+    const snapshot = heapSnapshot();
+
+    phase[edge] = snapshot.bytes;
+    phase.memorySource = snapshot.source;
+
+    const suffix = edge === "memoryStart" ? "MemStart" : "MemEnd";
+    $(prefix + suffix).textContent = fmtMB(snapshot.bytes);
+
+    const delta =
+      phase.memoryStart != null && phase.memoryEnd != null
+        ? phase.memoryEnd - phase.memoryStart
+        : null;
+
+    $(prefix + "MemDelta").textContent = signedMB(delta);
+  }
+
+  function updateStacMetrics() {
+    const s = state.stac;
+
+    $("stacPages").textContent = fmt(s.pages);
+    $("stacItems").textContent = fmt(s.items);
+    $("stacUnique").textContent = fmt(s.ids.size);
+    $("stacErrors").textContent = fmt(s.errors);
+
+    $("stacProgress").style.width =
+      s.finished ? "100%" : (s.started ? "50%" : "0%");
+  }
+
+  function updateSummary() {
+    const s = state.stac;
+    const j = state.janus;
+
+    $("summaryStac").textContent =
+      s.endTime == null
+        ? "Pendiente"
+        : elapsedText(s.endTime - s.startTime) + " · " + fmt(s.items) + " ítems";
+
+    $("summaryStacDetail").textContent =
+      s.endTime == null
+        ? "Sin resultados todavía."
+        : fmt(s.pages) + " páginas; " +
+          fmt(s.ids.size) + " IDs únicos; " +
+          fmt(s.duplicateIds) + " IDs duplicados; " +
+          fmt(s.errors) + " errores; heap Δ " +
+          signedMB(
+            s.memoryStart != null && s.memoryEnd != null
+              ? s.memoryEnd - s.memoryStart
+              : null
+          ) + ".";
+
+    $("summaryJanus").textContent =
+      j.finished
+        ? elapsedText(j.endTime - j.startTime)
+        : "Pendiente";
+
+    $("summaryJanusDetail").textContent =
+      !j.finished
+        ? "Sin resultados todavía."
+        : "Heap del documento anfitrión Δ " +
+          signedMB(
+            j.memoryStart != null && j.memoryEnd != null
+              ? j.memoryEnd - j.memoryStart
+              : null
+          ) + ". El heap del iframe puede no estar incluido.";
+
+    $("downloadReport").disabled =
+      !(s.endTime != null || j.finished);
+  }
+
+  function includeCoordinate(lon, lat) {
+    if (!Number.isFinite(lon) || !Number.isFinite(lat)) return;
+    if (lon < -180 || lon > 180 || lat < -90 || lat > 90) return;
+
+    const s = state.stac;
+
+    s.minLon = s.minLon == null ? lon : Math.min(s.minLon, lon);
+    s.maxLon = s.maxLon == null ? lon : Math.max(s.maxLon, lon);
+    s.minLat = s.minLat == null ? lat : Math.min(s.minLat, lat);
+    s.maxLat = s.maxLat == null ? lat : Math.max(s.maxLat, lat);
+  }
+
+  function scanCoordinates(node) {
+    if (!Array.isArray(node)) return;
+
+    if (
+      node.length >= 2 &&
+      typeof node[0] === "number" &&
+      typeof node[1] === "number"
+    ) {
+      includeCoordinate(node[0], node[1]);
+      return;
+    }
+
+    for (const child of node) {
+      scanCoordinates(child);
+    }
+  }
+
+  function scanDates(properties) {
+    if (!properties || typeof properties !== "object") return;
+
+    const candidates = [
+      properties.datetime,
+      properties.start_datetime,
+      properties.end_datetime,
+      properties.created,
+      properties.updated,
+      properties.date
+    ];
+
+    for (const value of candidates) {
+      if (typeof value !== "string") continue;
+
+      const timestamp = Date.parse(value);
+      if (!Number.isFinite(timestamp)) continue;
+
+      const iso = new Date(timestamp).toISOString();
+
+      if (!state.stac.minDate || iso < state.stac.minDate) {
+        state.stac.minDate = iso;
+      }
+
+      if (!state.stac.maxDate || iso > state.stac.maxDate) {
+        state.stac.maxDate = iso;
+      }
+    }
+  }
+
+  function processItem(item) {
+    const s = state.stac;
+    s.items++;
+
+    if (item && item.id != null) {
+      const id = String(item.id);
+
+      if (s.ids.has(id)) {
+        s.duplicateIds++;
+      } else {
+        s.ids.add(id);
+      }
+    }
+
+    if (item && item.properties && typeof item.properties === "object") {
+      for (const key of Object.keys(item.properties)) {
+        s.propertyKeys.add(key);
+      }
+
+      scanDates(item.properties);
+    }
+
+    if (item && item.assets && typeof item.assets === "object") {
+      s.assetsDeclared += Object.keys(item.assets).length;
+    }
+
+    if (item && item.geometry && item.geometry.coordinates) {
+      scanCoordinates(item.geometry.coordinates);
+    } else if (item && Array.isArray(item.bbox) && item.bbox.length >= 4) {
+      includeCoordinate(item.bbox[0], item.bbox[1]);
+      includeCoordinate(item.bbox[2], item.bbox[3]);
+    }
+  }
+
+  function deriveItemsUrl(input) {
+    const url = new URL(input);
+
+    if (!["https:", "http:"].includes(url.protocol)) {
+      throw new Error("La URL debe comenzar por http:// o https://.");
+    }
+
+    const path = url.pathname.replace(/\/+$/, "");
+
+    // URL de metadatos de una colección: se intenta acceder a sus ítems.
+    if (/\/collections\/[^/]+$/.test(path)) {
+      url.pathname = path + "/items";
+    } else if (/\/v1$/.test(path) || path === "") {
+      throw new Error(
+        "Has pegado la raíz de la API. Introduce /collections/ID/items " +
+        "o un endpoint /search para indicar qué catálogo recorrer."
+      );
+    }
+
+    return url.href;
+  }
+
+  async function fetchStacPage(url, method, body, headers) {
+    const options = {
+      method,
+      cache: "no-store",
+      headers: {
+        "Accept": "application/geo+json, application/json",
+        ...headers
+      }
+    };
+
+    if (method !== "GET" && body != null) {
+      options.body =
+        typeof body === "string" ? body : JSON.stringify(body);
+
+      if (!options.headers["Content-Type"]) {
+        options.headers["Content-Type"] = "application/json";
+      }
+    }
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status + " al consultar " + url);
+    }
+
+    return response.json();
+  }
+
+  function findNextLink(links) {
+    if (!Array.isArray(links)) return null;
+
+    return links.find(link =>
+      link &&
+      String(link.rel).toLowerCase() === "next" &&
+      link.href
+    ) || null;
+  }
+
+  async function crawlStac() {
+    const s = state.stac;
+    let currentUrl;
+
+    try {
+      currentUrl = deriveItemsUrl($("stacUrl").value.trim());
+    } catch (error) {
+      setStatus("stacStatus", "URL no válida", "warn");
+      log("stacLog", error.message);
+      return;
+    }
+
+    s.started = true;
+    s.startTime = performance.now();
+
+    recordMemory("stac", s, "memoryStart");
+
+    $("stacElapsed").textContent = "En curso";
+    $("stacStart").disabled = true;
+    $("stacEnd").disabled = true;
+    $("stacReset").disabled = true;
+    $("stacUrl").disabled = true;
+
+    setStatus("stacStatus", "Leyendo paginación");
+    $("stacLog").textContent = "";
+
+    log("stacLog", "Inicio de lectura.");
+    log("stacLog", "Endpoint efectivo: " + currentUrl);
+    log("stacLog", "No se descargarán los archivos raster de los assets.");
+
+    const visited = new Set();
+
+    let method = "GET";
+    let body = null;
+    let headers = {};
+
+    try {
+      while (currentUrl) {
+        const visitKey =
+          currentUrl + "|" + method + "|" +
+          (body == null ? "" : JSON.stringify(body));
+
+        if (visited.has(visitKey)) {
+          throw new Error(
+            "La API devolvió un enlace ya visitado. Se detiene para evitar un bucle."
+          );
+        }
+
+        visited.add(visitKey);
+
+        const page = await fetchStacPage(
+          currentUrl, method, body, headers
+        );
+
+        if (!page || typeof page !== "object") {
+          throw new Error("La respuesta no es un objeto JSON STAC.");
+        }
+
+        const features =
+          Array.isArray(page.features)
+            ? page.features
+            : (page.type === "Feature" ? [page] : null);
+
+        if (!features) {
+          throw new Error(
+            "La respuesta no contiene «features». Comprueba que la URL " +
+            "sea un endpoint de ítems o búsqueda STAC."
+          );
+        }
+
+        s.pages++;
+
+        /*
+         * Procesamos los ítems uno a uno.
+         * No guardamos sus objetos en una colección de resultados.
+         * Solo conservamos contadores, estadísticas y el conjunto de IDs.
+         */
+        for (const item of features) {
+          processItem(item);
+        }
+
+        const pageCount = features.length;
+        const next = findNextLink(page.links);
+
+        /*
+         * Liberamos las referencias a los objetos de esta página
+         * antes de solicitar la siguiente. El navegador decidirá cuándo
+         * recuperar físicamente esa memoria mediante garbage collection.
+         */
+        features.length = 0;
+        page.features = null;
+
+        updateStacMetrics();
+
+        log(
+          "stacLog",
+          "Página " + fmt(s.pages) +
+          ": +" + fmt(pageCount) +
+          " ítems · acumulado " + fmt(s.items) +
+          " · IDs únicos " + fmt(s.ids.size)
+        );
+
+        if (!next) {
+          currentUrl = null;
+          break;
+        }
+
+        const nextUrl = new URL(next.href, currentUrl);
+
+        if (!["https:", "http:"].includes(nextUrl.protocol)) {
+          throw new Error("El enlace next utiliza un protocolo no permitido.");
+        }
+
+        currentUrl = nextUrl.href;
+        method = String(next.method || "GET").toUpperCase();
+        body = next.body == null ? null : next.body;
+        headers =
+          next.headers && typeof next.headers === "object"
+            ? next.headers
+            : {};
+
+        if (!["GET", "POST"].includes(method)) {
+          throw new Error(
+            "Método de paginación no soportado: " + method
+          );
+        }
+      }
+
+      s.finished = true;
+
+      $("stacElapsed").textContent =
+        elapsedText(performance.now() - s.startTime);
+
+      $("stacProgress").style.width = "100%";
+
+      setStatus("stacStatus", "Proceso finalizado", "good");
+
+      log(
+        "stacLog",
+        "Proceso finalizado: no hay más enlaces rel=next."
+      );
+
+      if (s.duplicateIds > 0) {
+        log(
+          "stacLog",
+          "Aviso: se detectaron " + fmt(s.duplicateIds) +
+          " apariciones de IDs repetidos."
+        );
+      }
+
+      log(
+        "stacLog",
+        "Pulsa «Fin / registrar medición» para cerrar la fase."
+      );
+
+    } catch (error) {
+      s.errors++;
+      s.errorMessages.push(String(error.message || error));
+
+      setStatus("stacStatus", "Lectura detenida por error", "warn");
+
+      log("stacLog", "ERROR: " + (error.message || String(error)));
+
+      log(
+        "stacLog",
+        "Si aparece un error CORS, el navegador puede estar bloqueando " +
+        "el acceso desde el origen donde se aloja este HTML."
+      );
+
+      $("stacElapsed").textContent =
+        elapsedText(performance.now() - s.startTime);
+
+      updateStacMetrics();
+    }
+
+    /*
+     * El botón Fin se habilita únicamente cuando el proceso acaba
+     * o se detiene por error. Así no se inicia Janus mientras STAC
+     * continúa ejecutándose.
+     */
+    $("stacEnd").disabled = false;
+    $("stacReset").disabled = false;
+    updateSummary();
+  }
+
+  function finishStac() {
+    const s = state.stac;
+
+    if (!s.started || s.endTime != null) return;
+
+    s.endTime = performance.now();
+
+    recordMemory("stac", s, "memoryEnd");
+
+    $("stacElapsed").textContent =
+      elapsedText(s.endTime - s.startTime);
+
+    $("stacEnd").disabled = true;
+    $("stacStart").disabled = true;
+    $("stacReset").disabled = false;
+    $("stacUrl").disabled = false;
+
+    if (s.finished) {
+      setStatus("stacStatus", "Medición registrada", "good");
+    } else {
+      setStatus("stacStatus", "Medición registrada · lectura incompleta", "warn");
+    }
+
+    log(
+      "stacLog",
+      "Medición registrada. Fuente de memoria: " + s.memorySource + "."
+    );
+
+    $("janusStart").disabled = !state.janusLoaded;
+
+    setStatus(
+      "janusStatus",
+      state.janusLoaded ? "Listo para iniciar" : "Carga Janus para continuar"
+    );
+
+    updateSummary();
+  }
+
+  function resetStac() {
+    if (
+      state.stac.started &&
+      state.stac.endTime == null &&
+      !confirm("¿Quieres reiniciar la fase STAC?")
+    ) {
+      return;
+    }
+
+    state.stac = newStacState();
+
+    [
+      "stacElapsed", "stacMemStart", "stacMemEnd", "stacMemDelta"
+    ].forEach(id => $(id).textContent = "—");
+
+    [
+      "stacPages", "stacItems", "stacUnique", "stacErrors"
+    ].forEach(id => $(id).textContent = "0");
+
+    $("stacProgress").style.width = "0%";
+    $("stacLog").textContent = "Fase reiniciada.";
+
+    $("stacStart").disabled = false;
+    $("stacEnd").disabled = true;
+    $("stacReset").disabled = false;
+    $("stacUrl").disabled = false;
+
+    $("janusStart").disabled = true;
+    $("janusEnd").disabled = true;
+
+    setStatus("stacStatus", "Pendiente");
+    setStatus("janusStatus", "Esperando fase STAC");
+
+    updateSummary();
+  }
+
+  function loadJanus() {
+    const value = $("janusUrl").value.trim();
+
+    if (!value) {
+      log("janusLog", "Introduce primero la URL de Janus.");
+      return;
+    }
+
+    try {
+      const url = new URL(value);
+
+      if (!["https:", "http:"].includes(url.protocol)) {
+        throw new Error("La URL debe comenzar por http:// o https://.");
+      }
+
+      const iframe = document.createElement("iframe");
+      iframe.title = "Janus";
+      iframe.referrerPolicy = "no-referrer";
+      iframe.src = url.href;
+
+      $("frameWrap").replaceChildren(iframe);
+
+      state.janusLoaded = true;
+
+      log(
+        "janusLog",
+        "Iframe cargado. Espera a que Janus esté listo para explorar."
+      );
+
+      if (state.stac.endTime != null) {
+        $("janusStart").disabled = false;
+        setStatus("janusStatus", "Listo para iniciar");
+      } else {
+        log(
+          "janusLog",
+          "La fase cronometrada se habilitará tras registrar la fase STAC."
+        );
+      }
+
+    } catch (error) {
+      log("janusLog", error.message || String(error));
+    }
+  }
+
+  function startJanus() {
+    const j = state.janus;
+
+    if (state.stac.endTime == null) return;
+    if (!state.janusLoaded) return;
+    if (j.started && !j.finished) return;
+
+    j.started = true;
+    j.finished = false;
+    j.startTime = performance.now();
+    j.endTime = null;
+
+    recordMemory("janus", j, "memoryStart");
+
+    $("janusElapsed").textContent = "En curso";
+    $("janusStart").disabled = true;
+    $("janusEnd").disabled = false;
+
+    setStatus("janusStatus", "Exploración en curso");
+    $("janusLog").textContent = "";
+
+    log("janusLog", "Cronómetro iniciado.");
+    log(
+      "janusLog",
+      "Realiza la exploración habitual y pulsa Fin al aparecer «No More Data Cells»."
+    );
+  }
+
+  function finishJanus() {
+    const j = state.janus;
+
+    if (!j.started || j.finished) return;
+
+    j.endTime = performance.now();
+    j.finished = true;
+
+    recordMemory("janus", j, "memoryEnd");
+
+    $("janusElapsed").textContent =
+      elapsedText(j.endTime - j.startTime);
+
+    $("janusEnd").disabled = true;
+    $("janusStart").disabled = false;
+
+    setStatus("janusStatus", "Medición registrada", "good");
+
+    log(
+      "janusLog",
+      "Medición registrada. Fuente de memoria: " + j.memorySource + "."
+    );
+
+    updateSummary();
+  }
+
+  function exportReport() {
+    const s = state.stac;
+    const j = state.janus;
+
+    const report = {
+      title: "STAC reading benchmark",
+      exportedAt: new Date().toISOString(),
+
+      measurementNotes: [
+        "La API performance.memory, cuando está disponible, mide heap JavaScript del documento anfitrión.",
+        "El heap JavaScript no equivale a la memoria total de la pestaña ni a la memoria GPU.",
+        "La medición del documento anfitrión puede no incluir el heap del iframe Janus.",
+        "El lector STAC conserva IDs y estadísticas agregadas, no los objetos STAC completos ni los archivos raster.",
+        "La recuperación física de memoria depende del garbage collector del navegador.",
+        "La comparación de tiempos solo es válida si ambos procesos cubren un ámbito de datos comparable."
+      ],
+
+      stac: {
+        endpointInput: $("stacUrl").value.trim(),
+        started: s.started,
+        paginationFinished: s.finished,
+
+        elapsedMs:
+          s.startTime != null && s.endTime != null
+            ? Math.round(s.endTime - s.startTime)
+            : null,
+
+        pages: s.pages,
+        itemsProcessed: s.items,
+        uniqueIds: s.ids.size,
+        duplicateIds: s.duplicateIds,
+        errors: s.errors,
+        errorMessages: s.errorMessages,
+
+        assetsDeclared: s.assetsDeclared,
+        propertyKeys: [...s.propertyKeys].sort(),
+
+        temporalRange: {
+          start: s.minDate,
+          end: s.maxDate
+        },
+
+        spatialBounds: {
+          minLongitude: s.minLon,
+          maxLongitude: s.maxLon,
+          minLatitude: s.minLat,
+          maxLatitude: s.maxLat
+        },
+
+        memory: {
+          startBytes: s.memoryStart,
+          endBytes: s.memoryEnd,
+          deltaBytes:
+            s.memoryStart != null && s.memoryEnd != null
+              ? s.memoryEnd - s.memoryStart
+              : null,
+          source: s.memorySource
+        }
+      },
+
+      janus: {
+        url: $("janusUrl").value.trim(),
+        started: j.started,
+        finished: j.finished,
+
+        elapsedMs:
+          j.startTime != null && j.endTime != null
+            ? Math.round(j.endTime - j.startTime)
+            : null,
+
+        memory: {
+          startBytes: j.memoryStart,
+          endBytes: j.memoryEnd,
+          deltaBytes:
+            j.memoryStart != null && j.memoryEnd != null
+              ? j.memoryEnd - j.memoryStart
+              : null,
+          source: j.memorySource
+        }
+      }
+    };
+
+    const blob = new Blob(
+      [JSON.stringify(report, null, 2)],
+      { type: "application/json" }
+    );
+
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = objectUrl;
+    anchor.download =
+      "stac-janus-benchmark-" +
+      new Date().toISOString().replace(/[:.]/g, "-") +
+      ".json";
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  }
+
+  $("stacStart").addEventListener("click", () => {
+    if (state.stac.started) return;
+    crawlStac();
+  });
+
+  $("stacEnd").addEventListener("click", finishStac);
+  $("stacReset").addEventListener("click", resetStac);
+  $("loadJanus").addEventListener("click", loadJanus);
+  $("janusStart").addEventListener("click", startJanus);
+  $("janusEnd").addEventListener("click", finishJanus);
+  $("downloadReport").addEventListener("click", exportReport);
+
+})();
+</script>
+
+</body>
+</html>
