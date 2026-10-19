@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>3D OPE Lite Space | Bibliotecas 3D interactivas</title>
+  <title>3D Lite Space | Bibliotecas 3D interactivas en minutos</title>
   <meta name="description" content="Convierte tus repositorios 3D en bibliotecas interactivas en minutos. Organiza, prepara y comparte tus recursos desde tus repositorios existentes.">
   <meta name="theme-color" content="#F3F1EA">
 
@@ -59,10 +58,14 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    a:focus-visible {
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
       outline: 2px solid var(--primary);
       outline-offset: 4px;
     }
+
+    button, input { font: inherit; }
 
     ::selection { color: var(--bg); background: var(--primary); }
 
@@ -87,6 +90,21 @@
       color: var(--muted);
       font-size: 16px;
       line-height: 1.85;
+    }
+
+    .material-symbols-outlined {
+      display: inline-block;
+      font-family: "Material Symbols Outlined";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 23px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      white-space: nowrap;
+      direction: ltr;
+      font-feature-settings: "liga";
+      -webkit-font-smoothing: antialiased;
     }
 
     /* HEADER */
@@ -123,14 +141,9 @@
       align-items: center;
       justify-content: center;
       justify-self: center;
-      color: var(--text);
     }
 
-    .header-logo svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+    .header-logo svg { width: 100%; height: 100%; }
 
     .header-account {
       display: inline-flex;
@@ -141,29 +154,13 @@
       justify-self: end;
       border: 1px solid var(--line);
       border-radius: 50%;
-      transition: color .2s ease, background .2s ease, border-color .2s ease;
+      transition: .2s ease;
     }
 
     .header-account:hover {
       border-color: var(--primary);
       background: var(--panel);
       color: var(--primary);
-    }
-
-    .material-symbols-outlined {
-      display: inline-block;
-      font-family: "Material Symbols Outlined";
-      font-weight: normal;
-      font-style: normal;
-      font-size: 23px;
-      line-height: 1;
-      letter-spacing: normal;
-      text-transform: none;
-      white-space: nowrap;
-      direction: ltr;
-      font-feature-settings: "liga";
-      -webkit-font-feature-settings: "liga";
-      -webkit-font-smoothing: antialiased;
     }
 
     /* HERO */
@@ -202,7 +199,7 @@
       line-height: 1.9;
     }
 
-    /* BENEFICIOS: IMÁGENES A ANCHO COMPLETO */
+    /* BENEFICIOS 01–03 */
 
     .benefits {
       padding-top: clamp(45px, 7vw, 85px);
@@ -223,8 +220,7 @@
       align-items: center;
       overflow: hidden;
       isolation: isolate;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
+      border-block: 1px solid var(--line);
       background: var(--secondary);
       color: var(--bg);
     }
@@ -295,9 +291,7 @@
       width: 100%;
       opacity: 0;
       transform: translateY(24px);
-      transition:
-        opacity .45s ease,
-        transform .55s cubic-bezier(.2, .7, .2, 1);
+      transition: opacity .45s ease, transform .55s ease;
       pointer-events: none;
     }
 
@@ -346,8 +340,7 @@
 
     .additional-benefits {
       padding-block: clamp(55px, 8vw, 95px);
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
+      border-block: 1px solid var(--line);
       background: var(--panel);
     }
 
@@ -374,14 +367,437 @@
     }
 
     .additional-benefit p {
-      max-width: 440px;
+      max-width: 600px;
       margin: 3px 0 0;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.85;
     }
 
-    /* FRASE EDITORIAL CON EFECTO TYPEWRITER */
+    /* BENCHMARK IA VS LITE SPACE */
+
+    .benchmark {
+      margin-top: 35px;
+      padding: clamp(18px, 3.4vw, 38px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--bg);
+    }
+
+    .benchmark-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .benchmark-heading h3 {
+      margin: 0;
+      font-family: var(--font-brand);
+      font-size: clamp(23px, 3vw, 32px);
+      font-weight: 500;
+      letter-spacing: -.055em;
+      line-height: 1.15;
+    }
+
+    .benchmark-heading p {
+      max-width: 560px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .benchmark-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 10px;
+      letter-spacing: .035em;
+      white-space: nowrap;
+    }
+
+    .benchmark-tag::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      content: "";
+    }
+
+    .benchmark-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .benchmark-panel {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+      background: #F8F6F0;
+    }
+
+    .benchmark-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .benchmark-panel-header h4 {
+      margin: 0;
+      font-family: var(--font-brand);
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: -.035em;
+    }
+
+    .benchmark-index {
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 10px;
+    }
+
+    .benchmark-panel-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 14px;
+      padding: 15px;
+    }
+
+    .simulation-label {
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 10px;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+
+    .chat-window {
+      display: flex;
+      min-height: 245px;
+      flex: 1;
+      flex-direction: column;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--line-soft);
+      border-radius: 8px;
+      background: #F0EEE7;
+    }
+
+    .chat-message {
+      max-width: 94%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .chat-message--user {
+      align-self: flex-end;
+      background: #DCE4E5;
+      color: #243C44;
+    }
+
+    .chat-message--ai {
+      align-self: flex-start;
+      border: 1px solid var(--line);
+      background: #FAF9F5;
+    }
+
+    .chat-message--ai p { margin: 0; }
+
+    .chat-message--ai p + p { margin-top: 7px; }
+
+    .chat-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 4px;
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 10px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .chat-typing {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .chat-typing span {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: typing-pulse 1s infinite alternate;
+    }
+
+    .chat-typing span:nth-child(2) { animation-delay: .2s; }
+    .chat-typing span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes typing-pulse {
+      from { opacity: .25; transform: translateY(0); }
+      to { opacity: 1; transform: translateY(-3px); }
+    }
+
+    .benchmark-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .benchmark-stat {
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel);
+    }
+
+    .benchmark-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .benchmark-stat strong {
+      display: block;
+      margin-top: 5px;
+      font-family: var(--font-data);
+      font-size: clamp(13px, 1.5vw, 17px);
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+
+    .benchmark-stat small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    /* DEMOSTRACIÓN DE CARGA Y CREACIÓN */
+
+    .upload-zone {
+      display: flex;
+      min-height: 245px;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px;
+      border: 1px dashed #A9A294;
+      border-radius: 8px;
+      background:
+        linear-gradient(rgb(233 230 221 / 35%) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(233 230 221 / 35%) 1px, transparent 1px),
+        #F0EEE7;
+      background-size: 22px 22px;
+      text-align: center;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .upload-zone.is-loaded {
+      border-color: var(--green);
+      background-color: #E9EDE5;
+    }
+
+    .upload-symbol {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--primary);
+    }
+
+    .upload-symbol .material-symbols-outlined { font-size: 25px; }
+
+    .upload-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .upload-description {
+      max-width: 230px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .file-select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .file-select:hover {
+      border-color: var(--primary);
+      background: var(--panel);
+    }
+
+    .file-select input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    .create-scene-button {
+      position: relative;
+      display: flex;
+      width: 100%;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 16px;
+      overflow: hidden;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .create-scene-button:hover {
+      background: #B94A23;
+      transform: translateY(-1px);
+    }
+
+    .create-scene-button:disabled {
+      cursor: wait;
+      opacity: .7;
+    }
+
+    .button-pointer {
+      position: absolute;
+      z-index: 2;
+      top: 2px;
+      left: 54%;
+      color: #fff;
+      font-size: 22px;
+      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 25%));
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .create-scene-button.is-clicking .button-pointer {
+      animation: pointer-click .65s ease forwards;
+    }
+
+    @keyframes pointer-click {
+      0% { opacity: 0; transform: translate(15px, -13px) scale(1.1); }
+      35% { opacity: 1; transform: translate(0, 0) scale(.88); }
+      55% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(0, 0) scale(1); }
+    }
+
+    .scene-result {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #C6D2BF;
+      border-radius: 8px;
+      background: #E9EDE5;
+    }
+
+    .scene-result.is-visible {
+      display: flex;
+      animation: result-appear .4s ease both;
+    }
+
+    @keyframes result-appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scene-result-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+    }
+
+    .scene-result strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .scene-result span {
+      display: block;
+      margin-top: 3px;
+      color: #58664D;
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .benchmark-disclaimer {
+      margin: 18px 0 0;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.75;
+    }
+
+    /* FRASE EDITORIAL CON TYPEWRITER */
 
     .statement {
       overflow: hidden;
@@ -438,7 +854,7 @@
       line-height: 1.9;
     }
 
-    /* NUEVO BLOQUE: USO PUNTUAL GRATUITO */
+    /* USO PUNTUAL GRATUITO */
 
     .individual-access {
       padding-block: clamp(65px, 9vw, 110px);
@@ -476,7 +892,7 @@
       line-height: 1.04;
     }
 
-    .individual-card .individual-description {
+    .individual-description {
       max-width: 580px;
       margin: 22px 0 0;
       color: var(--muted);
@@ -569,7 +985,7 @@
       background: var(--primary-hover);
     }
 
-    /* PLANES PARA REPOSITORIOS */
+    /* B2B SERVICE */
 
     .pricing {
       padding-block: clamp(95px, 12vw, 150px);
@@ -581,6 +997,16 @@
     }
 
     .pricing-header .section-subtitle { margin-top: 20px; }
+
+    .pricing-eyebrow {
+      display: inline-block;
+      margin-bottom: 18px;
+      color: var(--primary);
+      font-family: var(--font-data);
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
 
     .pricing-grid {
       display: grid;
@@ -604,10 +1030,19 @@
       background: #E4E7E1;
     }
 
+    .plan-label {
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 10px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
     .price-card h3 {
       margin: 0;
       font-family: var(--font-brand);
-      font-size: 23px;
+      font-size: 25px;
       font-weight: 500;
       letter-spacing: -.045em;
     }
@@ -672,6 +1107,31 @@
       flex: 0 0 auto;
       color: var(--green);
       content: "✓";
+    }
+
+    .repository-cost {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: auto;
+      padding-top: 24px;
+    }
+
+    .repository-cost span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .repository-cost strong {
+      font-family: var(--font-brand);
+      font-size: 23px;
+      font-weight: 500;
+      letter-spacing: -.04em;
+    }
+
+    .repository-cost small {
+      color: var(--muted);
+      font-size: 11px;
     }
 
     .pricing-note {
@@ -868,6 +1328,17 @@
       }
     }
 
+    @media (max-width: 650px) {
+      .benchmark-grid { grid-template-columns: 1fr; }
+
+      .benchmark-panel-header h4 { font-size: 16px; }
+
+      .chat-window,
+      .upload-zone { min-height: 220px; }
+
+      .benchmark-stat strong { font-size: 15px; }
+    }
+
     @media (max-width: 600px) {
       :root { --gutter: 23px; }
 
@@ -877,15 +1348,9 @@
 
       .header-company { font-size: 12px; }
 
-      .header-logo {
-        width: 36px;
-        height: 36px;
-      }
+      .header-logo { width: 36px; height: 36px; }
 
-      .header-account {
-        width: 38px;
-        height: 38px;
-      }
+      .header-account { width: 38px; height: 38px; }
 
       .hero {
         min-height: 0;
@@ -894,10 +1359,7 @@
 
       .hero h1 { font-size: clamp(45px, 12.4vw, 67px); }
 
-      .hero p {
-        margin-top: 25px;
-        font-size: 15px;
-      }
+      .hero p { margin-top: 25px; font-size: 15px; }
 
       .story-scroll { height: 220vh; }
 
@@ -912,10 +1374,7 @@
 
       .story-phase h2 { font-size: clamp(40px, 11vw, 62px); }
 
-      .story-phase p {
-        margin-top: 22px;
-        font-size: 14px;
-      }
+      .story-phase p { margin-top: 22px; font-size: 14px; }
 
       .story-image::after {
         background: linear-gradient(
@@ -928,6 +1387,10 @@
       .additional-benefit { padding-block: 25px; }
 
       .additional-benefit h2 { font-size: 27px; }
+
+      .benchmark { padding: 16px; }
+
+      .benchmark-heading { gap: 12px; }
 
       .statement-inner { padding-block: 80px; }
 
@@ -951,6 +1414,8 @@
       .price-description { min-height: 0; }
 
       .price-amount { font-size: 53px; }
+
+      .repository-cost { margin-top: 24px; }
 
       .pricing-action .final-button { width: 100%; }
 
@@ -980,9 +1445,14 @@
         transition: none !important;
       }
 
-      .typewriter-cursor::after {
-        animation: none;
+      .typewriter-cursor::after,
+      .chat-typing span,
+      .create-scene-button.is-clicking .button-pointer,
+      .scene-result.is-visible {
+        animation: none !important;
       }
+
+      .button-pointer { display: none; }
     }
   </style>
 </head>
@@ -1116,7 +1586,7 @@
       </div>
     </section>
 
-    <!-- BENEFICIOS ADICIONALES -->
+    <!-- BENEFICIOS ADICIONALES + BENCHMARK -->
 
     <section class="additional-benefits">
       <div class="container">
@@ -1132,6 +1602,142 @@
             de tokens ni de desarrollar una solución para cada necesidad.
           </p>
         </article>
+
+        <section class="benchmark" aria-labelledby="benchmarkTitle">
+          <div class="benchmark-heading">
+            <div>
+              <h3 id="benchmarkTitle">Dos formas de crear una escena.</h3>
+              <p>
+                Compara el flujo de creación desde cero con IA con el proceso
+                de preparar una escena en Lite Space. El tiempo y el coste se
+                incorporarán tras realizar una prueba equivalente.
+              </p>
+            </div>
+
+            <span class="benchmark-tag">BENCHMARK · EN PREPARACIÓN</span>
+          </div>
+
+          <div class="benchmark-grid">
+
+            <!-- LADO IA -->
+
+            <article class="benchmark-panel">
+              <header class="benchmark-panel-header">
+                <h4>Creación desde cero con IA</h4>
+                <span class="benchmark-index">01 / IA</span>
+              </header>
+
+              <div class="benchmark-panel-body">
+                <span class="simulation-label">Conversación simulada</span>
+
+                <div class="chat-window" id="aiChat" aria-live="polite">
+                  <div class="chat-message chat-message--user">
+                    Crea una escena 3D interactiva a partir de un modelo,
+                    con estructura, controles y una experiencia lista para compartir.
+                  </div>
+
+                  <div class="chat-message chat-message--ai">
+                    <p>Para crear la escena necesito definir la estructura, preparar el código y resolver la visualización del modelo.</p>
+                    <p>Después habrá que probar el resultado y corregir los posibles errores.</p>
+                  </div>
+
+                  <div class="chat-status">
+                    <span class="status-dot"></span>
+                    <span>Flujo de trabajo ilustrativo</span>
+                  </div>
+                </div>
+
+                <div class="benchmark-stats">
+                  <div class="benchmark-stat">
+                    <span>Tiempo total</span>
+                    <strong>Por medir</strong>
+                    <small>Desde el prompt hasta el resultado funcional</small>
+                  </div>
+
+                  <div class="benchmark-stat">
+                    <span>Coste del servicio IA</span>
+                    <strong>Por calcular</strong>
+                    <small>Según proveedor, modelo y consumo real</small>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- LADO LITE SPACE -->
+
+            <article class="benchmark-panel">
+              <header class="benchmark-panel-header">
+                <h4>Creación con Lite Space</h4>
+                <span class="benchmark-index">02 / LITE SPACE</span>
+              </header>
+
+              <div class="benchmark-panel-body">
+                <span class="simulation-label">Carga y creación de escena</span>
+
+                <div class="upload-zone" id="uploadZone">
+                  <div class="upload-symbol">
+                    <span class="material-symbols-outlined" aria-hidden="true">deployed_code</span>
+                  </div>
+
+                  <p class="upload-title" id="uploadTitle">Selecciona un modelo 3D</p>
+
+                  <p class="upload-description" id="uploadDescription">
+                    Carga un archivo para representar el paso de preparación de la escena.
+                  </p>
+
+                  <label class="file-select">
+                    <span class="material-symbols-outlined" aria-hidden="true" style="font-size:17px">upload_file</span>
+                    <span>Seleccionar archivo</span>
+                    <input
+                      type="file"
+                      id="modelFile"
+                      accept=".glb,.gltf,.obj,.fbx,.stl,.ply"
+                      aria-label="Seleccionar archivo de modelo 3D"
+                    >
+                  </label>
+                </div>
+
+                <button class="create-scene-button" id="createSceneButton" type="button">
+                  <span class="material-symbols-outlined" aria-hidden="true">add_box</span>
+                  <span id="createSceneLabel">Crear escena</span>
+                  <span class="button-pointer" aria-hidden="true">↖</span>
+                </button>
+
+                <div class="scene-result" id="sceneResult" role="status" aria-live="polite">
+                  <div class="scene-result-icon">
+                    <span class="material-symbols-outlined" aria-hidden="true">check</span>
+                  </div>
+                  <div>
+                    <strong id="sceneResultTitle">Escena creada</strong>
+                    <span id="sceneResultDescription">Resultado visual de la simulación.</span>
+                  </div>
+                </div>
+
+                <div class="benchmark-stats">
+                  <div class="benchmark-stat">
+                    <span>Tiempo de creación</span>
+                    <strong>Por medir</strong>
+                    <small>Desde la carga hasta la escena publicada</small>
+                  </div>
+
+                  <div class="benchmark-stat">
+                    <span>Coste por operación</span>
+                    <strong>Por calcular</strong>
+                    <small>Según los costes reales de ejecución</small>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+          </div>
+
+          <p class="benchmark-disclaimer">
+            Demostración de interfaz: la conversación y la creación de escena
+            son simuladas y no ejecutan servicios de IA ni el motor real de Lite Space.
+            Los tiempos y costes se mostrarán cuando se midan ambos procesos con
+            el mismo objetivo y un alcance comparable.
+          </p>
+        </section>
 
         <article class="additional-benefit">
           <h2>
@@ -1152,7 +1758,6 @@
 
     <section class="statement">
       <div class="container statement-inner">
-
         <div>
           <h2
             id="statementTitle"
@@ -1176,15 +1781,13 @@
             los procesos de preparación.
           </p>
         </div>
-
       </div>
     </section>
 
-    <!-- USO PUNTUAL GRATUITO: SIN REPOSITORIO -->
+    <!-- USO PUNTUAL GRATUITO -->
 
-    <section class="individual-access" id="uso-puntual">
+    <section class="individual-access" id="acceso">
       <div class="container">
-
         <div class="individual-card">
 
           <div>
@@ -1218,23 +1821,25 @@
               Modalidad gratuita con marcado publicitario.
             </p>
 
-            <a class="individual-button" href="#acceso">
+            <!-- Sustituir #registro-gratis por la URL real del registro -->
+            <a class="individual-button" href="#registro-gratis">
               Crear escenas
               <span aria-hidden="true">↗</span>
             </a>
           </div>
 
         </div>
-
       </div>
     </section>
 
-    <!-- PLANES PARA REPOSITORIOS -->
+    <!-- B2B SERVICE: LICENCIAS PARA REPOSITORIOS -->
 
     <section class="pricing" id="precios">
       <div class="container">
 
         <div class="pricing-header">
+          <span class="pricing-eyebrow">B2B SERVICE</span>
+
           <h2 class="section-title">
             Elige la escala que necesitas.
           </h2>
@@ -1248,7 +1853,8 @@
         <div class="pricing-grid">
 
           <article class="price-card">
-            <h3>1 repositorio</h3>
+            <span class="plan-label">B2B SERVICE / 01</span>
+            <h3>2 repositorios</h3>
 
             <div class="price">
               <span class="price-amount">200</span>
@@ -1258,23 +1864,30 @@
             <p class="price-period">Por año · IVA no incluido</p>
 
             <p class="price-description">
-              Para trabajar con un repositorio y compartir sus recursos 3D.
+              Para trabajar con dos repositorios y compartir sus recursos 3D.
             </p>
 
             <div class="price-divider"></div>
 
             <ul class="price-features">
-              <li>1 repositorio</li>
+              <li>2 repositorios incluidos</li>
               <li>Escenas compartidas sin límite</li>
               <li>Licencia anual</li>
             </ul>
+
+            <div class="repository-cost">
+              <span>Coste por repositorio</span>
+              <strong>100 €/año</strong>
+              <small>Equivalente anual, IVA no incluido</small>
+            </div>
           </article>
 
           <article class="price-card price-card--featured">
-            <h3>3 repositorios</h3>
+            <span class="plan-label">B2B SERVICE / 02</span>
+            <h3>4 repositorios</h3>
 
             <div class="price">
-              <span class="price-amount">350</span>
+              <span class="price-amount">390</span>
               <span class="price-currency">€</span>
             </div>
 
@@ -1287,17 +1900,24 @@
             <div class="price-divider"></div>
 
             <ul class="price-features">
-              <li>3 repositorios</li>
+              <li>4 repositorios incluidos</li>
               <li>Escenas compartidas sin límite</li>
               <li>Licencia anual</li>
             </ul>
+
+            <div class="repository-cost">
+              <span>Coste por repositorio</span>
+              <strong>97,50 €/año</strong>
+              <small>Equivalente anual, IVA no incluido</small>
+            </div>
           </article>
 
           <article class="price-card">
-            <h3>50 repositorios</h3>
+            <span class="plan-label">B2B SERVICE / 03</span>
+            <h3>20 repositorios</h3>
 
             <div class="price">
-              <span class="price-amount">890</span>
+              <span class="price-amount">899</span>
               <span class="price-currency">€</span>
             </div>
 
@@ -1310,10 +1930,16 @@
             <div class="price-divider"></div>
 
             <ul class="price-features">
-              <li>50 repositorios</li>
+              <li>20 repositorios incluidos</li>
               <li>Escenas compartidas sin límite</li>
               <li>Licencia anual</li>
             </ul>
+
+            <div class="repository-cost">
+              <span>Coste por repositorio</span>
+              <strong>44,95 €/año</strong>
+              <small>Equivalente anual, IVA no incluido</small>
+            </div>
           </article>
 
         </div>
@@ -1329,7 +1955,7 @@
 
         <div class="pricing-action">
           <!-- Sustituir #comprar por la URL real del proceso de compra -->
-          <a class="final-button" href="#comprar" id="comprar">
+          <a class="final-button" href="#comprar">
             Elegir mi licencia
             <span aria-hidden="true">↗</span>
           </a>
@@ -1364,7 +1990,6 @@
 
   <footer class="site-footer">
     <div class="container">
-
       <div class="footer-main">
 
         <nav class="footer-links" aria-label="Información legal">
@@ -1387,7 +2012,6 @@
         </div>
 
       </div>
-
     </div>
   </footer>
 
@@ -1395,11 +2019,12 @@
     (() => {
       /* CAMBIO DE IMÁGENES Y TEXTOS DURANTE EL SCROLL */
 
-      const section = document.querySelector("#storyScroll");
-      if (section) {
-        const phases = [...section.querySelectorAll("[data-phase]")];
-        const images = [...section.querySelectorAll("[data-image]")];
-        const progress = section.querySelector(".story-progress-fill");
+      const storySection = document.querySelector("#storyScroll");
+
+      if (storySection) {
+        const phases = [...storySection.querySelectorAll("[data-phase]")];
+        const images = [...storySection.querySelectorAll("[data-image]")];
+        const progress = storySection.querySelector(".story-progress-fill");
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
         let ticking = false;
@@ -1436,8 +2061,8 @@
         function updateStory() {
           ticking = false;
 
-          const rect = section.getBoundingClientRect();
-          const scrollable = section.offsetHeight - window.innerHeight;
+          const rect = storySection.getBoundingClientRect();
+          const scrollable = storySection.offsetHeight - window.innerHeight;
 
           const progressValue = scrollable > 0
             ? Math.min(1, Math.max(0, -rect.top / scrollable))
@@ -1468,107 +2093,200 @@
           }
         }
 
-        function requestUpdate() {
+        function requestStoryUpdate() {
           if (ticking) return;
           ticking = true;
           window.requestAnimationFrame(updateStory);
         }
 
-        window.addEventListener("scroll", requestUpdate, { passive: true });
-        window.addEventListener("resize", requestUpdate);
+        window.addEventListener("scroll", requestStoryUpdate, { passive: true });
+        window.addEventListener("resize", requestStoryUpdate);
 
         if (reduceMotion.addEventListener) {
-          reduceMotion.addEventListener("change", requestUpdate);
+          reduceMotion.addEventListener("change", requestStoryUpdate);
         }
 
         updateStory();
       }
 
-      /* EFECTO TYPEWRITER EN EL MENSAJE EDITORIAL */
+      /* TYPEWRITER */
 
       const statement = document.querySelector(".statement");
-      const title = document.querySelector("#statementTitle");
-      const typewriterLines = title
-        ? [...title.querySelectorAll("[data-typewriter]")]
+      const statementTitle = document.querySelector("#statementTitle");
+      const typewriterLines = statementTitle
+        ? [...statementTitle.querySelectorAll("[data-typewriter]")]
         : [];
 
-      if (!statement || !title || !typewriterLines.length) return;
+      if (statement && statementTitle && typewriterLines.length) {
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        let animationStarted = false;
+        let typingTimers = [];
 
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      let animationStarted = false;
-      let typingTimers = [];
-
-      function showCompleteStatement() {
-        typewriterLines.forEach((line) => {
-          line.textContent = line.dataset.typewriter;
-          line.classList.remove("typewriter-cursor");
-        });
-      }
-
-      function startTypewriter() {
-        if (animationStarted) return;
-        animationStarted = true;
-
-        if (reduceMotion.matches) {
-          showCompleteStatement();
-          return;
+        function showCompleteStatement() {
+          typewriterLines.forEach((line) => {
+            line.textContent = line.dataset.typewriter;
+            line.classList.remove("typewriter-cursor");
+          });
         }
 
-        let lineIndex = 0;
-        let characterIndex = 0;
+        function startTypewriter() {
+          if (animationStarted) return;
+          animationStarted = true;
 
-        function typeNextCharacter() {
-          const line = typewriterLines[lineIndex];
-          const text = line.dataset.typewriter;
-
-          line.classList.add("typewriter-cursor");
-          line.textContent = text.slice(0, characterIndex + 1);
-          characterIndex++;
-
-          if (characterIndex < text.length) {
-            typingTimers.push(window.setTimeout(typeNextCharacter, 58));
+          if (reduceMotion.matches) {
+            showCompleteStatement();
             return;
           }
 
-          line.classList.remove("typewriter-cursor");
-          lineIndex++;
-          characterIndex = 0;
+          let lineIndex = 0;
+          let characterIndex = 0;
 
-          if (lineIndex < typewriterLines.length) {
-            typingTimers.push(window.setTimeout(typeNextCharacter, 300));
+          function typeNextCharacter() {
+            const line = typewriterLines[lineIndex];
+            const text = line.dataset.typewriter;
+
+            line.classList.add("typewriter-cursor");
+            line.textContent = text.slice(0, characterIndex + 1);
+            characterIndex++;
+
+            if (characterIndex < text.length) {
+              typingTimers.push(window.setTimeout(typeNextCharacter, 58));
+              return;
+            }
+
+            line.classList.remove("typewriter-cursor");
+            lineIndex++;
+            characterIndex = 0;
+
+            if (lineIndex < typewriterLines.length) {
+              typingTimers.push(window.setTimeout(typeNextCharacter, 300));
+            }
           }
+
+          typeNextCharacter();
         }
 
-        typeNextCharacter();
+        if ("IntersectionObserver" in window) {
+          const observer = new IntersectionObserver((entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) {
+              startTypewriter();
+              observer.disconnect();
+            }
+          }, { threshold: 0.45 });
+
+          observer.observe(statement);
+        } else {
+          startTypewriter();
+        }
+
+        if (reduceMotion.addEventListener) {
+          reduceMotion.addEventListener("change", (event) => {
+            if (event.matches) {
+              typingTimers.forEach((timer) => window.clearTimeout(timer));
+              typingTimers = [];
+              showCompleteStatement();
+            }
+          });
+        }
       }
 
-      if ("IntersectionObserver" in window) {
-        const observer = new IntersectionObserver((entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) {
-            startTypewriter();
-            observer.disconnect();
-          }
-        }, { threshold: 0.45 });
+      /* DEMOSTRACIÓN VISUAL DEL FLUJO DE CREACIÓN */
 
-        observer.observe(statement);
-      } else {
-        startTypewriter();
-      }
+      const fileInput = document.querySelector("#modelFile");
+      const uploadZone = document.querySelector("#uploadZone");
+      const uploadTitle = document.querySelector("#uploadTitle");
+      const uploadDescription = document.querySelector("#uploadDescription");
+      const createButton = document.querySelector("#createSceneButton");
+      const createLabel = document.querySelector("#createSceneLabel");
+      const sceneResult = document.querySelector("#sceneResult");
+      const sceneResultTitle = document.querySelector("#sceneResultTitle");
+      const sceneResultDescription = document.querySelector("#sceneResultDescription");
 
-      if (reduceMotion.addEventListener) {
-        reduceMotion.addEventListener("change", (event) => {
-          if (event.matches) {
-            typingTimers.forEach(window.clearTimeout);
-            typingTimers = [];
-            showCompleteStatement();
+      if (fileInput && createButton) {
+        let selectedFileName = "";
+
+        fileInput.addEventListener("change", () => {
+          const file = fileInput.files && fileInput.files[0];
+
+          sceneResult.classList.remove("is-visible");
+
+          if (!file) {
+            selectedFileName = "";
+            uploadTitle.textContent = "Selecciona un modelo 3D";
+            uploadDescription.textContent =
+              "Carga un archivo para representar el paso de preparación de la escena.";
+            uploadZone.classList.remove("is-loaded");
+            return;
           }
+
+          selectedFileName = file.name;
+          uploadTitle.textContent = file.name;
+          uploadDescription.textContent =
+            "Archivo seleccionado · " + (file.size / 1024 / 1024).toFixed(2) + " MB";
+          uploadZone.classList.add("is-loaded");
         });
+
+        createButton.addEventListener("click", () => {
+          if (createButton.disabled) return;
+
+          createButton.disabled = true;
+          createButton.classList.remove("is-clicking");
+          void createButton.offsetWidth;
+          createButton.classList.add("is-clicking");
+
+          sceneResult.classList.remove("is-visible");
+          createLabel.textContent = "Preparando escena…";
+
+          window.setTimeout(() => {
+            createButton.disabled = false;
+            createButton.classList.remove("is-clicking");
+            createLabel.textContent = "Crear escena";
+
+            sceneResultTitle.textContent = "Escena creada";
+            sceneResultDescription.textContent = selectedFileName
+              ? selectedFileName + " · resultado simulado"
+              : "modelo-demo.glb · resultado simulado";
+
+            sceneResult.classList.add("is-visible");
+          }, 1300);
+        });
+      }
+
+      /* CONVERSACIÓN ILUSTRATIVA CON IA */
+
+      const aiChat = document.querySelector("#aiChat");
+
+      if (aiChat) {
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        if (!reduceMotion.matches) {
+          window.setTimeout(() => {
+            const status = aiChat.querySelector(".chat-status");
+
+            if (status) {
+              status.innerHTML = `
+                <span class="chat-typing" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span>Simulación de generación y revisión</span>
+              `;
+            }
+
+            window.setTimeout(() => {
+              if (!status || !status.isConnected) return;
+
+              status.innerHTML = `
+                <span class="status-dot"></span>
+                <span>Flujo de trabajo ilustrativo</span>
+              `;
+            }, 2400);
+          }, 1800);
+        }
       }
     })();
   </script>
 
 </body>
 </html>
-
 
 
