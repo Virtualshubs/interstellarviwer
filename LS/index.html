@@ -1571,6 +1571,29 @@
         transition: none !important;
       }
     }
+
+    .footer-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.footer-brand-image {
+  display: block;
+  width: 190px;
+  height: 56px;
+  max-width: none;
+  object-fit: contain;
+  object-position: left center;
+  flex-shrink: 0;
+}
+
+.footer-brand > span {
+  font-size: 1rem;
+  line-height: 1;
+}
   </style>
 
 
@@ -2220,10 +2243,14 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
           <a href="#aviso-legal">Aviso legal</a>
         </nav>
 
-        <a class="footer-brand" href="#inicio" aria-label="Volver al inicio">
-          <span class="footer-brand-mark" aria-hidden="true">3D Twins</span>
-          <span>Lite</span>
-        </a>
+      <a class="footer-brand" href="#inicio" aria-label="Volver al inicio">
+  <img
+    src="https://3d.staratlas.es/LS/logolite.png"
+    alt="3D Twins"
+    class="footer-brand-image"
+  />
+  <span>Lite</span>
+</a>
 
         <div class="footer-contact">
           <span>Desarrollado por</span>
