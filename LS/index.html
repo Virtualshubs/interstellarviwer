@@ -63,10 +63,6 @@
     a {
       color: inherit;
       text-decoration: none;
-    }
-
-    button,
-    a {
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -103,7 +99,7 @@
       line-height: 1.85;
     }
 
-    /* CABECERA: IDENTIDAD SIN NAVEGACIÓN */
+    /* CABECERA */
 
     .site-header {
       height: 70px;
@@ -160,7 +156,7 @@
       text-transform: uppercase;
     }
 
-    /* BANNER PRINCIPAL */
+    /* HERO: TITULAR COMO PROTAGONISTA */
 
     .hero {
       display: grid;
@@ -198,50 +194,103 @@
       line-height: 1.9;
     }
 
-    /* PRINCIPIOS DE PRODUCTO */
-
-    .principles {
-      border-bottom: 1px solid var(--line);
-    }
-
-    .principles-inner {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .principle {
-      padding: 25px 24px;
-      border-right: 1px solid var(--line);
-    }
-
-    .principle:first-child {
-      border-left: 1px solid var(--line);
-    }
-
-    .principle p {
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: 15px;
-      font-weight: 500;
-      line-height: 1.5;
-    }
-
     /* BENEFICIOS */
 
     .benefits {
-      padding-block: clamp(95px, 12vw, 150px);
+      padding-block: clamp(65px, 8vw, 100px);
     }
 
-    .benefits-intro {
+    /* RELATO TIPOGRÁFICO ACTIVADO POR SCROLL */
+
+    .story-scroll {
+      position: relative;
+      height: 230vh;
+      margin-bottom: clamp(65px, 10vw, 120px);
+    }
+
+    .story-sticky {
+      position: sticky;
+      top: 0;
       display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      align-items: end;
-      gap: 48px;
-      margin-bottom: 65px;
+      min-height: 100svh;
+      align-items: center;
+      overflow: hidden;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
     }
 
-    .benefits-intro .section-subtitle {
-      margin: 0 0 5px;
+    .story-content {
+      position: relative;
+      width: 100%;
+      min-height: 340px;
+      padding-block: 70px;
+    }
+
+    .story-phase {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0;
+      font-family: var(--font-brand);
+      font-size: clamp(48px, 8.5vw, 104px);
+      font-weight: 500;
+      letter-spacing: -.085em;
+      line-height: .98;
+      opacity: 0;
+      transform: translateY(calc(-50% + 35px));
+      transition:
+        opacity .55s ease,
+        transform .55s cubic-bezier(.2, .7, .2, 1);
+      pointer-events: none;
+    }
+
+    .story-phase span {
+      color: var(--primary);
+    }
+
+    .story-phase.is-active {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+
+    .story-caption {
+      position: absolute;
+      top: calc(50% + 100px);
+      left: 0;
+      max-width: 520px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.85;
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        opacity .55s ease,
+        transform .55s ease;
+      pointer-events: none;
+    }
+
+    .story-caption.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .story-progress {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: var(--line-soft);
+    }
+
+    .story-progress-fill {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
     }
 
     .benefit-list {
@@ -282,7 +331,7 @@
       line-height: 1.9;
     }
 
-    /* CONTENEDOR CENTRAL: TIPOGRAFÍA Y CONTRASTE */
+    /* CONTRASTE EDITORIAL */
 
     .statement {
       overflow: hidden;
@@ -291,7 +340,6 @@
     }
 
     .statement-inner {
-      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 1fr) 100px;
       align-items: center;
@@ -466,6 +514,23 @@
       content: "✓";
     }
 
+    .pricing-action {
+      display: flex;
+      justify-content: center;
+      padding-top: 36px;
+    }
+
+    .pricing-action .final-button {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .pricing-action .final-button:hover {
+      background: #B94A23;
+      border-color: #B94A23;
+    }
+
     .pricing-note {
       display: flex;
       align-items: flex-start;
@@ -483,23 +548,25 @@
       font-weight: 500;
     }
 
-    /* LICENCIAS COMERCIALES */
+    /* LICENCIA B2B2B */
 
     .commercial {
       padding-block: clamp(55px, 8vw, 90px);
       border-top: 1px solid var(--line);
-      background: var(--panel);
+      background: var(--primary);
+      color: #fff;
     }
 
     .commercial-inner {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(220px, .65fr);
+      align-items: center;
       gap: 60px;
-      align-items: start;
     }
 
     .commercial h2 {
       margin: 0;
+      color: #fff;
       font-family: var(--font-brand);
       font-size: clamp(30px, 4vw, 45px);
       font-weight: 500;
@@ -509,41 +576,12 @@
 
     .commercial p {
       margin: 0;
-      color: var(--muted);
+      color: rgb(255 255 255 / 82%);
       font-size: 14px;
       line-height: 1.9;
     }
 
-    /* CIERRE Y ÚNICO BOTÓN */
-
-    .final-cta {
-      padding-block: clamp(90px, 13vw, 160px);
-      background: var(--primary);
-      color: #fff;
-      text-align: center;
-    }
-
-    .final-cta-inner {
-      width: min(calc(100% - var(--gutter) * 2), 850px);
-      margin-inline: auto;
-    }
-
-    .final-cta h2 {
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: clamp(43px, 7vw, 78px);
-      font-weight: 500;
-      letter-spacing: -.075em;
-      line-height: 1;
-    }
-
-    .final-cta p {
-      max-width: 580px;
-      margin: 24px auto 32px;
-      color: rgb(255 255 255 / 82%);
-      font-size: 15px;
-      line-height: 1.85;
-    }
+    /* BOTÓN DE COMPRA */
 
     .final-button {
       display: inline-flex;
@@ -570,7 +608,7 @@
       font-size: 19px;
     }
 
-    /* PIE DE PÁGINA */
+    /* FOOTER */
 
     .site-footer {
       padding-top: 32px;
@@ -637,26 +675,9 @@
       text-transform: uppercase;
     }
 
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      padding-block: 15px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 9px;
-      letter-spacing: .04em;
-    }
-
-    /* ADAPTACIÓN A PANTALLAS */
+    /* RESPONSIVE */
 
     @media (max-width: 850px) {
-      .benefits-intro {
-        grid-template-columns: 1fr;
-        gap: 22px;
-      }
-
       .benefit {
         grid-template-columns: 40px minmax(0, 1fr);
         gap: 14px 20px;
@@ -733,19 +754,24 @@
         font-size: 15px;
       }
 
-      .principles-inner {
-        grid-template-columns: 1fr;
+      .story-scroll {
+        height: 200vh;
+        margin-bottom: 65px;
       }
 
-      .principle,
-      .principle:first-child {
-        padding: 17px 0;
-        border: 0;
-        border-bottom: 1px solid var(--line);
+      .story-content {
+        min-height: 300px;
+        padding-block: 40px;
       }
 
-      .principle:last-child {
-        border-bottom: 0;
+      .story-phase {
+        font-size: clamp(46px, 12vw, 66px);
+      }
+
+      .story-caption {
+        top: calc(50% + 82px);
+        max-width: 90%;
+        font-size: 14px;
       }
 
       .benefit {
@@ -788,8 +814,12 @@
         font-size: 53px;
       }
 
-      .final-cta h2 {
-        font-size: clamp(44px, 12vw, 66px);
+      .pricing-action {
+        padding-top: 28px;
+      }
+
+      .pricing-action .final-button {
+        width: 100%;
       }
 
       .footer-main {
@@ -807,11 +837,6 @@
       .footer-contact {
         align-items: flex-start;
         text-align: left;
-      }
-
-      .footer-bottom {
-        flex-direction: column;
-        gap: 8px;
       }
     }
 
@@ -846,7 +871,6 @@
 
     <section class="hero" id="inicio">
       <div class="hero-inner">
-
         <h1>
           Convierte tus repositorios 3D en
           <span>bibliotecas interactivas</span>
@@ -858,47 +882,42 @@
           organízalos y explótalos de forma ágil, sin duplicar
           infraestructuras ni perder tiempo en tareas automatizables.
         </p>
-
       </div>
     </section>
 
-
-    <!-- PRINCIPIOS -->
-
-    <section class="principles" aria-label="Principios de trabajo">
-      <div class="container principles-inner">
-
-        <div class="principle">
-          <p>Trabaja desde tus repositorios existentes.</p>
-        </div>
-
-        <div class="principle">
-          <p>Reduce las operaciones manuales.</p>
-        </div>
-
-        <div class="principle">
-          <p>Decide qué recursos quieres compartir.</p>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- BENEFICIOS -->
+    <!-- BENEFICIOS: SECUENCIA ANIMADA -->
 
     <section class="benefits" id="beneficios">
       <div class="container">
 
-        <div class="benefits-intro">
-          <h2 class="section-title">
-            Menos operaciones manuales. Más control sobre tus recursos.
-          </h2>
+        <div class="story-scroll" id="storyScroll">
+          <div class="story-sticky">
+            <div class="story-content">
 
-          <p class="section-subtitle">
-            Prepara y distribuye contenido 3D con un flujo de trabajo
-            más directo. Dedica menos tiempo a las tareas repetitivas
-            y más a lo que quieres hacer con tus modelos.
-          </p>
+              <p class="story-phase" data-phase="0">
+                Menos operaciones <span>manuales.</span>
+              </p>
+
+              <p class="story-phase" data-phase="1">
+                Más control sobre <span>tus recursos.</span>
+              </p>
+
+              <p class="story-phase" data-phase="2">
+                Comparte solo <span>lo que necesitas.</span>
+              </p>
+
+              <p class="story-caption" data-caption>
+                Prepara y distribuye contenido 3D con un flujo de trabajo
+                más directo. Dedica menos tiempo a las tareas repetitivas
+                y más a lo que quieres hacer con tus modelos.
+              </p>
+
+            </div>
+
+            <div class="story-progress" aria-hidden="true">
+              <span class="story-progress-fill"></span>
+            </div>
+          </div>
         </div>
 
         <div class="benefit-list">
@@ -974,8 +993,7 @@
       </div>
     </section>
 
-
-    <!-- CONTENEDOR CENTRAL -->
+    <!-- CONTRASTE EDITORIAL -->
 
     <section class="statement">
       <div class="container statement-inner">
@@ -1000,8 +1018,7 @@
       </div>
     </section>
 
-
-    <!-- PLANES -->
+    <!-- PLANES Y COMPRA -->
 
     <section class="pricing" id="precios">
       <div class="container">
@@ -1042,7 +1059,6 @@
             </ul>
           </article>
 
-
           <article class="price-card price-card--featured">
             <h3>3 repositorios</h3>
 
@@ -1065,7 +1081,6 @@
               <li>Licencia anual</li>
             </ul>
           </article>
-
 
           <article class="price-card">
             <h3>50 repositorios</h3>
@@ -1092,6 +1107,14 @@
 
         </div>
 
+        <div class="pricing-action">
+          <!-- Sustituir #comprar por la URL real del proceso de compra -->
+          <a class="final-button" href="#comprar" id="comprar">
+            Elegir mi licencia
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
         <div class="pricing-note">
           <span aria-hidden="true">i</span>
           <div>
@@ -1104,15 +1127,12 @@
       </div>
     </section>
 
-
-    <!-- LICENCIAS COMERCIALES -->
+    <!-- LICENCIAS COMERCIALES B2B2B -->
 
     <section class="commercial" id="licencias">
       <div class="container commercial-inner">
 
-        <h2>
-          ¿Necesitas una licencia B2B2B?
-        </h2>
+        <h2>¿Necesitas una licencia B2B2B?</h2>
 
         <p>
           Si quieres incorporar 3D OPE Lite Space a una oferta comercial
@@ -1123,33 +1143,9 @@
       </div>
     </section>
 
-
-    <!-- ÚNICA LLAMADA A LA ACCIÓN -->
-
-    <section class="final-cta" id="contratar">
-      <div class="final-cta-inner">
-
-        <h2>
-          Tus recursos.
-          Nuevas posibilidades.
-        </h2>
-
-        <p>
-          Elige la licencia que encaja con tu forma de trabajar y empieza
-          a convertir tus repositorios 3D en bibliotecas interactivas.
-        </p>
-
-        <!-- Sustituir #contratar por la URL real del proceso de compra -->
-        <a class="final-button" href="#contratar">
-          Elegir mi licencia
-          <span aria-hidden="true">↗</span>
-        </a>
-
-      </div>
-    </section>
-
   </main>
 
+  <!-- FOOTER SIN FRANJA ADICIONAL -->
 
   <footer class="site-footer">
     <div class="container">
@@ -1177,14 +1173,83 @@
 
       </div>
 
-      <div class="footer-bottom">
-        <span>3D OPE LITE SPACE · BY 3D TWINS</span>
-        <span>SPATIAL DATA · INTERACTIVE 3D</span>
-      </div>
-
     </div>
   </footer>
 
+  <script>
+    (() => {
+      const section = document.querySelector("#storyScroll");
+
+      if (!section) return;
+
+      const phases = [...section.querySelectorAll(".story-phase")];
+      const caption = section.querySelector("[data-caption]");
+      const progress = section.querySelector(".story-progress-fill");
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      );
+
+      let ticking = false;
+
+      function updateStory() {
+        ticking = false;
+
+        const rect = section.getBoundingClientRect();
+        const scrollable = section.offsetHeight - window.innerHeight;
+
+        const progressValue = scrollable > 0
+          ? Math.min(1, Math.max(0, -rect.top / scrollable))
+          : 0;
+
+        let phaseIndex;
+
+        if (progressValue < 0.34) {
+          phaseIndex = 0;
+        } else if (progressValue < 0.67) {
+          phaseIndex = 1;
+        } else {
+          phaseIndex = 2;
+        }
+
+        phases.forEach((phase, index) => {
+          phase.classList.toggle("is-active", index === phaseIndex);
+        });
+
+        if (caption) {
+          caption.classList.toggle("is-active", progressValue >= 0.67);
+        }
+
+        if (progress) {
+          progress.style.width = `${progressValue * 100}%`;
+        }
+      }
+
+      function requestUpdate() {
+        if (ticking) return;
+
+        ticking = true;
+        window.requestAnimationFrame(updateStory);
+      }
+
+      if (reduceMotion.matches) {
+        phases.forEach((phase, index) => {
+          phase.classList.toggle("is-active", index === 0);
+        });
+
+        if (caption) caption.classList.remove("is-active");
+        if (progress) progress.style.width = "0";
+
+        return;
+      }
+
+      window.addEventListener("scroll", requestUpdate, { passive: true });
+      window.addEventListener("resize", requestUpdate);
+
+      updateStory();
+    })();
+  </script>
+
 </body>
 </html>
+
 
