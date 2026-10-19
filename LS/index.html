@@ -1712,141 +1712,152 @@
           </div>
 
           <div class="benchmark-grid">
-            <!-- PANEL 01: IA -->
-            <article class="benchmark-panel">
-              <header class="benchmark-panel-header">
-                <h4>Creación desde cero con IA</h4>
-                <span class="benchmark-index">01 / IA</span>
-              </header>
+         
+<!-- PANEL 01: IA -->
+<article class="benchmark-panel">
+  <header class="benchmark-panel-header">
+    <h4>Creación desde cero con IA</h4>
+    <span class="benchmark-index">01 / IA</span>
+  </header>
 
-              <div class="benchmark-panel-body">
-                <span class="simulation-label">
-                  Proceso técnico ilustrativo
-                </span>
+  <div class="benchmark-panel-body">
+    <span class="simulation-label">
+      Proceso técnico ilustrativo
+    </span>
 
-                <div
-                  class="demo-window"
-                  id="aiDemoWindow"
-                  aria-label="Simulación ilustrativa de una conversación de desarrollo con IA"
-                >
-                  <div class="ai-chat" id="aiDemoChat">
-                    <div class="ai-message ai-message--user">
-                      <span class="ai-message-label">TÚ</span>
+    <div
+      class="demo-window"
+      id="aiDemoWindow"
+      aria-label="Simulación ilustrativa de una conversación de desarrollo con IA"
+    >
+      <div class="ai-chat" id="aiDemoChat">
 
-                      <div
-                        class="ai-message-text"
-                        data-chat-text="Hola, me gustaría hacer un escenario 3D. Necesito cargar un modelo, visualizarlo en una escena interactiva y poder explorar el resultado. ¿Qué tendría que preparar?"
-                      ></div>
-                    </div>
+        <!-- MENSAJE 1: USUARIO -->
+        <div class="ai-message ai-message--user">
+          <span class="ai-message-label">TÚ</span>
 
-                    <div class="ai-message">
-                      <span class="ai-message-label">ASISTENTE IA</span>
+          <div
+            class="ai-message-text"
+            data-chat-text="Hola, me gustaría hacer un escenario 3D. Necesito cargar un modelo, visualizarlo en una escena interactiva y poder explorar el resultado. ¿Qué tendría que preparar?"
+          ></div>
+        </div>
 
-                      <div
-                        class="ai-message-text"
-                        data-chat-text="¡Holaaa! 😊 Claro que sí. Y además, para tu web podemos hacer algo bastante más interesante que poner un modelo 3D girando sin más.
+        <!-- MENSAJE 2: ASISTENTE -->
+        <div class="ai-message">
+          <span class="ai-message-label">ASISTENTE IA</span>
+
+          <div
+            class="ai-message-text"
+            data-chat-text="¡Holaaa! 😊 Claro que sí. Y además, para tu web podemos hacer algo bastante más interesante que poner un modelo 3D girando sin más.
 
 Lo primero que necesitas saber es que crear una escena 3D para una página web no significa necesariamente modelar en 3D desde cero. Podemos construirla con código, utilizar modelos existentes, combinar imágenes y geometría o crear un entorno interactivo completo.
-Te lo explico desde el principio, sin dar por hecho que sabes qué herramientas necesitas. 1. ¿Qué tipo de escena 3D puedes crear? A. Una escena 3D como portada
+
+Te lo explico desde el principio, sin dar por hecho que sabes qué herramientas necesitas.
+
+1. ¿Qué tipo de escena 3D puedes crear?
+
+A. Una escena 3D como portada
 
 Un planeta, una estructura geométrica, una esfera de datos o un objeto científico que se mueve sutilmente mientras el usuario navega por la web.
 
 Ideal para: una portada editorial, una landing o presentar un producto tecnológico.
-                        Una composición 3D abstracta
+
+B. Una composición 3D abstracta
 
 Geometrías, volúmenes, estructuras técnicas, materiales minerales y movimientos de cámara. No tiene por qué representar un objeto real.
 
-Ideal para: una identidad visual tecnológica, minimalista y científica. 2. ¿Qué necesitas realmente? "
-                      ></div>
-                    </div>
+Ideal para: una identidad visual tecnológica, minimalista y científica.
 
-                    <div class="ai-message ai-message--user">
-                      <span class="ai-message-label">TÚ</span>
+2. ¿Qué necesitas realmente?"
+          ></div>
+        </div>
 
-                      <div
-                        class="ai-message-text"
-                        data-chat-text="Quiero que sea sencillo: el modelo 3D, crear la escena y poder moverme alrededor del modelo."
-                      ></div>
-                    </div>
+        <!-- MENSAJE 3: USUARIO -->
+        <div class="ai-message ai-message--user">
+          <span class="ai-message-label">TÚ</span>
 
-                    <div class="ai-message">
-                      <span class="ai-message-label">ASISTENTE IA</span>
+          <div
+            class="ai-message-text"
+            data-chat-text="Quiero que sea sencillo: el modelo 3D, crear la escena y poder moverme alrededor del modelo."
+          ></div>
+        </div>
 
-                      <div
-                        class="ai-message-text"
-                        data-chat-text="Entonces necesitaríamos gestionar el archivo 3D, configurar la cámara y la iluminación, y añadir controles para rotar y acercar la vista. 3. ¿Cómo lo haríamos paso a paso?
-01
+        <!-- MENSAJE 4: ASISTENTE -->
+        <div class="ai-message">
+          <span class="ai-message-label">ASISTENTE IA</span>
 
-Definir la idea visual
+          <div
+            class="ai-message-text"
+            data-chat-text="Entonces necesitaríamos gestionar el archivo 3D, configurar la cámara y la iluminación, y añadir controles para rotar y acercar la vista.
 
-Decidimos qué se ve al entrar, qué tamaño ocupa y qué sensación debe transmitir. 
+3. ¿Cómo lo haríamos paso a paso?
 
+01. Definir la idea visual
 
-02
+Decidimos qué se ve al entrar, qué tamaño ocupa y qué sensación debe transmitir.
 
-Crear la escena
+02. Crear la escena
 
-Construimos el objeto o entorno 3D, ajustamos materiales, iluminación, cámara y composición. Hay que preparar la escena y diseñar la interface para que el usuario pueda interactuar con ella.
+Construimos el objeto o entorno 3D, ajustamos materiales, iluminación, cámara y composición. Hay que preparar la escena y diseñar la interfaz para que el usuario pueda interactuar con ella.
 
+03. Añadir movimiento
 
-03
+Por ejemplo, una rotación lenta, partículas, una cámara que responde al cursor o animaciones por fases. Después de comprobar si los resultados son los esperados, podemos empezar a afinar el zoom, la velocidad, el movimiento y todo lo que necesitamos para que funcione correctamente.
 
-Añadir movimiento
+04. Integrarla en la página
 
-Por ejemplo, una rotación lenta, partículas, una cámara que responde al cursor o animaciones por fases. Depue´s de ver si los resultados son los esperados podemos empezar a afinar el zoom la velocidad el movimiento y todo lo que necesitamos para que funcione correctamente.
+Para poder compartirlo, necesitarás una página web. Si no la tienes, podemos hacerla. Solo necesitarás crear la hoja de estilos CSS y un archivo HTML con el contenido de tu web. Luego podemos crear un script para integrar la escena que hemos creado previamente en otra página.
 
+Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacemos que conviva con los textos y botones."
+          ></div>
+        </div>
 
-04
+        <!-- MENSAJE 5: USUARIO -->
+        <div class="ai-message ai-message--user">
+          <span class="ai-message-label">TÚ</span>
 
-Integrarla en la página
+          <div
+            class="ai-message-text"
+            data-chat-text="¿Y después podría compartirlo?"
+          ></div>
+        </div>
 
-Para poder ompartirlo necesitarás una página web, si no la tienes podemos hacerla, solo necesitarás 1 creal el eltilo CSS y crear un archivo html con el contenido de tu web luego podemos crear un script para poder integhrar la escena que creamos previamente en otra página. Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacemos que conviva con los textos y botones."
-                      ></div>
-                    </div>
+        <!-- MENSAJE 6: ASISTENTE -->
+        <div class="ai-message">
+          <span class="ai-message-label">ASISTENTE IA</span>
 
-                    <div class="ai-message ai-message--user">
-                      <span class="ai-message-label">TÚ</span>
+          <div
+            class="ai-message-text"
+            data-chat-text="Sí. Habría que preparar la escena para publicarla y generar una web con un dominio personalizado. También necesitarás un servicio de hosting para poder servir la web. Conviene probar la carga y el rendimiento antes de integrarla y compartirla."
+          ></div>
+        </div>
 
-                      <div
-                        class="ai-message-text"
-                        data-chat-text="¿Y después podría compartirlo?"
-                      ></div>
-                    </div>
+        <div class="ai-chat-status" aria-hidden="true">
+          Conversación de ejemplo · Desarrollo asistido
+        </div>
+      </div>
+    </div>
 
-                    <div class="ai-message">
-                      <span class="ai-message-label">ASISTENTE IA</span>
+    <div class="benchmark-stats">
+      <div class="benchmark-stat">
+        <span>Tiempo transcurrido</span>
+        <strong id="benchmarkTimer">00:00.0</strong>
+        <small>
+          Cronómetro de la conversación simulada
+        </small>
+      </div>
 
-                      <div
-                        class="ai-message-text"
-                        data-chat-text="Sí. Habría que preparar la escena para publicarla y generar una web con un dominio personalizado también necesitarás un hosting para poder servir la web. También convendría probar la carga y el rendimiento antes de integrarlo y compartirlo."
-                      ></div>
-                    </div>
+      <div class="benchmark-stat">
+        <span>Coste del servicio de IA</span>
+        <strong>Variable</strong>
+        <small>
+          Depende del proveedor, modelo y consumo de tokens
+        </small>
+      </div>
+    </div>
+  </div>
+</article>
 
-                    <div class="ai-chat-status" aria-hidden="true">
-                      Conversación de ejemplo · Desarrollo asistido
-                    </div>
-                  </div>
-                </div>
-
-                <div class="benchmark-stats">
-                  <div class="benchmark-stat">
-                    <span>Tiempo transcurrido</span>
-                    <strong id="benchmarkTimer">00:00.0</strong>
-                    <small>
-                      Cronómetro de la conversación simulada
-                    </small>
-                  </div>
-
-                  <div class="benchmark-stat">
-                    <span>Coste del servicio de IA</span>
-                    <strong>Variable</strong>
-                    <small>
-                      Depende del proveedor, modelo y consumo de tokens
-                    </small>
-                  </div>
-                </div>
-              </div>
-            </article>
 
             <!-- PANEL 02: LITE SPACE -->
             <article class="benchmark-panel">
