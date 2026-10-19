@@ -1554,6 +1554,7 @@
       }
     }
   </style>
+
 </head>
 <body>
   <header class="site-header">
@@ -1702,13 +1703,11 @@
 
               <p>
                 Observa en paralelo una conversación de desarrollo asistido
-                por IA y el flujo de creación de Lite Space. El cronómetro
-                mide la duración de esta demostración visual hasta que
-                aparece «Escena creada».
+                por IA y el flujo de creación de Lite Space.
               </p>
             </div>
 
-            <span class="benchmark-tag">DEMOSTRACIÓN SINCRONIZADA</span>
+            <span class="benchmark-tag">BENCHMARK</span>
           </div>
 
           <div class="benchmark-grid">
@@ -1922,15 +1921,19 @@
             </article>
           </div>
 
-          <p class="benchmark-disclaimer">
-            Demostración sincronizada con medición temporal en navegador.
-            La conversación de IA y el flujo de Lite Space son simulaciones
-            visuales: no se ejecutan servicios de IA ni se mide una operación
-            real de creación. Los tiempos no representan una prueba comparativa
-            de rendimiento. El coste de IA depende del proveedor y del consumo;
-            el coste de Lite Space indicado corresponde a la modalidad de
-            acceso Early Access descrita.
-          </p>
+          <details class="benchmark-disclaimer">
+            <summary>ⓘ Sobre esta demostración</summary>
+
+            <p>
+              La conversación de IA y el flujo de Lite Space son simulaciones
+              visuales. No se ejecutan servicios de IA ni se mide una operación
+              real de creación. El cronómetro mide el tiempo de esta secuencia
+              en el navegador y no representa una prueba comparativa de
+              rendimiento. El coste de IA depende del proveedor y del consumo;
+              el coste de Lite Space indicado corresponde a la modalidad de
+              acceso Early Access descrita.
+            </p>
+          </details>
         </section>
 
         <article class="additional-benefit">
@@ -2364,14 +2367,15 @@
       }
 
       // =========================================================
-      // 3. BENCHMARK SINCRONIZADO
+      // 3. BENCHMARK
       //
-      // - El cronómetro comienza al iniciar la demostración.
-      // - La conversación y Lite Space avanzan en paralelo.
-      // - El cronómetro se detiene al aparecer "Escena creada".
+      // - Cronómetro compartido para ambas simulaciones.
+      // - La conversación de IA y Lite Space avanzan en paralelo.
+      // - La carga del modelo tiene una pausa deliberada.
+      // - La creación de escena incorpora un estado de procesamiento.
+      // - El cronómetro se detiene cuando aparece "Escena creada".
       // - La conversación se congela donde se encuentre.
-      // - El iframe solo se carga tras pulsar "Ver escena".
-      // - Una vez abierto, no se vuelve a asignar su URL.
+      // - El iframe se carga al pulsar "Ver escena" y conserva su estado.
       // =========================================================
 
       const benchmark = document.querySelector(".benchmark");
@@ -2393,6 +2397,7 @@
         const viewSceneButton = document.querySelector("#viewSceneButton");
         const sceneFrame = document.querySelector("#liteSceneFrame");
         const sceneIframe = document.querySelector("#liteSceneIframe");
+        const modelIcon = document.querySelector("#modelIcon");
 
         const timerDisplay = document.querySelector("#benchmarkTimer");
         const liteTimeDisplay = document.querySelector("#liteTimeResult");
@@ -2411,6 +2416,23 @@
         let benchmarkElapsed = 0;
         let timerFrame = null;
         let benchmarkFinished = false;
+
+        // ---------------------------------------------------------
+        // Duraciones de la simulación
+        // ---------------------------------------------------------
+
+        const INITIAL_DELAY = 700;
+        const POINTER_TRAVEL_TIME = 620;
+        const CLICK_DURATION = 180;
+
+        // Pausa de carga del archivo 3D.
+        const MODEL_LOADING_TIME = 2400;
+
+        // Pausa entre cargar el modelo y crear la escena.
+        const BEFORE_CREATE_DELAY = 700;
+
+        // Tiempo simulado para preparar la escena tras el clic.
+        const SCENE_PROCESSING_TIME = 1700;
 
         // ---------------------------------------------------------
         // Temporizadores auxiliares
@@ -2490,7 +2512,7 @@
         function stopTimer() {
           if (benchmarkFinished) return;
 
-          // Captura el tiempo final antes de cancelar el refresco.
+          // Capturar el tiempo final justo al completar la secuencia.
           benchmarkElapsed = performance.now() - benchmarkStartTime;
           benchmarkFinished = true;
 
@@ -2543,11 +2565,13 @@
 
           aiWindow.scrollTop = 0;
 
-          // No reiniciar el visor si ya se ha abierto.
+          // Si la escena real ya se abrió, conservarla.
           if (!sceneOpened) {
             demo.classList.remove(
               "is-loaded",
               "is-created",
+              "is-loading",
+              "is-processing",
               "is-scene-open"
             );
 
@@ -2563,6 +2587,10 @@
               pointer.style.opacity = "0";
               pointer.style.transform = "translate(35px,-35px)";
               pointer.style.transition = "none";
+            }
+
+            if (modelIcon) {
+              modelIcon.textContent = "deployed_code";
             }
 
             setStatus("Modelo 3D", "Esperando para cargar");
@@ -2672,8 +2700,8 @@
               if (callback) {
                 callback();
               }
-            }, 180, currentRun);
-          }, 620, currentRun);
+            }, CLICK_DURATION, currentRun);
+          }, POINTER_TRAVEL_TIME, currentRun);
         }
 
         // ---------------------------------------------------------
@@ -2681,42 +2709,88 @@
         // ---------------------------------------------------------
 
         function startLiteDemo(currentRun) {
-          // La carga comienza en paralelo con la conversación.
+          // Pequeña pausa inicial para que arranque la demostración.
           later(() => {
             movePointer(loadButton, currentRun, () => {
-              demo.classList.add("is-loaded");
+              /*
+               * El clic se ha producido. Ahora se muestra una espera
+               * de carga antes de confirmar que el modelo está listo.
+               */
+              demo.classList.add("is-loading");
+
+              if (modelIcon) {
+                modelIcon.textContent = "progress_activity";
+              }
 
               setStatus(
-                "InSight Cruise Lander.glb",
-                "Modelo cargado"
+                "Cargando modelo...",
+                "Preparando archivo 3D"
               );
 
-              // Después de cargar, el cursor pulsa Crear escena.
+              // Simular el tiempo de carga del modelo.
               later(() => {
-                movePointer(createButton, currentRun, () => {
-                  /*
-                   * Primero se actualiza el estado visual.
-                   * Después se detiene el cronómetro inmediatamente.
-                   */
-                  setStatus(
-                    "Escena creada",
-                    "Lista para visualizar"
-                  );
+                demo.classList.remove("is-loading");
+                demo.classList.add("is-loaded");
 
-                  demo.classList.add("is-created");
+                if (modelIcon) {
+                  modelIcon.textContent = "deployed_code";
+                }
 
-                  stopTimer();
+                setStatus(
+                  "InSight Cruise Lander.glb",
+                  "Modelo cargado"
+                );
 
-                  /*
-                   * Congelar la conversación exactamente donde esté.
-                   * No se completa ningún mensaje pendiente.
-                   */
-                  active = false;
-                  cancelTimers();
-                });
-              }, 680, currentRun);
+                // Dejar un pequeño intervalo antes del siguiente paso.
+                later(() => {
+                  movePointer(createButton, currentRun, () => {
+                    /*
+                     * El clic en Crear escena no produce un resultado
+                     * instantáneo: aparece un estado de procesamiento.
+                     */
+                    demo.classList.add("is-processing");
+
+                    if (modelIcon) {
+                      modelIcon.textContent = "progress_activity";
+                    }
+
+                    setStatus(
+                      "Preparando escena...",
+                      "Configurando el modelo y preparando la publicación"
+                    );
+
+                    // Esperar antes de mostrar la confirmación final.
+                    later(() => {
+                      demo.classList.remove("is-processing");
+
+                      if (modelIcon) {
+                        modelIcon.textContent = "deployed_code";
+                      }
+
+                      setStatus(
+                        "Escena creada",
+                        "Lista para visualizar"
+                      );
+
+                      /*
+                       * Mostrar la confirmación y detener el cronómetro
+                       * en el mismo paso de la secuencia.
+                       */
+                      demo.classList.add("is-created");
+                      stopTimer();
+
+                      /*
+                       * Congelar la conversación exactamente donde esté.
+                       * No se completa ningún mensaje pendiente.
+                       */
+                      active = false;
+                      cancelTimers();
+                    }, SCENE_PROCESSING_TIME, currentRun);
+                  });
+                }, BEFORE_CREATE_DELAY, currentRun);
+              }, MODEL_LOADING_TIME, currentRun);
             });
-          }, 700, currentRun);
+          }, INITIAL_DELAY, currentRun);
         }
 
         // ---------------------------------------------------------
@@ -2759,8 +2833,8 @@
           if (reduceMotion.matches) {
             /*
              * En modo de movimiento reducido no reproducimos el cursor.
-             * La secuencia termina inmediatamente y el tiempo reflejará
-             * esa modalidad accesible, no una medición comparable.
+             * El resultado aparece inmediatamente y no debe interpretarse
+             * como una medición comparable con la animación completa.
              */
             showConversationImmediately();
 
@@ -2860,8 +2934,8 @@
               resetBenchmark();
             } else if (sceneOpened) {
               /*
-               * Una vez abierto el visor, la escena y el estado de la
-               * conversación se conservan al abandonar la sección.
+               * Una vez abierto el visor, conservar la escena y el estado
+               * de la conversación al abandonar la sección.
                */
               active = false;
               cancelTimers();
@@ -2915,5 +2989,6 @@
   </script>
 </body>
 </html>
+
 
 
