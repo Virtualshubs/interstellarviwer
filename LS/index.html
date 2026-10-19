@@ -1555,6 +1555,7 @@
     }
   </style>
 
+
 </head>
 <body>
   <header class="site-header">
@@ -1794,7 +1795,7 @@
                     <span>Tiempo transcurrido</span>
                     <strong id="benchmarkTimer">00:00.0</strong>
                     <small>
-                      Cronómetro compartido · Se detiene al aparecer la escena
+                      Cronómetro de la conversación simulada
                     </small>
                   </div>
 
@@ -1927,8 +1928,8 @@
             <p>
               La conversación de IA y el flujo de Lite Space son simulaciones
               visuales. No se ejecutan servicios de IA ni se mide una operación
-              real de creación. El cronómetro mide el tiempo de esta secuencia
-              en el navegador y no representa una prueba comparativa de
+              real de creación. Los cronómetros miden el tiempo de esta secuencia
+              en el navegador y no representan una prueba comparativa de
               rendimiento. El coste de IA depende del proveedor y del consumo;
               el coste de Lite Space indicado corresponde a la modalidad de
               acceso Early Access descrita.
@@ -2367,15 +2368,13 @@
       }
 
       // =========================================================
-      // 3. BENCHMARK
+      // 3. BENCHMARK · CRONÓMETROS INDEPENDIENTES
       //
-      // - Cronómetro compartido para ambas simulaciones.
-      // - La conversación de IA y Lite Space avanzan en paralelo.
-      // - La carga del modelo tiene una pausa deliberada.
-      // - La creación de escena incorpora un estado de procesamiento.
-      // - El cronómetro se detiene cuando aparece "Escena creada".
-      // - La conversación se congela donde se encuentre.
-      // - El iframe se carga al pulsar "Ver escena" y conserva su estado.
+      // - Ambos cronómetros comienzan simultáneamente.
+      // - Lite Space se detiene al crear la escena y pasa a verde.
+      // - La conversación de IA sigue avanzando y su contador pasa a rojo.
+      // - El cronómetro de IA se detiene al finalizar el último mensaje.
+      // - El visor real se abre solo al pulsar "Ver escena".
       // =========================================================
 
       const benchmark = document.querySelector(".benchmark");
@@ -2402,6 +2401,9 @@
         const timerDisplay = document.querySelector("#benchmarkTimer");
         const liteTimeDisplay = document.querySelector("#liteTimeResult");
 
+        const aiTimerStat = timerDisplay?.closest(".benchmark-stat");
+        const liteTimerStat = liteTimeDisplay?.closest(".benchmark-stat");
+
         const originalMessages = chatMessages.map(
           element => element.dataset.chatText || ""
         );
@@ -2411,11 +2413,15 @@
         let active = false;
         let sceneOpened = false;
 
-        // Estado del cronómetro.
+        // Estado del cronómetro de IA.
         let benchmarkStartTime = 0;
         let benchmarkElapsed = 0;
         let timerFrame = null;
         let benchmarkFinished = false;
+
+        // Estado independiente de Lite Space.
+        let liteElapsed = 0;
+        let liteFinished = false;
 
         // ---------------------------------------------------------
         // Duraciones de la simulación
@@ -2425,14 +2431,45 @@
         const POINTER_TRAVEL_TIME = 620;
         const CLICK_DURATION = 180;
 
-        // Pausa de carga del archivo 3D.
         const MODEL_LOADING_TIME = 2400;
-
-        // Pausa entre cargar el modelo y crear la escena.
         const BEFORE_CREATE_DELAY = 700;
-
-        // Tiempo simulado para preparar la escena tras el clic.
         const SCENE_PROCESSING_TIME = 1700;
+
+        // ---------------------------------------------------------
+        // Estados visuales de los contadores
+        // ---------------------------------------------------------
+
+        function setTimerState(stat, stateClass, label) {
+          if (!stat) return;
+
+          stat.classList.remove(
+            "is-complete",
+            "is-continuing",
+            "is-conversation-finished"
+          );
+
+          if (stateClass) {
+            stat.classList.add(stateClass);
+          }
+
+          let state = stat.querySelector(".benchmark-timer-state");
+
+          if (!state) {
+            state = document.createElement("span");
+            state.className = "benchmark-timer-state";
+
+            const small = stat.querySelector("small");
+
+            if (small) {
+              stat.insertBefore(state, small);
+            } else {
+              stat.appendChild(state);
+            }
+          }
+
+          state.textContent = label || "";
+          state.hidden = !label;
+        }
 
         // ---------------------------------------------------------
         // Temporizadores auxiliares
@@ -2456,7 +2493,7 @@
         }
 
         // ---------------------------------------------------------
-        // Cronómetro: formato MM:SS.d
+        // Cronómetros independientes: formato MM:SS.d
         // ---------------------------------------------------------
 
         function formatTime(milliseconds) {
@@ -2471,14 +2508,12 @@
         }
 
         function renderTimer() {
-          const formatted = formatTime(benchmarkElapsed);
-
           if (timerDisplay) {
-            timerDisplay.textContent = formatted;
+            timerDisplay.textContent = formatTime(benchmarkElapsed);
           }
 
           if (liteTimeDisplay) {
-            liteTimeDisplay.textContent = formatted;
+            liteTimeDisplay.textContent = formatTime(liteElapsed);
           }
         }
 
@@ -2489,6 +2524,12 @@
           }
 
           benchmarkElapsed = performance.now() - benchmarkStartTime;
+
+          // Lite Space solo cuenta hasta que crea la escena.
+          if (!liteFinished) {
+            liteElapsed = benchmarkElapsed;
+          }
+
           renderTimer();
 
           timerFrame = requestAnimationFrame(updateTimer);
@@ -2501,20 +2542,42 @@
           }
 
           benchmarkElapsed = 0;
+          liteElapsed = 0;
           benchmarkStartTime = performance.now();
+
           benchmarkFinished = false;
+          liteFinished = false;
+
+          setTimerState(aiTimerStat, null, "");
+          setTimerState(liteTimerStat, null, "");
 
           renderTimer();
 
           timerFrame = requestAnimationFrame(updateTimer);
         }
 
+        // Detener únicamente el cronómetro de Lite Space.
+        function stopLiteTimer() {
+          if (liteFinished) return;
+
+          liteElapsed = performance.now() - benchmarkStartTime;
+          liteFinished = true;
+
+          renderTimer();
+        }
+
+        // Detener el cronómetro de la conversación.
         function stopTimer() {
           if (benchmarkFinished) return;
 
-          // Capturar el tiempo final justo al completar la secuencia.
           benchmarkElapsed = performance.now() - benchmarkStartTime;
           benchmarkFinished = true;
+
+          // Protección: asegurar un tiempo final para ambos contadores.
+          if (!liteFinished) {
+            liteElapsed = benchmarkElapsed;
+            liteFinished = true;
+          }
 
           if (timerFrame !== null) {
             cancelAnimationFrame(timerFrame);
@@ -2532,7 +2595,13 @@
 
           benchmarkStartTime = 0;
           benchmarkElapsed = 0;
+          liteElapsed = 0;
+
           benchmarkFinished = false;
+          liteFinished = false;
+
+          setTimerState(aiTimerStat, null, "");
+          setTimerState(liteTimerStat, null, "");
 
           renderTimer();
         }
@@ -2610,11 +2679,22 @@
         // ---------------------------------------------------------
 
         function typeMessage(index, currentRun) {
-          if (
-            !active ||
-            currentRun !== runId ||
-            index >= chatMessages.length
-          ) {
+          if (!active || currentRun !== runId) {
+            return;
+          }
+
+          // La conversación ha llegado al final programado.
+          if (index >= chatMessages.length) {
+            active = false;
+            cancelTimers();
+            stopTimer();
+
+            setTimerState(
+              aiTimerStat,
+              "is-conversation-finished",
+              "CONVERSACIÓN FINALIZADA"
+            );
+
             return;
           }
 
@@ -2709,13 +2789,9 @@
         // ---------------------------------------------------------
 
         function startLiteDemo(currentRun) {
-          // Pequeña pausa inicial para que arranque la demostración.
           later(() => {
             movePointer(loadButton, currentRun, () => {
-              /*
-               * El clic se ha producido. Ahora se muestra una espera
-               * de carga antes de confirmar que el modelo está listo.
-               */
+              // Simular la carga del modelo.
               demo.classList.add("is-loading");
 
               if (modelIcon) {
@@ -2727,7 +2803,6 @@
                 "Preparando archivo 3D"
               );
 
-              // Simular el tiempo de carga del modelo.
               later(() => {
                 demo.classList.remove("is-loading");
                 demo.classList.add("is-loaded");
@@ -2741,13 +2816,9 @@
                   "Modelo cargado"
                 );
 
-                // Dejar un pequeño intervalo antes del siguiente paso.
+                // Pausa antes de iniciar la creación de escena.
                 later(() => {
                   movePointer(createButton, currentRun, () => {
-                    /*
-                     * El clic en Crear escena no produce un resultado
-                     * instantáneo: aparece un estado de procesamiento.
-                     */
                     demo.classList.add("is-processing");
 
                     if (modelIcon) {
@@ -2759,7 +2830,6 @@
                       "Configurando el modelo y preparando la publicación"
                     );
 
-                    // Esperar antes de mostrar la confirmación final.
                     later(() => {
                       demo.classList.remove("is-processing");
 
@@ -2772,19 +2842,29 @@
                         "Lista para visualizar"
                       );
 
-                      /*
-                       * Mostrar la confirmación y detener el cronómetro
-                       * en el mismo paso de la secuencia.
-                       */
+                      // La escena queda creada.
                       demo.classList.add("is-created");
-                      stopTimer();
+
+                      // Congelar solo el tiempo de Lite Space.
+                      stopLiteTimer();
+
+                      setTimerState(
+                        liteTimerStat,
+                        "is-complete",
+                        "ESCENA CREADA"
+                      );
+
+                      // La IA continúa consumiendo tiempo.
+                      setTimerState(
+                        aiTimerStat,
+                        "is-continuing",
+                        "CONVERSACIÓN EN CURSO"
+                      );
 
                       /*
-                       * Congelar la conversación exactamente donde esté.
-                       * No se completa ningún mensaje pendiente.
+                       * No detenemos active ni cancelamos los temporizadores:
+                       * la conversación debe llegar al último mensaje.
                        */
-                      active = false;
-                      cancelTimers();
                     }, SCENE_PROCESSING_TIME, currentRun);
                   });
                 }, BEFORE_CREATE_DELAY, currentRun);
@@ -2794,7 +2874,7 @@
         }
 
         // ---------------------------------------------------------
-        // Accesibilidad: mostrar el contenido sin animación
+        // Accesibilidad: mostrar la conversación sin animación
         // ---------------------------------------------------------
 
         function showConversationImmediately() {
@@ -2811,10 +2891,6 @@
         // ---------------------------------------------------------
 
         function startBenchmark() {
-          /*
-           * Si el visor ya se abrió, no volver a ejecutar la secuencia
-           * ni completar o modificar la conversación congelada.
-           */
           if (sceneOpened) {
             active = false;
             cancelTimers();
@@ -2827,14 +2903,12 @@
 
           const currentRun = runId;
 
-          // El cronómetro comienza con el arranque de la secuencia.
           startTimer();
 
           if (reduceMotion.matches) {
             /*
-             * En modo de movimiento reducido no reproducimos el cursor.
-             * El resultado aparece inmediatamente y no debe interpretarse
-             * como una medición comparable con la animación completa.
+             * En movimiento reducido no reproducimos la secuencia.
+             * Los tiempos instantáneos no son comparables con la animación.
              */
             showConversationImmediately();
 
@@ -2845,8 +2919,22 @@
               "Pulsa «Ver escena» para explorarla"
             );
 
+            stopLiteTimer();
+
+            setTimerState(
+              liteTimerStat,
+              "is-complete",
+              "ESCENA CREADA"
+            );
+
             stopTimer();
             active = false;
+
+            setTimerState(
+              aiTimerStat,
+              "is-conversation-finished",
+              "CONVERSACIÓN FINALIZADA"
+            );
 
             return;
           }
@@ -2871,7 +2959,7 @@
 
           sceneOpened = true;
 
-          // Detener cualquier tarea que pudiera seguir activa.
+          // Cancelar cualquier tarea pendiente sin alterar los tiempos.
           active = false;
           cancelTimers();
 
@@ -2920,22 +3008,18 @@
             const entry = entries[0];
 
             if (entry.isIntersecting) {
-              /*
-               * Solo iniciar si el visor real aún no se ha abierto.
-               */
               if (!active && !sceneOpened) {
                 startBenchmark();
               }
             } else if (!sceneOpened && active) {
               /*
-               * Si el usuario abandona la sección durante la animación,
-               * se cancela y se reinicia en la siguiente visita.
+               * Si se abandona la sección durante la secuencia,
+               * se reinicia al volver a entrar.
                */
               resetBenchmark();
             } else if (sceneOpened) {
               /*
-               * Una vez abierto el visor, conservar la escena y el estado
-               * de la conversación al abandonar la sección.
+               * Si el visor ya se abrió, conservar su estado.
                */
               active = false;
               cancelTimers();
@@ -2946,7 +3030,6 @@
 
           observer.observe(benchmark);
         } else {
-          // Alternativa para navegadores sin IntersectionObserver.
           function checkVisibility() {
             if (isBenchmarkVisible()) {
               if (!active && !sceneOpened) {
@@ -2989,6 +3072,7 @@
   </script>
 </body>
 </html>
+
 
 
 
