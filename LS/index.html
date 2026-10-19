@@ -11,7 +11,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
 
   <style>
     :root {
@@ -28,24 +28,19 @@
       --accent: #E5682E;
       --secondary: #111210;
       --green: #657B54;
-
       --font-brand: "Space Grotesk", sans-serif;
       --font-body: "IBM Plex Sans", sans-serif;
       --font-data: "IBM Plex Mono", monospace;
-
       --page-width: 1180px;
       --gutter: clamp(22px, 6vw, 84px);
       --radius: 12px;
     }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
 
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: 70px;
     }
 
     body {
@@ -69,10 +64,7 @@
       outline-offset: 4px;
     }
 
-    ::selection {
-      color: var(--bg);
-      background: var(--primary);
-    }
+    ::selection { color: var(--bg); background: var(--primary); }
 
     .container {
       width: min(calc(100% - var(--gutter) * 2), var(--page-width));
@@ -97,61 +89,82 @@
       line-height: 1.85;
     }
 
-    /* CABECERA */
+    /* HEADER */
 
     .site-header {
+      position: relative;
+      z-index: 20;
       height: 70px;
       border-bottom: 1px solid var(--line);
+      background: var(--bg);
     }
 
     .header-inner {
-      display: flex;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
       width: min(calc(100% - var(--gutter) * 2), 1440px);
       height: 100%;
-      align-items: center;
       margin-inline: auto;
     }
 
-    .brand {
+    .header-company {
+      justify-self: start;
+      font-family: var(--font-brand);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -.045em;
+    }
+
+    .header-logo {
       display: inline-flex;
       align-items: center;
-      gap: 11px;
+      justify-content: center;
+      justify-self: center;
+      width: 42px;
+      height: 42px;
+      color: var(--text);
     }
 
-    .brand-mark {
-      display: grid;
-      width: 34px;
-      height: 34px;
-      flex: 0 0 34px;
-      place-items: center;
-      border: 1px solid var(--text);
+    .header-logo svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .header-account {
+      display: inline-flex;
+      width: 42px;
+      height: 42px;
+      align-items: center;
+      justify-content: center;
+      justify-self: end;
+      border: 1px solid var(--line);
       border-radius: 50%;
-      font-family: var(--font-brand);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: -.08em;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
     }
 
-    .brand-copy {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.15;
+    .header-account:hover {
+      border-color: var(--primary);
+      background: var(--panel);
+      color: var(--primary);
     }
 
-    .brand-name {
-      font-family: var(--font-brand);
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: -.025em;
-    }
-
-    .brand-byline {
-      margin-top: 5px;
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 9px;
-      letter-spacing: .07em;
-      text-transform: uppercase;
+    .material-symbols-outlined {
+      font-family: "Material Symbols Outlined";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 23px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      direction: ltr;
+      font-feature-settings: "liga";
+      -webkit-font-feature-settings: "liga";
+      -webkit-font-smoothing: antialiased;
     }
 
     /* HERO */
@@ -180,9 +193,7 @@
       line-height: .99;
     }
 
-    .hero h1 span {
-      color: var(--primary);
-    }
+    .hero h1 span { color: var(--primary); }
 
     .hero p {
       max-width: 680px;
@@ -192,7 +203,7 @@
       line-height: 1.9;
     }
 
-    /* TRES BENEFICIOS INTERACTIVOS */
+    /* BENEFICIOS CON IMÁGENES Y SCROLL */
 
     .benefits {
       padding-top: clamp(45px, 7vw, 85px);
@@ -211,27 +222,69 @@
       min-height: 100svh;
       align-items: center;
       overflow: hidden;
+      isolation: isolate;
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
+      background: var(--secondary);
+      color: var(--bg);
+    }
+
+    .story-images {
+      position: absolute;
+      z-index: -2;
+      inset: 0;
+      overflow: hidden;
+      background: var(--secondary);
+    }
+
+    .story-image {
+      position: absolute;
+      inset: 0;
+      background-position: center;
+      background-size: cover;
+      opacity: 0;
+      transform: translateY(100%);
+      will-change: transform, opacity;
+    }
+
+    .story-image::after {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        rgb(17 18 16 / 88%) 0%,
+        rgb(17 18 16 / 68%) 52%,
+        rgb(17 18 16 / 25%) 100%
+      );
+      content: "";
+    }
+
+    .story-image.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .story-image.is-leaving {
+      opacity: 0;
+      transform: translateY(-100%);
     }
 
     .story-content {
       position: relative;
-      width: 100%;
+      width: min(calc(100% - var(--gutter) * 2), var(--page-width));
       min-height: 390px;
+      margin-inline: auto;
       padding-block: 50px;
     }
 
     .story-phase {
       position: absolute;
-      top: 0;
+      top: 50px;
       left: 0;
       width: 100%;
       opacity: 0;
-      transform: translateY(28px);
-      transition:
-        opacity .55s ease,
-        transform .55s cubic-bezier(.2, .7, .2, 1);
+      transform: translateY(24px);
+      transition: opacity .45s ease, transform .55s cubic-bezier(.2, .7, .2, 1);
       pointer-events: none;
     }
 
@@ -250,14 +303,12 @@
       line-height: 1.02;
     }
 
-    .story-phase h2 span {
-      color: var(--primary);
-    }
+    .story-phase h2 span { color: #A6BFC6; }
 
     .story-phase p {
       max-width: 620px;
       margin: 28px 0 0;
-      color: var(--muted);
+      color: rgb(243 241 234 / 82%);
       font-size: clamp(14px, 1.4vw, 16px);
       line-height: 1.9;
     }
@@ -268,7 +319,7 @@
       bottom: 0;
       left: 0;
       height: 3px;
-      background: var(--line-soft);
+      background: rgb(243 241 234 / 20%);
     }
 
     .story-progress-fill {
@@ -289,7 +340,7 @@
 
     .additional-benefit {
       display: grid;
-      grid-template-columns: 55px minmax(0, 1fr) minmax(240px, .8fr);
+      grid-template-columns: minmax(0, 1fr) minmax(240px, .8fr);
       align-items: start;
       gap: clamp(18px, 3.5vw, 48px);
       padding-block: 30px;
@@ -297,13 +348,6 @@
 
     .additional-benefit + .additional-benefit {
       border-top: 1px solid var(--line);
-    }
-
-    .benefit-number {
-      padding-top: 7px;
-      color: var(--primary);
-      font-family: var(--font-data);
-      font-size: 12px;
     }
 
     .additional-benefit h2 {
@@ -334,9 +378,8 @@
 
     .statement-inner {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 100px;
+      grid-template-columns: minmax(0, 1fr);
       align-items: center;
-      gap: 32px;
       padding-block: clamp(65px, 10vw, 125px);
     }
 
@@ -353,43 +396,6 @@
     .statement h2 span {
       display: block;
       color: #A6BFC6;
-    }
-
-    .statement-mark {
-      position: relative;
-      width: 88px;
-      height: 88px;
-      justify-self: end;
-      border: 1px solid rgb(243 241 234 / 38%);
-      border-radius: 50%;
-    }
-
-    .statement-mark::before,
-    .statement-mark::after {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 125%;
-      height: 1px;
-      background: var(--accent);
-      content: "";
-      transform: translate(-50%, -50%) rotate(45deg);
-    }
-
-    .statement-mark::after {
-      transform: translate(-50%, -50%) rotate(-45deg);
-    }
-
-    .statement-mark span {
-      position: absolute;
-      z-index: 1;
-      top: 50%;
-      left: 50%;
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: var(--accent);
-      transform: translate(-50%, -50%);
     }
 
     .statement p {
@@ -411,9 +417,7 @@
       margin-bottom: 55px;
     }
 
-    .pricing-header .section-subtitle {
-      margin-top: 20px;
-    }
+    .pricing-header .section-subtitle { margin-top: 20px; }
 
     .pricing-grid {
       display: grid;
@@ -507,10 +511,27 @@
       content: "✓";
     }
 
+    .pricing-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 19px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .pricing-note strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
     .pricing-action {
       display: flex;
       justify-content: center;
-      padding-top: 36px;
+      padding-top: 24px;
     }
 
     .final-button {
@@ -534,26 +555,7 @@
       background: #B94A23;
     }
 
-    .final-button span {
-      font-size: 19px;
-    }
-
-    .pricing-note {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-top: 24px;
-      padding-top: 19px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.8;
-    }
-
-    .pricing-note strong {
-      color: var(--text);
-      font-weight: 500;
-    }
+    .final-button span { font-size: 19px; }
 
     /* LICENCIAS B2B2B */
 
@@ -588,11 +590,18 @@
       line-height: 1.9;
     }
 
+    .commercial a {
+      color: #fff;
+      text-decoration: underline;
+      text-decoration-color: rgb(255 255 255 / 55%);
+      text-underline-offset: 4px;
+    }
+
+    .commercial a:hover { text-decoration-color: #fff; }
+
     /* FOOTER */
 
-    .site-footer {
-      padding-top: 32px;
-    }
+    .site-footer { padding-top: 32px; }
 
     .footer-main {
       display: grid;
@@ -615,9 +624,7 @@
     }
 
     .footer-links a:hover,
-    .footer-contact a:hover {
-      color: var(--primary);
-    }
+    .footer-contact a:hover { color: var(--primary); }
 
     .footer-brand {
       display: flex;
@@ -659,40 +666,22 @@
 
     @media (max-width: 850px) {
       .additional-benefit {
-        grid-template-columns: 40px minmax(0, 1fr);
-        gap: 12px 20px;
+        grid-template-columns: 1fr;
+        gap: 12px;
       }
 
-      .additional-benefit .benefit-number {
-        grid-column: 1;
-        grid-row: 1 / span 2;
-      }
+      .additional-benefit p { margin-top: 4px; }
 
-      .additional-benefit h2,
-      .additional-benefit p {
-        grid-column: 2;
-      }
+      .pricing-grid { gap: 10px; }
 
-      .additional-benefit p {
-        margin-top: 4px;
-      }
-
-      .pricing-grid {
-        gap: 10px;
-      }
-
-      .price-card {
-        padding: 21px 17px;
-      }
+      .price-card { padding: 21px 17px; }
 
       .commercial-inner {
         grid-template-columns: 1fr;
         gap: 20px;
       }
 
-      .footer-main {
-        grid-template-columns: 1fr auto;
-      }
+      .footer-main { grid-template-columns: 1fr auto; }
 
       .footer-brand {
         grid-column: 1;
@@ -712,12 +701,22 @@
     }
 
     @media (max-width: 600px) {
-      :root {
-        --gutter: 23px;
+      :root { --gutter: 23px; }
+
+      .site-header { height: 62px; }
+
+      .header-inner { grid-template-columns: 1fr auto 1fr; }
+
+      .header-company { font-size: 12px; }
+
+      .header-logo {
+        width: 36px;
+        height: 36px;
       }
 
-      .site-header {
-        height: 62px;
+      .header-account {
+        width: 38px;
+        height: 38px;
       }
 
       .hero {
@@ -725,76 +724,59 @@
         padding-block: 105px 112px;
       }
 
-      .hero h1 {
-        font-size: clamp(45px, 12.4vw, 67px);
-      }
+      .hero h1 { font-size: clamp(45px, 12.4vw, 67px); }
 
       .hero p {
         margin-top: 25px;
         font-size: 15px;
       }
 
-      .story-scroll {
-        height: 220vh;
-      }
+      .story-scroll { height: 220vh; }
+
+      .story-sticky { min-height: 100svh; }
 
       .story-content {
         min-height: 400px;
         padding-block: 30px;
       }
 
-      .story-phase h2 {
-        font-size: clamp(40px, 11vw, 62px);
-      }
+      .story-phase { top: 30px; }
+
+      .story-phase h2 { font-size: clamp(40px, 11vw, 62px); }
 
       .story-phase p {
         margin-top: 22px;
         font-size: 14px;
       }
 
-      .additional-benefit {
-        padding-block: 25px;
+      .story-image::after {
+        background: linear-gradient(
+          90deg,
+          rgb(17 18 16 / 84%) 0%,
+          rgb(17 18 16 / 63%) 100%
+        );
       }
 
-      .additional-benefit h2 {
-        font-size: 27px;
-      }
+      .additional-benefit { padding-block: 25px; }
 
-      .statement-inner {
-        grid-template-columns: 1fr;
-        gap: 34px;
-      }
+      .additional-benefit h2 { font-size: 27px; }
 
-      .statement h2 {
-        font-size: clamp(45px, 12vw, 68px);
-      }
+      .statement-inner { grid-template-columns: 1fr; }
 
-      .statement-mark {
-        width: 57px;
-        height: 57px;
-        justify-self: start;
-      }
+      .statement h2 { font-size: clamp(45px, 12vw, 68px); }
 
       .pricing-grid {
         grid-template-columns: 1fr;
         gap: 13px;
       }
 
-      .price-card {
-        padding: 27px;
-      }
+      .price-card { padding: 27px; }
 
-      .price-description {
-        min-height: 0;
-      }
+      .price-description { min-height: 0; }
 
-      .price-amount {
-        font-size: 53px;
-      }
+      .price-amount { font-size: 53px; }
 
-      .pricing-action .final-button {
-        width: 100%;
-      }
+      .pricing-action .final-button { width: 100%; }
 
       .footer-main {
         grid-template-columns: 1fr;
@@ -815,12 +797,11 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
+      html { scroll-behavior: auto; }
 
-      .story-phase {
-        transition: none;
+      .story-phase,
+      .story-image {
+        transition: none !important;
       }
     }
   </style>
@@ -830,13 +811,36 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="#inicio" aria-label="3D OPE Lite Space">
-        <span class="brand-mark" aria-hidden="true">3D</span>
-        <span class="brand-copy">
-          <span class="brand-name">OPE Lite Space</span>
-          <span class="brand-byline">by 3D Twins</span>
-        </span>
+
+      <a
+        class="header-company"
+        href="https://www.virtualshubs.es/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="3DTWINS — web principal"
+      >3DTWINS</a>
+
+      <a class="header-logo" href="#inicio" aria-label="3D OPE Lite Space">
+        <!-- Imagotipo geométrico sin texto -->
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M8 30.5V17.5L24 8L40 17.5V30.5L24 40L8 30.5Z"
+                stroke="#242522" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M8 17.5L24 27L40 17.5M24 27V40"
+                stroke="#E5682E" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M16 13L32 22.5V31.5"
+                stroke="#416D80" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
       </a>
+
+      <a
+        class="header-account"
+        href="#acceso"
+        aria-label="Acceso de usuario registrado"
+        title="Acceso de usuario registrado"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+      </a>
+
     </div>
   </header>
 
@@ -860,13 +864,31 @@
       </div>
     </section>
 
-    <!-- BENEFICIOS 01–03: CONTENIDO VINCULADO AL SCROLL -->
+    <!-- BENEFICIOS 01–03: IMÁGENES VINCULADAS AL SCROLL -->
 
     <section class="benefits" id="beneficios">
       <div class="container">
 
         <div class="story-scroll" id="storyScroll">
           <div class="story-sticky">
+
+            <div class="story-images" aria-hidden="true">
+              <div
+                class="story-image is-active"
+                data-image="0"
+                style="background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2200&q=85')"
+              ></div>
+              <div
+                class="story-image"
+                data-image="1"
+                style="background-image:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2200&q=85')"
+              ></div>
+              <div
+                class="story-image"
+                data-image="2"
+                style="background-image:url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=85')"
+              ></div>
+            </div>
 
             <div class="story-content">
 
@@ -919,14 +941,12 @@
       </div>
     </section>
 
-    <!-- BENEFICIOS 04–05: BLOQUE COMPACTO -->
+    <!-- DOS BENEFICIOS RESTANTES, SIN NUMERACIÓN -->
 
     <section class="additional-benefits">
       <div class="container">
 
         <article class="additional-benefit">
-          <span class="benefit-number">04</span>
-
           <h2>
             Escala tus procesos sin costes de IA ni desarrollos a medida.
           </h2>
@@ -939,8 +959,6 @@
         </article>
 
         <article class="additional-benefit">
-          <span class="benefit-number">05</span>
-
           <h2>
             Distribuye tu contenido sin hosting propio ni migraciones.
           </h2>
@@ -971,10 +989,6 @@
             y adapta su publicación a cada necesidad, sin multiplicar
             los procesos de preparación.
           </p>
-        </div>
-
-        <div class="statement-mark" aria-hidden="true">
-          <span></span>
         </div>
 
       </div>
@@ -1069,14 +1083,6 @@
 
         </div>
 
-        <div class="pricing-action">
-          <!-- Sustituir #comprar por la URL real del proceso de compra -->
-          <a class="final-button" href="#comprar" id="comprar">
-            Elegir mi licencia
-            <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-
         <div class="pricing-note">
           <span aria-hidden="true">i</span>
           <div>
@@ -1084,6 +1090,14 @@
             Las condiciones de uso, los servicios incluidos y cualquier
             coste adicional estarán sujetos a la licencia correspondiente.
           </div>
+        </div>
+
+        <div class="pricing-action">
+          <!-- Sustituir #comprar por la URL real del proceso de compra -->
+          <a class="final-button" href="#comprar" id="comprar">
+            Elegir mi licencia
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
 
       </div>
@@ -1100,6 +1114,10 @@
           Si quieres incorporar 3D OPE Lite Space a una oferta comercial
           destinada a terceros, las condiciones de distribución se estudiarán
           de forma específica.
+          <br>
+          <a href="mailto:info@3dtwins.es?subject=Consulta%20sobre%20licencia%20B2B2B">
+            info@3dtwins.es
+          </a>
         </p>
 
       </div>
@@ -1141,16 +1159,36 @@
   <script>
     (() => {
       const section = document.querySelector("#storyScroll");
-
       if (!section) return;
 
       const phases = [...section.querySelectorAll("[data-phase]")];
+      const images = [...section.querySelectorAll("[data-image]")];
       const progress = section.querySelector(".story-progress-fill");
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      );
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       let ticking = false;
+      let currentPhase = 0;
+
+      function setPhase(nextPhase) {
+        if (nextPhase === currentPhase) return;
+
+        const previousPhase = currentPhase;
+        currentPhase = nextPhase;
+
+        phases.forEach((phase, index) => {
+          phase.classList.toggle("is-active", index === nextPhase);
+        });
+
+        images.forEach((image, index) => {
+          image.classList.remove("is-leaving", "is-active");
+
+          if (index === nextPhase) {
+            image.classList.add("is-active");
+          } else if (index === previousPhase && nextPhase > previousPhase) {
+            image.classList.add("is-leaving");
+          }
+        });
+      }
 
       function updateStory() {
         ticking = false;
@@ -1162,15 +1200,25 @@
           ? Math.min(1, Math.max(0, -rect.top / scrollable))
           : 0;
 
-        const phaseIndex = progressValue < 1 / 3
-          ? 0
-          : progressValue < 2 / 3
-            ? 1
-            : 2;
+        const phaseIndex = Math.min(
+          phases.length - 1,
+          Math.floor(progressValue * phases.length)
+        );
 
-        phases.forEach((phase, index) => {
-          phase.classList.toggle("is-active", index === phaseIndex);
-        });
+        if (reduceMotion.matches) {
+          phases.forEach((phase, index) => {
+            phase.classList.toggle("is-active", index === phaseIndex);
+          });
+
+          images.forEach((image, index) => {
+            image.classList.toggle("is-active", index === phaseIndex);
+            image.classList.remove("is-leaving");
+          });
+
+          currentPhase = phaseIndex;
+        } else {
+          setPhase(phaseIndex);
+        }
 
         if (progress) {
           progress.style.width = `${progressValue * 100}%`;
@@ -1179,22 +1227,16 @@
 
       function requestUpdate() {
         if (ticking) return;
-
         ticking = true;
         window.requestAnimationFrame(updateStory);
       }
 
-      if (reduceMotion.matches) {
-        phases.forEach((phase, index) => {
-          phase.classList.toggle("is-active", index === 0);
-        });
-
-        if (progress) progress.style.width = "0";
-        return;
-      }
-
       window.addEventListener("scroll", requestUpdate, { passive: true });
       window.addEventListener("resize", requestUpdate);
+
+      if (reduceMotion.addEventListener) {
+        reduceMotion.addEventListener("change", requestUpdate);
+      }
 
       updateStory();
     })();
