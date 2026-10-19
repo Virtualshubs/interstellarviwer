@@ -1,2291 +1,674 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>3D Lite Space | Bibliotecas 3D interactivas en minutos</title>
-  <meta name="description" content="Convierte tus repositorios 3D en bibliotecas interactivas en minutos. Organiza, prepara y comparte tus recursos desde tus repositorios existentes.">
-  <meta name="theme-color" content="#F3F1EA">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
-
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #F3F1EA;
-      --panel: #EAE7DE;
-      --panel-hover: #E1DED4;
-      --line: #D9D4C8;
-      --line-soft: #E5E1D8;
-      --text: #242522;
-      --muted: #716B60;
-      --primary: #416D80;
-      --primary-hover: #294A59;
-      --accent: #E5682E;
-      --secondary: #111210;
-      --green: #657B54;
-      --font-brand: "Space Grotesk", sans-serif;
-      --font-body: "IBM Plex Sans", sans-serif;
-      --font-data: "IBM Plex Mono", monospace;
-      --page-width: 1180px;
-      --gutter: clamp(22px, 6vw, 84px);
-      --radius: 12px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 70px;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.65;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    a:focus-visible,
-    button:focus-visible,
-    input:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 4px;
-    }
-
-    button, input { font: inherit; }
-
-    ::selection { color: var(--bg); background: var(--primary); }
-
-    .container {
-      width: min(calc(100% - var(--gutter) * 2), var(--page-width));
-      margin-inline: auto;
-    }
-
-    .section-title {
-      max-width: 820px;
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: clamp(34px, 4.6vw, 57px);
-      font-weight: 500;
-      letter-spacing: -.065em;
-      line-height: 1.08;
-    }
-
-    .section-subtitle {
-      max-width: 680px;
-      margin: 22px 0 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.85;
-    }
-
-    .material-symbols-outlined {
-      display: inline-block;
-      font-family: "Material Symbols Outlined";
-      font-weight: normal;
-      font-style: normal;
-      font-size: 23px;
-      line-height: 1;
-      letter-spacing: normal;
-      text-transform: none;
-      white-space: nowrap;
-      direction: ltr;
-      font-feature-settings: "liga";
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* HEADER */
-
-    .site-header {
-      position: relative;
-      z-index: 20;
-      height: 70px;
-      border-bottom: 1px solid var(--line);
-      background: var(--bg);
-    }
-
-    .header-inner {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      width: min(calc(100% - var(--gutter) * 2), 1440px);
-      height: 100%;
-      margin-inline: auto;
-    }
-
-    .header-company {
-      justify-self: start;
-      font-family: var(--font-brand);
-      font-size: 15px;
-      font-weight: 900;
-      letter-spacing: -.045em;
-    }
-
-    .header-logo {
-      display: inline-flex;
-      width: 42px;
-      height: 42px;
-      align-items: center;
-      justify-content: center;
-      justify-self: center;
-    }
-
-    .header-logo svg { width: 100%; height: 100%; }
-
-    .header-account {
-      display: inline-flex;
-      width: 42px;
-      height: 42px;
-      align-items: center;
-      justify-content: center;
-      justify-self: end;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      transition: .2s ease;
-    }
-
-    .header-account:hover {
-      border-color: var(--primary);
-      background: var(--panel);
-      color: var(--primary);
-    }
-
-    /* HERO */
-
-    .hero {
-      display: grid;
-      min-height: min(730px, calc(100svh - 70px));
-      align-items: center;
-      padding-block: clamp(100px, 14vw, 175px);
-      border-bottom: 1px solid var(--line);
-      text-align: center;
-    }
-
-    .hero-inner {
-      width: min(calc(100% - var(--gutter) * 2), 1080px);
-      margin-inline: auto;
-    }
-
-    .hero h1 {
-      max-width: 1050px;
-      margin: 0 auto;
-      font-family: var(--font-brand);
-      font-size: clamp(46px, 8.3vw, 104px);
-      font-weight: 500;
-      letter-spacing: -.085em;
-      line-height: .99;
-    }
-
-    .hero h1 span { color: var(--primary); }
-
-    .hero p {
-      max-width: 680px;
-      margin: 32px auto 0;
-      color: var(--muted);
-      font-size: clamp(15px, 1.6vw, 18px);
-      line-height: 1.9;
-    }
-
-    /* BENEFICIOS 01–03 */
-
-    .benefits {
-      padding-top: clamp(45px, 7vw, 85px);
-      padding-bottom: clamp(65px, 9vw, 110px);
-    }
-
-    .story-scroll {
-      position: relative;
-      width: 100%;
-      height: 270vh;
-    }
-
-    .story-sticky {
-      position: sticky;
-      top: 0;
-      display: grid;
-      min-height: 100svh;
-      align-items: center;
-      overflow: hidden;
-      isolation: isolate;
-      border-block: 1px solid var(--line);
-      background: var(--secondary);
-      color: var(--bg);
-    }
-
-    .story-images {
-      position: absolute;
-      z-index: -2;
-      inset: 0;
-      overflow: hidden;
-      background: var(--secondary);
-    }
-
-    .story-image {
-      position: absolute;
-      inset: 0;
-      background-position: center;
-      background-size: cover;
-      opacity: 0;
-      transform: translateY(100%);
-      transition:
-        transform .8s cubic-bezier(.2, .7, .2, 1),
-        opacity .8s ease;
-      will-change: transform, opacity;
-    }
-
-    .story-image::after {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        90deg,
-        rgb(17 18 16 / 88%) 0%,
-        rgb(17 18 16 / 68%) 52%,
-        rgb(17 18 16 / 25%) 100%
-      );
-      content: "";
-    }
-
-    .story-image.is-active {
-      z-index: 1;
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .story-image.is-leaving-up {
-      z-index: 2;
-      opacity: 0;
-      transform: translateY(-100%);
-    }
-
-    .story-image.is-leaving-down {
-      z-index: 2;
-      opacity: 0;
-      transform: translateY(100%);
-    }
-
-    .story-content {
-      position: relative;
-      width: min(calc(100% - var(--gutter) * 2), var(--page-width));
-      min-height: 390px;
-      margin-inline: auto;
-      padding-block: 50px;
-    }
-
-    .story-phase {
-      position: absolute;
-      top: 50px;
-      left: 0;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity .45s ease, transform .55s ease;
-      pointer-events: none;
-    }
-
-    .story-phase.is-active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .story-phase h2 {
-      max-width: 950px;
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: clamp(39px, 7.1vw, 84px);
-      font-weight: 500;
-      letter-spacing: -.08em;
-      line-height: 1.02;
-    }
-
-    .story-phase h2 span { color: #A6BFC6; }
-
-    .story-phase p {
-      max-width: 620px;
-      margin: 28px 0 0;
-      color: rgb(243 241 234 / 82%);
-      font-size: clamp(14px, 1.4vw, 16px);
-      line-height: 1.9;
-    }
-
-    .story-progress {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      height: 3px;
-      background: rgb(243 241 234 / 20%);
-    }
-
-    .story-progress-fill {
-      display: block;
-      width: 0;
-      height: 100%;
-      background: var(--accent);
-    }
-
-    /* BENEFICIOS ADICIONALES */
-
-    .additional-benefits {
-      padding-block: clamp(55px, 8vw, 95px);
-      border-block: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    .additional-benefit {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(240px, .8fr);
-      align-items: start;
-      gap: clamp(18px, 3.5vw, 48px);
-      padding-block: 30px;
-    }
-
-    .additional-benefit + .additional-benefit {
-      border-top: 1px solid var(--line);
-    }
-
-    .additional-benefit h2 {
-      max-width: 560px;
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: clamp(25px, 3.1vw, 38px);
-      font-weight: 500;
-      letter-spacing: -.055em;
-      line-height: 1.15;
-    }
-
-    .additional-benefit p {
-      max-width: 600px;
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.85;
-    }
-
-    /* BENCHMARK IA VS LITE SPACE */
-
-    .benchmark {
-      margin-top: 35px;
-      padding: clamp(18px, 3.4vw, 38px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--bg);
-    }
-
-    .benchmark-heading {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    .benchmark-heading h3 {
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: clamp(23px, 3vw, 32px);
-      font-weight: 500;
-      letter-spacing: -.055em;
-      line-height: 1.15;
-    }
-
-    .benchmark-heading p {
-      max-width: 560px;
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.75;
-    }
-
-    .benchmark-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 10px;
-      letter-spacing: .035em;
-      white-space: nowrap;
-    }
-
-    .benchmark-tag::before {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      content: "";
-    }
-
-    .benchmark-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 14px;
-      align-items: stretch;
-    }
-
-    .benchmark-panel {
-      display: flex;
-      min-width: 0;
-      flex-direction: column;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      overflow: hidden;
-      background: #F8F6F0;
-    }
-
-    .benchmark-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 15px 16px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .benchmark-panel-header h4 {
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: 17px;
-      font-weight: 500;
-      letter-spacing: -.035em;
-    }
-
-    .benchmark-index {
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 10px;
-    }
-
-    .benchmark-panel-body {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      gap: 14px;
-      padding: 15px;
-    }
-
-    .simulation-label {
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 10px;
-      letter-spacing: .055em;
-      text-transform: uppercase;
-    }
-
-    .chat-window {
-      display: flex;
-      min-height: 245px;
-      flex: 1;
-      flex-direction: column;
-      gap: 12px;
-      padding: 13px;
-      border: 1px solid var(--line-soft);
-      border-radius: 8px;
-      background: #F0EEE7;
-    }
-
-    .chat-message {
-      max-width: 94%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .chat-message--user {
-      align-self: flex-end;
-      background: #DCE4E5;
-      color: #243C44;
-    }
-
-    .chat-message--ai {
-      align-self: flex-start;
-      border: 1px solid var(--line);
-      background: #FAF9F5;
-    }
-
-    .chat-message--ai p { margin: 0; }
-
-    .chat-message--ai p + p { margin-top: 7px; }
-
-    .chat-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: auto;
-      padding-top: 4px;
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 10px;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      flex: 0 0 auto;
-      border-radius: 50%;
-      background: var(--green);
-    }
-
-    .chat-typing {
-      display: inline-flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .chat-typing span {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--primary);
-      animation: typing-pulse 1s infinite alternate;
-    }
-
-    .chat-typing span:nth-child(2) { animation-delay: .2s; }
-    .chat-typing span:nth-child(3) { animation-delay: .4s; }
-
-    @keyframes typing-pulse {
-      from { opacity: .25; transform: translateY(0); }
-      to { opacity: 1; transform: translateY(-3px); }
-    }
-
-    .benchmark-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: auto;
-    }
-
-    .benchmark-stat {
-      min-width: 0;
-      padding: 11px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: var(--panel);
-    }
-
-    .benchmark-stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.5;
-    }
-
-    .benchmark-stat strong {
-      display: block;
-      margin-top: 5px;
-      font-family: var(--font-data);
-      font-size: clamp(13px, 1.5vw, 17px);
-      font-weight: 500;
-      overflow-wrap: anywhere;
-    }
-
-    .benchmark-stat small {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.5;
-    }
-
-    /* DEMOSTRACIÓN DE CARGA Y CREACIÓN */
-
-    .upload-zone {
-      display: flex;
-      min-height: 245px;
-      flex: 1;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 20px;
-      border: 1px dashed #A9A294;
-      border-radius: 8px;
-      background:
-        linear-gradient(rgb(233 230 221 / 35%) 1px, transparent 1px),
-        linear-gradient(90deg, rgb(233 230 221 / 35%) 1px, transparent 1px),
-        #F0EEE7;
-      background-size: 22px 22px;
-      text-align: center;
-      transition: border-color .2s ease, background .2s ease;
-    }
-
-    .upload-zone.is-loaded {
-      border-color: var(--green);
-      background-color: #E9EDE5;
-    }
-
-    .upload-symbol {
-      display: grid;
-      width: 48px;
-      height: 48px;
-      place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      background: var(--bg);
-      color: var(--primary);
-    }
-
-    .upload-symbol .material-symbols-outlined { font-size: 25px; }
-
-    .upload-title {
-      margin: 0;
-      font-size: 13px;
-      font-weight: 600;
-      overflow-wrap: anywhere;
-    }
-
-    .upload-description {
-      max-width: 230px;
-      margin: 0;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
-    .file-select {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      min-height: 36px;
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      background: var(--bg);
-      color: var(--text);
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 600;
-      transition: border-color .2s ease, background .2s ease;
-    }
-
-    .file-select:hover {
-      border-color: var(--primary);
-      background: var(--panel);
-    }
-
-    .file-select input {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      clip-path: inset(50%);
-    }
-
-    .create-scene-button {
-      position: relative;
-      display: flex;
-      width: 100%;
-      min-height: 46px;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 12px 16px;
-      overflow: hidden;
-      border: 1px solid var(--accent);
-      border-radius: 8px;
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      transition: background .2s ease, transform .2s ease;
-    }
-
-    .create-scene-button:hover {
-      background: #B94A23;
-      transform: translateY(-1px);
-    }
-
-    .create-scene-button:disabled {
-      cursor: wait;
-      opacity: .7;
-    }
-
-    .button-pointer {
-      position: absolute;
-      z-index: 2;
-      top: 2px;
-      left: 54%;
-      color: #fff;
-      font-size: 22px;
-      filter: drop-shadow(0 1px 2px rgb(0 0 0 / 25%));
-      pointer-events: none;
-      opacity: 0;
-    }
-
-    .create-scene-button.is-clicking .button-pointer {
-      animation: pointer-click .65s ease forwards;
-    }
-
-    @keyframes pointer-click {
-      0% { opacity: 0; transform: translate(15px, -13px) scale(1.1); }
-      35% { opacity: 1; transform: translate(0, 0) scale(.88); }
-      55% { opacity: 1; transform: translate(0, 0) scale(1); }
-      100% { opacity: 0; transform: translate(0, 0) scale(1); }
-    }
-
-    .scene-result {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border: 1px solid #C6D2BF;
-      border-radius: 8px;
-      background: #E9EDE5;
-    }
-
-    .scene-result.is-visible {
-      display: flex;
-      animation: result-appear .4s ease both;
-    }
-
-    @keyframes result-appear {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .scene-result-icon {
-      display: grid;
-      width: 34px;
-      height: 34px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 50%;
-      background: var(--green);
-      color: white;
-    }
-
-    .scene-result strong {
-      display: block;
-      font-size: 12px;
-    }
-
-    .scene-result span {
-      display: block;
-      margin-top: 3px;
-      color: #58664D;
-      font-size: 10px;
-      line-height: 1.5;
-    }
-
-    .benchmark-disclaimer {
-      margin: 18px 0 0;
-      padding-top: 15px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.75;
-    }
-
-    /* FRASE EDITORIAL CON TYPEWRITER */
-
-    .statement {
-      overflow: hidden;
-      background: var(--secondary);
-      color: var(--bg);
-    }
-
-    .statement-inner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      align-items: center;
-      justify-items: center;
-      padding-block: clamp(75px, 12vw, 145px);
-      text-align: center;
-    }
-
-    .statement h2 {
-      max-width: 1000px;
-      margin: 0 auto;
-      font-family: var(--font-brand);
-      font-size: clamp(43px, 7.4vw, 91px);
-      font-weight: 500;
-      letter-spacing: -.08em;
-      line-height: 1.06;
-    }
-
-    .typewriter-line {
-      display: block;
-      min-height: 1.12em;
-    }
-
-    .typewriter-line--accent { color: #A6BFC6; }
-
-    .typewriter-cursor::after {
-      display: inline-block;
-      width: 3px;
-      height: .82em;
-      margin-left: .12em;
-      background: var(--accent);
-      content: "";
-      vertical-align: -.02em;
-      animation: cursor-blink .8s steps(2, start) infinite;
-    }
-
-    @keyframes cursor-blink {
-      to { visibility: hidden; }
-    }
-
-    .statement p {
-      max-width: 600px;
-      margin: 27px auto 0;
-      color: #C3C0B6;
-      font-size: 15px;
-      line-height: 1.9;
-    }
-
-    /* USO PUNTUAL GRATUITO */
-
-    .individual-access {
-      padding-block: clamp(65px, 9vw, 110px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .individual-card {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(270px, .75fr);
-      align-items: center;
-      gap: clamp(32px, 7vw, 90px);
-      padding: clamp(30px, 6vw, 70px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--panel);
-    }
-
-    .individual-eyebrow {
-      display: inline-block;
-      margin-bottom: 20px;
-      color: var(--primary);
-      font-family: var(--font-data);
-      font-size: 11px;
-      letter-spacing: .09em;
-      text-transform: uppercase;
-    }
-
-    .individual-card h2 {
-      max-width: 620px;
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: clamp(34px, 5vw, 58px);
-      font-weight: 500;
-      letter-spacing: -.07em;
-      line-height: 1.04;
-    }
-
-    .individual-description {
-      max-width: 580px;
-      margin: 22px 0 0;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.9;
-    }
-
-    .individual-details {
-      display: grid;
-      gap: 16px;
-      margin: 27px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .individual-details li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .individual-details li::before {
-      flex: 0 0 auto;
-      color: var(--green);
-      content: "✓";
-    }
-
-    .individual-offer {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      padding: clamp(24px, 3.5vw, 38px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--bg);
-    }
-
-    .individual-price {
-      font-family: var(--font-brand);
-      font-size: clamp(52px, 6vw, 72px);
-      font-weight: 500;
-      letter-spacing: -.08em;
-      line-height: 1;
-    }
-
-    .individual-price-label {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .individual-limit {
-      width: 100%;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid var(--line);
-      font-family: var(--font-data);
-      font-size: 12px;
-      line-height: 1.8;
-    }
-
-    .individual-ad-note {
-      margin: 17px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.8;
-    }
-
-    .individual-button {
-      display: inline-flex;
-      min-height: 50px;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 25px;
-      padding: 13px 19px;
-      border: 1px solid var(--primary);
-      border-radius: var(--radius);
-      background: var(--primary);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background .2s ease, border-color .2s ease;
-    }
-
-    .individual-button:hover {
-      border-color: var(--primary-hover);
-      background: var(--primary-hover);
-    }
-
-    /* B2B SERVICE */
-
-    .pricing {
-      padding-block: clamp(95px, 12vw, 150px);
-    }
-
-    .pricing-header {
-      max-width: 790px;
-      margin-bottom: 55px;
-    }
-
-    .pricing-header .section-subtitle { margin-top: 20px; }
-
-    .pricing-eyebrow {
-      display: inline-block;
-      margin-bottom: 18px;
-      color: var(--primary);
-      font-family: var(--font-data);
-      font-size: 11px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      align-items: stretch;
-    }
-
-    .price-card {
-      display: flex;
-      min-width: 0;
-      flex-direction: column;
-      padding: clamp(23px, 3vw, 34px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--panel);
-    }
-
-    .price-card--featured {
-      border-color: var(--primary);
-      background: #E4E7E1;
-    }
-
-    .plan-label {
-      margin-bottom: 12px;
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 10px;
-      letter-spacing: .07em;
-      text-transform: uppercase;
-    }
-
-    .price-card h3 {
-      margin: 0;
-      font-family: var(--font-brand);
-      font-size: 25px;
-      font-weight: 500;
-      letter-spacing: -.045em;
-    }
-
-    .price {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      margin-top: 29px;
-    }
-
-    .price-amount {
-      font-family: var(--font-brand);
-      font-size: clamp(42px, 5vw, 58px);
-      font-weight: 500;
-      letter-spacing: -.075em;
-      line-height: 1;
-    }
-
-    .price-currency {
-      font-family: var(--font-brand);
-      font-size: 20px;
-    }
-
-    .price-period {
-      margin: 11px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .price-description {
-      min-height: 58px;
-      margin: 24px 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .price-divider {
-      height: 1px;
-      margin-bottom: 22px;
-      background: var(--line);
-    }
-
-    .price-features {
-      display: grid;
-      gap: 14px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .price-features li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .price-features li::before {
-      flex: 0 0 auto;
-      color: var(--green);
-      content: "✓";
-    }
-
-    .repository-cost {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin-top: auto;
-      padding-top: 24px;
-    }
-
-    .repository-cost span {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .repository-cost strong {
-      font-family: var(--font-brand);
-      font-size: 23px;
-      font-weight: 500;
-      letter-spacing: -.04em;
-    }
-
-    .repository-cost small {
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .pricing-note {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-top: 24px;
-      padding-top: 19px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.8;
-    }
-
-    .pricing-note strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .pricing-action {
-      display: flex;
-      justify-content: center;
-      padding-top: 24px;
-    }
-
-    .final-button {
-      display: inline-flex;
-      min-height: 54px;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      padding: 15px 24px;
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
-      background: var(--accent);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background .2s ease, border-color .2s ease;
-    }
-
-    .final-button:hover {
-      border-color: #B94A23;
-      background: #B94A23;
-    }
-
-    .final-button span { font-size: 19px; }
-
-    /* LICENCIAS B2B2B */
-
-    .commercial {
-      padding-block: clamp(55px, 8vw, 90px);
-      border-top: 1px solid var(--line);
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .commercial-inner {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(220px, .65fr);
-      align-items: center;
-      gap: 60px;
-    }
-
-    .commercial h2 {
-      margin: 0;
-      color: #fff;
-      font-family: var(--font-brand);
-      font-size: clamp(30px, 4vw, 45px);
-      font-weight: 500;
-      letter-spacing: -.06em;
-      line-height: 1.1;
-    }
-
-    .commercial p {
-      margin: 0;
-      color: rgb(255 255 255 / 82%);
-      font-size: 14px;
-      line-height: 1.9;
-    }
-
-    .commercial a {
-      color: #fff;
-      text-decoration: underline;
-      text-decoration-color: rgb(255 255 255 / 55%);
-      text-underline-offset: 4px;
-    }
-
-    .commercial a:hover { text-decoration-color: #fff; }
-
-    /* FOOTER */
-
-    .site-footer { padding-top: 32px; }
-
-    .footer-main {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 24px;
-      padding-bottom: 30px;
-    }
-
-    .footer-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .footer-links a,
-    .footer-contact a {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .footer-links a:hover,
-    .footer-contact a:hover { color: var(--primary); }
-
-    .footer-brand {
-      display: flex;
-      align-items: center;
-      justify-self: center;
-      gap: 9px;
-      font-family: var(--font-brand);
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .footer-brand-mark {
-      display: grid;
-      width: 28px;
-      height: 28px;
-      place-items: center;
-      border: 1px solid var(--text);
-      border-radius: 50%;
-      font-size: 10px;
-    }
-
-    .footer-contact {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      text-align: right;
-    }
-
-    .footer-contact span {
-      color: var(--muted);
-      font-family: var(--font-data);
-      font-size: 9px;
-      letter-spacing: .05em;
-      text-transform: uppercase;
-    }
-
-    /* RESPONSIVE */
-
-    @media (max-width: 850px) {
-      .additional-benefit {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .additional-benefit p { margin-top: 4px; }
-
-      .individual-card {
-        grid-template-columns: 1fr;
-        gap: 35px;
-      }
-
-      .pricing-grid { gap: 10px; }
-
-      .price-card { padding: 21px 17px; }
-
-      .commercial-inner {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      .footer-main { grid-template-columns: 1fr auto; }
-
-      .footer-brand {
-        grid-column: 1;
-        grid-row: 1;
-        justify-self: start;
-      }
-
-      .footer-links {
-        grid-column: 1;
-        grid-row: 2;
-      }
-
-      .footer-contact {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-      }
-    }
-
-    @media (max-width: 650px) {
-      .benchmark-grid { grid-template-columns: 1fr; }
-
-      .benchmark-panel-header h4 { font-size: 16px; }
-
-      .chat-window,
-      .upload-zone { min-height: 220px; }
-
-      .benchmark-stat strong { font-size: 15px; }
-    }
-
-    @media (max-width: 600px) {
-      :root { --gutter: 23px; }
-
-      .site-header { height: 62px; }
-
-      .header-inner { grid-template-columns: 1fr auto 1fr; }
-
-      .header-company { font-size: 12px; }
-
-      .header-logo { width: 36px; height: 36px; }
-
-      .header-account { width: 38px; height: 38px; }
-
-      .hero {
-        min-height: 0;
-        padding-block: 105px 112px;
-      }
-
-      .hero h1 { font-size: clamp(45px, 12.4vw, 67px); }
-
-      .hero p { margin-top: 25px; font-size: 15px; }
-
-      .story-scroll { height: 220vh; }
-
-      .story-sticky { min-height: 100svh; }
-
-      .story-content {
-        min-height: 400px;
-        padding-block: 30px;
-      }
-
-      .story-phase { top: 30px; }
-
-      .story-phase h2 { font-size: clamp(40px, 11vw, 62px); }
-
-      .story-phase p { margin-top: 22px; font-size: 14px; }
-
-      .story-image::after {
-        background: linear-gradient(
-          90deg,
-          rgb(17 18 16 / 84%) 0%,
-          rgb(17 18 16 / 63%) 100%
-        );
-      }
-
-      .additional-benefit { padding-block: 25px; }
-
-      .additional-benefit h2 { font-size: 27px; }
-
-      .benchmark { padding: 16px; }
-
-      .benchmark-heading { gap: 12px; }
-
-      .statement-inner { padding-block: 80px; }
-
-      .statement h2 { font-size: clamp(39px, 10.5vw, 62px); }
-
-      .statement p { font-size: 14px; }
-
-      .individual-card { padding: 25px; }
-
-      .individual-card h2 { font-size: clamp(35px, 10vw, 48px); }
-
-      .individual-offer { padding: 25px; }
-
-      .pricing-grid {
-        grid-template-columns: 1fr;
-        gap: 13px;
-      }
-
-      .price-card { padding: 27px; }
-
-      .price-description { min-height: 0; }
-
-      .price-amount { font-size: 53px; }
-
-      .repository-cost { margin-top: 24px; }
-
-      .pricing-action .final-button { width: 100%; }
-
-      .footer-main {
-        grid-template-columns: 1fr;
-        gap: 22px;
-      }
-
-      .footer-brand,
-      .footer-links,
-      .footer-contact {
-        grid-column: 1;
-        grid-row: auto;
-      }
-
-      .footer-contact {
-        align-items: flex-start;
-        text-align: left;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-
-      .story-phase,
-      .story-image {
-        transition: none !important;
-      }
-
-      .typewriter-cursor::after,
-      .chat-typing span,
-      .create-scene-button.is-clicking .button-pointer,
-      .scene-result.is-visible {
-        animation: none !important;
-      }
-
-      .button-pointer { display: none; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Lite Space | Bibliotecas 3D interactivas en minutos</title>
+<meta name="description" content="Convierte tus repositorios 3D en bibliotecas interactivas en minutos. Organiza, prepara y comparte tus recursos desde tus repositorios existentes.">
+<meta name="theme-color" content="#F3F1EA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F3F1EA;
+  --panel:#EAE7DE;
+  --panel-hover:#E1DED4;
+  --line:#D9D4C8;
+  --line-soft:#E5E1D8;
+  --text:#242522;
+  --muted:#716B60;
+  --primary:#416D80;
+  --primary-hover:#294A59;
+  --accent:#E5682E;
+  --secondary:#111210;
+  --green:#657B54;
+  --font-brand:"Space Grotesk",sans-serif;
+  --font-body:"IBM Plex Sans",sans-serif;
+  --font-data:"IBM Plex Mono",monospace;
+  --page-width:1180px;
+  --gutter:clamp(22px,6vw,84px);
+  --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+a:focus-visible{outline:2px solid var(--primary);outline-offset:4px}
+::selection{color:var(--bg);background:var(--primary)}
+.container{width:min(calc(100% - var(--gutter)*2),var(--page-width));margin-inline:auto}
+.section-title{max-width:820px;margin:0;font-family:var(--font-brand);font-size:clamp(34px,4.6vw,57px);font-weight:500;letter-spacing:-.065em;line-height:1.08}
+.section-subtitle{max-width:680px;margin:22px 0 0;color:var(--muted);font-size:16px;line-height:1.85}
+.material-symbols-outlined{display:inline-block;font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;font-size:23px;line-height:1;white-space:nowrap;direction:ltr;font-feature-settings:"liga";-webkit-font-smoothing:antialiased}
+
+/* Cabecera */
+.site-header{position:relative;z-index:20;height:70px;border-bottom:1px solid var(--line);background:var(--bg)}
+.header-inner{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;width:min(calc(100% - var(--gutter)*2),1440px);height:100%;margin-inline:auto}
+.header-company{justify-self:start;font-family:var(--font-brand);font-size:15px;font-weight:900;letter-spacing:-.045em}
+.header-logo{display:inline-flex;width:42px;height:42px;align-items:center;justify-content:center;justify-self:center}
+.header-logo svg{width:100%;height:100%}
+.header-account{display:inline-flex;width:42px;height:42px;align-items:center;justify-content:center;justify-self:end;border:1px solid var(--line);border-radius:50%;transition:.2s ease}
+.header-account:hover{border-color:var(--primary);background:var(--panel);color:var(--primary)}
+
+/* Hero */
+.hero{display:grid;min-height:min(730px,calc(100svh - 70px));align-items:center;padding-block:clamp(100px,14vw,175px);border-bottom:1px solid var(--line);text-align:center}
+.hero-inner{width:min(calc(100% - var(--gutter)*2),1080px);margin-inline:auto}
+.hero h1{max-width:1050px;margin:0 auto;font-family:var(--font-brand);font-size:clamp(46px,8.3vw,104px);font-weight:500;letter-spacing:-.085em;line-height:.99}
+.hero h1 span{color:var(--primary)}
+.hero p{max-width:680px;margin:32px auto 0;color:var(--muted);font-size:clamp(15px,1.6vw,18px);line-height:1.9}
+
+/* Beneficios con desplazamiento */
+.benefits{padding-top:clamp(45px,7vw,85px);padding-bottom:clamp(65px,9vw,110px)}
+.story-scroll{position:relative;width:100%;height:270vh}
+.story-sticky{position:sticky;top:0;display:grid;min-height:100svh;align-items:center;overflow:hidden;isolation:isolate;border-block:1px solid var(--line);background:var(--secondary);color:var(--bg)}
+.story-images{position:absolute;z-index:-2;inset:0;overflow:hidden;background:var(--secondary)}
+.story-image{position:absolute;inset:0;background-position:center;background-size:cover;opacity:0;transform:translateY(100%);transition:transform .8s cubic-bezier(.2,.7,.2,1),opacity .8s ease}
+.story-image::after{position:absolute;inset:0;background:linear-gradient(90deg,rgb(17 18 16 / 88%) 0%,rgb(17 18 16 / 68%) 52%,rgb(17 18 16 / 25%) 100%);content:""}
+.story-image.is-active{z-index:1;opacity:1;transform:translateY(0)}
+.story-image.is-leaving-up{z-index:2;opacity:0;transform:translateY(-100%)}
+.story-image.is-leaving-down{z-index:2;opacity:0;transform:translateY(100%)}
+.story-content{position:relative;width:min(calc(100% - var(--gutter)*2),var(--page-width));min-height:390px;margin-inline:auto;padding-block:50px}
+.story-phase{position:absolute;top:50px;left:0;width:100%;opacity:0;transform:translateY(24px);transition:opacity .45s ease,transform .55s ease;pointer-events:none}
+.story-phase.is-active{opacity:1;transform:translateY(0)}
+.story-phase h2{max-width:950px;margin:0;font-family:var(--font-brand);font-size:clamp(39px,7.1vw,84px);font-weight:500;letter-spacing:-.08em;line-height:1.02}
+.story-phase h2 span{color:#A6BFC6}
+.story-phase p{max-width:620px;margin:28px 0 0;color:rgb(243 241 234 / 82%);font-size:clamp(14px,1.4vw,16px);line-height:1.9}
+.story-progress{position:absolute;right:0;bottom:0;left:0;height:3px;background:rgb(243 241 234 / 20%)}
+.story-progress-fill{display:block;width:0;height:100%;background:var(--accent)}
+
+/* Beneficios adicionales */
+.additional-benefits{padding-block:clamp(55px,8vw,95px);border-block:1px solid var(--line);background:var(--panel)}
+.additional-benefit{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);align-items:start;gap:clamp(18px,3.5vw,48px);padding-block:30px}
+.additional-benefit+.additional-benefit{border-top:1px solid var(--line)}
+.additional-benefit h2{max-width:560px;margin:0;font-family:var(--font-brand);font-size:clamp(25px,3.1vw,38px);font-weight:500;letter-spacing:-.055em;line-height:1.15}
+.additional-benefit>p{max-width:600px;margin:3px 0 0;color:var(--muted);font-size:14px;line-height:1.85}
+
+/* Benchmark */
+.benchmark{margin-top:28px;padding:clamp(18px,3.4vw,34px);border:1px solid var(--line);border-radius:var(--radius);background:var(--bg)}
+.benchmark-heading{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:22px}
+.benchmark-heading h3{margin:0;font-family:var(--font-brand);font-size:clamp(23px,3vw,32px);font-weight:500;letter-spacing:-.055em;line-height:1.15}
+.benchmark-heading p{max-width:560px;margin:9px 0 0;color:var(--muted);font-size:13px;line-height:1.75}
+.benchmark-tag{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-family:var(--font-data);font-size:10px;white-space:nowrap}
+.benchmark-tag::before{width:6px;height:6px;border-radius:50%;background:var(--accent);content:""}
+.benchmark-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+.benchmark-panel{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:9px;background:#F8F6F0}
+.benchmark-panel-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 15px;border-bottom:1px solid var(--line)}
+.benchmark-panel-header h4{margin:0;font-family:var(--font-brand);font-size:17px;font-weight:500;letter-spacing:-.035em}
+.benchmark-index{color:var(--muted);font-family:var(--font-data);font-size:10px}
+.benchmark-panel-body{padding:14px}
+.simulation-label{display:block;margin-bottom:10px;color:var(--muted);font-family:var(--font-data);font-size:10px;letter-spacing:.055em;text-transform:uppercase}
+
+/* Simulación IA: contenido largo, sin scroll interior */
+.demo-window{position:relative;height:290px;overflow:hidden;padding:12px;border:1px solid var(--line-soft);border-radius:8px;background:#F0EEE7}
+.demo-window::after{position:absolute;right:0;bottom:0;left:0;height:45px;background:linear-gradient(transparent,#F0EEE7);content:"";pointer-events:none}
+.ai-prompt{position:relative;z-index:1;max-width:94%;margin:0 0 12px auto;padding:9px 11px;border-radius:7px;background:#DCE4E5;color:#243C44;font-size:11px;line-height:1.65}
+.ai-response{display:grid;gap:10px;animation:ai-flow 12s 1s ease-in-out infinite alternate}
+.ai-step{padding:10px 11px;border:1px solid var(--line);border-radius:7px;background:#FAF9F5;font-size:11px;line-height:1.65}
+.ai-step strong{display:block;margin-bottom:3px;color:var(--primary);font-family:var(--font-data);font-size:9px;font-weight:500;letter-spacing:.04em}
+@keyframes ai-flow{0%,12%{transform:translateY(0)}100%{transform:translateY(-145px)}}
+
+/* Simulación Lite Space */
+.lite-demo{position:relative;display:flex;height:290px;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden;padding:16px;border:1px dashed #A9A294;border-radius:8px;background:linear-gradient(rgb(233 230 221 / 35%) 1px,transparent 1px),linear-gradient(90deg,rgb(233 230 221 / 35%) 1px,transparent 1px),#F0EEE7;background-size:22px 22px;text-align:center}
+.model-illustration{display:grid;width:60px;height:54px;place-items:center;border:1px solid var(--line);border-radius:8px;background:#F8F6F0;color:var(--primary);animation:model-loaded 7s infinite}
+.model-illustration .material-symbols-outlined{font-size:34px}
+.demo-status{min-height:18px;margin:0;font-size:12px;font-weight:600}
+.demo-substatus{min-height:17px;margin:0;color:var(--muted);font-size:10px}
+.demo-action{position:relative;display:flex;width:180px;min-height:36px;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border:1px solid var(--accent);border-radius:7px;background:var(--accent);color:#fff;font-size:11px;font-weight:600}
+.demo-action .material-symbols-outlined{font-size:17px}
+.demo-action--load{animation:load-click 7s infinite}
+.demo-action--create{border-color:var(--primary);background:var(--primary);animation:create-click 7s infinite}
+.demo-pointer{position:absolute;z-index:3;top:calc(50% - 22px);right:calc(50% - 112px);font-size:22px;line-height:1;opacity:0;filter:drop-shadow(0 1px 1px #fff);pointer-events:none;animation:pointer-move 7s infinite}
+.demo-result{display:flex;align-items:center;gap:6px;color:var(--green);font-size:11px;font-weight:600;opacity:0;animation:result-show 7s infinite}
+.demo-result .material-symbols-outlined{font-size:17px}
+@keyframes pointer-move{
+  0%,5%{opacity:0;transform:translate(-24px,-22px)}
+  12%,20%{opacity:1;transform:translate(0,0)}
+  23%{opacity:1;transform:translate(0,0) scale(.8)}
+  27%{opacity:1;transform:translate(0,0) scale(1)}
+  32%{opacity:0;transform:translate(0,0)}
+  40%{opacity:0;transform:translate(0,42px)}
+  48%,56%{opacity:1;transform:translate(0,42px)}
+  59%{opacity:1;transform:translate(0,42px) scale(.8)}
+  63%{opacity:1;transform:translate(0,42px) scale(1)}
+  70%,100%{opacity:0;transform:translate(0,42px)}
+}
+@keyframes load-click{0%,18%{transform:scale(1);filter:brightness(1)}21%{transform:scale(.97);filter:brightness(.86)}24%,100%{transform:scale(1);filter:brightness(1)}}
+@keyframes create-click{0%,55%{transform:scale(1);filter:brightness(1)}59%{transform:scale(.97);filter:brightness(.86)}62%,100%{transform:scale(1);filter:brightness(1)}}
+@keyframes model-loaded{
+  0%,20%{border-color:var(--line);background:#F8F6F0;color:var(--primary)}
+  26%,100%{border-color:#C6D2BF;background:#E9EDE5;color:var(--green)}
+}
+.demo-status::before{content:"Modelo 3D";animation:status-text 7s infinite}
+.demo-status{font-size:0}
+.demo-status::before{font-size:12px}
+.demo-substatus::before{content:"Esperando para cargar";animation:substatus-text 7s infinite}
+.demo-substatus{font-size:0}
+.demo-substatus::before{font-size:10px}
+@keyframes status-text{
+  0%,22%{content:"Modelo 3D"}
+  27%,53%{content:"modelo-demo.glb"}
+  58%,100%{content:"Escena creada"}
+}
+@keyframes substatus-text{
+  0%,22%{content:"Esperando para cargar"}
+  27%,53%{content:"Modelo cargado"}
+  58%,68%{content:"Creando visualización…"}
+  72%,100%{content:"Resultado de la simulación"}
+}
+.benchmark-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.benchmark-stat{min-width:0;padding:10px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+.benchmark-stat span{display:block;color:var(--muted);font-size:11px;line-height:1.5}
+.benchmark-stat strong{display:block;margin-top:4px;font-family:var(--font-data);font-size:14px;font-weight:500;overflow-wrap:anywhere}
+.benchmark-stat small{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.5}
+.benchmark-disclaimer{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:11px;line-height:1.75}
+
+/* Mensaje de cierre */
+.statement{overflow:hidden;background:var(--secondary);color:var(--bg)}
+.statement-inner{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;justify-items:center;padding-block:clamp(75px,12vw,145px);text-align:center}
+.statement h2{max-width:1000px;margin:0 auto;font-family:var(--font-brand);font-size:clamp(43px,7.4vw,91px);font-weight:500;letter-spacing:-.08em;line-height:1.06}
+.typewriter-line{display:block;min-height:1.12em}
+.typewriter-line--accent{color:#A6BFC6}
+.typewriter-cursor::after{display:inline-block;width:3px;height:.82em;margin-left:.12em;background:var(--accent);content:"";vertical-align:-.02em;animation:cursor-blink .8s steps(2,start) infinite}
+@keyframes cursor-blink{to{visibility:hidden}}
+.statement p{max-width:600px;margin:27px auto 0;color:#C3C0B6;font-size:15px;line-height:1.9}
+
+/* Acceso individual */
+.individual-access{padding-block:clamp(65px,9vw,110px);border-bottom:1px solid var(--line)}
+.individual-card{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(270px,.75fr);align-items:center;gap:clamp(32px,7vw,90px);padding:clamp(30px,6vw,70px);border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.individual-eyebrow{display:inline-block;margin-bottom:20px;color:var(--primary);font-family:var(--font-data);font-size:11px;letter-spacing:.09em;text-transform:uppercase}
+.individual-card h2{max-width:620px;margin:0;font-family:var(--font-brand);font-size:clamp(34px,5vw,58px);font-weight:500;letter-spacing:-.07em;line-height:1.04}
+.individual-description{max-width:580px;margin:22px 0 0;color:var(--muted);font-size:15px;line-height:1.9}
+.individual-details{display:grid;gap:16px;margin:27px 0 0;padding:0;list-style:none}
+.individual-details li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.7}
+.individual-details li::before{flex:0 0 auto;color:var(--green);content:"✓"}
+.individual-offer{display:flex;flex-direction:column;align-items:flex-start;padding:clamp(24px,3.5vw,38px);border:1px solid var(--line);border-radius:var(--radius);background:var(--bg)}
+.individual-price{font-family:var(--font-brand);font-size:clamp(52px,6vw,72px);font-weight:500;letter-spacing:-.08em;line-height:1}
+.individual-price-label{margin-top:8px;color:var(--muted);font-size:13px}
+.individual-limit{width:100%;margin-top:25px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--font-data);font-size:12px;line-height:1.8}
+.individual-ad-note{margin:17px 0 0;color:var(--muted);font-size:12px;line-height:1.8}
+.individual-button{display:inline-flex;min-height:50px;align-items:center;justify-content:center;gap:12px;margin-top:25px;padding:13px 19px;border:1px solid var(--primary);border-radius:var(--radius);background:var(--primary);color:#fff;font-size:14px;font-weight:600;transition:background .2s,border-color .2s}
+.individual-button:hover{border-color:var(--primary-hover);background:var(--primary-hover)}
+
+/* Precios */
+.pricing{padding-block:clamp(95px,12vw,150px)}
+.pricing-header{max-width:790px;margin-bottom:55px}
+.pricing-header .section-subtitle{margin-top:20px}
+.pricing-eyebrow{display:inline-block;margin-bottom:18px;color:var(--primary);font-family:var(--font-data);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.price-card{display:flex;min-width:0;flex-direction:column;padding:clamp(23px,3vw,34px);border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.price-card--featured{border-color:var(--primary);background:#E4E7E1}
+.plan-label{margin-bottom:12px;color:var(--muted);font-family:var(--font-data);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
+.price-card h3{margin:0;font-family:var(--font-brand);font-size:25px;font-weight:500;letter-spacing:-.045em}
+.price{display:flex;align-items:baseline;gap:6px;margin-top:29px}
+.price-amount{font-family:var(--font-brand);font-size:clamp(42px,5vw,58px);font-weight:500;letter-spacing:-.075em;line-height:1}
+.price-currency{font-family:var(--font-brand);font-size:20px}
+.price-period{margin:11px 0 0;color:var(--muted);font-size:12px}
+.price-description{min-height:58px;margin:24px 0;color:var(--muted);font-size:13px;line-height:1.8}
+.price-divider{height:1px;margin-bottom:22px;background:var(--line)}
+.price-features{display:grid;gap:14px;margin:0;padding:0;list-style:none}
+.price-features li{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.6}
+.price-features li::before{flex:0 0 auto;color:var(--green);content:"✓"}
+.repository-cost{display:flex;flex-direction:column;gap:5px;margin-top:auto;padding-top:24px}
+.repository-cost span{color:var(--muted);font-size:12px}
+.repository-cost strong{font-family:var(--font-brand);font-size:23px;font-weight:500;letter-spacing:-.04em}
+.repository-cost small{color:var(--muted);font-size:11px}
+.pricing-note{display:flex;align-items:flex-start;gap:12px;margin-top:24px;padding-top:19px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.8}
+.pricing-note strong{color:var(--text);font-weight:500}
+.pricing-action{display:flex;justify-content:center;padding-top:24px}
+.final-button{display:inline-flex;min-height:54px;align-items:center;justify-content:center;gap:16px;padding:15px 24px;border:1px solid var(--accent);border-radius:var(--radius);background:var(--accent);color:#fff;font-size:14px;font-weight:600;transition:background .2s,border-color .2s}
+.final-button:hover{border-color:#B94A23;background:#B94A23}
+.final-button span{font-size:19px}
+
+/* Licencias comerciales y pie */
+.commercial{padding-block:clamp(55px,8vw,90px);border-top:1px solid var(--line);background:var(--primary);color:#fff}
+.commercial-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.65fr);align-items:center;gap:60px}
+.commercial h2{margin:0;color:#fff;font-family:var(--font-brand);font-size:clamp(30px,4vw,45px);font-weight:500;letter-spacing:-.06em;line-height:1.1}
+.commercial p{margin:0;color:rgb(255 255 255 / 82%);font-size:14px;line-height:1.9}
+.commercial a{color:#fff;text-decoration:underline;text-decoration-color:rgb(255 255 255 / 55%);text-underline-offset:4px}
+.commercial a:hover{text-decoration-color:#fff}
+.site-footer{padding-top:32px}
+.footer-main{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;padding-bottom:30px}
+.footer-links{display:flex;flex-wrap:wrap;gap:16px}
+.footer-links a,.footer-contact a{color:var(--muted);font-size:12px}
+.footer-links a:hover,.footer-contact a:hover{color:var(--primary)}
+.footer-brand{display:flex;align-items:center;justify-self:center;gap:9px;font-family:var(--font-brand);font-size:13px;font-weight:600;white-space:nowrap}
+.footer-brand-mark{display:grid;width:28px;height:28px;place-items:center;border:1px solid var(--text);border-radius:50%;font-size:10px}
+.footer-contact{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.footer-contact span{color:var(--muted);font-family:var(--font-data);font-size:9px;letter-spacing:.05em;text-transform:uppercase}
+
+/* Adaptación a pantallas */
+@media(max-width:850px){
+  .additional-benefit{grid-template-columns:1fr;gap:12px}
+  .additional-benefit>p{margin-top:4px}
+  .individual-card{grid-template-columns:1fr;gap:35px}
+  .pricing-grid{gap:10px}
+  .price-card{padding:21px 17px}
+  .commercial-inner{grid-template-columns:1fr;gap:20px}
+  .footer-main{grid-template-columns:1fr auto}
+  .footer-brand{grid-column:1;grid-row:1;justify-self:start}
+  .footer-links{grid-column:1;grid-row:2}
+  .footer-contact{grid-column:2;grid-row:1/span 2}
+}
+@media(max-width:650px){
+  .benchmark-grid{grid-template-columns:1fr}
+  .benchmark-panel-header h4{font-size:16px}
+  .demo-window,.lite-demo{height:270px}
+  .benchmark-stat strong{font-size:13px}
+}
+@media(max-width:600px){
+  :root{--gutter:23px}
+  .site-header{height:62px}
+  .header-company{font-size:12px}
+  .header-logo{width:36px;height:36px}
+  .header-account{width:38px;height:38px}
+  .hero{min-height:0;padding-block:105px 112px}
+  .hero h1{font-size:clamp(45px,12.4vw,67px)}
+  .hero p{margin-top:25px;font-size:15px}
+  .story-scroll{height:220vh}
+  .story-content{min-height:400px;padding-block:30px}
+  .story-phase{top:30px}
+  .story-phase h2{font-size:clamp(40px,11vw,62px)}
+  .story-phase p{margin-top:22px;font-size:14px}
+  .story-image::after{background:linear-gradient(90deg,rgb(17 18 16 / 84%) 0%,rgb(17 18 16 / 63%) 100%)}
+  .additional-benefit{padding-block:25px}
+  .additional-benefit h2{font-size:27px}
+  .benchmark{padding:16px}
+  .benchmark-heading{gap:12px}
+  .statement-inner{padding-block:80px}
+  .statement h2{font-size:clamp(39px,10.5vw,62px)}
+  .statement p{font-size:14px}
+  .individual-card{padding:25px}
+  .individual-card h2{font-size:clamp(35px,10vw,48px)}
+  .individual-offer{padding:25px}
+  .pricing-grid{grid-template-columns:1fr;gap:13px}
+  .price-card{padding:27px}
+  .price-description{min-height:0}
+  .price-amount{font-size:53px}
+  .repository-cost{margin-top:24px}
+  .pricing-action .final-button{width:100%}
+  .footer-main{grid-template-columns:1fr;gap:22px}
+  .footer-brand,.footer-links,.footer-contact{grid-column:1;grid-row:auto}
+  .footer-contact{align-items:flex-start;text-align:left}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .story-phase,.story-image{transition:none!important}
+  .typewriter-cursor::after,.ai-response,.model-illustration,.demo-action,.demo-pointer,.demo-result{animation:none!important}
+  .demo-pointer{display:none}
+  .demo-status::before{content:"Escena creada"}
+  .demo-substatus::before{content:"Resultado de la simulación"}
+}
+</style>
 </head>
 
 <body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="header-company" href="https://www.virtualshubs.es/" target="_blank" rel="noopener noreferrer" aria-label="3DTWINS — web principal">3DTWINS</a>
+    <a class="header-logo" href="#inicio" aria-label="3D OPE Lite Space">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M8 30.5V17.5L24 8L40 17.5V30.5L24 40L8 30.5Z" stroke="#242522" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M8 17.5L24 27L40 17.5M24 27V40" stroke="#E5682E" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M16 13L32 22.5V31.5" stroke="#416D80" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <a class="header-account" href="#acceso" aria-label="Acceso de usuario registrado" title="Acceso de usuario registrado"><span class="material-symbols-outlined" aria-hidden="true">account_circle</span></a>
+  </div>
+</header>
 
-  <header class="site-header">
-    <div class="header-inner">
-
-      <a
-        class="header-company"
-        href="https://www.virtualshubs.es/"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="3DTWINS — web principal"
-      >3DTWINS</a>
-
-      <a class="header-logo" href="#inicio" aria-label="3D OPE Lite Space">
-        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-          <path d="M8 30.5V17.5L24 8L40 17.5V30.5L24 40L8 30.5Z"
-                stroke="#242522" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M8 17.5L24 27L40 17.5M24 27V40"
-                stroke="#E5682E" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M16 13L32 22.5V31.5"
-                stroke="#416D80" stroke-width="1.8" stroke-linejoin="round"/>
-        </svg>
-      </a>
-
-      <a
-        class="header-account"
-        href="#acceso"
-        aria-label="Acceso de usuario registrado"
-        title="Acceso de usuario registrado"
-      >
-        <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
-      </a>
-
+<main>
+  <section class="hero" id="inicio">
+    <div class="hero-inner">
+      <h1>Convierte tus repositorios 3D en <span>bibliotecas interactivas</span> en minutos.</h1>
+      <p>Sin transferencias ni migraciones. Accede a tus recursos, organízalos y explótalos de forma ágil, sin duplicar infraestructuras ni perder tiempo en tareas automatizables.</p>
     </div>
-  </header>
+  </section>
 
-  <main>
-
-    <!-- HERO -->
-
-    <section class="hero" id="inicio">
-      <div class="hero-inner">
-        <h1>
-          Convierte tus repositorios 3D en
-          <span>bibliotecas interactivas</span>
-          en minutos.
-        </h1>
-
-        <p>
-          Sin transferencias ni migraciones. Accede a tus recursos,
-          organízalos y explótalos de forma ágil, sin duplicar
-          infraestructuras ni perder tiempo en tareas automatizables.
-        </p>
-      </div>
-    </section>
-
-    <!-- BENEFICIOS 01–03: IMÁGENES A ANCHO COMPLETO -->
-
-    <section class="benefits" id="beneficios">
-      <div class="story-scroll" id="storyScroll">
-        <div class="story-sticky">
-
-          <div class="story-images" aria-hidden="true">
-            <div
-              class="story-image is-active"
-              data-image="0"
-              style="background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2200&q=85')"
-            ></div>
-            <div
-              class="story-image"
-              data-image="1"
-              style="background-image:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2200&q=85')"
-            ></div>
-            <div
-              class="story-image"
-              data-image="2"
-              style="background-image:url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=85')"
-            ></div>
-          </div>
-
-          <div class="story-content">
-
-            <article class="story-phase is-active" data-phase="0">
-              <h2>
-                Carga cientos de modelos y prepara tus escenas
-                <span>en tiempo récord.</span>
-              </h2>
-
-              <p>
-                Procesa grandes volúmenes de recursos 3D de forma ágil y reduce
-                el tiempo necesario para preparar tu contenido, sin tener que
-                incorporar los modelos uno a uno.
-              </p>
-            </article>
-
-            <article class="story-phase" data-phase="1">
-              <h2>
-                <span>Estandariza</span> tus procesos de trabajo.
-              </h2>
-
-              <p>
-                Unifica los criterios para organizar y preparar tus recursos 3D,
-                y facilita una forma de trabajo coherente y repetible.
-              </p>
-            </article>
-
-            <article class="story-phase" data-phase="2">
-              <h2>
-                Comparte una escena, una carpeta o
-                <span>todo tu repositorio 3D.</span>
-              </h2>
-
-              <p>
-                Elige qué recursos quieres convertir en una experiencia
-                interactiva: una escena específica, una carpeta aislada
-                o tu repositorio completo.
-              </p>
-            </article>
-
-          </div>
-
-          <div class="story-progress" aria-hidden="true">
-            <span class="story-progress-fill"></span>
-          </div>
-
+  <section class="benefits" id="beneficios">
+    <div class="story-scroll" id="storyScroll">
+      <div class="story-sticky">
+        <div class="story-images" aria-hidden="true">
+          <div class="story-image is-active" data-image="0" style="background-image:url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2200&q=85')"></div>
+          <div class="story-image" data-image="1" style="background-image:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=2200&q=85')"></div>
+          <div class="story-image" data-image="2" style="background-image:url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2200&q=85')"></div>
         </div>
-      </div>
-    </section>
-
-    <!-- BENEFICIOS ADICIONALES + BENCHMARK -->
-
-    <section class="additional-benefits">
-      <div class="container">
-
-        <article class="additional-benefit">
-          <h2>
-            Escala tus procesos sin costes de IA ni desarrollos a medida.
-          </h2>
-
-          <p>
-            Automatiza la gestión de grandes volúmenes de contenido mediante
-            herramientas específicas, sin depender de consumos variables
-            de tokens ni de desarrollar una solución para cada necesidad.
-          </p>
-        </article>
-
-        <section class="benchmark" aria-labelledby="benchmarkTitle">
-          <div class="benchmark-heading">
-            <div>
-              <h3 id="benchmarkTitle">Dos formas de crear una escena.</h3>
-              <p>
-                Compara el flujo de creación desde cero con IA con el proceso
-                de preparar una escena en Lite Space. El tiempo y el coste se
-                incorporarán tras realizar una prueba equivalente.
-              </p>
-            </div>
-
-            <span class="benchmark-tag">BENCHMARK · EN PREPARACIÓN</span>
-          </div>
-
-          <div class="benchmark-grid">
-
-            <!-- LADO IA -->
-
-            <article class="benchmark-panel">
-              <header class="benchmark-panel-header">
-                <h4>Creación desde cero con IA</h4>
-                <span class="benchmark-index">01 / IA</span>
-              </header>
-
-              <div class="benchmark-panel-body">
-                <span class="simulation-label">Conversación simulada</span>
-
-                <div class="chat-window" id="aiChat" aria-live="polite">
-                  <div class="chat-message chat-message--user">
-                    Crea una escena 3D interactiva a partir de un modelo,
-                    con estructura, controles y una experiencia lista para compartir.
-                  </div>
-
-                  <div class="chat-message chat-message--ai">
-                    <p>Para crear la escena necesito definir la estructura, preparar el código y resolver la visualización del modelo.</p>
-                    <p>Después habrá que probar el resultado y corregir los posibles errores.</p>
-                  </div>
-
-                  <div class="chat-status">
-                    <span class="status-dot"></span>
-                    <span>Flujo de trabajo ilustrativo</span>
-                  </div>
-                </div>
-
-                <div class="benchmark-stats">
-                  <div class="benchmark-stat">
-                    <span>Tiempo total</span>
-                    <strong>Por medir</strong>
-                    <small>Desde el prompt hasta el resultado funcional</small>
-                  </div>
-
-                  <div class="benchmark-stat">
-                    <span>Coste del servicio IA</span>
-                    <strong>Por calcular</strong>
-                    <small>Según proveedor, modelo y consumo real</small>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <!-- LADO LITE SPACE -->
-
-            <article class="benchmark-panel">
-              <header class="benchmark-panel-header">
-                <h4>Creación con Lite Space</h4>
-                <span class="benchmark-index">02 / LITE SPACE</span>
-              </header>
-
-              <div class="benchmark-panel-body">
-                <span class="simulation-label">Carga y creación de escena</span>
-
-                <div class="upload-zone" id="uploadZone">
-                  <div class="upload-symbol">
-                    <span class="material-symbols-outlined" aria-hidden="true">deployed_code</span>
-                  </div>
-
-                  <p class="upload-title" id="uploadTitle">Selecciona un modelo 3D</p>
-
-                  <p class="upload-description" id="uploadDescription">
-                    Carga un archivo para representar el paso de preparación de la escena.
-                  </p>
-
-                  <label class="file-select">
-                    <span class="material-symbols-outlined" aria-hidden="true" style="font-size:17px">upload_file</span>
-                    <span>Seleccionar archivo</span>
-                    <input
-                      type="file"
-                      id="modelFile"
-                      accept=".glb,.gltf,.obj,.fbx,.stl,.ply"
-                      aria-label="Seleccionar archivo de modelo 3D"
-                    >
-                  </label>
-                </div>
-
-                <button class="create-scene-button" id="createSceneButton" type="button">
-                  <span class="material-symbols-outlined" aria-hidden="true">add_box</span>
-                  <span id="createSceneLabel">Crear escena</span>
-                  <span class="button-pointer" aria-hidden="true">↖</span>
-                </button>
-
-                <div class="scene-result" id="sceneResult" role="status" aria-live="polite">
-                  <div class="scene-result-icon">
-                    <span class="material-symbols-outlined" aria-hidden="true">check</span>
-                  </div>
-                  <div>
-                    <strong id="sceneResultTitle">Escena creada</strong>
-                    <span id="sceneResultDescription">Resultado visual de la simulación.</span>
-                  </div>
-                </div>
-
-                <div class="benchmark-stats">
-                  <div class="benchmark-stat">
-                    <span>Tiempo de creación</span>
-                    <strong>Por medir</strong>
-                    <small>Desde la carga hasta la escena publicada</small>
-                  </div>
-
-                  <div class="benchmark-stat">
-                    <span>Coste por operación</span>
-                    <strong>Por calcular</strong>
-                    <small>Según los costes reales de ejecución</small>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-          </div>
-
-          <p class="benchmark-disclaimer">
-            Demostración de interfaz: la conversación y la creación de escena
-            son simuladas y no ejecutan servicios de IA ni el motor real de Lite Space.
-            Los tiempos y costes se mostrarán cuando se midan ambos procesos con
-            el mismo objetivo y un alcance comparable.
-          </p>
-        </section>
-
-        <article class="additional-benefit">
-          <h2>
-            Distribuye tu contenido sin hosting propio ni migraciones.
-          </h2>
-
-          <p>
-            Comparte tus recursos de forma ágil desde tus repositorios
-            existentes, sin duplicar infraestructuras para ponerlos
-            a disposición de otros.
-          </p>
-        </article>
-
-      </div>
-    </section>
-
-    <!-- MENSAJE EDITORIAL CON EFECTO TYPEWRITER -->
-
-    <section class="statement">
-      <div class="container statement-inner">
-        <div>
-          <h2
-            id="statementTitle"
-            aria-label="Tus modelos ya existen. Haz que trabajen para ti."
-          >
-            <span
-              class="typewriter-line"
-              data-typewriter="Tus modelos ya existen."
-              aria-hidden="true"
-            ></span>
-            <span
-              class="typewriter-line typewriter-line--accent"
-              data-typewriter="Haz que trabajen para ti."
-              aria-hidden="true"
-            ></span>
-          </h2>
-
-          <p>
-            Convierte los recursos que ya tienes en experiencias interactivas
-            y adapta su publicación a cada necesidad, sin multiplicar
-            los procesos de preparación.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- USO PUNTUAL GRATUITO -->
-
-    <section class="individual-access" id="acceso">
-      <div class="container">
-        <div class="individual-card">
-
-          <div>
-            <span class="individual-eyebrow">Acceso individual</span>
-
-            <h2>¿Solo necesitas crear y compartir escenas?</h2>
-
-            <p class="individual-description">
-              Utiliza 3D OPE Lite Space para crear escenas individuales
-              y compartirlas, sin necesidad de disponer de un repositorio propio.
-            </p>
-
-            <ul class="individual-details">
-              <li>Creación de escenas individuales.</li>
-              <li>Comparte las escenas que crees.</li>
-              <li>Hasta 5 escenas al mes.</li>
-              <li>Sin coste, a cambio de marcado publicitario.</li>
-            </ul>
-          </div>
-
-          <div class="individual-offer">
-            <div class="individual-price">Gratis</div>
-            <div class="individual-price-label">Para uso puntual</div>
-
-            <div class="individual-limit">
-              MÁXIMO<br>
-              5 ESCENAS / MES
-            </div>
-
-            <p class="individual-ad-note">
-              Modalidad gratuita con marcado publicitario.
-            </p>
-
-            <!-- Sustituir #registro-gratis por la URL real del registro -->
-            <a class="individual-button" href="#registro-gratis">
-              Crear escenas
-              <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- B2B SERVICE: LICENCIAS PARA REPOSITORIOS -->
-
-    <section class="pricing" id="precios">
-      <div class="container">
-
-        <div class="pricing-header">
-          <span class="pricing-eyebrow">B2B SERVICE</span>
-
-          <h2 class="section-title">
-            Elige la escala que necesitas.
-          </h2>
-
-          <p class="section-subtitle">
-            Una licencia anual para trabajar con tus repositorios y
-            compartir todas las escenas que necesites.
-          </p>
-        </div>
-
-        <div class="pricing-grid">
-
-          <article class="price-card">
-            <span class="plan-label">B2B SERVICE / 01</span>
-            <h3>2 repositorios</h3>
-
-            <div class="price">
-              <span class="price-amount">200</span>
-              <span class="price-currency">€</span>
-            </div>
-
-            <p class="price-period">Por año · IVA no incluido</p>
-
-            <p class="price-description">
-              Para trabajar con dos repositorios y compartir sus recursos 3D.
-            </p>
-
-            <div class="price-divider"></div>
-
-            <ul class="price-features">
-              <li>2 repositorios incluidos</li>
-              <li>Escenas compartidas sin límite</li>
-              <li>Licencia anual</li>
-            </ul>
-
-            <div class="repository-cost">
-              <span>Coste por repositorio</span>
-              <strong>100 €/año</strong>
-              <small>Equivalente anual, IVA no incluido</small>
-            </div>
+        <div class="story-content">
+          <article class="story-phase is-active" data-phase="0">
+            <h2>Carga cientos de modelos y prepara tus escenas <span>en tiempo récord.</span></h2>
+            <p>Procesa grandes volúmenes de recursos 3D de forma ágil y reduce el tiempo necesario para preparar tu contenido, sin tener que incorporar los modelos uno a uno.</p>
           </article>
-
-          <article class="price-card price-card--featured">
-            <span class="plan-label">B2B SERVICE / 02</span>
-            <h3>4 repositorios</h3>
-
-            <div class="price">
-              <span class="price-amount">390</span>
-              <span class="price-currency">€</span>
-            </div>
-
-            <p class="price-period">Por año · IVA no incluido</p>
-
-            <p class="price-description">
-              Para gestionar varios repositorios dentro de un mismo flujo de trabajo.
-            </p>
-
-            <div class="price-divider"></div>
-
-            <ul class="price-features">
-              <li>4 repositorios incluidos</li>
-              <li>Escenas compartidas sin límite</li>
-              <li>Licencia anual</li>
-            </ul>
-
-            <div class="repository-cost">
-              <span>Coste por repositorio</span>
-              <strong>97,50 €/año</strong>
-              <small>Equivalente anual, IVA no incluido</small>
-            </div>
+          <article class="story-phase" data-phase="1">
+            <h2><span>Estandariza</span> tus procesos de trabajo.</h2>
+            <p>Unifica los criterios para organizar y preparar tus recursos 3D, y facilita una forma de trabajo coherente y repetible.</p>
           </article>
-
-          <article class="price-card">
-            <span class="plan-label">B2B SERVICE / 03</span>
-            <h3>20 repositorios</h3>
-
-            <div class="price">
-              <span class="price-amount">899</span>
-              <span class="price-currency">€</span>
-            </div>
-
-            <p class="price-period">Por año · IVA no incluido</p>
-
-            <p class="price-description">
-              Para gestionar un volumen amplio de repositorios desde una misma solución.
-            </p>
-
-            <div class="price-divider"></div>
-
-            <ul class="price-features">
-              <li>20 repositorios incluidos</li>
-              <li>Escenas compartidas sin límite</li>
-              <li>Licencia anual</li>
-            </ul>
-
-            <div class="repository-cost">
-              <span>Coste por repositorio</span>
-              <strong>44,95 €/año</strong>
-              <small>Equivalente anual, IVA no incluido</small>
-            </div>
+          <article class="story-phase" data-phase="2">
+            <h2>Comparte una escena, una carpeta o <span>todo tu repositorio 3D.</span></h2>
+            <p>Elige qué recursos quieres convertir en una experiencia interactiva: una escena específica, una carpeta aislada o tu repositorio completo.</p>
           </article>
-
         </div>
-
-        <div class="pricing-note">
-          <span aria-hidden="true">i</span>
-          <div>
-            <strong>Precios anuales, IVA no incluido.</strong>
-            Las condiciones de uso, los servicios incluidos y cualquier
-            coste adicional estarán sujetos a la licencia correspondiente.
-          </div>
-        </div>
-
-        <div class="pricing-action">
-          <!-- Sustituir #comprar por la URL real del proceso de compra -->
-          <a class="final-button" href="#comprar">
-            Elegir mi licencia
-            <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-
+        <div class="story-progress" aria-hidden="true"><span class="story-progress-fill"></span></div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- LICENCIAS B2B2B -->
-
-    <section class="commercial" id="licencias">
-      <div class="container commercial-inner">
-
-        <h2>¿Necesitas una licencia B2B2B?</h2>
-
-        <p>
-          Si quieres incorporar 3D OPE Lite Space a una oferta comercial
-          destinada a terceros, las condiciones de distribución se estudiarán
-          de forma específica.
-          <br>
-          <a href="mailto:info@3dtwins.es?subject=Consulta%20sobre%20licencia%20B2B2B">
-            info@3dtwins.es
-          </a>
-        </p>
-
-      </div>
-    </section>
-
-  </main>
-
-  <!-- FOOTER -->
-
-  <footer class="site-footer">
+  <section class="additional-benefits">
     <div class="container">
-      <div class="footer-main">
+      <article class="additional-benefit">
+        <h2>Escala tus procesos sin costes de IA ni desarrollos a medida.</h2>
+        <p>Automatiza la gestión de grandes volúmenes de contenido mediante herramientas específicas, sin depender de consumos variables de tokens ni de desarrollar una solución para cada necesidad.</p>
+      </article>
 
-        <nav class="footer-links" aria-label="Información legal">
-          <!-- Sustituir por las páginas legales reales -->
-          <a href="#privacidad">Privacidad</a>
-          <a href="#cookies">Cookies</a>
-          <a href="#aviso-legal">Aviso legal</a>
-        </nav>
-
-        <a class="footer-brand" href="#inicio" aria-label="Volver al inicio">
-          <span class="footer-brand-mark" aria-hidden="true">3D</span>
-          <span>OPE Lite Space</span>
-        </a>
-
-        <div class="footer-contact">
-          <span>Desarrollado por</span>
-          <a href="https://www.virtualshubs.es/" target="_blank" rel="noopener noreferrer">
-            3D Twins / Virtuals Hubs ↗
-          </a>
+      <section class="benchmark" aria-labelledby="benchmarkTitle">
+        <div class="benchmark-heading">
+          <div>
+            <h3 id="benchmarkTitle">Dos formas de crear una escena.</h3>
+            <p>Compara el desarrollo desde cero con IA con el proceso de creación en Lite Space. El tiempo y el coste se incorporarán tras realizar una prueba equivalente.</p>
+          </div>
+          <span class="benchmark-tag">BENCHMARK · EN PREPARACIÓN</span>
         </div>
 
+        <div class="benchmark-grid">
+          <article class="benchmark-panel">
+            <header class="benchmark-panel-header">
+              <h4>Creación desde cero con IA</h4>
+              <span class="benchmark-index">01 / IA</span>
+            </header>
+            <div class="benchmark-panel-body">
+              <span class="simulation-label">Proceso técnico ilustrativo</span>
+              <div class="demo-window" aria-label="Simulación ilustrativa de los requisitos técnicos para desarrollar una escena con IA">
+                <div class="ai-prompt">Necesito una experiencia web interactiva para visualizar y compartir modelos 3D.</div>
+                <div class="ai-response">
+                  <div class="ai-step"><strong>01 / INFRAESTRUCTURA</strong>Necesitaremos un dominio personalizado, alojamiento web y un entorno de desarrollo donde implementar y probar la solución.</div>
+                  <div class="ai-step"><strong>02 / PROCESAMIENTO 3D</strong>Habrá que diseñar un algoritmo para gestionar los modelos y preparar los recursos para su visualización.</div>
+                  <div class="ai-step"><strong>03 / COMPOSICIÓN</strong>Definir la estructura de la escena, la disposición de sus elementos y sus parámetros de visualización.</div>
+                  <div class="ai-step"><strong>04 / INTERACTIVIDAD</strong>Implementar controles y comportamientos para que la escena pueda explorarse.</div>
+                  <div class="ai-step"><strong>05 / INTEGRACIÓN</strong>Conectar los distintos componentes y resolver las dependencias entre ellos.</div>
+                  <div class="ai-step"><strong>06 / VALIDACIÓN</strong>Probar el resultado, corregir errores y preparar su publicación y mantenimiento.</div>
+                </div>
+              </div>
+              <div class="benchmark-stats">
+                <div class="benchmark-stat"><span>Tiempo total</span><strong>Por medir</strong><small>Desde la solicitud hasta el resultado funcional</small></div>
+                <div class="benchmark-stat"><span>Coste del servicio IA</span><strong>Por calcular</strong><small>Según consumo y servicios utilizados</small></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="benchmark-panel">
+            <header class="benchmark-panel-header">
+              <h4>Creación con Lite Space</h4>
+              <span class="benchmark-index">02 / LITE SPACE</span>
+            </header>
+            <div class="benchmark-panel-body">
+              <span class="simulation-label">Flujo simplificado</span>
+              <div class="lite-demo" aria-label="Animación de carga de modelo y creación de escena">
+                <div class="model-illustration"><span class="material-symbols-outlined" aria-hidden="true">deployed_code</span></div>
+                <p class="demo-status" aria-live="off"></p>
+                <p class="demo-substatus"></p>
+                <div class="demo-action demo-action--load"><span class="material-symbols-outlined" aria-hidden="true">upload_file</span>Cargar modelo</div>
+                <div class="demo-action demo-action--create"><span class="material-symbols-outlined" aria-hidden="true">add_box</span>Crear escena</div>
+                <span class="demo-pointer" aria-hidden="true">↖</span>
+                <div class="demo-result"><span class="material-symbols-outlined" aria-hidden="true">check_circle</span>Escena creada</div>
+              </div>
+              <div class="benchmark-stats">
+                <div class="benchmark-stat"><span>Tiempo de creación</span><strong>Por medir</strong><small>Desde la carga hasta la escena creada</small></div>
+                <div class="benchmark-stat"><span>Coste por operación</span><strong>Por calcular</strong><small>Según los costes reales de ejecución</small></div>
+              </div>
+            </div>
+          </article>
+        </div>
+        <p class="benchmark-disclaimer">Demostración visual: ambos procesos están representados mediante animaciones; no se ejecutan servicios de IA ni el motor real de Lite Space. Los tiempos y costes se publicarán tras medir ambos procesos con un objetivo y alcance comparables.</p>
+      </section>
+
+      <article class="additional-benefit">
+        <h2>Distribuye tu contenido sin hosting propio ni migraciones.</h2>
+        <p>Comparte tus recursos de forma ágil desde tus repositorios existentes, sin duplicar infraestructuras para ponerlos a disposición de otros.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="statement">
+    <div class="container statement-inner">
+      <div>
+        <h2 id="statementTitle" aria-label="Tus modelos ya existen. Haz que trabajen para ti.">
+          <span class="typewriter-line" data-typewriter="Tus modelos ya existen." aria-hidden="true"></span>
+          <span class="typewriter-line typewriter-line--accent" data-typewriter="Haz que trabajen para ti." aria-hidden="true"></span>
+        </h2>
+        <p>Convierte los recursos que ya tienes en experiencias interactivas y adapta su publicación a cada necesidad, sin multiplicar los procesos de preparación.</p>
       </div>
     </div>
-  </footer>
+  </section>
 
-  <script>
-    (() => {
-      /* CAMBIO DE IMÁGENES Y TEXTOS DURANTE EL SCROLL */
+  <section class="individual-access" id="acceso">
+    <div class="container">
+      <div class="individual-card">
+        <div>
+          <span class="individual-eyebrow">Acceso individual</span>
+          <h2>¿Solo necesitas crear y compartir escenas?</h2>
+          <p class="individual-description">Utiliza 3D OPE Lite Space para crear escenas individuales y compartirlas, sin necesidad de disponer de un repositorio propio.</p>
+          <ul class="individual-details">
+            <li>Creación de escenas individuales.</li>
+            <li>Comparte las escenas que crees.</li>
+            <li>Hasta 5 escenas al mes.</li>
+            <li>Sin coste, a cambio de marcado publicitario.</li>
+          </ul>
+        </div>
+        <div class="individual-offer">
+          <div class="individual-price">Gratis</div>
+          <div class="individual-price-label">Para uso puntual</div>
+          <div class="individual-limit">MÁXIMO<br>5 ESCENAS / MES</div>
+          <p class="individual-ad-note">Modalidad gratuita con marcado publicitario.</p>
+          <a class="individual-button" href="#registro-gratis">Crear escenas <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      const storySection = document.querySelector("#storyScroll");
+  <section class="pricing" id="precios">
+    <div class="container">
+      <div class="pricing-header">
+        <span class="pricing-eyebrow">B2B SERVICE</span>
+        <h2 class="section-title">Elige la escala que necesitas.</h2>
+        <p class="section-subtitle">Una licencia anual para trabajar con tus repositorios y compartir todas las escenas que necesites.</p>
+      </div>
 
-      if (storySection) {
-        const phases = [...storySection.querySelectorAll("[data-phase]")];
-        const images = [...storySection.querySelectorAll("[data-image]")];
-        const progress = storySection.querySelector(".story-progress-fill");
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      <div class="pricing-grid">
+        <article class="price-card">
+          <span class="plan-label">B2B SERVICE / 01</span>
+          <h3>2 repositorios</h3>
+          <div class="price"><span class="price-amount">200</span><span class="price-currency">€</span></div>
+          <p class="price-period">Por año · IVA no incluido</p>
+          <p class="price-description">Para trabajar con dos repositorios y compartir sus recursos 3D.</p>
+          <div class="price-divider"></div>
+          <ul class="price-features"><li>2 repositorios incluidos</li><li>Escenas compartidas sin límite</li><li>Licencia anual</li></ul>
+          <div class="repository-cost"><span>Coste por repositorio</span><strong>100 €/año</strong><small>Equivalente anual, IVA no incluido</small></div>
+        </article>
 
-        let ticking = false;
-        let currentPhase = 0;
+        <article class="price-card price-card--featured">
+          <span class="plan-label">B2B SERVICE / 02</span>
+          <h3>4 repositorios</h3>
+          <div class="price"><span class="price-amount">390</span><span class="price-currency">€</span></div>
+          <p class="price-period">Por año · IVA no incluido</p>
+          <p class="price-description">Para gestionar varios repositorios dentro de un mismo flujo de trabajo.</p>
+          <div class="price-divider"></div>
+          <ul class="price-features"><li>4 repositorios incluidos</li><li>Escenas compartidas sin límite</li><li>Licencia anual</li></ul>
+          <div class="repository-cost"><span>Coste por repositorio</span><strong>97,50 €/año</strong><small>Equivalente anual, IVA no incluido</small></div>
+        </article>
 
-        function setPhase(nextPhase) {
-          if (nextPhase === currentPhase) return;
+        <article class="price-card">
+          <span class="plan-label">B2B SERVICE / 03</span>
+          <h3>20 repositorios</h3>
+          <div class="price"><span class="price-amount">899</span><span class="price-currency">€</span></div>
+          <p class="price-period">Por año · IVA no incluido</p>
+          <p class="price-description">Para gestionar un volumen amplio de repositorios desde una misma solución.</p>
+          <div class="price-divider"></div>
+          <ul class="price-features"><li>20 repositorios incluidos</li><li>Escenas compartidas sin límite</li><li>Licencia anual</li></ul>
+          <div class="repository-cost"><span>Coste por repositorio</span><strong>44,95 €/año</strong><small>Equivalente anual, IVA no incluido</small></div>
+        </article>
+      </div>
 
-          const previousPhase = currentPhase;
-          const movingForward = nextPhase > previousPhase;
-          currentPhase = nextPhase;
+      <div class="pricing-note"><span aria-hidden="true">i</span><div><strong>Precios anuales, IVA no incluido.</strong> Las condiciones de uso, los servicios incluidos y cualquier coste adicional estarán sujetos a la licencia correspondiente.</div></div>
+      <div class="pricing-action"><a class="final-button" href="#comprar">Elegir mi licencia <span aria-hidden="true">↗</span></a></div>
+    </div>
+  </section>
 
-          phases.forEach((phase, index) => {
-            phase.classList.toggle("is-active", index === nextPhase);
-          });
+  <section class="commercial" id="licencias">
+    <div class="container commercial-inner">
+      <h2>¿Necesitas una licencia B2B2B?</h2>
+      <p>Si quieres incorporar 3D OPE Lite Space a una oferta comercial destinada a terceros, las condiciones de distribución se estudiarán de forma específica.<br><a href="mailto:info@3dtwins.es?subject=Consulta%20sobre%20licencia%20B2B2B">info@3dtwins.es</a></p>
+    </div>
+  </section>
+</main>
 
-          images.forEach((image, index) => {
-            image.classList.remove(
-              "is-leaving-up",
-              "is-leaving-down",
-              "is-active"
-            );
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-main">
+      <nav class="footer-links" aria-label="Información legal">
+        <a href="#privacidad">Privacidad</a>
+        <a href="#cookies">Cookies</a>
+        <a href="#aviso-legal">Aviso legal</a>
+      </nav>
+      <a class="footer-brand" href="#inicio" aria-label="Volver al inicio"><span class="footer-brand-mark" aria-hidden="true">3D</span><span>OPE Lite Space</span></a>
+      <div class="footer-contact"><span>Desarrollado por</span><a href="https://www.virtualshubs.es/" target="_blank" rel="noopener noreferrer">3D Twins / Virtuals Hubs ↗</a></div>
+    </div>
+  </div>
+</footer>
 
-            if (index === nextPhase) {
-              image.classList.add("is-active");
-            } else if (index === previousPhase) {
-              image.classList.add(
-                movingForward ? "is-leaving-up" : "is-leaving-down"
-              );
-            }
-          });
+<script>
+(() => {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* Cambia el texto y las imágenes al desplazarse por la sección. */
+  const story = document.querySelector("#storyScroll");
+
+  if (story) {
+    const phases = [...story.querySelectorAll("[data-phase]")];
+    const images = [...story.querySelectorAll("[data-image]")];
+    const progress = story.querySelector(".story-progress-fill");
+    let current = 0;
+    let ticking = false;
+
+    function setPhase(next) {
+      if (next === current) return;
+      const previous = current;
+      current = next;
+
+      phases.forEach((el, i) => el.classList.toggle("is-active", i === next));
+
+      images.forEach((el, i) => {
+        el.classList.remove("is-leaving-up", "is-leaving-down", "is-active");
+
+        if (i === next) el.classList.add("is-active");
+        else if (i === previous) {
+          el.classList.add(next > previous ? "is-leaving-up" : "is-leaving-down");
         }
+      });
+    }
 
-        function updateStory() {
-          ticking = false;
+    function updateStory() {
+      ticking = false;
+      const rect = story.getBoundingClientRect();
+      const distance = story.offsetHeight - window.innerHeight;
+      const value = distance > 0 ? Math.min(1, Math.max(0, -rect.top / distance)) : 0;
+      const phase = Math.min(phases.length - 1, Math.floor(value * phases.length));
 
-          const rect = storySection.getBoundingClientRect();
-          const scrollable = storySection.offsetHeight - window.innerHeight;
-
-          const progressValue = scrollable > 0
-            ? Math.min(1, Math.max(0, -rect.top / scrollable))
-            : 0;
-
-          const phaseIndex = Math.min(
-            phases.length - 1,
-            Math.floor(progressValue * phases.length)
-          );
-
-          if (reduceMotion.matches) {
-            phases.forEach((phase, index) => {
-              phase.classList.toggle("is-active", index === phaseIndex);
-            });
-
-            images.forEach((image, index) => {
-              image.classList.toggle("is-active", index === phaseIndex);
-              image.classList.remove("is-leaving-up", "is-leaving-down");
-            });
-
-            currentPhase = phaseIndex;
-          } else {
-            setPhase(phaseIndex);
-          }
-
-          if (progress) {
-            progress.style.width = `${progressValue * 100}%`;
-          }
-        }
-
-        function requestStoryUpdate() {
-          if (ticking) return;
-          ticking = true;
-          window.requestAnimationFrame(updateStory);
-        }
-
-        window.addEventListener("scroll", requestStoryUpdate, { passive: true });
-        window.addEventListener("resize", requestStoryUpdate);
-
-        if (reduceMotion.addEventListener) {
-          reduceMotion.addEventListener("change", requestStoryUpdate);
-        }
-
-        updateStory();
+      if (reduceMotion.matches) {
+        phases.forEach((el, i) => el.classList.toggle("is-active", i === phase));
+        images.forEach((el, i) => {
+          el.classList.toggle("is-active", i === phase);
+          el.classList.remove("is-leaving-up", "is-leaving-down");
+        });
+        current = phase;
+      } else {
+        setPhase(phase);
       }
 
-      /* TYPEWRITER */
+      if (progress) progress.style.width = `${value * 100}%`;
+    }
 
-      const statement = document.querySelector(".statement");
-      const statementTitle = document.querySelector("#statementTitle");
-      const typewriterLines = statementTitle
-        ? [...statementTitle.querySelectorAll("[data-typewriter]")]
-        : [];
+    function requestUpdate() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateStory);
+    }
 
-      if (statement && statementTitle && typewriterLines.length) {
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-        let animationStarted = false;
-        let typingTimers = [];
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    updateStory();
+  }
 
-        function showCompleteStatement() {
-          typewriterLines.forEach((line) => {
-            line.textContent = line.dataset.typewriter;
-            line.classList.remove("typewriter-cursor");
-          });
-        }
+  /* Efecto de escritura del mensaje final. */
+  const statement = document.querySelector(".statement");
+  const lines = [...document.querySelectorAll("[data-typewriter]")];
 
-        function startTypewriter() {
-          if (animationStarted) return;
-          animationStarted = true;
+  if (statement && lines.length) {
+    let started = false;
+    let timers = [];
 
-          if (reduceMotion.matches) {
-            showCompleteStatement();
-            return;
-          }
+    const showAll = () => lines.forEach(line => {
+      line.textContent = line.dataset.typewriter;
+      line.classList.remove("typewriter-cursor");
+    });
 
-          let lineIndex = 0;
-          let characterIndex = 0;
+    function startTyping() {
+      if (started) return;
+      started = true;
 
-          function typeNextCharacter() {
-            const line = typewriterLines[lineIndex];
-            const text = line.dataset.typewriter;
+      if (reduceMotion.matches) {
+        showAll();
+        return;
+      }
 
-            line.classList.add("typewriter-cursor");
-            line.textContent = text.slice(0, characterIndex + 1);
-            characterIndex++;
+      let lineIndex = 0;
+      let charIndex = 0;
 
-            if (characterIndex < text.length) {
-              typingTimers.push(window.setTimeout(typeNextCharacter, 58));
-              return;
-            }
+      function type() {
+        const line = lines[lineIndex];
+        const value = line.dataset.typewriter;
 
-            line.classList.remove("typewriter-cursor");
-            lineIndex++;
-            characterIndex = 0;
+        line.classList.add("typewriter-cursor");
+        line.textContent = value.slice(0, ++charIndex);
 
-            if (lineIndex < typewriterLines.length) {
-              typingTimers.push(window.setTimeout(typeNextCharacter, 300));
-            }
-          }
-
-          typeNextCharacter();
-        }
-
-        if ("IntersectionObserver" in window) {
-          const observer = new IntersectionObserver((entries) => {
-            if (entries.some((entry) => entry.isIntersecting)) {
-              startTypewriter();
-              observer.disconnect();
-            }
-          }, { threshold: 0.45 });
-
-          observer.observe(statement);
+        if (charIndex < value.length) {
+          timers.push(setTimeout(type, 45));
         } else {
-          startTypewriter();
-        }
+          line.classList.remove("typewriter-cursor");
 
-        if (reduceMotion.addEventListener) {
-          reduceMotion.addEventListener("change", (event) => {
-            if (event.matches) {
-              typingTimers.forEach((timer) => window.clearTimeout(timer));
-              typingTimers = [];
-              showCompleteStatement();
-            }
-          });
-        }
-      }
-
-      /* DEMOSTRACIÓN VISUAL DEL FLUJO DE CREACIÓN */
-
-      const fileInput = document.querySelector("#modelFile");
-      const uploadZone = document.querySelector("#uploadZone");
-      const uploadTitle = document.querySelector("#uploadTitle");
-      const uploadDescription = document.querySelector("#uploadDescription");
-      const createButton = document.querySelector("#createSceneButton");
-      const createLabel = document.querySelector("#createSceneLabel");
-      const sceneResult = document.querySelector("#sceneResult");
-      const sceneResultTitle = document.querySelector("#sceneResultTitle");
-      const sceneResultDescription = document.querySelector("#sceneResultDescription");
-
-      if (fileInput && createButton) {
-        let selectedFileName = "";
-
-        fileInput.addEventListener("change", () => {
-          const file = fileInput.files && fileInput.files[0];
-
-          sceneResult.classList.remove("is-visible");
-
-          if (!file) {
-            selectedFileName = "";
-            uploadTitle.textContent = "Selecciona un modelo 3D";
-            uploadDescription.textContent =
-              "Carga un archivo para representar el paso de preparación de la escena.";
-            uploadZone.classList.remove("is-loaded");
-            return;
+          if (++lineIndex < lines.length) {
+            charIndex = 0;
+            timers.push(setTimeout(type, 220));
           }
-
-          selectedFileName = file.name;
-          uploadTitle.textContent = file.name;
-          uploadDescription.textContent =
-            "Archivo seleccionado · " + (file.size / 1024 / 1024).toFixed(2) + " MB";
-          uploadZone.classList.add("is-loaded");
-        });
-
-        createButton.addEventListener("click", () => {
-          if (createButton.disabled) return;
-
-          createButton.disabled = true;
-          createButton.classList.remove("is-clicking");
-          void createButton.offsetWidth;
-          createButton.classList.add("is-clicking");
-
-          sceneResult.classList.remove("is-visible");
-          createLabel.textContent = "Preparando escena…";
-
-          window.setTimeout(() => {
-            createButton.disabled = false;
-            createButton.classList.remove("is-clicking");
-            createLabel.textContent = "Crear escena";
-
-            sceneResultTitle.textContent = "Escena creada";
-            sceneResultDescription.textContent = selectedFileName
-              ? selectedFileName + " · resultado simulado"
-              : "modelo-demo.glb · resultado simulado";
-
-            sceneResult.classList.add("is-visible");
-          }, 1300);
-        });
-      }
-
-      /* CONVERSACIÓN ILUSTRATIVA CON IA */
-
-      const aiChat = document.querySelector("#aiChat");
-
-      if (aiChat) {
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-        if (!reduceMotion.matches) {
-          window.setTimeout(() => {
-            const status = aiChat.querySelector(".chat-status");
-
-            if (status) {
-              status.innerHTML = `
-                <span class="chat-typing" aria-hidden="true">
-                  <span></span><span></span><span></span>
-                </span>
-                <span>Simulación de generación y revisión</span>
-              `;
-            }
-
-            window.setTimeout(() => {
-              if (!status || !status.isConnected) return;
-
-              status.innerHTML = `
-                <span class="status-dot"></span>
-                <span>Flujo de trabajo ilustrativo</span>
-              `;
-            }, 2400);
-          }, 1800);
         }
       }
-    })();
-  </script>
 
+      type();
+    }
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          startTyping();
+          observer.disconnect();
+        }
+      }, { threshold: .4 });
+
+      observer.observe(statement);
+    } else {
+      startTyping();
+    }
+
+    if (reduceMotion.addEventListener) {
+      reduceMotion.addEventListener("change", event => {
+        if (event.matches) {
+          timers.forEach(clearTimeout);
+          showAll();
+        }
+      });
+    }
+  }
+})();
+</script>
 </body>
 </html>
 
