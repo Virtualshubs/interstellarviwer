@@ -1596,6 +1596,79 @@
   font-size: 1rem;
   line-height: 1;
 }
+
+/* Modal de acceso Lite Space */
+.access-modal {
+  position: fixed;
+  z-index: 19;
+  inset: 70px 0 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  background: var(--bg);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+
+.access-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.access-modal iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--bg);
+}
+
+.access-modal-close {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 20px;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+
+.access-modal-close:hover {
+  background: var(--primary);
+  color: white;
+}
+
+body.access-modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .access-modal {
+    inset-block-start: 62px;
+  }
+
+  .access-modal-close {
+    top: 10px;
+    right: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .access-modal {
+    transition: none;
+  }
+}
+
+    
   </style>
 
 
@@ -1618,17 +1691,45 @@
   />
 </a>
 
-      <a
-        class="header-account"
-        href="#acceso"
-        aria-label="Acceso de usuario registrado"
-        title="Acceso de usuario registrado"
-      >
-        <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
-      </a>
+  <a
+  class="header-account"
+  href="#acceso"
+  data-open-access
+  aria-label="Acceso de usuario registrado"
+  title="Acceso de usuario registrado"
+>
+  <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+</a>
     </div>
   </header>
 
+  
+<div
+  class="access-modal"
+  id="accessModal"
+  role="dialog"
+  aria-label="Acceso a 3D OPE Lite Space"
+  aria-modal="true"
+  aria-hidden="true"
+>
+  <button
+    class="access-modal-close"
+    id="closeAccessModal"
+    type="button"
+    aria-label="Cerrar acceso y volver a la página inicial"
+  >
+    <span class="material-symbols-outlined" aria-hidden="true">close</span>
+  </button>
+
+  <iframe
+    id="accessModalFrame"
+    title="Registro y acceso a 3D OPE Lite Space"
+    data-src="https://3d.staratlas.es/LS/earlyliteaccess.html"
+    loading="lazy"
+    allow="fullscreen"
+  ></iframe>
+</div>
+  
   <main>
     <section class="hero" id="inicio">
       <div class="hero-inner">
@@ -2088,9 +2189,9 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
               Modalidad gratuita con marcado publicitario.
             </p>
 
-            <a class="individual-button" href="#registro-gratis">
-              Crear escenas <span aria-hidden="true">↗</span>
-            </a>
+          <a class="individual-button" href="#registro-gratis" data-open-access>
+  Crear escenas <span aria-hidden="true">↗</span>
+</a>
           </div>
         </div>
       </div>
@@ -3149,6 +3250,54 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
         }
       }
     })();
+
+
+    (() => {
+  const modal = document.getElementById("accessModal");
+  const frame = document.getElementById("accessModalFrame");
+  const closeButton = document.getElementById("closeAccessModal");
+  const openButtons = document.querySelectorAll("[data-open-access]");
+
+  let previousFocus = null;
+
+  function openAccessModal(event) {
+    if (event) event.preventDefault();
+
+    previousFocus = document.activeElement;
+
+    if (!frame.src || frame.src === window.location.href) {
+      frame.src = frame.dataset.src;
+    }
+
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("access-modal-open");
+
+    closeButton.focus();
+  }
+
+  function closeAccessModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("access-modal-open");
+
+    if (previousFocus && typeof previousFocus.focus === "function") {
+      previousFocus.focus();
+    }
+  }
+
+  openButtons.forEach(button => {
+    button.addEventListener("click", openAccessModal);
+  });
+
+  closeButton.addEventListener("click", closeAccessModal);
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) {
+      closeAccessModal();
+    }
+  });
+})();
   </script>
 </body>
 </html>
