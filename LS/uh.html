@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Twins Lite User</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg:#F3F1EA;
+  --panel:#EAE7DE;
+  --panel-hover:#E1DED4;
+  --line:#D9D4C8;
+  --line-soft:#E5E1D8;
+  --text:#242522;
+  --muted:#716B60;
+  --primary:#416D80;
+  --primary-hover:#294A59;
+  --accent:#E5682E;
+  --secondary:#111210;
+  --green:#657B54;
+  --font-brand:'Space Grotesk',sans-serif;
+  --font-body:'IBM Plex Sans',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --header-height:68px;
+  --button-radius:12px;
+}
+
+* { box-sizing:border-box; }
+
+html,body {
+  width:100%;
+  height:100%;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+}
+
+body {
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+}
+
+button { font:inherit; color:inherit; }
+
+button:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:3px;
+}
+
+/* HEADER */
+
+.header {
+  height:var(--header-height);
+  min-height:var(--header-height);
+  flex:0 0 var(--header-height);
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(243,241,234,.97);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 32px;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  cursor:pointer;
+  background:none;
+  border:0;
+  padding:0;
+  text-align:left;
+}
+
+.brand-mark {
+  font-family:var(--font-brand);
+  font-size:25px;
+  font-weight:700;
+  letter-spacing:-2px;
+  line-height:1;
+}
+
+.brand-divider {
+  width:1px;
+  height:28px;
+  background:var(--line);
+}
+
+.brand-info {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.brand-name {
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:2px;
+}
+
+.brand-by {
+  color:var(--muted);
+  font-size:9px;
+  letter-spacing:1.7px;
+}
+
+.navigation {
+  display:flex;
+  align-items:center;
+  gap:27px;
+  height:100%;
+}
+
+.nav-button {
+  height:100%;
+  padding:0;
+  position:relative;
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.7px;
+  cursor:pointer;
+}
+
+.nav-button:hover,
+.nav-button.active { color:var(--text); }
+
+.nav-button.active::after {
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:2px;
+  background:var(--accent);
+}
+
+.status-dot {
+  width:6px;
+  height:6px;
+  flex:0 0 6px;
+  border-radius:50%;
+  background:var(--green);
+}
+
+/* MAIN */
+
+main {
+  width:100%;
+  margin:0;
+  padding:0 32px 24px;
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+
+#homeView,
+.settings-view { padding-top:48px; }
+
+.eyebrow {
+  color:var(--primary);
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:1.2px;
+  margin-bottom:16px;
+  text-transform:uppercase;
+}
+
+.page-title {
+  font-family:var(--font-brand);
+  font-size:clamp(32px,4vw,48px);
+  line-height:1.12;
+  font-weight:600;
+  letter-spacing:-1.5px;
+  margin:0;
+}
+
+.page-description {
+  margin:16px 0 0;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.7;
+  max-width:590px;
+}
+
+.section-heading {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:48px 0 15px;
+}
+
+.section-label {
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.section-count {
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* HOME TOOL CARDS */
+
+.tool-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+}
+
+.tool-card {
+  position:relative;
+  min-width:0;
+  min-height:265px;
+  display:flex;
+  flex-direction:column;
+  padding:23px;
+  background:transparent;
+  border:1px solid var(--line);
+  cursor:pointer;
+  text-align:left;
+  transition:background 160ms ease,border-color 160ms ease,transform 160ms ease;
+  overflow:hidden;
+}
+
+.tool-card::before {
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:0;
+  height:2px;
+  background:var(--accent);
+  transition:width 180ms ease;
+}
+
+.tool-card:hover {
+  background:var(--panel);
+  border-color:var(--primary);
+  transform:translateY(-2px);
+}
+
+.tool-card:hover::before { width:100%; }
+
+.tool-number {
+  color:var(--primary);
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:1px;
+}
+
+.tool-symbol {
+  height:84px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:13px 0 17px;
+  color:var(--primary);
+}
+
+.tool-symbol svg {
+  width:74px;
+  height:74px;
+  stroke:currentColor;
+  stroke-width:1;
+  fill:none;
+}
+
+.tool-name {
+  font-size:17px;
+  line-height:1.35;
+  font-weight:500;
+}
+
+.tool-description {
+  margin-top:9px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.tool-footer {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:auto;
+  padding-top:24px;
+}
+
+.open-label {
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.7px;
+}
+
+.open-arrow { font-size:17px; color:var(--primary); }
+.tool-card:hover .open-arrow { color:var(--accent); }
+
+/* WORKSPACE */
+
+.workspace {
+  display:none;
+  flex-direction:column;
+  flex:1 1 0;
+  min-height:0;
+  width:100%;
+  margin:0;
+  border:1px solid var(--line);
+  background:#111210;
+  overflow:hidden;
+}
+
+.workspace.visible { display:flex; }
+
+.workspace-toolbar {
+  flex:0 0 49px;
+  min-height:49px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 17px;
+  border-bottom:1px solid #343630;
+  background:#242522;
+  color:#F3F1EA;
+}
+
+.workspace-name {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-width:0;
+}
+
+.workspace-index {
+  color:#F3A174;
+  font-family:var(--font-mono);
+  font-size:11px;
+}
+
+.workspace-title {
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.4px;
+  overflow-wrap:anywhere;
+}
+
+.workspace-actions {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.text-button {
+  border:0;
+  padding:7px 0;
+  background:none;
+  color:#D9D4C8;
+  font-size:11px;
+  font-weight:500;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.text-button:hover { color:#F3A174; }
+
+.frame-container {
+  position:relative;
+  flex:1 1 0;
+  min-width:0;
+  min-height:0;
+  width:100%;
+  overflow:hidden;
+  background:#111210;
+}
+
+#toolFrame {
+  display:none;
+  position:absolute;
+  inset:0;
+  border:0;
+  width:100%;
+  height:100%;
+  background:#111210;
+}
+
+.frame-message {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:35px;
+  text-align:center;
+  color:#F3F1EA;
+}
+
+.frame-message h2 {
+  font-family:var(--font-brand);
+  font-size:20px;
+  font-weight:500;
+}
+
+.frame-message p {
+  max-width:490px;
+  color:#A5A5A0;
+  font-size:14px;
+  line-height:1.7;
+}
+
+.message-mark {
+  color:#F3A174;
+  font-family:var(--font-brand);
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.primary-button {
+  border:1px solid transparent;
+  border-radius:var(--button-radius);
+  background:var(--primary);
+  color:white;
+  padding:11px 17px;
+  font-size:13px;
+  cursor:pointer;
+  margin-top:12px;
+}
+
+.primary-button:hover { background:var(--primary-hover); }
+
+/* HORIZONTAL TOOL SELECTOR */
+
+.tool-sidebar {
+  display:none;
+  flex:0 0 auto;
+  width:100%;
+  min-width:0;
+  height:56px;
+  align-self:stretch;
+  flex-direction:row;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  padding:6px 16px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-bottom:0;
+  scrollbar-width:thin;
+  scrollbar-color:var(--line) transparent;
+}
+
+.tool-sidebar.visible { display:flex; }
+
+.tool-sidebar-button {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:42px;
+  flex:0 0 44px;
+  padding:8px;
+  border:1px solid transparent;
+  border-radius:8px;
+  background:transparent;
+  color:var(--primary);
+  cursor:pointer;
+  transition:background 160ms ease,color 160ms ease,border-color 160ms ease;
+}
+
+.tool-sidebar-button svg {
+  display:block;
+  width:25px;
+  height:25px;
+  stroke:currentColor;
+  stroke-width:1.5;
+  fill:none;
+}
+
+.tool-sidebar-button:hover {
+  background:var(--panel);
+  border-color:var(--line);
+}
+
+.tool-sidebar-button.active {
+  color:var(--accent);
+  background:var(--panel);
+  border-color:var(--line);
+}
+
+.tool-sidebar-button.active::before {
+  content:"";
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:-7px;
+  height:3px;
+  background:var(--accent);
+}
+
+.tool-sidebar-button:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:2px;
+}
+
+/* WORKSPACE LAYOUT: FULL AVAILABLE WIDTH AND HEIGHT */
+
+body:has(.workspace.visible) {
+  height:100vh;
+  height:100dvh;
+  min-height:0;
+  overflow:hidden;
+}
+
+body:has(.workspace.visible) main {
+  flex:1 1 0;
+  width:100%;
+  min-height:0;
+  padding:0;
+  overflow:hidden;
+  gap:0;
+}
+
+body:has(.workspace.visible) .header {
+  position:relative;
+  flex:0 0 var(--header-height);
+}
+
+body:has(.workspace.visible) .workspace {
+  flex:1 1 0;
+  min-height:0;
+  width:100%;
+}
+
+body:has(.workspace.visible) .footer {
+  flex:0 0 auto;
+}
+
+/* SETTINGS */
+
+.settings-view { display:none; }
+
+.settings-panel {
+  margin-top:32px;
+  max-width:650px;
+  border:1px solid var(--line);
+  background:var(--panel);
+}
+
+.settings-row {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  padding:22px;
+  border-bottom:1px solid var(--line-soft);
+}
+
+.settings-row:last-child { border-bottom:0; }
+
+.settings-key {
+  font-size:13px;
+  font-weight:600;
+}
+
+.settings-help {
+  margin-top:7px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+
+.settings-value {
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-align:right;
+}
+
+/* FOOTER */
+
+.footer {
+  flex:0 0 auto;
+  min-height:53px;
+  border-top:1px solid var(--line);
+  padding:0 32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+}
+
+.footer-status {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width:1100px) {
+  .tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+@media (max-width:850px) {
+  .header {
+    padding-right:24px;
+    padding-left:24px;
+  }
+
+  main { padding:0 24px 24px; }
+  .footer { padding-right:24px; padding-left:24px; }
+
+  #homeView,
+  .settings-view { padding-top:35px; }
+
+  .tool-grid { grid-template-columns:1fr; }
+  .tool-card { min-height:215px; }
+
+  .tool-symbol {
+    height:55px;
+    justify-content:flex-start;
+    margin:12px 0;
+  }
+
+  .tool-symbol svg { width:54px; height:54px; }
+
+  body:has(.workspace.visible) main { padding:0; }
+
+  .tool-sidebar {
+    height:54px;
+    padding:6px 12px;
+    gap:6px;
+  }
+
+  .tool-sidebar-button {
+    width:42px;
+    height:40px;
+    flex-basis:42px;
+  }
+
+  .workspace { min-width:0; }
+}
+
+@media (max-width:520px) {
+  :root { --header-height:62px; }
+
+  .header { padding:0 16px; }
+  .brand { gap:9px; }
+  .brand-mark { font-size:22px; }
+  .brand-name { font-size:9px; letter-spacing:1.5px; }
+  .brand-by { font-size:8px; }
+  .navigation { gap:15px; }
+  .nav-button { font-size:9px; letter-spacing:.3px; }
+
+  main { padding:0 16px 20px; }
+  #homeView,
+  .settings-view { padding-top:30px; }
+  .page-title { font-size:35px; }
+
+  .tool-sidebar {
+    height:50px;
+    gap:5px;
+    padding:5px 8px;
+  }
+
+  .tool-sidebar-button {
+    width:40px;
+    height:38px;
+    flex-basis:40px;
+    padding:7px;
+  }
+
+  .tool-sidebar-button.active::before {
+    left:7px;
+    right:7px;
+    bottom:-6px;
+  }
+
+  .workspace-toolbar {
+    flex-basis:45px;
+    min-height:45px;
+    padding:0 10px;
+    gap:6px;
+  }
+
+  .workspace-actions { gap:10px; }
+  .text-button { font-size:10px; }
+  .workspace-title { font-size:10px; }
+
+  .footer {
+    padding:13px 16px;
+    flex-wrap:wrap;
+    font-size:9px;
+  }
+}
+
+  
+/* HOME BANNER */
+
+.home-banner {
+  position: relative;
+  width: 100%;
+  height: clamp(190px, 23vw, 280px);
+  margin-top: 30px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.home-banner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(17,18,16,.72),
+    rgba(17,18,16,.12)
+  );
+}
+
+.home-banner-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 28px;
+  color: var(--bg);
+}
+
+.home-banner-content span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: #F3A174;
+}
+
+.home-banner-content h2 {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: clamp(25px, 3.2vw, 40px);
+  font-weight: 500;
+  letter-spacing: -1px;
+}
+
+@media (max-width: 520px) {
+  .home-banner {
+    height: 190px;
+    margin-top: 22px;
+  }
+
+  .home-banner-content {
+    padding: 18px;
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+  <button class="brand" id="brandHome" type="button" aria-label="Return to Home">
+    <span class="brand-mark">OPE</span>
+    <span class="brand-divider"></span>
+    <span class="brand-info">
+      <span class="brand-name">USER HOME</span>
+      <span class="brand-by">BY 3DTWINS</span>
+    </span>
+  </button>
+
+  <nav class="navigation" aria-label="Main navigation">
+    <button class="nav-button active" id="navHome" type="button">HOME</button>
+    <button class="nav-button" id="navUser" type="button">USER / SETTINGS</button>
+  </nav>
+</header>
+
+<main id="mainLayout">
+  <section id="homeView">
+    
+    <!-- HOME BANNER -->
+    <div class="home-banner">
+      <img
+        src="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/cop-dem.png"
+        alt="OPE spatial intelligence"
+      >
+      <div class="home-banner-overlay"></div>
+      <div class="home-banner-content">
+           <h1 class="page-title">USER HOME</h1>
+      </div>
+    </div>
+  
+    <p class="page-description">
+      Central access to your spatial tools and operational
+      environments. Select a tool to initialise your workspace.
+    </p>
+
+    <div class="section-heading">
+      <span class="section-label">AVAILABLE TOOLS</span>
+      <span class="section-count" id="toolCount">04 / 04 CONFIGURED</span>
+    </div>
+
+ <div class="tool-grid" id="toolGrid">
+
+  <button class="tool-card" data-tool="0" type="button">
+    <span class="tool-number">01 / TOOL</span>
+
+    <span class="tool-symbol" aria-hidden="true">
+      <svg viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="29"/>
+        <ellipse cx="40" cy="40" rx="13" ry="29"/>
+        <ellipse cx="40" cy="40" rx="29" ry="11"/>
+        <path d="M13 29 H67 M13 51 H67 M40 11 V69" opacity=".6"/>
+        <path d="M53 17 L62 22 L62 32" stroke="#E5682E"/>
+      </svg>
+    </span>
+
+    <span class="tool-name">3D OPE Lite Space</span>
+    <span class="tool-description">Create your 3D scene in seconds.</span>
+
+    <span class="tool-footer">
+      <span class="open-label">OPEN TOOL</span>
+      <span class="open-arrow">↗</span>
+    </span>
+  </button>
+
+</div>
+  </section>
+
+  <!-- LEFT SIDEBAR: ICONS GENERATED FROM THE TOOL CARDS -->
+  <aside class="tool-sidebar" id="toolSidebar" aria-label="Tool selector" aria-hidden="true"></aside>
+
+  <!-- WORKSPACE -->
+  <section class="workspace" id="workspace" aria-label="Tool workspace">
+    <div class="workspace-toolbar">
+      <div class="workspace-name">
+        <span class="workspace-index" id="workspaceIndex">01</span>
+        <span class="workspace-title" id="workspaceTitle">TOOL</span>
+      </div>
+      <div class="workspace-actions">
+        <button class="text-button" id="reloadTool" type="button">RELOAD</button>
+        <button class="text-button" id="openExternal" type="button" hidden>OPEN ↗</button>
+        <button class="text-button" id="closeTool" type="button">✕ CLOSE</button>
+      </div>
+    </div>
+
+    <div class="frame-container">
+      <div class="frame-message" id="frameMessage">
+        <div class="message-mark">OPE /</div>
+        <h2>WORKSPACE INITIALISED</h2>
+        <p>Select a tool from the sidebar to load it in this workspace.</p>
+      </div>
+      <iframe
+        id="toolFrame"
+        title="OPE tool workspace"
+        allow="fullscreen; clipboard-read; clipboard-write"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <!-- USER SETTINGS -->
+  <section class="settings-view" id="settingsView">
+    <div class="eyebrow">ACCOUNT ENVIRONMENT</div>
+    <h1 class="page-title">USER / SETTINGS</h1>
+    <p class="page-description">
+      User profile and platform configuration.
+      Authentication will be integrated in a later phase.
+    </p>
+
+    <div class="settings-panel">
+      <div class="settings-row">
+        <div>
+          <div class="settings-key">USER STATUS</div>
+          <div class="settings-help">Authentication is not connected in this version.</div>
+        </div>
+        <div class="settings-value">LOCAL PREVIEW</div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-key">PLATFORM</div>
+          <div class="settings-help">Spatial Operations Interface</div>
+        </div>
+        <div class="settings-value">OPE</div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-key">SESSION</div>
+          <div class="settings-help">Authentication will be connected here in a later phase.</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-key">APPLICATION VERSION</div>
+          <div class="settings-help">Initial interface build.</div>
+        </div>
+        <div class="settings-value">0.1.0</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-status">
+    <span class="status-dot"></span>
+    <span id="systemStatus">SYSTEM READY</span>
+  </div>
+  <div>OPE / SPATIAL OPERATIONS</div>
+  <div>BY 3DTWINS</div>
+</footer>
+
+<script>
+  
+
+const TOOL_CONFIG = [
+  {
+    id: "ope-lite-space",
+    name: "3D OPE Lite Space",
+    url: "https://3d.staratlas.es/opelite.html"
+  }
+];
+
+const homeView = document.getElementById("homeView");
+const settingsView = document.getElementById("settingsView");
+const workspace = document.getElementById("workspace");
+const toolSidebar = document.getElementById("toolSidebar");
+const navHome = document.getElementById("navHome");
+const navUser = document.getElementById("navUser");
+const brandHome = document.getElementById("brandHome");
+let toolFrame = document.getElementById("toolFrame");
+const frameMessage = document.getElementById("frameMessage");
+const workspaceIndex = document.getElementById("workspaceIndex");
+const workspaceTitle = document.getElementById("workspaceTitle");
+const systemStatus = document.getElementById("systemStatus");
+const toolCount = document.getElementById("toolCount");
+let activeToolIndex = null;
+  
+function isValidToolURL(value) {
+  if (!value) return false;
+  try {
+    const parsed = new URL(value, window.location.href);
+    return parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function destroyToolFrame() {
+  if (!toolFrame || !toolFrame.isConnected) return;
+  const replacement = toolFrame.cloneNode(false);
+  replacement.removeAttribute("src");
+  replacement.removeAttribute("srcdoc");
+  replacement.style.display = "none";
+  toolFrame.replaceWith(replacement);
+  toolFrame = replacement;
+  frameMessage.style.display = "flex";
+}
+
+
+function initialiseToolSidebar() {
+  toolSidebar.replaceChildren();
+
+  document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
+    const index = Number(card.dataset.tool);
+    const symbol = card.querySelector(".tool-symbol");
+    const name = card.querySelector(".tool-name");
+    const tool = TOOL_CONFIG[index];
+
+    if (!tool || !symbol || !name) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tool-sidebar-button";
+    button.dataset.tool = String(index);
+    button.title = tool.name;
+    button.setAttribute("aria-label", "Open " + tool.name);
+    button.setAttribute("aria-pressed", "false");
+    button.innerHTML = symbol.innerHTML;
+
+    button.addEventListener("click", () => openTool(index));
+    toolSidebar.appendChild(button);
+  });
+}
+
+function updateSidebarSelection(index) {
+  toolSidebar.querySelectorAll("[data-tool]").forEach(button => {
+    const active = Number(button.dataset.tool) === index;
+
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function showToolSidebar() {
+  toolSidebar.classList.add("visible");
+  toolSidebar.setAttribute("aria-hidden", "false");
+}
+
+function hideToolSidebar() {
+  toolSidebar.classList.remove("visible");
+  toolSidebar.setAttribute("aria-hidden", "true");
+}
+
+/* NAVIGATION */
+
+function setActiveNavigation(view) {
+  navHome.classList.toggle("active", view === "home");
+  navUser.classList.toggle("active", view === "settings");
+}
+
+function showHome() {
+  closeWorkspace();
+
+  settingsView.style.display = "none";
+  homeView.style.display = "block";
+
+  setActiveNavigation("home");
+  systemStatus.textContent = "SYSTEM READY";
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function showSettings() {
+  closeWorkspace();
+
+  homeView.style.display = "none";
+  settingsView.style.display = "block";
+
+  setActiveNavigation("settings");
+  systemStatus.textContent = "SETTINGS";
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* OPEN OR SWITCH TOOL */
+
+function openTool(index) {
+  const tool = TOOL_CONFIG[index];
+  if (!tool) return;
+
+  /*
+   * Always dispose of the previous tool before opening
+   * another one, including when the same tool is selected.
+   */
+  destroyToolFrame();
+
+  activeToolIndex = index;
+
+  homeView.style.display = "none";
+  settingsView.style.display = "none";
+  workspace.classList.add("visible");
+
+  showToolSidebar();
+  updateSidebarSelection(index);
+  setActiveNavigation("home");
+
+  workspaceIndex.textContent = String(index + 1).padStart(2, "0");
+  workspaceTitle.textContent = tool.name;
+
+  toolFrame.style.display = "none";
+  frameMessage.style.display = "flex";
+  frameMessage.replaceChildren();
+
+  if (!isValidToolURL(tool.url)) {
+    const heading = document.createElement("h2");
+    heading.textContent = "TOOL URL NOT CONFIGURED";
+
+    const message = document.createElement("p");
+    message.textContent = "Check the HTTPS address in TOOL_CONFIG.";
+
+    frameMessage.append(heading, message);
+    systemStatus.textContent = "AWAITING CONFIGURATION";
+    return;
+  }
+
+  toolFrame.title = tool.name + " workspace";
+  toolFrame.style.display = "block";
+  frameMessage.style.display = "none";
+
+  systemStatus.textContent = "TOOL LOADING";
+  toolFrame.src = tool.url;
+}
+
+/* CLOSE WORKSPACE AND RESTORE HOME CARDS */
+
+function closeWorkspace() {
+  /* Terminate the active tool's browsing context */
+  destroyToolFrame();
+
+  workspace.classList.remove("visible");
+  hideToolSidebar();
+
+  toolFrame.style.display = "none";
+  frameMessage.style.display = "flex";
+
+  activeToolIndex = null;
+}
+
+/* TOOL ACTIONS */
+
+function reloadTool() {
+  if (activeToolIndex === null) return;
+
+  const tool = TOOL_CONFIG[activeToolIndex];
+  if (!tool || !isValidToolURL(tool.url)) return;
+
+  /* Reload using a fresh browsing context */
+  destroyToolFrame();
+
+  toolFrame.title = tool.name + " workspace";
+  toolFrame.style.display = "block";
+  frameMessage.style.display = "none";
+
+  systemStatus.textContent = "TOOL RELOADING";
+  toolFrame.src = tool.url;
+}
+
+function openExternal() {
+  if (activeToolIndex === null) return;
+
+  const tool = TOOL_CONFIG[activeToolIndex];
+  if (!tool || !isValidToolURL(tool.url)) return;
+
+  window.open(tool.url, "_blank", "noopener,noreferrer");
+}
+
+/* EVENTS */
+
+document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
+  card.addEventListener("click", () => {
+    openTool(Number(card.dataset.tool));
+  });
+});
+
+navHome.addEventListener("click", showHome);
+brandHome.addEventListener("click", showHome);
+navUser.addEventListener("click", showSettings);
+
+document.getElementById("closeTool").addEventListener("click", showHome);
+document.getElementById("reloadTool").addEventListener("click", reloadTool);
+document.getElementById("openExternal").addEventListener("click", openExternal);
+
+/* INITIALISE */
+
+initialiseToolSidebar();
+
+const configuredTools = TOOL_CONFIG.filter(
+  tool => isValidToolURL(tool.url)
+).length;
+
+toolCount.textContent =
+  String(configuredTools).padStart(2, "0") + " / " +
+  String(TOOL_CONFIG.length).padStart(2, "0") + " CONFIGURED";
+
+
+
+
+  
+/* HOME BANNER: CHANGE IMAGE WHEN CLOSING A TOOL */
+
+const homeBannerImages = [
+  "https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG",
+  "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/cop-dem.png",
+  "https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/terraclimate.png"
+];
+
+let homeBannerIndex = 0;
+
+const homeBanner = document.querySelector(".home-banner");
+const homeBannerImage = homeBanner
+  ? homeBanner.querySelector("img")
+  : null;
+
+function changeHomeBanner() {
+  if (!homeBannerImage || homeBannerImages.length < 2) return;
+
+  homeBannerIndex =
+    (homeBannerIndex + 1) % homeBannerImages.length;
+
+  const nextImage = new Image();
+
+  nextImage.onload = () => {
+    homeBannerImage.src = nextImage.src;
+  };
+
+  nextImage.src = homeBannerImages[homeBannerIndex];
+}
+
+/* CHANGE THE BANNER WHEN THE USER CLOSES THE WORKSPACE */
+
+document.getElementById("closeTool").addEventListener("click", () => {
+  changeHomeBanner();
+});
+
+
+</script>
+
+</body>
+</html>
