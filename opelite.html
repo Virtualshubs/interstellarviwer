@@ -3594,6 +3594,7 @@ function createPublicModelInfoPanel() {
   const content = document.createElement("div");
   content.className = "publicInfoContent";
   content.id = "publicInfoContent";
+  content.hidden = true;
 
   const name = document.createElement("h2");
   name.className = "publicModelName";
@@ -3628,10 +3629,11 @@ function createPublicModelInfoPanel() {
 
   toggle.addEventListener("click", () => {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
+    const nextExpanded = !expanded;
 
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    content.hidden = expanded;
-    chevron.textContent = expanded ? "⌃" : "⌄";
+    toggle.setAttribute("aria-expanded", String(nextExpanded));
+    content.hidden = !nextExpanded;
+    chevron.textContent = nextExpanded ? "⌃" : "⌄";
   });
 }
 
