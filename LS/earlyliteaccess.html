@@ -1,0 +1,1232 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta
+    name="description"
+    content="3D OPE Lite Space. Registro gratuito y acceso a tu espacio de trabajo."
+  >
+  <title>3D OPE Lite Space | Early Access</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    :root {
+      color-scheme: light;
+
+      --bg: #F3F1EA;
+      --panel: #EAE7DE;
+      --panel-hover: #E1DED4;
+      --line: #D9D4C8;
+      --line-soft: #E5E1D8;
+      --text: #242522;
+      --muted: #716B60;
+      --primary: #416D80;
+      --primary-hover: #294A59;
+      --accent: #E5682E;
+      --secondary: #111210;
+      --green: #657B54;
+
+      --font-brand: "Space Grotesk", sans-serif;
+      --font-body: "IBM Plex Sans", sans-serif;
+      --font-data: "IBM Plex Mono", monospace;
+
+      --page-width: 1180px;
+      --gutter: clamp(22px, 6vw, 84px);
+      --radius: 12px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      min-height: 100%;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button,
+    input {
+      border-radius: 0;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 4px;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(100%, var(--page-width));
+      min-height: 100vh;
+      margin-inline: auto;
+      padding: 26px var(--gutter) 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 35px;
+      height: 35px;
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--primary);
+    }
+
+    .brand-mark svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.2;
+    }
+
+    .brand-name {
+      font-family: var(--font-brand);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.045em;
+    }
+
+    .brand-name span {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .header-meta,
+    .eyebrow,
+    .section-index,
+    .image-caption,
+    .footer-meta,
+    .field-label,
+    .requirement-label,
+    .status-label {
+      font-family: var(--font-data);
+      text-transform: uppercase;
+      letter-spacing: 0.065em;
+    }
+
+    .header-meta {
+      color: var(--muted);
+      font-size: 10px;
+      text-align: right;
+    }
+
+    /* Intro */
+
+    .intro {
+      padding: clamp(30px, 5vw, 54px) 0 30px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 14px;
+      color: var(--primary);
+      font-size: 10px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 700px;
+      margin-bottom: 13px;
+      font-family: var(--font-brand);
+      font-size: clamp(30px, 4.6vw, 48px);
+      line-height: 1.08;
+      font-weight: 500;
+      letter-spacing: -0.055em;
+    }
+
+    .intro-copy {
+      max-width: 590px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Main composition */
+
+    .auth-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.13);
+    }
+
+    .auth-panel {
+      min-width: 0;
+      padding: clamp(20px, 3vw, 34px);
+      transition: background 220ms ease;
+    }
+
+    .register-panel {
+      border-right: 1px solid var(--line-soft);
+    }
+
+    .auth-panel.is-active {
+      background: rgba(255, 255, 255, 0.19);
+    }
+
+    .section-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-index {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .section-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--green);
+      font-family: var(--font-data);
+      font-size: 9px;
+      letter-spacing: 0.045em;
+      text-transform: uppercase;
+    }
+
+    .state-dot {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .panel-image {
+      position: relative;
+      height: clamp(125px, 16vw, 190px);
+      margin-bottom: 25px;
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--panel);
+      transition: background 250ms ease;
+    }
+
+    .panel-image::before {
+      position: absolute;
+      z-index: -2;
+      inset: 0;
+      content: "";
+      background-position: center;
+      background-size: cover;
+      transform: scale(1.015);
+      transition: transform 600ms ease, filter 350ms ease;
+    }
+
+    .panel-image::after {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      content: "";
+      background: linear-gradient(
+        90deg,
+        rgba(17, 18, 16, 0.55),
+        rgba(17, 18, 16, 0.05) 85%
+      );
+      transition: opacity 300ms ease;
+    }
+
+    .register-image::before {
+      background-image: url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1100&q=85");
+      filter: saturate(0.55) contrast(1.02);
+    }
+
+    .access-image::before {
+      background-image: url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1100&q=85");
+      filter: saturate(0.48) contrast(1.08);
+    }
+
+    .auth-panel.is-active .panel-image::before {
+      transform: scale(1.055);
+      filter: saturate(0.78) contrast(1.06);
+    }
+
+    .image-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.22;
+      background-image:
+        linear-gradient(rgba(243, 241, 234, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(243, 241, 234, 0.3) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(135deg, black, transparent 80%);
+    }
+
+    .image-coordinate {
+      position: absolute;
+      top: 13px;
+      right: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      font-family: var(--font-data);
+      font-size: 9px;
+      letter-spacing: 0.07em;
+    }
+
+    .image-caption {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      left: 15px;
+      color: #F3F1EA;
+      font-size: 9px;
+      line-height: 1.6;
+    }
+
+    .image-caption strong {
+      display: block;
+      margin-bottom: 2px;
+      font-family: var(--font-brand);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+    .panel-heading {
+      margin-bottom: 7px;
+      font-family: var(--font-brand);
+      font-size: clamp(22px, 2.5vw, 27px);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1.2;
+    }
+
+    .panel-copy {
+      min-height: 44px;
+      margin-bottom: 23px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    /* Form fields */
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .field input {
+      display: block;
+      width: 100%;
+      min-height: 47px;
+      padding: 12px 13px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.3);
+      font-size: 14px;
+      transition: border-color 160ms ease, background 160ms ease;
+    }
+
+    .field input::placeholder {
+      color: #9A9488;
+    }
+
+    .field input:hover {
+      border-color: #B8B1A4;
+    }
+
+    .field input:focus {
+      border-color: var(--primary);
+      outline: none;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .field input[aria-invalid="true"] {
+      border-color: var(--accent);
+    }
+
+    .password-input {
+      padding-right: 72px !important;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 11px;
+      padding: 4px 0 4px 6px;
+      transform: translateY(-50%);
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      font-family: var(--font-data);
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+
+    .password-toggle:hover {
+      color: var(--primary);
+    }
+
+    .field-note {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    /* Password requirements */
+
+    .requirements {
+      margin: 0 0 22px;
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 5px;
+      background: rgba(234, 231, 222, 0.48);
+    }
+
+    .requirements-heading {
+      margin: 0 0 11px;
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .requirements-list {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .requirement {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      transition: color 160ms ease;
+    }
+
+    .requirement-mark {
+      display: grid;
+      place-items: center;
+      width: 15px;
+      height: 15px;
+      flex: 0 0 15px;
+      margin-top: 1px;
+      border: 1px solid #C7C0B3;
+      border-radius: 50%;
+      color: transparent;
+      font-family: var(--font-data);
+      font-size: 9px;
+      transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .requirement.is-met {
+      color: var(--green);
+    }
+
+    .requirement.is-met .requirement-mark {
+      border-color: var(--green);
+      color: #fff;
+      background: var(--green);
+    }
+
+    .requirement.is-met .requirement-mark::before {
+      content: "✓";
+    }
+
+    /* Buttons */
+
+    .action-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      width: 100%;
+      min-height: 49px;
+      padding: 13px 15px;
+      border: 1px solid var(--primary);
+      border-radius: 5px;
+      color: #fff;
+      background: var(--primary);
+      font-family: var(--font-data);
+      font-size: 10px;
+      letter-spacing: 0.055em;
+      text-align: left;
+      text-transform: uppercase;
+      transition: background 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    }
+
+    .action-button:hover:not(:disabled) {
+      border-color: var(--primary-hover);
+      background: var(--primary-hover);
+    }
+
+    .action-button:disabled {
+      cursor: not-allowed;
+      border-color: var(--line);
+      color: #827C71;
+      background: var(--panel);
+    }
+
+    .button-arrow {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .secondary-button {
+      border-color: var(--line);
+      color: var(--text);
+      background: transparent;
+    }
+
+    .secondary-button:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary-hover);
+      background: rgba(65, 109, 128, 0.06);
+    }
+
+    .form-message {
+      display: none;
+      margin: 12px 0 0;
+      padding: 10px 12px;
+      border-left: 2px solid var(--primary);
+      color: var(--text);
+      background: rgba(65, 109, 128, 0.07);
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .form-message.is-visible {
+      display: block;
+    }
+
+    .form-message.is-error {
+      border-left-color: var(--accent);
+      background: rgba(229, 104, 46, 0.07);
+    }
+
+    .form-message.is-success {
+      border-left-color: var(--green);
+      background: rgba(101, 123, 84, 0.08);
+    }
+
+    .form-footnote {
+      margin: 13px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .form-footnote a {
+      text-decoration-color: var(--line);
+      text-underline-offset: 3px;
+    }
+
+    /* Panel footer */
+
+    .panel-footer {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid var(--line-soft);
+      color: var(--muted);
+      font-family: var(--font-data);
+      font-size: 9px;
+      letter-spacing: 0.035em;
+      line-height: 1.6;
+    }
+
+    .panel-footer svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 1.5;
+    }
+
+    /* Global footer */
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: auto;
+      padding-top: 27px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .footer-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-status .state-dot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .footer-meta {
+      font-size: 9px;
+    }
+
+    .footer-creator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: inherit;
+      font-family: var(--font-data);
+      font-size: 9px;
+      letter-spacing: 0.045em;
+      text-decoration: none;
+      opacity: 0.72;
+      transition: opacity 160ms ease;
+    }
+
+    .footer-creator:hover {
+      opacity: 1;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 760px) {
+      .page {
+        padding-inline: clamp(18px, 4vw, 30px);
+      }
+
+      .auth-panel {
+        padding: 22px;
+      }
+
+      .panel-image {
+        height: 145px;
+      }
+
+      .requirements-list {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .panel-copy {
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding-top: 18px;
+        padding-bottom: 16px;
+      }
+
+      .header {
+        padding-bottom: 17px;
+      }
+
+      .header-meta {
+        max-width: 120px;
+        font-size: 9px;
+      }
+
+      .intro {
+        padding-top: 32px;
+        padding-bottom: 24px;
+      }
+
+      h1 {
+        font-size: clamp(29px, 8vw, 39px);
+      }
+
+      .auth-shell {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .register-panel {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .auth-panel {
+        padding: 22px clamp(17px, 5vw, 25px);
+      }
+
+      .panel-image {
+        height: 155px;
+      }
+
+      .requirements-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .footer {
+        flex-wrap: wrap;
+        padding-top: 22px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="header">
+      <a class="brand" href="#" aria-label="3D OPE Lite Space, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="11.5"/>
+            <ellipse cx="16" cy="16" rx="5.2" ry="11.5"/>
+            <ellipse cx="16" cy="16" rx="11.5" ry="4.3"/>
+            <path d="M4.5 16h23M16 4.5v23"/>
+            <path d="m22 6 4 2.5v4" stroke="#E5682E"/>
+          </svg>
+        </span>
+        <span class="brand-name">3D Twins <span>Lite Space</span></span>
+      </a>
+
+      <div class="header-meta">
+        SPATIAL DATA TOOLS<br>
+        EARLY ACCESS · FREE
+      </div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Your space starts here</p>
+        <h1 id="page-title">Tu espacio. Tus recursos 3D.</h1>
+        <p class="intro-copy">
+          Crea tu cuenta gratuita o accede a tu espacio de trabajo.
+          Dos vías de entrada, un mismo entorno.
+        </p>
+      </section>
+
+      <section class="auth-shell" id="authShell" aria-label="Registro y acceso">
+        <!-- REGISTRO -->
+        <section class="auth-panel register-panel is-active" id="registerPanel">
+          <div class="section-topline">
+            <span class="section-index">01 / NEW USER</span>
+            <span class="section-state">
+              <span class="state-dot"></span>
+              Early Access
+            </span>
+          </div>
+
+          <div class="panel-image register-image" aria-hidden="true">
+            <div class="image-grid"></div>
+            <span class="image-coordinate">LITE SPACE / 01</span>
+            <div class="image-caption">
+              <strong>Start with your resources.</strong>
+              Un espacio para tus bibliotecas interactivas.
+            </div>
+          </div>
+
+          <h2 class="panel-heading">Crear cuenta</h2>
+          <p class="panel-copy">
+            Regístrate para preparar tu espacio de trabajo gratuito.
+          </p>
+
+          <form id="registerForm" novalidate>
+            <div class="field">
+              <label class="field-label" for="registerEmail">Correo electrónico</label>
+              <input
+                id="registerEmail"
+                name="email"
+                type="email"
+                autocomplete="email"
+                inputmode="email"
+                maxlength="254"
+                placeholder="nombre@empresa.com"
+                required
+                aria-describedby="registerEmailNote"
+              >
+              <p class="field-note" id="registerEmailNote">
+                Utiliza una dirección de correo válida.
+              </p>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="registerPassword">Contraseña</label>
+              <div class="input-wrap">
+                <input
+                  class="password-input"
+                  id="registerPassword"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="12"
+                  maxlength="128"
+                  placeholder="Crea una contraseña"
+                  required
+                  aria-describedby="passwordRequirements"
+                >
+                <button
+                  class="password-toggle"
+                  type="button"
+                  data-toggle-password="registerPassword"
+                  aria-label="Mostrar contraseña"
+                  aria-pressed="false"
+                >Mostrar</button>
+              </div>
+            </div>
+
+            <div class="requirements" id="passwordRequirements">
+              <p class="requirements-heading">Requisitos de contraseña</p>
+              <ul class="requirements-list">
+                <li class="requirement" data-rule="length">
+                  <span class="requirement-mark" aria-hidden="true"></span>
+                  <span>12 caracteres como mínimo</span>
+                </li>
+                <li class="requirement" data-rule="uppercase">
+                  <span class="requirement-mark" aria-hidden="true"></span>
+                  <span>Una letra mayúscula</span>
+                </li>
+                <li class="requirement" data-rule="number">
+                  <span class="requirement-mark" aria-hidden="true"></span>
+                  <span>Un número</span>
+                </li>
+                <li class="requirement" data-rule="special">
+                  <span class="requirement-mark" aria-hidden="true"></span>
+                  <span>Un carácter especial</span>
+                </li>
+              </ul>
+            </div>
+
+            <button class="action-button" type="submit" id="registerButton">
+              <span>Crear cuenta gratuita</span>
+              <span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+
+            <p
+              class="form-message"
+              id="registerMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+            <p class="form-footnote">
+              Este prototipo no crea cuentas ni envía tus datos a ningún servicio.
+            </p>
+          </form>
+
+          <div class="panel-footer">
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M10 2.5 16 5v4.5c0 4-2.6 6.5-6 8-3.4-1.5-6-4-6-8V5z"/>
+              <path d="m7 10 2 2 4-4"/>
+            </svg>
+            <span>Validación local de los requisitos. Sin verificación de cuenta.</span>
+          </div>
+        </section>
+
+        <!-- ACCESO -->
+        <section class="auth-panel access-panel" id="accessPanel">
+          <div class="section-topline">
+            <span class="section-index">02 / EXISTING USER</span>
+            <span class="section-state">
+              <span class="state-dot"></span>
+              Access
+            </span>
+          </div>
+
+          <div class="panel-image access-image" aria-hidden="true">
+            <div class="image-grid"></div>
+            <span class="image-coordinate">LITE SPACE / 02</span>
+            <div class="image-caption">
+              <strong>Your workspace awaits.</strong>
+              Accede a tu espacio de trabajo.
+            </div>
+          </div>
+
+          <h2 class="panel-heading">Acceder a la cuenta</h2>
+          <p class="panel-copy">
+            Continúa donde lo dejaste y vuelve a tus recursos.
+          </p>
+
+          <form id="accessForm" novalidate>
+            <div class="field">
+              <label class="field-label" for="accessEmail">Correo electrónico</label>
+              <input
+                id="accessEmail"
+                name="email"
+                type="email"
+                autocomplete="username"
+                inputmode="email"
+                maxlength="254"
+                placeholder="nombre@empresa.com"
+                required
+              >
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="accessPassword">Contraseña</label>
+              <div class="input-wrap">
+                <input
+                  class="password-input"
+                  id="accessPassword"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  maxlength="128"
+                  placeholder="Tu contraseña"
+                  required
+                >
+                <button
+                  class="password-toggle"
+                  type="button"
+                  data-toggle-password="accessPassword"
+                  aria-label="Mostrar contraseña"
+                  aria-pressed="false"
+                >Mostrar</button>
+              </div>
+            </div>
+
+            <button class="action-button secondary-button" type="submit">
+              <span>Acceder</span>
+              <span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+
+            <p
+              class="form-message"
+              id="accessMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+            <p class="form-footnote">
+              ¿Aún no tienes cuenta? Puedes registrarte en el panel de la izquierda.
+            </p>
+          </form>
+
+          <div class="panel-footer">
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <rect x="4" y="8.5" width="12" height="9" rx="1"/>
+              <path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5"/>
+              <path d="M10 12v2"/>
+            </svg>
+            <span>El acceso real se conectará posteriormente al sistema de autenticación.</span>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-status">
+        <span class="state-dot" aria-hidden="true"></span>
+        <span class="footer-meta">INTERFACE READY</span>
+      </div>
+
+      <span>3D Twins Lite Space</span>
+
+      <a
+        class="footer-creator"
+        href="https://3dtwins.es/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Visitar la web de 3D Twins"
+      >
+        BY 3D TWINS <span aria-hidden="true">↗</span>
+      </a>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const registerForm = document.getElementById("registerForm");
+      const accessForm = document.getElementById("accessForm");
+      const registerEmail = document.getElementById("registerEmail");
+      const registerPassword = document.getElementById("registerPassword");
+      const registerButton = document.getElementById("registerButton");
+      const registerMessage = document.getElementById("registerMessage");
+      const accessMessage = document.getElementById("accessMessage");
+      const registerPanel = document.getElementById("registerPanel");
+      const accessPanel = document.getElementById("accessPanel");
+
+      const requirements = {
+        length: password => password.length >= 12,
+        uppercase: password => /[A-Z]/.test(password),
+        number: password => /[0-9]/.test(password),
+        special: password => /[^A-Za-z0-9]/.test(password)
+      };
+
+      function emailIsValid(value) {
+        const email = value.trim();
+
+        if (email.length === 0 || email.length > 254) {
+          return false;
+        }
+
+        // Validación básica de interfaz. La verificación definitiva
+        // corresponderá al servicio de autenticación.
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function passwordRules(password) {
+        return Object.fromEntries(
+          Object.entries(requirements).map(([name, test]) => [
+            name,
+            test(password)
+          ])
+        );
+      }
+
+      function updatePasswordRequirements() {
+        const password = registerPassword.value;
+        const results = passwordRules(password);
+
+        Object.entries(results).forEach(([name, passed]) => {
+          const item = document.querySelector(
+            `.requirement[data-rule="${name}"]`
+          );
+
+          if (!item) return;
+
+          item.classList.toggle("is-met", passed);
+          item.setAttribute("aria-label", passed
+            ? `Requisito cumplido: ${name}`
+            : `Requisito pendiente: ${name}`
+          );
+        });
+
+        // El botón permanece disponible visualmente.
+        // Solo se habilita cuando el email y las reglas son válidos.
+        registerButton.disabled = !emailIsValid(registerEmail.value)
+          || !Object.values(results).every(Boolean);
+      }
+
+      function showMessage(element, message, type) {
+        element.textContent = message;
+        element.classList.add("is-visible");
+        element.classList.toggle("is-error", type === "error");
+        element.classList.toggle("is-success", type === "success");
+      }
+
+      function clearMessage(element) {
+        element.textContent = "";
+        element.classList.remove("is-visible", "is-error", "is-success");
+      }
+
+      function setActivePanel(panel) {
+        registerPanel.classList.toggle("is-active", panel === "register");
+        accessPanel.classList.toggle("is-active", panel === "access");
+      }
+
+      registerEmail.addEventListener("input", () => {
+        registerEmail.setAttribute(
+          "aria-invalid",
+          String(registerEmail.value.length > 0 && !emailIsValid(registerEmail.value))
+        );
+
+        clearMessage(registerMessage);
+        updatePasswordRequirements();
+      });
+
+      registerPassword.addEventListener("input", () => {
+        clearMessage(registerMessage);
+        updatePasswordRequirements();
+      });
+
+      registerPanel.addEventListener("focusin", () => setActivePanel("register"));
+      accessPanel.addEventListener("focusin", () => setActivePanel("access"));
+
+      document.querySelectorAll("[data-toggle-password]").forEach(button => {
+        button.addEventListener("click", () => {
+          const inputId = button.getAttribute("data-toggle-password");
+          const input = document.getElementById(inputId);
+
+          if (!input) return;
+
+          const willShow = input.type === "password";
+          input.type = willShow ? "text" : "password";
+          button.textContent = willShow ? "Ocultar" : "Mostrar";
+          button.setAttribute("aria-pressed", String(willShow));
+          button.setAttribute(
+            "aria-label",
+            willShow ? "Ocultar contraseña" : "Mostrar contraseña"
+          );
+
+          input.focus();
+        });
+      });
+
+      registerForm.addEventListener("submit", event => {
+        event.preventDefault();
+        clearMessage(registerMessage);
+
+        const email = registerEmail.value.trim();
+        const results = passwordRules(registerPassword.value);
+        const allRulesPassed = Object.values(results).every(Boolean);
+
+        if (!emailIsValid(email)) {
+          showMessage(
+            registerMessage,
+            "Introduce un correo electrónico con un formato válido.",
+            "error"
+          );
+          registerEmail.focus();
+          return;
+        }
+
+        if (!allRulesPassed) {
+          showMessage(
+            registerMessage,
+            "La contraseña todavía no cumple todos los requisitos.",
+            "error"
+          );
+          registerPassword.focus();
+          return;
+        }
+
+        // SIMULACIÓN:
+        // No se crea una cuenta, no se envía información y no se valida
+        // la contraseña contra ningún servicio externo.
+        showMessage(
+          registerMessage,
+          "Los requisitos se cumplen. El registro real se conectará cuando integremos el servicio de autenticación.",
+          "success"
+        );
+
+        // Cambia el énfasis visual sin ocultar ninguno de los dos paneles.
+        setActivePanel("access");
+      });
+
+      accessForm.addEventListener("submit", event => {
+        event.preventDefault();
+        clearMessage(accessMessage);
+
+        const emailInput = document.getElementById("accessEmail");
+        const passwordInput = document.getElementById("accessPassword");
+
+        if (!emailIsValid(emailInput.value)) {
+          showMessage(
+            accessMessage,
+            "Introduce un correo electrónico con un formato válido.",
+            "error"
+          );
+          emailInput.focus();
+          return;
+        }
+
+        if (!passwordInput.value) {
+          showMessage(
+            accessMessage,
+            "Introduce tu contraseña para continuar.",
+            "error"
+          );
+          passwordInput.focus();
+          return;
+        }
+
+        // SIMULACIÓN:
+        // No se comprueba si la cuenta existe ni si la contraseña es correcta.
+        // Aquí se conectará más adelante la autenticación y la navegación
+        // del iframe al destino autorizado.
+        showMessage(
+          accessMessage,
+          "Interfaz de acceso preparada. La autenticación y la navegación todavía no están conectadas.",
+          "success"
+        );
+      });
+
+      updatePasswordRequirements();
+    })();
+  </script>
+</body>
+</html>
