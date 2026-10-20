@@ -784,6 +784,33 @@ body:has(.workspace.visible) .footer {
   }
 }
 
+
+.footer-creator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  opacity: 0.65;
+  transition: opacity 160ms ease;
+}
+
+.footer-creator:hover {
+  opacity: 1;
+}
+
+.footer-creator span {
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.footer-creator:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+  
 </style>
 
 </head>
@@ -792,17 +819,17 @@ body:has(.workspace.visible) .footer {
 
 <header class="header">
   <button class="brand" id="brandHome" type="button" aria-label="Return to Home">
-    <span class="brand-mark">OPE</span>
+    <span class="brand-mark">Lite</span>
     <span class="brand-divider"></span>
     <span class="brand-info">
       <span class="brand-name">USER HOME</span>
-      <span class="brand-by">BY 3DTWINS</span>
+      <span class="brand-by">BY 3D TWINS</span>
     </span>
   </button>
 
   <nav class="navigation" aria-label="Main navigation">
     <button class="nav-button active" id="navHome" type="button">HOME</button>
-    <button class="nav-button" id="navUser" type="button">USER / SETTINGS</button>
+    <button class="nav-button" id="navUser" type="button">SETTINGS</button>
   </nav>
 </header>
 
@@ -827,14 +854,14 @@ body:has(.workspace.visible) .footer {
     </p>
 
     <div class="section-heading">
-      <span class="section-label">AVAILABLE TOOLS</span>
-      <span class="section-count" id="toolCount">04 / 04 CONFIGURED</span>
+      <span class="section-label">Your 3D Scenes</span>
+      <span class="section-count" id="toolCount">Ready to use</span>
     </div>
 
  <div class="tool-grid" id="toolGrid">
 
   <button class="tool-card" data-tool="0" type="button">
-    <span class="tool-number">01 / TOOL</span>
+    <span class="tool-number">01 / V2.1</span>
 
     <span class="tool-symbol" aria-hidden="true">
       <svg viewBox="0 0 80 80">
@@ -846,11 +873,11 @@ body:has(.workspace.visible) .footer {
       </svg>
     </span>
 
-    <span class="tool-name">3D OPE Lite Space</span>
+    <span class="tool-name">NEW SCENE</span>
     <span class="tool-description">Create your 3D scene in seconds.</span>
 
     <span class="tool-footer">
-      <span class="open-label">OPEN TOOL</span>
+      <span class="open-label">Create scene</span>
       <span class="open-arrow">↗</span>
     </span>
   </button>
@@ -937,8 +964,18 @@ body:has(.workspace.visible) .footer {
     <span class="status-dot"></span>
     <span id="systemStatus">SYSTEM READY</span>
   </div>
-  <div>OPE / SPATIAL OPERATIONS</div>
-  <div>BY 3DTWINS</div>
+
+  <div>3D Twins Lite</div>
+
+  <a
+    class="footer-creator"
+    href="https://3dtwins.es/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Visitar la web de 3D Twins"
+  >
+    BY 3D TWINS <span aria-hidden="true">↗</span>
+  </a>
 </footer>
 
 <script>
