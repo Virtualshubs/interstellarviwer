@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png" type="image/x-icon" />
-<title>3D Lite SPACE</title>
+<title>3D Twins Lite</title>
 
 <style>
 
@@ -3359,7 +3359,7 @@ function createWatermark() {
   logo.alt = "";
 
   watermark.appendChild(logo);
-  watermark.appendChild(document.createTextNode(" Made with 3D Twins"));
+  watermark.appendChild(document.createTextNode(" Made with 3D Twins Lite"));
 
   document.body.appendChild(watermark);
 }
@@ -3578,7 +3578,7 @@ function createPublicModelInfoPanel() {
   toggle.className = "publicInfoToggle";
   toggle.id = "publicInfoToggle";
   toggle.type = "button";
-  toggle.setAttribute("aria-expanded", "true");
+  toggle.setAttribute("aria-expanded", "false");
   toggle.setAttribute("aria-controls", "publicInfoContent");
 
   const toggleLabel = document.createElement("span");
