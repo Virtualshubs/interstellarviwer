@@ -3609,23 +3609,23 @@ function createPublicModelInfoPanel() {
   panel.id = "publicModelInfo";
   panel.hidden = true;
 
+  // BOTÓN INDEPENDIENTE
   const toggle = document.createElement("button");
   toggle.className = "publicInfoToggle";
   toggle.id = "publicInfoToggle";
   toggle.type = "button";
   toggle.setAttribute("aria-expanded", "false");
   toggle.setAttribute("aria-controls", "publicInfoContent");
+  toggle.setAttribute("aria-label", "Model information");
 
-  const toggleLabel = document.createElement("span");
-  toggleLabel.textContent = "Model information";
+  const toggleIcon = document.createElement("span");
+  toggleIcon.className = "material-symbols-outlined";
+  toggleIcon.setAttribute("aria-hidden", "true");
+  toggleIcon.textContent = "tune";
 
-  const chevron = document.createElement("span");
-  chevron.id = "publicInfoChevron";
-  chevron.setAttribute("aria-hidden", "true");
-  chevron.textContent = "⌄";
+  toggle.append(toggleIcon);
 
-  toggle.append(toggleLabel, chevron);
-
+  // CONTENIDO INDEPENDIENTE
   const content = document.createElement("div");
   content.className = "publicInfoContent";
   content.id = "publicInfoContent";
@@ -3662,12 +3662,13 @@ function createPublicModelInfoPanel() {
   panel.append(toggle, content);
   document.body.appendChild(panel);
 
+  // APERTURA Y CIERRE
   toggle.addEventListener("click", () => {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
+    const nextExpanded = !expanded;
 
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    content.hidden = expanded;
-    chevron.textContent = expanded ? "⌃" : "⌄";
+    toggle.setAttribute("aria-expanded", String(nextExpanded));
+    content.hidden = !nextExpanded;
   });
 }
 
