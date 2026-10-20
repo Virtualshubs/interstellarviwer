@@ -3663,11 +3663,10 @@ function createPublicModelInfoPanel() {
 
   toggle.addEventListener("click", () => {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
-    const nextExpanded = !expanded;
 
-    toggle.setAttribute("aria-expanded", String(nextExpanded));
-    content.hidden = !nextExpanded;
-    chevron.textContent = nextExpanded ? "⌃" : "⌄";
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    content.hidden = expanded;
+    chevron.textContent = expanded ? "⌃" : "⌄";
   });
 }
 
