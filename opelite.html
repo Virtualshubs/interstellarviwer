@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png" type="image/x-icon" />
 <title>3D Twins Lite</title>
+  <link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0"
+/>
 
 <style>
 
@@ -1469,6 +1473,11 @@ select:focus-visible {
 }
 
 .publicInfoToggle {
+  position: fixed;
+  z-index: 1002;
+  top: 20px;
+  right: 20px;
+
   display: flex;
   width: 42px;
   height: 42px;
@@ -3603,13 +3612,9 @@ function assignModelLocation() {
 }
 
 function createPublicModelInfoPanel() {
-  if (document.getElementById("publicModelInfo")) return;
+  if (document.getElementById("publicInfoToggle")) return;
 
-  const panel = document.createElement("section");
-  panel.id = "publicModelInfo";
-  panel.hidden = true;
-
-  // BOTÓN INDEPENDIENTE
+  // BOTÓN INDEPENDIENTE DEL PANEL
   const toggle = document.createElement("button");
   toggle.className = "publicInfoToggle";
   toggle.id = "publicInfoToggle";
@@ -3625,7 +3630,10 @@ function createPublicModelInfoPanel() {
 
   toggle.append(toggleIcon);
 
-  // CONTENIDO INDEPENDIENTE
+  // PANEL DE INFORMACIÓN
+  const panel = document.createElement("section");
+  panel.id = "publicModelInfo";
+
   const content = document.createElement("div");
   content.className = "publicInfoContent";
   content.id = "publicInfoContent";
@@ -3659,16 +3667,18 @@ function createPublicModelInfoPanel() {
     addField("DESCRIPTION", "publicModelDescription", "publicDescriptionField")
   );
 
-  panel.append(toggle, content);
-  document.body.appendChild(panel);
+  panel.appendChild(content);
 
-  // APERTURA Y CIERRE
+  // BOTÓN Y PANEL COMO ELEMENTOS SEPARADOS
+  document.body.append(toggle, panel);
+
   toggle.addEventListener("click", () => {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
     const nextExpanded = !expanded;
 
     toggle.setAttribute("aria-expanded", String(nextExpanded));
     content.hidden = !nextExpanded;
+    panel.hidden = !nextExpanded;
   });
 }
 
