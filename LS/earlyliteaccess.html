@@ -5,10 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta
-    name="description"
-    content="3D OPE Lite Space. Registro gratuito y acceso a tu espacio de trabajo."
-  >
+  <meta name="description" content="3D OPE Lite Space. Registro gratuito y acceso a tu espacio de trabajo.">
   <title>3D OPE Lite Space | Early Access</title>
 
   <style>
@@ -16,7 +13,6 @@
 
     :root {
       color-scheme: light;
-
       --bg: #F3F1EA;
       --panel: #EAE7DE;
       --panel-hover: #E1DED4;
@@ -61,13 +57,11 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    button,
-    input {
+    button, input {
       font: inherit;
     }
 
-    button,
-    input {
+    button, input {
       border-radius: 0;
     }
 
@@ -95,7 +89,7 @@
       flex-direction: column;
     }
 
-    /* Header */
+    /* HEADER */
 
     .header {
       display: flex;
@@ -136,7 +130,7 @@
       font-family: var(--font-brand);
       font-size: 15px;
       font-weight: 700;
-      letter-spacing: -0.045em;
+      letter-spacing: -.045em;
     }
 
     .brand-name span {
@@ -149,12 +143,10 @@
     .section-index,
     .image-caption,
     .footer-meta,
-    .field-label,
-    .requirement-label,
-    .status-label {
+    .field-label {
       font-family: var(--font-data);
       text-transform: uppercase;
-      letter-spacing: 0.065em;
+      letter-spacing: .065em;
     }
 
     .header-meta {
@@ -163,7 +155,7 @@
       text-align: right;
     }
 
-    /* Intro */
+    /* INTRO */
 
     .intro {
       padding: clamp(30px, 5vw, 54px) 0 30px;
@@ -185,9 +177,7 @@
       background: var(--accent);
     }
 
-    h1,
-    h2,
-    p {
+    h1, h2, p {
       margin-top: 0;
     }
 
@@ -198,7 +188,7 @@
       font-size: clamp(30px, 4.6vw, 48px);
       line-height: 1.08;
       font-weight: 500;
-      letter-spacing: -0.055em;
+      letter-spacing: -.055em;
     }
 
     .intro-copy {
@@ -209,21 +199,24 @@
       line-height: 1.7;
     }
 
-    /* Main composition */
+    /* TWO-PANEL COMPOSITION */
 
     .auth-shell {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: stretch;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.13);
+      background: rgba(255, 255, 255, .13);
     }
 
     .auth-panel {
+      position: relative;
       min-width: 0;
       padding: clamp(20px, 3vw, 34px);
       transition: background 220ms ease;
+      isolation: isolate;
     }
 
     .register-panel {
@@ -231,7 +224,7 @@
     }
 
     .auth-panel.is-active {
-      background: rgba(255, 255, 255, 0.19);
+      background: rgba(255, 255, 255, .19);
     }
 
     .section-topline {
@@ -254,7 +247,7 @@
       color: var(--green);
       font-family: var(--font-data);
       font-size: 9px;
-      letter-spacing: 0.045em;
+      letter-spacing: .045em;
       text-transform: uppercase;
     }
 
@@ -266,6 +259,8 @@
       background: var(--green);
     }
 
+    /* FORM IMAGES */
+
     .panel-image {
       position: relative;
       height: clamp(125px, 16vw, 190px);
@@ -273,7 +268,6 @@
       overflow: hidden;
       isolation: isolate;
       background: var(--panel);
-      transition: background 250ms ease;
     }
 
     .panel-image::before {
@@ -294,34 +288,33 @@
       content: "";
       background: linear-gradient(
         90deg,
-        rgba(17, 18, 16, 0.55),
-        rgba(17, 18, 16, 0.05) 85%
+        rgba(17, 18, 16, .55),
+        rgba(17, 18, 16, .05) 85%
       );
-      transition: opacity 300ms ease;
     }
 
     .register-image::before {
       background-image: url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1100&q=85");
-      filter: saturate(0.55) contrast(1.02);
+      filter: saturate(.55) contrast(1.02);
     }
 
     .access-image::before {
       background-image: url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1100&q=85");
-      filter: saturate(0.48) contrast(1.08);
+      filter: saturate(.48) contrast(1.08);
     }
 
     .auth-panel.is-active .panel-image::before {
       transform: scale(1.055);
-      filter: saturate(0.78) contrast(1.06);
+      filter: saturate(.78) contrast(1.06);
     }
 
     .image-grid {
       position: absolute;
       inset: 0;
-      opacity: 0.22;
+      opacity: .22;
       background-image:
-        linear-gradient(rgba(243, 241, 234, 0.3) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(243, 241, 234, 0.3) 1px, transparent 1px);
+        linear-gradient(rgba(243, 241, 234, .3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(243, 241, 234, .3) 1px, transparent 1px);
       background-size: 28px 28px;
       mask-image: linear-gradient(135deg, black, transparent 80%);
     }
@@ -330,10 +323,10 @@
       position: absolute;
       top: 13px;
       right: 14px;
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, .8);
       font-family: var(--font-data);
       font-size: 9px;
-      letter-spacing: 0.07em;
+      letter-spacing: .07em;
     }
 
     .image-caption {
@@ -352,16 +345,170 @@
       font-family: var(--font-brand);
       font-size: 15px;
       font-weight: 500;
-      letter-spacing: -0.02em;
+      letter-spacing: -.02em;
       text-transform: none;
     }
+
+    /* IMAGE SHUTTERS */
+
+    .panel-shutter {
+      position: absolute;
+      z-index: 10;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      padding: clamp(22px, 3vw, 34px);
+      overflow: hidden;
+      border: 0;
+      border-radius: 0;
+      color: var(--bg);
+      background: var(--secondary);
+      text-align: left;
+      cursor: pointer;
+      isolation: isolate;
+
+      transform: scaleY(1);
+      transform-origin: top center;
+
+      transition:
+        transform 560ms cubic-bezier(.76, 0, .24, 1),
+        visibility 0s linear 0s;
+    }
+
+    .panel-shutter::before {
+      position: absolute;
+      z-index: -2;
+      inset: 0;
+      content: "";
+      background-position: center;
+      background-size: cover;
+      transform: scale(1.02);
+      transition: transform 900ms ease, filter 400ms ease;
+    }
+
+    .panel-shutter::after {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      content: "";
+      background: linear-gradient(
+        180deg,
+        rgba(17, 18, 16, .15) 0%,
+        rgba(17, 18, 16, .18) 35%,
+        rgba(17, 18, 16, .82) 100%
+      );
+      transition: opacity 300ms ease;
+    }
+
+    .register-shutter::before {
+      background-image: url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1100&q=85");
+      filter: saturate(.5);
+    }
+
+    .access-shutter::before {
+      background-image: url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1100&q=85");
+      filter: saturate(.45);
+    }
+
+    .panel-shutter:hover::before {
+      transform: scale(1.065);
+    }
+
+    .panel-shutter:hover::after {
+      opacity: .88;
+    }
+
+    .panel-shutter:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -5px;
+    }
+
+    /* The active panel reveals its form by retracting its image. */
+    .auth-panel.is-active .panel-shutter {
+      pointer-events: none;
+      transform: scaleY(0);
+      transform-origin: top center;
+      visibility: hidden;
+      transition:
+        transform 560ms cubic-bezier(.76, 0, .24, 1),
+        visibility 0s linear 560ms;
+    }
+
+    .shutter-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(243, 241, 234, .84);
+      font-family: var(--font-data);
+      font-size: 10px;
+      letter-spacing: .065em;
+      text-transform: uppercase;
+    }
+
+    .shutter-coordinate {
+      text-align: right;
+    }
+
+    .shutter-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .shutter-title {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--font-brand);
+      font-size: clamp(25px, 3vw, 34px);
+      font-weight: 500;
+      letter-spacing: -.055em;
+      line-height: 1.08;
+    }
+
+    .shutter-copy {
+      display: block;
+      max-width: 250px;
+      color: rgba(243, 241, 234, .82);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .shutter-action {
+      display: inline-flex;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(243, 241, 234, .55);
+      border-radius: 50%;
+      color: var(--bg);
+      font-size: 19px;
+      transition:
+        color 180ms ease,
+        background 180ms ease,
+        border-color 180ms ease;
+    }
+
+    .panel-shutter:hover .shutter-action {
+      border-color: var(--bg);
+      color: var(--secondary);
+      background: var(--bg);
+    }
+
+    /* PANEL HEADINGS */
 
     .panel-heading {
       margin-bottom: 7px;
       font-family: var(--font-brand);
       font-size: clamp(22px, 2.5vw, 27px);
       font-weight: 500;
-      letter-spacing: -0.045em;
+      letter-spacing: -.045em;
       line-height: 1.2;
     }
 
@@ -373,7 +520,7 @@
       line-height: 1.65;
     }
 
-    /* Form fields */
+    /* FORM FIELDS */
 
     .field {
       margin-bottom: 18px;
@@ -398,7 +545,7 @@
       border: 1px solid var(--line);
       border-radius: 5px;
       color: var(--text);
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, .3);
       font-size: 14px;
       transition: border-color 160ms ease, background 160ms ease;
     }
@@ -414,7 +561,7 @@
     .field input:focus {
       border-color: var(--primary);
       outline: none;
-      background: rgba(255, 255, 255, 0.58);
+      background: rgba(255, 255, 255, .58);
     }
 
     .field input[aria-invalid="true"] {
@@ -450,14 +597,14 @@
       line-height: 1.5;
     }
 
-    /* Password requirements */
+    /* PASSWORD REQUIREMENTS */
 
     .requirements {
       margin: 0 0 22px;
       padding: 14px;
       border: 1px solid var(--line-soft);
       border-radius: 5px;
-      background: rgba(234, 231, 222, 0.48);
+      background: rgba(234, 231, 222, .48);
     }
 
     .requirements-heading {
@@ -465,7 +612,7 @@
       color: var(--muted);
       font-family: var(--font-data);
       font-size: 9px;
-      letter-spacing: 0.06em;
+      letter-spacing: .06em;
       text-transform: uppercase;
     }
 
@@ -518,7 +665,7 @@
       content: "✓";
     }
 
-    /* Buttons */
+    /* BUTTONS */
 
     .action-button {
       display: flex;
@@ -534,7 +681,7 @@
       background: var(--primary);
       font-family: var(--font-data);
       font-size: 10px;
-      letter-spacing: 0.055em;
+      letter-spacing: .055em;
       text-align: left;
       text-transform: uppercase;
       transition: background 180ms ease, border-color 180ms ease, opacity 180ms ease;
@@ -566,7 +713,7 @@
     .secondary-button:hover:not(:disabled) {
       border-color: var(--primary);
       color: var(--primary-hover);
-      background: rgba(65, 109, 128, 0.06);
+      background: rgba(65, 109, 128, .06);
     }
 
     .form-message {
@@ -575,7 +722,7 @@
       padding: 10px 12px;
       border-left: 2px solid var(--primary);
       color: var(--text);
-      background: rgba(65, 109, 128, 0.07);
+      background: rgba(65, 109, 128, .07);
       font-size: 12px;
       line-height: 1.6;
       overflow-wrap: anywhere;
@@ -587,12 +734,12 @@
 
     .form-message.is-error {
       border-left-color: var(--accent);
-      background: rgba(229, 104, 46, 0.07);
+      background: rgba(229, 104, 46, .07);
     }
 
     .form-message.is-success {
       border-left-color: var(--green);
-      background: rgba(101, 123, 84, 0.08);
+      background: rgba(101, 123, 84, .08);
     }
 
     .form-footnote {
@@ -607,7 +754,7 @@
       text-underline-offset: 3px;
     }
 
-    /* Panel footer */
+    /* PANEL FOOTER */
 
     .panel-footer {
       display: flex;
@@ -619,7 +766,7 @@
       color: var(--muted);
       font-family: var(--font-data);
       font-size: 9px;
-      letter-spacing: 0.035em;
+      letter-spacing: .035em;
       line-height: 1.6;
     }
 
@@ -632,7 +779,7 @@
       stroke-width: 1.5;
     }
 
-    /* Global footer */
+    /* GLOBAL FOOTER */
 
     .footer {
       display: flex;
@@ -667,9 +814,9 @@
       color: inherit;
       font-family: var(--font-data);
       font-size: 9px;
-      letter-spacing: 0.045em;
+      letter-spacing: .045em;
       text-decoration: none;
-      opacity: 0.72;
+      opacity: .72;
       transition: opacity 160ms ease;
     }
 
@@ -677,7 +824,7 @@
       opacity: 1;
     }
 
-    /* Responsive */
+    /* RESPONSIVE */
 
     @media (max-width: 760px) {
       .page {
@@ -746,6 +893,14 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .panel-shutter {
+        padding: 22px clamp(17px, 5vw, 25px);
+      }
+
+      .shutter-title {
+        font-size: 30px;
+      }
+
       .footer {
         flex-wrap: wrap;
         padding-top: 22px;
@@ -757,8 +912,8 @@
       *::before,
       *::after {
         scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
       }
     }
@@ -798,8 +953,33 @@
       </section>
 
       <section class="auth-shell" id="authShell" aria-label="Registro y acceso">
+
         <!-- REGISTRO -->
         <section class="auth-panel register-panel is-active" id="registerPanel">
+
+          <!-- Persiana del registro: visible cuando el acceso está activo -->
+          <button
+            class="panel-shutter register-shutter"
+            type="button"
+            data-show-panel="register"
+            aria-label="Mostrar el formulario de creación de cuenta"
+          >
+            <span class="shutter-top">
+              <span>01 / NEW USER</span>
+              <span class="shutter-coordinate">EARLY ACCESS</span>
+            </span>
+
+            <span class="shutter-bottom">
+              <span>
+                <span class="shutter-title">Crear cuenta</span>
+                <span class="shutter-copy">
+                  Accede al espacio gratuito para tus recursos 3D.
+                </span>
+              </span>
+              <span class="shutter-action" aria-hidden="true">↗</span>
+            </span>
+          </button>
+
           <div class="section-topline">
             <span class="section-index">01 / NEW USER</span>
             <span class="section-state">
@@ -888,17 +1068,12 @@
               </ul>
             </div>
 
-            <button class="action-button" type="submit" id="registerButton">
+            <button class="action-button" type="submit" id="registerButton" disabled>
               <span>Crear cuenta gratuita</span>
               <span class="button-arrow" aria-hidden="true">↗</span>
             </button>
 
-            <p
-              class="form-message"
-              id="registerMessage"
-              role="status"
-              aria-live="polite"
-            ></p>
+            <p class="form-message" id="registerMessage" role="status" aria-live="polite"></p>
 
             <p class="form-footnote">
               Este prototipo no crea cuentas ni envía tus datos a ningún servicio.
@@ -916,6 +1091,30 @@
 
         <!-- ACCESO -->
         <section class="auth-panel access-panel" id="accessPanel">
+
+          <!-- Persiana del acceso: visible inicialmente -->
+          <button
+            class="panel-shutter access-shutter"
+            type="button"
+            data-show-panel="access"
+            aria-label="Mostrar el formulario de acceso a la cuenta"
+          >
+            <span class="shutter-top">
+              <span>02 / EXISTING USER</span>
+              <span class="shutter-coordinate">LITE SPACE</span>
+            </span>
+
+            <span class="shutter-bottom">
+              <span>
+                <span class="shutter-title">Acceder</span>
+                <span class="shutter-copy">
+                  Abre tu espacio de trabajo y continúa donde lo dejaste.
+                </span>
+              </span>
+              <span class="shutter-action" aria-hidden="true">↗</span>
+            </span>
+          </button>
+
           <div class="section-topline">
             <span class="section-index">02 / EXISTING USER</span>
             <span class="section-state">
@@ -981,12 +1180,7 @@
               <span class="button-arrow" aria-hidden="true">↗</span>
             </button>
 
-            <p
-              class="form-message"
-              id="accessMessage"
-              role="status"
-              aria-live="polite"
-            ></p>
+            <p class="form-message" id="accessMessage" role="status" aria-live="polite"></p>
 
             <p class="form-footnote">
               ¿Aún no tienes cuenta? Puedes registrarte en el panel de la izquierda.
@@ -1053,8 +1247,6 @@
           return false;
         }
 
-        // Validación básica de interfaz. La verificación definitiva
-        // corresponderá al servicio de autenticación.
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
@@ -1068,8 +1260,7 @@
       }
 
       function updatePasswordRequirements() {
-        const password = registerPassword.value;
-        const results = passwordRules(password);
+        const results = passwordRules(registerPassword.value);
 
         Object.entries(results).forEach(([name, passed]) => {
           const item = document.querySelector(
@@ -1079,16 +1270,11 @@
           if (!item) return;
 
           item.classList.toggle("is-met", passed);
-          item.setAttribute("aria-label", passed
-            ? `Requisito cumplido: ${name}`
-            : `Requisito pendiente: ${name}`
-          );
         });
 
-        // El botón permanece disponible visualmente.
-        // Solo se habilita cuando el email y las reglas son válidos.
-        registerButton.disabled = !emailIsValid(registerEmail.value)
-          || !Object.values(results).every(Boolean);
+        registerButton.disabled =
+          !emailIsValid(registerEmail.value) ||
+          !Object.values(results).every(Boolean);
       }
 
       function showMessage(element, message, type) {
@@ -1104,14 +1290,30 @@
       }
 
       function setActivePanel(panel) {
-        registerPanel.classList.toggle("is-active", panel === "register");
-        accessPanel.classList.toggle("is-active", panel === "access");
+        const showRegister = panel === "register";
+
+        registerPanel.classList.toggle("is-active", showRegister);
+        accessPanel.classList.toggle("is-active", !showRegister);
       }
+
+      /* Click on either image shutter to reveal its corresponding form. */
+      document.querySelectorAll("[data-show-panel]").forEach(button => {
+        button.addEventListener("click", () => {
+          const target = button.getAttribute("data-show-panel");
+
+          if (target === "register" || target === "access") {
+            setActivePanel(target);
+          }
+        });
+      });
 
       registerEmail.addEventListener("input", () => {
         registerEmail.setAttribute(
           "aria-invalid",
-          String(registerEmail.value.length > 0 && !emailIsValid(registerEmail.value))
+          String(
+            registerEmail.value.length > 0 &&
+            !emailIsValid(registerEmail.value)
+          )
         );
 
         clearMessage(registerMessage);
@@ -1122,9 +1324,6 @@
         clearMessage(registerMessage);
         updatePasswordRequirements();
       });
-
-      registerPanel.addEventListener("focusin", () => setActivePanel("register"));
-      accessPanel.addEventListener("focusin", () => setActivePanel("access"));
 
       document.querySelectorAll("[data-toggle-password]").forEach(button => {
         button.addEventListener("click", () => {
@@ -1174,16 +1373,17 @@
           return;
         }
 
-        // SIMULACIÓN:
-        // No se crea una cuenta, no se envía información y no se valida
-        // la contraseña contra ningún servicio externo.
+        /*
+          SIMULACIÓN:
+          No se crea una cuenta ni se envían datos a ningún servicio.
+          Solo se comprueban las reglas de la interfaz.
+        */
         showMessage(
           registerMessage,
           "Los requisitos se cumplen. El registro real se conectará cuando integremos el servicio de autenticación.",
           "success"
         );
 
-        // Cambia el énfasis visual sin ocultar ninguno de los dos paneles.
         setActivePanel("access");
       });
 
@@ -1214,10 +1414,12 @@
           return;
         }
 
-        // SIMULACIÓN:
-        // No se comprueba si la cuenta existe ni si la contraseña es correcta.
-        // Aquí se conectará más adelante la autenticación y la navegación
-        // del iframe al destino autorizado.
+        /*
+          SIMULACIÓN:
+          No se verifica la cuenta ni la contraseña.
+          Aquí conectaremos posteriormente la autenticación y la URL
+          que deberá cargar el iframe de la página principal.
+        */
         showMessage(
           accessMessage,
           "Interfaz de acceso preparada. La autenticación y la navegación todavía no están conectadas.",
@@ -1230,3 +1432,4 @@
   </script>
 </body>
 </html>
+
