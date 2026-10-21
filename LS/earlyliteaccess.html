@@ -1526,16 +1526,19 @@ h1 {
             <div class="field">
               <label class="field-label" for="accessPassword">Contraseña</label>
               <div class="input-wrap">
-                <input
-                  class="password-input"
-                  id="accessPassword"
-                  name="password"
-                  type="password"
-                  autocomplete="current-password"
-                  maxlength="128"
-                  placeholder="Tu contraseña"
-                  required
-                >
+              
+<input
+  class="password-input"
+  id="accessPassword"
+  name="password"
+  type="password"
+  autocomplete="current-password"
+  maxlength="128"
+  placeholder="Tu contraseña"
+  required
+  aria-describedby="accessPasswordRequirements"
+>
+
                 <button
                   class="password-toggle"
                   type="button"
@@ -1545,6 +1548,8 @@ h1 {
                 >Mostrar</button>
               </div>
             </div>
+
+            
 
             <button class="action-button secondary-button" type="submit">
               <span>Acceder</span>
