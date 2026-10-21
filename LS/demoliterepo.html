@@ -1,0 +1,3888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="https://viewer.3dtwins.tech/puntero_3dtwinsStar.png" type="image/x-icon" />
+<title>3D Twins Lite</title>
+  <link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0"
+/>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  color-scheme: light;
+
+  --bg: #F3F1EA;
+  --panel: #EAE7DE;
+  --panel-soft: #F7F5EF;
+  --panel-hover: #E3E0D7;
+
+  --line: rgba(36, 37, 34, 0.14);
+  --line-strong: rgba(36, 37, 34, 0.28);
+
+  --text: #242522;
+  --text-soft: #3F403A;
+  --text-muted: #686A63;
+
+  --accent: #416D80;
+  --accent-strong: #34596A;
+  --accent-bg: rgba(65, 109, 128, 0.08);
+  --accent-line: rgba(65, 109, 128, 0.35);
+
+  --danger: #A32626;
+
+  --orange: #E5682E;
+  --graphite: #242522;
+  --black: #111210;
+  --blue: #416D80;
+  --green: #657B54;
+
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+
+  --space-line: 1px solid var(--line);
+  --shadow-panel: 0 20px 60px rgba(36, 37, 34, 0.10);
+
+  --ease: 180ms ease;
+}
+
+/* ================= RESET ================= */
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  min-width: 320px;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+canvas {
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  color: var(--text);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: #FFFFFF;
+  background: var(--accent);
+}
+
+/* ================= WATERMARK ================= */
+
+#watermark {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  color: rgba(243, 241, 234, 0.92);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-decoration: none;
+  background: rgba(36, 37, 34, 0.96);
+  border: 1px solid #41423D;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition:
+    color var(--ease),
+    border-color var(--ease),
+    background var(--ease);
+}
+
+#watermark:hover {
+  color: #FFFFFF;
+  border-color: var(--blue);
+  background: var(--blue);
+}
+
+.watermarkLogo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  #watermark {
+    right: 12px;
+    bottom: 12px;
+    gap: 6px;
+    padding: 6px 9px;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+  }
+}
+
+@media (max-width: 380px) {
+  #watermark {
+    right: 8px;
+    bottom: 8px;
+    gap: 5px;
+    padding: 5px 7px;
+    font-size: 8px;
+    letter-spacing: 0.04em;
+  }
+}
+  
+.loading-scene #ui {
+  display: none !important;
+}
+
+.loading-scene body {
+  background: #000000 !important;
+}
+
+  
+
+/* ================= MAIN UI ================= */
+
+#ui {
+  position: absolute;
+  top: 20px;
+  left: 0px;
+  z-index: 10;
+  width: 340px;
+  max-height: calc(100% - 40px);
+  padding: 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+
+#ui.ui-fullscreen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+
+#ui.ui-fullscreen .stepNav,
+#ui.ui-fullscreen .stepDot,
+#ui.ui-fullscreen #step2,
+#ui.ui-fullscreen #step3 {
+  display: none;
+}
+
+/* ================= HERO ================= */
+
+.step-hero {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 0;
+  max-height: calc(100vh - 48px);
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 17px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
+  text-align: center;
+}
+
+#title {
+  margin: 0;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.titleGif {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin: 0 auto 3px;
+  opacity: 1;
+}
+
+.heroTitle {
+  margin: 0;
+  color: var(--graphite);
+  font-family: var(--font-heading);
+  font-size: clamp(27px, 4vw, 38px);
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.heroSubtitle {
+  max-width: 440px;
+  margin: 0 auto;
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+.heroInputBox {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  text-align: left;
+  background: var(--panel-soft);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(36, 37, 34, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.heroHint {
+  margin-top: 1px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: 0.025em;
+}
+
+/* ================= INPUTS ================= */
+
+#ui input[type="url"],
+#ui input[type="text"],
+#ui input[type="search"],
+#ui input[type="email"],
+#ui input[type="number"],
+#ui input[type="password"] {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  margin: 0 0 8px;
+  padding: 11px 12px;
+  color: var(--graphite);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.5;
+  background: #FFFFFF;
+  border: 1px solid #C4C1B8;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition:
+    border-color var(--ease),
+    background var(--ease),
+    box-shadow var(--ease);
+}
+
+#ui .heroInputBox input[type="url"],
+#ui .heroInputBox input[type="text"],
+#ui .heroInputBox input[type="search"] {
+  min-height: 46px;
+  margin: 0;
+  padding: 12px 13px;
+  font-size: 13px;
+}
+
+#ui input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+#ui input[type="url"]:hover,
+#ui input[type="text"]:hover,
+#ui input[type="search"]:hover,
+#ui input[type="email"]:hover,
+#ui input[type="number"]:hover,
+#ui input[type="password"]:hover {
+  border-color: var(--blue);
+}
+
+#ui input[type="url"]:focus,
+#ui input[type="text"]:focus,
+#ui input[type="search"]:focus,
+#ui input[type="email"]:focus,
+#ui input[type="number"]:focus,
+#ui input[type="password"]:focus {
+  border-color: var(--blue);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(65, 109, 128, 0.12);
+}
+
+/* ================= BUTTONS ================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 4px;
+  padding: 11px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    color var(--ease),
+    background var(--ease),
+    border-color var(--ease),
+    transform var(--ease);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  color: #FFFFFF;
+  background: var(--orange);
+  border-color: var(--orange);
+}
+
+.btn-primary:hover {
+  color: #FFFFFF;
+  background: #CC5725;
+  border-color: #CC5725;
+}
+
+.btn-secondary {
+  color: var(--graphite);
+  background: transparent;
+  border-color: var(--line-strong);
+}
+
+.btn-secondary:hover {
+  color: #FFFFFF;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+/* ================= NASA SECTION ================= */
+
+.nasa-divider {
+  width: 100%;
+  height: 1px;
+  margin: 9px 0;
+  background: var(--line);
+}
+
+.nasa-explorer {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  text-align: left;
+}
+
+.nasa-explorer[hidden] {
+  display: none !important;
+}
+
+.nasa-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nasa-heading-title {
+  color: var(--text-soft);
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.105em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.nasa-heading-caption {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.nasa-label {
+  margin-bottom: 6px;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.nasa-select {
+  width: 100%;
+  min-height: 39px;
+  padding: 9px 11px;
+  color: var(--graphite);
+  background: #FFFFFF;
+  border: 1px solid #C4C1B8;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 11px;
+  outline: none;
+  transition: border-color var(--ease);
+}
+
+.nasa-select:hover,
+.nasa-select:focus {
+  border-color: var(--blue);
+}
+
+.nasa-select option {
+  color: var(--graphite);
+  background: #FFFFFF;
+}
+
+/* ================= LIST / GRID SWITCH ================= */
+
+.nasa-view-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.nasa-view-toggle button {
+  flex: 1;
+  min-width: 0;
+  min-height: 33px;
+  padding: 7px 10px;
+  color: var(--text-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 550;
+  cursor: pointer;
+  transition:
+    color var(--ease),
+    background var(--ease),
+    border-color var(--ease);
+}
+
+.nasa-view-toggle button:hover {
+  color: var(--graphite);
+  background: var(--panel-hover);
+}
+
+.nasa-view-toggle button.active {
+  color: #FFFFFF;
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+/* ================= NASA ASSET LIST ================= */
+
+.nasa-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 200px;
+  padding-right: 3px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
+}
+
+.nasa-asset {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  color: var(--text-soft);
+  text-align: left;
+  overflow-wrap: anywhere;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    border-color var(--ease);
+}
+
+.nasa-asset:hover {
+  background: var(--panel-soft);
+  border-color: var(--blue);
+}
+
+.nasa-asset-icon {
+  flex: 0 0 auto;
+  color: var(--blue);
+  font-size: 16px;
+}
+
+.nasa-asset-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.nasa-asset-type {
+  display: block;
+  margin-top: 3px;
+
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+}
+
+/* ================= NASA ASSET GRID ================= */
+
+.nasa-asset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 9px;
+  max-height: 360px;
+  padding: 2px 3px 4px 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
+}
+
+.nasa-asset-grid:empty {
+  display: none;
+}
+
+.nasa-card {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--graphite);
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background var(--ease),
+    border-color var(--ease);
+}
+
+.nasa-card:hover,
+.nasa-card:focus-visible {
+  background: var(--panel-soft);
+  border-color: var(--blue);
+}
+
+.nasa-card:focus-visible {
+  box-shadow: 0 0 0 2px rgba(65, 109, 128, 0.18);
+}
+
+/* ================= MODEL PREVIEWS ================= */
+
+.nasa-card-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(ellipse at center, #30343A 0%, #1E1E1E 72%, #111210 100%);
+  background-size: 22px 22px, 22px 22px, auto;
+  border-bottom: 1px solid var(--line);
+}
+
+.nasa-card-preview img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+  object-fit: contain;
+}
+
+.nasa-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: rgba(243, 241, 234, 0.5);
+  font-family: var(--font-mono);
+  font-size: 32px;
+
+  pointer-events: none;
+}
+
+/* ================= PREVIEW CAROUSEL ================= */
+
+.nasa-carousel-control {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 29px;
+  height: 34px;
+  padding: 0;
+  transform: translateY(-50%);
+  color: #FFFFFF;
+  background: rgba(36, 37, 34, 0.94);
+  border: 1px solid rgba(243, 241, 234, 0.3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    border-color var(--ease);
+}
+
+.nasa-carousel-control:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.nasa-carousel-prev {
+  left: 6px;
+}
+
+.nasa-carousel-next {
+  right: 6px;
+}
+
+.nasa-carousel-count {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 2;
+  padding: 3px 6px;
+  color: #FFFFFF;
+  background: rgba(36, 37, 34, 0.94);
+  border: 1px solid rgba(243, 241, 234, 0.2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* ================= CARD METADATA ================= */
+
+.nasa-card-info {
+  min-width: 0;
+  padding: 10px;
+  text-align: left;
+}
+
+.nasa-card-name {
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.nasa-card-type {
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.nasa-global-count {
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.nasa-global-path {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* ================= GLOBAL NASA GALLERY ================= */
+
+#nasaGlobalGallery {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+#nasaGlobalGallery .nasa-heading {
+  align-items: flex-start;
+}
+
+#nasaGlobalGallery .nasa-heading .btn {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 34px;
+  margin: 0;
+  padding: 7px 10px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+#nasaGlobalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 9px;
+  max-height: 48vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(36, 37, 34, 0.25) transparent;
+}
+
+#nasaGlobalGrid .nasa-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+}
+
+/* ================= STATUS / MESSAGES ================= */
+
+.nasa-status {
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.nasa-status.error {
+  color: var(--danger);
+}
+
+.nasa-status a {
+  color: var(--blue);
+  text-decoration-color: rgba(65, 109, 128, 0.5);
+  text-underline-offset: 3px;
+}
+
+.nasa-status a:hover {
+  color: var(--accent-strong);
+}
+
+.nasa-footer {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* ================= SETTINGS GROUPS ================= */
+
+.settingGroup {
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.settingGroup:first-child {
+  margin-top: 0;
+}
+
+.settingGroup .label {
+  margin-bottom: 12px;
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* ================= BACKGROUND PALETTE ================= */
+
+#colorPalette {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  flex: 0 0 auto;
+
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(36, 37, 34, 0.22);
+  cursor: pointer;
+  transition:
+    transform var(--ease),
+    border-color var(--ease),
+    box-shadow var(--ease);
+}
+
+.color-swatch:hover {
+  transform: scale(1.08);
+  border-color: var(--blue);
+}
+
+.color-swatch.active {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(229, 104, 46, 0.16);
+}
+
+#colorWheel {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: conic-gradient(
+    #E65C5C,
+    #E7BC56,
+    #86C878,
+    #67C9C7,
+    #6E9CE8,
+    #B18BE0,
+    #E65C5C
+  );
+
+  border: 2px solid rgba(36, 37, 34, 0.22);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    transform var(--ease),
+    border-color var(--ease);
+}
+
+#colorWheel:hover {
+  transform: scale(1.08);
+  border-color: var(--blue);
+}
+
+#bgInput {
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ================= BACKGROUND IMAGE ================= */
+
+.backgroundImageToggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.backgroundImageToggle input {
+  flex: 0 0 auto;
+  width: 15px !important;
+  height: 15px;
+  margin: 0 !important;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.backgroundImageControls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.backgroundImageControls input {
+  width: 100%;
+  min-height: 39px;
+  margin: 0;
+  padding: 9px 11px;
+  color: var(--graphite);
+  background: #FFFFFF;
+  border: 1px solid #C4C1B8;
+  border-radius: var(--radius-sm);
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  transition: border-color var(--ease);
+}
+
+.backgroundImageControls input:focus {
+  border-color: var(--blue);
+}
+
+.backgroundImageHint {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+/* ================= SHARED URL / EXPORT ================= */
+
+#linkBox {
+  margin-top: 12px;
+  padding: 11px;
+  color: var(--text-soft);
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  user-select: text;
+}
+
+#exportActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#exportActions .btn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ================= STEPS ================= */
+
+.step {
+  display: none;
+}
+
+.step.active {
+  display: block;
+}
+
+.stepNav {
+  display: flex;
+  justify-content: space-between;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.stepDot {
+  flex: 1;
+  height: 3px;
+  background: #D5D1C7;
+  border-radius: 2px;
+
+  transition: background var(--ease);
+}
+
+.stepDot.active {
+  background: var(--orange);
+}
+
+/* ================= LIGHTING CONTROLS ================= */
+
+.lightingControl {
+  margin-top: 15px;
+}
+
+.lightingControl label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 7px;
+
+  color: var(--text-soft);
+  font-family: var(--font-body);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.lightingControl label span {
+  color: var(--graphite);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lightingControl input[type="range"] {
+  display: block;
+
+  width: 100%;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.lightingControl input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.lightingGroup .backgroundImageHint {
+  margin-top: 12px;
+}
+
+/* ================= SCROLLBARS ================= */
+
+#ui::-webkit-scrollbar,
+.step-hero::-webkit-scrollbar,
+.nasa-slot::-webkit-scrollbar,
+.nasa-asset-grid::-webkit-scrollbar,
+#nasaGlobalGrid::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+#ui::-webkit-scrollbar-thumb,
+.step-hero::-webkit-scrollbar-thumb,
+.nasa-slot::-webkit-scrollbar-thumb,
+.nasa-asset-grid::-webkit-scrollbar-thumb,
+#nasaGlobalGrid::-webkit-scrollbar-thumb {
+  background: rgba(36, 37, 34, 0.25);
+  border-radius: 5px;
+}
+
+#ui::-webkit-scrollbar-track,
+.step-hero::-webkit-scrollbar-track,
+.nasa-slot::-webkit-scrollbar-track,
+.nasa-asset-grid::-webkit-scrollbar-track,
+#nasaGlobalGrid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ================= RESPONSIVE · TABLET ================= */
+
+@media (max-width: 1024px) {
+  #ui:not(.ui-fullscreen) {
+    top: 16px;
+    left: 16px;
+    width: 310px;
+    max-height: calc(100% - 32px);
+  }
+
+  .heroTitle {
+    font-size: 31px;
+  }
+
+  .titleGif {
+    width: 250px;
+  }
+}
+
+/* ================= RESPONSIVE · MOBILE ================= */
+
+@media (max-width: 768px) {
+  #ui:not(.ui-fullscreen) {
+    top: 12px;
+    left: 12px;
+
+    width: min(340px, calc(100% - 24px));
+    max-height: calc(100% - 24px);
+    padding: 14px;
+  }
+
+  #ui.ui-fullscreen {
+    padding: 6vh 20px 24px;
+  }
+
+  .step-hero {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    gap: 13px;
+  }
+
+  .heroTitle {
+    font-size: 29px;
+    line-height: 1.12;
+  }
+
+  .heroSubtitle {
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .heroInputBox {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  .titleGif {
+    width: 205px;
+  }
+
+  #colorPalette {
+    gap: 8px;
+  }
+
+  .color-swatch {
+    width: 24px;
+    height: 24px;
+  }
+
+  .stepNav {
+    gap: 6px;
+  }
+
+  #watermark {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+/* ================= RESPONSIVE · SMALL MOBILE ================= */
+
+@media (max-width: 480px) {
+  #ui:not(.ui-fullscreen) {
+    top: 8px;
+    left: 8px;
+
+    width: calc(100% - 16px);
+    max-height: calc(100% - 16px);
+    padding: 12px;
+  }
+
+  #ui.ui-fullscreen {
+    padding: 3vh 12px 16px;
+  }
+
+  .step-hero {
+    gap: 11px;
+    margin-top: 0;
+    max-height: 94vh;
+  }
+
+  .heroTitle {
+    font-size: 25px;
+    line-height: 1.12;
+  }
+
+  .heroSubtitle {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .heroInputBox {
+    padding: 13px;
+  }
+
+  .heroInputBox input[type="url"],
+  .heroInputBox input[type="text"],
+  .heroInputBox input[type="search"] {
+    min-height: 43px;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .titleGif {
+    width: 155px;
+  }
+
+  .btn {
+    min-height: 40px;
+    padding: 10px 11px;
+    font-size: 11px;
+  }
+
+  .settingGroup {
+    padding: 12px;
+  }
+
+  #colorPalette {
+    gap: 7px;
+  }
+
+  .color-swatch {
+    width: 22px;
+    height: 22px;
+  }
+
+  #colorWheel {
+    width: 25px;
+    height: 25px;
+  }
+
+  #watermark {
+    right: 8px;
+    bottom: 8px;
+    padding: 6px 9px;
+    font-size: 9px;
+  }
+
+  .nasa-slot {
+    max-height: 145px;
+  }
+
+  .nasa-asset-grid {
+    gap: 7px;
+    max-height: 300px;
+  }
+
+  #nasaGlobalGrid {
+    max-height: 58vh;
+  }
+
+  #nasaGlobalGallery .nasa-heading {
+    flex-wrap: wrap;
+  }
+
+  #nasaGlobalGallery .nasa-heading .btn {
+    max-width: 100%;
+  }
+
+  .nasa-card-info {
+    padding: 8px;
+  }
+
+  .nasa-card-name {
+    font-size: 10px;
+  }
+
+  .nasa-card-type {
+    font-size: 9px;
+  }
+
+  .nasa-carousel-control {
+    width: 25px;
+    height: 31px;
+  }
+}
+
+/* ================= REDUCED MOTION ================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+
+/* =====================================================
+   MODEL INFORMATION — EDITOR
+   ===================================================== */
+
+.modelInfoEditor[hidden],
+#publicModelInfo[hidden],
+#editorDescriptionField[hidden],
+#publicDescriptionField[hidden] {
+  display: none !important;
+}
+
+.modelInfoEditor {
+  margin-top: 22px;
+}
+
+.modelInfoCard {
+  padding: 18px;
+  background: var(--panel, #EAE7DE);
+  border: 1px solid var(--line, #D9D4C8);
+  border-radius: 12px;
+}
+
+.modelInfoCard h3 {
+  margin: 0 0 22px;
+  color: var(--text, #242522);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.modelInfoField {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 13px 0;
+  border-top: 1px solid var(--line, #D9D4C8);
+  color: var(--text, #242522);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.modelInfoLabel {
+  color: var(--muted, #716B60);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  line-height: 1.4;
+}
+
+#editorModelSource,
+#editorModelLocation,
+#editorModelDescription {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+#assignModelLocation {
+  margin-top: 5px;
+}
+
+/* =====================================================
+   MODEL INFORMATION — PUBLISHED SCENE
+   ===================================================== */
+
+
+#publicModelInfo {
+  position: fixed;
+  z-index: 1000;
+  top: 20px;
+  right: 20px;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  color: #242522;
+  background: #F3F1EA;
+  border: none;
+  border-radius: 8px;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.publicInfoToggle {
+  position: fixed;
+  z-index: 1002;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  width: 42px;
+  height: 42px;
+  min-height: 22px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(217, 212, 200, 0.32);
+  border-radius: 50%;
+  color: #F3F1EA;
+  background: rgba(36, 37, 34, 0.88);
+  font-family: "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.publicInfoToggle:hover {
+  background: rgba(65, 109, 128, 0.3);
+  border-color: rgba(217, 212, 200, 0.58);
+}
+
+.publicInfoToggle:focus-visible {
+  outline: 2px solid #416D80;
+  outline-offset: 3px;
+}
+
+.publicInfoToggle .material-symbols-outlined {
+  font-size: 21px;
+  line-height: 1;
+  font-weight: normal;
+}
+
+.publicInfoToggle > span:not(.material-symbols-outlined) {
+  display: none;
+}
+
+#publicInfoChevron {
+  display: none;
+}
+
+.publicInfoContent {
+  padding: 4px 14px 14px;
+}
+
+.publicInfoContent[hidden] {
+  display: none !important;
+}
+
+.publicModelName {
+  margin: 2px 0 16px;
+  color: #242522;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#publicModelInfo .modelInfoField {
+  border-top: 1px solid rgba(217, 212, 200, 0.16);
+  color: #242522;
+  font-size: 12px;
+}
+
+#publicModelInfo .modelInfoLabel {
+  color: #242522;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+#publicModelSource,
+#publicModelLocation,
+#publicModelDescription {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  #publicModelInfo {
+    top: 12px;
+    right: 12px;
+    width: min(300px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+  }
+
+  
+  .publicInfoToggle {
+  position: fixed;
+  z-index: 9002;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  width: 22px;
+  height: 22px;
+}
+
+  .publicInfoToggle {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 600px) {
+  #publicModelInfo {
+    top: 12px;
+    right: 12px;
+    width: min(290px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+  }
+
+  .publicInfoToggle {
+  position: fixed;
+  z-index: 9002;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  width: 22px;
+  height: 22px;
+}
+
+  .modelInfoCard {
+    padding: 15px;
+  }
+}
+  
+</style>
+
+<script>
+if (new URLSearchParams(location.search).get("scene")) {
+  document.documentElement.classList.add("loading-scene");
+}
+</script>
+</head>
+
+<body>
+<div id="ui">
+  <div class="stepNav">
+    <div class="stepDot active" id="dot1"></div>
+    <div class="stepDot" id="dot2"></div>
+    <div class="stepDot" id="dot3"></div>
+  </div>
+
+  <div id="step1" class="step active step-hero">
+    <div id="title"></div>
+    <img class="titleGif" src="https://3d.staratlas.es/LS/logoredondolite-removebg-preview.png" alt="3D Twins"/>
+    <div class="heroTitle"></div>
+    <div class="heroInputBox">
+          <div class="heroSubtitle">Create your 3D scene</div>
+      <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url" hidden/>
+      <div class="heroHint">Supports GLB / GLTF files hosted online</div>     
+      <div class="nasa-divider"></div>
+      <button id="nasaToggle" class="btn btn-secondary" type="button" onclick="toggleNASAExplorer()">Explore NASA 3D Models</button>
+     <button
+  id="rostockToggle"
+  class="btn btn-secondary"
+  type="button"
+  onclick="toggleRostockExplorer()"
+>
+  Explore Rostock 3D Models
+</button>
+
+      <div id="nasaExplorer" class="nasa-explorer" hidden>
+        <div class="nasa-heading">
+          <div>
+            <div class="nasa-heading-caption">Browse folders and load a model</div>
+          </div>
+        </div>
+
+   
+        <div>
+          <div class="nasa-label">Model folder</div>
+          <select id="nasaFolderSelect" class="nasa-select" disabled>
+            <option value="">Loading folders…</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="nasa-label">Available assets</div>
+          <div class="nasa-view-toggle">
+            <button id="nasaListViewButton" class="active" type="button" onclick="setNASAAssetView('list')">List</button>
+            <button id="nasaGridViewButton" type="button" onclick="setNASAAssetView('grid')">Gallery</button>
+          </div>
+          <div id="nasaAssetSlot" class="nasa-slot">
+            <div class="nasa-status">Open the explorer to retrieve the NASA folders.</div>
+          </div>
+          <div id="nasaAssetGrid" class="nasa-asset-grid" hidden></div>
+        </div>
+
+        <div id="nasaStatus" class="nasa-status" aria-live="polite"></div>
+        <div class="nasa-footer">Models are loaded from NASA's public GitHub repository. Some GLTF files may reference additional assets.</div>
+      </div>
+
+      <div id="nasaGlobalGallery" hidden>
+        <div class="nasa-heading">
+          <div>
+            <div class="nasa-heading-title">NASA 3D MODEL GALLERY</div>
+            <div class="nasa-heading-caption">Browse GLB and GLTF files across the repository</div>
+          </div>
+          <button class="btn btn-secondary" type="button" onclick="showNASAExplorer()">Back to explorer</button>
+        </div>
+        <div id="nasaGlobalStatus" class="nasa-status" aria-live="polite">The repository scan will start when you open the gallery.</div>
+        <div id="nasaGlobalGrid" class="nasa-asset-grid"></div>
+        <div class="nasa-footer">The gallery indexes model paths from NASA's public repository. Models load only when selected.</div>
+      </div>
+           <button class="btn btn-primary" onclick="goStep(2)">Load model</button>
+    </div>
+  </div>
+
+  <div id="step2" class="step">
+    <div class="settingGroup">
+      <div class="label">Background color</div>
+      <div class="colorPickerRow">
+        <div id="colorWheel"></div>
+        <div id="colorPalette">
+          <div class="color-swatch" data-color="#0e0f13" style="background:#0e0f13"></div>
+          <div class="color-swatch" data-color="#c2ceff" style="background:#c2ceff"></div>
+          <div class="color-swatch" data-color="#ffffff" style="background:#ffffff"></div>
+          <div class="color-swatch" data-color="#1a1a1a" style="background:#1a1a1a"></div>
+          <div class="color-swatch" data-color="#4da3ff" style="background:#4da3ff"></div>
+          <div class="color-swatch" data-color="#ff6b6b" style="background:#ff6b6b"></div>
+        </div>
+      </div>
+      <input id="bgInput" type="color" value="#0e0f13" style="display:none;" />
+    </div>
+
+    <div class="settingGroup">
+      <div class="label">Background image</div>
+      <label class="backgroundImageToggle">
+        <input id="backgroundImageInput" type="checkbox" checked>
+        <span>Enable deep-space background</span>
+      </label>
+      <div class="backgroundImageControls">
+        <input id="backgroundImageUrlInput" type="url" placeholder="https://example.com/space-image.jpg" autocomplete="url" />
+        <button class="btn btn-secondary" type="button" onclick="applyCustomBackgroundImage()">Apply image URL</button>
+        <div class="backgroundImageHint">Leave the URL empty to use the default NASA Hubble Deep Field image. Selecting a background color disables the image.</div>
+      </div>
+    </div>
+
+    <div class="settingGroup">
+      <div class="label">Auto rotate</div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;">
+        <input id="rotateInput" type="checkbox">
+        Enable rotation
+      </label>
+    </div>
+
+    <div class="settingGroup lightingGroup">
+      <div class="label">Lighting &amp; shadows</div>
+      <label class="backgroundImageToggle">
+        <input id="shadowsInput" type="checkbox" checked>
+        <span>Enable shadows</span>
+      </label>
+      <div class="lightingControl">
+        <label for="lightIntensityInput">Light intensity <span id="lightIntensityValue">0.8</span></label>
+        <input id="lightIntensityInput" type="range" min="0" max="3" step="0.1" value="0.8">
+      </div>
+      <div class="lightingControl">
+        <label for="lightXInput">Light position X <span id="lightXValue">5</span></label>
+        <input id="lightXInput" type="range" min="-10" max="10" step="0.5" value="5">
+      </div>
+      <div class="lightingControl">
+        <label for="lightYInput">Light position Y <span id="lightYValue">10</span></label>
+        <input id="lightYInput" type="range" min="-10" max="10" step="0.5" value="10">
+      </div>
+      <div class="lightingControl">
+        <label for="lightZInput">Light position Z <span id="lightZValue">5</span></label>
+        <input id="lightZInput" type="range" min="-10" max="10" step="0.5" value="5">
+      </div>
+      <div class="lightingControl">
+        <label for="shadowSoftnessInput">Shadow softness <span id="shadowSoftnessValue">3</span></label>
+        <input id="shadowSoftnessInput" type="range" min="0" max="8" step="1" value="3">
+      </div>
+      <div class="backgroundImageHint">Adjust the light direction and intensity. Shadow softness depends on the renderer and the model geometry.</div>
+    </div>
+
+    
+
+<!-- MODEL INFORMATION EDITOR -->
+<div class="settingGroup modelInfoEditor" id="modelInfoEditor" hidden>
+  <div class="label">Model information</div>
+
+  <div class="modelInfoCard">
+    <h3 id="editorModelName">Model</h3>
+
+    <div class="modelInfoField">
+      <span class="modelInfoLabel">SOURCE</span>
+      <div id="editorModelSource">Not identified</div>
+    </div>
+
+    <div class="modelInfoField">
+      <span class="modelInfoLabel">GEOLOCATION</span>
+      <div id="editorModelLocation">
+        No geographic position associated
+      </div>
+
+      <button
+        class="btn btn-secondary"
+        id="assignModelLocation"
+        type="button"
+      >
+        + Assign geographic position
+      </button>
+    </div>
+
+    <div class="modelInfoField" id="editorDescriptionField" hidden>
+      <span class="modelInfoLabel">DESCRIPTION</span>
+      <div id="editorModelDescription"></div>
+    </div>
+  </div>
+</div>
+
+
+    <div class="stepNav">
+      <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
+      <button class="btn btn-secondary" onclick="goStep(3)">Continue</button>
+    </div>
+  </div>
+
+  <div id="step3" class="step">
+ <button class="btn btn-primary" onclick="showRegisterMessage()">
+  Publish Scene
+</button>
+    <div class="label" hidden>Share link</div>
+    <div id="linkBox" hidden>No scene generated yet</div>
+    <div id="exportActions" style="display:none;margin-top:12px;gap:8px;flex-direction:column;">
+      <button class="btn btn-secondary" onclick="openScene()">Go to scene</button>
+      <button class="btn btn-secondary" onclick="copyURL()">Copy URL</button>
+      <button class="btn btn-secondary" onclick="generateQR()">Generate QR</button>
+    </div>
+    <div class="stepNav"><button class="btn btn-secondary" onclick="goStep(2)">Back</button></div>
+  </div>
+</div>
+
+<canvas id="c"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/DRACOLoader.js"></script>
+
+<script>
+/* ================= CONFIG ================= */
+
+const DEFAULT_BACKGROUND_IMAGE = {
+  enabled: true,
+  url: "https://science.nasa.gov/wp-content/uploads/2023/06/hubble-deep-field-jpeg.webp"
+};
+
+  function showRegisterMessage() {
+  alert("Regístrate para poder exportar una escena.");
+}
+
+/* ================= STATE ================= */
+
+let scene, camera, renderer, controls, model;
+let keyLight;
+let modelRadius = 1;
+let backgroundTextureLoader;
+let backgroundLoadId = 0;
+
+let state = {
+  modelUrl: null,
+  bg: "#0e0f13",
+  autoRotate: false,
+  backgroundImage: DEFAULT_BACKGROUND_IMAGE.enabled,
+  backgroundImageUrl: null,
+  lighting: {
+    shadows: true,
+    intensity: 0.8,
+    x: 5,
+    y: 10,
+    z: 5,
+    softness: 3
+  }
+};
+
+let lastGeneratedURL = null;
+let isLoadingFromURL = false;
+
+const NASA_BASE_URL = "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/master/3D%20Models/";
+const NASA_API_URL = "https://api.github.com/repos/nasa/NASA-3D-Resources/contents/3D%20Models?ref=master";
+const NASA_TREE_API_URL = "https://api.github.com/repos/nasa/NASA-3D-Resources/git/trees/master?recursive=1";
+
+/* ================= ROSTOCK CATALOG ================= */
+
+const ROSTOCK_CATALOG_URL =
+  "https://raw.githubusercontent.com/rostock/3DModels/main/Rostock_Catalog.json";
+
+let activeCatalogSource = "nasa";
+let rostockCatalog = null;
+let rostockCatalogPromise = null;
+
+let nasaFoldersLoaded = false;
+let nasaFolderCache = new Map();
+let nasaRequestId = 0;
+let nasaAssetView = "list";
+
+/* ================= GLOBAL NASA MODEL ARRAY =================
+   One central array stores discovered model files.
+   The repository scan and folder navigation both feed this array.
+   Model paths are unique, so repeated discoveries do not duplicate entries.
+*/
+
+const NASA_MODELS = [];
+const NASA_MODEL_PATHS = new Set();
+
+let nasaGlobalAssets = NASA_MODELS;
+let nasaGlobalScanPromise = null;
+let nasaGlobalScanned = false;
+let nasaGlobalScanTruncated = false;
+
+function addNASAModel(asset) {
+  if (!asset || !asset.path || !/\.(glb|gltf)$/i.test(asset.path)) return;
+
+  const path = asset.path;
+  if (NASA_MODEL_PATHS.has(path)) return;
+
+  const modelAsset = {
+    name: asset.name || path.split("/").pop(),
+    path,
+    download_url: asset.download_url || null
+  };
+
+  NASA_MODEL_PATHS.add(path);
+  NASA_MODELS.push(modelAsset);
+}
+
+function addNASAModels(assets) {
+  assets.forEach(addNASAModel);
+  NASA_MODELS.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+init();
+checkURL();
+animate();
+
+/* ================= INIT ================= */
+
+function init() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(state.bg);
+  backgroundTextureLoader = new THREE.TextureLoader();
+
+  camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.01, 1000);
+  camera.position.set(2, 2, 3);
+
+  renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById("c"),
+    antialias: true
+  });
+
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.autoRotate = state.autoRotate;
+  controls.addEventListener("change", updateCameraClipping);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1));
+
+  keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.bias = -0.0001;
+  keyLight.shadow.normalBias = 0.02;
+  scene.add(keyLight);
+  scene.add(keyLight.target);
+
+  window.addEventListener("resize", onResize);
+
+  const rotateInput = document.getElementById("rotateInput");
+  if (rotateInput) {
+    rotateInput.checked = state.autoRotate;
+    rotateInput.addEventListener("change", (e) => applyRotation(e.target.checked));
+  }
+
+  const bgInput = document.getElementById("bgInput");
+  if (bgInput) {
+    bgInput.addEventListener("input", (e) => {
+      const color = e.target.value;
+      applySceneStyle(color);
+      document.querySelectorAll(".color-swatch").forEach((swatch) => {
+        swatch.classList.toggle("active", swatch.dataset.color === color);
+      });
+    });
+  }
+
+  document.querySelectorAll(".color-swatch").forEach((swatch) => {
+    swatch.addEventListener("click", () => {
+      const color = swatch.dataset.color;
+      if (bgInput) bgInput.value = color;
+      applySceneStyle(color);
+      document.querySelectorAll(".color-swatch").forEach((item) => item.classList.remove("active"));
+      swatch.classList.add("active");
+    });
+  });
+
+  document.getElementById("colorWheel")?.addEventListener("click", () => bgInput?.click());
+
+  const backgroundImageInput = document.getElementById("backgroundImageInput");
+  if (backgroundImageInput) {
+    backgroundImageInput.checked = state.backgroundImage;
+    backgroundImageInput.addEventListener("change", (e) => applyBackgroundImage(e.target.checked));
+  }
+
+  document.getElementById("backgroundImageUrlInput")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      applyCustomBackgroundImage();
+    }
+  });
+
+  ["lightIntensityInput", "lightXInput", "lightYInput", "lightZInput", "shadowSoftnessInput", "shadowsInput"]
+    .forEach((id) => {
+      document.getElementById(id)?.addEventListener("input", () => applyLighting(readLightingControls()));
+    });
+
+  const actions = document.getElementById("exportActions");
+  if (actions) actions.style.display = "none";
+
+  document.getElementById("ui")?.classList.add("ui-fullscreen");
+  updateCameraClipping();
+  applyLighting();
+  applyBackgroundImage(DEFAULT_BACKGROUND_IMAGE.enabled);
+}
+
+/* ================= CAMERA / SCALE ================= */
+
+function frameModel(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  if (box.isEmpty()) {
+    modelRadius = 1;
+    return;
+  }
+
+  const center = box.getCenter(new THREE.Vector3());
+  object.position.sub(center);
+  object.updateMatrixWorld(true);
+
+  const centeredBox = new THREE.Box3().setFromObject(object);
+  const sphere = centeredBox.getBoundingSphere(new THREE.Sphere());
+  modelRadius = Math.max(sphere.radius, 1e-9);
+
+  const direction = camera.position.clone();
+  if (direction.lengthSq() === 0) direction.set(2, 2, 3);
+  direction.normalize();
+
+  const halfFov = THREE.MathUtils.degToRad(camera.fov * 0.5);
+  const fitDistance = (modelRadius / Math.sin(halfFov)) * 1.25;
+
+  camera.position.copy(direction.multiplyScalar(fitDistance));
+  controls.target.set(0, 0, 0);
+  controls.minDistance = Math.max(modelRadius * 1e-8, 1e-10);
+  controls.maxDistance = Math.max(modelRadius * 1e6, fitDistance * 100);
+  updateCameraClipping();
+  controls.update();
+  updateCameraClipping();
+}
+
+function updateCameraClipping() {
+  if (!camera || !controls) return;
+
+  const distance = Math.max(camera.position.distanceTo(controls.target), 1e-10);
+  const radius = Math.max(modelRadius, 1e-9);
+  const nearFloor = Math.max(radius * 1e-9, 1e-10);
+  const near = Math.max(Math.min(distance * 0.01, radius * 0.001), nearFloor);
+  const far = Math.max(distance + radius * 4, radius * 10, near * 1000);
+
+  if (Math.abs(camera.near - near) > near * 0.01 || Math.abs(camera.far - far) > far * 0.01) {
+    camera.near = near;
+    camera.far = far;
+    camera.updateProjectionMatrix();
+  }
+}
+
+/* ================= UI MODE ================= */
+
+function setCompactUI() {
+  document.getElementById("ui")?.classList.remove("ui-fullscreen");
+}
+
+/* ================= MODEL LOADER ================= */
+
+function loadModel(url) {
+  if (!url) {
+    setNASAStatus("Select a model or enter a valid model URL.", true);
+    return;
+  }
+
+  const loader = new THREE.GLTFLoader();
+  const dracoLoader = new THREE.DRACOLoader();
+
+  dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
+  loader.setDRACOLoader(dracoLoader);
+
+  loader.load(
+    url,
+    (gltf) => {
+      if (model) scene.remove(model);
+      model = gltf.scene;
+      scene.add(model);
+      frameModel(model);
+      applyLighting();
+      state.modelUrl = url;
+      setCompactUI();
+      goStep(2);
+      setNASAStatus("");
+      dracoLoader.dispose();
+    },
+    undefined,
+    (error) => {
+      console.error("Error loading model:", url, error);
+      if (state.modelUrl === url) state.modelUrl = null;
+      setNASAStatus("Could not load this model. Check the file URL and its external resources.", true);
+      dracoLoader.dispose();
+    }
+  );
+}
+
+/* ================= STEPS ================= */
+
+function goStep(step) {
+  if (step === 2) {
+    const url = document.getElementById("urlInput").value.trim();
+    if (!url) {
+      setNASAStatus("Enter a model URL or select a NASA asset.", true);
+      document.getElementById("urlInput").focus();
+      return;
+    }
+    if (url !== state.modelUrl) {
+      loadModel(url);
+      return;
+    }
+  }
+
+  document.querySelectorAll(".step").forEach((element) => element.classList.remove("active"));
+  document.getElementById("step" + step)?.classList.add("active");
+  document.querySelectorAll(".stepDot").forEach((element) => element.classList.remove("active"));
+  document.getElementById("dot" + step)?.classList.add("active");
+
+  if (step === 3) {
+    const rotateInput = document.getElementById("rotateInput");
+    applyRotation(rotateInput ? rotateInput.checked : state.autoRotate);
+  }
+}
+
+/* ================= SHARED MODEL EXPLORER ================= */
+
+function setNASAAssetView(view) {
+  nasaAssetView = view === "grid" ? "grid" : "list";
+
+  const list = document.getElementById("nasaAssetSlot");
+  const grid = document.getElementById("nasaAssetGrid");
+
+  if (list) list.hidden = nasaAssetView !== "list";
+  if (grid) grid.hidden = nasaAssetView !== "grid";
+
+  document.getElementById("nasaListViewButton")?.classList.toggle("active", nasaAssetView === "list");
+  document.getElementById("nasaGridViewButton")?.classList.toggle("active", nasaAssetView === "grid");
+}
+
+/* ================= NASA EXPLORER ================= */
+
+async function toggleNASAExplorer() {
+  const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
+  const toggle = document.getElementById("nasaToggle");
+
+  if (!explorer || !gallery) return;
+
+  /* If Rostock is currently open, switch back to NASA. */
+  if (activeCatalogSource === "rostock") {
+    activeCatalogSource = "nasa";
+    nasaRequestId++;
+
+    explorer.hidden = false;
+    gallery.hidden = true;
+
+    if (toggle) toggle.textContent = "Hide NASA Explorer";
+
+    await loadNASAFolders();
+    return;
+  }
+
+  if (!explorer.hidden) {
+    explorer.hidden = true;
+    gallery.hidden = false;
+
+    if (toggle) toggle.textContent = "Hide NASA Gallery";
+
+    if (!nasaGlobalScanned) await loadNASAGlobalGallery();
+    return;
+  }
+
+  if (!gallery.hidden) {
+    gallery.hidden = true;
+
+    if (toggle) toggle.textContent = "Explore NASA 3D Models";
+    return;
+  }
+
+  activeCatalogSource = "nasa";
+  explorer.hidden = false;
+  gallery.hidden = true;
+
+  if (toggle) toggle.textContent = "Hide NASA Explorer";
+
+  await loadNASAFolders();
+}
+
+async function showNASAExplorer() {
+  const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
+  const toggle = document.getElementById("nasaToggle");
+
+  if (!explorer || !gallery) return;
+
+  activeCatalogSource = "nasa";
+  nasaRequestId++;
+
+  gallery.hidden = true;
+  explorer.hidden = false;
+
+  if (toggle) toggle.textContent = "Hide NASA Explorer";
+
+  await loadNASAFolders();
+}
+
+/* ================= ROSTOCK EXPLORER ================= */
+
+async function toggleRostockExplorer() {
+  const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
+  const nasaToggle = document.getElementById("nasaToggle");
+  const rostockToggle = document.getElementById("rostockToggle");
+
+  if (!explorer || !gallery) {
+    console.error("Rostock explorer: the existing NASA explorer elements were not found.");
+    return;
+  }
+
+  /* Close Rostock if its explorer is already open. */
+  if (!explorer.hidden && activeCatalogSource === "rostock") {
+    explorer.hidden = true;
+    gallery.hidden = true;
+    activeCatalogSource = "nasa";
+    nasaRequestId++;
+
+    if (nasaToggle) nasaToggle.textContent = "Explore NASA 3D Models";
+    if (rostockToggle) rostockToggle.textContent = "Explore Rostock 3D Models";
+
+    clearNASAAssets();
+    setNASAStatus("");
+    return;
+  }
+
+  activeCatalogSource = "rostock";
+  nasaRequestId++;
+
+  explorer.hidden = false;
+  gallery.hidden = true;
+
+  if (nasaToggle) nasaToggle.textContent = "Explore NASA 3D Models";
+  if (rostockToggle) rostockToggle.textContent = "Hide Rostock Explorer";
+
+  clearNASAAssets();
+
+  const select = document.getElementById("nasaFolderSelect");
+
+  if (!select) {
+    setNASAStatus("The category selector could not be found.", true);
+    return;
+  }
+
+  select.disabled = true;
+  select.innerHTML = '<option value="">Loading Rostock categories…</option>';
+  setNASAStatus("Loading the Rostock model catalog…");
+
+  try {
+    const catalog = await loadRostockCatalog();
+
+    /* Ignore the response if the user switched catalogs while loading. */
+    if (activeCatalogSource !== "rostock") return;
+
+    const categories = getRostockCategories(catalog);
+
+    if (!categories.length) {
+      throw new Error("No categories were found in the Rostock catalog.");
+    }
+
+    select.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select a Rostock category…";
+    select.appendChild(placeholder);
+
+    categories.forEach((category, index) => {
+      const option = document.createElement("option");
+      option.value = String(index);
+      option.textContent = getRostockCategoryTitle(category, index);
+      select.appendChild(option);
+    });
+
+    select.disabled = false;
+
+    select.onchange = () => {
+      if (activeCatalogSource !== "rostock") return;
+
+      if (select.value === "") {
+        clearNASAAssets();
+        setNASAStatus("Choose a Rostock category to browse its models.");
+        return;
+      }
+
+      loadRostockAssets(Number(select.value));
+    };
+
+    setNASAStatus("Choose a Rostock category to browse its models.");
+  } catch (error) {
+    if (activeCatalogSource !== "rostock") return;
+
+    console.error("Rostock catalog loading failed:", error);
+    select.innerHTML = '<option value="">Could not load Rostock catalog</option>';
+    select.disabled = true;
+    setNASAStatus(
+      "Could not load the Rostock catalog. Check the catalog URL and its JSON structure.",
+      true
+    );
+  }
+}
+
+async function loadRostockCatalog() {
+  if (rostockCatalog) return rostockCatalog;
+  if (rostockCatalogPromise) return rostockCatalogPromise;
+
+  rostockCatalogPromise = (async () => {
+    const response = await fetch(ROSTOCK_CATALOG_URL, {
+      headers: { Accept: "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error("Rostock catalog request failed (" + response.status + ").");
+    }
+
+    const data = await response.json();
+
+    if (!data || typeof data !== "object") {
+      throw new Error("The Rostock catalog did not return a valid JSON object.");
+    }
+
+    rostockCatalog = data;
+    return rostockCatalog;
+  })();
+
+  try {
+    return await rostockCatalogPromise;
+  } catch (error) {
+    rostockCatalogPromise = null;
+    throw error;
+  }
+}
+
+function getRostockCategories(catalog) {
+  if (Array.isArray(catalog?.items)) return catalog.items;
+  if (Array.isArray(catalog?.categories)) return catalog.categories;
+  return [];
+}
+
+function getRostockCategoryTitle(category, index = 0) {
+  const title = category?.title;
+
+  if (typeof title === "string" && title.trim()) return title.trim();
+
+  if (title && typeof title === "object") {
+    for (const language of ["en", "de", "es"]) {
+      if (typeof title[language] === "string" && title[language].trim()) {
+        return title[language].trim();
+      }
+    }
+
+    const localizedTitle = Object.values(title).find(
+      value => typeof value === "string" && value.trim()
+    );
+
+    if (localizedTitle) return localizedTitle.trim();
+  }
+
+  return category?.name ||
+    category?.label ||
+    category?.id ||
+    ("Category " + (index + 1));
+}
+
+function getRostockModelURL(item) {
+  const rawURL =
+    item?.properties?.olcs_modelUrl ||
+    item?.olcs_modelUrl ||
+    item?.modelUrl ||
+    item?.model_url ||
+    "";
+
+  if (typeof rawURL !== "string" || !rawURL.trim()) return null;
+
+  try {
+    const parsed = new URL(rawURL.trim());
+
+    if (parsed.protocol !== "https:") return null;
+    if (!/\.(glb|gltf)$/i.test(parsed.pathname)) return null;
+
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
+function getRostockModelName(item, url) {
+  const candidates = [
+    item?.title,
+    item?.name,
+    item?.properties?.name,
+    item?.properties?.title,
+    item?.properties?.displayName,
+    item?.properties?.label,
+    item?.id
+  ];
+
+  const name = candidates.find(
+    value => typeof value === "string" && value.trim()
+  );
+
+  if (name) return name.trim();
+
+  try {
+    return decodeURIComponent(new URL(url).pathname.split("/").pop() || "Rostock model");
+  } catch {
+    return "Rostock model";
+  }
+}
+
+function getRostockPreviewURL(item) {
+  const candidates = [
+    item?.icon,
+    item?.properties?.icon,
+    item?.thumbnail,
+    item?.properties?.thumbnail,
+    item?.properties?.preview
+  ];
+
+  for (const candidate of candidates) {
+    const value = typeof candidate === "string"
+      ? candidate
+      : candidate && typeof candidate === "object"
+        ? candidate.url || candidate.href
+        : null;
+
+    if (typeof value !== "string" || !value.trim()) continue;
+
+    try {
+      const parsed = new URL(value, ROSTOCK_CATALOG_URL);
+      if (parsed.protocol === "https:") return parsed.href;
+    } catch {}
+  }
+
+  return null;
+}
+
+async function loadRostockAssets(categoryIndex) {
+  const list = document.getElementById("nasaAssetSlot");
+  const grid = document.getElementById("nasaAssetGrid");
+  const select = document.getElementById("nasaFolderSelect");
+
+  if (activeCatalogSource !== "rostock") return;
+
+  const requestId = ++nasaRequestId;
+
+  clearNASAAssets();
+  showNASAStatusInSlot("Loading Rostock models…");
+  setNASAStatus("Reading the selected Rostock category…");
+
+  try {
+    const catalog = await loadRostockCatalog();
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "rostock") return;
+
+    const categories = getRostockCategories(catalog);
+    const category = categories[categoryIndex];
+
+    if (!category) {
+      throw new Error("The selected Rostock category could not be found.");
+    }
+
+    const objects = Array.isArray(category.predefinedObjects)
+      ? category.predefinedObjects
+      : Array.isArray(category.objects)
+        ? category.objects
+        : Array.isArray(category.items)
+          ? category.items
+          : [];
+
+    const assets = objects
+      .map((item) => {
+        const url = getRostockModelURL(item);
+        if (!url) return null;
+
+        let name = getRostockModelName(item, url);
+
+        /* Preserve the model extension for the existing GLB/GLTF UI. */
+        if (!/\.(glb|gltf)$/i.test(name)) {
+          const extension = new URL(url).pathname.match(/\.(glb|gltf)$/i)?.[0] || ".glb";
+          name += extension;
+        }
+
+        return {
+          name,
+          path: url,
+          download_url: url,
+          source: "Rostock",
+          preview_url: getRostockPreviewURL(item)
+        };
+      })
+      .filter(Boolean);
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "rostock") return;
+
+    if (!assets.length) {
+      const message = document.createElement("div");
+      message.className = "nasa-status";
+      message.textContent = "No valid GLB or GLTF model URLs were found in this category.";
+
+      list.replaceChildren(message);
+      grid.replaceChildren();
+
+      setNASAStatus(
+        "This category contains no supported model URLs, or its model URL fields use a different format."
+      );
+      return;
+    }
+
+    assets.forEach((asset) => {
+      const previews = asset.preview_url
+        ? [{ name: asset.name, url: asset.preview_url }]
+        : [];
+
+      list.appendChild(createNASAAssetListItem(asset));
+      grid.appendChild(createNASAAssetCard(asset, previews));
+    });
+
+    setNASAAssetView(nasaAssetView);
+
+    setNASAStatus(
+      assets.length + " Rostock model" +
+      (assets.length === 1 ? "" : "s") +
+      " found. Select one to load it."
+    );
+  } catch (error) {
+    if (requestId !== nasaRequestId || activeCatalogSource !== "rostock") return;
+
+    console.error("Rostock model listing failed:", error);
+
+    clearNASAAssets();
+    showNASAStatusInSlot("Could not retrieve Rostock models.");
+    showNASAStatusInGrid("Could not retrieve Rostock models.");
+    setNASAStatus(error.message, true);
+  }
+}
+
+/* ================= NASA GLOBAL GALLERY ================= */
+
+async function loadNASAGlobalGallery() {
+  if (nasaGlobalScanned) {
+    renderNASAGlobalGallery(NASA_MODELS);
+    return;
+  }
+
+  if (nasaGlobalScanPromise) return nasaGlobalScanPromise;
+
+  const status = document.getElementById("nasaGlobalStatus");
+  const grid = document.getElementById("nasaGlobalGrid");
+
+  status.classList.remove("error");
+  status.textContent = "Scanning the NASA repository for GLB and GLTF files…";
+  grid.replaceChildren();
+
+  nasaGlobalScanPromise = (async () => {
+    try {
+      const response = await fetch(NASA_TREE_API_URL, {
+        headers: { Accept: "application/vnd.github+json" }
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          response.status === 403 || response.status === 429
+            ? "GitHub API rate limit reached. Try again later."
+            : "Could not scan the NASA repository (" + response.status + ")."
+        );
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data.tree)) throw new Error("The repository tree could not be read.");
+
+      const assets = data.tree
+        .filter((entry) =>
+          entry.type === "blob" &&
+          /^3D Models\//i.test(entry.path) &&
+          /\.(glb|gltf)$/i.test(entry.path)
+        )
+        .map((entry) => ({
+          name: entry.path.split("/").pop(),
+          path: entry.path,
+          download_url: null
+        }));
+
+      /* The global repository scan feeds the shared NASA array. */
+      addNASAModels(assets);
+      nasaGlobalAssets = NASA_MODELS;
+      nasaGlobalScanned = true;
+      nasaGlobalScanTruncated = Boolean(data.truncated);
+
+      renderNASAGlobalGallery(NASA_MODELS);
+
+      const countText = NASA_MODELS.length + " model file" +
+        (NASA_MODELS.length === 1 ? "" : "s") + " found across the repository.";
+
+      status.textContent = nasaGlobalScanTruncated
+        ? countText + " GitHub returned a truncated repository tree, so the list may be incomplete."
+        : countText;
+    } catch (error) {
+      console.error("NASA global gallery scan failed:", error);
+      status.textContent = error.message;
+      status.classList.add("error");
+
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "btn btn-secondary";
+      retry.textContent = "Retry scan";
+      retry.addEventListener("click", () => {
+        nasaGlobalScanPromise = null;
+        loadNASAGlobalGallery();
+      });
+      grid.replaceChildren(retry);
+    } finally {
+      nasaGlobalScanPromise = null;
+    }
+  })();
+
+  return nasaGlobalScanPromise;
+}
+
+function renderNASAGlobalGallery(assets = NASA_MODELS) {
+  const grid = document.getElementById("nasaGlobalGrid");
+  const fragment = document.createDocumentFragment();
+
+  if (!assets.length) {
+    const empty = document.createElement("div");
+    empty.className = "nasa-status";
+    empty.textContent = "No GLB or GLTF files were found.";
+    grid.replaceChildren(empty);
+    return;
+  }
+
+  assets.forEach((asset) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "nasa-card";
+    card.setAttribute("aria-label", "Load model " + asset.name);
+    card.title = asset.path;
+
+    const preview = document.createElement("div");
+    preview.className = "nasa-card-preview";
+
+    const placeholder = document.createElement("div");
+    placeholder.className = "nasa-card-placeholder";
+    placeholder.textContent = "▧";
+    preview.appendChild(placeholder);
+
+    const info = document.createElement("div");
+    info.className = "nasa-card-info";
+
+    const name = document.createElement("div");
+    name.className = "nasa-card-name";
+    name.textContent = asset.name;
+
+    const type = document.createElement("div");
+    type.className = "nasa-card-type";
+    type.textContent = asset.name.toLowerCase().endsWith(".glb") ? "GLB model" : "GLTF model";
+
+    const path = document.createElement("span");
+    path.className = "nasa-global-path";
+    path.textContent = asset.path.replace(/^3D Models\//i, "");
+
+    info.append(name, type, path);
+    card.append(preview, info);
+    card.addEventListener("click", () => selectNASAAsset(asset));
+    fragment.appendChild(card);
+  });
+
+  grid.replaceChildren(fragment);
+}
+
+/* ================= NASA FOLDER LOADER ================= */
+
+async function loadNASAFolders() {
+  const select = document.getElementById("nasaFolderSelect");
+  if (!select) return;
+
+  activeCatalogSource = "nasa";
+
+  const requestId = ++nasaRequestId;
+
+  select.disabled = true;
+  select.innerHTML = '<option value="">Loading folders…</option>';
+
+  clearNASAAssets();
+  setNASAStatus("Connecting to the NASA public repository…");
+
+  try {
+    const response = await fetch(NASA_API_URL, {
+      headers: { Accept: "application/vnd.github+json" }
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        response.status === 403 || response.status === 429
+          ? "GitHub API rate limit reached. Try again later."
+          : "GitHub repository request failed (" + response.status + ")."
+      );
+    }
+
+    const entries = await response.json();
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
+    const folders = entries
+      .filter((entry) => entry.type === "dir")
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    if (!folders.length) {
+      throw new Error("No folders were found in the NASA 3D Models directory.");
+    }
+
+    select.replaceChildren();
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select a folder…";
+    select.appendChild(placeholder);
+
+    folders.forEach((folder) => {
+      const option = document.createElement("option");
+      option.value = folder.path;
+      option.textContent = folder.name;
+      select.appendChild(option);
+    });
+
+    select.disabled = false;
+    nasaFoldersLoaded = true;
+
+    select.onchange = () => {
+      if (activeCatalogSource !== "nasa") return;
+
+      if (select.value) {
+        loadNASAAssets(select.value);
+      } else {
+        clearNASAAssets();
+        setNASAStatus("Choose a folder to browse its model files.");
+      }
+    };
+
+    setNASAStatus("Choose a folder to browse its model files.");
+  } catch (error) {
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
+    console.error("NASA folder listing failed:", error);
+    select.innerHTML = '<option value="">Could not load folders</option>';
+    select.disabled = true;
+    setNASAStatus(error.message + " You can still paste a direct model URL above.", true);
+  }
+}
+
+function clearNASAAssets() {
+  document.getElementById("nasaAssetSlot")?.replaceChildren();
+  document.getElementById("nasaAssetGrid")?.replaceChildren();
+}
+
+function isNASAImage(entry) {
+  return entry.type === "file" && /\.(png|jpe?g|webp|gif)$/i.test(entry.name);
+}
+
+function getNASAImageURL(entry) {
+  return entry.download_url || (
+    NASA_BASE_URL +
+    entry.path.replace(/^3D Models\//, "").split("/").map(encodeURIComponent).join("/")
+  );
+}
+
+function getNASAAssetURL(asset) {
+  return asset.download_url || (
+    NASA_BASE_URL +
+    asset.path.replace(/^3D Models\//, "").split("/").map(encodeURIComponent).join("/")
+  );
+}
+
+function getNASAImagePreviews(asset, images) {
+  const modelBase = asset.name.replace(/\.(glb|gltf)$/i, "").toLowerCase();
+
+  const exactMatches = images.filter((image) => {
+    const imageBase = image.name.replace(/\.(png|jpe?g|webp|gif)$/i, "").toLowerCase();
+    return imageBase === modelBase ||
+      imageBase.startsWith(modelBase + "_") ||
+      imageBase.startsWith(modelBase + "-");
+  });
+
+  const candidates = exactMatches.length ? exactMatches : images;
+
+  return candidates.slice().sort((a, b) => a.name.localeCompare(b.name)).map((image) => ({
+    name: image.name,
+    url: getNASAImageURL(image)
+  }));
+}
+
+async function loadNASAAssets(folderPath) {
+  if (activeCatalogSource !== "nasa") return;
+
+  const list = document.getElementById("nasaAssetSlot");
+  const grid = document.getElementById("nasaAssetGrid");
+  const requestId = ++nasaRequestId;
+
+  clearNASAAssets();
+  showNASAStatusInSlot("Loading assets…");
+  setNASAStatus("Reading folder contents…");
+
+  try {
+    let entries = nasaFolderCache.get(folderPath);
+
+    if (!entries) {
+      const apiURL =
+        "https://api.github.com/repos/nasa/NASA-3D-Resources/contents/" +
+        folderPath.split("/").map(encodeURIComponent).join("/") + "?ref=master";
+
+      const response = await fetch(apiURL, {
+        headers: { Accept: "application/vnd.github+json" }
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          response.status === 403 || response.status === 429
+            ? "GitHub API rate limit reached. Try again later."
+            : "Could not read this folder (" + response.status + ")."
+        );
+      }
+
+      entries = await response.json();
+      nasaFolderCache.set(folderPath, entries);
+    }
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
+    const assets = entries
+      .filter((entry) => entry.type === "file" && /\.(glb|gltf)$/i.test(entry.name))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    /* Folder navigation also contributes discovered models to the shared NASA array. */
+    addNASAModels(assets.map((asset) => ({
+      name: asset.name,
+      path: asset.path,
+      download_url: asset.download_url || null
+    })));
+
+    const images = entries.filter(isNASAImage);
+
+    if (!assets.length) {
+      const message = document.createElement("div");
+      message.className = "nasa-status";
+      message.textContent = "No .glb or .gltf files found directly in this folder.";
+      list.replaceChildren(message);
+      grid.replaceChildren();
+      setNASAStatus("This folder may contain nested folders or supporting files instead of a model.");
+      return;
+    }
+
+    assets.forEach((asset) => {
+      const previews = getNASAImagePreviews(asset, images);
+      list.appendChild(createNASAAssetListItem(asset));
+      grid.appendChild(createNASAAssetCard(asset, previews));
+    });
+
+    setNASAAssetView(nasaAssetView);
+    setNASAStatus(
+      assets.length + " model file" +
+      (assets.length === 1 ? "" : "s") +
+      " found. Select one to load it."
+    );
+  } catch (error) {
+    if (requestId !== nasaRequestId || activeCatalogSource !== "nasa") return;
+
+    console.error("NASA asset listing failed:", error);
+    clearNASAAssets();
+    showNASAStatusInSlot("Could not retrieve assets for this folder.");
+    showNASAStatusInGrid("Could not retrieve assets for this folder.");
+    setNASAStatus(error.message, true);
+  }
+}
+
+function createNASAAssetListItem(asset) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "nasa-asset";
+
+  const icon = document.createElement("span");
+  icon.className = "nasa-asset-icon";
+  icon.textContent = "▧";
+
+  const name = document.createElement("span");
+  name.className = "nasa-asset-name";
+
+  const filename = document.createElement("span");
+  filename.textContent = asset.name;
+
+  const type = document.createElement("span");
+  type.className = "nasa-asset-type";
+  type.textContent = asset.name.toLowerCase().endsWith(".glb") ? "GLB model" : "GLTF model";
+
+  name.append(filename, type);
+
+  const arrow = document.createElement("span");
+  arrow.textContent = "↗";
+
+  button.append(icon, name, arrow);
+  button.addEventListener("click", () => selectNASAAsset(asset));
+  return button;
+}
+
+function createNASAAssetCard(asset, previews = []) {
+  const card = document.createElement("div");
+  card.className = "nasa-card";
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
+  card.setAttribute("aria-label", "Load model " + asset.name);
+
+  const preview = document.createElement("div");
+  preview.className = "nasa-card-preview";
+
+  const placeholder = document.createElement("div");
+  placeholder.className = "nasa-card-placeholder";
+  placeholder.textContent = "▧";
+  preview.appendChild(placeholder);
+
+  const imageList = previews.length ? previews : [];
+  let imageIndex = 0;
+  let currentImage = null;
+
+  const counter = document.createElement("span");
+  counter.className = "nasa-carousel-count";
+
+  function showPreview(index) {
+    if (!imageList.length) {
+      if (currentImage) currentImage.remove();
+      currentImage = null;
+      placeholder.hidden = false;
+      counter.hidden = true;
+      return;
+    }
+
+    imageIndex = (index + imageList.length) % imageList.length;
+    if (currentImage) currentImage.remove();
+
+    const img = document.createElement("img");
+    img.alt = imageList[imageIndex].name;
+    img.loading = "lazy";
+    img.src = imageList[imageIndex].url;
+
+    img.addEventListener("load", () => {
+      if (currentImage === img) placeholder.hidden = true;
+    });
+
+    img.addEventListener("error", () => {
+      if (currentImage === img) {
+        img.remove();
+        currentImage = null;
+        placeholder.hidden = false;
+      }
+    });
+
+    currentImage = img;
+    preview.appendChild(img);
+    placeholder.hidden = false;
+    counter.textContent = (imageIndex + 1) + " / " + imageList.length;
+    counter.hidden = imageList.length < 2;
+  }
+
+  if (imageList.length > 1) {
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "nasa-carousel-control nasa-carousel-prev";
+    prev.textContent = "‹";
+    prev.setAttribute("aria-label", "Previous preview");
+
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "nasa-carousel-control nasa-carousel-next";
+    next.textContent = "›";
+    next.setAttribute("aria-label", "Next preview");
+
+    prev.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showPreview(imageIndex - 1);
+    });
+
+    next.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showPreview(imageIndex + 1);
+    });
+
+    preview.append(prev, next);
+  }
+
+  preview.appendChild(counter);
+
+  const info = document.createElement("div");
+  info.className = "nasa-card-info";
+
+  const name = document.createElement("div");
+  name.className = "nasa-card-name";
+  name.textContent = asset.name;
+
+  const type = document.createElement("div");
+  type.className = "nasa-card-type";
+  type.textContent = asset.name.toLowerCase().endsWith(".glb") ? "GLB model" : "GLTF model";
+
+  info.append(name, type);
+  card.append(preview, info);
+
+  card.addEventListener("click", () => selectNASAAsset(asset));
+  card.addEventListener("keydown", (event) => {
+    if (event.target !== card) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      selectNASAAsset(asset);
+    }
+  });
+
+  showPreview(0);
+  return card;
+}
+
+/* ================= ASSET SELECTION ================= */
+
+/* Shared by NASA and Rostock; preserve the catalog source in the model metadata. */
+function selectNASAAsset(asset) {
+  const url = getNASAAssetURL(asset);
+
+  document.getElementById("urlInput").value = url;
+  setNASAStatus("Loading " + asset.name + "…");
+
+  loadModel(url, {
+    name: asset.name.replace(/\.(glb|gltf)$/i, ""),
+    source: asset.source || "NASA"
+  });
+}
+
+function showNASAStatusInSlot(message) {
+  const slot = document.getElementById("nasaAssetSlot");
+  if (!slot) return;
+
+  const status = document.createElement("div");
+  status.className = "nasa-status";
+  status.textContent = message;
+  slot.replaceChildren(status);
+}
+
+function showNASAStatusInGrid(message) {
+  const grid = document.getElementById("nasaAssetGrid");
+  if (!grid) return;
+
+  const status = document.createElement("div");
+  status.className = "nasa-status";
+  status.textContent = message;
+  grid.replaceChildren(status);
+}
+
+function setNASAStatus(message, isError = false) {
+  const status = document.getElementById("nasaStatus");
+  if (!status) return;
+
+  status.textContent = message;
+  status.classList.toggle("error", isError);
+}
+
+/* ================= BACKGROUND COLOR ================= */
+
+function applySceneStyle(bg, disableImage = true) {
+  state.bg = bg;
+
+  if (disableImage) {
+    state.backgroundImage = false;
+    const imageToggle = document.getElementById("backgroundImageInput");
+    if (imageToggle) imageToggle.checked = false;
+  }
+
+  backgroundLoadId++;
+  scene.background = new THREE.Color(bg);
+  document.body.style.background = bg;
+}
+
+/* ================= BACKGROUND IMAGE ================= */
+
+function normalizeBackgroundURL(url) {
+  if (!url) return null;
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return null;
+
+    const normalized = parsed.href;
+    if (normalized === DEFAULT_BACKGROUND_IMAGE.url) return null;
+
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+
+function applyBackgroundImage(enabled, customURL = state.backgroundImageUrl) {
+  state.backgroundImage = Boolean(enabled);
+
+  const checkbox = document.getElementById("backgroundImageInput");
+  if (checkbox) checkbox.checked = state.backgroundImage;
+
+  const input = document.getElementById("backgroundImageUrlInput");
+  if (input && customURL) input.value = customURL;
+
+  if (!state.backgroundImage) {
+    backgroundLoadId++;
+    scene.background = new THREE.Color(state.bg);
+    document.body.style.background = state.bg;
+    return;
+  }
+
+  const url = normalizeBackgroundURL(customURL) || DEFAULT_BACKGROUND_IMAGE.url;
+  state.backgroundImageUrl = normalizeBackgroundURL(customURL);
+  const requestId = ++backgroundLoadId;
+
+  backgroundTextureLoader.load(
+    url,
+    (texture) => {
+      if (requestId !== backgroundLoadId) {
+        texture.dispose();
+        return;
+      }
+
+      texture.encoding = THREE.sRGBEncoding;
+      scene.background = texture;
+      document.body.style.background = "#000";
+    },
+    undefined,
+    (error) => {
+      if (requestId !== backgroundLoadId) return;
+
+      console.error("Could not load background image:", url, error);
+      scene.background = new THREE.Color(state.bg);
+      document.body.style.background = state.bg;
+    }
+  );
+}
+
+function applyCustomBackgroundImage() {
+  const input = document.getElementById("backgroundImageUrlInput");
+  const rawURL = input.value.trim();
+
+  if (!rawURL) {
+    state.backgroundImageUrl = null;
+    applyBackgroundImage(true, null);
+    return;
+  }
+
+  let parsedURL;
+
+  try {
+    parsedURL = new URL(rawURL);
+  } catch {
+    alert("Enter a valid HTTPS image URL.");
+    input.focus();
+    return;
+  }
+
+  if (parsedURL.protocol !== "https:") {
+    alert("The background image URL must use HTTPS.");
+    input.focus();
+    return;
+  }
+
+  const customURL = normalizeBackgroundURL(parsedURL.href);
+  state.backgroundImageUrl = customURL;
+  applyBackgroundImage(true, customURL);
+}
+
+/* ================= LIGHTING & SHADOWS ================= */
+
+function readLightingControls() {
+  return {
+    shadows: document.getElementById("shadowsInput")?.checked ?? state.lighting.shadows,
+    intensity: document.getElementById("lightIntensityInput")?.value ?? state.lighting.intensity,
+    x: document.getElementById("lightXInput")?.value ?? state.lighting.x,
+    y: document.getElementById("lightYInput")?.value ?? state.lighting.y,
+    z: document.getElementById("lightZInput")?.value ?? state.lighting.z,
+    softness: document.getElementById("shadowSoftnessInput")?.value ?? state.lighting.softness
+  };
+}
+
+function applyLighting(values = state.lighting) {
+  state.lighting = {
+    shadows: Boolean(values.shadows ?? true),
+    intensity: THREE.MathUtils.clamp(Number(values.intensity ?? 0.8), 0, 3),
+    x: THREE.MathUtils.clamp(Number(values.x ?? 5), -10, 10),
+    y: THREE.MathUtils.clamp(Number(values.y ?? 10), -10, 10),
+    z: THREE.MathUtils.clamp(Number(values.z ?? 5), -10, 10),
+    softness: THREE.MathUtils.clamp(Number(values.softness ?? 3), 0, 8)
+  };
+
+  const light = state.lighting;
+
+  [
+    ["shadowsInput", light.shadows],
+    ["lightIntensityInput", light.intensity],
+    ["lightXInput", light.x],
+    ["lightYInput", light.y],
+    ["lightZInput", light.z],
+    ["shadowSoftnessInput", light.softness]
+  ].forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.value = value;
+  });
+
+  [
+    ["lightIntensityValue", light.intensity],
+    ["lightXValue", light.x],
+    ["lightYValue", light.y],
+    ["lightZValue", light.z],
+    ["shadowSoftnessValue", light.softness]
+  ].forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  });
+
+  if (!keyLight || !renderer) return;
+
+  keyLight.intensity = light.intensity;
+  keyLight.position.set(light.x * modelRadius, light.y * modelRadius, light.z * modelRadius);
+  keyLight.target.position.set(0, 0, 0);
+  keyLight.castShadow = light.shadows;
+  renderer.shadowMap.enabled = light.shadows;
+  keyLight.shadow.radius = light.softness;
+
+  const shadowExtent = Math.max(modelRadius * 2, 0.001);
+  const shadowCamera = keyLight.shadow.camera;
+
+  shadowCamera.left = -shadowExtent;
+  shadowCamera.right = shadowExtent;
+  shadowCamera.top = shadowExtent;
+  shadowCamera.bottom = -shadowExtent;
+  shadowCamera.near = 0.1;
+  shadowCamera.far = Math.max(modelRadius * 30, 1);
+  shadowCamera.updateProjectionMatrix();
+
+  keyLight.shadow.needsUpdate = true;
+
+  if (model) {
+    model.traverse((object) => {
+      if (object.isMesh) {
+        object.castShadow = light.shadows;
+        object.receiveShadow = light.shadows;
+      }
+    });
+  }
+}
+
+/* ================= ROTATION ================= */
+
+function applyRotation(value) {
+  state.autoRotate = value;
+
+  if (controls) controls.autoRotate = value;
+
+  const rotateInput = document.getElementById("rotateInput");
+  if (rotateInput) rotateInput.checked = value;
+}
+
+/* ================= EXPORT ================= */
+
+function exportScene() {
+  const url = document.getElementById("urlInput").value.trim();
+
+  if (!url) {
+    setNASAStatus("Load a model before publishing the scene.", true);
+    return;
+  }
+
+  const payload = {
+    modelUrl: url,
+    modelInfo: { ...(modelInfo || {}) },
+    bg: state.bg,
+    autoRotate: state.autoRotate,
+    backgroundImage: state.backgroundImage,
+    lighting: state.lighting
+  };
+
+  if (state.backgroundImage && state.backgroundImageUrl) {
+    payload.backgroundImageUrl = state.backgroundImageUrl;
+  }
+
+  const encoded = btoa(JSON.stringify(payload));
+  const link = `${location.origin}${location.pathname}?scene=${encoded}`;
+
+  lastGeneratedURL = link;
+
+  document.getElementById("linkBox").textContent = link;
+
+  const actions = document.getElementById("exportActions");
+  if (actions) actions.style.display = "flex";
+}
+
+/* ================= ACTIONS ================= */
+
+function openScene() {
+  if (!lastGeneratedURL) return;
+  window.open(lastGeneratedURL, "_blank", "noopener,noreferrer");
+}
+
+function copyURL() {
+  if (!lastGeneratedURL) return;
+
+  navigator.clipboard.writeText(lastGeneratedURL)
+    .then(() => alert("URL copied"))
+    .catch(() => {
+      const temp = document.createElement("textarea");
+      temp.value = lastGeneratedURL;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      temp.remove();
+    });
+}
+
+function generateQR() {
+  if (!lastGeneratedURL) return;
+
+  const win = window.open("", "_blank");
+  if (!win) return;
+
+  const img = win.document.createElement("img");
+  img.alt = "Scene QR code";
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" +
+    encodeURIComponent(lastGeneratedURL);
+
+  win.document.body.style.cssText =
+    "display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#fff;";
+
+  win.document.body.appendChild(img);
+}
+
+/* ================= URL LOAD ================= */
+
+function checkURL() {
+  const sceneParam = new URLSearchParams(location.search).get("scene");
+  if (!sceneParam) return;
+
+  isLoadingFromURL = true;
+
+  try {
+    const data = JSON.parse(atob(sceneParam));
+
+    document.getElementById("ui").style.display = "none";
+
+    applySceneStyle(data.bg || state.bg, false);
+    applyRotation(data.autoRotate ?? false);
+
+    const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
+    const imageEnabled = data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
+
+    state.backgroundImageUrl = customURL;
+
+    const imageURLInput = document.getElementById("backgroundImageUrlInput");
+    if (imageURLInput) imageURLInput.value = customURL || "";
+
+    applyBackgroundImage(imageEnabled, customURL);
+    applyLighting(data.lighting || state.lighting);
+
+    const savedInfo = data.modelInfo || {};
+
+    modelInfo = {
+      name: savedInfo.name || "",
+      source: savedInfo.source || "",
+      description: savedInfo.description || "",
+      latitude: savedInfo.latitude ?? null,
+      longitude: savedInfo.longitude ?? null,
+      _hostname: savedInfo._hostname || ""
+    };
+
+    state.modelInfo = { ...modelInfo };
+
+    createPublicModelInfoPanel();
+
+    const panel = document.getElementById("publicModelInfo");
+    if (panel) panel.hidden = false;
+
+    renderModelInfo();
+
+    if (data.modelUrl) {
+      document.getElementById("urlInput").value = data.modelUrl;
+      loadModel(data.modelUrl, modelInfo);
+    }
+
+    lastGeneratedURL = window.location.href;
+  } catch (error) {
+    console.error("Could not decode scene URL:", error);
+  }
+
+  requestAnimationFrame(() => {
+    isLoadingFromURL = false;
+  });
+}
+
+/* ================= 3D TWINS WATERMARK ================= */
+
+function createWatermark() {
+  if (document.getElementById("watermark")) return;
+
+  const watermark = document.createElement("a");
+  watermark.id = "watermark";
+  watermark.href = "https://3dtwins.es";
+  watermark.target = "_blank";
+  watermark.rel = "noopener";
+
+  const logo = document.createElement("img");
+  logo.src = "https://viewer.3dtwins.tech/puntero_3dtwinsStar.png";
+  logo.className = "watermarkLogo";
+  logo.alt = "";
+
+  watermark.appendChild(logo);
+  watermark.appendChild(document.createTextNode(" Made with 3D Twins Lite"));
+
+  document.body.appendChild(watermark);
+}
+
+createWatermark();
+
+/* ================= LOOP ================= */
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (isLoadingFromURL) return;
+
+  if (controls) controls.update();
+
+  updateCameraClipping();
+  renderer.render(scene, camera);
+}
+
+/* ================= RESIZE ================= */
+
+function onResize() {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  updateCameraClipping();
+}
+
+/* ================= MODEL METADATA ================= */
+
+var modelInfo;
+
+function getInitialModelInfo(url, suppliedInfo = {}) {
+  let filename = "3D model";
+  let hostname = "";
+
+  try {
+    const parsed = new URL(url, location.href);
+
+    filename = decodeURIComponent(
+      parsed.pathname.split("/").filter(Boolean).pop() || filename
+    ).replace(/\.(glb|gltf)$/i, "");
+
+    hostname = parsed.hostname.replace(/^www\./i, "");
+  } catch {}
+
+  return {
+    name: suppliedInfo.name || filename,
+    source: suppliedInfo.source || "",
+    description: suppliedInfo.description || "",
+    latitude: suppliedInfo.latitude ?? null,
+    longitude: suppliedInfo.longitude ?? null,
+    _hostname: hostname
+  };
+}
+
+function getGLTFModelInfo(gltf, initialInfo) {
+  const asset = gltf.parser?.json?.asset || {};
+  const assetExtras = asset.extras || {};
+  const sceneExtras = gltf.scene?.userData || {};
+
+  const firstText = (...values) => {
+    const found = values.find(
+      value => typeof value === "string" && value.trim()
+    );
+
+    return found ? found.trim() : "";
+  };
+
+  const firstNumber = (...values) => {
+    for (const value of values) {
+      if (value === null || value === undefined || value === "") continue;
+
+      const number = Number(value);
+      if (Number.isFinite(number)) return number;
+    }
+
+    return null;
+  };
+
+  const geo = assetExtras.geo || sceneExtras.geo || {};
+
+  const latitude = firstNumber(
+    assetExtras.latitude,
+    assetExtras.lat,
+    geo.latitude,
+    geo.lat,
+    sceneExtras.latitude,
+    sceneExtras.lat,
+    initialInfo.latitude
+  );
+
+  const longitude = firstNumber(
+    assetExtras.longitude,
+    assetExtras.lon,
+    assetExtras.lng,
+    geo.longitude,
+    geo.lon,
+    geo.lng,
+    sceneExtras.longitude,
+    sceneExtras.lon,
+    sceneExtras.lng,
+    initialInfo.longitude
+  );
+
+  return {
+    name: firstText(
+      assetExtras.name,
+      sceneExtras.name,
+      initialInfo.name
+    ),
+    source: firstText(
+      assetExtras.author,
+      assetExtras.creator,
+      assetExtras.owner,
+      assetExtras.provider,
+      assetExtras.source,
+      sceneExtras.author,
+      sceneExtras.creator,
+      sceneExtras.owner,
+      initialInfo.source
+    ),
+    description: firstText(
+      assetExtras.description,
+      sceneExtras.description,
+      initialInfo.description
+    ),
+    latitude:
+      latitude !== null && latitude >= -90 && latitude <= 90
+        ? latitude
+        : null,
+    longitude:
+      longitude !== null && longitude >= -180 && longitude <= 180
+        ? longitude
+        : null,
+    _hostname: initialInfo._hostname || ""
+  };
+}
+
+function formatModelLocation(info) {
+  if (info.latitude === null || info.longitude === null) {
+    return "No geographic position associated";
+  }
+
+  return `${info.latitude}, ${info.longitude}`;
+}
+
+function renderModelInfo() {
+  const info = modelInfo || {};
+
+  const editor = document.getElementById("modelInfoEditor");
+  if (editor) editor.hidden = !info.name;
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+
+  const setHidden = (id, hidden) => {
+    const element = document.getElementById(id);
+    if (element) element.hidden = hidden;
+  };
+
+  setText("editorModelName", info.name || "3D model");
+  setText("editorModelSource", info.source || "Not identified");
+  setText("editorModelLocation", formatModelLocation(info));
+  setText("editorModelDescription", info.description || "");
+  setHidden("editorDescriptionField", !info.description);
+
+  setText("publicModelName", info.name || "3D model");
+  setText("publicModelSource", info.source || "Not identified");
+  setText("publicModelLocation", formatModelLocation(info));
+  setText("publicModelDescription", info.description || "");
+  setHidden("publicDescriptionField", !info.description);
+}
+
+function assignModelLocation() {
+  const latitudeText = prompt("Latitude (-90 to 90):");
+  if (latitudeText === null) return;
+
+  const longitudeText = prompt("Longitude (-180 to 180):");
+  if (longitudeText === null) return;
+
+  const latitude = Number(latitudeText.trim());
+  const longitude = Number(longitudeText.trim());
+
+  if (
+    !latitudeText.trim() ||
+    !longitudeText.trim() ||
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    alert("Enter a valid latitude and longitude.");
+    return;
+  }
+
+  modelInfo.latitude = latitude;
+  modelInfo.longitude = longitude;
+  state.modelInfo = { ...modelInfo };
+
+  renderModelInfo();
+}
+
+function createPublicModelInfoPanel() {
+  if (document.getElementById("publicInfoToggle")) return;
+
+  // BOTÓN INDEPENDIENTE DEL PANEL
+  const toggle = document.createElement("button");
+  toggle.className = "publicInfoToggle";
+  toggle.id = "publicInfoToggle";
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-controls", "publicInfoContent");
+  toggle.setAttribute("aria-label", "Model information");
+
+  const toggleIcon = document.createElement("span");
+  toggleIcon.className = "material-symbols-outlined";
+  toggleIcon.setAttribute("aria-hidden", "true");
+  toggleIcon.textContent = "tune";
+
+  toggle.append(toggleIcon);
+
+  // PANEL DE INFORMACIÓN
+  const panel = document.createElement("section");
+  panel.id = "publicModelInfo";
+
+  const content = document.createElement("div");
+  content.className = "publicInfoContent";
+  content.id = "publicInfoContent";
+  content.hidden = true;
+
+  const name = document.createElement("h2");
+  name.className = "publicModelName";
+  name.id = "publicModelName";
+
+  function addField(label, id, fieldId = null) {
+    const field = document.createElement("div");
+    field.className = "modelInfoField";
+
+    if (fieldId) field.id = fieldId;
+
+    const caption = document.createElement("span");
+    caption.className = "modelInfoLabel";
+    caption.textContent = label;
+
+    const value = document.createElement("div");
+    value.id = id;
+
+    field.append(caption, value);
+    return field;
+  }
+
+  content.append(
+    name,
+    addField("SOURCE", "publicModelSource"),
+    addField("GEOLOCATION", "publicModelLocation"),
+    addField("DESCRIPTION", "publicModelDescription", "publicDescriptionField")
+  );
+
+  panel.appendChild(content);
+
+  // BOTÓN Y PANEL COMO ELEMENTOS SEPARADOS
+  document.body.append(toggle, panel);
+
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
+    const nextExpanded = !expanded;
+
+    toggle.setAttribute("aria-expanded", String(nextExpanded));
+    content.hidden = !nextExpanded;
+    panel.hidden = !nextExpanded;
+  });
+}
+
+document
+  .getElementById("assignModelLocation")
+  ?.addEventListener("click", assignModelLocation);
+
+/* ================= MODEL LOADER WITH METADATA ================= */
+
+function loadModel(url, suppliedInfo = null) {
+  if (!url) {
+    setNASAStatus("Select a model or enter a valid model URL.", true);
+    return;
+  }
+
+  const initialInfo = getInitialModelInfo(url, suppliedInfo || {});
+  const loader = new THREE.GLTFLoader();
+  const dracoLoader = new THREE.DRACOLoader();
+
+  dracoLoader.setDecoderPath(
+    "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
+  );
+
+  loader.setDRACOLoader(dracoLoader);
+
+  loader.load(
+    url,
+    (gltf) => {
+      if (model) scene.remove(model);
+
+      model = gltf.scene;
+      scene.add(model);
+
+      frameModel(model);
+      applyLighting();
+
+      modelInfo = getGLTFModelInfo(gltf, initialInfo);
+      state.modelInfo = { ...modelInfo };
+      state.modelUrl = url;
+
+      renderModelInfo();
+      setCompactUI();
+      goStep(2);
+      setNASAStatus("");
+
+      dracoLoader.dispose();
+    },
+    undefined,
+    (error) => {
+      console.error("Error loading model:", url, error);
+
+      if (state.modelUrl === url) state.modelUrl = null;
+
+      setNASAStatus(
+        "Could not load this model. Check the file URL and its external resources.",
+        true
+      );
+
+      dracoLoader.dispose();
+    }
+  );
+}
+
+/* ================= PUBLIC SCENE EXPORT ================= */
+
+function exportScene() {
+  const url = document.getElementById("urlInput").value.trim();
+
+  if (!url) {
+    setNASAStatus("Load a model before publishing the scene.", true);
+    return;
+  }
+
+  const payload = {
+    modelUrl: url,
+    modelInfo: { ...(modelInfo || {}) },
+    bg: state.bg,
+    autoRotate: state.autoRotate,
+    backgroundImage: state.backgroundImage,
+    lighting: state.lighting
+  };
+
+  if (state.backgroundImage && state.backgroundImageUrl) {
+    payload.backgroundImageUrl = state.backgroundImageUrl;
+  }
+
+  const encoded = btoa(JSON.stringify(payload));
+  const link = `${location.origin}${location.pathname}?scene=${encoded}`;
+
+  lastGeneratedURL = link;
+
+  document.getElementById("linkBox").textContent = link;
+
+  const actions = document.getElementById("exportActions");
+  if (actions) actions.style.display = "flex";
+}
+
+/* ================= PUBLIC SCENE LOAD ================= */
+
+function checkURL() {
+  const sceneParam = new URLSearchParams(location.search).get("scene");
+  if (!sceneParam) return;
+
+  isLoadingFromURL = true;
+
+  try {
+    const data = JSON.parse(atob(sceneParam));
+
+    document.getElementById("ui").style.display = "none";
+
+    applySceneStyle(data.bg || state.bg, false);
+    applyRotation(data.autoRotate ?? false);
+
+    const customURL = normalizeBackgroundURL(data.backgroundImageUrl);
+    const imageEnabled =
+      data.backgroundImage ?? DEFAULT_BACKGROUND_IMAGE.enabled;
+
+    state.backgroundImageUrl = customURL;
+
+    const imageURLInput = document.getElementById("backgroundImageUrlInput");
+    if (imageURLInput) imageURLInput.value = customURL || "";
+
+    applyBackgroundImage(imageEnabled, customURL);
+    applyLighting(data.lighting || state.lighting);
+
+    const savedInfo = data.modelInfo || {};
+
+    modelInfo = {
+      name: savedInfo.name || "",
+      source: savedInfo.source || "",
+      description: savedInfo.description || "",
+      latitude: savedInfo.latitude ?? null,
+      longitude: savedInfo.longitude ?? null,
+      _hostname: savedInfo._hostname || ""
+    };
+
+    state.modelInfo = { ...modelInfo };
+
+    createPublicModelInfoPanel();
+
+    const panel = document.getElementById("publicModelInfo");
+    if (panel) panel.hidden = false;
+
+    renderModelInfo();
+
+    if (data.modelUrl) {
+      document.getElementById("urlInput").value = data.modelUrl;
+      loadModel(data.modelUrl, modelInfo);
+    }
+
+    lastGeneratedURL = window.location.href;
+  } catch (error) {
+    console.error("Could not decode scene URL:", error);
+  }
+
+  requestAnimationFrame(() => {
+    isLoadingFromURL = false;
+  });
+}
+</script>
+</body>
+</html>
