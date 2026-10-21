@@ -4557,14 +4557,12 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
 
 
+
 (() => {
   const banner = document.getElementById("liteTransfer");
   if (!banner || banner.dataset.initialized === "true") return;
-
   banner.dataset.initialized = "true";
 
-  // Sustituye este valor por la URL exacta que utiliza
-  // el iframe #liteSceneIframe del benchmark existente.
   const LITE_TRANSFER_SCENE_URL = "https://3d.staratlas.es/opelite.html?scene=eyJtb2RlbFVybCI6Imh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9uYXNhL05BU0EtM0QtUmVzb3VyY2VzL21hc3Rlci8zRCUyME1vZGVscy9Wb3lhZ2VyJTIwUHJvYmUlMjAoQSkvVm95YWdlciUyMFByb2JlJTIwKEEpLmdsYiIsIm1vZGVsSW5mbyI6eyJuYW1lIjoiVm95YWdlciBQcm9iZSAoQSkiLCJzb3VyY2UiOiJOQVNBIiwiZGVzY3JpcHRpb24iOiIiLCJsYXRpdHVkZSI6bnVsbCwibG9uZ2l0dWRlIjpudWxsLCJfaG9zdG5hbWUiOiJyYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tIn0sImJnIjoiI2U2ZTZlNiIsImF1dG9Sb3RhdGUiOmZhbHNlLCJiYWNrZ3JvdW5kSW1hZ2UiOmZhbHNlLCJsaWdodGluZyI6eyJzaGFkb3dzIjp0cnVlLCJpbnRlbnNpdHkiOjAuMywieCI6MS41LCJ5Ijo2LCJ6Ijo1LCJzb2Z0bmVzcyI6M319";
 
   const stage = document.getElementById("transferStage");
@@ -4578,7 +4576,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   const engineCaption = document.getElementById("transferEngineCaption");
   const engineProgress = document.getElementById("transferEngineProgress");
 
-  const viewer = document.querySelector(".transfer-viewer");
+  const viewer = banner.querySelector(".transfer-viewer");
   const viewerWindow = document.getElementById("transferViewerWindow");
   const viewerEmpty = document.getElementById("transferViewerEmpty");
   const viewerIframe = document.getElementById("transferViewerIframe");
@@ -4591,25 +4589,57 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   const bottomIndicator = document.getElementById("transferBottomIndicator");
   const replayButton = document.getElementById("transferReplay");
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (
+    !stage || !sourceFolder || !movingFolder || !particles ||
+    !engine || !viewer || !viewerWindow || !viewerEmpty ||
+    !viewerIframe || !viewerLoading || !viewerComplete ||
+    !replayButton
+  ) {
+    console.error("[Lite Space] Faltan elementos HTML del banner.");
+    return;
+  }
 
-  let sequenceTimer = null;
-  let activeAnimations = [];
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
+
   let running = false;
+  let runId = 0;
+  let sequenceTimer = null;
+  let loadTimer = null;
+  let activeAnimations = [];
   let observer = null;
 
-  const wait = (ms) => new Promise(resolve => {
-    sequenceTimer = window.setTimeout(resolve, ms);
-  });
+  function wait(ms, currentRun) {
+    return new Promise(resolve => {
+      sequenceTimer = window.setTimeout(() => {
+        sequenceTimer = null;
+        resolve(currentRun === runId);
+      }, ms);
+    });
+  }
 
-  function clearSequence() {
+  function clearTimers() {
     if (sequenceTimer !== null) {
       window.clearTimeout(sequenceTimer);
       sequenceTimer = null;
     }
 
-    activeAnimations.forEach(animation => animation.cancel());
+    if (loadTimer !== null) {
+      window.clearTimeout(loadTimer);
+      loadTimer = null;
+    }
+  }
+
+  function cancelAnimations() {
+    const animations = [...activeAnimations];
     activeAnimations = [];
+
+    animations.forEach(animation => {
+      animation.onfinish = null;
+      animation.oncancel = null;
+      animation.cancel();
+    });
   }
 
   function getCenter(element) {
@@ -4622,13 +4652,20 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     };
   }
 
-  function placeMovingFolder(x, y) {
-    movingFolder.style.left = `${x}px`;
-    movingFolder.style.top = `${y}px`;
+  function placeMovingFolder(point) {
+    movingFolder.style.left = `${point.x}px`;
+    movingFolder.style.top = `${point.y}px`;
   }
 
-  function moveFolder(from, to, duration) {
+  function moveFolder(from, to, duration, currentRun) {
     return new Promise(resolve => {
+      if (currentRun !== runId) {
+        resolve(false);
+        return;
+      }
+
+      placeMovingFolder(from);
+
       const animation = movingFolder.animate(
         [
           {
@@ -4645,21 +4682,35 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
           }
         ],
         {
-          duration,
+          duration: reducedMotion.matches ? 1 : duration,
           easing: "cubic-bezier(.22,.75,.25,1)",
           fill: "forwards"
         }
       );
 
       activeAnimations.push(animation);
-      animation.onfinish = () => {
-        placeMovingFolder(to.x, to.y);
-        animation.cancel();
-        activeAnimations = activeAnimations.filter(item => item !== animation);
-        resolve();
+
+      const cleanup = () => {
+        activeAnimations = activeAnimations.filter(
+          item => item !== animation
+        );
       };
 
-      animation.oncancel = resolve;
+      animation.onfinish = () => {
+        cleanup();
+
+        if (currentRun === runId) {
+          placeMovingFolder(to);
+          animation.cancel();
+        }
+
+        resolve(currentRun === runId);
+      };
+
+      animation.oncancel = () => {
+        cleanup();
+        resolve(currentRun === runId);
+      };
     });
   }
 
@@ -4675,165 +4726,195 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   }
 
   function resetBanner() {
-    clearSequence();
-
+    // Invalida las secuencias anteriores.
+    runId++;
     running = false;
+
+    clearTimers();
+    cancelAnimations();
+
+    viewerIframe.onload = null;
+    viewerIframe.onerror = null;
+    viewerIframe.removeAttribute("src");
+
     movingFolder.className = "transfer-moving-folder";
+    movingFolder.style.display = "";
+    movingFolder.style.opacity = "";
+    movingFolder.innerHTML =
+      '<span class="material-symbols-outlined">folder</span>' +
+      '<span>satellite-collection</span>';
+
     particles.classList.remove("is-active");
 
     engine.classList.remove("is-processing", "is-complete");
     engineStatus.textContent = "EN ESPERA";
     engineMessage.textContent = "Esperando recursos";
-    engineCaption.textContent = "De los archivos a una escena interactiva.";
+    engineCaption.textContent =
+      "De los archivos a una escena interactiva.";
     engineProgress.style.width = "0%";
 
     viewer.classList.remove("is-loaded");
     viewerStatus.textContent = "VACÍO";
-    viewerCaption.textContent = "Un espacio interactivo listo para explorar.";
+    viewerCaption.textContent =
+      "Un espacio interactivo listo para explorar.";
 
     viewerEmpty.hidden = false;
     viewerLoading.hidden = true;
     viewerComplete.hidden = true;
     viewerIframe.hidden = true;
 
-    // Al reiniciar, el visor vuelve a estar vacío.
-    // Se conserva la URL configurada para la siguiente reproducción.
-    viewerIframe.removeAttribute("src");
-
-    bottomMessage.textContent = "RECURSOS EXISTENTES · SIN MIGRACIONES";
+    bottomMessage.textContent =
+      "RECURSOS EXISTENTES · SIN MIGRACIONES";
     bottomIndicator.classList.remove("is-complete");
+  }
+
+  function loadRealViewer(currentRun) {
+    return new Promise(resolve => {
+      let finished = false;
+
+      const finish = (loaded) => {
+        if (finished || currentRun !== runId) return;
+        finished = true;
+
+        if (loadTimer !== null) {
+          window.clearTimeout(loadTimer);
+          loadTimer = null;
+        }
+
+        viewerLoading.hidden = true;
+        viewerIframe.hidden = false;
+
+        if (loaded) {
+          viewerEmpty.hidden = true;
+          viewerComplete.hidden = false;
+
+          viewer.classList.add("is-loaded");
+          viewerStatus.textContent = "ESCENA CARGADA";
+          viewerCaption.textContent =
+            "Visor disponible. La inicialización 3D puede continuar.";
+          bottomMessage.textContent =
+            "VISOR CARGADO · ESCENA DISPONIBLE";
+          bottomIndicator.classList.add("is-complete");
+        } else {
+          // Dejamos el iframe visible para facilitar el diagnóstico.
+          viewerEmpty.hidden = true;
+          viewerComplete.hidden = true;
+
+          viewerStatus.textContent = "COMPROBAR VISOR";
+          viewerCaption.textContent =
+            "El marco está visible, pero no se ha confirmado la carga.";
+          bottomMessage.textContent =
+            "COMPRUEBA LA CARGA DEL VISOR EN EL NAVEGADOR";
+        }
+
+        viewerIframe.onload = null;
+        viewerIframe.onerror = null;
+        running = false;
+        resolve();
+      };
+
+      viewerEmpty.hidden = true;
+      viewerComplete.hidden = true;
+      viewerIframe.hidden = false;
+      viewerLoading.hidden = false;
+
+      viewerStatus.textContent = "CARGANDO";
+      viewerCaption.textContent = "Abriendo el visor 3D…";
+      bottomMessage.textContent = "CARGANDO ESCENA 3D…";
+
+      // Instala los eventos antes de asignar la URL.
+      viewerIframe.onload = () => finish(true);
+      viewerIframe.onerror = () => finish(false);
+
+      // Carga la URL completa, incluidos sus parámetros.
+      viewerIframe.src = LITE_TRANSFER_SCENE_URL;
+
+      // No ocultamos el iframe si no llega onload:
+      // puede seguir visible y permitir inspeccionar el resultado.
+      loadTimer = window.setTimeout(() => {
+        finish(false);
+      }, 15000);
+    });
   }
 
   async function runSequence() {
     if (running) return;
 
-    running = true;
     resetBanner();
     running = true;
+
+    const currentRun = runId;
+
+    const stillCurrent = () => currentRun === runId;
+
+    if (!(await wait(100, currentRun)) || !stillCurrent()) return;
 
     const source = getCenter(sourceFolder);
     const enginePoint = getCenter(engine);
     const viewerPoint = getCenter(viewerWindow);
 
-    if (reducedMotion.matches) {
-      movingFolder.classList.add("is-visible");
-      placeMovingFolder(source.x, source.y);
-      await wait(150);
-      movingFolder.classList.add("is-transforming");
-      await wait(150);
-      engine.classList.add("is-processing");
-      engineStatus.textContent = "PROCESANDO";
-      engineMessage.textContent = "Preparando recursos";
-      engineProgress.style.width = "65%";
-      await wait(200);
-      movingFolder.classList.add("is-transformed");
-      placeMovingFolder(viewerPoint.x, viewerPoint.y);
-    } else {
-      movingFolder.classList.add("is-visible");
-      placeMovingFolder(source.x, source.y);
-      await wait(350);
+    movingFolder.classList.add("is-visible");
+    placeMovingFolder(source);
 
-      // 1. La carpeta sale del repositorio.
-      await moveFolder(source, enginePoint, 1050);
+    if (!(await wait(300, currentRun)) || !stillCurrent()) return;
 
-      // 2. Los recursos se transforman en Lite Space.
-      movingFolder.classList.add("is-transforming");
-      engine.classList.add("is-processing");
-      engineStatus.textContent = "PROCESANDO";
-      engineMessage.textContent = "Organizando recursos";
-      engineCaption.textContent = "Preparando la escena interactiva.";
-      engineProgress.style.width = "38%";
+    // 1. La carpeta sale del repositorio.
+    if (
+      !(await moveFolder(source, enginePoint, 1050, currentRun)) ||
+      !stillCurrent()
+    ) return;
 
-      burstAt(engine);
-      await wait(450);
+    // 2. Lite Space transforma los recursos.
+    movingFolder.classList.add("is-transforming");
+    engine.classList.add("is-processing");
 
-      movingFolder.classList.add("is-transformed");
-      movingFolder.innerHTML =
-        '<span class="material-symbols-outlined">deployed_code</span><span>Escena 3D</span>';
+    engineStatus.textContent = "PROCESANDO";
+    engineMessage.textContent = "Organizando recursos";
+    engineCaption.textContent = "Preparando la escena interactiva.";
+    engineProgress.style.width = "38%";
 
-      engineMessage.textContent = "Preparando el visor";
-      engineProgress.style.width = "75%";
+    burstAt(engine);
 
-      await wait(350);
+    if (!(await wait(450, currentRun)) || !stillCurrent()) return;
 
-      // 3. El resultado viaja al visor.
-      await moveFolder(enginePoint, viewerPoint, 1050);
-    }
+    movingFolder.classList.add("is-transformed");
+    movingFolder.innerHTML =
+      '<span class="material-symbols-outlined">deployed_code</span>' +
+      '<span>Escena 3D</span>';
 
-    // 4. La escena real aparece solo al llegar al visor.
+    engineMessage.textContent = "Preparando el visor";
+    engineProgress.style.width = "75%";
+
+    if (!(await wait(300, currentRun)) || !stillCurrent()) return;
+
+    // 3. El resultado viaja al visor.
+    if (
+      !(await moveFolder(enginePoint, viewerPoint, 1050, currentRun)) ||
+      !stillCurrent()
+    ) return;
+
     movingFolder.style.opacity = "0";
     burstAt(viewerWindow);
 
     engine.classList.remove("is-processing");
     engine.classList.add("is-complete");
+
     engineStatus.textContent = "COMPLETADO";
     engineMessage.textContent = "Recursos preparados";
     engineCaption.textContent = "Recursos listos para visualizar.";
     engineProgress.style.width = "100%";
 
-    viewerEmpty.hidden = true;
-    viewerLoading.hidden = false;
-    viewerStatus.textContent = "CARGANDO";
-    viewerCaption.textContent = "La escena se está cargando en el visor.";
-    bottomMessage.textContent = "TRANSFORMACIÓN COMPLETADA · CARGANDO ESCENA";
-
-    if (LITE_TRANSFER_SCENE_URL.trim()) {
-      viewerIframe.onload = () => {
-        viewerLoading.hidden = true;
-        viewerIframe.hidden = false;
-        viewerComplete.hidden = false;
-        viewer.classList.add("is-loaded");
-        viewerStatus.textContent = "ESCENA LISTA";
-        viewerCaption.textContent = "Explora la escena 3D interactiva.";
-        bottomMessage.textContent = "RECURSOS PREPARADOS · ESCENA INTERACTIVA";
-        bottomIndicator.classList.add("is-complete");
-        running = false;
-      };
-
-      viewerIframe.onerror = () => {
-        viewerLoading.hidden = true;
-        viewerEmpty.hidden = false;
-        viewerStatus.textContent = "NO DISPONIBLE";
-        viewerCaption.textContent = "No se ha podido cargar la escena.";
-        bottomMessage.textContent = "NO SE HA PODIDO CARGAR EL VISOR";
-        running = false;
-      };
-
-      viewerIframe.src = LITE_TRANSFER_SCENE_URL.trim();
-
-      // Evita dejar la secuencia bloqueada si el iframe no termina de cargar.
-      await wait(12000);
-
-      if (running && viewerIframe.hidden) {
-        viewerLoading.hidden = true;
-        viewerEmpty.hidden = false;
-        viewerStatus.textContent = "SIN RESPUESTA";
-        viewerCaption.textContent = "Comprueba la URL y la disponibilidad del visor.";
-        bottomMessage.textContent = "NO SE HA CONFIRMADO LA CARGA DEL VISOR";
-        running = false;
-      }
-    } else {
-      // Sin una URL real no se finge una carga correcta.
-      viewerLoading.hidden = true;
-      viewerEmpty.hidden = false;
-      viewerStatus.textContent = "PENDIENTE";
-      viewerCaption.textContent = "Falta configurar la URL del visor real.";
-      bottomMessage.textContent = "CONFIGURA LA URL DEL VISOR PARA COMPLETAR LA DEMOSTRACIÓN";
-      running = false;
-    }
+    // 4. Se muestra el visor real al terminar la animación.
+    await loadRealViewer(currentRun);
   }
 
   replayButton.addEventListener("click", () => {
-    if (running) {
-      clearSequence();
-      running = false;
-    }
+    resetBanner();
     runSequence();
   });
 
   resetBanner();
 
- 
   if ("IntersectionObserver" in window) {
     observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
@@ -4848,6 +4929,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     runSequence();
   }
 })();
+
 
     
   </script>
