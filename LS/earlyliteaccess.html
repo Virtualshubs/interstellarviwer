@@ -1661,362 +1661,407 @@ h1 {
   </div>
 
   <script>
-    (() => {
-      "use strict";
+(() => {
+  "use strict";
 
-      /* =====================================================
-         ELEMENTOS
-      ===================================================== */
+  /* =====================================================
+     ELEMENTOS
+  ===================================================== */
 
-      const registerForm = document.getElementById("registerForm");
-      const accessForm = document.getElementById("accessForm");
+  const registerForm = document.getElementById("registerForm");
+  const accessForm = document.getElementById("accessForm");
 
-      const registerEmail = document.getElementById("registerEmail");
-      const registerPassword = document.getElementById("registerPassword");
-      const registerPasswordRequirements =
-        document.getElementById("registerPasswordRequirements");
-      const registerButton = document.getElementById("registerButton");
-      const registerMessage = document.getElementById("registerMessage");
+  const registerEmail = document.getElementById("registerEmail");
+  const registerPassword = document.getElementById("registerPassword");
+  const registerPasswordRequirements =
+    document.getElementById("registerPasswordRequirements");
+  const registerButton = document.getElementById("registerButton");
+  const registerMessage = document.getElementById("registerMessage");
 
-      const accessEmail = document.getElementById("accessEmail");
-      const accessPassword = document.getElementById("accessPassword");
-      const accessPasswordRequirements =
-        document.getElementById("accessPasswordRequirements");
-      const accessMessage = document.getElementById("accessMessage");
+  const accessEmail = document.getElementById("accessEmail");
+  const accessPassword = document.getElementById("accessPassword");
+  const accessPasswordRequirements =
+    document.getElementById("accessPasswordRequirements");
+  const accessMessage = document.getElementById("accessMessage");
 
-      const registerPanel = document.getElementById("registerPanel");
-      const accessPanel = document.getElementById("accessPanel");
+  const registerPanel = document.getElementById("registerPanel");
+  const accessPanel = document.getElementById("accessPanel");
 
-      const privacyRead = document.getElementById("privacyRead");
-      const earlyAccessToggle = document.getElementById("earlyAccessToggle");
-      const earlyAccessContent = document.getElementById("earlyAccessContent");
+  const privacyRead = document.getElementById("privacyRead");
+  const shareWith3DTwins = document.getElementById("shareWith3DTwins");
+  const commercialCommunications =
+    document.getElementById("commercialCommunications");
 
-      /* =====================================================
-         REGLAS COMPARTIDAS
-         Una única definición para registro y acceso.
-      ===================================================== */
+  const earlyAccessToggle = document.getElementById("earlyAccessToggle");
+  const earlyAccessContent = document.getElementById("earlyAccessContent");
 
-      const passwordRequirements = {
-        length: password => password.length >= 12,
-        uppercase: password => /[A-Z]/.test(password),
-        number: password => /[0-9]/.test(password),
-        special: password => /[^A-Za-z0-9]/.test(password)
-      };
+  /* =====================================================
+     REGLAS COMPARTIDAS
+     Una única definición para registro y acceso.
+  ===================================================== */
 
-      function emailIsValid(value) {
-        const email = value.trim();
+  const passwordRequirements = {
+    length: password => password.length >= 12,
+    uppercase: password => /[A-Z]/.test(password),
+    number: password => /[0-9]/.test(password),
+    special: password => /[^A-Za-z0-9]/.test(password)
+  };
 
-        if (email.length === 0 || email.length > 254) {
-          return false;
-        }
+  function emailIsValid(value) {
+    const email = value.trim();
 
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (email.length === 0 || email.length > 254) {
+      return false;
+    }
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function passwordRules(password) {
+    return Object.fromEntries(
+      Object.entries(passwordRequirements).map(([name, test]) => [
+        name,
+        test(password)
+      ])
+    );
+  }
+
+  /*
+   * Comprueba las tres casillas del formulario de registro.
+   * Si alguna no existe o no está marcada, la validación falla.
+   */
+  function privacyChecksAreValid() {
+    return [
+      privacyRead,
+      shareWith3DTwins,
+      commercialCommunications
+    ].every(checkbox => checkbox && checkbox.checked);
+  }
+
+  /*
+   * Devuelve la primera casilla obligatoria que falta marcar.
+   */
+  function getFirstUncheckedPrivacyCheck() {
+    return [
+      privacyRead,
+      shareWith3DTwins,
+      commercialCommunications
+    ].find(checkbox => !checkbox || !checkbox.checked);
+  }
+
+  /*
+   * Función visual compartida.
+   * Recibe el valor de la contraseña y SU CONTENEDOR.
+   * No utiliza selectores globales para los indicadores.
+   */
+  function renderPasswordRequirements(password, container) {
+    const results = passwordRules(password);
+
+    container.querySelectorAll(".requirement[data-rule]").forEach(item => {
+      const rule = item.dataset.rule;
+      const passed = Boolean(results[rule]);
+
+      item.classList.toggle("is-met", passed);
+      item.setAttribute(
+        "aria-label",
+        `${rule}: ${passed ? "cumplido" : "pendiente"}`
+      );
+    });
+
+    return results;
+  }
+
+  /* =====================================================
+     VALIDACIÓN DEL REGISTRO
+  ===================================================== */
+
+  function updateRegisterValidation() {
+    const results = renderPasswordRequirements(
+      registerPassword.value,
+      registerPasswordRequirements
+    );
+
+    const passwordIsValid = Object.values(results).every(Boolean);
+    const emailIsValidNow = emailIsValid(registerEmail.value);
+    const privacyIsValid = privacyChecksAreValid();
+
+    registerEmail.setAttribute(
+      "aria-invalid",
+      String(registerEmail.value.length > 0 && !emailIsValidNow)
+    );
+
+    registerPassword.setAttribute(
+      "aria-invalid",
+      String(registerPassword.value.length > 0 && !passwordIsValid)
+    );
+
+    registerButton.disabled =
+      !emailIsValidNow ||
+      !passwordIsValid ||
+      !privacyIsValid;
+  }
+
+  /* =====================================================
+     VALIDACIÓN VISUAL DEL ACCESO
+     No exige que una contraseña existente cumpla las reglas
+     nuevas de creación de contraseña.
+  ===================================================== */
+
+  function updateAccessValidation() {
+    renderPasswordRequirements(
+      accessPassword.value,
+      accessPasswordRequirements
+    );
+
+    accessEmail.setAttribute(
+      "aria-invalid",
+      String(
+        accessEmail.value.length > 0 &&
+        !emailIsValid(accessEmail.value)
+      )
+    );
+  }
+
+  /* =====================================================
+     MENSAJES
+  ===================================================== */
+
+  function showMessage(element, message, type) {
+    element.textContent = message;
+    element.classList.add("is-visible");
+    element.classList.toggle("is-error", type === "error");
+    element.classList.toggle("is-success", type === "success");
+  }
+
+  function clearMessage(element) {
+    element.textContent = "";
+    element.classList.remove("is-visible", "is-error", "is-success");
+  }
+
+  /* =====================================================
+     CAMBIO DE PANEL
+  ===================================================== */
+
+  function setActivePanel(panel) {
+    const showRegister = panel === "register";
+
+    registerPanel.classList.toggle("is-active", showRegister);
+    accessPanel.classList.toggle("is-active", !showRegister);
+  }
+
+  /* =====================================================
+     DESPLEGABLE EARLY ACCESS
+  ===================================================== */
+
+  earlyAccessToggle.addEventListener("click", () => {
+    const isExpanded =
+      earlyAccessToggle.getAttribute("aria-expanded") === "true";
+
+    earlyAccessToggle.setAttribute("aria-expanded", String(!isExpanded));
+    earlyAccessContent.hidden = isExpanded;
+  });
+
+  /* =====================================================
+     SELECTOR DE REGISTRO / ACCESO
+  ===================================================== */
+
+  document.querySelectorAll("[data-show-panel]").forEach(button => {
+    button.addEventListener("click", () => {
+      const target = button.getAttribute("data-show-panel");
+
+      if (target === "register" || target === "access") {
+        setActivePanel(target);
       }
+    });
+  });
 
-      function passwordRules(password) {
-        return Object.fromEntries(
-          Object.entries(passwordRequirements).map(([name, test]) => [
-            name,
-            test(password)
-          ])
-        );
+  /* =====================================================
+     EVENTOS DEL REGISTRO
+  ===================================================== */
+
+  registerEmail.addEventListener("input", () => {
+    clearMessage(registerMessage);
+    updateRegisterValidation();
+  });
+
+  registerPassword.addEventListener("input", () => {
+    clearMessage(registerMessage);
+    updateRegisterValidation();
+  });
+
+  /*
+   * Actualiza la validación al marcar o desmarcar cualquiera
+   * de las tres casillas.
+   */
+  [
+    privacyRead,
+    shareWith3DTwins,
+    commercialCommunications
+  ].forEach(checkbox => {
+    checkbox.addEventListener("change", () => {
+      clearMessage(registerMessage);
+      updateRegisterValidation();
+    });
+  });
+
+  /* =====================================================
+     EVENTOS DEL ACCESO
+  ===================================================== */
+
+  accessEmail.addEventListener("input", () => {
+    clearMessage(accessMessage);
+    updateAccessValidation();
+  });
+
+  accessPassword.addEventListener("input", () => {
+    clearMessage(accessMessage);
+    updateAccessValidation();
+  });
+
+  /* =====================================================
+     MOSTRAR / OCULTAR CONTRASEÑAS
+     Un único listener para ambos formularios.
+  ===================================================== */
+
+  document.querySelectorAll("[data-toggle-password]").forEach(button => {
+    button.addEventListener("click", () => {
+      const inputId = button.getAttribute("data-toggle-password");
+      const input = document.getElementById(inputId);
+
+      if (!input) return;
+
+      const willShow = input.type === "password";
+
+      input.type = willShow ? "text" : "password";
+      button.textContent = willShow ? "Ocultar" : "Mostrar";
+      button.setAttribute("aria-pressed", String(willShow));
+      button.setAttribute(
+        "aria-label",
+        willShow ? "Ocultar contraseña" : "Mostrar contraseña"
+      );
+
+      input.focus();
+    });
+  });
+
+  /* =====================================================
+     ENVÍO DEL REGISTRO
+  ===================================================== */
+
+  registerForm.addEventListener("submit", event => {
+    event.preventDefault();
+    clearMessage(registerMessage);
+
+    const email = registerEmail.value.trim();
+    const results = passwordRules(registerPassword.value);
+    const allRulesPassed = Object.values(results).every(Boolean);
+
+    if (!emailIsValid(email)) {
+      showMessage(
+        registerMessage,
+        "Introduce un correo electrónico con un formato válido.",
+        "error"
+      );
+      registerEmail.focus();
+      return;
+    }
+
+    if (!allRulesPassed) {
+      showMessage(
+        registerMessage,
+        "La contraseña todavía no cumple todos los requisitos.",
+        "error"
+      );
+      registerPassword.focus();
+      return;
+    }
+
+    /*
+     * Verificación adicional al enviar el formulario.
+     * No basta con que el botón esté desactivado:
+     * se vuelven a comprobar todas las casillas.
+     */
+    if (!privacyChecksAreValid()) {
+      showMessage(
+        registerMessage,
+        "Debes marcar todas las casillas de privacidad y consentimiento para continuar.",
+        "error"
+      );
+
+      const firstUnchecked = getFirstUncheckedPrivacyCheck();
+
+      if (firstUnchecked) {
+        firstUnchecked.focus();
       }
-
-      /*
-       * Función visual compartida.
-       * Recibe el valor de la contraseña y SU CONTENEDOR.
-       * No utiliza selectores globales para los indicadores.
-       */
-      function renderPasswordRequirements(password, container) {
-        const results = passwordRules(password);
-
-        container.querySelectorAll(".requirement[data-rule]").forEach(item => {
-          const rule = item.dataset.rule;
-          const passed = Boolean(results[rule]);
-
-          item.classList.toggle("is-met", passed);
-          item.setAttribute("aria-label", `${rule}: ${passed ? "cumplido" : "pendiente"}`);
-        });
-
-        return results;
-      }
-
-      /* =====================================================
-         VALIDACIÓN DEL REGISTRO
-      ===================================================== */
-
-      function updateRegisterValidation() {
-        const results = renderPasswordRequirements(
-          registerPassword.value,
-          registerPasswordRequirements
-        );
-
-        const passwordIsValid = Object.values(results).every(Boolean);
-        const emailIsValidNow = emailIsValid(registerEmail.value);
-
-        registerEmail.setAttribute(
-          "aria-invalid",
-          String(registerEmail.value.length > 0 && !emailIsValidNow)
-        );
-
-        registerPassword.setAttribute(
-          "aria-invalid",
-          String(registerPassword.value.length > 0 && !passwordIsValid)
-        );
-
-        registerButton.disabled =
-          !emailIsValidNow ||
-          !passwordIsValid ||
-          !privacyRead.checked;
-      }
-
-      /* =====================================================
-         VALIDACIÓN VISUAL DEL ACCESO
-         Muestra los mismos requisitos y checks, pero NO exige
-         que una contraseña existente cumpla las reglas nuevas.
-      ===================================================== */
-
-      function updateAccessValidation() {
-        renderPasswordRequirements(
-          accessPassword.value,
-          accessPasswordRequirements
-        );
-
-        accessEmail.setAttribute(
-          "aria-invalid",
-          String(
-            accessEmail.value.length > 0 &&
-            !emailIsValid(accessEmail.value)
-          )
-        );
-      }
-
-      /* =====================================================
-         MENSAJES
-      ===================================================== */
-
-      function showMessage(element, message, type) {
-        element.textContent = message;
-        element.classList.add("is-visible");
-        element.classList.toggle("is-error", type === "error");
-        element.classList.toggle("is-success", type === "success");
-      }
-
-      function clearMessage(element) {
-        element.textContent = "";
-        element.classList.remove("is-visible", "is-error", "is-success");
-      }
-
-      /* =====================================================
-         CAMBIO DE PANEL
-      ===================================================== */
-
-      function setActivePanel(panel) {
-        const showRegister = panel === "register";
-
-        registerPanel.classList.toggle("is-active", showRegister);
-        accessPanel.classList.toggle("is-active", !showRegister);
-      }
-
-      /* =====================================================
-         DESPLEGABLE EARLY ACCESS
-      ===================================================== */
-
-      earlyAccessToggle.addEventListener("click", () => {
-        const isExpanded =
-          earlyAccessToggle.getAttribute("aria-expanded") === "true";
-
-        earlyAccessToggle.setAttribute("aria-expanded", String(!isExpanded));
-        earlyAccessContent.hidden = isExpanded;
-      });
-
-      /* =====================================================
-         SELECTOR DE REGISTRO / ACCESO
-      ===================================================== */
-
-      document.querySelectorAll("[data-show-panel]").forEach(button => {
-        button.addEventListener("click", () => {
-          const target = button.getAttribute("data-show-panel");
-
-          if (target === "register" || target === "access") {
-            setActivePanel(target);
-          }
-        });
-      });
-
-      /* =====================================================
-         EVENTOS DEL REGISTRO
-      ===================================================== */
-
-      registerEmail.addEventListener("input", () => {
-        clearMessage(registerMessage);
-        updateRegisterValidation();
-      });
-
-      registerPassword.addEventListener("input", () => {
-        clearMessage(registerMessage);
-        updateRegisterValidation();
-      });
-
-      privacyRead.addEventListener("change", () => {
-        clearMessage(registerMessage);
-        updateRegisterValidation();
-      });
-
-      /* =====================================================
-         EVENTOS DEL ACCESO
-      ===================================================== */
-
-      accessEmail.addEventListener("input", () => {
-        clearMessage(accessMessage);
-        updateAccessValidation();
-      });
-
-      accessPassword.addEventListener("input", () => {
-        clearMessage(accessMessage);
-        updateAccessValidation();
-      });
-
-      /* =====================================================
-         MOSTRAR / OCULTAR CONTRASEÑAS
-         Un único listener para ambos formularios.
-      ===================================================== */
-
-      document.querySelectorAll("[data-toggle-password]").forEach(button => {
-        button.addEventListener("click", () => {
-          const inputId = button.getAttribute("data-toggle-password");
-          const input = document.getElementById(inputId);
-
-          if (!input) return;
-
-          const willShow = input.type === "password";
-
-          input.type = willShow ? "text" : "password";
-          button.textContent = willShow ? "Ocultar" : "Mostrar";
-          button.setAttribute("aria-pressed", String(willShow));
-          button.setAttribute(
-            "aria-label",
-            willShow ? "Ocultar contraseña" : "Mostrar contraseña"
-          );
-
-          input.focus();
-        });
-      });
-
-      /* =====================================================
-         ENVÍO DEL REGISTRO
-      ===================================================== */
-
-      registerForm.addEventListener("submit", event => {
-        event.preventDefault();
-        clearMessage(registerMessage);
-
-        const email = registerEmail.value.trim();
-        const results = passwordRules(registerPassword.value);
-        const allRulesPassed = Object.values(results).every(Boolean);
-
-        if (!emailIsValid(email)) {
-          showMessage(
-            registerMessage,
-            "Introduce un correo electrónico con un formato válido.",
-            "error"
-          );
-          registerEmail.focus();
-          return;
-        }
-
-        if (!allRulesPassed) {
-          showMessage(
-            registerMessage,
-            "La contraseña todavía no cumple todos los requisitos.",
-            "error"
-          );
-          registerPassword.focus();
-          return;
-        }
-
-        if (!privacyRead.checked) {
-          showMessage(
-            registerMessage,
-            "Lee la información de privacidad y marca la casilla para continuar.",
-            "error"
-          );
-          privacyRead.focus();
-          return;
-        }
-
-        /*
-         * SIMULACIÓN:
-         * No se crea una cuenta ni se envían datos a ningún servicio.
-         * Las casillas comerciales son opcionales.
-         * Los consentimientos no se guardan ni se transmiten.
-         */
-
-        showMessage(
-          registerMessage,
-          "Los requisitos se cumplen. El registro real se conectará cuando integremos el servicio de autenticación.",
-          "success"
-        );
-
-        setActivePanel("access");
-      });
-
-      /* =====================================================
-         ENVÍO DEL ACCESO
-      ===================================================== */
-
-      accessForm.addEventListener("submit", event => {
-        event.preventDefault();
-        clearMessage(accessMessage);
-
-        const email = accessEmail.value.trim();
-        const password = accessPassword.value;
-
-        if (!emailIsValid(email)) {
-          showMessage(
-            accessMessage,
-            "Introduce un correo electrónico con un formato válido.",
-            "error"
-          );
-          accessEmail.focus();
-          return;
-        }
-
-        if (!password) {
-          showMessage(
-            accessMessage,
-            "Introduce tu contraseña para continuar.",
-            "error"
-          );
-          accessPassword.focus();
-          return;
-        }
-
-        /*
-         * SIMULACIÓN:
-         * No se verifica la cuenta ni la contraseña.
-         * No se exige que una contraseña existente cumpla las reglas
-         * actuales de creación de contraseña.
-         *
-         * Aquí conectaremos posteriormente la autenticación y la URL
-         * que deberá cargar el iframe de la página principal.
-         */
-
-        showMessage(
-          accessMessage,
-          "Interfaz de acceso preparada. La autenticación y la navegación todavía no están conectadas.",
-          "success"
-        );
-      });
-
-      /* =====================================================
-         INICIALIZACIÓN
-      ===================================================== */
 
       updateRegisterValidation();
-      updateAccessValidation();
+      return;
+    }
 
-    })();
+    /*
+     * SIMULACIÓN:
+     * No se crea una cuenta ni se envían datos a ningún servicio.
+     * Los consentimientos no se guardan ni se transmiten.
+     */
+
+    showMessage(
+      registerMessage,
+      "Los requisitos se cumplen. El registro real se conectará cuando integremos el servicio de autenticación.",
+      "success"
+    );
+
+    setActivePanel("access");
+  });
+
+  /* =====================================================
+     ENVÍO DEL ACCESO
+  ===================================================== */
+
+  accessForm.addEventListener("submit", event => {
+    event.preventDefault();
+    clearMessage(accessMessage);
+
+    const email = accessEmail.value.trim();
+    const password = accessPassword.value;
+
+    if (!emailIsValid(email)) {
+      showMessage(
+        accessMessage,
+        "Introduce un correo electrónico con un formato válido.",
+        "error"
+      );
+      accessEmail.focus();
+      return;
+    }
+
+    if (!password) {
+      showMessage(
+        accessMessage,
+        "Introduce tu contraseña para continuar.",
+        "error"
+      );
+      accessPassword.focus();
+      return;
+    }
+
+  
+
+    showMessage(
+      accessMessage,
+      "Interfaz de acceso preparada. La autenticación y la navegación todavía no están conectadas.",
+      "success"
+    );
+  });
+
+  /* =====================================================
+     INICIALIZACIÓN
+  ===================================================== */
+
+  updateRegisterValidation();
+  updateAccessValidation();
+
+})();
+
   </script>
 </body>
 </html>
