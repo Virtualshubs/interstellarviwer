@@ -1669,6 +1669,7 @@ body.access-modal-open {
 }
 
     
+
 /* =========================================================
    LITE SPACE · REPOSITORIO → ESCENA 3D
    ========================================================= */
@@ -1739,6 +1740,8 @@ body.access-modal-open {
   font-size: 15px;
   line-height: 1.7;
 }
+
+/* Escenario */
 
 .transfer-stage {
   display: grid;
@@ -2162,6 +2165,7 @@ body.access-modal-open {
 .transfer-viewer {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .viewer-status {
@@ -2177,9 +2181,11 @@ body.access-modal-open {
 
 .transfer-viewer-window {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
   min-width: 0;
-  min-height: 250px;
-  flex: 1;
+  min-height: 286px;
   overflow: hidden;
   border: 1px solid #353732;
   border-radius: 8px;
@@ -2188,10 +2194,13 @@ body.access-modal-open {
 }
 
 .viewer-toolbar {
+  position: relative;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  flex: 0 0 36px;
   min-height: 36px;
   padding: 0 10px;
   border-bottom: 1px solid #393A35;
@@ -2216,9 +2225,12 @@ body.access-modal-open {
   font-size: 10px;
 }
 
+/* Estado vacío: solo visible antes de cargar el iframe */
+
 .viewer-empty {
   position: absolute;
   inset: 36px 0 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2297,10 +2309,19 @@ body.access-modal-open {
   line-height: 1.6;
 }
 
+/*
+  El iframe permanece en el flujo del contenedor:
+  el toolbar ocupa 36 px y el visor dispone de al menos 250 px.
+  No usar position:absolute ni height:100% sin altura definida.
+*/
+
 #transferViewerIframe {
+  position: relative;
+  z-index: 2;
   display: block;
+  flex: 1 0 250px;
   width: 100%;
-  height: 100%;
+  height: 250px;
   min-height: 250px;
   border: 0;
   background: #191A18;
@@ -2308,14 +2329,17 @@ body.access-modal-open {
 
 #transferViewerIframe[hidden],
 .viewer-loading[hidden],
-.viewer-complete[hidden] {
+.viewer-complete[hidden],
+.viewer-empty[hidden] {
   display: none !important;
 }
+
+/* Capa de carga por encima del iframe mientras se abre */
 
 .viewer-loading {
   position: absolute;
   inset: 36px 0 0;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2339,11 +2363,13 @@ body.access-modal-open {
   animation: transferOrbit .8s linear infinite;
 }
 
+/* Indicador opcional de estado; no debe cubrir el visor */
+
 .viewer-complete {
   position: absolute;
   right: 9px;
   bottom: 9px;
-  z-index: 3;
+  z-index: 4;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2552,20 +2578,29 @@ body.access-modal-open {
   font-size: 16px;
 }
 
+/* Escritorio */
+
 @media (min-width: 1200px) {
   .transfer-module {
     padding: 17px;
   }
 
-  .engine-surface,
-  .transfer-viewer-window {
+  .engine-surface {
     min-height: 290px;
   }
 
+  .transfer-viewer-window {
+    min-height: 326px;
+  }
+
   #transferViewerIframe {
+    height: 290px;
     min-height: 290px;
+    flex-basis: 290px;
   }
 }
+
+/* Tableta */
 
 @media (max-width: 850px) {
   .transfer-stage {
@@ -2598,15 +2633,22 @@ body.access-modal-open {
     grid-row: 1;
   }
 
-  .engine-surface,
-  .transfer-viewer-window {
+  .engine-surface {
     min-height: 235px;
   }
 
+  .transfer-viewer-window {
+    min-height: 271px;
+  }
+
   #transferViewerIframe {
+    height: 235px;
     min-height: 235px;
+    flex-basis: 235px;
   }
 }
+
+/* Móvil */
 
 @media (max-width: 560px) {
   .lite-transfer {
@@ -2651,11 +2693,13 @@ body.access-modal-open {
   }
 
   .transfer-viewer-window {
-    min-height: 260px;
+    min-height: 296px;
   }
 
   #transferViewerIframe {
+    height: 260px;
     min-height: 260px;
+    flex-basis: 260px;
   }
 
   .transfer-bottom {
@@ -2668,6 +2712,8 @@ body.access-modal-open {
     font-size: 9px;
   }
 }
+
+/* Accesibilidad */
 
 @media (prefers-reduced-motion: reduce) {
   .lite-transfer *,
@@ -2746,10 +2792,22 @@ body.access-modal-open {
 <main>
   <section class="hero" id="inicio">
     <div class="hero-inner">
+    
+      <h1>
+        Convierte tus repositorios 3D en
+        <span>bibliotecas interactivas</span> en minutos.
+      </h1>
+
+      <p>
+        Sin transferencias ni migraciones. Accede a tus recursos,
+        organízalos y explótalos de forma ágil, sin duplicar
+        infraestructuras ni perder tiempo en tareas automatizables.
+      </p>
+    </div>
+  </section>
 
 
-
-<section class="lite-transfer" id="liteTransfer" aria-label="De repositorio 3D a biblioteca interactiva">
+  <section class="lite-transfer" id="liteTransfer" aria-label="De repositorio 3D a biblioteca interactiva">
   <div class="lite-transfer-inner">
 
     <div class="lite-transfer-heading">
@@ -2919,14 +2977,15 @@ body.access-modal-open {
             <span>El espacio está preparado para recibir tus recursos.</span>
           </div>
 
-          <iframe
-            id="transferViewerIframe"
-            title="Visor 3D de Lite Space"
-            loading="lazy"
-            allow="fullscreen; xr-spatial-tracking"
-            allowfullscreen
-            hidden
-          ></iframe>
+        
+<iframe
+  id="transferViewerIframe"
+  title="Visor 3D de Lite Space"
+  allow="fullscreen; xr-spatial-tracking"
+  allowfullscreen
+  hidden
+></iframe>
+
 
           <div class="viewer-loading" id="transferViewerLoading" hidden>
             <span class="viewer-loading-ring"></span>
@@ -2974,22 +3033,6 @@ body.access-modal-open {
 
   </div>
 </section>
-
-
-
-      
-      <h1>
-        Convierte tus repositorios 3D en
-        <span>bibliotecas interactivas</span> en minutos.
-      </h1>
-
-      <p>
-        Sin transferencias ni migraciones. Accede a tus recursos,
-        organízalos y explótalos de forma ágil, sin duplicar
-        infraestructuras ni perder tiempo en tareas automatizables.
-      </p>
-    </div>
-  </section>
 
   <section class="benefits" id="beneficios">
     <div class="story-scroll" id="storyScroll">
@@ -4557,7 +4600,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
 
 
-
 (() => {
   const banner = document.getElementById("liteTransfer");
   if (!banner || banner.dataset.initialized === "true") return;
@@ -4606,9 +4648,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   let running = false;
   let runId = 0;
   let sequenceTimer = null;
-  let loadTimer = null;
   let activeAnimations = [];
-  let observer = null;
 
   function wait(ms, currentRun) {
     return new Promise(resolve => {
@@ -4623,11 +4663,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     if (sequenceTimer !== null) {
       window.clearTimeout(sequenceTimer);
       sequenceTimer = null;
-    }
-
-    if (loadTimer !== null) {
-      window.clearTimeout(loadTimer);
-      loadTimer = null;
     }
   }
 
@@ -4726,7 +4761,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   }
 
   function resetBanner() {
-    // Invalida las secuencias anteriores.
     runId++;
     running = false;
 
@@ -4768,73 +4802,53 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     bottomIndicator.classList.remove("is-complete");
   }
 
+  // Carga sencilla: mostrar el iframe y asignarle la escena.
   function loadRealViewer(currentRun) {
-    return new Promise(resolve => {
-      let finished = false;
+    viewerEmpty.hidden = true;
+    viewerComplete.hidden = true;
+    viewerIframe.hidden = false;
+    viewerLoading.hidden = false;
 
-      const finish = (loaded) => {
-        if (finished || currentRun !== runId) return;
-        finished = true;
+    viewerStatus.textContent = "CARGANDO";
+    viewerCaption.textContent = "Abriendo el visor 3D…";
+    bottomMessage.textContent = "CARGANDO ESCENA 3D…";
 
-        if (loadTimer !== null) {
-          window.clearTimeout(loadTimer);
-          loadTimer = null;
-        }
+    viewerIframe.onload = () => {
+      if (currentRun !== runId) return;
 
-        viewerLoading.hidden = true;
-        viewerIframe.hidden = false;
-
-        if (loaded) {
-          viewerEmpty.hidden = true;
-          viewerComplete.hidden = false;
-
-          viewer.classList.add("is-loaded");
-          viewerStatus.textContent = "ESCENA CARGADA";
-          viewerCaption.textContent =
-            "Visor disponible. La inicialización 3D puede continuar.";
-          bottomMessage.textContent =
-            "VISOR CARGADO · ESCENA DISPONIBLE";
-          bottomIndicator.classList.add("is-complete");
-        } else {
-          // Dejamos el iframe visible para facilitar el diagnóstico.
-          viewerEmpty.hidden = true;
-          viewerComplete.hidden = true;
-
-          viewerStatus.textContent = "COMPROBAR VISOR";
-          viewerCaption.textContent =
-            "El marco está visible, pero no se ha confirmado la carga.";
-          bottomMessage.textContent =
-            "COMPRUEBA LA CARGA DEL VISOR EN EL NAVEGADOR";
-        }
-
-        viewerIframe.onload = null;
-        viewerIframe.onerror = null;
-        running = false;
-        resolve();
-      };
-
+      viewerLoading.hidden = true;
       viewerEmpty.hidden = true;
       viewerComplete.hidden = true;
+
+      viewer.classList.add("is-loaded");
+      viewerStatus.textContent = "VISOR ABIERTO";
+      viewerCaption.textContent =
+        "Visor cargado. La escena puede terminar de inicializarse.";
+      bottomMessage.textContent = "VISOR ABIERTO · INICIALIZANDO ESCENA";
+      bottomIndicator.classList.add("is-complete");
+
+      viewerIframe.onload = null;
+      viewerIframe.onerror = null;
+    };
+
+    viewerIframe.onerror = () => {
+      if (currentRun !== runId) return;
+
+      viewerLoading.hidden = true;
       viewerIframe.hidden = false;
-      viewerLoading.hidden = false;
+      viewerEmpty.hidden = true;
 
-      viewerStatus.textContent = "CARGANDO";
-      viewerCaption.textContent = "Abriendo el visor 3D…";
-      bottomMessage.textContent = "CARGANDO ESCENA 3D…";
+      viewerStatus.textContent = "ERROR DE CARGA";
+      viewerCaption.textContent =
+        "No se ha podido cargar el documento del visor.";
+      bottomMessage.textContent = "NO SE HA PODIDO CARGAR EL VISOR";
 
-      // Instala los eventos antes de asignar la URL.
-      viewerIframe.onload = () => finish(true);
-      viewerIframe.onerror = () => finish(false);
+      viewerIframe.onload = null;
+      viewerIframe.onerror = null;
+    };
 
-      // Carga la URL completa, incluidos sus parámetros.
-      viewerIframe.src = LITE_TRANSFER_SCENE_URL;
-
-      // No ocultamos el iframe si no llega onload:
-      // puede seguir visible y permitir inspeccionar el resultado.
-      loadTimer = window.setTimeout(() => {
-        finish(false);
-      }, 15000);
-    });
+    // La URL original se carga directamente en el iframe.
+    viewerIframe.src = LITE_TRANSFER_SCENE_URL;
   }
 
   async function runSequence() {
@@ -4844,7 +4858,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     running = true;
 
     const currentRun = runId;
-
     const stillCurrent = () => currentRun === runId;
 
     if (!(await wait(100, currentRun)) || !stillCurrent()) return;
@@ -4887,7 +4900,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
     if (!(await wait(300, currentRun)) || !stillCurrent()) return;
 
-    // 3. El resultado viaja al visor.
+    // 3. El resultado llega al contenedor del visor.
     if (
       !(await moveFolder(enginePoint, viewerPoint, 1050, currentRun)) ||
       !stillCurrent()
@@ -4904,8 +4917,9 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     engineCaption.textContent = "Recursos listos para visualizar.";
     engineProgress.style.width = "100%";
 
-    // 4. Se muestra el visor real al terminar la animación.
-    await loadRealViewer(currentRun);
+    // 4. Cargar el iframe. Sin esperas ni comprobaciones adicionales.
+    loadRealViewer(currentRun);
+    running = false;
   }
 
   replayButton.addEventListener("click", () => {
@@ -4916,7 +4930,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   resetBanner();
 
   if ("IntersectionObserver" in window) {
-    observer = new IntersectionObserver(entries => {
+    const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
         if (entry.isIntersecting && !running) {
           runSequence();
@@ -4929,7 +4943,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     runSequence();
   }
 })();
-
 
     
   </script>
