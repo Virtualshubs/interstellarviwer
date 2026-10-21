@@ -1178,6 +1178,7 @@ h1 {
 
 
   </style>
+
 </head>
 
 <body>
@@ -1210,56 +1211,65 @@ h1 {
           Dos vías de entrada, un mismo entorno.
         </p>
       </section>
-         <!-- CONDICIONES EARLY ACCESS -->
-            <section class="early-access" aria-labelledby="earlyAccessToggle">
-              <button
-                class="early-access-toggle"
-                id="earlyAccessToggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls="earlyAccessContent"
-              >
-                <span>
-                  <span class="early-access-toggle-label">Condiciones de Early Access</span>
-                  <span class="early-access-toggle-hint">Consulta qué incluye el acceso individual.</span>
-                </span>
-                <span class="early-access-chevron" aria-hidden="true">⌄</span>
-              </button>
 
-              <div class="early-access-content" id="earlyAccessContent" hidden>
-                <h3>Acceso individual</h3>
-                <p><strong>¿Solo necesitas crear y compartir escenas 3D sencillas?</strong></p>
-                <p>
-                  Utiliza 3D Lite Space para crear escenas individuales y compartirlas,
-                  sin necesidad de disponer de un repositorio propio.
-                </p>
-                <ul>
-                  <li>Creación de escenas individuales.</li>
-                  <li>Comparte las escenas que crees.</li>
-                  <li>Hasta 5 escenas al mes.</li>
-                  <li>Sin coste, a cambio de marcado publicitario.</li>                
-<li>Acceso gratuito a 3D Twins Lite durante 6 meses. Para seguir 
-  reando escenas una vez finalizado el periodo de prueba, será necesario contratar un plan de pago.</li>
+      <!-- CONDICIONES EARLY ACCESS -->
+      <section class="early-access" aria-labelledby="earlyAccessToggle">
+        <button
+          class="early-access-toggle"
+          id="earlyAccessToggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="earlyAccessContent"
+        >
+          <span>
+            <span class="early-access-toggle-label">Condiciones de Early Access</span>
+            <span class="early-access-toggle-hint">Consulta qué incluye el acceso individual.</span>
+          </span>
+          <span class="early-access-chevron" aria-hidden="true">⌄</span>
+        </button>
 
+        <div class="early-access-content" id="earlyAccessContent" hidden>
+          <h3>Acceso individual</h3>
 
-                  <li>          Los datos necesarios para gestionar la cuenta y prestar el servicio
-                se tratarán conforme a la Política de privacidad. La atención al
-                cliente, los avisos técnicos y las comunicaciones sobre incidencias
-                relacionadas con el servicio se diferencian de las comunicaciones
-                comerciales. Puedes retirar tus consentimientos comerciales en
-                cualquier momento.</li>
+          <p>
+            <strong>¿Solo necesitas crear y compartir escenas 3D sencillas?</strong>
+          </p>
 
-                    <br><br>
-                Más información en la
-                <a
-                  href="https://web.3dtwins.tech/legal/politica-privacidad.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >Política de privacidad</a>
+          <p>
+            Utiliza 3D Lite Space para crear escenas individuales y compartirlas,
+            sin necesidad de disponer de un repositorio propio.
+          </p>
 
-                </ul>
-              </div>
-            </section>
+          <ul>
+            <li>Creación de escenas individuales.</li>
+            <li>Comparte las escenas que crees.</li>
+            <li>Hasta 5 escenas al mes.</li>
+            <li>Sin coste, a cambio de marcado publicitario.</li>
+            <li>
+              Acceso gratuito a 3D Twins Lite durante 6 meses.
+              Para seguir creando escenas una vez finalizado el periodo
+              de prueba, será necesario contratar un plan de pago.
+            </li>
+            <li>
+              Los datos necesarios para gestionar la cuenta y prestar el servicio
+              se tratarán conforme a la Política de privacidad. La atención al
+              cliente, los avisos técnicos y las comunicaciones sobre incidencias
+              relacionadas con el servicio se diferencian de las comunicaciones
+              comerciales. Puedes retirar tus consentimientos comerciales en
+              cualquier momento.
+            </li>
+          </ul>
+
+          <p>
+            Más información en la
+            <a
+              href="https://web.3dtwins.tech/legal/politica-privacidad.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Política de privacidad</a>.
+          </p>
+        </div>
+      </section>
 
       <section class="auth-shell" id="authShell" aria-label="Registro y acceso">
 
@@ -1289,7 +1299,6 @@ h1 {
           </button>
 
           <div class="section-topline">
-           
             <span class="section-state">
               <span class="state-dot"></span>
               Early Access
@@ -1312,7 +1321,9 @@ h1 {
 
           <form id="registerForm" novalidate>
             <div class="field">
-              <label class="field-label" for="registerEmail">Correo electrónico</label>
+              <label class="field-label" for="registerEmail">
+                Correo electrónico
+              </label>
               <input
                 id="registerEmail"
                 name="email"
@@ -1330,7 +1341,9 @@ h1 {
             </div>
 
             <div class="field">
-              <label class="field-label" for="registerPassword">Contraseña</label>
+              <label class="field-label" for="registerPassword">
+                Contraseña
+              </label>
               <div class="input-wrap">
                 <input
                   class="password-input"
@@ -1342,7 +1355,7 @@ h1 {
                   maxlength="128"
                   placeholder="Crea una contraseña"
                   required
-                  aria-describedby="passwordRequirements"
+                  aria-describedby="registerPasswordRequirements"
                 >
                 <button
                   class="password-toggle"
@@ -1354,7 +1367,12 @@ h1 {
               </div>
             </div>
 
-            <div class="requirements" id="passwordRequirements">
+            <!-- REQUISITOS DE CONTRASEÑA: REGISTRO -->
+            <div
+              class="requirements"
+              id="registerPasswordRequirements"
+              aria-live="polite"
+            >
               <p class="requirements-heading">Requisitos de contraseña</p>
               <ul class="requirements-list">
                 <li class="requirement" data-rule="length">
@@ -1376,9 +1394,7 @@ h1 {
               </ul>
             </div>
 
-         
-
-            <!-- PRIVACIDAD Y CONSENTIMIENTOS -->
+            <!-- PRIVACIDAD Y CONSENTIMIENTOS: SOLO REGISTRO -->
             <section class="consent-section" aria-labelledby="consentHeading">
               <p class="consent-heading" id="consentHeading">
                 Privacidad y comunicaciones
@@ -1408,6 +1424,10 @@ h1 {
                 </span>
               </label>
 
+              <p class="consent-note" id="consentNote">
+                La aceptación de las comunicaciones comerciales es opcional.
+              </p>
+
               <label class="consent-option" for="shareWith3DTwins">
                 <input
                   id="shareWith3DTwins"
@@ -1434,8 +1454,6 @@ h1 {
                   <span class="consent-optional">Opcional</span>
                 </span>
               </label>
-
-         
             </section>
 
             <button class="action-button" type="submit" id="registerButton" disabled>
@@ -1443,10 +1461,15 @@ h1 {
               <span class="button-arrow" aria-hidden="true">↗</span>
             </button>
 
-            <p class="form-message" id="registerMessage" role="status" aria-live="polite"></p>
+            <p
+              class="form-message"
+              id="registerMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
 
             <p class="form-footnote">
-           Estás un paso más cerca de poder crear tus popios universos 3D ;)
+              Estás un paso más cerca de poder crear tus propios universos 3D ;)
             </p>
           </form>
 
@@ -1459,7 +1482,6 @@ h1 {
           </div>
         </section>
 
-        
         <!-- ACCESO -->
         <section class="auth-panel access-panel" id="accessPanel">
 
@@ -1509,7 +1531,9 @@ h1 {
 
           <form id="accessForm" novalidate>
             <div class="field">
-              <label class="field-label" for="accessEmail">Correo electrónico</label>
+              <label class="field-label" for="accessEmail">
+                Correo electrónico
+              </label>
               <input
                 id="accessEmail"
                 name="email"
@@ -1519,26 +1543,29 @@ h1 {
                 maxlength="254"
                 placeholder="nombre@empresa.com"
                 required
+                aria-describedby="accessEmailNote"
               >
+              <p class="field-note" id="accessEmailNote">
+                Introduce el correo asociado a tu cuenta.
+              </p>
             </div>
 
             <div class="field">
-              <label class="field-label" for="accessPassword">Contraseña</label>
+              <label class="field-label" for="accessPassword">
+                Contraseña
+              </label>
               <div class="input-wrap">
-              
-<input
-  class="password-input"
-  id="accessPassword"
-  name="password"
-  type="password"
-  autocomplete="current-password"
-  maxlength="128"
-  placeholder="Tu contraseña"
-  required
-  aria-describedby="consentNote"
->
-
-
+                <input
+                  class="password-input"
+                  id="accessPassword"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  maxlength="128"
+                  placeholder="Tu contraseña"
+                  required
+                  aria-describedby="accessPasswordRequirements"
+                >
                 <button
                   class="password-toggle"
                   type="button"
@@ -1549,8 +1576,12 @@ h1 {
               </div>
             </div>
 
-            
-            <div class="requirements" id="passwordRequirements">
+            <!-- REQUISITOS DE CONTRASEÑA: ACCESO -->
+            <div
+              class="requirements"
+              id="accessPasswordRequirements"
+              aria-live="polite"
+            >
               <p class="requirements-heading">Requisitos de contraseña</p>
               <ul class="requirements-list">
                 <li class="requirement" data-rule="length">
@@ -1577,7 +1608,12 @@ h1 {
               <span class="button-arrow" aria-hidden="true">↗</span>
             </button>
 
-            <p class="form-message" id="accessMessage" role="status" aria-live="polite"></p>
+            <p
+              class="form-message"
+              id="accessMessage"
+              role="status"
+              aria-live="polite"
+            ></p>
 
             <p class="form-footnote">
               ¿Aún no tienes cuenta? Puedes registrarte en el panel de la izquierda.
@@ -1590,7 +1626,9 @@ h1 {
               <path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5"/>
               <path d="M10 12v2"/>
             </svg>
-            <span>El acceso real se conectará posteriormente al sistema de autenticación.</span>
+            <span>
+              El acceso real se conectará posteriormente al sistema de autenticación.
+            </span>
           </div>
         </section>
       </section>
@@ -1620,13 +1658,26 @@ h1 {
     (() => {
       "use strict";
 
+      /* =====================================================
+         ELEMENTOS
+      ===================================================== */
+
       const registerForm = document.getElementById("registerForm");
       const accessForm = document.getElementById("accessForm");
+
       const registerEmail = document.getElementById("registerEmail");
       const registerPassword = document.getElementById("registerPassword");
+      const registerPasswordRequirements =
+        document.getElementById("registerPasswordRequirements");
       const registerButton = document.getElementById("registerButton");
       const registerMessage = document.getElementById("registerMessage");
+
+      const accessEmail = document.getElementById("accessEmail");
+      const accessPassword = document.getElementById("accessPassword");
+      const accessPasswordRequirements =
+        document.getElementById("accessPasswordRequirements");
       const accessMessage = document.getElementById("accessMessage");
+
       const registerPanel = document.getElementById("registerPanel");
       const accessPanel = document.getElementById("accessPanel");
 
@@ -1634,7 +1685,12 @@ h1 {
       const earlyAccessToggle = document.getElementById("earlyAccessToggle");
       const earlyAccessContent = document.getElementById("earlyAccessContent");
 
-      const requirements = {
+      /* =====================================================
+         REGLAS COMPARTIDAS
+         Una única definición para registro y acceso.
+      ===================================================== */
+
+      const passwordRequirements = {
         length: password => password.length >= 12,
         uppercase: password => /[A-Z]/.test(password),
         number: password => /[0-9]/.test(password),
@@ -1653,31 +1709,85 @@ h1 {
 
       function passwordRules(password) {
         return Object.fromEntries(
-          Object.entries(requirements).map(([name, test]) => [
+          Object.entries(passwordRequirements).map(([name, test]) => [
             name,
             test(password)
           ])
         );
       }
 
-      function updatePasswordRequirements() {
-        const results = passwordRules(registerPassword.value);
+      /*
+       * Función visual compartida.
+       * Recibe el valor de la contraseña y SU CONTENEDOR.
+       * No utiliza selectores globales para los indicadores.
+       */
+      function renderPasswordRequirements(password, container) {
+        const results = passwordRules(password);
 
-        Object.entries(results).forEach(([name, passed]) => {
-          const item = document.querySelector(
-            `.requirement[data-rule="${name}"]`
-          );
-
-          if (!item) return;
+        container.querySelectorAll(".requirement[data-rule]").forEach(item => {
+          const rule = item.dataset.rule;
+          const passed = Boolean(results[rule]);
 
           item.classList.toggle("is-met", passed);
+          item.setAttribute("aria-label", `${rule}: ${passed ? "cumplido" : "pendiente"}`);
         });
 
+        return results;
+      }
+
+      /* =====================================================
+         VALIDACIÓN DEL REGISTRO
+      ===================================================== */
+
+      function updateRegisterValidation() {
+        const results = renderPasswordRequirements(
+          registerPassword.value,
+          registerPasswordRequirements
+        );
+
+        const passwordIsValid = Object.values(results).every(Boolean);
+        const emailIsValidNow = emailIsValid(registerEmail.value);
+
+        registerEmail.setAttribute(
+          "aria-invalid",
+          String(registerEmail.value.length > 0 && !emailIsValidNow)
+        );
+
+        registerPassword.setAttribute(
+          "aria-invalid",
+          String(registerPassword.value.length > 0 && !passwordIsValid)
+        );
+
         registerButton.disabled =
-          !emailIsValid(registerEmail.value) ||
-          !Object.values(results).every(Boolean) ||
+          !emailIsValidNow ||
+          !passwordIsValid ||
           !privacyRead.checked;
       }
+
+      /* =====================================================
+         VALIDACIÓN VISUAL DEL ACCESO
+         Muestra los mismos requisitos y checks, pero NO exige
+         que una contraseña existente cumpla las reglas nuevas.
+      ===================================================== */
+
+      function updateAccessValidation() {
+        renderPasswordRequirements(
+          accessPassword.value,
+          accessPasswordRequirements
+        );
+
+        accessEmail.setAttribute(
+          "aria-invalid",
+          String(
+            accessEmail.value.length > 0 &&
+            !emailIsValid(accessEmail.value)
+          )
+        );
+      }
+
+      /* =====================================================
+         MENSAJES
+      ===================================================== */
 
       function showMessage(element, message, type) {
         element.textContent = message;
@@ -1691,6 +1801,10 @@ h1 {
         element.classList.remove("is-visible", "is-error", "is-success");
       }
 
+      /* =====================================================
+         CAMBIO DE PANEL
+      ===================================================== */
+
       function setActivePanel(panel) {
         const showRegister = panel === "register";
 
@@ -1698,7 +1812,10 @@ h1 {
         accessPanel.classList.toggle("is-active", !showRegister);
       }
 
-      /* Desplegable de condiciones de Early Access. */
+      /* =====================================================
+         DESPLEGABLE EARLY ACCESS
+      ===================================================== */
+
       earlyAccessToggle.addEventListener("click", () => {
         const isExpanded =
           earlyAccessToggle.getAttribute("aria-expanded") === "true";
@@ -1707,7 +1824,10 @@ h1 {
         earlyAccessContent.hidden = isExpanded;
       });
 
-      /* Click en cualquiera de las persianas para revelar su formulario. */
+      /* =====================================================
+         SELECTOR DE REGISTRO / ACCESO
+      ===================================================== */
+
       document.querySelectorAll("[data-show-panel]").forEach(button => {
         button.addEventListener("click", () => {
           const target = button.getAttribute("data-show-panel");
@@ -1718,28 +1838,43 @@ h1 {
         });
       });
 
-      registerEmail.addEventListener("input", () => {
-        registerEmail.setAttribute(
-          "aria-invalid",
-          String(
-            registerEmail.value.length > 0 &&
-            !emailIsValid(registerEmail.value)
-          )
-        );
+      /* =====================================================
+         EVENTOS DEL REGISTRO
+      ===================================================== */
 
+      registerEmail.addEventListener("input", () => {
         clearMessage(registerMessage);
-        updatePasswordRequirements();
+        updateRegisterValidation();
       });
 
       registerPassword.addEventListener("input", () => {
         clearMessage(registerMessage);
-        updatePasswordRequirements();
+        updateRegisterValidation();
       });
 
       privacyRead.addEventListener("change", () => {
         clearMessage(registerMessage);
-        updatePasswordRequirements();
+        updateRegisterValidation();
       });
+
+      /* =====================================================
+         EVENTOS DEL ACCESO
+      ===================================================== */
+
+      accessEmail.addEventListener("input", () => {
+        clearMessage(accessMessage);
+        updateAccessValidation();
+      });
+
+      accessPassword.addEventListener("input", () => {
+        clearMessage(accessMessage);
+        updateAccessValidation();
+      });
+
+      /* =====================================================
+         MOSTRAR / OCULTAR CONTRASEÑAS
+         Un único listener para ambos formularios.
+      ===================================================== */
 
       document.querySelectorAll("[data-toggle-password]").forEach(button => {
         button.addEventListener("click", () => {
@@ -1749,6 +1884,7 @@ h1 {
           if (!input) return;
 
           const willShow = input.type === "password";
+
           input.type = willShow ? "text" : "password";
           button.textContent = willShow ? "Ocultar" : "Mostrar";
           button.setAttribute("aria-pressed", String(willShow));
@@ -1760,6 +1896,10 @@ h1 {
           input.focus();
         });
       });
+
+      /* =====================================================
+         ENVÍO DEL REGISTRO
+      ===================================================== */
 
       registerForm.addEventListener("submit", event => {
         event.preventDefault();
@@ -1800,11 +1940,12 @@ h1 {
         }
 
         /*
-          SIMULACIÓN:
-          No se crea una cuenta ni se envían datos a ningún servicio.
-          Las casillas comerciales son opcionales y no bloquean el registro.
-          Los consentimientos no se guardan ni se transmiten.
-        */
+         * SIMULACIÓN:
+         * No se crea una cuenta ni se envían datos a ningún servicio.
+         * Las casillas comerciales son opcionales.
+         * Los consentimientos no se guardan ni se transmiten.
+         */
+
         showMessage(
           registerMessage,
           "Los requisitos se cumplen. El registro real se conectará cuando integremos el servicio de autenticación.",
@@ -1814,39 +1955,47 @@ h1 {
         setActivePanel("access");
       });
 
+      /* =====================================================
+         ENVÍO DEL ACCESO
+      ===================================================== */
+
       accessForm.addEventListener("submit", event => {
         event.preventDefault();
         clearMessage(accessMessage);
 
-        const emailInput = document.getElementById("accessEmail");
-        const passwordInput = document.getElementById("accessPassword");
+        const email = accessEmail.value.trim();
+        const password = accessPassword.value;
 
-        if (!emailIsValid(emailInput.value)) {
+        if (!emailIsValid(email)) {
           showMessage(
             accessMessage,
             "Introduce un correo electrónico con un formato válido.",
             "error"
           );
-          emailInput.focus();
+          accessEmail.focus();
           return;
         }
 
-        if (!passwordInput.value) {
+        if (!password) {
           showMessage(
             accessMessage,
             "Introduce tu contraseña para continuar.",
             "error"
           );
-          passwordInput.focus();
+          accessPassword.focus();
           return;
         }
 
         /*
-          SIMULACIÓN:
-          No se verifica la cuenta ni la contraseña.
-          Aquí conectaremos posteriormente la autenticación y la URL
-          que deberá cargar el iframe de la página principal.
-        */
+         * SIMULACIÓN:
+         * No se verifica la cuenta ni la contraseña.
+         * No se exige que una contraseña existente cumpla las reglas
+         * actuales de creación de contraseña.
+         *
+         * Aquí conectaremos posteriormente la autenticación y la URL
+         * que deberá cargar el iframe de la página principal.
+         */
+
         showMessage(
           accessMessage,
           "Interfaz de acceso preparada. La autenticación y la navegación todavía no están conectadas.",
@@ -1854,10 +2003,17 @@ h1 {
         );
       });
 
-      updatePasswordRequirements();
+      /* =====================================================
+         INICIALIZACIÓN
+      ===================================================== */
+
+      updateRegisterValidation();
+      updateAccessValidation();
+
     })();
   </script>
 </body>
 </html>
+
 
 
