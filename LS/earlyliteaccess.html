@@ -1211,6 +1211,37 @@ h1 {
           Dos vías de entrada, un mismo entorno.
         </p>
       </section>
+         <!-- CONDICIONES EARLY ACCESS -->
+            <section class="early-access" aria-labelledby="earlyAccessToggle">
+              <button
+                class="early-access-toggle"
+                id="earlyAccessToggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="earlyAccessContent"
+              >
+                <span>
+                  <span class="early-access-toggle-label">Condiciones de Early Access</span>
+                  <span class="early-access-toggle-hint">Consulta qué incluye el acceso individual.</span>
+                </span>
+                <span class="early-access-chevron" aria-hidden="true">⌄</span>
+              </button>
+
+              <div class="early-access-content" id="earlyAccessContent" hidden>
+                <h3>Acceso individual</h3>
+                <p><strong>¿Solo necesitas crear y compartir escenas 3D sencillas?</strong></p>
+                <p>
+                  Utiliza 3D Lite Space para crear escenas individuales y compartirlas,
+                  sin necesidad de disponer de un repositorio propio.
+                </p>
+                <ul>
+                  <li>Creación de escenas individuales.</li>
+                  <li>Comparte las escenas que crees.</li>
+                  <li>Hasta 5 escenas al mes.</li>
+                  <li>Sin coste, a cambio de marcado publicitario.</li>
+                </ul>
+              </div>
+            </section>
 
       <section class="auth-shell" id="authShell" aria-label="Registro y acceso">
 
@@ -1327,37 +1358,7 @@ h1 {
               </ul>
             </div>
 
-            <!-- CONDICIONES EARLY ACCESS -->
-            <section class="early-access" aria-labelledby="earlyAccessToggle">
-              <button
-                class="early-access-toggle"
-                id="earlyAccessToggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls="earlyAccessContent"
-              >
-                <span>
-                  <span class="early-access-toggle-label">Condiciones de Early Access</span>
-                  <span class="early-access-toggle-hint">Consulta qué incluye el acceso individual.</span>
-                </span>
-                <span class="early-access-chevron" aria-hidden="true">⌄</span>
-              </button>
-
-              <div class="early-access-content" id="earlyAccessContent" hidden>
-                <h3>Acceso individual</h3>
-                <p><strong>¿Solo necesitas crear y compartir escenas 3D sencillas?</strong></p>
-                <p>
-                  Utiliza 3D Lite Space para crear escenas individuales y compartirlas,
-                  sin necesidad de disponer de un repositorio propio.
-                </p>
-                <ul>
-                  <li>Creación de escenas individuales.</li>
-                  <li>Comparte las escenas que crees.</li>
-                  <li>Hasta 5 escenas al mes.</li>
-                  <li>Sin coste, a cambio de marcado publicitario.</li>
-                </ul>
-              </div>
-            </section>
+         
 
             <!-- PRIVACIDAD Y CONSENTIMIENTOS -->
             <section class="consent-section" aria-labelledby="consentHeading">
@@ -1416,21 +1417,7 @@ h1 {
                 </span>
               </label>
 
-              <p class="consent-note" id="consentNote">
-                Los datos necesarios para gestionar la cuenta y prestar el servicio
-                se tratarán conforme a la Política de privacidad. La atención al
-                cliente, los avisos técnicos y las comunicaciones sobre incidencias
-                relacionadas con el servicio se diferencian de las comunicaciones
-                comerciales. Puedes retirar tus consentimientos comerciales en
-                cualquier momento.
-                <br><br>
-                Más información en la
-                <a
-                  href="URL_POLITICA_PRIVACIDAD"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >Política de privacidad</a>.
-              </p>
+         
             </section>
 
             <button class="action-button" type="submit" id="registerButton" disabled>
@@ -1451,10 +1438,25 @@ h1 {
               <path d="M10 2.5 16 5v4.5c0 4-2.6 6.5-6 8-3.4-1.5-6-4-6-8V5z"/>
               <path d="m7 10 2 2 4-4"/>
             </svg>
-            <span>Validación local de los requisitos. Sin verificación de cuenta.</span>
+            <span>Registro seguro.</span>
           </div>
         </section>
-
+     <p class="consent-note" id="consentNote">
+                Los datos necesarios para gestionar la cuenta y prestar el servicio
+                se tratarán conforme a la Política de privacidad. La atención al
+                cliente, los avisos técnicos y las comunicaciones sobre incidencias
+                relacionadas con el servicio se diferencian de las comunicaciones
+                comerciales. Puedes retirar tus consentimientos comerciales en
+                cualquier momento.
+                <br><br>
+                Más información en la
+                <a
+                  href="URL_POLITICA_PRIVACIDAD"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Política de privacidad</a>.
+              </p>
+        
         <!-- ACCESO -->
         <section class="auth-panel access-panel" id="accessPanel">
 
