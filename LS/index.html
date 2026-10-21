@@ -1747,21 +1747,21 @@ body.access-modal-open {
 .transfer-stage {
   display: grid;
   grid-template-columns:
-    minmax(0, .82fr)
-    38px
-    minmax(0, 1.6fr);
+    minmax(0, 1.5fr)
+    28px
+    minmax(0, 3.5fr);
   grid-template-rows: auto 26px auto;
   grid-template-areas:
     "repository . viewer"
     "first      . viewer"
     "engine   second viewer";
   align-items: stretch;
-  column-gap: 12px;
+  column-gap: 6px;
   row-gap: 0;
   position: relative;
   isolation: isolate;
 }
-
+    
 .transfer-module {
   min-width: 0;
   padding: 14px;
@@ -2637,10 +2637,10 @@ body.access-modal-open {
 @media (min-width: 1200px) {
   .transfer-stage {
     grid-template-columns:
-      minmax(0, .82fr)
-      42px
-      minmax(0, 1.6fr);
-    column-gap: 16px;
+      minmax(0, 1.5fr)
+      30px
+      minmax(0, 3.5fr);
+    column-gap: 8px;
   }
 
   .transfer-module {
