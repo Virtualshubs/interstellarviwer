@@ -2785,31 +2785,119 @@ body.access-modal-open {
 
     
 
-/* Product panel */
+
+/* =========================================
+   3D TWINS — CONFIGURATOR CTA
+   Editorial / Lite Space
+   ========================================= */
+
+.configurator-cta {
+  --cta-bg: var(--bg, #F3F1EA);
+  --cta-panel: var(--panel, #EAE7DE);
+  --cta-line: var(--line, #D9D4C8);
+  --cta-text: var(--text, #242522);
+  --cta-muted: var(--muted, #716B60);
+  --cta-primary: var(--primary, #416D80);
+  --cta-accent: var(--accent, #E5682E);
+  --cta-hover: var(--primary-hover, #294A59);
+
+  width: 100%;
+  box-sizing: border-box;
+  padding: clamp(48px, 7vw, 88px)
+    var(--gutter, clamp(22px, 6vw, 84px));
+
+  background: var(--cta-bg);
+  color: var(--cta-text);
+  font-family: var(--font-body, "IBM Plex Sans", sans-serif);
+}
+
+.configurator-cta *,
+.configurator-cta *::before,
+.configurator-cta *::after {
+  box-sizing: border-box;
+}
+
+.configurator-cta__content {
+  width: 100%;
+  max-width: var(--page-width, 1180px);
+  margin-inline: auto;
+}
+
+/* =========================================
+   TITULAR EDITORIAL
+   ========================================= */
+
+.configurator-cta__title {
+  max-width: 850px;
+  margin: 0;
+
+  font-family: var(--font-brand, "Space Grotesk", sans-serif);
+  font-size: clamp(36px, 5.5vw, 68px);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+}
+
+.configurator-cta__title span {
+  color: var(--cta-accent);
+}
+
+.configurator-cta__subtitle {
+  margin: 24px 0 12px;
+
+  font-family: var(--font-brand, "Space Grotesk", sans-serif);
+  font-size: clamp(21px, 2.5vw, 30px);
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.configurator-cta__description {
+  max-width: 680px;
+  margin: 0;
+
+  color: var(--cta-muted);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+/* =========================================
+   PANEL DEL CONFIGURADOR
+   ========================================= */
 
 .configurator-cta__panel {
   margin-top: 34px;
   padding: clamp(20px, 3vw, 30px);
-  background: var(--panel, #EAE7DE);
-  border: 1px solid var(--line, #D9D4C8);
+
+  background: var(--cta-panel);
+  border: 1px solid var(--cta-line);
   border-radius: var(--radius, 12px);
 }
+
+/* Logo | Texto | Botón */
 
 .configurator-cta__product {
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr) 220px;
   align-items: stretch;
   gap: 24px;
+
   min-width: 0;
 }
+
+/* =========================================
+   LOGO 3D TWINS
+   ========================================= */
 
 .configurator-cta__logo {
   display: flex;
   align-self: center;
-  width: 76px;
-  height: 76px;
   align-items: center;
   justify-content: center;
+
+  width: 76px;
+  height: 76px;
+  min-width: 0;
 }
 
 .configurator-cta__logo img {
@@ -2819,15 +2907,21 @@ body.access-modal-open {
   object-fit: contain;
 }
 
+/* =========================================
+   INFORMACIÓN DEL PRODUCTO
+   ========================================= */
+
 .configurator-cta__product-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
+
   min-width: 0;
 }
 
 .configurator-cta__product-info h4 {
   margin: 0 0 10px;
+
   font-family: var(--font-brand, "Space Grotesk", sans-serif);
   font-size: clamp(21px, 2.2vw, 28px);
   font-weight: 600;
@@ -2838,60 +2932,79 @@ body.access-modal-open {
 .configurator-cta__product-info p {
   max-width: none;
   margin: 0;
-  color: var(--muted, #716B60);
+
+  color: var(--cta-muted);
   font-size: clamp(15px, 1.3vw, 17px);
   line-height: 1.65;
 }
 
-/* Square CTA occupying the right side */
+/* =========================================
+   BOTÓN NARANJA CUADRADO
+   Ocupa el lateral derecho de la ficha
+   ========================================= */
 
 .configurator-cta__button {
   display: flex;
-  width: 100%;
-  min-height: 140px;
   align-self: stretch;
   align-items: center;
   justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 140px;
   padding: 24px;
-  border: 1px solid var(--accent, #E5682E);
+
+  border: 1px solid var(--cta-accent);
   border-radius: 0;
-  background: var(--accent, #E5682E);
+
+  background: var(--cta-accent);
   color: #FFFFFF;
+
   font-family: var(--font-body, "IBM Plex Sans", sans-serif);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
   text-align: center;
   text-decoration: none;
+
   transition:
     background-color 180ms ease,
-    border-color 180ms ease;
+    border-color 180ms ease,
+    color 180ms ease;
 }
 
 .configurator-cta__button:hover {
-  background: var(--primary-hover, #294A59);
-  border-color: var(--primary-hover, #294A59);
+  background: var(--cta-hover);
+  border-color: var(--cta-hover);
   color: #FFFFFF;
 }
 
 .configurator-cta__button:focus-visible {
-  outline: 2px solid var(--primary, #416D80);
+  outline: 2px solid var(--cta-primary);
   outline-offset: 4px;
 }
 
-/* Process steps */
+/* =========================================
+   DIVISOR
+   ========================================= */
 
 .configurator-cta__divider {
   height: 1px;
   margin: 24px 0;
-  background: var(--line, #D9D4C8);
+
+  background: var(--cta-line);
 }
+
+/* =========================================
+   SECUENCIA DE CAPACIDADES
+   ========================================= */
 
 .configurator-cta__steps {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 0;
+
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2900,7 +3013,9 @@ body.access-modal-open {
 .configurator-cta__steps li {
   display: inline-flex;
   align-items: center;
-  color: var(--primary, #416D80);
+
+  color: var(--cta-primary);
+
   font-family: var(--font-data, "IBM Plex Mono", monospace);
   font-size: 11px;
   font-weight: 500;
@@ -2913,16 +3028,21 @@ body.access-modal-open {
 .configurator-cta__steps li:not(:last-child)::after {
   content: "→";
   margin: 0 13px;
-  color: var(--muted, #716B60);
+
+  color: var(--cta-muted);
   font-family: var(--font-body, "IBM Plex Sans", sans-serif);
   font-size: 14px;
 }
 
-/* Signature */
+/* =========================================
+   FIRMA DE ESPECIALIZACIÓN
+   ========================================= */
 
 .configurator-cta__signature {
   margin: 22px 0 0;
-  color: var(--text, #242522);
+
+  color: var(--cta-text);
+
   font-family: var(--font-body, "IBM Plex Sans", sans-serif);
   font-size: 12px;
   font-weight: 700;
@@ -2930,9 +3050,16 @@ body.access-modal-open {
   letter-spacing: 0.01em;
 }
 
-/* Responsive */
+/* =========================================
+   TABLET Y MÓVIL
+   ========================================= */
 
 @media (max-width: 760px) {
+  .configurator-cta {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
   .configurator-cta__product {
     grid-template-columns: 60px minmax(0, 1fr);
     gap: 18px;
@@ -2951,7 +3078,21 @@ body.access-modal-open {
 }
 
 @media (max-width: 480px) {
+  .configurator-cta {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  .configurator-cta__subtitle {
+    margin-top: 20px;
+  }
+
+  .configurator-cta__description {
+    font-size: 15px;
+  }
+
   .configurator-cta__panel {
+    margin-top: 26px;
     padding: 16px;
   }
 
@@ -2973,6 +3114,12 @@ body.access-modal-open {
     font-size: 14px;
   }
 
+  .configurator-cta__button {
+    min-height: 60px;
+    padding: 16px;
+    font-size: 13px;
+  }
+
   .configurator-cta__steps li {
     font-size: 10px;
   }
@@ -2980,13 +3127,22 @@ body.access-modal-open {
   .configurator-cta__steps li:not(:last-child)::after {
     margin-inline: 8px;
   }
+
+  .configurator-cta__signature {
+    font-size: 12px;
+  }
 }
+
+/* =========================================
+   ACCESIBILIDAD
+   ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .configurator-cta__button {
     transition: none;
   }
 }
+
 
     
   </style>
