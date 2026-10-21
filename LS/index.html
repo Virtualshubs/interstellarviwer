@@ -2784,91 +2784,28 @@ body.access-modal-open {
 
 
     
-/* =========================================
-   3D TWINS — CONFIGURATOR CTA
-   Editorial / Lite Space
-   ========================================= */
-
-.configurator-cta {
-  --cta-bg: var(--bg, #F3F1EA);
-  --cta-panel: var(--panel, #EAE7DE);
-  --cta-line: var(--line, #D9D4C8);
-  --cta-text: var(--text, #242522);
-  --cta-muted: var(--muted, #716B60);
-  --cta-primary: var(--primary, #416D80);
-  --cta-accent: var(--accent, #E5682E);
-
-  width: 100%;
-  box-sizing: border-box;
-  padding: clamp(48px, 7vw, 88px) var(--gutter, clamp(22px, 6vw, 84px));
-  background: var(--cta-bg);
-  color: var(--cta-text);
-  font-family: var(--font-body, "IBM Plex Sans", sans-serif);
-}
-
-.configurator-cta *,
-.configurator-cta *::before,
-.configurator-cta *::after {
-  box-sizing: border-box;
-}
-
-.configurator-cta__content {
-  width: 100%;
-  max-width: var(--page-width, 1180px);
-  margin-inline: auto;
-}
-
-.configurator-cta__title {
-  margin: 0;
-  max-width: 850px;
-  font-family: var(--font-brand, "Space Grotesk", sans-serif);
-  font-size: clamp(36px, 5.5vw, 68px);
-  font-weight: 600;
-  line-height: 1.04;
-  letter-spacing: -0.055em;
-}
-
-.configurator-cta__title span {
-  color: var(--cta-accent);
-}
-
-.configurator-cta__subtitle {
-  margin: 24px 0 12px;
-  font-family: var(--font-brand, "Space Grotesk", sans-serif);
-  font-size: clamp(21px, 2.5vw, 30px);
-  font-weight: 400;
-  line-height: 1.25;
-  letter-spacing: -0.025em;
-}
-
-.configurator-cta__description {
-  max-width: 680px;
-  margin: 0;
-  color: var(--cta-muted);
-  font-size: 16px;
-  line-height: 1.75;
-}
 
 /* Product panel */
 
 .configurator-cta__panel {
   margin-top: 34px;
-  padding: clamp(18px, 3vw, 28px);
-  background: var(--cta-panel);
-  border: 1px solid var(--cta-line);
+  padding: clamp(20px, 3vw, 30px);
+  background: var(--panel, #EAE7DE);
+  border: 1px solid var(--line, #D9D4C8);
   border-radius: var(--radius, 12px);
 }
 
 .configurator-cta__product {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 220px;
+  align-items: stretch;
+  gap: 24px;
   min-width: 0;
 }
 
 .configurator-cta__logo {
   display: flex;
-  flex: 0 0 76px;
+  align-self: center;
   width: 76px;
   height: 76px;
   align-items: center;
@@ -2883,39 +2820,72 @@ body.access-modal-open {
 }
 
 .configurator-cta__product-info {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-width: 0;
 }
 
 .configurator-cta__product-info h4 {
-  margin: 0 0 6px;
+  margin: 0 0 10px;
   font-family: var(--font-brand, "Space Grotesk", sans-serif);
-  font-size: clamp(17px, 2vw, 21px);
+  font-size: clamp(21px, 2.2vw, 28px);
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
 }
 
 .configurator-cta__product-info p {
+  max-width: none;
   margin: 0;
-  color: var(--cta-muted);
-  font-size: 14px;
-  line-height: 1.6;
+  color: var(--muted, #716B60);
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.65;
 }
 
-.configurator-cta__external {
-  flex: 0 0 auto;
-  color: var(--cta-primary);
-  font-size: 30px;
-  line-height: 1;
+/* Square CTA occupying the right side */
+
+.configurator-cta__button {
+  display: flex;
+  width: 100%;
+  min-height: 140px;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border: 1px solid var(--accent, #E5682E);
+  border-radius: 0;
+  background: var(--accent, #E5682E);
+  color: #FFFFFF;
+  font-family: var(--font-body, "IBM Plex Sans", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
 }
+
+.configurator-cta__button:hover {
+  background: var(--primary-hover, #294A59);
+  border-color: var(--primary-hover, #294A59);
+  color: #FFFFFF;
+}
+
+.configurator-cta__button:focus-visible {
+  outline: 2px solid var(--primary, #416D80);
+  outline-offset: 4px;
+}
+
+/* Process steps */
 
 .configurator-cta__divider {
   height: 1px;
   margin: 24px 0;
-  background: var(--cta-line);
+  background: var(--line, #D9D4C8);
 }
-
-/* Process steps */
 
 .configurator-cta__steps {
   display: flex;
@@ -2930,7 +2900,7 @@ body.access-modal-open {
 .configurator-cta__steps li {
   display: inline-flex;
   align-items: center;
-  color: var(--cta-primary);
+  color: var(--primary, #416D80);
   font-family: var(--font-data, "IBM Plex Mono", monospace);
   font-size: 11px;
   font-weight: 500;
@@ -2943,57 +2913,16 @@ body.access-modal-open {
 .configurator-cta__steps li:not(:last-child)::after {
   content: "→";
   margin: 0 13px;
-  color: var(--cta-muted);
+  color: var(--muted, #716B60);
   font-family: var(--font-body, "IBM Plex Sans", sans-serif);
   font-size: 14px;
 }
 
-/* CTA button */
-
-.configurator-cta__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  min-height: 52px;
-  margin-top: 24px;
-  padding: 15px 22px;
-  border: 1px solid var(--cta-accent);
-  border-radius: var(--radius, 12px);
-  background: var(--cta-accent);
-  color: #FFFFFF;
-  font-family: var(--font-body, "IBM Plex Sans", sans-serif);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-decoration: none;
-  transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    transform 180ms ease;
-}
-
-.configurator-cta__button:hover {
-  background: var(--primary-hover, #294A59);
-  border-color: var(--primary-hover, #294A59);
-  color: #FFFFFF;
-}
-
-.configurator-cta__button:focus-visible {
-  outline: 2px solid var(--cta-primary);
-  outline-offset: 4px;
-}
-
-.configurator-cta__button-arrow {
-  font-size: 18px;
-  line-height: 1;
-}
-
-/* Editorial signature */
+/* Signature */
 
 .configurator-cta__signature {
   margin: 22px 0 0;
-  color: var(--cta-text);
+  color: var(--text, #242522);
   font-family: var(--font-body, "IBM Plex Sans", sans-serif);
   font-size: 12px;
   font-weight: 700;
@@ -3003,41 +2932,45 @@ body.access-modal-open {
 
 /* Responsive */
 
-@media (max-width: 600px) {
-  .configurator-cta {
-    padding-top: 48px;
-    padding-bottom: 48px;
+@media (max-width: 760px) {
+  .configurator-cta__product {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 18px;
   }
 
-  .configurator-cta__subtitle {
-    margin-top: 20px;
+  .configurator-cta__logo {
+    width: 60px;
+    height: 60px;
   }
 
-  .configurator-cta__description {
-    font-size: 15px;
-  }
-
-  .configurator-cta__panel {
-    margin-top: 26px;
+  .configurator-cta__button {
+    grid-column: 1 / -1;
+    min-height: 64px;
     padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .configurator-cta__panel {
+    padding: 16px;
   }
 
   .configurator-cta__product {
+    grid-template-columns: 48px minmax(0, 1fr);
     gap: 14px;
   }
 
   .configurator-cta__logo {
-    flex-basis: 54px;
-    width: 54px;
-    height: 54px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .configurator-cta__product-info h4 {
+    font-size: 19px;
   }
 
   .configurator-cta__product-info p {
-    font-size: 13px;
-  }
-
-  .configurator-cta__external {
-    font-size: 24px;
+    font-size: 14px;
   }
 
   .configurator-cta__steps li {
@@ -3046,12 +2979,6 @@ body.access-modal-open {
 
   .configurator-cta__steps li:not(:last-child)::after {
     margin-inline: 8px;
-  }
-
-  .configurator-cta__button {
-    width: 100%;
-    gap: 12px;
-    padding-inline: 14px;
   }
 }
 
@@ -4012,23 +3939,12 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
           </p>
         </div>
 
-         <a
-      class="configurator-cta__button"
-      href="https://3dtwins.es/"
-    >
-      <span>Explorar el configurador</span>
-      <span class="configurator-cta__button-arrow"
-            aria-hidden="true">↗</span>
-    </a>
-
-    <p class="configurator-cta__signature">
-      Especialistas en gemelos digitales interactivos para B2B,
-      B2B2C y B2C.
-    </p>
-
-        <span class="configurator-cta__external" aria-hidden="true">
-          ↗
-        </span>
+        <a
+          class="configurator-cta__button"
+          href="#"
+        >
+          <span>Explorar el configurador</span>
+        </a>
 
       </div>
 
@@ -4045,8 +3961,14 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
     </div>
 
+    <p class="configurator-cta__signature">
+      Especialistas en gemelos digitales interactivos para B2B,
+      B2B2C y B2C.
+    </p>
+
   </div>
 </section>
+
 
 
 
