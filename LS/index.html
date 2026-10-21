@@ -1670,6 +1670,7 @@ body.access-modal-open {
 
     
 
+
 /* =========================================================
    LITE SPACE · REPOSITORIO → ESCENA 3D
    ========================================================= */
@@ -1741,13 +1742,22 @@ body.access-modal-open {
   line-height: 1.7;
 }
 
-/* Escenario */
+/* Escenario · collage asimétrico */
 
 .transfer-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 38px minmax(0, .82fr) 38px minmax(0, 1fr);
+  grid-template-columns:
+    minmax(0, .82fr)
+    38px
+    minmax(0, 1.6fr);
+  grid-template-rows: auto 26px auto;
+  grid-template-areas:
+    "repository . viewer"
+    "first      . viewer"
+    "engine   second viewer";
   align-items: stretch;
-  gap: 12px;
+  column-gap: 12px;
+  row-gap: 0;
   position: relative;
   isolation: isolate;
 }
@@ -1805,6 +1815,24 @@ body.access-modal-open {
   color: var(--transfer-muted);
   font-size: 11px;
   line-height: 1.6;
+}
+
+/* Distribución de los módulos */
+
+.transfer-repository {
+  grid-area: repository;
+  min-width: 0;
+}
+
+.transfer-engine {
+  grid-area: engine;
+  min-width: 0;
+}
+
+.transfer-viewer {
+  grid-area: viewer;
+  min-width: 0;
+  min-height: 0;
 }
 
 /* Repositorio */
@@ -1956,14 +1984,14 @@ body.access-modal-open {
   background: var(--transfer-green);
 }
 
-/* Conectores */
+/* Conectores del flujo */
 
 .transfer-connector {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0;
+  min-width: 0;
   color: var(--transfer-blue);
 }
 
@@ -1978,7 +2006,34 @@ body.access-modal-open {
 }
 
 .transfer-connector--first {
+  grid-area: first;
+  flex-direction: column;
   color: var(--transfer-orange);
+}
+
+.transfer-connector--first .transfer-connector-line {
+  width: 1px;
+  height: 10px;
+}
+
+.transfer-connector--first > .material-symbols-outlined {
+  font-size: 20px;
+  transform: rotate(90deg);
+}
+
+.transfer-connector--second {
+  grid-area: second;
+  flex-direction: row;
+  color: var(--transfer-orange);
+}
+
+.transfer-connector--second .transfer-connector-line {
+  width: 10px;
+  height: 1px;
+}
+
+.transfer-connector--second > .material-symbols-outlined {
+  font-size: 20px;
 }
 
 /* Lite Space */
@@ -2001,7 +2056,7 @@ body.access-modal-open {
 
 .engine-surface {
   display: flex;
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 250px;
   flex-direction: column;
   align-items: center;
@@ -2165,7 +2220,6 @@ body.access-modal-open {
 .transfer-viewer {
   display: flex;
   flex-direction: column;
-  min-width: 0;
 }
 
 .viewer-status {
@@ -2183,9 +2237,9 @@ body.access-modal-open {
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   min-width: 0;
-  min-height: 286px;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #353732;
   border-radius: 8px;
@@ -2578,77 +2632,79 @@ body.access-modal-open {
   font-size: 16px;
 }
 
-/* Escritorio */
+/* Escritorio amplio */
 
 @media (min-width: 1200px) {
+  .transfer-stage {
+    grid-template-columns:
+      minmax(0, .82fr)
+      42px
+      minmax(0, 1.6fr);
+    column-gap: 16px;
+  }
+
   .transfer-module {
     padding: 17px;
   }
 
   .engine-surface {
-    min-height: 290px;
+    min-height: 250px;
   }
 
   .transfer-viewer-window {
-    min-height: 326px;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   #transferViewerIframe {
+    flex: 1 0 290px;
     height: 290px;
     min-height: 290px;
-    flex-basis: 290px;
   }
 }
 
-/* Tableta */
+/* Tableta y portátil */
 
-@media (max-width: 850px) {
+@media (min-width: 561px) and (max-width: 850px) {
   .transfer-stage {
-    grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
-    gap: 10px;
+    grid-template-columns:
+      minmax(0, .82fr)
+      28px
+      minmax(0, 1.45fr);
+    grid-template-rows: auto 26px auto;
+    column-gap: 8px;
   }
 
-  .transfer-engine {
-    grid-column: 1;
-    grid-row: 2;
+  .transfer-module {
+    padding: 11px;
   }
 
-  .transfer-connector--first {
-    grid-column: 2;
-    grid-row: 1;
+  .transfer-module-header {
+    flex-wrap: wrap;
   }
 
-  .transfer-connector--second {
-    grid-column: 2;
-    grid-row: 2;
-  }
-
-  .transfer-viewer {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-  }
-
-  .transfer-repository {
-    grid-column: 1;
-    grid-row: 1;
+  .transfer-module-caption {
+    min-height: 0;
   }
 
   .engine-surface {
     min-height: 235px;
+    padding-inline: 6px;
   }
 
   .transfer-viewer-window {
-    min-height: 271px;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   #transferViewerIframe {
+    flex: 1 0 235px;
     height: 235px;
     min-height: 235px;
-    flex-basis: 235px;
   }
 }
 
-/* Móvil */
+/* Móvil: módulos apilados */
 
 @media (max-width: 560px) {
   .lite-transfer {
@@ -2674,6 +2730,7 @@ body.access-modal-open {
   }
 
   .transfer-connector {
+    align-self: center;
     height: 25px;
     flex-direction: row;
   }
@@ -2683,9 +2740,8 @@ body.access-modal-open {
     height: 1px;
   }
 
-  .transfer-connector--first,
-  .transfer-connector--second {
-    align-self: center;
+  .transfer-connector--first > .material-symbols-outlined {
+    transform: none;
   }
 
   .engine-surface {
@@ -2693,13 +2749,14 @@ body.access-modal-open {
   }
 
   .transfer-viewer-window {
+    flex: 0 0 auto;
     min-height: 296px;
   }
 
   #transferViewerIframe {
+    flex: 0 0 260px;
     height: 260px;
     min-height: 260px;
-    flex-basis: 260px;
   }
 
   .transfer-bottom {
