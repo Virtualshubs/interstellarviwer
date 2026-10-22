@@ -3160,6 +3160,163 @@ body.access-modal-open {
   }
 }
 
+
+
+
+#promoWidgetOverlay {
+z-index: 90000;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+ overflow: hidden;
+
+}
+#promoWidgetOverlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#promoWidgetContainer {
+z-index: 99000;
+  width: 90vw;
+  max-width: 550px;
+  height: 85vh;
+  background: #f1f1f1;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.5s ease;
+  position: relative;
+  font-family: system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+#promoWidgetOverlay.active #promoWidgetContainer {
+  transform: scale(1);
+}
+
+
+#promoWidgetContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+#promoWidgetText {
+  text-align: center;
+  margin-bottom: 16px;
+}
+#promoWidgetText h1 {
+top:10px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #000;
+}
+#promoWidgetText p {
+  font-size: 1.3rem;
+  color: #000;
+  line-height: 1.4;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+
+#promoWidgetIframeWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch; /* se estira verticalmente */
+  background: #f1f1f1;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0; 
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* --- Iframe --- */
+#promoWidgetIframe {
+  width: 100%;
+  height: 100%; 
+  border: none;
+  border-radius: 0;
+  display: block;
+  object-fit: fill;
+}
+
+
+#promoWidgetFooter {
+  text-align: center;
+}
+.promoWidgetButton {
+  display: inline-block;
+  background: linear-gradient(90deg, #00bcd4, #00ffcc);
+  color: #111;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.promoWidgetButton:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* --- Botón cerrar --- */
+#promoWidgetClose {
+  position: absolute;
+  top: 0px;
+  right: 14px;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  color: orange;
+  z-index: 10;
+}
+
+/* --- RESPONSIVE MÓVIL --- */
+@media (max-width: 768px) {
+  #promoWidgetContainer {
+    width: 90vh;
+    height: 90vh;
+    border-radius: 14px;
+  }
+  #promoWidgetContent {
+    padding: 12px;
+  }
+  #promoWidgetText h1 {
+    font-size: 1.9rem;
+  }
+  #promoWidgetText p {
+    font-size: 1rem;
+  }
+  #promoWidgetIframeWrapper {
+    margin-bottom: 12px;
+  }
+  #promoWidgetIframe {
+    width: 100%;
+    height: 100%; 
+    object-fit: fill; 
+  }
+  .promoWidgetButton {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+  }
+}
+
+    
+
   </style>
 </head>
 <body>
@@ -4147,10 +4304,37 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 </section>
 
 
+<div id="promoWidgetOverlay">
+  <div id="promoWidgetContainer">
+    <span id="promoWidgetClose">&times;</span>
+
+    <div id="promoWidgetContent">
+      <div id="promoWidgetText">
+        <h1><strong>✨ Crea configuradores de producto 3D interactivos en minutos</strong></h1>
+        <p>·sin conocimiento de código ni 3D</p>
+      </div>
+
+      <div id="promoWidgetIframeWrapper">
+        <iframe
+          id="promoWidgetIframe"
+          src="https://scene.3dtwins.tech/?scene=aHR0cHM6Ly9wcm9kdWN0LjNkdHdpbnMudGVjaC8/bmFtZT1Tb2YlQzMlQTEmY29uZmlnPUJhc2VfbWV0JUMzJUExbGljYSUzQSUyMzAzMDQyYiU3Q0VzdHJ1Y3R1cmFfaW50ZXJuYSUzQSUyMzFmMWYxZiU3Q0VzdHJ1Y3R1cmFfYmFzZSUzQSUyMzE3MTcxNyU3Q0VzdHJ1Y3R1cmFfZXh0ZXJuYSUzQSUyMzEyMTIxMiU3Q0NvamluZXNfYXV4aWxpYXJlcyUzQSUyMzc2NzQ3NCU3Q0FzaWVudG9zJTNBJTIzMDgwODA4JnF1YW50aXR5PTEmdG9rZW49MDk4ZDM1ZmUtNDBkZC00MzZlLWIyNDUtNWMzZjA4NWJhYWIxJm1vZGVsVXJsPWh0dHBzJTNBJTJGJTJGdmlld2VyLjNkdHdpbnMudGVjaCUyRlNvZmElQ0MlODEuZ2xiJmJ1eVVSTD1odHRwcyUzQSUyRiUyRjNkdHdpbnMuZXM="
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <div id="promoWidgetFooter">
+        <a href="https://3dtwins.es/pages/integraciones" target="_blank" class="promoWidgetButton">
+          Descubre más sobre nuestra tecnología para gemelos digitales.
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
   
+
 </main>
 
 <footer class="site-footer">
@@ -5504,6 +5688,25 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
   updateScrollProgress();
 })();
+
+
+
+(function() {
+  const overlay = document.getElementById('promoWidgetOverlay');
+  const container = document.getElementById('promoWidgetContainer');
+  const closeBtn = document.getElementById('promoWidgetClose');
+  const iframe = document.getElementById('promoWidgetIframe');
+
+  function openWidget() { overlay.classList.add('active'); }
+  function closeWidget() { overlay.classList.remove('active'); setTimeout(()=>{ iframe.src=''; },400); }
+
+  closeBtn.onclick = closeWidget;
+  overlay.onclick = (e) => { if(e.target===overlay) closeWidget(); }
+
+  const delay = 2000 + Math.random()*7000;
+  setTimeout(openWidget, delay);
+})();
+
     
   </script>
 </body>
