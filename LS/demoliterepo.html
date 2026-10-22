@@ -1915,7 +1915,19 @@ if (new URLSearchParams(location.search).get("scene")) {
 </button>
   
     
-<div id="registerOverlay" class="register-overlay" hidden>
+
+    <div class="label" hidden>Share link</div>
+    <div id="linkBox" hidden>No scene generated yet</div>
+    <div id="exportActions" style="display:none;margin-top:12px;gap:8px;flex-direction:column;">
+      <button class="btn btn-secondary" onclick="openScene()">Go to scene</button>
+      <button class="btn btn-secondary" onclick="copyURL()">Copy URL</button>
+      <button class="btn btn-secondary" onclick="generateQR()">Generate QR</button>
+    </div>
+    <div class="stepNav"><button class="btn btn-secondary" onclick="goStep(2)">Back</button></div>
+  </div>
+</div>
+
+  <div id="registerOverlay" class="register-overlay" hidden>
 
   <div class="register-card">
     <span class="register-label">3D TWINS · LITE SPACE</span>
@@ -1940,16 +1952,6 @@ if (new URLSearchParams(location.search).get("scene")) {
     >
       ×
     </button>
-  </div>
-</div>
-    <div class="label" hidden>Share link</div>
-    <div id="linkBox" hidden>No scene generated yet</div>
-    <div id="exportActions" style="display:none;margin-top:12px;gap:8px;flex-direction:column;">
-      <button class="btn btn-secondary" onclick="openScene()">Go to scene</button>
-      <button class="btn btn-secondary" onclick="copyURL()">Copy URL</button>
-      <button class="btn btn-secondary" onclick="generateQR()">Generate QR</button>
-    </div>
-    <div class="stepNav"><button class="btn btn-secondary" onclick="goStep(2)">Back</button></div>
   </div>
 </div>
 
