@@ -1960,6 +1960,87 @@ if (new URLSearchParams(location.search).get("scene")) {
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/DRACOLoader.js"></script>
 
 <script>
+
+
+/* ================= SECURITY: INPUT VALIDATION ================= */
+
+const LITE_SECURITY = Object.freeze({
+  maxTextLength: 2000,
+  maxSceneLength: 200000,
+  maxModelURLLength: 4096,
+  maxBackgroundURLLength: 4096
+});
+
+function getSafeText(value, maxLength = LITE_SECURITY.maxTextLength) {
+  if (typeof value !== "string") return "";
+
+  const text = value.trim();
+
+  if (!text || text.length > maxLength) return "";
+
+  // Reject control characters, including null bytes.
+  if (/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text)) {
+    return "";
+  }
+
+  return text;
+}
+
+function getSafeModelURL(value) {
+  const text = getSafeText(value, LITE_SECURITY.maxModelURLLength);
+  if (!text) return null;
+
+  try {
+    const url = new URL(text);
+
+    if (url.protocol !== "https:") return null;
+    if (url.username || url.password) return null;
+    if (!/\.(glb|gltf)$/i.test(url.pathname)) return null;
+
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function getSafeBackgroundURL(value) {
+  const text = getSafeText(value, LITE_SECURITY.maxBackgroundURLLength);
+  if (!text) return null;
+
+  try {
+    const url = new URL(text);
+
+    if (url.protocol !== "https:") return null;
+    if (url.username || url.password) return null;
+    if (!/\.(jpe?g)$/i.test(url.pathname)) return null;
+
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
+function getSafeColor(value, fallback = "#0e0f13") {
+  return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value)
+    ? value
+    : fallback;
+}
+
+function getSafeNumber(value, min, max) {
+  if (value === null || value === undefined || value === "") return null;
+
+  const number = Number(value);
+
+  return Number.isFinite(number) && number >= min && number <= max
+    ? number
+    : null;
+}
+
+function getSafeMetadataText(value, maxLength = 300) {
+  return getSafeText(value, maxLength);
+}
+
+  
 /* ================= CONFIG ================= */
 
 const DEFAULT_BACKGROUND_IMAGE = {
