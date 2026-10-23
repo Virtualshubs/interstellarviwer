@@ -1938,13 +1938,14 @@ if (new URLSearchParams(location.search).get("scene")) {
       Regístrate para publicar y exportar tus propias escenas 3D.
     </p>
 
-<button
-  type="button"
+<a
+  id="registerButton"
   class="btn btn-primary"
-  onclick="goToRegister()"
+  target="_blank"
+  rel="noopener noreferrer"
 >
   Crear cuenta
-</button>
+</a>
 
     <button
       class="register-close"
@@ -2059,10 +2060,9 @@ function closeRegisterMessage() {
   document.getElementById("registerOverlay").hidden = true;
 }
 
-function goToRegister() {
-  const url = "https://3d.staratlas.es/LS/earlyliteaccess.html";
-  window.open(url, "_blank", "noopener,noreferrer");
-}
+document.getElementById("registerButton").href =
+  "https://3d.staratlas.es/LS/earlyliteaccess.html";
+  
 /* ================= STATE ================= */
 
 let scene, camera, renderer, controls, model;
