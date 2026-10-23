@@ -5976,6 +5976,12 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
 
 
+
+    
+
+
+
+
 (() => {
   "use strict";
 
@@ -6007,8 +6013,8 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   });
 
   /* =========================================
-     VALIDACIÓN DE ENTRADAS
-     Bloqueo de HTML, URL y protocolos
+     VALIDACIÓN RESTRICTIVA DE ENTRADAS
+     Solo texto corriente en los campos.
      ========================================= */
 
   const fields = [
@@ -6016,70 +6022,109 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
       id: "license-name",
       name: "name",
       maxLength: 120,
-      multiline: false
+      type: "name"
     },
     {
       id: "license-company",
       name: "company",
       maxLength: 160,
-      multiline: false
+      type: "company"
     },
     {
       id: "license-activity",
       name: "activity",
       maxLength: 1500,
-      multiline: true
+      type: "activity"
     }
   ];
 
   /*
-   * Detecta etiquetas HTML, entidades, URL habituales
-   * y protocolos potencialmente peligrosos.
+   * Lista permitida por campo.
+   * Se rechaza cualquier carácter que no esté autorizado.
+   * No se pretende interpretar ni ejecutar el contenido.
    */
-  function containsForbiddenContent(value) {
-    const patterns = [
-      /<\s*\/?\s*[a-z][^>]*>/i,
-      /<\s*!|<\s*\?/i,
-      /&(?:lt|gt|quot|apos|amp|#\d+|#x[\da-f]+);/i,
+  const allowedPatterns = {
+    name: /^[\p{L}\p{M}\p{N} .'\u2019-]*$/u,
 
-      /\b(?:https?|ftp|file|javascript|data|vbscript|blob|about):/i,
+    company: /^[\p{L}\p{M}\p{N} &.,'’\-()+]*$/u,
 
-      /\bwww\./i,
+    activity: /^[\p{L}\p{M}\p{N} \t\n\r.,;:!?¿¡'’"“”\-()€%/]*$/u
+  };
 
-      // Dominios con TLD habituales, con o sin ruta.
-      /(?:^|[\s(])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|es|net|org|io|dev|app|info|biz|eu|co|edu|gov|xyz|cat|online|site|tech)(?=$|[\s/:?#),])/i,
-
-      // Elementos HTML activos o capaces de cargar recursos.
-      /<\s*(?:script|iframe|img|svg|object|embed|link|meta|style|form|input|video|audio|source)\b/i
-    ];
-
-    return patterns.some((pattern) => pattern.test(value));
-  }
-
-  function isValidText(value, multiline = false) {
+  function isValidText(value, type) {
     if (typeof value !== "string") return false;
-    if (value.length > 1500) return false;
 
-    // Rechaza caracteres de control no necesarios.
-    const controlChars = multiline
-      ? /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/
-      : /[\u0000-\u001F\u007F]/;
+    const config = fields.find((item) => item.type === type);
+    if (!config || value.length > config.maxLength) return false;
 
-    if (controlChars.test(value)) return false;
-
-    // Rechaza controles bidireccionales que pueden ocultar
-    // visualmente partes del contenido.
-    if (/[\u202A-\u202E\u2066-\u2069]/.test(value)) {
+    // Rechaza controles, caracteres invisibles y controles
+    // bidireccionales que podrían alterar la presentación.
+    if (/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/u.test(value)) {
       return false;
     }
 
-    if (containsForbiddenContent(value)) return false;
+    const pattern = allowedPatterns[type];
+    return Boolean(pattern && pattern.test(value));
+  }
 
-    return true;
+  function isValidEmail(value) {
+    if (typeof value !== "string" || value.length > 254) {
+      return false;
+    }
+
+    // El correo admite @, pero no espacios, controles,
+    // etiquetas HTML, comillas ni separadores de cabecera.
+    if (/[\s\u0000-\u001F\u007F-\u009F<>()[\]\\,;:"`]/u.test(value)) {
+      return false;
+    }
+
+    return /^[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+$/i.test(value);
   }
 
   function setFieldError(field, message) {
     field.setCustomValidity(message);
+  }
+
+  function validateField(field, config, showError = false) {
+    const value = field.value;
+
+    if (value.length > config.maxLength) {
+      setFieldError(
+        field,
+        `Este campo no puede superar ${config.maxLength} caracteres.`
+      );
+
+      if (showError) field.reportValidity();
+      return false;
+    }
+
+    if (!isValidText(value, config.type)) {
+      setFieldError(
+        field,
+        "Introduce únicamente texto normal. No se permiten código, HTML, URL ni símbolos no autorizados."
+      );
+
+      if (showError) field.reportValidity();
+      return false;
+    }
+
+    setFieldError(field, "");
+    return true;
+  }
+
+  function getResultingLength(field, insertedText) {
+    const start = field.selectionStart;
+    const end = field.selectionEnd;
+
+    if (typeof start !== "number" || typeof end !== "number") {
+      return field.value.length + insertedText.length;
+    }
+
+    return (
+      field.value.length -
+      (end - start) +
+      insertedText.length
+    );
   }
 
   fields.forEach((config) => {
@@ -6087,35 +6132,21 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     if (!field) return;
 
     field.maxLength = config.maxLength;
+    field.autocomplete = "off";
+    field.spellcheck = false;
 
-    function validateField() {
-      const value = field.value;
+    field.addEventListener("input", () => {
+      validateField(field, config);
+    });
 
-      if (value.length > config.maxLength) {
-        setFieldError(
-          field,
-          `Este campo no puede superar ${config.maxLength} caracteres.`
-        );
-        return false;
-      }
+    field.addEventListener("change", () => {
+      validateField(field, config);
+    });
 
-      if (!isValidText(value, config.multiline)) {
-        setFieldError(
-          field,
-          "No se permiten etiquetas HTML, direcciones web ni protocolos en este campo."
-        );
-        return false;
-      }
-
-      setFieldError(field, "");
-      return true;
-    }
-
-    // Valida la escritura y los cambios de contenido.
-    field.addEventListener("input", validateField);
-    field.addEventListener("change", validateField);
-
-    // Comprueba el contenido pegado antes de introducirlo.
+    /*
+     * Valida el texto pegado antes de permitir su inserción.
+     * Considera el texto seleccionado que será reemplazado.
+     */
     field.addEventListener("paste", (event) => {
       const clipboard = event.clipboardData;
       const pasted = clipboard
@@ -6124,14 +6155,14 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
       if (
         typeof pasted !== "string" ||
-        !isValidText(pasted, config.multiline) ||
-        field.value.length + pasted.length > config.maxLength
+        !isValidText(pasted, config.type) ||
+        getResultingLength(field, pasted) > config.maxLength
       ) {
         event.preventDefault();
 
         setFieldError(
           field,
-          "El contenido pegado no está permitido o supera el límite del campo."
+          "El texto pegado contiene caracteres no permitidos o supera el límite del campo."
         );
 
         field.reportValidity();
@@ -6141,23 +6172,27 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
       setFieldError(field, "");
     });
 
-    // Impide introducir mediante arrastre texto no permitido.
+    /*
+     * Impide introducir contenido no permitido mediante arrastre.
+     */
     field.addEventListener("drop", (event) => {
       const transfer = event.dataTransfer;
       const dropped = transfer
         ? transfer.getData("text/plain")
         : null;
 
+      // Se rechaza si el navegador no permite inspeccionar
+      // el texto antes de insertarlo.
       if (
         typeof dropped !== "string" ||
-        !isValidText(dropped, config.multiline) ||
-        field.value.length + dropped.length > config.maxLength
+        !isValidText(dropped, config.type) ||
+        getResultingLength(field, dropped) > config.maxLength
       ) {
         event.preventDefault();
 
         setFieldError(
           field,
-          "El contenido arrastrado no está permitido."
+          "El texto arrastrado contiene caracteres no permitidos o supera el límite del campo."
         );
 
         field.reportValidity();
@@ -6166,35 +6201,79 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   });
 
   /* =========================================
+     VALIDACIÓN DEL CORREO ELECTRÓNICO
+     ========================================= */
+
+  const emailField = form.querySelector("#license-email");
+
+  if (emailField) {
+    emailField.maxLength = 254;
+    emailField.autocomplete = "email";
+
+    function validateEmailField() {
+      const value = emailField.value.trim();
+
+      if (value && !isValidEmail(value)) {
+        setFieldError(
+          emailField,
+          "Introduce un correo electrónico válido, sin espacios ni contenido adicional."
+        );
+        return false;
+      }
+
+      setFieldError(emailField, "");
+      return true;
+    }
+
+    emailField.addEventListener("input", validateEmailField);
+    emailField.addEventListener("change", validateEmailField);
+
+    emailField.addEventListener("paste", (event) => {
+      const clipboard = event.clipboardData;
+      const pasted = clipboard
+        ? clipboard.getData("text/plain")
+        : null;
+
+      if (
+        typeof pasted !== "string" ||
+        /[\s\u0000-\u001F\u007F-\u009F<>()[\]\\,;:"`]/u.test(pasted) ||
+        getResultingLength(emailField, pasted) > 254
+      ) {
+        event.preventDefault();
+
+        setFieldError(
+          emailField,
+          "El correo pegado contiene caracteres no permitidos."
+        );
+
+        emailField.reportValidity();
+        return;
+      }
+
+      setFieldError(emailField, "");
+    });
+  }
+
+  /* =========================================
      VALIDACIÓN Y PREPARACIÓN DEL CORREO
      ========================================= */
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    // Valida de nuevo los campos protegidos antes del envío.
+    // Revalida los campos independientemente de los eventos
+    // anteriores: no confía en la validación durante la escritura.
     for (const config of fields) {
       const field = form.querySelector(`#${config.id}`);
-      if (!field) continue;
 
-      if (
-        field.value.length > config.maxLength ||
-        !isValidText(field.value, config.multiline)
-      ) {
-        setFieldError(
-          field,
-          "Revisa el contenido: no se permiten HTML, URL ni protocolos."
-        );
+      if (!field) return;
 
-        field.reportValidity();
+      if (!validateField(field, config, true)) {
         field.focus();
         return;
       }
-
-      setFieldError(field, "");
     }
 
-    // Mantiene la validación nativa de required, email y select.
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
@@ -6206,15 +6285,12 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     const activity = get("activity");
     const plan = get("plan");
 
-    // Evita URL y protocolos también en los datos que se
-    // incorporarán al asunto y al cuerpo del correo.
-    const emailPattern = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
-
-    if (!emailPattern.test(email) || containsForbiddenContent(email)) {
-      const emailField = form.querySelector("#license-email");
-
+    // Validación específica del correo: no aplicar aquí
+    // los filtros de URL de los campos de texto.
+    if (!isValidEmail(email)) {
       if (emailField) {
-        emailField.setCustomValidity(
+        setFieldError(
+          emailField,
           "Introduce un correo electrónico válido."
         );
         emailField.reportValidity();
@@ -6223,6 +6299,29 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
       return;
     }
+
+    // Solo se aceptan las opciones comerciales configuradas.
+    const planField = form.querySelector("#license-plan");
+
+    if (
+      !planField ||
+      !Array.from(planField.options).some(
+        (option) => option.value === plan && option.value !== ""
+      )
+    ) {
+      if (planField) {
+        setFieldError(
+          planField,
+          "Selecciona una de las licencias disponibles."
+        );
+        planField.reportValidity();
+        planField.focus();
+      }
+
+      return;
+    }
+
+    setFieldError(planField, "");
 
     const subject = `Solicitud de licencia B2B2C — ${company}`;
 
@@ -6250,7 +6349,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     window.location.href = mailto;
   });
 })();
-
 
     
     
