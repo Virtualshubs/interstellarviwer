@@ -1938,11 +1938,13 @@ if (new URLSearchParams(location.search).get("scene")) {
       Regístrate para publicar y exportar tus propias escenas 3D.
     </p>
 
-    <button
-      class="btn btn-primary"
-    >
-      Crear cuenta
-    </button>
+<button
+  type="button"
+  class="btn btn-primary"
+  onclick="goToRegister()"
+>
+  Crear cuenta
+</button>
 
     <button
       class="register-close"
@@ -2058,8 +2060,7 @@ function closeRegisterMessage() {
 }
 
 function goToRegister() {
-  // Sustituye esta línea por la URL o función de registro real.
-  window.location.blank = "";
+  window.open("https://3d.staratlas.es/LS/index.html", "_blank", "noopener,noreferrer");
 }
 
 /* ================= STATE ================= */
