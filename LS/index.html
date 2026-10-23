@@ -4423,7 +4423,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
 <div class="pricing-action">
   <a class="final-button" href="#solicitud-licencia" data-open-license-form>
-    Contacta con ventas para solicitar tu licencia
+  Solicita infomación o acceso B2B aquí.
     <span aria-hidden="true">↗</span>
   </a>
 </div>
@@ -4461,7 +4461,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     </select>
 
     <button class="final-button" type="submit">
-      Preparar correo de solicitud ↗
+      Enviar solicitud ↗
     </button>
     <button type="button" data-close-license-form>Cancelar</button>
   </form>
@@ -5969,11 +5969,16 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
 
 
-
-
     
 
+
+
+
+
+
 (() => {
+  "use strict";
+
   const section = document.querySelector("#precios");
   if (!section) return;
 
@@ -5984,37 +5989,254 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
   if (!openButton || !panel || !form || !closeButton) return;
 
+  /* =========================================
+     APERTURA Y CIERRE DEL FORMULARIO
+     ========================================= */
+
   openButton.addEventListener("click", (event) => {
     event.preventDefault();
     panel.hidden = false;
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
   });
 
   closeButton.addEventListener("click", () => {
     panel.hidden = true;
   });
 
+  /* =========================================
+     VALIDACIÓN DE ENTRADAS
+     Bloqueo de HTML, URL y protocolos
+     ========================================= */
+
+  const fields = [
+    {
+      id: "license-name",
+      name: "name",
+      maxLength: 120,
+      multiline: false
+    },
+    {
+      id: "license-company",
+      name: "company",
+      maxLength: 160,
+      multiline: false
+    },
+    {
+      id: "license-activity",
+      name: "activity",
+      maxLength: 1500,
+      multiline: true
+    }
+  ];
+
+  /*
+   * Detecta etiquetas HTML, entidades, URL habituales
+   * y protocolos potencialmente peligrosos.
+   */
+  function containsForbiddenContent(value) {
+    const patterns = [
+      /<\s*\/?\s*[a-z][^>]*>/i,
+      /<\s*!|<\s*\?/i,
+      /&(?:lt|gt|quot|apos|amp|#\d+|#x[\da-f]+);/i,
+
+      /\b(?:https?|ftp|file|javascript|data|vbscript|blob|about):/i,
+
+      /\bwww\./i,
+
+      // Dominios con TLD habituales, con o sin ruta.
+      /(?:^|[\s(])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|es|net|org|io|dev|app|info|biz|eu|co|edu|gov|xyz|cat|online|site|tech)(?=$|[\s/:?#),])/i,
+
+      // Elementos HTML activos o capaces de cargar recursos.
+      /<\s*(?:script|iframe|img|svg|object|embed|link|meta|style|form|input|video|audio|source)\b/i
+    ];
+
+    return patterns.some((pattern) => pattern.test(value));
+  }
+
+  function isValidText(value, multiline = false) {
+    if (typeof value !== "string") return false;
+    if (value.length > 1500) return false;
+
+    // Rechaza caracteres de control no necesarios.
+    const controlChars = multiline
+      ? /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/
+      : /[\u0000-\u001F\u007F]/;
+
+    if (controlChars.test(value)) return false;
+
+    // Rechaza controles bidireccionales que pueden ocultar
+    // visualmente partes del contenido.
+    if (/[\u202A-\u202E\u2066-\u2069]/.test(value)) {
+      return false;
+    }
+
+    if (containsForbiddenContent(value)) return false;
+
+    return true;
+  }
+
+  function setFieldError(field, message) {
+    field.setCustomValidity(message);
+  }
+
+  fields.forEach((config) => {
+    const field = form.querySelector(`#${config.id}`);
+    if (!field) return;
+
+    field.maxLength = config.maxLength;
+
+    function validateField() {
+      const value = field.value;
+
+      if (value.length > config.maxLength) {
+        setFieldError(
+          field,
+          `Este campo no puede superar ${config.maxLength} caracteres.`
+        );
+        return false;
+      }
+
+      if (!isValidText(value, config.multiline)) {
+        setFieldError(
+          field,
+          "No se permiten etiquetas HTML, direcciones web ni protocolos en este campo."
+        );
+        return false;
+      }
+
+      setFieldError(field, "");
+      return true;
+    }
+
+    // Valida la escritura y los cambios de contenido.
+    field.addEventListener("input", validateField);
+    field.addEventListener("change", validateField);
+
+    // Comprueba el contenido pegado antes de introducirlo.
+    field.addEventListener("paste", (event) => {
+      const clipboard = event.clipboardData;
+      const pasted = clipboard
+        ? clipboard.getData("text/plain")
+        : null;
+
+      if (
+        typeof pasted !== "string" ||
+        !isValidText(pasted, config.multiline) ||
+        field.value.length + pasted.length > config.maxLength
+      ) {
+        event.preventDefault();
+
+        setFieldError(
+          field,
+          "El contenido pegado no está permitido o supera el límite del campo."
+        );
+
+        field.reportValidity();
+        return;
+      }
+
+      setFieldError(field, "");
+    });
+
+    // Impide introducir mediante arrastre texto no permitido.
+    field.addEventListener("drop", (event) => {
+      const transfer = event.dataTransfer;
+      const dropped = transfer
+        ? transfer.getData("text/plain")
+        : null;
+
+      if (
+        typeof dropped !== "string" ||
+        !isValidText(dropped, config.multiline) ||
+        field.value.length + dropped.length > config.maxLength
+      ) {
+        event.preventDefault();
+
+        setFieldError(
+          field,
+          "El contenido arrastrado no está permitido."
+        );
+
+        field.reportValidity();
+      }
+    });
+  });
+
+  /* =========================================
+     VALIDACIÓN Y PREPARACIÓN DEL CORREO
+     ========================================= */
+
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    // Valida de nuevo los campos protegidos antes del envío.
+    for (const config of fields) {
+      const field = form.querySelector(`#${config.id}`);
+      if (!field) continue;
+
+      if (
+        field.value.length > config.maxLength ||
+        !isValidText(field.value, config.multiline)
+      ) {
+        setFieldError(
+          field,
+          "Revisa el contenido: no se permiten HTML, URL ni protocolos."
+        );
+
+        field.reportValidity();
+        field.focus();
+        return;
+      }
+
+      setFieldError(field, "");
+    }
+
+    // Mantiene la validación nativa de required, email y select.
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
     const get = (key) => String(data.get(key) || "").trim();
 
-    const subject = `Solicitud de licencia B2B2C — ${get("company")}`;
+    const name = get("name");
+    const email = get("email");
+    const company = get("company");
+    const activity = get("activity");
+    const plan = get("plan");
+
+    // Evita URL y protocolos también en los datos que se
+    // incorporarán al asunto y al cuerpo del correo.
+    const emailPattern = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+
+    if (!emailPattern.test(email) || containsForbiddenContent(email)) {
+      const emailField = form.querySelector("#license-email");
+
+      if (emailField) {
+        emailField.setCustomValidity(
+          "Introduce un correo electrónico válido."
+        );
+        emailField.reportValidity();
+        emailField.focus();
+      }
+
+      return;
+    }
+
+    const subject = `Solicitud de licencia B2B2C — ${company}`;
 
     const body = [
       "SOLICITUD COMERCIAL — 3D TWINS",
       "",
-      `Nombre: ${get("name")}`,
-      `Correo electrónico: ${get("email")}`,
-      `Empresa: ${get("company")}`,
+      `Nombre: ${name}`,
+      `Correo electrónico: ${email}`,
+      `Empresa: ${company}`,
       "",
       "Actividad de la empresa:",
-      get("activity"),
+      activity,
       "",
-      `Licencia solicitada: ${get("plan")}`,
+      `Licencia solicitada: ${plan}`,
       "",
       "Solicito información sobre las condiciones y la contratación de esta licencia."
     ].join("\n");
@@ -6024,6 +6246,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
       "?subject=" + encodeURIComponent(subject) +
       "&body=" + encodeURIComponent(body);
 
+    // Única navegación iniciada por este manejador.
     window.location.href = mailto;
   });
 })();
