@@ -5978,10 +5978,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
 
     
-
-
-
-
 (() => {
   "use strict";
 
@@ -6041,13 +6037,10 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   /*
    * Lista permitida por campo.
    * Se rechaza cualquier carácter que no esté autorizado.
-   * No se pretende interpretar ni ejecutar el contenido.
    */
   const allowedPatterns = {
     name: /^[\p{L}\p{M}\p{N} .'\u2019-]*$/u,
-
     company: /^[\p{L}\p{M}\p{N} &.,'’\-()+]*$/u,
-
     activity: /^[\p{L}\p{M}\p{N} \t\n\r.,;:!?¿¡'’"“”\-()€%/]*$/u
   };
 
@@ -6057,8 +6050,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     const config = fields.find((item) => item.type === type);
     if (!config || value.length > config.maxLength) return false;
 
-    // Rechaza controles, caracteres invisibles y controles
-    // bidireccionales que podrían alterar la presentación.
+    // Rechaza controles, caracteres invisibles y controles bidireccionales.
     if (/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/u.test(value)) {
       return false;
     }
@@ -6072,8 +6064,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
       return false;
     }
 
-    // El correo admite @, pero no espacios, controles,
-    // etiquetas HTML, comillas ni separadores de cabecera.
+    // El correo admite @, pero no espacios, controles ni separadores peligrosos.
     if (/[\s\u0000-\u001F\u007F-\u009F<>()[\]\\,;:"`]/u.test(value)) {
       return false;
     }
@@ -6120,11 +6111,33 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
       return field.value.length + insertedText.length;
     }
 
-    return (
-      field.value.length -
-      (end - start) +
-      insertedText.length
-    );
+    return field.value.length - (end - start) + insertedText.length;
+  }
+
+  /* =========================================
+     BLOQUEO DE ARRASTRE
+     ========================================= */
+
+  /*
+   * Bloquea cualquier contenido soltado sobre el campo,
+   * independientemente de que se pueda inspeccionar.
+   */
+  function blockDrop(field, message) {
+    field.addEventListener("dragover", (event) => {
+      event.preventDefault();
+
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+    });
+
+    field.addEventListener("drop", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      setFieldError(field, message);
+      field.reportValidity();
+    });
   }
 
   fields.forEach((config) => {
@@ -6145,7 +6158,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
     /*
      * Valida el texto pegado antes de permitir su inserción.
-     * Considera el texto seleccionado que será reemplazado.
      */
     field.addEventListener("paste", (event) => {
       const clipboard = event.clipboardData;
@@ -6172,32 +6184,10 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
       setFieldError(field, "");
     });
 
-    /*
-     * Impide introducir contenido no permitido mediante arrastre.
-     */
-    field.addEventListener("drop", (event) => {
-      const transfer = event.dataTransfer;
-      const dropped = transfer
-        ? transfer.getData("text/plain")
-        : null;
-
-      // Se rechaza si el navegador no permite inspeccionar
-      // el texto antes de insertarlo.
-      if (
-        typeof dropped !== "string" ||
-        !isValidText(dropped, config.type) ||
-        getResultingLength(field, dropped) > config.maxLength
-      ) {
-        event.preventDefault();
-
-        setFieldError(
-          field,
-          "El texto arrastrado contiene caracteres no permitidos o supera el límite del campo."
-        );
-
-        field.reportValidity();
-      }
-    });
+    blockDrop(
+      field,
+      "No se permite introducir contenido mediante arrastre. Escribe o pega texto válido."
+    );
   });
 
   /* =========================================
@@ -6252,7 +6242,40 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
 
       setFieldError(emailField, "");
     });
+
+    blockDrop(
+      emailField,
+      "No se permite introducir contenido mediante arrastre. Escribe o pega un correo válido."
+    );
   }
+
+  /*
+   * Bloquea la suelta de archivos en cualquier parte del formulario,
+   * incluidos los espacios entre campos.
+   */
+  form.addEventListener("dragover", (event) => {
+    const transfer = event.dataTransfer;
+
+    if (
+      transfer &&
+      Array.from(transfer.types || []).includes("Files")
+    ) {
+      event.preventDefault();
+      transfer.dropEffect = "none";
+    }
+  });
+
+  form.addEventListener("drop", (event) => {
+    const transfer = event.dataTransfer;
+
+    if (
+      transfer &&
+      Array.from(transfer.types || []).includes("Files")
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  });
 
   /* =========================================
      VALIDACIÓN Y PREPARACIÓN DEL CORREO
@@ -6261,8 +6284,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    // Revalida los campos independientemente de los eventos
-    // anteriores: no confía en la validación durante la escritura.
+    // Revalida todos los campos antes de continuar.
     for (const config of fields) {
       const field = form.querySelector(`#${config.id}`);
 
@@ -6285,8 +6307,7 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
     const activity = get("activity");
     const plan = get("plan");
 
-    // Validación específica del correo: no aplicar aquí
-    // los filtros de URL de los campos de texto.
+    // Validación específica del correo.
     if (!isValidEmail(email)) {
       if (emailField) {
         setFieldError(
@@ -6350,7 +6371,6 @@ Adaptamos el tamaño a móviles y escritorio, optimizamos el rendimiento y hacem
   });
 })();
 
-    
     
   </script>
 </body>
