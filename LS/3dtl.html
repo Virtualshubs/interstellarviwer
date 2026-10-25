@@ -1666,6 +1666,29 @@ if (new URLSearchParams(location.search).get("scene")) {
   Explore Rostock 3D Models
   </button>
 
+
+
+<div id="customRepoInputGroup" class="custom-repo-input-group">
+  <input
+    id="customRepoUrlInput"
+    type="text"
+    placeholder="Pega una URL de GitHub o de una carpeta..."
+    autocomplete="url"
+    spellcheck="false"
+    aria-label="URL del repositorio GitHub"
+  />
+
+  <button
+    id="customRepoLoadButton"
+    type="button"
+    class="btn btn-secondary"
+  >
+    Cargar
+  </button>
+</div>
+      
+      
+
   <div id="nasaExplorer" class="nasa-explorer" hidden>
       <div class="nasa-heading">
         <div>
@@ -3851,6 +3874,437 @@ function checkURL() {
     isLoadingFromURL = false;
   });
 }
+
+
+
+
+
+
+
+
+/* ================= CUSTOM REPO · ADAPTADOR ================= */
+
+let customRepoState = null;
+let customRepoRequestId = 0;
+
+const CUSTOM_REPO_ROOT_VALUE = "__CUSTOM_REPO_ROOT__";
+
+function initCustomRepoUI() {
+  const input = document.getElementById("customRepoUrlInput");
+  const loadButton = document.getElementById("customRepoLoadButton");
+
+  if (!input || !loadButton || loadButton.dataset.initialized === "true") return;
+
+  loadButton.dataset.initialized = "true";
+
+  loadButton.addEventListener("click", loadCustomRepo);
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      loadCustomRepo();
+    }
+  });
+}
+
+/* Interpreta una URL normal de repositorio o carpeta de GitHub. */
+function parseCustomRepoURL(inputURL) {
+  const url = new URL(inputURL);
+
+  if (url.protocol !== "https:" || url.hostname !== "github.com") {
+    throw new Error("Introduce una URL HTTPS de github.com.");
+  }
+
+  const parts = url.pathname
+    .split("/")
+    .filter(Boolean)
+    .map(part => decodeURIComponent(part));
+
+  if (parts.length < 2) {
+    throw new Error("La URL debe identificar un repositorio de GitHub.");
+  }
+
+  const owner = parts[0];
+  const repo = parts[1].replace(/\.git$/i, "");
+
+  if (!owner || !repo) {
+    throw new Error("No se pudo identificar el repositorio.");
+  }
+
+  let branch = null;
+  let rootPath = "";
+
+  if (parts.length > 2) {
+    if (parts[2] !== "tree" || !parts[3]) {
+      throw new Error(
+        "Introduce la URL del repositorio o de una carpeta abierta en GitHub."
+      );
+    }
+
+    branch = parts[3];
+    rootPath = parts.slice(4).join("/");
+  }
+
+  return { owner, repo, branch, rootPath };
+}
+
+/* Consulta el repositorio y descubre sus carpetas y archivos. */
+async function loadCustomRepo() {
+  const input = document.getElementById("customRepoUrlInput");
+  const loadButton = document.getElementById("customRepoLoadButton");
+
+  const rawInput = input?.value.trim();
+
+  if (!rawInput) {
+    setNASAStatus("Pega la URL del repositorio que quieres explorar.", true);
+    input?.focus();
+    return;
+  }
+
+  const requestId = ++customRepoRequestId;
+
+  loadButton.disabled = true;
+  setNASAStatus("Leyendo el repositorio de GitHub…");
+
+  try {
+    const config = parseCustomRepoURL(rawInput);
+
+    /* Si se pega la raíz del repositorio, obtenemos su rama predeterminada. */
+    if (!config.branch) {
+      const repoResponse = await fetch(
+        "https://api.github.com/repos/" +
+        encodeURIComponent(config.owner) + "/" +
+        encodeURIComponent(config.repo),
+        { headers: { Accept: "application/vnd.github+json" } }
+      );
+
+      if (!repoResponse.ok) {
+        throw new Error(
+          repoResponse.status === 403 || repoResponse.status === 429
+            ? "GitHub ha limitado las consultas. Inténtalo más tarde."
+            : "No se pudo consultar el repositorio (" +
+              repoResponse.status + "). Comprueba que sea público."
+        );
+      }
+
+      const repoData = await repoResponse.json();
+
+      if (!repoData.default_branch) {
+        throw new Error("No se pudo determinar la rama predeterminada.");
+      }
+
+      config.branch = repoData.default_branch;
+    }
+
+    const treeURL =
+      "https://api.github.com/repos/" +
+      encodeURIComponent(config.owner) + "/" +
+      encodeURIComponent(config.repo) +
+      "/git/trees/" + encodeURIComponent(config.branch) +
+      "?recursive=1";
+
+    const treeResponse = await fetch(treeURL, {
+      headers: { Accept: "application/vnd.github+json" }
+    });
+
+    if (!treeResponse.ok) {
+      throw new Error(
+        treeResponse.status === 403 || treeResponse.status === 429
+          ? "GitHub ha limitado las consultas. Inténtalo más tarde."
+          : "No se pudo leer el árbol del repositorio (" +
+            treeResponse.status + "). Comprueba la rama y la ruta."
+      );
+    }
+
+    const treeData = await treeResponse.json();
+
+    if (!Array.isArray(treeData.tree)) {
+      throw new Error("GitHub no devolvió una lista de archivos válida.");
+    }
+
+    if (requestId !== customRepoRequestId) return;
+
+    const rootPrefix = config.rootPath
+      ? config.rootPath.replace(/\/+$/, "") + "/"
+      : "";
+
+    /* Si se indicó una carpeta, solo conservamos su contenido. */
+    const entries = treeData.tree.filter((entry) =>
+      entry.path.startsWith(rootPrefix) &&
+      entry.path !== config.rootPath
+    );
+
+    const folders = entries
+      .filter(entry => entry.type === "tree")
+      .map(entry => entry.path)
+      .sort((a, b) => a.localeCompare(b));
+
+    const branchPath = config.branch
+      .split("/")
+      .map(encodeURIComponent)
+      .join("/");
+
+    const rawBaseURL =
+      "https://raw.githubusercontent.com/" +
+      encodeURIComponent(config.owner) + "/" +
+      encodeURIComponent(config.repo) + "/" +
+      branchPath + "/";
+
+    customRepoState = {
+      ...config,
+      entries,
+      folders,
+      rawBaseURL,
+      truncated: Boolean(treeData.truncated)
+    };
+
+    createCustomRepoButton();
+
+    const modelCount = entries.filter(entry =>
+      entry.type === "blob" && /\.(glb|gltf)$/i.test(entry.path)
+    ).length;
+
+    setNASAStatus(
+      "Repositorio leído: " + folders.length + " carpetas y " +
+      modelCount + " modelos en el árbol. Pulsa Custom URL 1 para explorar." +
+      (treeData.truncated ? " El árbol de GitHub está truncado." : "")
+    );
+  } catch (error) {
+    if (requestId !== customRepoRequestId) return;
+
+    console.error("Custom repository loading failed:", error);
+    setNASAStatus(error.message || "No se pudo leer el repositorio.", true);
+  } finally {
+    if (requestId === customRepoRequestId && loadButton) {
+      loadButton.disabled = false;
+    }
+  }
+}
+
+/* Crea un botón con la misma clase visual que los controles existentes. */
+function createCustomRepoButton() {
+  let button = document.getElementById("customRepoToggle");
+
+  if (!button) {
+    const reference =
+      document.getElementById("rostockToggle") ||
+      document.getElementById("nasaToggle");
+
+    button = reference
+      ? reference.cloneNode(false)
+      : document.createElement("button");
+
+    button.id = "customRepoToggle";
+    button.type = "button";
+    button.textContent = "Custom URL 1";
+
+    if (!reference) button.className = "btn btn-secondary";
+
+    if (reference) {
+      reference.insertAdjacentElement("afterend", button);
+    } else {
+      document.getElementById("customRepoInputGroup")
+        ?.insertAdjacentElement("afterend", button);
+    }
+
+    button.addEventListener("click", toggleCustomRepoExplorer);
+  }
+
+  button.hidden = false;
+  button.disabled = false;
+  button.textContent = "Custom URL 1";
+}
+
+/* Abre el explorador compartido; no crea un menú nuevo. */
+async function toggleCustomRepoExplorer() {
+  if (!customRepoState) {
+    setNASAStatus("Primero carga una URL de GitHub.", true);
+    return;
+  }
+
+  const explorer = document.getElementById("nasaExplorer");
+  const gallery = document.getElementById("nasaGlobalGallery");
+  const button = document.getElementById("customRepoToggle");
+
+  if (!explorer || !gallery) {
+    setNASAStatus("No se encontraron los elementos del explorador actual.", true);
+    return;
+  }
+
+  if (activeCatalogSource === "customrepo" && !explorer.hidden) {
+    explorer.hidden = true;
+    gallery.hidden = true;
+    activeCatalogSource = "nasa";
+    nasaRequestId++;
+
+    if (button) button.textContent = "Custom URL 1";
+
+    clearNASAAssets();
+    setNASAStatus("");
+    return;
+  }
+
+  activeCatalogSource = "customrepo";
+  nasaRequestId++;
+
+  explorer.hidden = false;
+  gallery.hidden = true;
+
+  if (document.getElementById("nasaToggle")) {
+    document.getElementById("nasaToggle").textContent = "Explore NASA 3D Models";
+  }
+
+  if (document.getElementById("rostockToggle")) {
+    document.getElementById("rostockToggle").textContent = "Explore Rostock 3D Models";
+  }
+
+  if (button) button.textContent = "Hide Custom URL 1";
+
+  clearNASAAssets();
+
+  const select = document.getElementById("nasaFolderSelect");
+
+  if (!select) {
+    setNASAStatus("No se encontró el selector de carpetas.", true);
+    return;
+  }
+
+  select.replaceChildren();
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select a folder…";
+  select.appendChild(placeholder);
+
+  const rootOption = document.createElement("option");
+  rootOption.value = CUSTOM_REPO_ROOT_VALUE;
+  rootOption.textContent = customRepoState.rootPath
+    ? "Selected folder root"
+    : "Repository root";
+  select.appendChild(rootOption);
+
+  customRepoState.folders.forEach(path => {
+    const option = document.createElement("option");
+    option.value = path;
+
+    const relativePath = customRepoState.rootPath
+      ? path.slice(customRepoState.rootPath.length).replace(/^\/+/, "")
+      : path;
+
+    option.textContent = relativePath;
+    select.appendChild(option);
+  });
+
+  select.disabled = false;
+
+  select.onchange = () => {
+    if (activeCatalogSource !== "customrepo") return;
+
+    if (!select.value) {
+      clearNASAAssets();
+      setNASAStatus("Choose a folder to browse its model files.");
+      return;
+    }
+
+    const folderPath = select.value === CUSTOM_REPO_ROOT_VALUE
+      ? customRepoState.rootPath
+      : select.value;
+
+    loadCustomRepoAssets(folderPath);
+  };
+
+  setNASAStatus("Choose a folder to browse its model files.");
+}
+
+/* Lista únicamente los modelos que están directamente en la carpeta elegida. */
+async function loadCustomRepoAssets(folderPath) {
+  if (activeCatalogSource !== "customrepo" || !customRepoState) return;
+
+  const requestId = ++nasaRequestId;
+
+  clearNASAAssets();
+  showNASAStatusInSlot("Loading models…");
+  setNASAStatus("Reading the selected folder…");
+
+  try {
+    const assets = customRepoState.entries
+      .filter(entry => {
+        if (entry.type !== "blob" || !/\.(glb|gltf)$/i.test(entry.path)) {
+          return false;
+        }
+
+        const lastSlash = entry.path.lastIndexOf("/");
+        const parentPath = lastSlash >= 0 ? entry.path.slice(0, lastSlash) : "";
+
+        return parentPath === folderPath;
+      })
+      .sort((a, b) => a.path.localeCompare(b.path))
+      .map(entry => {
+        const encodedPath = entry.path
+          .split("/")
+          .map(encodeURIComponent)
+          .join("/");
+
+        return {
+          name: entry.path.split("/").pop(),
+          path: entry.path,
+          download_url: customRepoState.rawBaseURL + encodedPath,
+          source: "Custom URL 1"
+        };
+      });
+
+    if (requestId !== nasaRequestId || activeCatalogSource !== "customrepo") {
+      return;
+    }
+
+    if (!assets.length) {
+      const message = document.createElement("div");
+      message.className = "nasa-status";
+      message.textContent =
+        "No .glb or .gltf files were found directly in this folder.";
+
+      document.getElementById("nasaAssetSlot")?.replaceChildren(message);
+      document.getElementById("nasaAssetGrid")?.replaceChildren();
+
+      setNASAStatus(
+        "This folder contains no supported models directly. Choose a subfolder if available."
+      );
+      return;
+    }
+
+    const list = document.getElementById("nasaAssetSlot");
+    const grid = document.getElementById("nasaAssetGrid");
+
+    assets.forEach(asset => {
+      list.appendChild(createNASAAssetListItem(asset));
+      grid.appendChild(createNASAAssetCard(asset, []));
+    });
+
+    setNASAAssetView(nasaAssetView);
+
+    setNASAStatus(
+      assets.length + " Custom URL 1 model" +
+      (assets.length === 1 ? "" : "s") +
+      " found. Select one to load it."
+    );
+  } catch (error) {
+    if (requestId !== nasaRequestId || activeCatalogSource !== "customrepo") {
+      return;
+    }
+
+    console.error("Custom repository folder loading failed:", error);
+    clearNASAAssets();
+    showNASAStatusInSlot("Could not retrieve models from this folder.");
+    showNASAStatusInGrid("Could not retrieve models from this folder.");
+    setNASAStatus(error.message || "Could not retrieve models.", true);
+  }
+}
+
+/* Inicializa los eventos del nuevo input sin alterar init() ni los catálogos. */
+initCustomRepoUI();
+
+
+  
 </script>
 </body>
 </html>
