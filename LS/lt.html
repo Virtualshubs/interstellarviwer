@@ -1840,7 +1840,7 @@ if (new URLSearchParams(location.search).get("scene")) {
 <script>
 
 const DEFAULT_BACKGROUND_IMAGE = {
-  enabled: true,
+  enabled: false,
   url: "https://science.nasa.gov/wp-content/uploads/2023/06/hubble-deep-field-jpeg.webp"
 };
 
@@ -1853,7 +1853,7 @@ let backgroundLoadId = 0;
 
 let state = {
   modelUrl: null,
-  bg: "#0e0f13",
+  bg: "#f5f5f5",
   autoRotate: false,
   backgroundImage: DEFAULT_BACKGROUND_IMAGE.enabled,
   backgroundImageUrl: null,
