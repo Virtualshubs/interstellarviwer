@@ -1464,6 +1464,57 @@ body:has(.workspace.visible) .footer {
 
     </section>
 
+
+
+
+
+
+<section class="multirepo-panel" aria-labelledby="multirepoTitle">
+
+  <div class="multirepo-header">
+    <span class="multirepo-eyebrow">REPOSITORY TOOLS / 02</span>
+
+    <h2 id="multirepoTitle">Crear multirepo compartido</h2>
+
+    <p class="multirepo-description">
+      Selecciona los repositorios que quieres combinar en un enlace
+      independiente. Esta selección no modifica la integración en escenas.
+    </p>
+  </div>
+
+  <div
+    id="multirepoSettingsList"
+    class="multirepo-list"
+    aria-label="Repositorios disponibles para compartir"
+  ></div>
+
+  <div
+    id="multirepoStatus"
+    class="multirepo-status"
+    role="status"
+    aria-live="polite"
+  >
+    Cargando repositorios disponibles...
+  </div>
+
+  <div class="multirepo-actions">
+    <button
+      id="createMultirepoButton"
+      class="multirepo-create-button"
+      type="button"
+      disabled
+    >
+      <span>Crear multirepo compartido</span>
+      <span class="multirepo-create-arrow" aria-hidden="true">↗</span>
+    </button>
+  </div>
+
+</section>
+
+
+
+   
+
     <section
       class="settings-section settings-information"
       aria-labelledby="platformSectionTitle"
@@ -1574,6 +1625,7 @@ let activeToolIndex = null;
 const MAX_USER_REPOSITORIES = 5;
 const MAX_REPOSITORY_URL_LENGTH = 300;
 const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
+const MULTIREPO_SELECTION_KEY = "liteSpaceMultirepoSelectionV1";
 
 
 function emptyRepositorySlots() {
@@ -1582,6 +1634,7 @@ function emptyRepositorySlots() {
     () => ({ url: "", selected: false })
   );
 }
+
 
 function normalizeGitHubRepositoryURL(value) {
   if (typeof value !== "string") return null;
@@ -1670,7 +1723,6 @@ function normalizeGitHubRepositoryURL(value) {
     }
   }
 
-
   const lastPart = parts[parts.length - 1];
 
   const forbiddenFileExtensions =
@@ -1750,6 +1802,8 @@ function saveUserRepositories() {
     );
 
     updateRepositorySettingsStatus();
+    renderMultirepoSettings();
+
     return true;
   } catch (error) {
     console.error("Could not save repositories:", error);
@@ -1802,6 +1856,10 @@ function updateRepositorySettingsStatus() {
 }
 
 
+/* =========================================================
+   REPOSITORY INPUTS — EXISTING SETTINGS
+   ========================================================= */
+
 function processRepositoryInput(input, index, rawValue) {
   const value = typeof rawValue === "string"
     ? rawValue.trim()
@@ -1843,7 +1901,6 @@ function processRepositoryInput(input, index, rawValue) {
 
   return true;
 }
-
 
 
 function renderRepositorySettings() {
@@ -1901,7 +1958,6 @@ function renderRepositorySettings() {
       processRepositoryInput(input, index, clipboardText);
     });
 
-
     input.addEventListener("dragover", event => {
       event.preventDefault();
     });
@@ -1915,7 +1971,6 @@ function renderRepositorySettings() {
       processRepositoryInput(input, index, droppedText);
     });
 
-
     input.addEventListener("input", () => {
       input.setCustomValidity("");
 
@@ -1927,7 +1982,6 @@ function renderRepositorySettings() {
       }
     });
 
-   
     input.addEventListener("change", () => {
       const value = input.value.trim();
 
@@ -1995,6 +2049,265 @@ function renderRepositorySettings() {
 }
 
 
+/* =========================================================
+   MULTIREPO — NEW INDEPENDENT SELECTION
+   Reads the existing repository URLs, but has its own checks.
+   ========================================================= */
+
+function loadMultirepoSelection() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(MULTIREPO_SELECTION_KEY) || "[]"
+    );
+
+    if (!Array.isArray(saved)) return [];
+
+    return [...new Set(
+      saved
+        .map(normalizeGitHubRepositoryURL)
+        .filter(Boolean)
+    )];
+  } catch (error) {
+    console.error("Could not read multirepo selection:", error);
+    return [];
+  }
+}
+
+
+function saveMultirepoSelection(selectedURLs) {
+  const normalizedURLs = [...new Set(
+    selectedURLs
+      .map(normalizeGitHubRepositoryURL)
+      .filter(Boolean)
+  )].slice(0, MAX_USER_REPOSITORIES);
+
+  try {
+    localStorage.setItem(
+      MULTIREPO_SELECTION_KEY,
+      JSON.stringify(normalizedURLs)
+    );
+
+    updateMultirepoStatus();
+    return true;
+  } catch (error) {
+    console.error("Could not save multirepo selection:", error);
+
+    const status = document.getElementById("multirepoStatus");
+
+    if (status) {
+      status.textContent =
+        "Could not save the multirepo selection in this browser.";
+    }
+
+    return false;
+  }
+}
+
+
+function getAvailableRepositoryURLs() {
+  return [...new Set(
+    userRepositories
+      .map(repository =>
+        normalizeGitHubRepositoryURL(repository.url)
+      )
+      .filter(Boolean)
+  )].slice(0, MAX_USER_REPOSITORIES);
+}
+
+
+function getSelectedMultirepoURLs() {
+  const availableURLs = new Set(getAvailableRepositoryURLs());
+
+  return loadMultirepoSelection().filter(url =>
+    availableURLs.has(url)
+  );
+}
+
+
+function updateMultirepoStatus() {
+  const status = document.getElementById("multirepoStatus");
+  const button = document.getElementById("createMultirepoButton");
+
+  const availableURLs = getAvailableRepositoryURLs();
+  const selectedURLs = getSelectedMultirepoURLs();
+
+  if (status) {
+    if (availableURLs.length === 0) {
+      status.textContent =
+        "Add repository URLs in the repository settings first.";
+    } else if (selectedURLs.length === 0) {
+      status.textContent =
+        availableURLs.length +
+        " available · Select the repositories to share.";
+    } else {
+      status.textContent =
+        selectedURLs.length +
+        " repository" +
+        (selectedURLs.length === 1 ? "" : "ies") +
+        " selected for the shared multirepo.";
+    }
+  }
+
+  if (button) {
+    button.disabled = selectedURLs.length === 0;
+  }
+}
+
+
+function renderMultirepoSettings() {
+  const container = document.getElementById(
+    "multirepoSettingsList"
+  );
+
+  if (!container) {
+    updateMultirepoStatus();
+    return;
+  }
+
+  container.replaceChildren();
+
+  const availableURLs = getAvailableRepositoryURLs();
+  const selectedURLs = new Set(loadMultirepoSelection());
+
+  if (availableURLs.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "multirepo-empty";
+    empty.textContent =
+      "Your saved repository URLs will appear here.";
+
+    container.appendChild(empty);
+    updateMultirepoStatus();
+    return;
+  }
+
+  availableURLs.forEach((repositoryURL, index) => {
+    const item = document.createElement("label");
+    item.className = "multirepo-item";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "multirepo-checkbox";
+    checkbox.checked = selectedURLs.has(repositoryURL);
+    checkbox.value = repositoryURL;
+
+    checkbox.setAttribute(
+      "aria-label",
+      "Include repository " + (index + 1) + " in shared multirepo"
+    );
+
+    const details = document.createElement("span");
+    details.className = "multirepo-item-details";
+
+    const name = document.createElement("span");
+    name.className = "multirepo-item-name";
+    name.textContent = "REPOSITORY " +
+      String(index + 1).padStart(2, "0");
+
+    const url = document.createElement("span");
+    url.className = "multirepo-item-url";
+    url.textContent = repositoryURL;
+
+    details.append(name, url);
+    item.append(checkbox, details);
+    container.appendChild(item);
+
+    checkbox.addEventListener("change", () => {
+      const current = new Set(loadMultirepoSelection());
+
+      if (checkbox.checked) {
+        current.add(repositoryURL);
+      } else {
+        current.delete(repositoryURL);
+      }
+
+      saveMultirepoSelection([...current]);
+      updateMultirepoStatus();
+    });
+  });
+
+  updateMultirepoStatus();
+}
+
+
+/* Independent URL builder for shared multirepos.
+   Does not use or change the editor's current checkbox selection. */
+
+function buildMultirepoURL(baseURL, repositoryURLs) {
+  if (!isValidToolURL(baseURL)) return null;
+
+  const normalizedURLs = [...new Set(
+    repositoryURLs
+      .map(normalizeGitHubRepositoryURL)
+      .filter(Boolean)
+  )].slice(0, MAX_USER_REPOSITORIES);
+
+  if (normalizedURLs.length === 0) return null;
+
+  try {
+    const url = new URL(baseURL);
+    const json = JSON.stringify(normalizedURLs);
+
+    const encoded = btoa(
+      unescape(encodeURIComponent(json))
+    );
+
+    url.searchParams.set("rep", encoded);
+
+    return url.href;
+  } catch (error) {
+    console.error("Could not build the multirepo URL:", error);
+    return null;
+  }
+}
+
+
+function createSharedMultirepo() {
+  const status = document.getElementById("multirepoStatus");
+  const selectedURLs = getSelectedMultirepoURLs();
+  const baseURL = TOOL_CONFIG[0]?.url;
+
+  if (selectedURLs.length === 0) {
+    if (status) {
+      status.textContent =
+        "Select at least one valid repository before continuing.";
+    }
+
+    updateMultirepoStatus();
+    return;
+  }
+
+  if (!isValidToolURL(baseURL)) {
+    if (status) {
+      status.textContent =
+        "The viewer URL is not configured correctly.";
+    }
+
+    return;
+  }
+
+  const targetURL = buildMultirepoURL(baseURL, selectedURLs);
+
+  if (!targetURL) {
+    if (status) {
+      status.textContent =
+        "Could not create the shared multirepo URL.";
+    }
+
+    return;
+  }
+
+  /* Open synchronously from the button click to avoid popup blocking. */
+  window.open(
+    targetURL,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
+
+
+/* =========================================================
+   EXISTING TOOL URL AND WORKSPACE
+   ========================================================= */
 
 function buildToolURL(baseURL) {
   const url = new URL(baseURL);
@@ -2022,7 +2335,6 @@ function buildToolURL(baseURL) {
 }
 
 
-
 function isValidToolURL(value) {
   if (typeof value !== "string" || !value.trim()) return false;
 
@@ -2040,7 +2352,6 @@ function isValidToolURL(value) {
 }
 
 
-
 function destroyToolFrame() {
   if (!toolFrame || !toolFrame.isConnected) return;
 
@@ -2055,7 +2366,6 @@ function destroyToolFrame() {
 
   frameMessage.style.display = "flex";
 }
-
 
 
 function initialiseToolSidebar() {
@@ -2135,9 +2445,10 @@ function showSettings() {
   setActiveNavigation("settings");
   systemStatus.textContent = "SETTINGS";
 
+  renderMultirepoSettings();
+
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
 
 
 function openTool(index) {
@@ -2202,7 +2513,6 @@ function closeWorkspace() {
 }
 
 
-
 function reloadTool() {
   if (activeToolIndex === null) return;
 
@@ -2240,6 +2550,9 @@ function openExternal() {
 }
 
 
+/* =========================================================
+   EXISTING HOME EVENTS
+   ========================================================= */
 
 document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
   card.addEventListener("click", () => {
@@ -2256,6 +2569,9 @@ document.getElementById("reloadTool").addEventListener("click", reloadTool);
 document.getElementById("openExternal").addEventListener("click", openExternal);
 
 
+/* =========================================================
+   EXISTING HOME BANNER
+   ========================================================= */
 
 const homeBannerImages = [
   "https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG",
@@ -2287,14 +2603,28 @@ function changeHomeBanner() {
 }
 
 
-
 document.getElementById("closeTool").addEventListener("click", () => {
   changeHomeBanner();
 });
 
 
+/* =========================================================
+   INITIALISATION
+   ========================================================= */
+
+const createMultirepoButton = document.getElementById(
+  "createMultirepoButton"
+);
+
+if (createMultirepoButton) {
+  createMultirepoButton.addEventListener(
+    "click",
+    createSharedMultirepo
+  );
+}
 
 renderRepositorySettings();
+renderMultirepoSettings();
 initialiseToolSidebar();
 
 const configuredTools = TOOL_CONFIG.filter(
@@ -2306,7 +2636,6 @@ toolCount.textContent =
   " / " +
   String(TOOL_CONFIG.length).padStart(2, "0") +
   " CONFIGURED";
-
 
 
 </script>
