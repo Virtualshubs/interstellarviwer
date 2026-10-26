@@ -811,6 +811,133 @@ body:has(.workspace.visible) .footer {
   outline-offset: 4px;
   border-radius: 2px;
 }
+
+ /* REPOSITORY SETTINGS */
+
+.repository-settings {
+  width: 100%;
+  max-width: 850px;
+  margin-top: 32px;
+}
+
+.repository-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.repository-settings-title {
+  font-family: var(--font-brand);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.repository-settings-description {
+  margin-top: 7px;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.repository-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.repository-slot {
+  min-width: 0;
+  min-height: 205px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.repository-slot:focus-within {
+  border-color: var(--primary);
+}
+
+.repository-slot-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.repository-slot-number {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.repository-slot-icon {
+  color: var(--primary);
+  font-size: 25px;
+  line-height: 1;
+}
+
+.repository-slot label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.repository-url-input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 11px var(--font-mono);
+}
+
+.repository-url-input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.repository-share-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.repository-share-toggle input {
+  accent-color: var(--primary);
+}
+
+.repository-settings-status {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 850px) {
+  .repository-settings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .repository-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .repository-slot {
+    min-height: 175px;
+  }
+}
   
 </style>
 
@@ -928,6 +1055,39 @@ body:has(.workspace.visible) .footer {
     </p>
 
     <div class="settings-panel">
+     <div class="settings-row">
+  <div class="repository-settings">
+    <div class="repository-settings-header">
+      <div>
+        <div class="repository-settings-title">
+          My repositories
+        </div>
+        <div class="repository-settings-description">
+          Guarda hasta cinco repositorios públicos de GitHub.
+          Selecciona cuáles quieres incluir al abrir el editor.
+          Guardar una URL no implica compartirla.
+        </div>
+      </div>
+      <div class="settings-value" id="repositoryCount">
+        00 / 05
+      </div>
+    </div>
+
+    <div
+      class="repository-settings-grid"
+      id="repositorySettingsList"
+    ></div>
+
+    <div
+      class="repository-settings-status"
+      id="repositorySettingsStatus"
+      role="status"
+      aria-live="polite"
+    >
+      Los cambios se guardan en este navegador.
+    </div>
+  </div>
+</div>
       <div class="settings-row">
         <div>
           <div class="settings-key">USER STATUS</div>
@@ -981,12 +1141,11 @@ body:has(.workspace.visible) .footer {
 
 <script>
   
-
 const TOOL_CONFIG = [
   {
     id: "ope-lite-space",
     name: "3D OPE Lite Space",
-    url: "https://3d.staratlas.es/opelite.html"
+    url: "https://3d.staratlas.es/LS/3dtl.html"
   }
 ];
 
@@ -997,16 +1156,309 @@ const toolSidebar = document.getElementById("toolSidebar");
 const navHome = document.getElementById("navHome");
 const navUser = document.getElementById("navUser");
 const brandHome = document.getElementById("brandHome");
+
 let toolFrame = document.getElementById("toolFrame");
+
 const frameMessage = document.getElementById("frameMessage");
 const workspaceIndex = document.getElementById("workspaceIndex");
 const workspaceTitle = document.getElementById("workspaceTitle");
 const systemStatus = document.getElementById("systemStatus");
 const toolCount = document.getElementById("toolCount");
+
 let activeToolIndex = null;
-  
+
+
+/* =========================================================
+   USER REPOSITORIES
+   ========================================================= */
+
+const MAX_USER_REPOSITORIES = 5;
+const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
+
+function emptyRepositorySlots() {
+  return Array.from(
+    { length: MAX_USER_REPOSITORIES },
+    () => ({ url: "", selected: false })
+  );
+}
+
+function loadUserRepositories() {
+  const slots = emptyRepositorySlots();
+
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(USER_REPOSITORIES_KEY) || "[]"
+    );
+
+    if (!Array.isArray(saved)) return slots;
+
+    saved.slice(0, MAX_USER_REPOSITORIES).forEach((item, index) => {
+      if (!item || typeof item !== "object") return;
+
+      slots[index] = {
+        url: typeof item.url === "string" ? item.url : "",
+        selected: item.selected === true
+      };
+    });
+  } catch (error) {
+    console.error("Could not read saved repositories:", error);
+  }
+
+  return slots;
+}
+
+let userRepositories = loadUserRepositories();
+
+
+/*
+ * Validates GitHub repository URLs.
+ * Supports repository root URLs and URLs pointing to folders.
+ */
+function isValidGitHubRepositoryURL(value) {
+  if (typeof value !== "string" || !value.trim()) return false;
+
+  try {
+    const url = new URL(value.trim());
+
+    if (
+      url.protocol !== "https:" ||
+      url.hostname.toLowerCase() !== "github.com" ||
+      url.username ||
+      url.password ||
+      url.port
+    ) {
+      return false;
+    }
+
+    const parts = url.pathname.split("/").filter(Boolean);
+
+    // A repository URL requires at least owner/repository.
+    if (parts.length < 2) return false;
+
+    // Reject malformed paths that cannot identify a repository.
+    if (
+      parts[0] === "." ||
+      parts[0] === ".." ||
+      parts[1] === "." ||
+      parts[1] === ".."
+    ) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+
+function saveUserRepositories() {
+  try {
+    localStorage.setItem(
+      USER_REPOSITORIES_KEY,
+      JSON.stringify(userRepositories)
+    );
+
+    updateRepositorySettingsStatus();
+    return true;
+  } catch (error) {
+    console.error("Could not save repositories:", error);
+
+    const status = document.getElementById(
+      "repositorySettingsStatus"
+    );
+
+    if (status) {
+      status.textContent =
+        "Could not save changes in this browser.";
+    }
+
+    return false;
+  }
+}
+
+
+function updateRepositorySettingsStatus() {
+  const count = document.getElementById("repositoryCount");
+  const status = document.getElementById(
+    "repositorySettingsStatus"
+  );
+
+  const savedCount = userRepositories.filter(
+    repository => repository.url.trim()
+  ).length;
+
+  const selectedCount = userRepositories.filter(
+    repository =>
+      repository.url.trim() &&
+      repository.selected &&
+      isValidGitHubRepositoryURL(repository.url)
+  ).length;
+
+  if (count) {
+    count.textContent =
+      String(savedCount).padStart(2, "0") +
+      " / " +
+      String(MAX_USER_REPOSITORIES).padStart(2, "0");
+  }
+
+  if (status) {
+    status.textContent =
+      savedCount +
+      " saved · " +
+      selectedCount +
+      " selected for the editor.";
+  }
+}
+
+
+function renderRepositorySettings() {
+  const container = document.getElementById(
+    "repositorySettingsList"
+  );
+
+  if (!container) return;
+
+  container.replaceChildren();
+
+  userRepositories.forEach((repository, index) => {
+    const slot = document.createElement("div");
+    slot.className = "repository-slot";
+
+    const top = document.createElement("div");
+    top.className = "repository-slot-top";
+
+    const icon = document.createElement("span");
+    icon.className = "repository-slot-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "◇";
+
+    const number = document.createElement("span");
+    number.className = "repository-slot-number";
+    number.textContent =
+      "REPOSITORY " + String(index + 1).padStart(2, "0");
+
+    top.append(icon, number);
+
+    const label = document.createElement("label");
+    label.htmlFor = "repositoryUrl" + index;
+    label.textContent = "GitHub URL";
+
+    const input = document.createElement("input");
+    input.type = "url";
+    input.id = "repositoryUrl" + index;
+    input.className = "repository-url-input";
+    input.placeholder = "https://github.com/owner/repo";
+    input.autocomplete = "url";
+    input.spellcheck = false;
+    input.value = repository.url;
+    input.setAttribute(
+      "aria-label",
+      "Repository URL " + (index + 1)
+    );
+
+    input.addEventListener("input", () => {
+      input.setCustomValidity("");
+    });
+
+    input.addEventListener("change", () => {
+      const value = input.value.trim();
+
+      if (value && !isValidGitHubRepositoryURL(value)) {
+        input.setCustomValidity(
+          "Enter a valid HTTPS GitHub repository URL."
+        );
+        input.reportValidity();
+        return;
+      }
+
+      input.setCustomValidity("");
+
+      userRepositories[index].url = value;
+
+      if (!value) {
+        userRepositories[index].selected = false;
+      }
+
+      saveUserRepositories();
+      renderRepositorySettings();
+    });
+
+    const toggleLabel = document.createElement("label");
+    toggleLabel.className = "repository-share-toggle";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = repository.selected;
+    checkbox.disabled = !(
+      repository.url.trim() &&
+      isValidGitHubRepositoryURL(repository.url)
+    );
+
+    checkbox.setAttribute(
+      "aria-label",
+      "Include repository " + (index + 1) + " in the editor"
+    );
+
+    checkbox.addEventListener("change", () => {
+      userRepositories[index].selected = checkbox.checked;
+
+      saveUserRepositories();
+      renderRepositorySettings();
+    });
+
+    const toggleText = document.createElement("span");
+    toggleText.textContent = "Include in editor";
+
+    toggleLabel.append(checkbox, toggleText);
+    slot.append(top, label, input, toggleLabel);
+    container.appendChild(slot);
+  });
+
+  updateRepositorySettingsStatus();
+}
+
+
+/*
+ * Builds the URL received by the editor.
+ *
+ * Only selected and valid repository URLs are included.
+ * The editor's existing rep= recovery mechanism decodes
+ * the array and loads each repository.
+ */
+function buildToolURL(baseURL) {
+  const url = new URL(baseURL);
+
+  const selectedURLs = userRepositories
+    .filter(repository =>
+      repository.selected &&
+      isValidGitHubRepositoryURL(repository.url)
+    )
+    .map(repository => repository.url.trim());
+
+  // Avoid carrying an old repository configuration forward.
+  url.searchParams.delete("rep");
+
+  if (selectedURLs.length > 0) {
+    const json = JSON.stringify(selectedURLs);
+    const encoded = btoa(
+      unescape(encodeURIComponent(json))
+    );
+
+    url.searchParams.set("rep", encoded);
+  }
+
+  return url.href;
+}
+
+
+/* =========================================================
+   TOOL URL VALIDATION
+   ========================================================= */
+
 function isValidToolURL(value) {
   if (!value) return false;
+
   try {
     const parsed = new URL(value, window.location.href);
     return parsed.protocol === "https:";
@@ -1015,17 +1467,30 @@ function isValidToolURL(value) {
   }
 }
 
+
+/* =========================================================
+   IFRAME LIFECYCLE
+   ========================================================= */
+
 function destroyToolFrame() {
   if (!toolFrame || !toolFrame.isConnected) return;
+
   const replacement = toolFrame.cloneNode(false);
+
   replacement.removeAttribute("src");
   replacement.removeAttribute("srcdoc");
   replacement.style.display = "none";
+
   toolFrame.replaceWith(replacement);
   toolFrame = replacement;
+
   frameMessage.style.display = "flex";
 }
 
+
+/* =========================================================
+   TOOL SIDEBAR
+   ========================================================= */
 
 function initialiseToolSidebar() {
   toolSidebar.replaceChildren();
@@ -1048,9 +1513,11 @@ function initialiseToolSidebar() {
     button.innerHTML = symbol.innerHTML;
 
     button.addEventListener("click", () => openTool(index));
+
     toolSidebar.appendChild(button);
   });
 }
+
 
 function updateSidebarSelection(index) {
   toolSidebar.querySelectorAll("[data-tool]").forEach(button => {
@@ -1061,22 +1528,28 @@ function updateSidebarSelection(index) {
   });
 }
 
+
 function showToolSidebar() {
   toolSidebar.classList.add("visible");
   toolSidebar.setAttribute("aria-hidden", "false");
 }
+
 
 function hideToolSidebar() {
   toolSidebar.classList.remove("visible");
   toolSidebar.setAttribute("aria-hidden", "true");
 }
 
-/* NAVIGATION */
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
 
 function setActiveNavigation(view) {
   navHome.classList.toggle("active", view === "home");
   navUser.classList.toggle("active", view === "settings");
 }
+
 
 function showHome() {
   closeWorkspace();
@@ -1087,8 +1560,9 @@ function showHome() {
   setActiveNavigation("home");
   systemStatus.textContent = "SYSTEM READY";
 
-  window.scrollTo({top:0, behavior:"smooth"});
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
 
 function showSettings() {
   closeWorkspace();
@@ -1099,10 +1573,13 @@ function showSettings() {
   setActiveNavigation("settings");
   systemStatus.textContent = "SETTINGS";
 
-  window.scrollTo({top:0, behavior:"smooth"});
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* OPEN OR SWITCH TOOL */
+
+/* =========================================================
+   OPEN OR SWITCH TOOL
+   ========================================================= */
 
 function openTool(index) {
   const tool = TOOL_CONFIG[index];
@@ -1124,7 +1601,9 @@ function openTool(index) {
   updateSidebarSelection(index);
   setActiveNavigation("home");
 
-  workspaceIndex.textContent = String(index + 1).padStart(2, "0");
+  workspaceIndex.textContent =
+    String(index + 1).padStart(2, "0");
+
   workspaceTitle.textContent = tool.name;
 
   toolFrame.style.display = "none";
@@ -1136,22 +1615,28 @@ function openTool(index) {
     heading.textContent = "TOOL URL NOT CONFIGURED";
 
     const message = document.createElement("p");
-    message.textContent = "Check the HTTPS address in TOOL_CONFIG.";
+    message.textContent =
+      "Check the HTTPS address in TOOL_CONFIG.";
 
     frameMessage.append(heading, message);
     systemStatus.textContent = "AWAITING CONFIGURATION";
     return;
   }
 
+  const targetURL = buildToolURL(tool.url);
+
   toolFrame.title = tool.name + " workspace";
   toolFrame.style.display = "block";
   frameMessage.style.display = "none";
 
   systemStatus.textContent = "TOOL LOADING";
-  toolFrame.src = tool.url;
+  toolFrame.src = targetURL;
 }
 
-/* CLOSE WORKSPACE AND RESTORE HOME CARDS */
+
+/* =========================================================
+   CLOSE WORKSPACE AND RESTORE HOME CARDS
+   ========================================================= */
 
 function closeWorkspace() {
   /* Terminate the active tool's browsing context */
@@ -1166,35 +1651,52 @@ function closeWorkspace() {
   activeToolIndex = null;
 }
 
-/* TOOL ACTIONS */
+
+/* =========================================================
+   TOOL ACTIONS
+   ========================================================= */
 
 function reloadTool() {
   if (activeToolIndex === null) return;
 
   const tool = TOOL_CONFIG[activeToolIndex];
+
   if (!tool || !isValidToolURL(tool.url)) return;
 
   /* Reload using a fresh browsing context */
   destroyToolFrame();
+
+  const targetURL = buildToolURL(tool.url);
 
   toolFrame.title = tool.name + " workspace";
   toolFrame.style.display = "block";
   frameMessage.style.display = "none";
 
   systemStatus.textContent = "TOOL RELOADING";
-  toolFrame.src = tool.url;
+  toolFrame.src = targetURL;
 }
+
 
 function openExternal() {
   if (activeToolIndex === null) return;
 
   const tool = TOOL_CONFIG[activeToolIndex];
+
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  window.open(tool.url, "_blank", "noopener,noreferrer");
+  const targetURL = buildToolURL(tool.url);
+
+  window.open(
+    targetURL,
+    "_blank",
+    "noopener,noreferrer"
+  );
 }
 
-/* EVENTS */
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
 
 document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
   card.addEventListener("click", () => {
@@ -1210,23 +1712,10 @@ document.getElementById("closeTool").addEventListener("click", showHome);
 document.getElementById("reloadTool").addEventListener("click", reloadTool);
 document.getElementById("openExternal").addEventListener("click", openExternal);
 
-/* INITIALISE */
 
-initialiseToolSidebar();
-
-const configuredTools = TOOL_CONFIG.filter(
-  tool => isValidToolURL(tool.url)
-).length;
-
-toolCount.textContent =
-  String(configuredTools).padStart(2, "0") + " / " +
-  String(TOOL_CONFIG.length).padStart(2, "0") + " CONFIGURED";
-
-
-
-
-  
-/* HOME BANNER: CHANGE IMAGE WHEN CLOSING A TOOL */
+/* =========================================================
+   HOME BANNER: CHANGE IMAGE WHEN CLOSING A TOOL
+   ========================================================= */
 
 const homeBannerImages = [
   "https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG",
@@ -1240,6 +1729,7 @@ const homeBanner = document.querySelector(".home-banner");
 const homeBannerImage = homeBanner
   ? homeBanner.querySelector("img")
   : null;
+
 
 function changeHomeBanner() {
   if (!homeBannerImage || homeBannerImages.length < 2) return;
@@ -1256,11 +1746,30 @@ function changeHomeBanner() {
   nextImage.src = homeBannerImages[homeBannerIndex];
 }
 
+
 /* CHANGE THE BANNER WHEN THE USER CLOSES THE WORKSPACE */
 
 document.getElementById("closeTool").addEventListener("click", () => {
   changeHomeBanner();
 });
+
+
+/* =========================================================
+   INITIALISE
+   ========================================================= */
+
+renderRepositorySettings();
+initialiseToolSidebar();
+
+const configuredTools = TOOL_CONFIG.filter(
+  tool => isValidToolURL(tool.url)
+).length;
+
+toolCount.textContent =
+  String(configuredTools).padStart(2, "0") +
+  " / " +
+  String(TOOL_CONFIG.length).padStart(2, "0") +
+  " CONFIGURED";
 
 
 </script>
