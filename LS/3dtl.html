@@ -1630,6 +1630,258 @@ select:focus-visible {
     padding: 15px;
   }
 }
+
+
+
+/* =====================================================
+   USER SETTINGS · REPOSITORY LIBRARY STANDARD
+   Unificación visual de contenedores y campos
+   ===================================================== */
+
+:root {
+  --settings-surface: var(--panel, #EAE7DE);
+  --settings-surface-hover: var(--panel-hover, #E1DED4);
+  --settings-border: var(--line, #D9D4C8);
+  --settings-border-strong: var(--line-strong, rgba(36, 37, 34, 0.28));
+  --settings-text: var(--text, #242522);
+  --settings-text-secondary: var(--text-soft, #3F403A);
+  --settings-text-muted: var(--text-muted, #686A63);
+  --settings-radius: 8px;
+  --settings-padding: 16px;
+}
+
+/* 01 · Contenedores principales de ajustes */
+
+.settingGroup,
+.modelInfoCard {
+  min-width: 0;
+  padding: var(--settings-padding);
+  background: var(--settings-surface);
+  border: 1px solid var(--settings-border);
+  border-radius: var(--settings-radius);
+  box-shadow: none;
+}
+
+/* Separación uniforme entre grupos */
+
+.settingGroup {
+  margin-top: 12px;
+}
+
+.settingGroup:first-child {
+  margin-top: 0;
+}
+
+.modelInfoEditor {
+  min-width: 0;
+  margin-top: 16px;
+}
+
+.modelInfoCard {
+  margin: 0;
+}
+
+/* 02 · Cabeceras y títulos */
+
+.settingGroup .label {
+  margin: 0 0 12px;
+  color: var(--settings-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.modelInfoCard h3 {
+  margin: 0 0 16px;
+  color: var(--settings-text);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* 03 · Filas de información del modelo */
+
+.modelInfoField {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 0;
+  color: var(--settings-text-secondary);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.6;
+  border-top: 1px solid var(--settings-border);
+  overflow-wrap: anywhere;
+}
+
+.modelInfoLabel {
+  color: var(--settings-text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* 04 · Campos de edición dentro de los ajustes */
+
+.settingGroup input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.settingGroup select,
+.settingGroup textarea,
+.modelInfoCard input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.modelInfoCard select,
+.modelInfoCard textarea {
+  max-width: 100%;
+  color: var(--settings-text);
+  font-family: var(--font-body);
+  background: #FFFFFF;
+  border: 1px solid #C4C1B8;
+  border-radius: var(--settings-radius);
+  box-shadow: none;
+  transition:
+    border-color var(--ease),
+    background var(--ease),
+    box-shadow var(--ease);
+}
+
+.settingGroup input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.settingGroup select,
+.settingGroup textarea,
+.modelInfoCard input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.modelInfoCard select,
+.modelInfoCard textarea {
+  min-width: 0;
+}
+
+.settingGroup input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):hover,
+.settingGroup select:hover,
+.settingGroup textarea:hover,
+.modelInfoCard input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):hover,
+.modelInfoCard select:hover,
+.modelInfoCard textarea:hover {
+  border-color: var(--accent);
+}
+
+.settingGroup input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus,
+.settingGroup select:focus,
+.settingGroup textarea:focus,
+.modelInfoCard input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus,
+.modelInfoCard select:focus,
+.modelInfoCard textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* 05 · Controles específicos: conservar su comportamiento */
+
+.settingGroup input[type="checkbox"],
+.settingGroup input[type="radio"],
+.settingGroup input[type="range"],
+.modelInfoCard input[type="checkbox"],
+.modelInfoCard input[type="radio"],
+.modelInfoCard input[type="range"] {
+  accent-color: var(--accent);
+}
+
+.settingGroup input[type="checkbox"],
+.settingGroup input[type="radio"],
+.modelInfoCard input[type="checkbox"],
+.modelInfoCard input[type="radio"] {
+  cursor: pointer;
+}
+
+/* 06 · Galería de ajustes: fondo y bordes coherentes */
+
+.settingGroup #colorPalette {
+  gap: 9px;
+}
+
+.settingGroup .backgroundImageControls {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.settingGroup .backgroundImageHint {
+  color: var(--settings-text-muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+/* 07 · Panel de información de la escena publicada */
+
+#publicModelInfo {
+  color: var(--settings-text);
+  background: var(--bg, #F3F1EA);
+  border: 1px solid var(--settings-border);
+  border-radius: var(--settings-radius);
+  box-shadow: var(--shadow-panel, none);
+  font-family: var(--font-body);
+}
+
+.publicInfoContent {
+  padding: 12px 14px 14px;
+}
+
+.publicModelName {
+  margin: 0 0 14px;
+  color: var(--settings-text);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+#publicModelInfo .modelInfoField {
+  color: var(--settings-text-secondary);
+  border-top-color: var(--settings-border);
+  font-size: 12px;
+}
+
+#publicModelInfo .modelInfoLabel {
+  color: var(--settings-text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+/* 08 · Adaptación móvil */
+
+@media (max-width: 480px) {
+  .settingGroup,
+  .modelInfoCard {
+    padding: 12px;
+    border-radius: var(--settings-radius);
+  }
+
+  .modelInfoEditor {
+    margin-top: 12px;
+  }
+
+  .modelInfoCard h3 {
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+
+  .modelInfoField {
+    padding: 10px 0;
+  }
+
+  .publicInfoContent {
+    padding: 10px 12px 12px;
+  }
+}
+
   
 </style>
 
