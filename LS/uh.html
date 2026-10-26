@@ -1712,13 +1712,14 @@ body:has(.workspace.visible) .footer {
 </head>
 <body>
 
+ 
 <header class="header">
-  <button class="brand" id="brandHome" type="button" aria-label="Return to Home">
+  <button class="brand" id="brandHome" type="button" aria-label="Volver al inicio">
     <span class="brand-mark">3D TWINS Lite</span>
     <span class="brand-divider"></span>
     <span class="brand-info">
-      <span class="brand-name">USER HOME</span>
-      <span class="brand-by">BY 3D TWINS</span>
+      <span class="brand-name">INICIO DE USUARIO</span>
+      <span class="brand-by">POR 3D TWINS</span>
     </span>
   </button>
 
@@ -1729,9 +1730,9 @@ body:has(.workspace.visible) .footer {
     >
   </div>
 
-  <nav class="navigation" aria-label="Main navigation">
-    <button class="nav-button active" id="navHome" type="button">HOME</button>
-    <button class="nav-button" id="navUser" type="button">SETTINGS</button>
+  <nav class="navigation" aria-label="Navegación principal">
+    <button class="nav-button active" id="navHome" type="button">INICIO</button>
+    <button class="nav-button" id="navUser" type="button">AJUSTES</button>
   </nav>
 </header>
 
@@ -1739,8 +1740,8 @@ body:has(.workspace.visible) .footer {
   <section id="homeView">
     <div class="home-banner">
       <img
-        src="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/cop-dem.png"
-        alt="OPE spatial intelligence"
+        src="https://3d.staratlas.es/LS/logolitenaranja.png"
+        alt="Inteligencia espacial OPE"
       >
       <div class="home-banner-overlay"></div>
       <div class="home-banner-content">
@@ -1749,11 +1750,12 @@ body:has(.workspace.visible) .footer {
     </div>
 
     <p class="page-description">
-    Haz update para aumentar el número de repositorios simultáneos permitidos.
+      Actualiza tu plan para aumentar el número de repositorios simultáneos permitidos.
+    </p>
 
     <div class="section-heading">
-      <span class="section-label">Your 3D repository</span>
-      <span class="section-count" id="toolCount">Ready to use</span>
+      <span class="section-label">Tu repositorio 3D</span>
+      <span class="section-count" id="toolCount">Listo para usar</span>
     </div>
 
     <div class="tool-grid" id="toolGrid">
@@ -1761,14 +1763,14 @@ body:has(.workspace.visible) .footer {
       <button class="tool-card" data-tool="0" type="button">
         <span class="tool-number">3D TWINS Lite / V2.1.0</span>
 
-<span class="tool-symbol" aria-hidden="true">
-  <img
-    src="https://3d.staratlas.es/LS/logolitenaranja.png"
-    alt=""
-    loading="eager"
-    decoding="async"
-  >
-</span>
+        <span class="tool-symbol" aria-hidden="true">
+          <img
+            src="https://3d.staratlas.es/LS/logolitenaranja.png"
+            alt=""
+            loading="eager"
+            decoding="async"
+          >
+        </span>
 
         <span class="tool-name">Consultar repositorio 3D</span>
         <span class="tool-description">Accede a tu repositorio dinámico</span>
@@ -1785,35 +1787,35 @@ body:has(.workspace.visible) .footer {
   <aside
     class="tool-sidebar"
     id="toolSidebar"
-    aria-label="Tool selector"
+    aria-label="Selector de herramientas"
     aria-hidden="true"
   ></aside>
 
-  <section class="workspace" id="workspace" aria-label="Tool workspace">
+  <section class="workspace" id="workspace" aria-label="Área de trabajo de la herramienta">
 
     <div class="workspace-toolbar">
       <div class="workspace-name">
         <span class="workspace-index" id="workspaceIndex">01</span>
-        <span class="workspace-title" id="workspaceTitle">TOOL</span>
+        <span class="workspace-title" id="workspaceTitle">HERRAMIENTA</span>
       </div>
 
       <div class="workspace-actions">
-        <button class="text-button" id="reloadTool" type="button">RELOAD</button>
-        <button class="text-button" id="openExternal" type="button" hidden>OPEN ↗</button>
-        <button class="text-button" id="closeTool" type="button">✕ CLOSE</button>
+        <button class="text-button" id="reloadTool" type="button">RECARGAR</button>
+        <button class="text-button" id="openExternal" type="button" hidden>ABRIR ↗</button>
+        <button class="text-button" id="closeTool" type="button">✕ CERRAR</button>
       </div>
     </div>
 
     <div class="frame-container">
       <div class="frame-message" id="frameMessage">
         <div class="message-mark">3D TWINS Lite/</div>
-        <h2>WORKSPACE INITIALISED</h2>
-        <p>Select a tool from the sidebar to load it in this workspace.</p>
+        <h2>ÁREA DE TRABAJO INICIALIZADA</h2>
+        <p>Selecciona una herramienta en el panel lateral para cargarla en esta área de trabajo.</p>
       </div>
 
       <iframe
         id="toolFrame"
-        title="OPE tool workspace"
+        title="Área de trabajo de OPE"
         allow="fullscreen; clipboard-read; clipboard-write"
         allowfullscreen
       ></iframe>
@@ -1821,16 +1823,15 @@ body:has(.workspace.visible) .footer {
 
   </section>
 
-  
   <section class="settings-view" id="settingsView">
     <div class="eyebrow"></div>
-    <h1 class="page-title">USER / SETTINGS</h1>
+    <h1 class="page-title">USUARIO / AJUSTES</h1>
     <p class="page-description">
-      Manage your personal workspace and configure the 3D assets
-      available in your scene editor.
+      Gestiona tu espacio de trabajo personal y configura los recursos 3D
+      disponibles en el editor de escenas.
     </p>
 
-  <section
+    <section
       class="settings-section settings-information"
       aria-labelledby="platformSectionTitle"
     >
@@ -1840,7 +1841,7 @@ body:has(.workspace.visible) .footer {
           <div class="settings-key"></div>
 
           <h2 class="settings-section-title" id="platformSectionTitle">
-            Account &amp; platform
+            Cuenta y plataforma
           </h2>
         </div>
 
@@ -1851,39 +1852,39 @@ body:has(.workspace.visible) .footer {
 
         <div class="settings-row">
           <div>
-            <div class="settings-key">USER STATUS</div>
+            <div class="settings-key">ESTADO DEL USUARIO</div>
             <div class="settings-help">
-              Account authentication is not connected yet.
+              La autenticación de la cuenta todavía no está conectada.
             </div>
           </div>
-          <div class="settings-value">PREVIEW</div>
+          <div class="settings-value">VISTA PREVIA</div>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-key">PLATFORM</div>
+            <div class="settings-key">PLATAFORMA</div>
             <div class="settings-help">
-              System access
+              Acceso al sistema
             </div>
           </div>
-          <div class="settings-value">3DTWINS Lite</div>
+          <div class="settings-value">3D TWINS Lite</div>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-key">SESSION</div>
+            <div class="settings-key">SESIÓN</div>
             <div class="settings-help">
-              Account session management will be available in a later phase.
+              La gestión de sesiones de la cuenta estará disponible en una fase posterior.
             </div>
           </div>
-          <div class="settings-value">NOT CONNECTED</div>
+          <div class="settings-value">NO CONECTADA</div>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-key">APPLICATION</div>
+            <div class="settings-key">APLICACIÓN</div>
             <div class="settings-help">
-              VERSION
+              VERSIÓN
             </div>
           </div>
           <div class="settings-value">2.1.0</div>
@@ -1891,98 +1892,98 @@ body:has(.workspace.visible) .footer {
       </div>
     </section>
 
-<!-- INDIVIDUAL SCENE -->
-<section
-  class="individual-scene-panel"
-  aria-labelledby="individualSceneTitle"
->
-  <div class="individual-scene-header">
-    <h2 id="individualSceneTitle">
-      Crear escena individual
-    </h2>
-
-    <p class="individual-scene-description">
-      Introduce la URL directa de un modelo 3D para crear una escena
-      individual y abrirla en el editor.
-    </p>
-  </div>
-
-  <div class="individual-scene-form">
-    <label
-      class="individual-scene-label"
-      for="individualModelURL"
+    <!-- ESCENA INDIVIDUAL -->
+    <section
+      class="individual-scene-panel"
+      aria-labelledby="individualSceneTitle"
     >
-      URL DEL MODELO
-    </label>
+      <div class="individual-scene-header">
+        <h2 id="individualSceneTitle">
+          Crear escena individual
+        </h2>
 
-    <input
-      type="url"
-      id="individualModelURL"
-      class="individual-scene-url-input"
-      placeholder="https://example.com/model.glb"
-      autocomplete="url"
-      autocapitalize="off"
-      spellcheck="false"
-      maxlength="2048"
-      aria-describedby="individualSceneHint individualSceneStatus"
-    >
+        <p class="individual-scene-description">
+          Introduce la URL directa de un modelo 3D para crear una escena
+          individual y abrirla en el editor.
+        </p>
+      </div>
 
-    <p
-      id="individualSceneHint"
-      class="individual-scene-hint"
-    >
-      Formatos admitidos: .glb y .gltf. Introduce una URL HTTPS
-      directa al archivo del modelo.
-    </p>
-  </div>
+      <div class="individual-scene-form">
+        <label
+          class="individual-scene-label"
+          for="individualModelURL"
+        >
+          URL DEL MODELO
+        </label>
 
-  <div
-    id="individualSceneStatus"
-    class="individual-scene-status"
-    role="status"
-    aria-live="polite"
-  >
-    Pega una URL HTTPS directa de un modelo GLB o GLTF.
-  </div>
+        <input
+          type="url"
+          id="individualModelURL"
+          class="individual-scene-url-input"
+          placeholder="https://example.com/model.glb"
+          autocomplete="url"
+          autocapitalize="off"
+          spellcheck="false"
+          maxlength="2048"
+          aria-describedby="individualSceneHint individualSceneStatus"
+        >
 
-  <div class="individual-scene-actions">
-    <button
-      id="createIndividualSceneButton"
-      class="individual-scene-create-button"
-      type="button"
-      disabled
-    >
-      <span>Crear escena</span>
+        <p
+          id="individualSceneHint"
+          class="individual-scene-hint"
+        >
+          Formatos admitidos: .glb y .gltf. Introduce una URL HTTPS
+          directa al archivo del modelo.
+        </p>
+      </div>
 
-      <span
-        class="individual-scene-create-arrow"
-        aria-hidden="true"
-      >↗</span>
-    </button>
-  </div>
-</section>
+      <div
+        id="individualSceneStatus"
+        class="individual-scene-status"
+        role="status"
+        aria-live="polite"
+      >
+        Pega una URL HTTPS directa de un modelo GLB o GLTF.
+      </div>
 
-   
+      <div class="individual-scene-actions">
+        <button
+          id="createIndividualSceneButton"
+          class="individual-scene-create-button"
+          type="button"
+          disabled
+        >
+          <span>Crear escena</span>
+
+          <span
+            class="individual-scene-create-arrow"
+            aria-hidden="true"
+          >↗</span>
+        </button>
+      </div>
+    </section>
+
     <section class="settings-section" aria-labelledby="repositorySectionTitle">
       <div class="settings-section-heading">
         <div>
           <h2 class="settings-section-title" id="repositorySectionTitle">
-           Your repository library
+            Tu biblioteca de repositorios
           </h2>
 
           <p class="settings-section-description">
-            Add up to five public GitHub repositories and select
-            which sources will be available when you open the editor.
+            Añade hasta cinco repositorios públicos de GitHub y selecciona
+            qué fuentes estarán disponibles al abrir el editor.
           </p>
         </div>
 
         <div class="repository-total">
-          <span class="repository-total-label">SAVED SOURCES</span>
+          <span class="repository-total-label">FUENTES GUARDADAS</span>
           <span class="repository-total-value" id="repositoryCount">00 / 05</span>
         </div>
       </div>
 
       <div class="repository-settings-grid" id="repositorySettingsList"></div>
+
       <div class="repository-settings-footer">
         <div
           class="repository-settings-status"
@@ -1990,60 +1991,54 @@ body:has(.workspace.visible) .footer {
           role="status"
           aria-live="polite"
         >
-          Changes are saved in this browser.
+          Los cambios se guardan en este navegador.
         </div>
 
         <div class="repository-settings-note">
           <span class="repository-note-mark" aria-hidden="true">i</span>
-          Only selected repositories are sent to the scene editor.
+          Solo se envían al editor de escenas los repositorios seleccionados.
         </div>
+      </div>
+    </section>
+
+    <section class="multirepo-panel" aria-labelledby="multirepoTitle">
+
+      <div class="multirepo-header">
+        <h2 id="multirepoTitle">Crear multirepositorio compartido</h2>
+        <p class="multirepo-description">
+          Selecciona los repositorios que quieres combinar en un enlace
+          independiente. Esta selección no modifica la integración en las escenas.
+        </p>
+      </div>
+
+      <div
+        id="multirepoSettingsList"
+        class="multirepo-list"
+        aria-label="Repositorios disponibles para compartir"
+      ></div>
+
+      <div
+        id="multirepoStatus"
+        class="multirepo-status"
+        role="status"
+        aria-live="polite"
+      >
+        Cargando los repositorios disponibles...
+      </div>
+
+      <div class="multirepo-actions">
+        <button
+          id="createMultirepoButton"
+          class="multirepo-create-button"
+          type="button"
+          disabled
+        >
+          <span>Crear multirepositorio compartido</span>
+          <span class="multirepo-create-arrow" aria-hidden="true">↗</span>
+        </button>
       </div>
 
     </section>
-
-
-
-
-
-
-<section class="multirepo-panel" aria-labelledby="multirepoTitle">
-
-  <div class="multirepo-header">
-    <h2 id="multirepoTitle">Crear multirepo compartido</h2>
-    <p class="multirepo-description">
-      Selecciona los repositorios que quieres combinar en un enlace
-      independiente. Esta selección no modifica la integración en escenas.
-    </p>
-  </div>
-
-  <div
-    id="multirepoSettingsList"
-    class="multirepo-list"
-    aria-label="Repositorios disponibles para compartir"
-  ></div>
-
-  <div
-    id="multirepoStatus"
-    class="multirepo-status"
-    role="status"
-    aria-live="polite"
-  >
-    Cargando repositorios disponibles...
-  </div>
-
-  <div class="multirepo-actions">
-    <button
-      id="createMultirepoButton"
-      class="multirepo-create-button"
-      type="button"
-      disabled
-    >
-      <span>Crear multirepo compartido</span>
-      <span class="multirepo-create-arrow" aria-hidden="true">↗</span>
-    </button>
-  </div>
-
-</section>
 
   </section>
 </main>
@@ -2051,9 +2046,9 @@ body:has(.workspace.visible) .footer {
 <footer class="footer">
   <div class="footer-status">
     <span class="status-dot"></span>
-    <span id="systemStatus">SYSTEM READY</span>
+    <span id="systemStatus">SISTEMA LISTO</span>
   </div>
-  <div>3D Twins Lite</div>
+  <div>3D TWINS Lite</div>
   <a
     class="footer-creator"
     href="https://3dtwins.es/"
@@ -2061,9 +2056,10 @@ body:has(.workspace.visible) .footer {
     rel="noopener noreferrer"
     aria-label="Visitar la web de 3D Twins"
   >
-    BY 3D TWINS <span aria-hidden="true">↗</span>
+    POR 3D TWINS <span aria-hidden="true">↗</span>
   </a>
 </footer>
+
  
 <script>
 const TOOL_CONFIG = [
