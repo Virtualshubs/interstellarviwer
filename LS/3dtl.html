@@ -1652,16 +1652,17 @@ if (new URLSearchParams(location.search).get("scene")) {
     <img class="titleGif" src="https://3d.staratlas.es/LS/logonaranjalite.png" alt="3D Twins"/>
     <div class="heroTitle"></div>
     <div class="heroInputBox">
-    <div class="heroSubtitle">Create your 3D scene</div>
-    <div class="heroHint">Supports GLB / GLTF files hosted online</div>     
-    <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url" />
+    <div class="heroSubtitle" hidden>Create your 3D scene</div>
+    <div class="heroHint" hidden>Supports GLB / GLTF files hosted online</div>     
+    <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url"  hidden />
     <div class="nasa-divider"></div>
-    <button id="nasaToggle" class="btn btn-secondary" type="button" onclick="toggleNASAExplorer()">Explore NASA 3D Models</button>
+    <button id="nasaToggle" class="btn btn-secondary" type="button" onclick="toggleNASAExplorer()"  hidden>Explore NASA 3D Models</button>
     <button
   id="rostockToggle"
   class="btn btn-secondary"
   type="button"
   onclick="toggleRostockExplorer()"
+  hidden
   >
   Explore Rostock 3D Models
   </button>
@@ -1676,12 +1677,14 @@ if (new URLSearchParams(location.search).get("scene")) {
     autocomplete="url"
     spellcheck="false"
     aria-label="URL del repositorio GitHub"
+    hidden
   />
 
   <button
     id="customRepoLoadButton"
     type="button"
     class="btn btn-secondary"
+    hidden
   >
     Cargar
   </button>
@@ -1689,6 +1692,7 @@ if (new URLSearchParams(location.search).get("scene")) {
   id="customRepoShareButton"
   type="button"
   class="btn btn-secondary"
+    
 >
   Compartir repositorio
 </button>
