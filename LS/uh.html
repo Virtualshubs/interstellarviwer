@@ -1569,6 +1569,7 @@ let activeToolIndex = null;
 const MAX_USER_REPOSITORIES = 5;
 const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
 
+
 function emptyRepositorySlots() {
   return Array.from(
     { length: MAX_USER_REPOSITORIES },
@@ -1576,6 +1577,139 @@ function emptyRepositorySlots() {
   );
 }
 
+
+/*
+ * Validate and normalize GitHub repository URLs.
+ *
+ * Accepted:
+ *   https://github.com/owner/repo
+ *   https://github.com/owner/repo/tree/branch/folder
+ *
+ * Rejected:
+ *   HTTP, alternate domains, credentials, ports, query strings,
+ *   fragments, direct file URLs and malformed paths.
+ *
+ * Note: URL validation does not establish that repository
+ * contents are trustworthy or safe to execute.
+ */
+function normalizeGitHubRepositoryURL(value) {
+  if (typeof value !== "string") return null;
+
+  const input = value.trim();
+
+  if (
+    !input ||
+    input.length > 2048 ||
+    /[\u0000-\u0020\u007F\\]/.test(input) ||
+    /%(?:2f|5c|2e|00)/i.test(input)
+  ) {
+    return null;
+  }
+
+  // Require an explicit HTTPS URL on the exact GitHub host.
+  if (!/^https:\/\/github\.com\//i.test(input)) {
+    return null;
+  }
+
+  let url;
+
+  try {
+    url = new URL(input);
+  } catch {
+    return null;
+  }
+
+  if (
+    url.protocol !== "https:" ||
+    url.hostname !== "github.com" ||
+    url.origin !== "https://github.com" ||
+    url.username ||
+    url.password ||
+    url.port ||
+    url.search ||
+    url.hash
+  ) {
+    return null;
+  }
+
+  let decodedPath;
+
+  try {
+    decodedPath = decodeURIComponent(url.pathname);
+  } catch {
+    return null;
+  }
+
+  if (
+    decodedPath.includes("\\") ||
+    /[\u0000-\u001F\u007F]/.test(decodedPath)
+  ) {
+    return null;
+  }
+
+  const parts = decodedPath.split("/").filter(Boolean);
+
+  // Minimum path: owner/repository.
+  if (parts.length < 2) return null;
+
+  const [owner, repository] = parts;
+  const validName = /^[A-Za-z0-9_.-]+$/;
+
+  if (
+    !validName.test(owner) ||
+    !validName.test(repository) ||
+    owner === "." ||
+    owner === ".." ||
+    repository === "." ||
+    repository === ".."
+  ) {
+    return null;
+  }
+
+  // Permit only repository root or /tree/branch/folder...
+  if (parts.length > 2) {
+    if (
+      parts.length < 4 ||
+      parts[2] !== "tree" ||
+      parts.slice(3).some(part =>
+        !part ||
+        part === "." ||
+        part === ".." ||
+        /[<>:"|?*]/.test(part)
+      )
+    ) {
+      return null;
+    }
+  }
+
+  // Prevent direct links to files/resources.
+  // This does not block those files inside a repository.
+  const lastPart = parts[parts.length - 1];
+
+  const forbiddenFileExtensions =
+    /\.(?:glb|gltf|obj|fbx|stl|ply|dae|3ds|usd|usdz|step|stp|iges|igs|png|jpe?g|gif|webp|avif|svg|bmp|tiff?|ico|json|json5|jsonl|js|mjs|cjs|jsx|ts|tsx|html?|xhtml|php|py|rb|sh|bat|ps1|wasm|zip|rar|7z|tar|gz|pdf|xml|ya?ml|toml|ini|env|sql|map)$/i;
+
+  if (forbiddenFileExtensions.test(lastPart)) {
+    return null;
+  }
+
+  // Normalize the accepted path.
+  url.pathname =
+    "/" + parts.map(part => encodeURIComponent(part)).join("/");
+
+  return url.href;
+}
+
+
+function isValidGitHubRepositoryURL(value) {
+  return normalizeGitHubRepositoryURL(value) !== null;
+}
+
+
+/*
+ * Load stored entries defensively.
+ * Invalid saved URLs are discarded rather than trusted.
+ */
 function loadUserRepositories() {
   const slots = emptyRepositorySlots();
 
@@ -1587,11 +1721,15 @@ function loadUserRepositories() {
     if (!Array.isArray(saved)) return slots;
 
     saved.slice(0, MAX_USER_REPOSITORIES).forEach((item, index) => {
-      if (!item || typeof item !== "object") return;
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        return;
+      }
+
+      const normalizedURL = normalizeGitHubRepositoryURL(item.url);
 
       slots[index] = {
-        url: typeof item.url === "string" ? item.url : "",
-        selected: item.selected === true
+        url: normalizedURL || "",
+        selected: Boolean(normalizedURL) && item.selected === true
       };
     });
   } catch (error) {
@@ -1601,53 +1739,24 @@ function loadUserRepositories() {
   return slots;
 }
 
+
 let userRepositories = loadUserRepositories();
-
-
-/*
- * Validates GitHub repository URLs.
- * Supports repository root URLs and URLs pointing to folders.
- */
-function isValidGitHubRepositoryURL(value) {
-  if (typeof value !== "string" || !value.trim()) return false;
-
-  try {
-    const url = new URL(value.trim());
-
-    if (
-      url.protocol !== "https:" ||
-      url.hostname.toLowerCase() !== "github.com" ||
-      url.username ||
-      url.password ||
-      url.port
-    ) {
-      return false;
-    }
-
-    const parts = url.pathname.split("/").filter(Boolean);
-
-    // A repository URL requires at least owner/repository.
-    if (parts.length < 2) return false;
-
-    // Reject malformed paths that cannot identify a repository.
-    if (
-      parts[0] === "." ||
-      parts[0] === ".." ||
-      parts[1] === "." ||
-      parts[1] === ".."
-    ) {
-      return false;
-    }
-
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 
 function saveUserRepositories() {
   try {
+    // Revalidate before persistence as well.
+    userRepositories = userRepositories.map(repository => {
+      const normalizedURL =
+        normalizeGitHubRepositoryURL(repository.url);
+
+      return {
+        url: normalizedURL || "",
+        selected: Boolean(normalizedURL) &&
+          repository.selected === true
+      };
+    });
+
     localStorage.setItem(
       USER_REPOSITORIES_KEY,
       JSON.stringify(userRepositories)
@@ -1745,6 +1854,7 @@ function renderRepositorySettings() {
     input.placeholder = "https://github.com/owner/repo";
     input.autocomplete = "url";
     input.spellcheck = false;
+    input.maxLength = 2048;
     input.value = repository.url;
     input.setAttribute(
       "aria-label",
@@ -1757,10 +1867,13 @@ function renderRepositorySettings() {
 
     input.addEventListener("change", () => {
       const value = input.value.trim();
+      const normalizedURL = value
+        ? normalizeGitHubRepositoryURL(value)
+        : "";
 
-      if (value && !isValidGitHubRepositoryURL(value)) {
+      if (value && !normalizedURL) {
         input.setCustomValidity(
-          "Enter a valid HTTPS GitHub repository URL."
+          "Enter a valid HTTPS GitHub repository or folder URL. Direct file URLs are not allowed."
         );
         input.reportValidity();
         return;
@@ -1768,9 +1881,9 @@ function renderRepositorySettings() {
 
       input.setCustomValidity("");
 
-      userRepositories[index].url = value;
+      userRepositories[index].url = normalizedURL;
 
-      if (!value) {
+      if (!normalizedURL) {
         userRepositories[index].selected = false;
       }
 
@@ -1815,22 +1928,20 @@ function renderRepositorySettings() {
 
 /*
  * Builds the URL received by the editor.
- *
- * Only selected and valid repository URLs are included.
- * The editor's existing rep= recovery mechanism decodes
- * the array and loads each repository.
+ * Includes only selected, validated repository URLs.
  */
 function buildToolURL(baseURL) {
   const url = new URL(baseURL);
 
   const selectedURLs = userRepositories
-    .filter(repository =>
-      repository.selected &&
-      isValidGitHubRepositoryURL(repository.url)
+    .filter(repository => repository.selected === true)
+    .map(repository =>
+      normalizeGitHubRepositoryURL(repository.url)
     )
-    .map(repository => repository.url.trim());
+    .filter(Boolean)
+    .slice(0, MAX_USER_REPOSITORIES);
 
-  // Avoid carrying an old repository configuration forward.
+  // Remove any previous repository configuration.
   url.searchParams.delete("rep");
 
   if (selectedURLs.length > 0) {
@@ -1851,11 +1962,16 @@ function buildToolURL(baseURL) {
    ========================================================= */
 
 function isValidToolURL(value) {
-  if (!value) return false;
+  if (typeof value !== "string" || !value.trim()) return false;
 
   try {
-    const parsed = new URL(value, window.location.href);
-    return parsed.protocol === "https:";
+    const parsed = new URL(value);
+
+    return (
+      parsed.protocol === "https:" &&
+      parsed.username === "" &&
+      parsed.password === ""
+    );
   } catch {
     return false;
   }
@@ -1904,6 +2020,8 @@ function initialiseToolSidebar() {
     button.title = tool.name;
     button.setAttribute("aria-label", "Open " + tool.name);
     button.setAttribute("aria-pressed", "false");
+
+    // Copy the existing icon markup from the trusted page DOM.
     button.innerHTML = symbol.innerHTML;
 
     button.addEventListener("click", () => openTool(index));
@@ -1979,10 +2097,7 @@ function openTool(index) {
   const tool = TOOL_CONFIG[index];
   if (!tool) return;
 
-  /*
-   * Always dispose of the previous tool before opening
-   * another one, including when the same tool is selected.
-   */
+  // Dispose of the previous tool browsing context.
   destroyToolFrame();
 
   activeToolIndex = index;
@@ -2033,7 +2148,6 @@ function openTool(index) {
    ========================================================= */
 
 function closeWorkspace() {
-  /* Terminate the active tool's browsing context */
   destroyToolFrame();
 
   workspace.classList.remove("visible");
@@ -2057,7 +2171,7 @@ function reloadTool() {
 
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  /* Reload using a fresh browsing context */
+  // Reload using a fresh browsing context.
   destroyToolFrame();
 
   const targetURL = buildToolURL(tool.url);
@@ -2141,7 +2255,7 @@ function changeHomeBanner() {
 }
 
 
-/* CHANGE THE BANNER WHEN THE USER CLOSES THE WORKSPACE */
+/* Change the banner when the user closes the workspace. */
 
 document.getElementById("closeTool").addEventListener("click", () => {
   changeHomeBanner();
