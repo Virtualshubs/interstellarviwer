@@ -873,7 +873,13 @@ body:has(.workspace.visible) .footer {
   font-family:var(--font-mono);
   font-size:9px;
 }
-
+ 
+.tool-symbol img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 /* =========================================================
    ACCOUNT & PLATFORM INFORMATION
    ========================================================= */
@@ -1320,15 +1326,14 @@ body:has(.workspace.visible) .footer {
       <button class="tool-card" data-tool="0" type="button">
         <span class="tool-number">3D TWINS Lite / V2.1.0</span>
 
-        <span class="tool-symbol" aria-hidden="true">
-          <svg viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="29"/>
-            <ellipse cx="40" cy="40" rx="13" ry="29"/>
-            <ellipse cx="40" cy="40" rx="29" ry="11"/>
-            <path d="M13 29 H67 M13 51 H67 M40 11 V69" opacity=".6"/>
-            <path d="M53 17 L62 22 L62 32" stroke="#E5682E"/>
-          </svg>
-        </span>
+<span class="tool-symbol" aria-hidden="true">
+  <img
+    src="https://3d.staratlas.es/LS/logolitenaranja.png"
+    alt=""
+    loading="eager"
+    decoding="async"
+  >
+</span>
 
         <span class="tool-name">Consultar repositorio 3D</span>
         <span class="tool-description">Accede a tu repositorio dinámico</span>
