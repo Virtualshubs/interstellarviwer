@@ -1301,7 +1301,199 @@ body:has(.workspace.visible) .footer {
   }
 }
 
-  
+
+
+/* =========================================================
+   MULTIREPO — SETTINGS
+   ========================================================= */
+
+.multirepo-panel {
+  width: 100%;
+  margin-top: 28px;
+  padding: 26px;
+  box-sizing: border-box;
+  background: #EAE7DE;
+  border: 1px solid #D9D4C8;
+  border-radius: 12px;
+  color: #242522;
+}
+
+.multirepo-header {
+  margin-bottom: 22px;
+}
+
+.multirepo-eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: #416D80;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.multirepo-header h2 {
+  margin: 0;
+  color: #242522;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.multirepo-description {
+  max-width: 620px;
+  margin: 10px 0 0;
+  color: #62635D;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.multirepo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.multirepo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  min-width: 0;
+  padding: 14px;
+  box-sizing: border-box;
+  background: #F3F1EA;
+  border: 1px solid #D9D4C8;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.multirepo-item:hover {
+  background: #E1DED4;
+  border-color: #C5BFB1;
+}
+
+.multirepo-checkbox {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #E5682E;
+  cursor: pointer;
+}
+
+.multirepo-item-details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.multirepo-item-name {
+  color: #242522;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.multirepo-item-url {
+  overflow-wrap: anywhere;
+  color: #62635D;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.multirepo-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed #C5BFB1;
+  border-radius: 8px;
+  color: #62635D;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.multirepo-status {
+  margin-top: 16px;
+  color: #62635D;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.multirepo-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 18px;
+}
+
+.multirepo-create-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid #E5682E;
+  border-radius: 8px;
+  background: #E5682E;
+  color: #111210;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.multirepo-create-button:hover:not(:disabled) {
+  background: #D75A25;
+  border-color: #D75A25;
+}
+
+.multirepo-create-button:focus-visible {
+  outline: 2px solid #416D80;
+  outline-offset: 3px;
+}
+
+.multirepo-create-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.multirepo-create-arrow {
+  font-size: 17px;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .multirepo-panel {
+    margin-top: 20px;
+    padding: 18px;
+  }
+
+  .multirepo-header h2 {
+    font-size: 19px;
+  }
+
+  .multirepo-create-button {
+    width: 100%;
+  }
+}
+
+
+ 
 </style>
 
 </head>
