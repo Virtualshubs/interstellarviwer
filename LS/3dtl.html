@@ -1688,14 +1688,7 @@ if (new URLSearchParams(location.search).get("scene")) {
   >
     Cargar
   </button>
-  <button
-  id="customRepoShareButton"
-  type="button"
-  class="btn btn-secondary"
-    
->
-  Compartir repositorio
-</button>
+
 </div>
       
       
@@ -1852,6 +1845,13 @@ if (new URLSearchParams(location.search).get("scene")) {
   </div>
 
   <div id="step3" class="step">
+  <button
+  id="customRepoShareButton"
+  type="button"
+  class="btn btn-secondary">
+  Compartir repositorio
+</button>
+    
     <button class="btn btn-primary" onclick="exportScene()">Publish Scene</button>
     <div class="label" hidden>Share link</div>
     <div id="linkBox" hidden>No scene generated yet</div>
