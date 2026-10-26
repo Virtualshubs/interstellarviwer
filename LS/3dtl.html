@@ -1685,6 +1685,13 @@ if (new URLSearchParams(location.search).get("scene")) {
   >
     Cargar
   </button>
+  <button
+  id="customRepoShareButton"
+  type="button"
+  class="btn btn-secondary"
+>
+  Compartir repositorio
+</button>
 </div>
       
       
@@ -3889,7 +3896,6 @@ function checkURL() {
   
 
 
-
 /* ================= CUSTOM REPO · ADAPTADOR MULTIPLE ================= */
 
 const customRepoStates = [];
@@ -3904,24 +3910,32 @@ function getCustomRepoState(repoId) {
   return customRepoStates.find(repo => repo.id === repoId) || null;
 }
 
-/* Inicializa los controles del input. */
+/* Inicializa los controles del input y del botón de compartir. */
 function initCustomRepoUI() {
   const input = document.getElementById("customRepoUrlInput");
   const loadButton = document.getElementById("customRepoLoadButton");
+  const shareButton = document.getElementById("customRepoShareButton");
 
-  if (!input || !loadButton ||
-      loadButton.dataset.initialized === "true") return;
+  if (input && loadButton &&
+      loadButton.dataset.initialized !== "true") {
+    loadButton.dataset.initialized = "true";
 
-  loadButton.dataset.initialized = "true";
+    loadButton.addEventListener("click", loadCustomRepo);
 
-  loadButton.addEventListener("click", loadCustomRepo);
+    input.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        loadCustomRepo();
+      }
+    });
+  }
 
-  input.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      loadCustomRepo();
-    }
-  });
+  /* El botón de compartir se inicializa independientemente. */
+  if (shareButton &&
+      shareButton.dataset.initialized !== "true") {
+    shareButton.dataset.initialized = "true";
+    shareButton.addEventListener("click", shareCustomRepos);
+  }
 }
 
 /* Interpreta una URL normal de repositorio o carpeta de GitHub. */
@@ -4067,10 +4081,7 @@ async function loadCustomRepo() {
       encodeURIComponent(config.repo) + "/" +
       branchPath + "/";
 
-    /*
-     * Asignar un ID propio a cada colección.
-     * No se guarda en ningún servicio externo.
-     */
+    /* Asignar un ID propio a cada colección. */
     const repoId = ++customRepoCounter;
 
     const ownerMatches = customRepoStates.filter(
@@ -4089,7 +4100,10 @@ async function loadCustomRepo() {
       folders,
       rawBaseURL,
       displayName,
-      truncated: Boolean(treeData.truncated)
+      truncated: Boolean(treeData.truncated),
+
+      /* URL original para reconstruir el enlace compartido. */
+      originalURL: rawInput
     };
 
     customRepoStates.push(repoState);
@@ -4416,8 +4430,154 @@ async function loadCustomRepoAssets(repoId, folderPath) {
   }
 }
 
-/* Inicializar los eventos del input. */
+/* ================= COMPARTIR REPOSITORIOS ================= */
+
+/*
+ * Codifica una lista de URL como JSON en Base64 compatible
+ * con caracteres Unicode.
+ */
+function encodeCustomRepoURLs(repoURLs) {
+  const json = JSON.stringify(repoURLs);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+
+/* Decodifica el parámetro rep y valida su estructura. */
+function decodeCustomRepoURLs(encoded) {
+  const decoded = decodeURIComponent(escape(atob(encoded)));
+  const parsed = JSON.parse(decoded);
+
+  const repoURLs = Array.isArray(parsed) ? parsed : [parsed];
+
+  if (
+    repoURLs.length === 0 ||
+    repoURLs.some(url =>
+      typeof url !== "string" || !url.trim()
+    )
+  ) {
+    throw new Error("El enlace no contiene URL de repositorios válidas.");
+  }
+
+  /* Validar todas las URL antes de comenzar a cargarlas. */
+  repoURLs.forEach(url => parseCustomRepoURL(url));
+
+  return repoURLs;
+}
+
+/* Genera un enlace y lo abre en una pestaña nueva. */
+function shareCustomRepos() {
+  if (!customRepoStates.length) {
+    setNASAStatus(
+      "Carga al menos un repositorio antes de compartirlo.",
+      true
+    );
+    return;
+  }
+
+  try {
+    const repoURLs = customRepoStates.map(repo => repo.originalURL);
+    const encoded = encodeCustomRepoURLs(repoURLs);
+
+    const shareURL = new URL(window.location.href);
+
+    /*
+     * Se evita que un enlace de escena existente interfiera
+     * con la apertura compartida de los repositorios.
+     * La función original de recuperación scene= no se modifica.
+     */
+    shareURL.searchParams.delete("scene");
+    shareURL.searchParams.set("rep", encoded);
+    shareURL.hash = "";
+
+    const newTab = window.open(
+      shareURL.href,
+      "_blank",
+      "noopener"
+    );
+
+    if (!newTab) {
+      setNASAStatus(
+        "El navegador ha bloqueado la nueva pestaña. " +
+        "Permite las ventanas emergentes e inténtalo de nuevo.",
+        true
+      );
+      return;
+    }
+
+    setNASAStatus(
+      repoURLs.length === 1
+        ? "Enlace del repositorio generado."
+        : "Enlace generado para " + repoURLs.length + " repositorios."
+    );
+
+  } catch (error) {
+    console.error("Custom repository sharing failed:", error);
+    setNASAStatus(
+      error.message || "No se pudo generar el enlace compartido.",
+      true
+    );
+  }
+}
+
+/* ================= RECUPERAR REPOSITORIOS DESDE rep= ================= */
+
+/*
+ * Lee el parámetro rep, restaura el input y reutiliza loadCustomRepo().
+ * No carga modelos automáticamente ni modifica la recuperación scene=.
+ */
+async function restoreCustomReposFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const encoded = params.get("rep");
+
+  if (!encoded) return;
+
+  const input = document.getElementById("customRepoUrlInput");
+
+  if (!input) {
+    console.error(
+      "No se encontró customRepoUrlInput para recuperar los repositorios."
+    );
+    return;
+  }
+
+  try {
+    const repoURLs = decodeCustomRepoURLs(encoded);
+
+    for (const repoURL of repoURLs) {
+      input.value = repoURL;
+
+      /*
+       * Esperar a que termine cada consulta antes de comenzar
+       * la siguiente, evitando que se invaliden entre sí.
+       */
+      await loadCustomRepo();
+    }
+
+    if (repoURLs.length > 0) {
+      setNASAStatus(
+        repoURLs.length === 1
+          ? "Repositorio recuperado desde el enlace. Selecciona su colección para explorarla."
+          : repoURLs.length +
+            " repositorios recuperados desde el enlace. Selecciona una colección para explorarla."
+      );
+    }
+
+  } catch (error) {
+    console.error("Custom repository URL recovery failed:", error);
+    setNASAStatus(
+      error.message || "No se pudieron recuperar los repositorios del enlace.",
+      true
+    );
+  }
+}
+
+/* ================= INICIALIZACIÓN ================= */
+
+/* Primero se inicializan los controles. */
 initCustomRepoUI();
+
+/* Después se leen y recuperan los repositorios de rep=. */
+restoreCustomReposFromURL();
+
 
   
 </script>
