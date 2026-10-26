@@ -2119,16 +2119,16 @@ const systemStatus = document.getElementById("systemStatus");
 const toolCount = document.getElementById("toolCount");
 
 let activeToolIndex = null;
-
-/* NEW: remembers a directly opened individual scene. */
 let activeToolURLOverride = null;
 
 const MAX_USER_REPOSITORIES = 5;
 const MAX_REPOSITORY_URL_LENGTH = 300;
 const MAX_MODEL_URL_LENGTH = 2048;
+const MAX_USER_INDIVIDUAL_SCENES = 5;
 
 const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
 const MULTIREPO_SELECTION_KEY = "liteSpaceMultirepoSelectionV1";
+const INDIVIDUAL_SCENES_KEY = "liteSpaceIndividualScenesV1";
 
 
 function emptyRepositorySlots() {
@@ -2284,6 +2284,7 @@ function loadUserRepositories() {
 
 
 let userRepositories = loadUserRepositories();
+let individualScenes = [];
 
 
 function saveUserRepositories() {
@@ -2447,6 +2448,7 @@ function renderRepositorySettings() {
     input.spellcheck = false;
     input.maxLength = MAX_REPOSITORY_URL_LENGTH;
     input.value = repository.url;
+
     input.setAttribute(
       "aria-label",
       "Repository URL " + (index + 1)
@@ -2522,6 +2524,7 @@ function renderRepositorySettings() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = repository.selected;
+
     checkbox.disabled = !(
       repository.url.trim() &&
       isValidGitHubRepositoryURL(repository.url)
@@ -2554,7 +2557,6 @@ function renderRepositorySettings() {
 
 /* =========================================================
    MULTIREPO — INDEPENDENT SELECTION
-   Reads the existing repository URLs, but has its own checks.
    ========================================================= */
 
 function loadMultirepoSelection() {
@@ -2703,8 +2705,8 @@ function renderMultirepoSettings() {
 
     const name = document.createElement("span");
     name.className = "multirepo-item-name";
-    name.textContent = "REPOSITORY " +
-      String(index + 1).padStart(2, "0");
+    name.textContent =
+      "REPOSITORY " + String(index + 1).padStart(2, "0");
 
     const url = document.createElement("span");
     url.className = "multirepo-item-url";
@@ -2732,8 +2734,7 @@ function renderMultirepoSettings() {
 }
 
 
-/* Independent URL builder for shared multirepos.
-   Does not use or change the editor's current checkbox selection. */
+/* Independent URL builder for shared multirepos. */
 
 function buildMultirepoURL(baseURL, repositoryURLs) {
   if (!isValidToolURL(baseURL)) return null;
@@ -2799,7 +2800,6 @@ function createSharedMultirepo() {
     return;
   }
 
-  /* Open synchronously from the button click to avoid popup blocking. */
   window.open(
     targetURL,
     "_blank",
@@ -2809,16 +2809,9 @@ function createSharedMultirepo() {
 
 
 /* =========================================================
-   INDIVIDUAL SCENE — NEW SETTINGS CONTAINER
-   Builds the same ?scene= structure as the viewer.
-   Uses the existing iframe; does not affect repository checks.
+   INDIVIDUAL SCENE — URL GENERATION
    ========================================================= */
 
-
-/**
- * Accepts only direct HTTPS URLs pointing to a .glb or .gltf file.
- * Query parameters are allowed for signed/CDN URLs.
- */
 function normalizeModelFileURL(value) {
   if (typeof value !== "string") return null;
 
@@ -2869,18 +2862,6 @@ function normalizeModelFileURL(value) {
 }
 
 
-/**
- * Derives the model metadata from its URL.
- *
- * Example:
- * https://raw.githubusercontent.com/SpectraStudios/...
- *
- * name      -> filename without extension
- * source    -> GitHub owner, or hostname for other providers
- * description -> empty by default
- * latitude / longitude -> null by default
- * _hostname -> URL hostname
- */
 function buildIndividualModelInfo(modelURL) {
   let url;
 
@@ -2935,12 +2916,6 @@ function buildIndividualModelInfo(modelURL) {
 }
 
 
-/**
- * Builds the individual scene URL using the default state supplied
- * for 3D TWINS Lite.
- *
- * The generated URL contains ?scene= and not ?rep=.
- */
 function buildIndividualSceneURL(baseURL, modelURL) {
   if (!isValidToolURL(baseURL)) return null;
 
@@ -2954,7 +2929,7 @@ function buildIndividualSceneURL(baseURL, modelURL) {
 
   const sceneState = {
     modelUrl: normalizedModelURL,
-    modelInfo: modelInfo,
+    modelInfo,
     bg: "#f5f5f5",
     autoRotate: false,
     backgroundImage: false,
@@ -2971,10 +2946,6 @@ function buildIndividualSceneURL(baseURL, modelURL) {
   try {
     const url = new URL(baseURL);
 
-    /*
-     * An individual scene must not inherit the multirepo selection.
-     * The viewer will read the scene parameters from the URL.
-     */
     url.searchParams.delete("rep");
 
     const json = JSON.stringify(sceneState);
@@ -2993,9 +2964,587 @@ function buildIndividualSceneURL(baseURL, modelURL) {
 }
 
 
-/**
- * Updates validation status and button state without loading the viewer.
- */
+/* =========================================================
+   INDIVIDUAL SCENES — PERSISTENCE AND SAVED SLOTS
+   ========================================================= */
+
+function createIndividualSceneId() {
+  return "scene-" + Date.now().toString(36) + "-" +
+    Math.random().toString(36).slice(2, 8);
+}
+
+
+function isValidIndividualSceneURL(value) {
+  const baseURL = TOOL_CONFIG[0]?.url;
+
+  if (!isValidToolURL(value) || !isValidToolURL(baseURL)) {
+    return false;
+  }
+
+  try {
+    const candidate = new URL(value);
+    const viewer = new URL(baseURL);
+
+    return (
+      candidate.origin === viewer.origin &&
+      candidate.pathname === viewer.pathname &&
+      Boolean(candidate.searchParams.get("scene")) &&
+      !candidate.searchParams.has("rep")
+    );
+  } catch {
+    return false;
+  }
+}
+
+
+function normalizeStoredIndividualScene(item, index) {
+  if (!item || typeof item !== "object" || Array.isArray(item)) {
+    return null;
+  }
+
+  const modelURL = normalizeModelFileURL(item.modelUrl);
+  if (!modelURL) return null;
+
+  const sceneURL =
+    typeof item.sceneURL === "string" &&
+    isValidIndividualSceneURL(item.sceneURL)
+      ? item.sceneURL
+      : buildIndividualSceneURL(TOOL_CONFIG[0]?.url, modelURL);
+
+  if (!sceneURL || !isValidIndividualSceneURL(sceneURL)) {
+    return null;
+  }
+
+  const modelInfo = buildIndividualModelInfo(modelURL);
+  if (!modelInfo) return null;
+
+  const createdAt = Number(item.createdAt);
+
+  const id =
+    typeof item.id === "string" &&
+    /^[A-Za-z0-9_-]{1,100}$/.test(item.id)
+      ? item.id
+      : "saved-scene-" + index + "-" +
+        (Number.isFinite(createdAt) ? createdAt : Date.now());
+
+  const name =
+    typeof item.name === "string" && item.name.trim()
+      ? item.name.trim().slice(0, 120)
+      : modelInfo.name;
+
+  return {
+    id,
+    name,
+    modelUrl: modelURL,
+    sceneURL,
+    createdAt: Number.isFinite(createdAt) ? createdAt : Date.now()
+  };
+}
+
+
+function loadIndividualScenes() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(INDIVIDUAL_SCENES_KEY) || "[]"
+    );
+
+    if (!Array.isArray(saved)) return [];
+
+    return saved
+      .slice(0, MAX_USER_INDIVIDUAL_SCENES)
+      .map((item, index) =>
+        normalizeStoredIndividualScene(item, index)
+      )
+      .filter(Boolean);
+  } catch (error) {
+    console.error("Could not read saved individual scenes:", error);
+    return [];
+  }
+}
+
+
+function saveIndividualScenes() {
+  try {
+    localStorage.setItem(
+      INDIVIDUAL_SCENES_KEY,
+      JSON.stringify(
+        individualScenes.slice(0, MAX_USER_INDIVIDUAL_SCENES)
+      )
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Could not save individual scenes:", error);
+    return false;
+  }
+}
+
+
+/* =========================================================
+   DYNAMIC HTML AND CSS FOR SAVED SCENES
+   No separate HTML or CSS changes are required.
+   ========================================================= */
+
+function ensureIndividualScenesUI() {
+  let section =
+    document.getElementById("individualScenesSection") ||
+    document.querySelector(".individual-scenes-section");
+
+  if (!section) {
+    section = document.createElement("section");
+    section.id = "individualScenesSection";
+    section.className = "individual-scenes-section";
+    section.setAttribute(
+      "aria-labelledby",
+      "individualScenesTitle"
+    );
+
+    const header = document.createElement("div");
+    header.className = "individual-scenes-header";
+
+    const headingGroup = document.createElement("div");
+
+    const eyebrow = document.createElement("span");
+    eyebrow.className = "individual-scenes-eyebrow";
+    eyebrow.textContent = "PERSONAL LIBRARY";
+
+    const heading = document.createElement("h3");
+    heading.id = "individualScenesTitle";
+    heading.textContent = "Escenas guardadas";
+
+    headingGroup.append(eyebrow, heading);
+
+    const count = document.createElement("span");
+    count.id = "individualScenesCount";
+    count.className = "individual-scenes-count";
+    count.setAttribute(
+      "aria-label",
+      "Número de escenas guardadas"
+    );
+    count.textContent = "00 / 05";
+
+    header.append(headingGroup, count);
+
+    const list = document.createElement("div");
+    list.id = "individualScenesList";
+    list.className = "individual-scenes-list";
+    list.setAttribute(
+      "aria-label",
+      "Escenas individuales guardadas"
+    );
+
+    section.append(header, list);
+
+    const panel = document.querySelector(".individual-scene-panel");
+    const actions = panel?.querySelector(".individual-scene-actions");
+
+    if (actions) {
+      actions.insertAdjacentElement("afterend", section);
+    } else if (panel) {
+      panel.appendChild(section);
+    } else if (settingsView) {
+      settingsView.appendChild(section);
+    }
+  }
+
+  if (!section.id) {
+    section.id = "individualScenesSection";
+  }
+
+  let count = section.querySelector("#individualScenesCount");
+
+  if (!count) {
+    count = document.createElement("span");
+    count.id = "individualScenesCount";
+    count.className = "individual-scenes-count";
+    count.setAttribute(
+      "aria-label",
+      "Número de escenas guardadas"
+    );
+
+    const header = section.querySelector(
+      ".individual-scenes-header"
+    );
+
+    if (header) header.appendChild(count);
+  }
+
+  let list = section.querySelector("#individualScenesList");
+
+  if (!list) {
+    list = document.createElement("div");
+    list.id = "individualScenesList";
+    list.className = "individual-scenes-list";
+    list.setAttribute(
+      "aria-label",
+      "Escenas individuales guardadas"
+    );
+
+    section.appendChild(list);
+  }
+
+  if (!document.getElementById("individualScenesDynamicStyles")) {
+    const style = document.createElement("style");
+    style.id = "individualScenesDynamicStyles";
+
+    style.textContent = `
+      .individual-scenes-section {
+        margin-top: 30px;
+        padding-top: 24px;
+        border-top: 1px solid #D9D4C8;
+      }
+
+      .individual-scenes-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .individual-scenes-eyebrow {
+        display: block;
+        margin-bottom: 7px;
+        color: #77756B;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: .08em;
+        line-height: 1.5;
+        text-transform: uppercase;
+      }
+
+      .individual-scenes-header h3 {
+        margin: 0;
+        color: #242522;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.3;
+        letter-spacing: -.025em;
+      }
+
+      .individual-scenes-count {
+        flex-shrink: 0;
+        color: #626159;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .individual-scenes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .individual-scenes-empty {
+        margin: 0;
+        padding: 18px;
+        color: #77756B;
+        background: #F3F1EA;
+        border: 1px dashed #D9D4C8;
+        border-radius: 8px;
+        font-family: "IBM Plex Sans", sans-serif;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .individual-scene-slot {
+        display: flex;
+        align-items: stretch;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .individual-scene-slot-open {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex: 1;
+        min-width: 0;
+        padding: 13px 14px;
+        text-align: left;
+        color: #242522;
+        background: #F3F1EA;
+        border: 1px solid #D9D4C8;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          background-color 160ms ease,
+          border-color 160ms ease;
+      }
+
+      .individual-scene-slot-open:hover {
+        background: #E1DED4;
+        border-color: #B8B2A5;
+      }
+
+      .individual-scene-slot-open:focus-visible,
+      .individual-scene-slot-delete:focus-visible {
+        outline: 2px solid #E5682E;
+        outline-offset: 2px;
+      }
+
+      .individual-scene-slot-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 32px;
+        width: 32px;
+        height: 32px;
+        color: #E5682E;
+        background: #EAE7DE;
+        border: 1px solid #D9D4C8;
+        border-radius: 6px;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .individual-scene-slot-details {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .individual-scene-slot-name {
+        color: #242522;
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+      }
+
+      .individual-scene-slot-url {
+        display: block;
+        color: #77756B;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 1.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .individual-scene-slot-arrow {
+        flex-shrink: 0;
+        color: #77756B;
+        font-size: 17px;
+        line-height: 1;
+      }
+
+      .individual-scene-slot-open:hover
+      .individual-scene-slot-arrow {
+        color: #E5682E;
+      }
+
+      .individual-scene-slot-delete {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 42px;
+        width: 42px;
+        min-height: 58px;
+        color: #77756B;
+        background: transparent;
+        border: 1px solid #D9D4C8;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: "IBM Plex Sans", sans-serif;
+        font-size: 23px;
+        font-weight: 400;
+        line-height: 1;
+        transition:
+          color 160ms ease,
+          background-color 160ms ease,
+          border-color 160ms ease;
+      }
+
+      .individual-scene-slot-delete:hover {
+        color: #B94A23;
+        background: #F3F1EA;
+        border-color: #B94A23;
+      }
+
+      @media (max-width: 600px) {
+        .individual-scenes-section {
+          margin-top: 24px;
+          padding-top: 20px;
+        }
+
+        .individual-scene-slot-open {
+          gap: 10px;
+          padding: 11px;
+        }
+
+        .individual-scene-slot-number {
+          flex-basis: 28px;
+          width: 28px;
+          height: 28px;
+        }
+
+        .individual-scene-slot-delete {
+          flex-basis: 38px;
+          width: 38px;
+        }
+
+        .individual-scene-slot-url {
+          font-size: 9px;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  return { section, list, count };
+}
+
+
+function renderIndividualScenes() {
+  const ui = ensureIndividualScenesUI();
+  const container = ui?.list;
+  const count = ui?.count;
+
+  if (!container) {
+    updateIndividualSceneStatus();
+    return;
+  }
+
+  container.replaceChildren();
+
+  if (count) {
+    count.textContent =
+      String(individualScenes.length).padStart(2, "0") +
+      " / " +
+      String(MAX_USER_INDIVIDUAL_SCENES).padStart(2, "0");
+  }
+
+  if (individualScenes.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "individual-scenes-empty";
+    empty.textContent =
+      "Todavía no hay escenas guardadas. Crea una escena para añadirla aquí.";
+
+    container.appendChild(empty);
+    updateIndividualSceneStatus();
+    return;
+  }
+
+  individualScenes.forEach((sceneItem, index) => {
+    const slot = document.createElement("div");
+    slot.className = "individual-scene-slot";
+
+    const openButton = document.createElement("button");
+    openButton.type = "button";
+    openButton.className = "individual-scene-slot-open";
+
+    openButton.setAttribute(
+      "aria-label",
+      "Abrir escena " + sceneItem.name
+    );
+
+    const number = document.createElement("span");
+    number.className = "individual-scene-slot-number";
+    number.textContent = String(index + 1).padStart(2, "0");
+
+    const details = document.createElement("span");
+    details.className = "individual-scene-slot-details";
+
+    const name = document.createElement("span");
+    name.className = "individual-scene-slot-name";
+    name.textContent = sceneItem.name;
+
+    const url = document.createElement("span");
+    url.className = "individual-scene-slot-url";
+    url.textContent = sceneItem.modelUrl;
+    url.title = sceneItem.modelUrl;
+
+    const arrow = document.createElement("span");
+    arrow.className = "individual-scene-slot-arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    arrow.textContent = "↗";
+
+    details.append(name, url);
+    openButton.append(number, details, arrow);
+
+    openButton.addEventListener("click", () => {
+      const savedScene = individualScenes.find(
+        item => item.id === sceneItem.id
+      );
+
+      if (
+        !savedScene ||
+        !isValidIndividualSceneURL(savedScene.sceneURL)
+      ) {
+        const status = document.getElementById(
+          "individualSceneStatus"
+        );
+
+        if (status) {
+          status.textContent =
+            "Could not open this saved scene. Check its saved URL.";
+        }
+
+        return;
+      }
+
+      openTool(0, savedScene.sceneURL);
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "individual-scene-slot-delete";
+    deleteButton.textContent = "×";
+    deleteButton.title = "Eliminar escena guardada";
+
+    deleteButton.setAttribute(
+      "aria-label",
+      "Eliminar escena " + sceneItem.name
+    );
+
+    deleteButton.addEventListener("click", () => {
+      individualScenes = individualScenes.filter(
+        item => item.id !== sceneItem.id
+      );
+
+      const persisted = saveIndividualScenes();
+
+      renderIndividualScenes();
+
+      const status = document.getElementById(
+        "individualSceneStatus"
+      );
+
+      if (status) {
+        status.textContent = persisted
+          ? "Escena eliminada. " +
+            individualScenes.length +
+            " de " +
+            MAX_USER_INDIVIDUAL_SCENES +
+            " slots ocupados."
+          : "La escena se ha eliminado de esta sesión, pero no se pudo guardar el cambio.";
+      }
+    });
+
+    slot.append(openButton, deleteButton);
+    container.appendChild(slot);
+  });
+
+  updateIndividualSceneStatus();
+}
+
+
+/* Load saved scenes after the supporting URL functions are available. */
+individualScenes = loadIndividualScenes();
+
+
 function updateIndividualSceneStatus() {
   const input = document.getElementById("individualModelURL");
   const status = document.getElementById("individualSceneStatus");
@@ -3007,32 +3556,45 @@ function updateIndividualSceneStatus() {
   const normalizedURL = normalizeModelFileURL(value);
   const isValid = Boolean(normalizedURL);
 
-  button.disabled = !isValid;
+  const atCapacity =
+    individualScenes.length >= MAX_USER_INDIVIDUAL_SCENES;
+
+  button.disabled = !isValid || atCapacity;
 
   if (!status) return;
 
-  if (!value) {
+  if (atCapacity) {
     status.textContent =
-      "Paste a direct HTTPS URL to a GLB or GLTF model.";
+      "Has alcanzado el límite de cinco escenas. Elimina un slot para crear otra.";
+  } else if (!value) {
+    status.textContent =
+      "Pega una URL HTTPS directa de un modelo GLB o GLTF. " +
+      individualScenes.length + "/" +
+      MAX_USER_INDIVIDUAL_SCENES +
+      " escenas guardadas.";
   } else if (isValid) {
     status.textContent =
-      "Valid model URL · ready to create the scene.";
+      "URL válida · " +
+      individualScenes.length + "/" +
+      MAX_USER_INDIVIDUAL_SCENES +
+      " escenas guardadas.";
   } else {
     status.textContent =
-      "Invalid URL. Use HTTPS and a direct .glb or .gltf file.";
+      "URL no válida. Introduce una URL HTTPS directa terminada en .glb o .gltf.";
   }
 }
 
 
-/**
- * Opens an individual scene through the existing tool iframe.
- * No second iframe or popup is created.
- */
 function createIndividualScene() {
   const input = document.getElementById("individualModelURL");
   const status = document.getElementById("individualSceneStatus");
 
   if (!input) return;
+
+  if (individualScenes.length >= MAX_USER_INDIVIDUAL_SCENES) {
+    updateIndividualSceneStatus();
+    return;
+  }
 
   const normalizedModelURL = normalizeModelFileURL(input.value);
 
@@ -3059,12 +3621,14 @@ function createIndividualScene() {
     return;
   }
 
+  const modelInfo = buildIndividualModelInfo(normalizedModelURL);
+
   const targetURL = buildIndividualSceneURL(
     tool.url,
     normalizedModelURL
   );
 
-  if (!targetURL) {
+  if (!modelInfo || !targetURL) {
     if (status) {
       status.textContent =
         "Could not build the individual scene URL.";
@@ -3073,15 +3637,26 @@ function createIndividualScene() {
     return;
   }
 
+  const newScene = {
+    id: createIndividualSceneId(),
+    name: modelInfo.name,
+    modelUrl: normalizedModelURL,
+    sceneURL: targetURL,
+    createdAt: Date.now()
+  };
+
+  individualScenes.push(newScene);
+
+  const persisted = saveIndividualScenes();
+
+  renderIndividualScenes();
+
   if (status) {
-    status.textContent =
-      "Opening the individual scene in the editor...";
+    status.textContent = persisted
+      ? "Escena guardada. Abriendo el editor..."
+      : "Escena creada, pero el navegador no ha permitido guardar la colección.";
   }
 
-  /*
-   * Passing a direct URL prevents the regular repository URL builder
-   * from replacing ?scene= with the saved ?rep= selection.
-   */
   openTool(0, targetURL);
 }
 
@@ -3228,17 +3803,13 @@ function showSettings() {
   systemStatus.textContent = "SETTINGS";
 
   renderMultirepoSettings();
+  renderIndividualScenes();
   updateIndividualSceneStatus();
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 
-/*
- * Optional directURL parameter:
- * - omitted: existing repository workflow
- * - supplied: open the individual scene URL directly
- */
 function openTool(index, directURL = null) {
   const tool = TOOL_CONFIG[index];
 
@@ -3299,8 +3870,6 @@ function openTool(index, directURL = null) {
   frameMessage.style.display = "none";
 
   systemStatus.textContent = "TOOL LOADING";
-
-  /* Setting src triggers navigation and loading of the viewer. */
   toolFrame.src = targetURL;
 }
 
@@ -3328,10 +3897,6 @@ function reloadTool() {
 
   destroyToolFrame();
 
-  /*
-   * Keep the individual scene URL when one was opened from Settings.
-   * Otherwise, preserve the original repository workflow.
-   */
   const targetURL =
     activeToolURLOverride || buildToolURL(tool.url);
 
@@ -3441,8 +4006,6 @@ if (createMultirepoButton) {
 }
 
 
-/* NEW: individual-scene controls */
-
 const individualModelURLInput = document.getElementById(
   "individualModelURL"
 );
@@ -3471,6 +4034,7 @@ if (createIndividualSceneButton) {
 
 renderRepositorySettings();
 renderMultirepoSettings();
+renderIndividualScenes();
 updateIndividualSceneStatus();
 initialiseToolSidebar();
 
