@@ -3882,24 +3882,41 @@ function checkURL() {
 
 
 
-/* ================= CUSTOM REPO · ADAPTADOR ================= */
 
-let customRepoState = null;
+
+
+
+  
+
+
+
+/* ================= CUSTOM REPO · ADAPTADOR MULTIPLE ================= */
+
+const customRepoStates = [];
 let customRepoRequestId = 0;
+let customRepoCounter = 0;
+let activeCustomRepoId = null;
 
 const CUSTOM_REPO_ROOT_VALUE = "__CUSTOM_REPO_ROOT__";
 
+/* Recupera un repositorio por su identificador. */
+function getCustomRepoState(repoId) {
+  return customRepoStates.find(repo => repo.id === repoId) || null;
+}
+
+/* Inicializa los controles del input. */
 function initCustomRepoUI() {
   const input = document.getElementById("customRepoUrlInput");
   const loadButton = document.getElementById("customRepoLoadButton");
 
-  if (!input || !loadButton || loadButton.dataset.initialized === "true") return;
+  if (!input || !loadButton ||
+      loadButton.dataset.initialized === "true") return;
 
   loadButton.dataset.initialized = "true";
 
   loadButton.addEventListener("click", loadCustomRepo);
 
-  input.addEventListener("keydown", (event) => {
+  input.addEventListener("keydown", event => {
     if (event.key === "Enter") {
       event.preventDefault();
       loadCustomRepo();
@@ -3948,11 +3965,10 @@ function parseCustomRepoURL(inputURL) {
   return { owner, repo, branch, rootPath };
 }
 
-/* Consulta el repositorio y descubre sus carpetas y archivos. */
+/* Consulta GitHub y añade una colección independiente a la sesión. */
 async function loadCustomRepo() {
   const input = document.getElementById("customRepoUrlInput");
   const loadButton = document.getElementById("customRepoLoadButton");
-
   const rawInput = input?.value.trim();
 
   if (!rawInput) {
@@ -3963,19 +3979,22 @@ async function loadCustomRepo() {
 
   const requestId = ++customRepoRequestId;
 
-  loadButton.disabled = true;
+  if (loadButton) loadButton.disabled = true;
+
   setNASAStatus("Leyendo el repositorio de GitHub…");
 
   try {
     const config = parseCustomRepoURL(rawInput);
 
-    /* Si se pega la raíz del repositorio, obtenemos su rama predeterminada. */
+    /* Si se pega la raíz, obtener la rama predeterminada. */
     if (!config.branch) {
       const repoResponse = await fetch(
         "https://api.github.com/repos/" +
         encodeURIComponent(config.owner) + "/" +
         encodeURIComponent(config.repo),
-        { headers: { Accept: "application/vnd.github+json" } }
+        {
+          headers: { Accept: "application/vnd.github+json" }
+        }
       );
 
       if (!repoResponse.ok) {
@@ -4024,14 +4043,12 @@ async function loadCustomRepo() {
 
     if (requestId !== customRepoRequestId) return;
 
-    const rootPrefix = config.rootPath
-      ? config.rootPath.replace(/\/+$/, "") + "/"
-      : "";
+    const rootPath = config.rootPath.replace(/^\/+|\/+$/g, "");
+    const rootPrefix = rootPath ? rootPath + "/" : "";
 
-    /* Si se indicó una carpeta, solo conservamos su contenido. */
-    const entries = treeData.tree.filter((entry) =>
+    const entries = treeData.tree.filter(entry =>
       entry.path.startsWith(rootPrefix) &&
-      entry.path !== config.rootPath
+      entry.path !== rootPath
     );
 
     const folders = entries
@@ -4050,30 +4067,52 @@ async function loadCustomRepo() {
       encodeURIComponent(config.repo) + "/" +
       branchPath + "/";
 
-    customRepoState = {
+    /*
+     * Asignar un ID propio a cada colección.
+     * No se guarda en ningún servicio externo.
+     */
+    const repoId = ++customRepoCounter;
+
+    const ownerMatches = customRepoStates.filter(
+      repo => repo.owner.toLowerCase() === config.owner.toLowerCase()
+    ).length;
+
+    const displayName = ownerMatches > 0
+      ? config.owner + " " + (ownerMatches + 1)
+      : config.owner;
+
+    const repoState = {
+      id: repoId,
       ...config,
+      rootPath,
       entries,
       folders,
       rawBaseURL,
+      displayName,
       truncated: Boolean(treeData.truncated)
     };
 
-    createCustomRepoButton();
+    customRepoStates.push(repoState);
+
+    createCustomRepoButton(repoState);
 
     const modelCount = entries.filter(entry =>
       entry.type === "blob" && /\.(glb|gltf)$/i.test(entry.path)
     ).length;
 
     setNASAStatus(
-      "Repositorio leído: " + folders.length + " carpetas y " +
-      modelCount + " modelos en el árbol. Pulsa Custom URL 1 para explorar." +
+      "Colección " + displayName + " añadida: " +
+      folders.length + " carpetas y " + modelCount +
+      " modelos en el árbol." +
       (treeData.truncated ? " El árbol de GitHub está truncado." : "")
     );
+
   } catch (error) {
     if (requestId !== customRepoRequestId) return;
 
     console.error("Custom repository loading failed:", error);
     setNASAStatus(error.message || "No se pudo leer el repositorio.", true);
+
   } finally {
     if (requestId === customRepoRequestId && loadButton) {
       loadButton.disabled = false;
@@ -4081,11 +4120,14 @@ async function loadCustomRepo() {
   }
 }
 
-function createCustomRepoButton() {
-  let button = document.getElementById("customRepoToggle");
+/* Crea un botón independiente por colección. */
+function createCustomRepoButton(repoState) {
+  const buttonId = "customRepoToggle-" + repoState.id;
+  let button = document.getElementById(buttonId);
 
   if (!button) {
     const reference =
+      document.getElementById("customRepoToggle-" + (repoState.id - 1)) ||
       document.getElementById("rostockToggle") ||
       document.getElementById("nasaToggle");
 
@@ -4093,10 +4135,13 @@ function createCustomRepoButton() {
       ? reference.cloneNode(false)
       : document.createElement("button");
 
-    button.id = "customRepoToggle";
+    button.id = buttonId;
     button.type = "button";
+    button.dataset.customRepoId = String(repoState.id);
 
-    if (!reference) button.className = "btn btn-secondary";
+    if (!reference) {
+      button.className = "btn btn-secondary";
+    }
 
     if (reference) {
       reference.insertAdjacentElement("afterend", button);
@@ -4105,38 +4150,55 @@ function createCustomRepoButton() {
         ?.insertAdjacentElement("afterend", button);
     }
 
-    button.addEventListener("click", toggleCustomRepoExplorer);
+    button.addEventListener("click", () => {
+      toggleCustomRepoExplorer(repoState.id);
+    });
   }
 
   button.hidden = false;
   button.disabled = false;
-  button.textContent = customRepoState.owner;
+  button.textContent = repoState.displayName;
 }
 
-  
-/* Abre el explorador compartido; no crea un menú nuevo. */
-async function toggleCustomRepoExplorer() {
-  if (!customRepoState) {
-    setNASAStatus("Primero carga una URL de GitHub.", true);
+/* Abre la colección seleccionada en el explorador compartido. */
+function toggleCustomRepoExplorer(repoId) {
+  const repoState = getCustomRepoState(repoId);
+
+  if (!repoState) {
+    setNASAStatus("No se encontró la colección seleccionada.", true);
     return;
   }
 
   const explorer = document.getElementById("nasaExplorer");
   const gallery = document.getElementById("nasaGlobalGallery");
-  const button = document.getElementById("customRepoToggle");
 
   if (!explorer || !gallery) {
-    setNASAStatus("No se encontraron los elementos del explorador actual.", true);
+    setNASAStatus(
+      "No se encontraron los elementos del explorador actual.",
+      true
+    );
     return;
   }
 
-  if (activeCatalogSource === "customrepo" && !explorer.hidden) {
+  const isSameRepoOpen =
+    activeCatalogSource === "customrepo" &&
+    activeCustomRepoId === repoId &&
+    !explorer.hidden;
+
+  if (isSameRepoOpen) {
     explorer.hidden = true;
     gallery.hidden = true;
     activeCatalogSource = "nasa";
+    activeCustomRepoId = null;
     nasaRequestId++;
 
-    if (button) button.textContent = "Custom URL 1";
+    const currentButton = document.getElementById(
+      "customRepoToggle-" + repoId
+    );
+
+    if (currentButton) {
+      currentButton.textContent = repoState.displayName;
+    }
 
     clearNASAAssets();
     setNASAStatus("");
@@ -4144,20 +4206,35 @@ async function toggleCustomRepoExplorer() {
   }
 
   activeCatalogSource = "customrepo";
+  activeCustomRepoId = repoId;
   nasaRequestId++;
 
   explorer.hidden = false;
   gallery.hidden = true;
 
-  if (document.getElementById("nasaToggle")) {
-    document.getElementById("nasaToggle").textContent = "Explore NASA 3D Models";
+  const nasaButton = document.getElementById("nasaToggle");
+  const rostockButton = document.getElementById("rostockToggle");
+
+  if (nasaButton) {
+    nasaButton.textContent = "Explore NASA 3D Models";
   }
 
-  if (document.getElementById("rostockToggle")) {
-    document.getElementById("rostockToggle").textContent = "Explore Rostock 3D Models";
+  if (rostockButton) {
+    rostockButton.textContent = "Explore Rostock 3D Models";
   }
 
-  if (button) button.textContent = "Hide Custom URL 1";
+  /* Actualizar el texto de todos los botones personalizados. */
+  customRepoStates.forEach(repo => {
+    const button = document.getElementById(
+      "customRepoToggle-" + repo.id
+    );
+
+    if (button) {
+      button.textContent = repo.id === repoId
+        ? "Hide " + repo.displayName
+        : repo.displayName;
+    }
+  });
 
   clearNASAAssets();
 
@@ -4177,17 +4254,18 @@ async function toggleCustomRepoExplorer() {
 
   const rootOption = document.createElement("option");
   rootOption.value = CUSTOM_REPO_ROOT_VALUE;
-  rootOption.textContent = customRepoState.rootPath
+  rootOption.textContent = repoState.rootPath
     ? "Selected folder root"
     : "Repository root";
+
   select.appendChild(rootOption);
 
-  customRepoState.folders.forEach(path => {
+  repoState.folders.forEach(path => {
     const option = document.createElement("option");
     option.value = path;
 
-    const relativePath = customRepoState.rootPath
-      ? path.slice(customRepoState.rootPath.length).replace(/^\/+/, "")
+    const relativePath = repoState.rootPath
+      ? path.slice(repoState.rootPath.length).replace(/^\/+/, "")
       : path;
 
     option.textContent = relativePath;
@@ -4197,7 +4275,12 @@ async function toggleCustomRepoExplorer() {
   select.disabled = false;
 
   select.onchange = () => {
-    if (activeCatalogSource !== "customrepo") return;
+    if (
+      activeCatalogSource !== "customrepo" ||
+      activeCustomRepoId !== repoId
+    ) {
+      return;
+    }
 
     if (!select.value) {
       clearNASAAssets();
@@ -4206,18 +4289,29 @@ async function toggleCustomRepoExplorer() {
     }
 
     const folderPath = select.value === CUSTOM_REPO_ROOT_VALUE
-      ? customRepoState.rootPath
+      ? repoState.rootPath
       : select.value;
 
-    loadCustomRepoAssets(folderPath);
+    loadCustomRepoAssets(repoId, folderPath);
   };
 
-  setNASAStatus("Choose a folder to browse its model files.");
+  setNASAStatus(
+    "Colección activa: " + repoState.displayName +
+    ". Choose a folder to browse its model files."
+  );
 }
 
-/* Lista únicamente los modelos que están directamente en la carpeta elegida. */
-async function loadCustomRepoAssets(folderPath) {
-  if (activeCatalogSource !== "customrepo" || !customRepoState) return;
+/* Lista los modelos de la carpeta elegida en la colección activa. */
+async function loadCustomRepoAssets(repoId, folderPath) {
+  const repoState = getCustomRepoState(repoId);
+
+  if (
+    !repoState ||
+    activeCatalogSource !== "customrepo" ||
+    activeCustomRepoId !== repoId
+  ) {
+    return;
+  }
 
   const requestId = ++nasaRequestId;
 
@@ -4226,14 +4320,19 @@ async function loadCustomRepoAssets(folderPath) {
   setNASAStatus("Reading the selected folder…");
 
   try {
-    const assets = customRepoState.entries
+    const assets = repoState.entries
       .filter(entry => {
-        if (entry.type !== "blob" || !/\.(glb|gltf)$/i.test(entry.path)) {
+        if (
+          entry.type !== "blob" ||
+          !/\.(glb|gltf)$/i.test(entry.path)
+        ) {
           return false;
         }
 
         const lastSlash = entry.path.lastIndexOf("/");
-        const parentPath = lastSlash >= 0 ? entry.path.slice(0, lastSlash) : "";
+        const parentPath = lastSlash >= 0
+          ? entry.path.slice(0, lastSlash)
+          : "";
 
         return parentPath === folderPath;
       })
@@ -4247,12 +4346,16 @@ async function loadCustomRepoAssets(folderPath) {
         return {
           name: entry.path.split("/").pop(),
           path: entry.path,
-          download_url: customRepoState.rawBaseURL + encodedPath,
-          source: "Custom URL 1"
+          download_url: repoState.rawBaseURL + encodedPath,
+          source: repoState.displayName
         };
       });
 
-    if (requestId !== nasaRequestId || activeCatalogSource !== "customrepo") {
+    if (
+      requestId !== nasaRequestId ||
+      activeCatalogSource !== "customrepo" ||
+      activeCustomRepoId !== repoId
+    ) {
       return;
     }
 
@@ -4262,17 +4365,25 @@ async function loadCustomRepoAssets(folderPath) {
       message.textContent =
         "No .glb or .gltf files were found directly in this folder.";
 
-      document.getElementById("nasaAssetSlot")?.replaceChildren(message);
-      document.getElementById("nasaAssetGrid")?.replaceChildren();
+      document.getElementById("nasaAssetSlot")
+        ?.replaceChildren(message);
+
+      document.getElementById("nasaAssetGrid")
+        ?.replaceChildren();
 
       setNASAStatus(
-        "This folder contains no supported models directly. Choose a subfolder if available."
+        "This folder contains no supported models directly. " +
+        "Choose a subfolder if available."
       );
       return;
     }
 
     const list = document.getElementById("nasaAssetSlot");
     const grid = document.getElementById("nasaAssetGrid");
+
+    if (!list || !grid) {
+      throw new Error("No se encontraron los contenedores de modelos.");
+    }
 
     assets.forEach(asset => {
       list.appendChild(createNASAAssetListItem(asset));
@@ -4282,16 +4393,22 @@ async function loadCustomRepoAssets(folderPath) {
     setNASAAssetView(nasaAssetView);
 
     setNASAStatus(
-      assets.length + " Custom URL 1 model" +
+      assets.length + " " + repoState.displayName + " model" +
       (assets.length === 1 ? "" : "s") +
       " found. Select one to load it."
     );
+
   } catch (error) {
-    if (requestId !== nasaRequestId || activeCatalogSource !== "customrepo") {
+    if (
+      requestId !== nasaRequestId ||
+      activeCatalogSource !== "customrepo" ||
+      activeCustomRepoId !== repoId
+    ) {
       return;
     }
 
     console.error("Custom repository folder loading failed:", error);
+
     clearNASAAssets();
     showNASAStatusInSlot("Could not retrieve models from this folder.");
     showNASAStatusInGrid("Could not retrieve models from this folder.");
@@ -4299,9 +4416,8 @@ async function loadCustomRepoAssets(folderPath) {
   }
 }
 
-/* Inicializa los eventos del nuevo input sin alterar init() ni los catálogos. */
+/* Inicializar los eventos del input. */
 initCustomRepoUI();
-
 
   
 </script>
