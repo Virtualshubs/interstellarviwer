@@ -6,7 +6,6 @@
 <title>3DTWINSLite User Home</title>
  <link rel="icon" href="https://3d.staratlas.es/LS/logolitenaranja.png" type="image/x-icon" />
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
@@ -27,6 +26,11 @@
   --font-mono:'IBM Plex Mono',monospace;
   --header-height:68px;
   --button-radius:12px;
+
+  /* Settings: sistema común de superficies y controles */
+  --settings-radius:10px;
+  --settings-control-radius:6px;
+  --settings-padding:16px;
 }
 
 * {
@@ -169,28 +173,28 @@ button:focus-visible {
 }
 
 .header {
-  position: relative;
+  position:relative;
 }
 
 .header-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 42px;
-  max-width: 180px;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:42px;
+  max-width:180px;
 }
 
 .header-center img {
-  display: block;
-  width: 130%;
-  height: 130%;
-  object-fit: contain;
+  display:block;
+  width:130%;
+  height:130%;
+  object-fit:contain;
 }
- 
+
 /* =========================================================
    MAIN
    ========================================================= */
@@ -199,14 +203,8 @@ main {
   width:100%;
   margin:0;
   padding:0 32px 24px;
-
-  /*
-   * Permite que el contenido aumente la altura de la página.
-   * Evita que el footer quede desplazado fuera del flujo.
-   */
   flex:1 0 auto;
   min-height:0;
-
   display:flex;
   flex-direction:column;
 }
@@ -336,6 +334,13 @@ main {
   stroke:currentColor;
   stroke-width:1;
   fill:none;
+}
+
+.tool-symbol img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
 .tool-name {
@@ -648,7 +653,7 @@ body:has(.workspace.visible) .footer {
   max-width:620px;
 }
 
-/* Each settings section is independent of the information panel. */
+/* Estructura común de las secciones de Settings */
 
 .settings-section {
   width:100%;
@@ -703,6 +708,7 @@ body:has(.workspace.visible) .footer {
 
 /* =========================================================
    REPOSITORY LIBRARY
+   Referencia visual para los contenedores de Settings
    ========================================================= */
 
 .repository-total {
@@ -743,7 +749,7 @@ body:has(.workspace.visible) .footer {
   min-height:205px;
   padding:16px;
   border:1px solid var(--line);
-  border-radius:10px;
+  border-radius:var(--settings-radius);
   background:transparent;
   transition:background 160ms ease,border-color 160ms ease;
 }
@@ -801,14 +807,14 @@ body:has(.workspace.visible) .footer {
   min-height:40px;
   padding:10px;
   border:1px solid var(--line);
-  border-radius:6px;
+  border-radius:var(--settings-control-radius);
   outline:none;
   background:var(--bg);
   color:var(--text);
   font-family:var(--font-mono);
   font-size:11px;
   line-height:1.4;
-  transition:border-color 160ms ease;
+  transition:border-color 160ms ease,box-shadow 160ms ease;
 }
 
 .repository-url-input::placeholder {
@@ -854,8 +860,6 @@ body:has(.workspace.visible) .footer {
   opacity:.7;
 }
 
-/* Repository status and explanatory note */
-
 .repository-settings-footer {
   display:flex;
   align-items:flex-start;
@@ -896,15 +900,10 @@ body:has(.workspace.visible) .footer {
   font-family:var(--font-mono);
   font-size:9px;
 }
- 
-.tool-symbol img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+
 /* =========================================================
    ACCOUNT & PLATFORM INFORMATION
+   Mismo borde y superficie transparente que Repository
    ========================================================= */
 
 .settings-information .settings-panel {
@@ -913,8 +912,8 @@ body:has(.workspace.visible) .footer {
   margin-top:0;
   overflow:hidden;
   border:1px solid var(--line);
-  border-radius:10px;
-  background:var(--panel);
+  border-radius:var(--settings-radius);
+  background:transparent;
 }
 
 .settings-information .settings-row {
@@ -922,8 +921,14 @@ body:has(.workspace.visible) .footer {
   align-items:center;
   justify-content:space-between;
   gap:20px;
-  padding:19px 20px;
+  padding:16px;
   border-bottom:1px solid var(--line-soft);
+  background:transparent;
+  transition:background 160ms ease;
+}
+
+.settings-information .settings-row:hover {
+  background:rgba(234,231,222,.45);
 }
 
 .settings-information .settings-row:last-child {
@@ -957,6 +962,375 @@ body:has(.workspace.visible) .footer {
   font-size:10px;
   line-height:1.5;
   text-align:right;
+}
+
+/* =========================================================
+   MULTIREPO — SETTINGS
+   Normalizado con Repository Library
+   ========================================================= */
+
+.multirepo-panel {
+  width:100%;
+  min-width:0;
+  margin-top:28px;
+  padding:var(--settings-padding);
+  color:var(--text);
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:var(--settings-radius);
+  transition:background 160ms ease,border-color 160ms ease;
+}
+
+.multirepo-panel:hover {
+  background:rgba(234,231,222,.2);
+}
+
+.multirepo-panel:focus-within {
+  border-color:var(--primary);
+}
+
+.multirepo-header {
+  margin-bottom:20px;
+}
+
+.multirepo-eyebrow {
+  display:block;
+  margin-bottom:10px;
+  color:var(--primary);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.multirepo-header h2 {
+  margin:0;
+  color:var(--text);
+  font-family:var(--font-brand);
+  font-size:22px;
+  font-weight:500;
+  line-height:1.3;
+  letter-spacing:-.5px;
+}
+
+.multirepo-description {
+  max-width:620px;
+  margin:10px 0 0;
+  color:var(--muted);
+  font-family:var(--font-body);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.multirepo-list {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.multirepo-item {
+  display:flex;
+  align-items:flex-start;
+  gap:13px;
+  min-width:0;
+  padding:12px;
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--settings-control-radius);
+  cursor:pointer;
+  transition:background 160ms ease,border-color 160ms ease;
+}
+
+.multirepo-item:hover {
+  background:var(--panel-hover);
+  border-color:var(--line);
+}
+
+.multirepo-checkbox {
+  flex:0 0 auto;
+  width:15px;
+  height:15px;
+  margin:2px 0 0;
+  accent-color:var(--primary);
+  cursor:pointer;
+}
+
+.multirepo-item-details {
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  gap:5px;
+  min-width:0;
+}
+
+.multirepo-item-name {
+  color:var(--text);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:.05em;
+  overflow-wrap:anywhere;
+}
+
+.multirepo-item-url {
+  overflow-wrap:anywhere;
+  color:var(--muted);
+  font-family:var(--font-body);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.multirepo-empty {
+  margin:0;
+  padding:14px;
+  border:1px dashed var(--line);
+  border-radius:var(--settings-control-radius);
+  color:var(--muted);
+  background:transparent;
+  font-family:var(--font-body);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.multirepo-status {
+  margin-top:14px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+
+.multirepo-actions {
+  display:flex;
+  justify-content:flex-start;
+  margin-top:16px;
+}
+
+.multirepo-create-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  min-height:40px;
+  padding:0 16px;
+  border:1px solid var(--accent);
+  border-radius:var(--settings-control-radius);
+  background:var(--accent);
+  color:#FFFFFF;
+  font-family:var(--font-body);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background 160ms ease,border-color 160ms ease,opacity 160ms ease;
+}
+
+.multirepo-create-button:hover:not(:disabled) {
+  background:var(--primary-hover);
+  border-color:var(--primary-hover);
+}
+
+.multirepo-create-button:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:3px;
+}
+
+.multirepo-create-button:disabled {
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.multirepo-create-arrow {
+  font-size:17px;
+  line-height:1;
+}
+
+/* =========================================================
+   INDIVIDUAL SCENE — SETTINGS
+   Normalizado con Repository Library
+   ========================================================= */
+
+.individual-scene-panel {
+  width:100%;
+  min-width:0;
+  margin-top:24px;
+  padding:var(--settings-padding);
+  color:var(--text);
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:var(--settings-radius);
+  transition:background 160ms ease,border-color 160ms ease;
+}
+
+.individual-scene-panel:hover {
+  background:rgba(234,231,222,.2);
+}
+
+.individual-scene-panel:focus-within {
+  border-color:var(--primary);
+}
+
+.individual-scene-header {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0;
+  margin-bottom:20px;
+}
+
+.individual-scene-eyebrow {
+  display:inline-block;
+  margin-bottom:10px;
+  color:var(--primary);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:500;
+  line-height:1.5;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.individual-scene-header h2 {
+  margin:0;
+  color:var(--text);
+  font-family:var(--font-brand);
+  font-size:22px;
+  font-weight:500;
+  line-height:1.3;
+  letter-spacing:-.5px;
+}
+
+.individual-scene-description {
+  max-width:620px;
+  margin:10px 0 0;
+  color:var(--muted);
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:400;
+  line-height:1.6;
+}
+
+.individual-scene-form {
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.individual-scene-label {
+  display:block;
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:12px;
+  font-weight:500;
+  line-height:1.5;
+}
+
+.individual-scene-url-input {
+  display:block;
+  width:100%;
+  min-width:0;
+  min-height:40px;
+  padding:10px;
+  color:var(--text);
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:var(--settings-control-radius);
+  outline:none;
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:400;
+  line-height:1.4;
+  transition:border-color 160ms ease,box-shadow 160ms ease;
+}
+
+.individual-scene-url-input::placeholder {
+  color:var(--muted);
+  opacity:.8;
+}
+
+.individual-scene-url-input:hover {
+  border-color:var(--line);
+}
+
+.individual-scene-url-input:focus {
+  border-color:var(--primary);
+  outline:2px solid rgba(65,109,128,.16);
+  outline-offset:1px;
+  box-shadow:none;
+}
+
+.individual-scene-url-input:invalid:not(:placeholder-shown):focus {
+  border-color:#B94A23;
+  outline-color:rgba(185,74,35,.14);
+}
+
+.individual-scene-hint {
+  margin:2px 0 0;
+  color:var(--muted);
+  font-family:var(--font-body);
+  font-size:12px;
+  line-height:1.6;
+}
+
+.individual-scene-status {
+  min-height:18px;
+  margin-top:16px;
+  color:var(--muted);
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:400;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+
+.individual-scene-actions {
+  display:flex;
+  justify-content:flex-start;
+  margin-top:16px;
+}
+
+.individual-scene-create-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  min-height:40px;
+  padding:0 16px;
+  color:#FFFFFF;
+  background:var(--accent);
+  border:1px solid var(--accent);
+  border-radius:var(--settings-control-radius);
+  cursor:pointer;
+  font-family:var(--font-body);
+  font-size:12px;
+  font-weight:600;
+  line-height:1.4;
+  transition:background 160ms ease,border-color 160ms ease,opacity 160ms ease;
+}
+
+.individual-scene-create-button:not(:disabled):hover {
+  color:#FFFFFF;
+  background:var(--primary-hover);
+  border-color:var(--primary-hover);
+}
+
+.individual-scene-create-button:focus-visible {
+  outline:2px solid var(--primary);
+  outline-offset:3px;
+}
+
+.individual-scene-create-button:disabled {
+  color:var(--muted);
+  background:var(--panel);
+  border-color:var(--line);
+  cursor:not-allowed;
+  opacity:.7;
+}
+
+.individual-scene-create-arrow {
+  font-size:17px;
+  line-height:1;
 }
 
 /* =========================================================
@@ -1301,426 +1675,37 @@ body:has(.workspace.visible) .footer {
   }
 }
 
-
-
 /* =========================================================
-   MULTIREPO — SETTINGS
+   SETTINGS — RESPONSIVE COMPLEMENT
    ========================================================= */
 
-.multirepo-panel {
-  width: 100%;
-  margin-top: 28px;
-  padding: 26px;
-  box-sizing: border-box;
-  background: #EAE7DE;
-  border: 1px solid #D9D4C8;
-  border-radius: 12px;
-  color: #242522;
-}
-
-.multirepo-header {
-  margin-bottom: 22px;
-}
-
-.multirepo-eyebrow {
-  display: block;
-  margin-bottom: 10px;
-  color: #416D80;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.multirepo-header h2 {
-  margin: 0;
-  color: #242522;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.multirepo-description {
-  max-width: 620px;
-  margin: 10px 0 0;
-  color: #62635D;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.multirepo-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.multirepo-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 13px;
-  min-width: 0;
-  padding: 14px;
-  box-sizing: border-box;
-  background: #F3F1EA;
-  border: 1px solid #D9D4C8;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    background-color 160ms ease,
-    border-color 160ms ease;
-}
-
-.multirepo-item:hover {
-  background: #E1DED4;
-  border-color: #C5BFB1;
-}
-
-.multirepo-checkbox {
-  flex: 0 0 auto;
-  width: 16px;
-  height: 16px;
-  margin: 2px 0 0;
-  accent-color: #E5682E;
-  cursor: pointer;
-}
-
-.multirepo-item-details {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-
-.multirepo-item-name {
-  color: #242522;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-}
-
-.multirepo-item-url {
-  overflow-wrap: anywhere;
-  color: #62635D;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.multirepo-empty {
-  margin: 0;
-  padding: 18px;
-  border: 1px dashed #C5BFB1;
-  border-radius: 8px;
-  color: #62635D;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.multirepo-status {
-  margin-top: 16px;
-  color: #62635D;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  line-height: 1.6;
-}
-
-.multirepo-actions {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 18px;
-}
-
-.multirepo-create-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid #E5682E;
-  border-radius: 8px;
-  background: #E5682E;
-  color: #111210;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 160ms ease,
-    border-color 160ms ease,
-    opacity 160ms ease;
-}
-
-.multirepo-create-button:hover:not(:disabled) {
-  background: #D75A25;
-  border-color: #D75A25;
-}
-
-.multirepo-create-button:focus-visible {
-  outline: 2px solid #416D80;
-  outline-offset: 3px;
-}
-
-.multirepo-create-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.multirepo-create-arrow {
-  font-size: 17px;
-  line-height: 1;
-}
-
-@media (max-width: 600px) {
-  .multirepo-panel {
-    margin-top: 20px;
-    padding: 18px;
-  }
-
-  .multirepo-header h2 {
-    font-size: 19px;
-  }
-
-  .multirepo-create-button {
-    width: 100%;
-  }
-}
-
-/* =========================================================
-   INDIVIDUAL SCENE — SETTINGS
-   ========================================================= */
-
-.individual-scene-panel {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 28px;
-  margin-top: 24px;
-
-  color: #242522;
-  background: #EAE7DE;
-
-  border: 1px solid #D9D4C8;
-  border-radius: 12px;
-}
-
-.individual-scene-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-  margin-bottom: 26px;
-}
-
-.individual-scene-eyebrow {
-  display: inline-block;
-  margin-bottom: 12px;
-
-  color: #E5682E;
-
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-
-.individual-scene-header h2 {
-  margin: 0;
-
-  color: #242522;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(21px, 2.5vw, 28px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.035em;
-}
-
-.individual-scene-description {
-  max-width: 620px;
-  margin: 12px 0 0;
-
-  color: #626159;
-
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.65;
-}
-
-.individual-scene-form {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-
-.individual-scene-label {
-  display: block;
-
-  color: #55554D;
-
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.individual-scene-url-input {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-
-  padding: 14px 15px;
-
-  color: #242522;
-  background: #F3F1EA;
-
-  border: 1px solid #D9D4C8;
-  border-radius: 8px;
-  outline: none;
-
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.5;
-
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease;
-}
-
-.individual-scene-url-input::placeholder {
-  color: #89877E;
-  opacity: 1;
-}
-
-.individual-scene-url-input:hover {
-  border-color: #B8B2A5;
-}
-
-.individual-scene-url-input:focus {
-  border-color: #E5682E;
-  box-shadow: 0 0 0 3px rgb(229 104 46 / 12%);
-}
-
-.individual-scene-url-input:invalid:not(:placeholder-shown):focus {
-  border-color: #B94A23;
-}
-
-.individual-scene-hint {
-  margin: 2px 0 0;
-
-  color: #77756B;
-
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.individual-scene-status {
-  min-height: 18px;
-  margin-top: 18px;
-
-  color: #626159;
-
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
-
-.individual-scene-actions {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 18px;
-}
-
-.individual-scene-create-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-
-  min-height: 46px;
-  padding: 0 18px;
-
-  color: #F3F1EA;
-  background: #242522;
-
-  border: 1px solid #242522;
-  border-radius: 8px;
-
-  cursor: pointer;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
-
-  transition:
-    color 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    opacity 160ms ease;
-}
-
-.individual-scene-create-button:not(:disabled):hover {
-  color: #FFFFFF;
-  background: #E5682E;
-  border-color: #E5682E;
-}
-
-.individual-scene-create-button:focus-visible {
-  outline: 2px solid #E5682E;
-  outline-offset: 3px;
-}
-
-.individual-scene-create-button:disabled {
-  color: #89877E;
-  background: #E1DED4;
-  border-color: #D9D4C8;
-  cursor: not-allowed;
-}
-
-.individual-scene-create-arrow {
-  font-size: 17px;
-  line-height: 1;
-}
-
-/* Responsive settings layout */
-
-@media (max-width: 600px) {
+@media (max-width:600px) {
+  .multirepo-panel,
   .individual-scene-panel {
-    padding: 20px;
-    margin-top: 18px;
+    margin-top:20px;
+    padding:var(--settings-padding);
+  }
+
+  .multirepo-header h2,
+  .individual-scene-header h2 {
+    font-size:19px;
+  }
+
+  .multirepo-create-button,
+  .individual-scene-create-button {
+    width:100%;
+    justify-content:space-between;
   }
 
   .individual-scene-header {
-    margin-bottom: 22px;
+    margin-bottom:18px;
   }
 
   .individual-scene-url-input {
-    padding: 13px 12px;
-    font-size: 11px;
-  }
-
-  .individual-scene-create-button {
-    width: 100%;
-    justify-content: space-between;
+    font-size:11px;
   }
 }
+
  
 </style>
 
