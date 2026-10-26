@@ -275,6 +275,111 @@ select:focus-visible {
   opacity: 1;
 }
 
+
+
+/* CUADRO ESTACIONAL */
+.seasonal-banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #242522;
+}
+
+/* ESCENA DECORATIVA */
+.seasonal-scene {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.seasonal-layer {
+  position: absolute;
+  display: block;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  animation: seasonal-enter 1.2s ease-out both;
+}
+
+/* POSICIONES DE EJEMPLO */
+.layer-back {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation-delay: 0s;
+}
+
+.layer-middle {
+  width: 55%;
+  bottom: 0;
+  left: 0;
+  animation-delay: 0.25s;
+}
+
+.layer-front {
+  width: 45%;
+  bottom: 0;
+  right: 0;
+  animation-delay: 0.5s;
+}
+
+
+
+
+  
+
+/* LOGO ORIGINAL, POR ENCIMA DEL ENTORNO */
+.seasonal-banner .titleGif {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin: 0 auto 3px;
+  opacity: 1;
+}
+
+/* ENTRADA DESDE LOS LATERALES */
+@keyframes seasonal-enter {
+  from {
+    opacity: 0;
+    transform: translateX(var(--seasonal-start, 0));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.layer-middle {
+  --seasonal-start: -35px;
+}
+
+.layer-front {
+  --seasonal-start: 35px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seasonal-layer {
+    animation: none;
+  }
+}
+
+
+  
+
+  
+
 .heroTitle {
   margin: 0;
   color: var(--graphite);
@@ -1901,8 +2006,26 @@ if (new URLSearchParams(location.search).get("scene")) {
   </div>
   <div id="step1" class="step active step-hero">
     <div id="title"></div>
-    <img class="titleGif" src="https://3d.staratlas.es/LS/logonaranjalite.png" alt="3D Twins"/>
+
+
+<div class="seasonal-banner">
+  <div class="seasonal-scene" aria-hidden="true">
+    <img class="seasonal-layer layer-back" src="URL_FONDO.png" alt="">
+    <img class="seasonal-layer layer-middle" src="URL_ARBOLES.png" alt="">
+    <img class="seasonal-layer layer-front" src="URL_DETALLES.png" alt="">
+  </div>
+
+  <img
+    class="titleGif"
+    src="https://3d.staratlas.es/LS/logonaranjalite.png"
+    alt="3D Twins"
+  />
+</div>
+
+
+    
     <div class="heroTitle"></div>
+    
     <div class="heroInputBox">
     <div class="heroSubtitle" hidden>Create your 3D scene</div>
     <div class="heroHint" hidden>Supports GLB / GLTF files hosted online</div>     
