@@ -1997,125 +1997,182 @@ if (new URLSearchParams(location.search).get("scene")) {
 </head>
 
 <body>
+  
 <div id="ui">
   <div class="stepNav">
     <div class="stepDot active" id="dot1"></div>
     <div class="stepDot" id="dot2"></div>
     <div class="stepDot" id="dot3"></div>
   </div>
+
   <div id="step1" class="step active step-hero">
     <div id="title"></div>
 
+    <div class="seasonal-banner">
+      <div class="seasonal-scene" aria-hidden="true">
+        <img class="seasonal-layer layer-back" src="https://3d.staratlas.es/LS/fondoblue.png" alt="">
+        <img class="seasonal-layer layer-middle" src="https://3d.staratlas.es/LS/" alt="">
+        <img class="seasonal-layer layer-front" src="https://3d.staratlas.es/LS/" alt="">
+      </div>
 
-<div class="seasonal-banner">
-  <div class="seasonal-scene" aria-hidden="true">
-    <img class="seasonal-layer layer-back" src="https://3d.staratlas.es/LS/fondoblue.png" alt="">
-    <img class="seasonal-layer layer-middle" src="https://3d.staratlas.es/LS/" alt="">
-    <img class="seasonal-layer layer-front" src="https://3d.staratlas.es/LS/" alt="">
-  </div>
+      <img
+        class="titleGif"
+        src="https://3d.staratlas.es/LS/logonaranjalite.png"
+        alt="3D Twins"
+      />
+    </div>
 
-  <img
-    class="titleGif"
-    src="https://3d.staratlas.es/LS/logonaranjalite.png"
-    alt="3D Twins"
-  />
-</div>
-
-
-    
     <div class="heroTitle"></div>
-    
+
     <div class="heroInputBox">
-    <div class="heroSubtitle" hidden>Create your 3D scene</div>
-    <div class="heroHint" hidden>Supports GLB / GLTF files hosted online</div>     
-    <input id="urlInput" type="url" placeholder="https://demo.3dtwins.eu/Mantra.glb" autocomplete="url"  hidden />
-    <div class="nasa-divider"></div>
-    <button id="nasaToggle" class="btn btn-secondary" type="button" onclick="toggleNASAExplorer()"  hidden>Explore NASA 3D Models</button>
-    <button
-  id="rostockToggle"
-  class="btn btn-secondary"
-  type="button"
-  onclick="toggleRostockExplorer()"
-  hidden
-  >
-  Explore Rostock 3D Models
-  </button>
+      <div class="heroSubtitle" hidden>Crea tu escena 3D</div>
+      <div class="heroHint" hidden>Compatible con archivos GLB y GLTF alojados en línea</div>
 
+      <input
+        id="urlInput"
+        type="url"
+        placeholder="https://demo.3dtwins.eu/Mantra.glb"
+        autocomplete="url"
+        hidden
+      />
 
+      <div class="nasa-divider"></div>
 
-<div id="customRepoInputGroup" class="custom-repo-input-group">
-  <input
-    id="customRepoUrlInput"
-    type="text"
-    placeholder="Pega una URL de GitHub o de una carpeta..."
-    autocomplete="url"
-    spellcheck="false"
-    aria-label="URL del repositorio GitHub"
-    hidden
-  />
+      <button
+        id="nasaToggle"
+        class="btn btn-secondary"
+        type="button"
+        onclick="toggleNASAExplorer()"
+        hidden
+      >
+        Explorar modelos 3D de la NASA
+      </button>
 
-  <button
-    id="customRepoLoadButton"
-    type="button"
-    class="btn btn-secondary"
-    hidden
-  >
-    Cargar
-  </button>
+      <button
+        id="rostockToggle"
+        class="btn btn-secondary"
+        type="button"
+        onclick="toggleRostockExplorer()"
+        hidden
+      >
+        Explorar modelos 3D de Rostock
+      </button>
 
-</div>
-      
-      
+      <div id="customRepoInputGroup" class="custom-repo-input-group">
+        <input
+          id="customRepoUrlInput"
+          type="text"
+          placeholder="Pega una URL de GitHub o de una carpeta..."
+          autocomplete="url"
+          spellcheck="false"
+          aria-label="URL del repositorio de GitHub"
+          hidden
+        />
 
-  <div id="nasaExplorer" class="nasa-explorer" hidden>
-      <div class="nasa-heading">
+        <button
+          id="customRepoLoadButton"
+          type="button"
+          class="btn btn-secondary"
+          hidden
+        >
+          Cargar
+        </button>
+      </div>
+
+      <div id="nasaExplorer" class="nasa-explorer" hidden>
+        <div class="nasa-heading">
+          <div>
+            <div class="nasa-heading-caption">Explora las carpetas y carga un modelo</div>
+          </div>
+        </div>
+
         <div>
-         <div class="nasa-heading-caption">Browse folders and load a model</div>
-         </div>
-     </div>
-        <div>
-          <div class="nasa-label">Model folder</div>
+          <div class="nasa-label">Carpeta de modelos</div>
           <select id="nasaFolderSelect" class="nasa-select" disabled>
-            <option value="">Loading folders…</option>
+            <option value="">Cargando carpetas...</option>
           </select>
         </div>
-   <div>
-          <div class="nasa-label">Available assets</div>
+
+        <div>
+          <div class="nasa-label">Recursos disponibles</div>
+
           <div class="nasa-view-toggle">
-            <button id="nasaListViewButton" class="active" type="button" onclick="setNASAAssetView('list')">List</button>
-            <button id="nasaGridViewButton" type="button" onclick="setNASAAssetView('grid')">Gallery</button>
+            <button
+              id="nasaListViewButton"
+              class="active"
+              type="button"
+              onclick="setNASAAssetView('list')"
+            >
+              Lista
+            </button>
+
+            <button
+              id="nasaGridViewButton"
+              type="button"
+              onclick="setNASAAssetView('grid')"
+            >
+              Galería
+            </button>
           </div>
+
           <div id="nasaAssetSlot" class="nasa-slot">
-            <div class="nasa-status">Open the explorer to retrieve the NASA folders.</div>
+            <div class="nasa-status">Abre el explorador para consultar las carpetas de la NASA.</div>
           </div>
+
           <div id="nasaAssetGrid" class="nasa-asset-grid" hidden></div>
         </div>
 
         <div id="nasaStatus" class="nasa-status" aria-live="polite"></div>
-        <div class="nasa-footer">Models are loaded from NASA's public GitHub repository. Some GLTF files may reference additional assets.</div>
+
+        <div class="nasa-footer">
+          Los modelos se cargan desde el repositorio público de GitHub de la NASA.
+          Algunos archivos GLTF pueden utilizar recursos adicionales.
+        </div>
       </div>
 
       <div id="nasaGlobalGallery" hidden>
         <div class="nasa-heading">
           <div>
-            <div class="nasa-heading-title">NASA 3D MODEL GALLERY</div>
-            <div class="nasa-heading-caption">Browse GLB and GLTF files across the repository</div>
+            <div class="nasa-heading-title">GALERÍA DE MODELOS 3D DE LA NASA</div>
+            <div class="nasa-heading-caption">
+              Explora archivos GLB y GLTF de todo el repositorio
+            </div>
           </div>
-          <button class="btn btn-secondary" type="button" onclick="showNASAExplorer()">Back to explorer</button>
+
+          <button
+            class="btn btn-secondary"
+            type="button"
+            onclick="showNASAExplorer()"
+          >
+            Volver al explorador
+          </button>
         </div>
-        <div id="nasaGlobalStatus" class="nasa-status" aria-live="polite">The repository scan will start when you open the gallery.</div>
+
+        <div id="nasaGlobalStatus" class="nasa-status" aria-live="polite">
+          El análisis del repositorio comenzará al abrir la galería.
+        </div>
+
         <div id="nasaGlobalGrid" class="nasa-asset-grid"></div>
-        <div class="nasa-footer">The gallery indexes model paths from NASA's public repository. Models load only when selected.</div>
+
+        <div class="nasa-footer">
+          La galería indexa las rutas de los modelos del repositorio público de la NASA.
+          Los modelos se cargan únicamente al seleccionarlos.
+        </div>
       </div>
-           <button class="btn btn-primary" onclick="goStep(2)" hidden>Load model</button>
+
+      <button class="btn btn-primary" onclick="goStep(2)" hidden>
+        Cargar modelo
+      </button>
     </div>
   </div>
 
   <div id="step2" class="step">
     <div class="settingGroup">
-      <div class="label">Background color</div>
+      <div class="label">Color de fondo</div>
+
       <div class="colorPickerRow">
         <div id="colorWheel"></div>
+
         <div id="colorPalette">
           <div class="color-swatch" data-color="#0e0f13" style="background:#0e0f13"></div>
           <div class="color-swatch" data-color="#c2ceff" style="background:#c2ceff"></div>
@@ -2125,118 +2182,178 @@ if (new URLSearchParams(location.search).get("scene")) {
           <div class="color-swatch" data-color="#ff6b6b" style="background:#ff6b6b"></div>
         </div>
       </div>
+
       <input id="bgInput" type="color" value="#0e0f13" style="display:none;" />
     </div>
 
     <div class="settingGroup">
-      <div class="label">Background image</div>
+      <div class="label">Imagen de fondo</div>
+
       <label class="backgroundImageToggle">
         <input id="backgroundImageInput" type="checkbox" checked>
-        <span>Enable deep-space background</span>
+        <span>Activar fondo del espacio profundo</span>
       </label>
+
       <div class="backgroundImageControls">
-        <input id="backgroundImageUrlInput" type="url" placeholder="https://example.com/space-image.jpg" autocomplete="url" />
-        <button class="btn btn-secondary" type="button" onclick="applyCustomBackgroundImage()">Apply image URL</button>
-        <div class="backgroundImageHint">Leave the URL empty to use the default NASA Hubble Deep Field image. Selecting a background color disables the image.</div>
+        <input
+          id="backgroundImageUrlInput"
+          type="url"
+          placeholder="https://example.com/space-image.jpg"
+          autocomplete="url"
+        />
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          onclick="applyCustomBackgroundImage()"
+        >
+          Aplicar URL de imagen
+        </button>
+
+        <div class="backgroundImageHint">
+          Deja la URL vacía para utilizar la imagen predeterminada del campo profundo
+          de Hubble de la NASA. Al seleccionar un color de fondo, se desactiva la imagen.
+        </div>
       </div>
     </div>
 
     <div class="settingGroup">
-      <div class="label">Auto rotate</div>
+      <div class="label">Rotación automática</div>
+
       <label style="display:flex;align-items:center;gap:8px;font-size:12px;">
         <input id="rotateInput" type="checkbox">
-        Enable rotation
+        Activar rotación
       </label>
     </div>
 
     <div class="settingGroup lightingGroup">
-      <div class="label">Lighting &amp; shadows</div>
+      <div class="label">Iluminación y sombras</div>
+
       <label class="backgroundImageToggle">
         <input id="shadowsInput" type="checkbox" checked>
-        <span>Enable shadows</span>
+        <span>Activar sombras</span>
       </label>
+
       <div class="lightingControl">
-        <label for="lightIntensityInput">Light intensity <span id="lightIntensityValue">0.8</span></label>
+        <label for="lightIntensityInput">
+          Intensidad de la luz <span id="lightIntensityValue">0.8</span>
+        </label>
         <input id="lightIntensityInput" type="range" min="0" max="3" step="0.1" value="0.8">
       </div>
+
       <div class="lightingControl">
-        <label for="lightXInput">Light position X <span id="lightXValue">5</span></label>
+        <label for="lightXInput">
+          Posición de la luz X <span id="lightXValue">5</span>
+        </label>
         <input id="lightXInput" type="range" min="-10" max="10" step="0.5" value="5">
       </div>
+
       <div class="lightingControl">
-        <label for="lightYInput">Light position Y <span id="lightYValue">10</span></label>
+        <label for="lightYInput">
+          Posición de la luz Y <span id="lightYValue">10</span>
+        </label>
         <input id="lightYInput" type="range" min="-10" max="10" step="0.5" value="10">
       </div>
+
       <div class="lightingControl">
-        <label for="lightZInput">Light position Z <span id="lightZValue">5</span></label>
+        <label for="lightZInput">
+          Posición de la luz Z <span id="lightZValue">5</span>
+        </label>
         <input id="lightZInput" type="range" min="-10" max="10" step="0.5" value="5">
       </div>
+
       <div class="lightingControl">
-        <label for="shadowSoftnessInput">Shadow softness <span id="shadowSoftnessValue">3</span></label>
+        <label for="shadowSoftnessInput">
+          Suavidad de las sombras <span id="shadowSoftnessValue">3</span>
+        </label>
         <input id="shadowSoftnessInput" type="range" min="0" max="8" step="1" value="3">
       </div>
-      <div class="backgroundImageHint">Adjust the light direction and intensity. Shadow softness depends on the renderer and the model geometry.</div>
-    </div>
 
-  
-<div class="settingGroup modelInfoEditor" id="modelInfoEditor" hidden>
-  <div class="label">Model information</div>
-
-  <div class="modelInfoCard">
-    <h3 id="editorModelName">Model</h3>
-
-    <div class="modelInfoField">
-      <span class="modelInfoLabel">SOURCE</span>
-      <div id="editorModelSource">Not identified</div>
-    </div>
-
-    <div class="modelInfoField">
-      <span class="modelInfoLabel">GEOLOCATION</span>
-      <div id="editorModelLocation">
-        No geographic position associated
+      <div class="backgroundImageHint">
+        Ajusta la dirección y la intensidad de la luz. La suavidad de las sombras
+        depende del motor de renderizado y de la geometría del modelo.
       </div>
-
-      <button
-        class="btn btn-secondary"
-        id="assignModelLocation"
-        type="button"
-      >
-        + Assign geographic position
-      </button>
     </div>
 
-    <div class="modelInfoField" id="editorDescriptionField" hidden>
-      <span class="modelInfoLabel">DESCRIPTION</span>
-      <div id="editorModelDescription"></div>
+    <div class="settingGroup modelInfoEditor" id="modelInfoEditor" hidden>
+      <div class="label">Información del modelo</div>
+
+      <div class="modelInfoCard">
+        <h3 id="editorModelName">Modelo</h3>
+
+        <div class="modelInfoField">
+          <span class="modelInfoLabel">ORIGEN</span>
+          <div id="editorModelSource">No identificado</div>
+        </div>
+
+        <div class="modelInfoField">
+          <span class="modelInfoLabel">UBICACIÓN GEOGRÁFICA</span>
+          <div id="editorModelLocation">
+            No hay ninguna posición geográfica asociada
+          </div>
+
+          <button
+            class="btn btn-secondary"
+            id="assignModelLocation"
+            type="button"
+          >
+            + Asignar posición geográfica
+          </button>
+        </div>
+
+        <div class="modelInfoField" id="editorDescriptionField" hidden>
+          <span class="modelInfoLabel">DESCRIPCIÓN</span>
+          <div id="editorModelDescription"></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
     <div class="stepNav">
-      <button class="btn btn-secondary" onclick="goStep(1)">Back</button>
-      <button class="btn btn-secondary" onclick="goStep(3)">Continue</button>
+      <button class="btn btn-secondary" onclick="goStep(1)">Atrás</button>
+      <button class="btn btn-secondary" onclick="goStep(3)">Continuar</button>
     </div>
   </div>
 
   <div id="step3" class="step">
-  <button
-  id="customRepoShareButton"
-  type="button"
-  class="btn btn-secondary" hidden>
-  Compartir repositorio
-</button>
-    
-    <button class="btn btn-primary" onclick="exportScene()">Publish Scene</button>
-    <div class="label" hidden>Share link</div>
-    <div id="linkBox" hidden>No scene generated yet</div>
-    <div id="exportActions" style="display:none;margin-top:12px;gap:8px;flex-direction:column;">
-      <button class="btn btn-secondary" onclick="openScene()">Go to scene</button>
-      <button class="btn btn-secondary" onclick="copyURL()">Copy URL</button>
-      <button class="btn btn-secondary" onclick="generateQR()">Generate QR</button>
+    <button
+      id="customRepoShareButton"
+      type="button"
+      class="btn btn-secondary"
+      hidden
+    >
+      Compartir repositorio
+    </button>
+
+    <button class="btn btn-primary" onclick="exportScene()">
+      Publicar escena
+    </button>
+
+    <div class="label" hidden>Enlace para compartir</div>
+
+    <div id="linkBox" hidden>
+      Todavía no se ha generado ninguna escena
     </div>
-    <div class="stepNav"><button class="btn btn-secondary" onclick="goStep(2)">Back</button></div>
+
+    <div id="exportActions" style="display:none;margin-top:12px;gap:8px;flex-direction:column;">
+      <button class="btn btn-secondary" onclick="openScene()">
+        Abrir escena
+      </button>
+
+      <button class="btn btn-secondary" onclick="copyURL()">
+        Copiar URL
+      </button>
+
+      <button class="btn btn-secondary" onclick="generateQR()">
+        Generar código QR
+      </button>
+    </div>
+
+    <div class="stepNav">
+      <button class="btn btn-secondary" onclick="goStep(2)">Atrás</button>
+    </div>
   </div>
 </div>
+
 
 <canvas id="c"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
