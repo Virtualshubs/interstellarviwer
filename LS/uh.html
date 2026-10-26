@@ -1534,7 +1534,6 @@ body:has(.workspace.visible) .footer {
 </footer>
 
 <script>
-  
 const TOOL_CONFIG = [
   {
     id: "ope-lite-space",
@@ -1567,6 +1566,7 @@ let activeToolIndex = null;
    ========================================================= */
 
 const MAX_USER_REPOSITORIES = 5;
+const MAX_REPOSITORY_URL_LENGTH = 300;
 const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
 
 
@@ -1588,9 +1588,6 @@ function emptyRepositorySlots() {
  * Rejected:
  *   HTTP, alternate domains, credentials, ports, query strings,
  *   fragments, direct file URLs and malformed paths.
- *
- * Note: URL validation does not establish that repository
- * contents are trustworthy or safe to execute.
  */
 function normalizeGitHubRepositoryURL(value) {
   if (typeof value !== "string") return null;
@@ -1599,14 +1596,13 @@ function normalizeGitHubRepositoryURL(value) {
 
   if (
     !input ||
-    input.length > 2048 ||
+    input.length > MAX_REPOSITORY_URL_LENGTH ||
     /[\u0000-\u0020\u007F\\]/.test(input) ||
     /%(?:2f|5c|2e|00)/i.test(input)
   ) {
     return null;
   }
 
-  // Require an explicit HTTPS URL on the exact GitHub host.
   if (!/^https:\/\/github\.com\//i.test(input)) {
     return null;
   }
@@ -1649,7 +1645,6 @@ function normalizeGitHubRepositoryURL(value) {
 
   const parts = decodedPath.split("/").filter(Boolean);
 
-  // Minimum path: owner/repository.
   if (parts.length < 2) return null;
 
   const [owner, repository] = parts;
@@ -1666,7 +1661,7 @@ function normalizeGitHubRepositoryURL(value) {
     return null;
   }
 
-  // Permit only repository root or /tree/branch/folder...
+  // Permit repository root or /tree/branch/folder...
   if (parts.length > 2) {
     if (
       parts.length < 4 ||
@@ -1682,8 +1677,8 @@ function normalizeGitHubRepositoryURL(value) {
     }
   }
 
-  // Prevent direct links to files/resources.
-  // This does not block those files inside a repository.
+  // Reject direct file/resource links.
+  // These file types may still exist inside the repository.
   const lastPart = parts[parts.length - 1];
 
   const forbiddenFileExtensions =
@@ -1693,11 +1688,16 @@ function normalizeGitHubRepositoryURL(value) {
     return null;
   }
 
-  // Normalize the accepted path.
   url.pathname =
     "/" + parts.map(part => encodeURIComponent(part)).join("/");
 
-  return url.href;
+  const normalizedURL = url.href;
+
+  if (normalizedURL.length > MAX_REPOSITORY_URL_LENGTH) {
+    return null;
+  }
+
+  return normalizedURL;
 }
 
 
@@ -1706,10 +1706,10 @@ function isValidGitHubRepositoryURL(value) {
 }
 
 
-/*
- * Load stored entries defensively.
- * Invalid saved URLs are discarded rather than trusted.
- */
+/* =========================================================
+   LOAD STORED REPOSITORIES
+   ========================================================= */
+
 function loadUserRepositories() {
   const slots = emptyRepositorySlots();
 
@@ -1743,9 +1743,12 @@ function loadUserRepositories() {
 let userRepositories = loadUserRepositories();
 
 
+/* =========================================================
+   SAVE REPOSITORIES
+   ========================================================= */
+
 function saveUserRepositories() {
   try {
-    // Revalidate before persistence as well.
     userRepositories = userRepositories.map(repository => {
       const normalizedURL =
         normalizeGitHubRepositoryURL(repository.url);
@@ -1781,6 +1784,10 @@ function saveUserRepositories() {
 }
 
 
+/* =========================================================
+   REPOSITORY STATUS
+   ========================================================= */
+
 function updateRepositorySettingsStatus() {
   const count = document.getElementById("repositoryCount");
   const status = document.getElementById(
@@ -1814,6 +1821,61 @@ function updateRepositorySettingsStatus() {
   }
 }
 
+
+/* =========================================================
+   REPOSITORY INPUT SECURITY
+   ========================================================= */
+
+/*
+ * Process pasted or dropped content.
+ * Only accept a single valid GitHub repository/folder URL.
+ */
+function processRepositoryInput(input, index, rawValue) {
+  const value = typeof rawValue === "string"
+    ? rawValue.trim()
+    : "";
+
+  if (
+    !value ||
+    value.length > MAX_REPOSITORY_URL_LENGTH ||
+    /[\r\n\u0000-\u001F\u007F]/.test(value)
+  ) {
+    input.setCustomValidity(
+      "Enter one GitHub repository URL of no more than 300 characters."
+    );
+    input.reportValidity();
+    return false;
+  }
+
+  const normalizedURL = normalizeGitHubRepositoryURL(value);
+
+  if (!normalizedURL) {
+    input.setCustomValidity(
+      "Only valid HTTPS GitHub repository or folder URLs are allowed. Direct file URLs and code are not accepted."
+    );
+    input.reportValidity();
+    return false;
+  }
+
+  input.setCustomValidity("");
+  input.value = normalizedURL;
+
+  userRepositories[index].url = normalizedURL;
+
+  if (!normalizedURL) {
+    userRepositories[index].selected = false;
+  }
+
+  saveUserRepositories();
+  renderRepositorySettings();
+
+  return true;
+}
+
+
+/* =========================================================
+   RENDER REPOSITORY SETTINGS
+   ========================================================= */
 
 function renderRepositorySettings() {
   const container = document.getElementById(
@@ -1854,24 +1916,79 @@ function renderRepositorySettings() {
     input.placeholder = "https://github.com/owner/repo";
     input.autocomplete = "url";
     input.spellcheck = false;
-    input.maxLength = 2048;
+    input.maxLength = MAX_REPOSITORY_URL_LENGTH;
     input.value = repository.url;
     input.setAttribute(
       "aria-label",
       "Repository URL " + (index + 1)
     );
 
-    input.addEventListener("input", () => {
-      input.setCustomValidity("");
+    /*
+     * PASTE:
+     * Allow valid repository URLs only.
+     * Invalid clipboard content is never inserted.
+     */
+    input.addEventListener("paste", event => {
+      event.preventDefault();
+
+      const clipboardText =
+        event.clipboardData?.getData("text/plain") || "";
+
+      processRepositoryInput(input, index, clipboardText);
     });
 
+    /*
+     * DRAG AND DROP:
+     * Allow text drops only when they contain a valid URL.
+     */
+    input.addEventListener("dragover", event => {
+      event.preventDefault();
+    });
+
+    input.addEventListener("drop", event => {
+      event.preventDefault();
+
+      const droppedText =
+        event.dataTransfer?.getData("text/plain") || "";
+
+      processRepositoryInput(input, index, droppedText);
+    });
+
+    /*
+     * Clear validation feedback while typing.
+     */
+    input.addEventListener("input", () => {
+      input.setCustomValidity("");
+
+      // Do not allow input to grow beyond the configured limit.
+      if (input.value.length > MAX_REPOSITORY_URL_LENGTH) {
+        input.value = input.value.slice(
+          0,
+          MAX_REPOSITORY_URL_LENGTH
+        );
+      }
+    });
+
+    /*
+     * Validate manually entered URLs on change.
+     */
     input.addEventListener("change", () => {
       const value = input.value.trim();
-      const normalizedURL = value
-        ? normalizeGitHubRepositoryURL(value)
-        : "";
 
-      if (value && !normalizedURL) {
+      if (!value) {
+        userRepositories[index].url = "";
+        userRepositories[index].selected = false;
+
+        input.setCustomValidity("");
+        saveUserRepositories();
+        renderRepositorySettings();
+        return;
+      }
+
+      const normalizedURL =
+        normalizeGitHubRepositoryURL(value);
+
+      if (!normalizedURL) {
         input.setCustomValidity(
           "Enter a valid HTTPS GitHub repository or folder URL. Direct file URLs are not allowed."
         );
@@ -1880,12 +1997,7 @@ function renderRepositorySettings() {
       }
 
       input.setCustomValidity("");
-
       userRepositories[index].url = normalizedURL;
-
-      if (!normalizedURL) {
-        userRepositories[index].selected = false;
-      }
 
       saveUserRepositories();
       renderRepositorySettings();
@@ -1919,6 +2031,7 @@ function renderRepositorySettings() {
 
     toggleLabel.append(checkbox, toggleText);
     slot.append(top, label, input, toggleLabel);
+
     container.appendChild(slot);
   });
 
@@ -1926,10 +2039,10 @@ function renderRepositorySettings() {
 }
 
 
-/*
- * Builds the URL received by the editor.
- * Includes only selected, validated repository URLs.
- */
+/* =========================================================
+   BUILD TOOL URL
+   ========================================================= */
+
 function buildToolURL(baseURL) {
   const url = new URL(baseURL);
 
@@ -1941,7 +2054,6 @@ function buildToolURL(baseURL) {
     .filter(Boolean)
     .slice(0, MAX_USER_REPOSITORIES);
 
-  // Remove any previous repository configuration.
   url.searchParams.delete("rep");
 
   if (selectedURLs.length > 0) {
@@ -2020,8 +2132,6 @@ function initialiseToolSidebar() {
     button.title = tool.name;
     button.setAttribute("aria-label", "Open " + tool.name);
     button.setAttribute("aria-pressed", "false");
-
-    // Copy the existing icon markup from the trusted page DOM.
     button.innerHTML = symbol.innerHTML;
 
     button.addEventListener("click", () => openTool(index));
@@ -2097,7 +2207,6 @@ function openTool(index) {
   const tool = TOOL_CONFIG[index];
   if (!tool) return;
 
-  // Dispose of the previous tool browsing context.
   destroyToolFrame();
 
   activeToolIndex = index;
@@ -2144,7 +2253,7 @@ function openTool(index) {
 
 
 /* =========================================================
-   CLOSE WORKSPACE AND RESTORE HOME CARDS
+   CLOSE WORKSPACE
    ========================================================= */
 
 function closeWorkspace() {
@@ -2171,7 +2280,6 @@ function reloadTool() {
 
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  // Reload using a fresh browsing context.
   destroyToolFrame();
 
   const targetURL = buildToolURL(tool.url);
@@ -2222,7 +2330,7 @@ document.getElementById("openExternal").addEventListener("click", openExternal);
 
 
 /* =========================================================
-   HOME BANNER: CHANGE IMAGE WHEN CLOSING A TOOL
+   HOME BANNER
    ========================================================= */
 
 const homeBannerImages = [
@@ -2278,6 +2386,7 @@ toolCount.textContent =
   " / " +
   String(TOOL_CONFIG.length).padStart(2, "0") +
   " CONFIGURED";
+
 
 
 </script>
