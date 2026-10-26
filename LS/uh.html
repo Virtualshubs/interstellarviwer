@@ -1492,7 +1492,235 @@ body:has(.workspace.visible) .footer {
   }
 }
 
+/* =========================================================
+   INDIVIDUAL SCENE — SETTINGS
+   ========================================================= */
 
+.individual-scene-panel {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 28px;
+  margin-top: 24px;
+
+  color: #242522;
+  background: #EAE7DE;
+
+  border: 1px solid #D9D4C8;
+  border-radius: 12px;
+}
+
+.individual-scene-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 26px;
+}
+
+.individual-scene-eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+
+  color: #E5682E;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.individual-scene-header h2 {
+  margin: 0;
+
+  color: #242522;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(21px, 2.5vw, 28px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.individual-scene-description {
+  max-width: 620px;
+  margin: 12px 0 0;
+
+  color: #626159;
+
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+.individual-scene-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.individual-scene-label {
+  display: block;
+
+  color: #55554D;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.individual-scene-url-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  padding: 14px 15px;
+
+  color: #242522;
+  background: #F3F1EA;
+
+  border: 1px solid #D9D4C8;
+  border-radius: 8px;
+  outline: none;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.individual-scene-url-input::placeholder {
+  color: #89877E;
+  opacity: 1;
+}
+
+.individual-scene-url-input:hover {
+  border-color: #B8B2A5;
+}
+
+.individual-scene-url-input:focus {
+  border-color: #E5682E;
+  box-shadow: 0 0 0 3px rgb(229 104 46 / 12%);
+}
+
+.individual-scene-url-input:invalid:not(:placeholder-shown):focus {
+  border-color: #B94A23;
+}
+
+.individual-scene-hint {
+  margin: 2px 0 0;
+
+  color: #77756B;
+
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.individual-scene-status {
+  min-height: 18px;
+  margin-top: 18px;
+
+  color: #626159;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.individual-scene-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 18px;
+}
+
+.individual-scene-create-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+
+  min-height: 46px;
+  padding: 0 18px;
+
+  color: #F3F1EA;
+  background: #242522;
+
+  border: 1px solid #242522;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
+}
+
+.individual-scene-create-button:not(:disabled):hover {
+  color: #FFFFFF;
+  background: #E5682E;
+  border-color: #E5682E;
+}
+
+.individual-scene-create-button:focus-visible {
+  outline: 2px solid #E5682E;
+  outline-offset: 3px;
+}
+
+.individual-scene-create-button:disabled {
+  color: #89877E;
+  background: #E1DED4;
+  border-color: #D9D4C8;
+  cursor: not-allowed;
+}
+
+.individual-scene-create-arrow {
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* Responsive settings layout */
+
+@media (max-width: 600px) {
+  .individual-scene-panel {
+    padding: 20px;
+    margin-top: 18px;
+  }
+
+  .individual-scene-header {
+    margin-bottom: 22px;
+  }
+
+  .individual-scene-url-input {
+    padding: 13px 12px;
+    font-size: 11px;
+  }
+
+  .individual-scene-create-button {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
  
 </style>
 
@@ -1617,6 +1845,84 @@ body:has(.workspace.visible) .footer {
       available in your scene editor.
     </p>
 
+
+
+<!-- INDIVIDUAL SCENE -->
+<section
+  class="individual-scene-panel"
+  aria-labelledby="individualSceneTitle"
+>
+  <div class="individual-scene-header">
+    <span class="individual-scene-eyebrow">
+      SCENE TOOLS / 03
+    </span>
+
+    <h2 id="individualSceneTitle">
+      Crear escena individual
+    </h2>
+
+    <p class="individual-scene-description">
+      Introduce la URL directa de un modelo 3D para crear una escena
+      individual y abrirla en el editor.
+    </p>
+  </div>
+
+  <div class="individual-scene-form">
+    <label
+      class="individual-scene-label"
+      for="individualModelURL"
+    >
+      URL DEL MODELO
+    </label>
+
+    <input
+      type="url"
+      id="individualModelURL"
+      class="individual-scene-url-input"
+      placeholder="https://example.com/model.glb"
+      autocomplete="url"
+      autocapitalize="off"
+      spellcheck="false"
+      maxlength="2048"
+      aria-describedby="individualSceneHint individualSceneStatus"
+    >
+
+    <p
+      id="individualSceneHint"
+      class="individual-scene-hint"
+    >
+      Formatos admitidos: .glb y .gltf. Introduce una URL HTTPS
+      directa al archivo del modelo.
+    </p>
+  </div>
+
+  <div
+    id="individualSceneStatus"
+    class="individual-scene-status"
+    role="status"
+    aria-live="polite"
+  >
+    Pega una URL HTTPS directa de un modelo GLB o GLTF.
+  </div>
+
+  <div class="individual-scene-actions">
+    <button
+      id="createIndividualSceneButton"
+      class="individual-scene-create-button"
+      type="button"
+      disabled
+    >
+      <span>Crear escena</span>
+
+      <span
+        class="individual-scene-create-arrow"
+        aria-hidden="true"
+      >↗</span>
+    </button>
+  </div>
+</section>
+
+   
     <section class="settings-section" aria-labelledby="repositorySectionTitle">
       <div class="settings-section-heading">
         <div>
@@ -1814,8 +2120,13 @@ const toolCount = document.getElementById("toolCount");
 
 let activeToolIndex = null;
 
+/* NEW: remembers a directly opened individual scene. */
+let activeToolURLOverride = null;
+
 const MAX_USER_REPOSITORIES = 5;
 const MAX_REPOSITORY_URL_LENGTH = 300;
+const MAX_MODEL_URL_LENGTH = 2048;
+
 const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
 const MULTIREPO_SELECTION_KEY = "liteSpaceMultirepoSelectionV1";
 
@@ -2242,7 +2553,7 @@ function renderRepositorySettings() {
 
 
 /* =========================================================
-   MULTIREPO — NEW INDEPENDENT SELECTION
+   MULTIREPO — INDEPENDENT SELECTION
    Reads the existing repository URLs, but has its own checks.
    ========================================================= */
 
@@ -2498,6 +2809,284 @@ function createSharedMultirepo() {
 
 
 /* =========================================================
+   INDIVIDUAL SCENE — NEW SETTINGS CONTAINER
+   Builds the same ?scene= structure as the viewer.
+   Uses the existing iframe; does not affect repository checks.
+   ========================================================= */
+
+
+/**
+ * Accepts only direct HTTPS URLs pointing to a .glb or .gltf file.
+ * Query parameters are allowed for signed/CDN URLs.
+ */
+function normalizeModelFileURL(value) {
+  if (typeof value !== "string") return null;
+
+  const input = value.trim();
+
+  if (
+    !input ||
+    input.length > MAX_MODEL_URL_LENGTH ||
+    /[\u0000-\u0020\u007F\\]/.test(input)
+  ) {
+    return null;
+  }
+
+  let url;
+
+  try {
+    url = new URL(input);
+  } catch {
+    return null;
+  }
+
+  if (
+    url.protocol !== "https:" ||
+    !url.hostname ||
+    url.username ||
+    url.password
+  ) {
+    return null;
+  }
+
+  let decodedPath;
+
+  try {
+    decodedPath = decodeURIComponent(url.pathname);
+  } catch {
+    return null;
+  }
+
+  if (
+    decodedPath.includes("\\") ||
+    /[\u0000-\u001F\u007F]/.test(decodedPath) ||
+    !/\.(?:glb|gltf)$/i.test(decodedPath)
+  ) {
+    return null;
+  }
+
+  return url.href;
+}
+
+
+/**
+ * Derives the model metadata from its URL.
+ *
+ * Example:
+ * https://raw.githubusercontent.com/SpectraStudios/...
+ *
+ * name      -> filename without extension
+ * source    -> GitHub owner, or hostname for other providers
+ * description -> empty by default
+ * latitude / longitude -> null by default
+ * _hostname -> URL hostname
+ */
+function buildIndividualModelInfo(modelURL) {
+  let url;
+
+  try {
+    url = new URL(modelURL);
+  } catch {
+    return null;
+  }
+
+  let decodedPath;
+
+  try {
+    decodedPath = decodeURIComponent(url.pathname);
+  } catch {
+    return null;
+  }
+
+  const parts = decodedPath.split("/").filter(Boolean);
+
+  if (parts.length === 0) return null;
+
+  const filename = parts[parts.length - 1];
+
+  const name = filename.replace(
+    /\.(?:glb|gltf)$/i,
+    ""
+  );
+
+  if (!name) return null;
+
+  const hostname = url.hostname;
+  const normalizedHostname = hostname.toLowerCase();
+
+  let source = hostname.replace(/^www\./i, "");
+
+  if (
+    normalizedHostname === "raw.githubusercontent.com" ||
+    normalizedHostname === "raw.github.com" ||
+    normalizedHostname === "github.com"
+  ) {
+    source = parts[0] || source;
+  }
+
+  return {
+    name,
+    source,
+    description: "",
+    latitude: null,
+    longitude: null,
+    _hostname: hostname
+  };
+}
+
+
+/**
+ * Builds the individual scene URL using the default state supplied
+ * for 3D TWINS Lite.
+ *
+ * The generated URL contains ?scene= and not ?rep=.
+ */
+function buildIndividualSceneURL(baseURL, modelURL) {
+  if (!isValidToolURL(baseURL)) return null;
+
+  const normalizedModelURL = normalizeModelFileURL(modelURL);
+
+  if (!normalizedModelURL) return null;
+
+  const modelInfo = buildIndividualModelInfo(normalizedModelURL);
+
+  if (!modelInfo) return null;
+
+  const sceneState = {
+    modelUrl: normalizedModelURL,
+    modelInfo: modelInfo,
+    bg: "#f5f5f5",
+    autoRotate: false,
+    backgroundImage: false,
+    lighting: {
+      shadows: true,
+      intensity: 0.8,
+      x: 5,
+      y: 10,
+      z: 5,
+      softness: 3
+    }
+  };
+
+  try {
+    const url = new URL(baseURL);
+
+    /*
+     * An individual scene must not inherit the multirepo selection.
+     * The viewer will read the scene parameters from the URL.
+     */
+    url.searchParams.delete("rep");
+
+    const json = JSON.stringify(sceneState);
+
+    const encodedScene = btoa(
+      unescape(encodeURIComponent(json))
+    );
+
+    url.searchParams.set("scene", encodedScene);
+
+    return url.href;
+  } catch (error) {
+    console.error("Could not build the individual scene URL:", error);
+    return null;
+  }
+}
+
+
+/**
+ * Updates validation status and button state without loading the viewer.
+ */
+function updateIndividualSceneStatus() {
+  const input = document.getElementById("individualModelURL");
+  const status = document.getElementById("individualSceneStatus");
+  const button = document.getElementById("createIndividualSceneButton");
+
+  if (!input || !button) return;
+
+  const value = input.value.trim();
+  const normalizedURL = normalizeModelFileURL(value);
+  const isValid = Boolean(normalizedURL);
+
+  button.disabled = !isValid;
+
+  if (!status) return;
+
+  if (!value) {
+    status.textContent =
+      "Paste a direct HTTPS URL to a GLB or GLTF model.";
+  } else if (isValid) {
+    status.textContent =
+      "Valid model URL · ready to create the scene.";
+  } else {
+    status.textContent =
+      "Invalid URL. Use HTTPS and a direct .glb or .gltf file.";
+  }
+}
+
+
+/**
+ * Opens an individual scene through the existing tool iframe.
+ * No second iframe or popup is created.
+ */
+function createIndividualScene() {
+  const input = document.getElementById("individualModelURL");
+  const status = document.getElementById("individualSceneStatus");
+
+  if (!input) return;
+
+  const normalizedModelURL = normalizeModelFileURL(input.value);
+
+  if (!normalizedModelURL) {
+    input.setCustomValidity(
+      "Enter a valid HTTPS URL pointing directly to a .glb or .gltf model."
+    );
+
+    input.reportValidity();
+    updateIndividualSceneStatus();
+    return;
+  }
+
+  input.setCustomValidity("");
+
+  const tool = TOOL_CONFIG[0];
+
+  if (!tool || !isValidToolURL(tool.url)) {
+    if (status) {
+      status.textContent =
+        "The viewer URL is not configured correctly.";
+    }
+
+    return;
+  }
+
+  const targetURL = buildIndividualSceneURL(
+    tool.url,
+    normalizedModelURL
+  );
+
+  if (!targetURL) {
+    if (status) {
+      status.textContent =
+        "Could not build the individual scene URL.";
+    }
+
+    return;
+  }
+
+  if (status) {
+    status.textContent =
+      "Opening the individual scene in the editor...";
+  }
+
+  /*
+   * Passing a direct URL prevents the regular repository URL builder
+   * from replacing ?scene= with the saved ?rep= selection.
+   */
+  openTool(0, targetURL);
+}
+
+
+/* =========================================================
    EXISTING TOOL URL AND WORKSPACE
    ========================================================= */
 
@@ -2516,6 +3105,7 @@ function buildToolURL(baseURL) {
 
   if (selectedURLs.length > 0) {
     const json = JSON.stringify(selectedURLs);
+
     const encoded = btoa(
       unescape(encodeURIComponent(json))
     );
@@ -2638,18 +3228,26 @@ function showSettings() {
   systemStatus.textContent = "SETTINGS";
 
   renderMultirepoSettings();
+  updateIndividualSceneStatus();
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 
-function openTool(index) {
+/*
+ * Optional directURL parameter:
+ * - omitted: existing repository workflow
+ * - supplied: open the individual scene URL directly
+ */
+function openTool(index, directURL = null) {
   const tool = TOOL_CONFIG[index];
+
   if (!tool) return;
 
   destroyToolFrame();
 
   activeToolIndex = index;
+  activeToolURLOverride = directURL || null;
 
   homeView.style.display = "none";
   settingsView.style.display = "none";
@@ -2681,13 +3279,28 @@ function openTool(index) {
     return;
   }
 
-  const targetURL = buildToolURL(tool.url);
+  const targetURL = directURL || buildToolURL(tool.url);
+
+  if (!isValidToolURL(targetURL)) {
+    const heading = document.createElement("h2");
+    heading.textContent = "INVALID TOOL URL";
+
+    const message = document.createElement("p");
+    message.textContent =
+      "The requested viewer address could not be validated.";
+
+    frameMessage.append(heading, message);
+    systemStatus.textContent = "INVALID URL";
+    return;
+  }
 
   toolFrame.title = tool.name + " workspace";
   toolFrame.style.display = "block";
   frameMessage.style.display = "none";
 
   systemStatus.textContent = "TOOL LOADING";
+
+  /* Setting src triggers navigation and loading of the viewer. */
   toolFrame.src = targetURL;
 }
 
@@ -2702,6 +3315,7 @@ function closeWorkspace() {
   frameMessage.style.display = "flex";
 
   activeToolIndex = null;
+  activeToolURLOverride = null;
 }
 
 
@@ -2714,7 +3328,14 @@ function reloadTool() {
 
   destroyToolFrame();
 
-  const targetURL = buildToolURL(tool.url);
+  /*
+   * Keep the individual scene URL when one was opened from Settings.
+   * Otherwise, preserve the original repository workflow.
+   */
+  const targetURL =
+    activeToolURLOverride || buildToolURL(tool.url);
+
+  if (!isValidToolURL(targetURL)) return;
 
   toolFrame.title = tool.name + " workspace";
   toolFrame.style.display = "block";
@@ -2732,7 +3353,10 @@ function openExternal() {
 
   if (!tool || !isValidToolURL(tool.url)) return;
 
-  const targetURL = buildToolURL(tool.url);
+  const targetURL =
+    activeToolURLOverride || buildToolURL(tool.url);
+
+  if (!isValidToolURL(targetURL)) return;
 
   window.open(
     targetURL,
@@ -2774,6 +3398,7 @@ const homeBannerImages = [
 let homeBannerIndex = 0;
 
 const homeBanner = document.querySelector(".home-banner");
+
 const homeBannerImage = homeBanner
   ? homeBanner.querySelector("img")
   : null;
@@ -2815,8 +3440,38 @@ if (createMultirepoButton) {
   );
 }
 
+
+/* NEW: individual-scene controls */
+
+const individualModelURLInput = document.getElementById(
+  "individualModelURL"
+);
+
+const createIndividualSceneButton = document.getElementById(
+  "createIndividualSceneButton"
+);
+
+if (individualModelURLInput) {
+  individualModelURLInput.addEventListener("input", () => {
+    individualModelURLInput.setCustomValidity("");
+    updateIndividualSceneStatus();
+  });
+
+  individualModelURLInput.addEventListener("change", () => {
+    updateIndividualSceneStatus();
+  });
+}
+
+if (createIndividualSceneButton) {
+  createIndividualSceneButton.addEventListener(
+    "click",
+    createIndividualScene
+  );
+}
+
 renderRepositorySettings();
 renderMultirepoSettings();
+updateIndividualSceneStatus();
 initialiseToolSidebar();
 
 const configuredTools = TOOL_CONFIG.filter(
@@ -2828,8 +3483,6 @@ toolCount.textContent =
   " / " +
   String(TOOL_CONFIG.length).padStart(2, "0") +
   " CONFIGURED";
-
-
 </script>
 
 </body>
