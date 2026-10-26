@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3DTwinsLite User Home</title>
+<title>3DTWINSLite User Home</title>
  <link rel="icon" href="https://3d.staratlas.es/LS/logolitenaranja.png" type="image/x-icon" />
 <style>
 
@@ -1276,12 +1276,11 @@ body:has(.workspace.visible) .footer {
 </style>
 
 </head>
-
 <body>
 
 <header class="header">
   <button class="brand" id="brandHome" type="button" aria-label="Return to Home">
-    <span class="brand-mark">3D Twins Lite</span>
+    <span class="brand-mark">3D TWINS Lite</span>
     <span class="brand-divider"></span>
     <span class="brand-info">
       <span class="brand-name">USER HOME</span>
@@ -1296,10 +1295,7 @@ body:has(.workspace.visible) .footer {
 </header>
 
 <main id="mainLayout">
-
-  <!-- HOME -->
   <section id="homeView">
-
     <div class="home-banner">
       <img
         src="https://ai4edatasetspublicassets.blob.core.windows.net/assets/pc_thumbnails/cop-dem.png"
@@ -1307,24 +1303,22 @@ body:has(.workspace.visible) .footer {
       >
       <div class="home-banner-overlay"></div>
       <div class="home-banner-content">
-        <h1 class="page-title">USER HOME</h1>
+        <h1 class="page-title"></h1>
       </div>
     </div>
 
     <p class="page-description">
-      Central access to your spatial tools and operational
-      environments. Select a tool to initialise your workspace.
-    </p>
+    Haz update para aumentar el número de repositorios simultáneos permitidos.
 
     <div class="section-heading">
-      <span class="section-label">Your 3D Scenes</span>
+      <span class="section-label">Your 3D repository</span>
       <span class="section-count" id="toolCount">Ready to use</span>
     </div>
 
     <div class="tool-grid" id="toolGrid">
 
       <button class="tool-card" data-tool="0" type="button">
-        <span class="tool-number">01 / V2.1</span>
+        <span class="tool-number">3D TWINS Lite / V2.1.0</span>
 
         <span class="tool-symbol" aria-hidden="true">
           <svg viewBox="0 0 80 80">
@@ -1336,11 +1330,11 @@ body:has(.workspace.visible) .footer {
           </svg>
         </span>
 
-        <span class="tool-name">NEW SCENE</span>
-        <span class="tool-description">Create your 3D scene in seconds.</span>
+        <span class="tool-name">Consultar repositorio 3D</span>
+        <span class="tool-description">Accede a tu repositorio dinámico</span>
 
         <span class="tool-footer">
-          <span class="open-label">Create scene</span>
+          <span class="open-label">Tus repositorios</span>
           <span class="open-arrow">↗</span>
         </span>
       </button>
@@ -1348,7 +1342,6 @@ body:has(.workspace.visible) .footer {
     </div>
   </section>
 
-  <!-- TOOL SELECTOR -->
   <aside
     class="tool-sidebar"
     id="toolSidebar"
@@ -1356,7 +1349,6 @@ body:has(.workspace.visible) .footer {
     aria-hidden="true"
   ></aside>
 
-  <!-- WORKSPACE -->
   <section class="workspace" id="workspace" aria-label="Tool workspace">
 
     <div class="workspace-toolbar">
@@ -1389,25 +1381,19 @@ body:has(.workspace.visible) .footer {
 
   </section>
 
-  <!-- USER SETTINGS -->
+  
   <section class="settings-view" id="settingsView">
-
     <div class="eyebrow"></div>
-
     <h1 class="page-title">USER / SETTINGS</h1>
-
     <p class="page-description">
       Manage your personal workspace and configure the 3D assets
       available in your scene editor.
     </p>
 
-    <!-- REPOSITORY CONFIGURATION -->
     <section class="settings-section" aria-labelledby="repositorySectionTitle">
-
       <div class="settings-section-heading">
         <div>
           <div class="settings-key">ASSET SOURCES / 01</div>
-
           <h2 class="settings-section-title" id="repositorySectionTitle">
             Repository library
           </h2>
@@ -1425,7 +1411,6 @@ body:has(.workspace.visible) .footer {
       </div>
 
       <div class="repository-settings-grid" id="repositorySettingsList"></div>
-
       <div class="repository-settings-footer">
         <div
           class="repository-settings-status"
@@ -1444,7 +1429,6 @@ body:has(.workspace.visible) .footer {
 
     </section>
 
-    <!-- ACCOUNT AND PLATFORM INFORMATION -->
     <section
       class="settings-section settings-information"
       aria-labelledby="platformSectionTitle"
@@ -1503,24 +1487,17 @@ body:has(.workspace.visible) .footer {
           </div>
           <div class="settings-value">2.1.0</div>
         </div>
-
       </div>
     </section>
-
   </section>
-
 </main>
 
-<!-- FOOTER -->
 <footer class="footer">
-
   <div class="footer-status">
     <span class="status-dot"></span>
     <span id="systemStatus">SYSTEM READY</span>
   </div>
-
   <div>3D Twins Lite</div>
-
   <a
     class="footer-creator"
     href="https://3dtwins.es/"
@@ -1530,9 +1507,8 @@ body:has(.workspace.visible) .footer {
   >
     BY 3D TWINS <span aria-hidden="true">↗</span>
   </a>
-
 </footer>
-
+ 
 <script>
 const TOOL_CONFIG = [
   {
@@ -1560,11 +1536,6 @@ const toolCount = document.getElementById("toolCount");
 
 let activeToolIndex = null;
 
-
-/* =========================================================
-   USER REPOSITORIES
-   ========================================================= */
-
 const MAX_USER_REPOSITORIES = 5;
 const MAX_REPOSITORY_URL_LENGTH = 300;
 const USER_REPOSITORIES_KEY = "liteSpaceRepositoriesV1";
@@ -1577,18 +1548,6 @@ function emptyRepositorySlots() {
   );
 }
 
-
-/*
- * Validate and normalize GitHub repository URLs.
- *
- * Accepted:
- *   https://github.com/owner/repo
- *   https://github.com/owner/repo/tree/branch/folder
- *
- * Rejected:
- *   HTTP, alternate domains, credentials, ports, query strings,
- *   fragments, direct file URLs and malformed paths.
- */
 function normalizeGitHubRepositoryURL(value) {
   if (typeof value !== "string") return null;
 
@@ -1661,7 +1620,6 @@ function normalizeGitHubRepositoryURL(value) {
     return null;
   }
 
-  // Permit repository root or /tree/branch/folder...
   if (parts.length > 2) {
     if (
       parts.length < 4 ||
@@ -1677,8 +1635,7 @@ function normalizeGitHubRepositoryURL(value) {
     }
   }
 
-  // Reject direct file/resource links.
-  // These file types may still exist inside the repository.
+
   const lastPart = parts[parts.length - 1];
 
   const forbiddenFileExtensions =
@@ -1705,10 +1662,6 @@ function isValidGitHubRepositoryURL(value) {
   return normalizeGitHubRepositoryURL(value) !== null;
 }
 
-
-/* =========================================================
-   LOAD STORED REPOSITORIES
-   ========================================================= */
 
 function loadUserRepositories() {
   const slots = emptyRepositorySlots();
@@ -1742,10 +1695,6 @@ function loadUserRepositories() {
 
 let userRepositories = loadUserRepositories();
 
-
-/* =========================================================
-   SAVE REPOSITORIES
-   ========================================================= */
 
 function saveUserRepositories() {
   try {
@@ -1784,10 +1733,6 @@ function saveUserRepositories() {
 }
 
 
-/* =========================================================
-   REPOSITORY STATUS
-   ========================================================= */
-
 function updateRepositorySettingsStatus() {
   const count = document.getElementById("repositoryCount");
   const status = document.getElementById(
@@ -1822,14 +1767,6 @@ function updateRepositorySettingsStatus() {
 }
 
 
-/* =========================================================
-   REPOSITORY INPUT SECURITY
-   ========================================================= */
-
-/*
- * Process pasted or dropped content.
- * Only accept a single valid GitHub repository/folder URL.
- */
 function processRepositoryInput(input, index, rawValue) {
   const value = typeof rawValue === "string"
     ? rawValue.trim()
@@ -1873,9 +1810,6 @@ function processRepositoryInput(input, index, rawValue) {
 }
 
 
-/* =========================================================
-   RENDER REPOSITORY SETTINGS
-   ========================================================= */
 
 function renderRepositorySettings() {
   const container = document.getElementById(
@@ -1923,11 +1857,6 @@ function renderRepositorySettings() {
       "Repository URL " + (index + 1)
     );
 
-    /*
-     * PASTE:
-     * Allow valid repository URLs only.
-     * Invalid clipboard content is never inserted.
-     */
     input.addEventListener("paste", event => {
       event.preventDefault();
 
@@ -1937,10 +1866,7 @@ function renderRepositorySettings() {
       processRepositoryInput(input, index, clipboardText);
     });
 
-    /*
-     * DRAG AND DROP:
-     * Allow text drops only when they contain a valid URL.
-     */
+
     input.addEventListener("dragover", event => {
       event.preventDefault();
     });
@@ -1954,13 +1880,10 @@ function renderRepositorySettings() {
       processRepositoryInput(input, index, droppedText);
     });
 
-    /*
-     * Clear validation feedback while typing.
-     */
+
     input.addEventListener("input", () => {
       input.setCustomValidity("");
 
-      // Do not allow input to grow beyond the configured limit.
       if (input.value.length > MAX_REPOSITORY_URL_LENGTH) {
         input.value = input.value.slice(
           0,
@@ -1969,9 +1892,7 @@ function renderRepositorySettings() {
       }
     });
 
-    /*
-     * Validate manually entered URLs on change.
-     */
+   
     input.addEventListener("change", () => {
       const value = input.value.trim();
 
@@ -2039,9 +1960,6 @@ function renderRepositorySettings() {
 }
 
 
-/* =========================================================
-   BUILD TOOL URL
-   ========================================================= */
 
 function buildToolURL(baseURL) {
   const url = new URL(baseURL);
@@ -2069,9 +1987,6 @@ function buildToolURL(baseURL) {
 }
 
 
-/* =========================================================
-   TOOL URL VALIDATION
-   ========================================================= */
 
 function isValidToolURL(value) {
   if (typeof value !== "string" || !value.trim()) return false;
@@ -2090,9 +2005,6 @@ function isValidToolURL(value) {
 }
 
 
-/* =========================================================
-   IFRAME LIFECYCLE
-   ========================================================= */
 
 function destroyToolFrame() {
   if (!toolFrame || !toolFrame.isConnected) return;
@@ -2110,9 +2022,6 @@ function destroyToolFrame() {
 }
 
 
-/* =========================================================
-   TOOL SIDEBAR
-   ========================================================= */
 
 function initialiseToolSidebar() {
   toolSidebar.replaceChildren();
@@ -2163,10 +2072,6 @@ function hideToolSidebar() {
 }
 
 
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
-
 function setActiveNavigation(view) {
   navHome.classList.toggle("active", view === "home");
   navUser.classList.toggle("active", view === "settings");
@@ -2199,9 +2104,6 @@ function showSettings() {
 }
 
 
-/* =========================================================
-   OPEN OR SWITCH TOOL
-   ========================================================= */
 
 function openTool(index) {
   const tool = TOOL_CONFIG[index];
@@ -2252,10 +2154,6 @@ function openTool(index) {
 }
 
 
-/* =========================================================
-   CLOSE WORKSPACE
-   ========================================================= */
-
 function closeWorkspace() {
   destroyToolFrame();
 
@@ -2269,9 +2167,6 @@ function closeWorkspace() {
 }
 
 
-/* =========================================================
-   TOOL ACTIONS
-   ========================================================= */
 
 function reloadTool() {
   if (activeToolIndex === null) return;
@@ -2310,9 +2205,6 @@ function openExternal() {
 }
 
 
-/* =========================================================
-   EVENTS
-   ========================================================= */
 
 document.querySelectorAll("#toolGrid [data-tool]").forEach(card => {
   card.addEventListener("click", () => {
@@ -2329,9 +2221,6 @@ document.getElementById("reloadTool").addEventListener("click", reloadTool);
 document.getElementById("openExternal").addEventListener("click", openExternal);
 
 
-/* =========================================================
-   HOME BANNER
-   ========================================================= */
 
 const homeBannerImages = [
   "https://landsat-diss.eo.esa.int/oads/meta/LandsatETM/browse/L07_RFUI_ETM_GTC_1P_20000703T105743_20000703T105812_006478_0203_0028_5E1E_v0100.SIP.ZIP_BID.PNG",
@@ -2363,16 +2252,12 @@ function changeHomeBanner() {
 }
 
 
-/* Change the banner when the user closes the workspace. */
 
 document.getElementById("closeTool").addEventListener("click", () => {
   changeHomeBanner();
 });
 
 
-/* =========================================================
-   INITIALISE
-   ========================================================= */
 
 renderRepositorySettings();
 initialiseToolSidebar();
