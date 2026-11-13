@@ -9203,6 +9203,151 @@ urlInput.addEventListener("keydown",event=>{
 })();
 </script>
 
+
+<script>
+(() => {
+  "use strict";
+
+  const CONFIG = {
+    initialDelay: 10000,
+    adDuration: 25000,
+    breakDuration: 40000,
+
+    sponsors: [
+      {
+        image: "https://cdn.3dtwins.tech/publicity/Troquia.png",
+        url: "https://troquia.es",
+        alt: "Patrocinador 1"
+      },
+      {
+        image: "https://lite.3dtwins.tech/heritage2.png",
+        url: "https://3dtwins.es/",
+        alt: "Patrocinador 2"
+      },
+      {
+        image: "https://lite.3dtwins.tech/heritage.png",
+        url: "https://3dtwins.es/",
+        alt: "Patrocinador 3"
+      }
+    ]
+  };
+
+  const slot = document.getElementById("liteAdSlot");
+  const canvas = document.getElementById("c");
+
+  if (!slot || !canvas || !CONFIG.sponsors.length) return;
+
+  /* =========================================
+     EXCLUIR PUBLICIDAD EN ESCENAS PÚBLICAS
+  ========================================= */
+
+  const sceneParam = new URLSearchParams(location.search).get("scene");
+
+  if (sceneParam) {
+    slot.style.display = "none";
+    slot.classList.remove("is-open");
+    slot.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  const link = slot.querySelector("#liteAdLink");
+  const image = slot.querySelector("#liteAdImage");
+
+  if (!link || !image) return;
+
+  /* =========================================
+     DISTRIBUCIÓN LATERAL
+  ========================================= */
+
+  const layout = canvas.parentElement;
+
+  if (!layout || slot.parentElement !== layout) return;
+
+  /* Colocar publicidad después del canvas */
+  if (canvas.nextElementSibling !== slot) {
+    canvas.insertAdjacentElement("afterend", slot);
+  }
+
+  /* Activar distribución horizontal */
+  layout.classList.add("lite-ad-layout");
+
+  /* =========================================
+     PRECARGA DE IMÁGENES
+  ========================================= */
+
+  CONFIG.sponsors.forEach(sponsor => {
+    const preload = new Image();
+    preload.src = sponsor.image;
+  });
+
+  let currentIndex = 0;
+
+  /* =========================================
+     CAMBIAR PATROCINADOR
+  ========================================= */
+
+  function showSponsor() {
+    const sponsor = CONFIG.sponsors[currentIndex];
+
+    image.classList.add("is-changing");
+
+    setTimeout(() => {
+      image.src = sponsor.image;
+      image.alt = sponsor.alt || "Patrocinador";
+      link.href = sponsor.url;
+
+      image.classList.remove("is-changing");
+    }, 350);
+
+    currentIndex = (currentIndex + 1) % CONFIG.sponsors.length;
+  }
+
+  /* =========================================
+     CICLO PUBLICITARIO
+  ========================================= */
+
+  function startCampaign() {
+
+    // Reiniciar siempre desde el primer patrocinador
+    currentIndex = 0;
+
+    // Mostrar el primer patrocinador
+    const firstSponsor = CONFIG.sponsors[0];
+
+    image.src = firstSponsor.image;
+    image.alt = firstSponsor.alt || "Patrocinador";
+    link.href = firstSponsor.url;
+
+    // Abrir columna derecha
+    slot.classList.add("is-open");
+    slot.setAttribute("aria-hidden", "false");
+
+    // Esperar 25 segundos antes de mostrar el segundo
+    const rotation = setInterval(() => {
+      showSponsor();
+    }, CONFIG.adDuration);
+
+    // Finalizar tanda
+    setTimeout(() => {
+
+      clearInterval(rotation);
+
+      slot.classList.remove("is-open");
+      slot.setAttribute("aria-hidden", "true");
+
+      setTimeout(startCampaign, CONFIG.breakDuration);
+
+    }, CONFIG.adDuration * CONFIG.sponsors.length);
+  }
+
+  /* =========================================
+     INICIO
+  ========================================= */
+
+  setTimeout(startCampaign, CONFIG.initialDelay);
+
+})();
+</script>
   
 </body>
 </html>
