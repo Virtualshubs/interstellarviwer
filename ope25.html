@@ -1596,139 +1596,76 @@ width:100%;
 }
 }
 
-  /* DISTRIBUCIÓN DEL EDITOR Y PUBLICIDAD */
-.lite-ad-layout {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: stretch !important;
+/* =========================================
+   BLOQUE PUBLICITARIO FLOTANTE
+========================================= */
 
-  width: 100%;
-  height: 100vh !important;
-  min-height: 0;
-
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-/* CANVAS: OCUPA EL ESPACIO DISPONIBLE */
-.lite-ad-layout > #c {
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-  max-width: 100%;
-  height: 100% !important;
-}
-
-/* PANEL PUBLICITARIO CERRADO */
 #liteAdSlot {
-  position: relative !important;
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%) translateX(120%);
 
-  flex: 0 0 0 !important;
-  width: 0 !important;
-  min-width: 0 !important;
-  max-width: 0 !important;
+  width: 180px;
+  max-width: calc(100vw - 40px);
 
-  height: 100% !important;
-  min-height: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden !important;
-  box-sizing: border-box;
-
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-
-  background: #F3F1EA !important;
+  z-index: 99999;
 
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 
   transition:
-    flex-basis 0.45s ease,
-    opacity 0.3s ease,
-    visibility 0s linear 0.45s;
+    transform 0.6s ease,
+    opacity 0.6s ease,
+    visibility 0.6s ease;
 }
 
-/* PANEL ABIERTO: COLUMNA DERECHA */
+/* Estado visible */
+
 #liteAdSlot.is-open {
-  flex: 0 0 20% !important;
-  width: 20% !important;
-  min-width: 220px !important;
-  max-width: 380px !important;
+  transform: translateY(-50%) translateX(0);
 
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-
-  background: #F3F1EA !important;
-
-  transition:
-    flex-basis 0.45s ease,
-    opacity 0.3s ease,
-    visibility 0s;
 }
 
-/* CONTENEDOR INTERIOR */
-#liteAdSlot a {
-  display: flex !important;
+/* Enlace */
 
-  flex: 1 1 auto;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0;
-  min-height: 0;
-
-  align-items: center !important;
-  justify-content: center !important;
-
-  padding: 16px;
-  margin: 0;
-
-  box-sizing: border-box;
-  background: #F3F1EA !important;
+#liteAdLink {
+  display: block;
+  width: 100%;
+  text-decoration: none;
 }
 
-/* IMAGEN ADAPTABLE */
-#liteAdSlot img {
-  display: block !important;
+/* Imagen */
 
-  width: 100% !important;
-  height: 100% !important;
+#liteAdImage {
+  display: block;
+  width: 100%;
+  height: auto;
 
-  max-width: 100% !important;
-  max-height: 100% !important;
-
-  object-fit: contain !important;
-  object-position: center center;
-
-  margin: 0 !important;
+  border-radius: 8px;
 
   opacity: 1;
   transition: opacity 0.35s ease;
 }
 
-/* TRANSICIÓN ENTRE PATROCINADORES */
-#liteAdSlot img.is-changing {
+/* Transición entre patrocinadores */
+
+#liteAdImage.is-changing {
   opacity: 0;
 }
 
-/* MÓVILES */
-@media (max-width: 700px) {
-  #liteAdSlot.is-open {
-    flex-basis: 38% !important;
-    width: 38% !important;
-    min-width: 150px !important;
-  }
+/* Adaptación móvil */
 
-  #liteAdSlot a {
-    padding: 8px;
+@media (max-width: 600px) {
+  #liteAdSlot {
+    width: 125px;
+    right: 10px;
   }
 }
-
   
 </style>
 </head>
@@ -2089,10 +2026,18 @@ Apply to Earth
     <img src="https://3d.staratlas.es/logoope.png" alt="Orbital Pass Engine">
 </div>
 
-
-  <div id="liteAdSlot" aria-label="Publicidad patrocinada" aria-hidden="true">
-  <a id="liteAdLink" target="_blank" rel="noopener noreferrer">
-    <img id="liteAdImage" src="" alt="">
+<div id="liteAdSlot" aria-hidden="true">
+  <a
+    id="liteAdLink"
+    href="#"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      id="liteAdImage"
+      src=""
+      alt="Patrocinador"
+    >
   </a>
 </div>
 
@@ -9348,6 +9293,7 @@ urlInput.addEventListener("keydown",event=>{
 </script>
 
 
+
 <script>
 (() => {
   "use strict";
@@ -9377,9 +9323,8 @@ urlInput.addEventListener("keydown",event=>{
   };
 
   const slot = document.getElementById("liteAdSlot");
-  const canvas = document.getElementById("c");
 
-  if (!slot || !canvas || !CONFIG.sponsors.length) return;
+  if (!slot || !CONFIG.sponsors.length) return;
 
   /* =========================================
      EXCLUIR PUBLICIDAD EN ESCENAS PÚBLICAS
@@ -9400,20 +9345,22 @@ urlInput.addEventListener("keydown",event=>{
   if (!link || !image) return;
 
   /* =========================================
-     DISTRIBUCIÓN LATERAL
+     POSICIONAMIENTO INDEPENDIENTE
   ========================================= */
 
-  const layout = canvas.parentElement;
-
-  if (!layout || slot.parentElement !== layout) return;
-
-  /* Colocar publicidad después del canvas */
-  if (canvas.nextElementSibling !== slot) {
-    canvas.insertAdjacentElement("afterend", slot);
+  // Sacar el bloque de cualquier contenedor del canvas
+  if (slot.parentElement !== document.body) {
+    document.body.appendChild(slot);
   }
 
-  /* Activar distribución horizontal */
-  layout.classList.add("lite-ad-layout");
+  // Posicionamiento flotante sobre la página
+  Object.assign(slot.style, {
+    position: "fixed",
+    right: "20px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    zIndex: "99999"
+  });
 
   /* =========================================
      PRECARGA DE IMÁGENES
@@ -9452,26 +9399,21 @@ urlInput.addEventListener("keydown",event=>{
 
   function startCampaign() {
 
-    // Reiniciar siempre desde el primer patrocinador
     currentIndex = 0;
 
-    // Mostrar el primer patrocinador
     const firstSponsor = CONFIG.sponsors[0];
 
     image.src = firstSponsor.image;
     image.alt = firstSponsor.alt || "Patrocinador";
     link.href = firstSponsor.url;
 
-    // Abrir columna derecha
     slot.classList.add("is-open");
     slot.setAttribute("aria-hidden", "false");
 
-    // Esperar 25 segundos antes de mostrar el segundo
     const rotation = setInterval(() => {
       showSponsor();
     }, CONFIG.adDuration);
 
-    // Finalizar tanda
     setTimeout(() => {
 
       clearInterval(rotation);
@@ -9492,6 +9434,7 @@ urlInput.addEventListener("keydown",event=>{
 
 })();
 </script>
+
   
 </body>
 </html>
