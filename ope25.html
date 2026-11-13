@@ -204,450 +204,623 @@ body {
 /* TRACKING PANEL */
 /* ===================================================== */
 
-#trackingControl{
-    background:linear-gradient(
-        145deg,
-        rgba(20,30,45,.92),
-        rgba(5,10,18,.92)
-    );
 
-    border:1px solid rgba(120,180,255,.2);
-    border-radius:12px;
-    padding:18px;
-    width:260px;
-    font-family:"Roboto Mono",monospace;
-    box-shadow:0 10px 35px rgba(0,0,0,.45);
+/* =====================================================
+   OPE — ORBITAL PASS ENGINE
+   COMPLETE INTERFACE DESIGN SYSTEM
+   Editorial Aerospace / Scientific Instrumentation
+===================================================== */
+
+:root {
+  --ope-mineral: #F3F1EA;
+  --ope-graphite: #242522;
+  --ope-black: #171916;
+  --ope-surface: #20231F;
+
+  --ope-atmospheric: #7195A3;
+  --ope-thermal: #E5682E;
+  --ope-vegetal: #87977A;
+
+  --ope-text: #F3F1EA;
+  --ope-muted: #A4A69E;
+
+  --ope-line: rgba(243,241,234,.14);
+  --ope-line-soft: rgba(243,241,234,.08);
+
+  --ope-font: "IBM Plex Sans", sans-serif;
+  --ope-mono: "IBM Plex Mono", monospace;
+  --ope-display: "Space Grotesk", sans-serif;
 }
 
+/* =====================================================
+   TRACKING CONTROL
+===================================================== */
 
-.control-title{
-    font-size:11px;
-    letter-spacing:3px;
-    color:#7da8d8;
-    text-align:center;
-    margin:0 0 18px;
+#trackingControl {
+  background: var(--ope-black);
+  border: 1px solid var(--ope-line);
+  border-radius: 3px;
+  padding: 18px;
+  width: 260px;
+  font-family: var(--ope-font);
+  box-shadow: 0 12px 35px rgba(0,0,0,.22);
 }
 
-
-#trackingControl label{
-    display:block;
-    font-size:10px;
-    letter-spacing:2px;
-    color:#7890aa;
-    margin:14px 0 6px;
-
+.control-title {
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--ope-muted);
+  text-align: left;
+  margin: 0 0 18px;
+  text-transform: uppercase;
 }
 
-
-#trackingControl select{
-
-    width:100%;
-    height:40px;
-    padding:0 12px;
-    border-radius:8px;
-    border:1px solid rgba(120,180,255,.2);
-    background:rgba(255,255,255,.05);
-    color:white;
-    font-family:inherit;
-    cursor:pointer;
-    transition:
-    border-color .25s ease,
-    background .25s ease,
-    box-shadow .25s ease;
+#trackingControl label {
+  display: block;
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--ope-muted);
+  margin: 14px 0 7px;
+  text-transform: uppercase;
 }
 
-
-#trackingControl select:hover{
-    border-color:rgba(120,180,255,.5);
-    background:rgba(255,255,255,.07);
+#trackingControl select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 2px;
+  border: 1px solid var(--ope-line);
+  background: var(--ope-surface);
+  color: var(--ope-text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .2s ease;
 }
 
-
-#trackingControl select:focus{
-    outline:none;
-    border-color:rgba(120,180,255,.75);
-    box-shadow:0 0 10px rgba(80,160,255,.25);
+#trackingControl select:hover {
+  border-color: var(--ope-atmospheric);
+  background: var(--ope-surface);
 }
 
-
-#trackingControl select option{
-    background:#101722;
-    color:white;
+#trackingControl select:focus {
+  outline: none;
+  border-color: var(--ope-atmospheric);
+  box-shadow: none;
 }
 
-
-
-#calcBtn{
-    width:100%;
-    margin: 0px;
-    height:42px;
-    border-radius:10px;
-    border:
-    1px solid rgba(100,200,255,.35);
-    background:
-    rgba(80,160,255,.18);
-    color:white;
-    font-family:
-    inherit;
-    letter-spacing:2px;
-    font-size:11px;
-    cursor:pointer;
-    transition:.25s;
+#trackingControl select option {
+  background: var(--ope-graphite);
+  color: var(--ope-text);
 }
 
+/* =====================================================
+   TRACKING BUTTON
+===================================================== */
 
-
-#calcBtn:hover{
-    background:
-    rgba(80,160,255,.35);
-    box-shadow:  0 0 20px rgba(80,160,255,.3);
-    transform:
-    translateY(-2px);
- 
+#calcBtn {
+  width: 100%;
+  margin: 0;
+  height: 42px;
+  border-radius: 2px;
+  border: 1px solid var(--ope-atmospheric);
+  background: var(--ope-atmospheric);
+  color: var(--ope-black);
+  font-family: var(--ope-mono);
+  font-weight: 600;
+  letter-spacing: .12em;
+  font-size: 10px;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
 }
-  
-canvas { display: block; }
+
+#calcBtn:hover {
+  background: #8EABB5;
+  border-color: #8EABB5;
+  box-shadow: none;
+  transform: none;
+}
+
+/* =====================================================
+   GLOBAL ELEMENTS
+===================================================== */
+
+canvas {
+  display: block;
+}
+
+button,
+select,
+input {
+  font-family: var(--ope-font);
+  color: var(--ope-text);
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+/* =====================================================
+   MAIN UI PANEL
+===================================================== */
 
 #ui {
   position: absolute;
   top: 12px;
   left: 12px;
   z-index: 10;
+
   width: 400px;
+  max-width: calc(100vw - 24px);
   max-height: 85vh;
   overflow: auto;
-  padding: 16px;
-  border-radius: 16px;
-  background: rgba(8, 12, 20, 0.78);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(120, 180, 255, 0.18);
-  box-shadow:
-    0 0 45px rgba(70, 120, 255, 0.10),
-    inset 0 0 25px rgba(255,255,255,0.02);
+
+  padding: 20px;
+
+  border-radius: 3px;
+  background: rgba(23,25,22,.96);
+  backdrop-filter: blur(12px);
+
+  border: 1px solid var(--ope-line);
+
+  box-shadow: 0 12px 35px rgba(0,0,0,.22);
+
+  color: var(--ope-text);
+  font-family: var(--ope-font);
+
+  box-sizing: border-box;
+}
+
+#ui * {
+  box-sizing: border-box;
 }
 
 #ui::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(120, 180, 255, 0.5),
-    transparent
-  );
-  opacity: 0.6;
+  content: none;
 }
 
+/* =====================================================
+   MAIN TITLE
+===================================================== */
 
 #ui h3 {
-  margin: 0 0 12px 0;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  font-size: 24px;
-  color: #9CCBFF;
+  margin: 0 0 6px;
+  font-family: var(--ope-display);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  font-size: 23px;
+  color: var(--ope-mineral);
   text-transform: uppercase;
 }
 
-button, select, input {
+#ui .control-title {
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  letter-spacing: .07em;
+  color: var(--ope-muted);
+  text-align: left;
+  margin: 0 0 22px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--ope-line);
+}
+
+/* =====================================================
+   LABELS
+===================================================== */
+
+#ui label {
+  display: block;
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: var(--ope-muted);
+  margin: 16px 0 7px;
+  text-transform: uppercase;
+}
+
+/* =====================================================
+   FORM ELEMENTS
+===================================================== */
+
+button,
+select,
+input {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
 
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(120, 180, 255, 0.14);
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
+  border-radius: 2px;
 
-  color: #E6F1FF;
-
-  border-radius: 10px;
-  outline: none;
+  color: var(--ope-text);
 
   font-size: 12px;
-  letter-spacing: 0.02em;
+  letter-spacing: .01em;
 
-  transition: all 0.2s ease;
+  outline: none;
 }
 
-button:hover {
-  border-color: rgba(120, 180, 255, 0.35);
-  background: rgba(120, 180, 255, 0.06);
+#ui button,
+#ui select,
+#ui input {
+  width: 100%;
+  padding: 10px 11px;
+  margin-top: 7px;
+
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
+  border-radius: 2px;
+
+  color: var(--ope-text);
+
+  font-family: var(--ope-font);
+  font-size: 12px;
+  letter-spacing: .01em;
+
+  outline: none;
+
+  transition: border-color .2s ease, background .2s ease;
+}
+
+#ui select {
+  height: 39px;
   cursor: pointer;
 }
 
-button:active {
-  transform: scale(0.98);
+#ui select:hover,
+#ui input:hover {
+  border-color: rgba(113,149,163,.65);
 }
 
+#ui select:focus,
+#ui input:focus {
+  border-color: var(--ope-atmospheric);
+  box-shadow: none;
+}
+
+#ui select option {
+  background: var(--ope-graphite);
+  color: var(--ope-text);
+}
+
+button:hover,
+#ui button:hover {
+  border-color: var(--ope-atmospheric);
+  background: #292E29;
+  cursor: pointer;
+}
+
+button:active,
+#ui button:active {
+  transform: none;
+}
+
+#ui #calcBtn {
+  height: 42px;
+  margin-top: 19px;
+  background: var(--ope-atmospheric);
+  border-color: var(--ope-atmospheric);
+  color: var(--ope-black);
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+#ui #calcBtn:hover {
+  background: #8EABB5;
+  border-color: #8EABB5;
+}
+
+/* =====================================================
+   HIGHLIGHT
+===================================================== */
 
 .highlight {
   margin-top: 14px;
-  padding: 14px;
-  border-radius: 14px;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 255, 170, 0.08),
-    rgba(0, 120, 255, 0.06)
-  );
+  padding: 13px;
 
-  border: 1px solid rgba(0, 255, 170, 0.18);
-  font-size: 13px;
+  border-radius: 2px;
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
+  border-left: 2px solid var(--ope-thermal);
+
+  font-size: 12px;
   line-height: 1.55;
-  box-shadow: inset 0 0 18px rgba(0,255,150,0.05);
+
+  box-shadow: none;
 }
-  
+
+/* =====================================================
+   INSIGHT BLOCK
+===================================================== */
 
 .insightBlock {
   margin-top: 10px;
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(120, 180, 255, 0.12);
+  padding: 13px;
+
+  border-radius: 2px;
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
+
   position: relative;
 }
-  
-
 
 .insightBlock::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-  background: rgba(120, 180, 255, 0.35);
-  border-radius: 2px;
+  content: none;
 }
 
 .insightTitle {
-  font-size: 30px;
-  letter-spacing: 0.18em;
+  font-family: var(--ope-mono);
+  font-size: 11px;
+  letter-spacing: .1em;
   text-transform: uppercase;
-  color: #7FB3FF;
-  margin-bottom: 8px;
-  opacity: 0.9;
+  color: var(--ope-atmospheric);
+  margin-bottom: 9px;
+  opacity: 1;
 }
 
 .insightItem {
-  font-size: 12px;
-  opacity: 0.92;
-  margin: 3px 0;
-  padding-left: 8px;
-  border-left: 1px solid rgba(120, 180, 255, 0.25);
+  font-size: 11px;
+  opacity: .95;
+  margin: 5px 0;
+  padding-left: 9px;
+  border-left: 1px solid var(--ope-line);
+  color: var(--ope-text);
 }
 
+/* =====================================================
+   RANK CARDS
+===================================================== */
 
 .rankCard {
   margin-top: 8px;
-  padding: 10px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  font-size: 12px;
-  transition: all 0.2s ease;
+  padding: 11px;
+
+  border-radius: 2px;
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
+
+  font-size: 11px;
+  transition: border-color .2s ease;
 }
 
 .rankCard:hover {
-  border-color: rgba(120, 180, 255, 0.28);
-  background: rgba(120, 180, 255, 0.05);
+  border-color: var(--ope-atmospheric);
+  background: var(--ope-surface);
 }
 
-
+/* =====================================================
+   PRE / DATA OUTPUT
+===================================================== */
 
 pre {
   white-space: pre-wrap;
-  font-size: 11px;
+  font-size: 10px;
   margin-top: 10px;
-  opacity: 0.65;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+  opacity: .85;
+  color: var(--ope-muted);
+  font-family: var(--ope-mono);
 }
 
-
+/* =====================================================
+   MAIN PANEL SCROLLBAR
+===================================================== */
 
 #ui::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 #ui::-webkit-scrollbar-thumb {
-  background: rgba(120, 180, 255, 0.25);
-  border-radius: 10px;
+  background: rgba(113,149,163,.4);
+  border-radius: 2px;
 }
 
 #ui::-webkit-scrollbar-track {
   background: transparent;
 }
 
+/* =====================================================
+   SATELLITE INFORMATION PANEL
+===================================================== */
 
-  #satInfoPanel {
+#satInfoPanel {
   position: fixed;
   top: 12px;
   right: 12px;
+
   width: 300px;
   max-height: 92vh;
   overflow: auto;
+
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 3px;
+
   z-index: 20;
-  background: rgba(8, 12, 20, 0.78);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(120, 180, 255, 0.18);
-  box-shadow:
-    0 0 40px rgba(70, 120, 255, 0.12),
-    inset 0 0 20px rgba(255,255,255,0.02);
-  color: #E6F1FF;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+
+  background: rgba(23,25,22,.96);
+  backdrop-filter: blur(12px);
+
+  border: 1px solid var(--ope-line);
+
+  box-shadow: 0 12px 35px rgba(0,0,0,.22);
+
+  color: var(--ope-text);
+  font-family: var(--ope-font);
+
+  animation: satFadeIn .25s ease-out;
 }
 
-  .satPanelTitle {
-  font-size: 25px;
-  font-weight: 400;
+/* =====================================================
+   SATELLITE TITLE
+===================================================== */
+
+.satPanelTitle {
+  font-family: var(--ope-display);
+  font-size: 22px;
+  font-weight: 500;
   margin-bottom: 12px;
-  letter-spacing: 0.12em;
+  letter-spacing: -.02em;
   text-transform: uppercase;
-  color: #FE9A37;
+  color: var(--ope-thermal);
 }
 
-  #satHeader {
+/* =====================================================
+   SATELLITE HEADER
+===================================================== */
+
+#satHeader {
   width: 100%;
   height: 200px;
-  border-radius: 12px;
+
+  border-radius: 2px;
   overflow: hidden;
   margin-bottom: 12px;
+
   position: relative;
-  border: 1px solid rgba(120, 180, 255, 0.25);
-  box-shadow: 0 0 20px rgba(120,180,255,0.15);
+
+  border: 1px solid var(--ope-line);
+  box-shadow: none;
 }
 
-  #satHeader img {
+#satHeader img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: contrast(1.1) brightness(0.9);
+  filter: contrast(1.05) brightness(.92);
 }
 
-  #satHeader::after {
+#satHeader::after {
   content: "";
   position: absolute;
   inset: 0;
+
   background: linear-gradient(
     180deg,
-    rgba(0,0,0,0.1),
-    rgba(0,0,0,0.7)
+    rgba(0,0,0,0),
+    rgba(0,0,0,.35)
   );
 
   pointer-events: none;
 }
 
-  .satBlock {
+/* =====================================================
+   SATELLITE BLOCKS
+===================================================== */
+
+.satBlock {
   margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(120, 180, 255, 0.10);
+  padding: 11px 12px;
+
+  border-radius: 2px;
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
+
   position: relative;
 }
 
-  .satBlock::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-  background: rgba(120, 180, 255, 0.35);
-  border-radius: 2px;
+.satBlock::before {
+  content: none;
 }
 
-  
-  .satBlockTitle {
+.satBlockTitle {
+  font-family: var(--ope-mono);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: #7FB3FF;
-  margin-bottom: 6px;
-  opacity: 0.85;
+  color: var(--ope-atmospheric);
+  margin-bottom: 7px;
+  opacity: 1;
 }
 
-  .satItem {
-  font-size: 12px;
-  margin: 3px 0;
-  opacity: 0.92;
-  padding-left: 6px;
-  border-left: 1px solid rgba(120, 180, 255, 0.25);
+.satItem {
+  font-size: 11px;
+  margin: 4px 0;
+  opacity: .95;
+  padding-left: 8px;
+  border-left: 1px solid var(--ope-line);
 }
 
-  #satInfoPanel {
-  animation: satFadeIn 0.25s ease-out;
-}
+/* =====================================================
+   SATELLITE PANEL ANIMATION
+===================================================== */
 
 @keyframes satFadeIn {
   from {
     opacity: 0;
     transform: translateY(-6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+/* =====================================================
+   SATELLITE PATCH
+===================================================== */
+
 #satPatch {
   position: fixed;
   bottom: 18px;
   right: 18px;
+
   width: 72px;
   height: 72px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(255,255,255,0.18),
-    rgba(120,180,255,0.10) 45%,
-    rgba(10,14,20,0.92) 100%
-  );
 
-  border: 1px solid rgba(120, 180, 255, 0.35);
-  box-shadow:
-    0 0 20px rgba(120,180,255,0.25),
-    inset 0 0 14px rgba(255,255,255,0.05);
+  border-radius: 50%;
+
+  background: var(--ope-graphite);
+
+  border: 1px solid var(--ope-line);
+
+  box-shadow: 0 5px 18px rgba(0,0,0,.25);
 
   display: flex;
   align-items: center;
   justify-content: center;
+
   overflow: hidden;
   z-index: 50;
+
   backdrop-filter: blur(10px);
+
+  transition: transform .2s ease, border-color .3s ease;
 }
-  
-  #satPatch {
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
-  
 
 #satPatch:hover {
-  transform: scale(1.08);
-  box-shadow:
-    0 0 28px rgba(120,180,255,0.35),
-    inset 0 0 14px rgba(255,255,255,0.06);
+  transform: scale(1.04);
+  border-color: var(--ope-atmospheric);
+  box-shadow: 0 5px 18px rgba(0,0,0,.25);
 }
-  
+
 #satPatch img {
   width: 100px;
   height: 100px;
   object-fit: contain;
- 
-
-  filter: drop-shadow(0 0 6px rgba(120,180,255,0.4));
+  filter: none;
 }
+
+/* =====================================================
+   MISSION NAVIGATION
+===================================================== */
 
 #missionNav {
   position: fixed;
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
+
   display: flex;
-  gap: 12px;
+  gap: 8px;
+
   z-index: 9999;
 }
 
@@ -655,411 +828,536 @@ pre {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  border-radius: 50px;
-  background: rgba(0,0,0,0.35);
+
+  padding: 9px 13px;
+
+  border-radius: 3px;
+
+  background: rgba(23,25,22,.94);
   backdrop-filter: blur(10px);
+
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255,255,255,0.08);
+
+  transition: border-color .2s ease, background .2s ease;
+
+  border: 1px solid var(--ope-line);
 }
 
 .missionSlot:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.2);
+  transform: none;
+  border-color: var(--ope-atmospheric);
 }
 
 .missionSlot.active {
-  background: rgba(0,150,255,0.25);
-  border-color: rgba(0,150,255,0.6);
+  background: rgba(65,109,128,.22);
+  border-color: var(--ope-atmospheric);
 }
 
 .missionSlot img {
   width: 28px;
   height: 28px;
+  object-fit: contain;
 }
 
 .missionMeta {
   display: flex;
   flex-direction: column;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .missionLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ope-text);
 }
 
 .missionSub {
-  font-size: 10px;
-  opacity: 0.7;
-  color: white;
+  font-family: var(--ope-mono);
+  font-size: 9px;
+  opacity: .75;
+  color: var(--ope-muted);
 }
 
-  #missionPanel{
- position:fixed;
+/* =====================================================
+   MISSION PANEL
+===================================================== */
+
+#missionPanel {
+  position: fixed;
   display: none;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:420px;
-  min-height:180px;
-  padding:24px;
-  background:rgba(8,12,18,0.95);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(120,180,255,0.35);
-  border-radius:20px;
-  box-shadow:
-    0 0 40px rgba(120,180,255,0.25);
-  color:white;
-  z-index:9999;
-  overflow:hidden;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+
+  width: 420px;
+  max-width: calc(100vw - 30px);
+  min-height: 180px;
+
+  padding: 24px;
+
+  background: rgba(23,25,22,.98);
+  backdrop-filter: blur(16px);
+
+  border: 1px solid var(--ope-line);
+  border-radius: 3px;
+
+  box-shadow: 0 15px 45px rgba(0,0,0,.35);
+
+  color: var(--ope-text);
+  z-index: 9999;
+
+  overflow: hidden;
 }
 
-  .missionTitle{
-  font-size:24px;
-  font-weight:600;
-  margin-bottom:12px;
+.missionTitle {
+  font-family: var(--ope-display);
+  font-size: 23px;
+  font-weight: 500;
+  margin-bottom: 12px;
 }
 
-.missionDesc{
-  font-size:14px;
-  line-height:1.6;
-  opacity:0.85;
-  margin-bottom:16px;
+.missionDesc {
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: .9;
+  color: var(--ope-muted);
+  margin-bottom: 16px;
 }
 
-.missionSatCount{
-  font-size:13px;
-  color:#7ec8ff;
+.missionSatCount {
+  font-family: var(--ope-mono);
+  font-size: 12px;
+  color: var(--ope-atmospheric);
 }
 
-  #satInfo{
+/* =====================================================
+   SATELLITE INFO
+===================================================== */
 
-    background:
-    linear-gradient(
-        145deg,
-        rgba(20,30,45,.95),
-        rgba(5,10,18,.95)
-    );
+#satInfo {
+  background: var(--ope-surface);
 
-    border:1px solid rgba(120,180,255,.25);
-    border-radius:12px;
-    padding:18px;
-    color:#d8e9ff;
-    font-family:
-    "Orbitron",
-    "Roboto Mono",
-    monospace;
-    box-shadow:
-    0 0 25px rgba(0,120,255,.15);
+  border: 1px solid var(--ope-line);
+  border-radius: 2px;
 
+  padding: 16px;
+
+  color: var(--ope-text);
+  font-family: var(--ope-font);
+
+  box-shadow: none;
 }
 
+/* =====================================================
+   MISSION HEADER
+===================================================== */
 
-.mission-header{
-    border-bottom:1px solid rgba(255,255,255,.12);
-    padding-bottom:16px;
-    margin-bottom:22px;
-
+.mission-header {
+  border-bottom: 1px solid var(--ope-line);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.mission-label{
-
-    font-size:11px;
-    letter-spacing:2.5px;
-    color:#7da8d8;
-
+.mission-label {
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--ope-atmospheric);
+  text-transform: uppercase;
 }
 
-.mission-name{
+.mission-name {
+  margin-top: 7px;
 
-    margin-top:6px;
-    font-size:26px;
-    font-weight:700;
-    line-height:1.2;
-    color:white;
+  font-family: var(--ope-display);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
 
+  color: var(--ope-text);
 }
 
-.mission-status{
-    margin-top:12px;
-    font-size:13px;
-
+.mission-status {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--ope-muted);
 }
 
+/* =====================================================
+   MISSION DETAILS
+===================================================== */
 
-
-.mission-details{
-
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-bottom:24px;
-
+.mission-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 22px;
 }
 
-.mission-details div{
-    padding:14px;
-    border-radius:10px;
+.mission-details div {
+  padding: 12px;
 
+  background: rgba(243,241,234,.035);
+  border: 1px solid var(--ope-line-soft);
+  border-radius: 2px;
 }
 
-.mission-details span{
-    margin-bottom:6px;
-    font-size:10px;
-    letter-spacing:1.8px;
+.mission-details span {
+  display: block;
+  margin-bottom: 6px;
 
+  font-family: var(--ope-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: var(--ope-muted);
+  text-transform: uppercase;
 }
 
-.mission-details strong{
-    display:block;
-    font-size:14px;
-
+.mission-details strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ope-text);
 }
 
+/* =====================================================
+   TELEMETRY
+===================================================== */
 
-.telemetry-title{
-    font-size:11px;
-    letter-spacing:3px;
-    color:#7da8d8;
-    margin-bottom:10px;
-
+.telemetry-title {
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--ope-atmospheric);
+  margin-bottom: 10px;
+  text-transform: uppercase;
 }
 
-
-
-.telemetry-grid{
-
-    display:grid;
-    grid-template-columns:
-    1fr 1fr;
-    gap:10px;
-
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
+.telemetry-card {
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
 
-
-.telemetry-card{
-
-    background:
-    linear-gradient(
-    135deg,
-    rgba(255,255,255,.07),
-    rgba(255,255,255,.02)
-    );
-
-    border:
-
-    1px solid rgba(255,255,255,.08);
-
-    padding:12px;
-    border-radius:8px;
-
+  padding: 12px;
+  border-radius: 2px;
 }
 
+.telemetry-card span {
+  display: block;
 
-
-.telemetry-card span{
-
-    display:block;
-    font-size:10px;
-    color:#8da6c5;
-    letter-spacing:2px;
-
+  font-family: var(--ope-mono);
+  font-size: 9px;
+  color: var(--ope-muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
+.telemetry-card strong {
+  display: block;
+  margin-top: 7px;
 
+  font-family: var(--ope-display);
+  font-size: 20px;
+  font-weight: 500;
 
-.telemetry-card strong{
-
-    display:block;
-    margin-top:6px;
-    font-size:20px;
-    color:#ffffff;
-
+  color: var(--ope-text);
 }
 
-  select { width:220px; margin-top:5px; }
+/* =====================================================
+   SELECT
+===================================================== */
 
-
-.pass-card{
-
-    background:
-    rgba(255,255,255,.035);
-
-    border:
-    1px solid rgba(120,180,255,.15);
-
-    border-radius:10px;
-    padding:14px;
-    margin:12px;
-
+select {
+  width: 220px;
+  margin-top: 5px;
 }
 
+/* =====================================================
+   PASS CARDS
+===================================================== */
 
+.pass-card {
+  background: var(--ope-surface);
+  border: 1px solid var(--ope-line);
 
-.pass-header{
-
-    display:flex;
-    justify-content:space-between;
-    font-size:12px;
-    letter-spacing:2px;
-    color:#8da6c5;
-    margin-bottom:12px;
-
+  border-radius: 2px;
+  padding: 14px;
+  margin: 12px;
 }
 
+.pass-header {
+  display: flex;
+  justify-content: space-between;
 
+  font-family: var(--ope-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
 
-.pass-header strong{
-    color:#7dff9b;
-    font-size:11px;
-
+  color: var(--ope-muted);
+  margin-bottom: 12px;
 }
 
-
+.pass-header strong {
+  color: var(--ope-vegetal);
+  font-size: 10px;
+}
 
 .pass-times,
-.pass-data{
-
-    display:grid;
-    grid-template-columns:
-    repeat(3,1fr);
-    gap:8px;
-
+.pass-data {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
 }
-
-
 
 .pass-times div,
-.pass-data div{
+.pass-data div {
+  background: rgba(243,241,234,.035);
+  border: 1px solid var(--ope-line-soft);
 
-    background:
-    rgba(255,255,255,.04);
+  padding: 8px;
+  border-radius: 2px;
 
-    padding:8px;
-    border-radius:6px;
-    font-size:13px;
-
+  font-size: 12px;
+  color: var(--ope-text);
 }
 
+/* =====================================================
+   SMALL LABELS
+===================================================== */
 
+small {
+  display: block;
 
-small{
+  color: var(--ope-muted);
+  font-family: var(--ope-mono);
 
-    display:block;
-    color:#71839b;
-    font-size:9px;
-    letter-spacing:1.5px;
-    margin-bottom:4px;
+  font-size: 9px;
+  letter-spacing: .07em;
 
+  margin-bottom: 4px;
 }
 
+/* =====================================================
+   PASS ROUTE
+===================================================== */
 
+.pass-route {
+  margin-top: 12px;
 
-.pass-route{
+  text-align: center;
 
-    margin-top:12px;
-    text-align:center;
-    color:#a9c7ef;
-    font-size:12px;
-    letter-spacing:2px;
+  color: var(--ope-atmospheric);
+  font-family: var(--ope-mono);
 
+  font-size: 10px;
+  letter-spacing: .1em;
 }
 
+/* =====================================================
+   MORE PASSES
+===================================================== */
 
-
-.more-passes{
-
-    margin-top:10px;
-    font-size:12px;
-    color:#8da6c5;
-
+.more-passes {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--ope-muted);
 }
 
+/* =====================================================
+   MINI PASS LIST
+===================================================== */
 
-
-.mini-pass{
-
-    padding:8px;
-    border-bottom:
-    1px solid rgba(255,255,255,.08);
-
+.mini-pass {
+  padding: 8px;
+  border-bottom: 1px solid var(--ope-line-soft);
 }
 
-.mini-header{
+.mini-header {
+  display: grid;
 
-    display:grid;
-    grid-template-columns:
-    45px
-    110px
-    90px
-    60px
-    70px;
-    gap:8px;
-    padding:10px 6px;
-    color:#71839b;
-    font-size:9px;
-    letter-spacing:1.5px;
-
-}
-
-
-
-.mini-pass{
-
-    display:grid;
-    grid-template-columns:
+  grid-template-columns:
     45px
     110px
     90px
     60px
     70px;
 
+  gap: 8px;
+  padding: 10px 6px;
 
-    align-items:center;
-    gap:8px;
-    padding:10px 6px;
-    border-bottom:
-    1px solid rgba(255,255,255,.08);
-    font-size:12px;
-    color:#cbd9ec;
+  color: var(--ope-muted);
+  font-family: var(--ope-mono);
 
+  font-size: 9px;
+  letter-spacing: .06em;
+
+  border-bottom: 1px solid var(--ope-line);
 }
 
+.mini-pass {
+  display: grid;
 
+  grid-template-columns:
+    45px
+    110px
+    90px
+    60px
+    70px;
 
-.mini-number{
-    color:#7da8d8;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 6px;
+
+  border-bottom: 1px solid var(--ope-line-soft);
+
+  font-size: 11px;
+  color: var(--ope-text);
 }
 
-
-
-.mini-quality{
-    font-size:11px;
+.mini-number {
+  color: var(--ope-atmospheric);
+  font-family: var(--ope-mono);
 }
 
-  .pass-date{
-    margin-bottom:12px;
-    padding:8px 10px;
-    background:
-    rgba(80,160,255,.06);
-    border-left:
-    2px solid rgba(100,200,255,.45);
-    border-radius:6px;
-    font-size:13px;
-    letter-spacing:2px;
-    color:#d8e9ff;
-
+.mini-quality {
+  font-size: 10px;
 }
 
+/* =====================================================
+   PASS DATE
+===================================================== */
 
-.pass-date small{
-    display:block;
-    margin-bottom:4px;
+.pass-date {
+  margin-bottom: 12px;
+  padding: 9px 10px;
 
+  background: rgba(113,149,163,.08);
+
+  border-left: 2px solid var(--ope-atmospheric);
+  border-radius: 0;
+
+  font-family: var(--ope-mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+
+  color: var(--ope-text);
+}
+
+.pass-date small {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* =====================================================
+   SECONDARY PANEL SCROLLBARS
+===================================================== */
+
+#satInfoPanel::-webkit-scrollbar,
+#missionPanel::-webkit-scrollbar {
+  width: 4px;
+}
+
+#satInfoPanel::-webkit-scrollbar-thumb,
+#missionPanel::-webkit-scrollbar-thumb {
+  background: rgba(113,149,163,.4);
+}
+
+#satInfoPanel::-webkit-scrollbar-track,
+#missionPanel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 600px) {
+
+  #ui {
+    top: 8px;
+    left: 8px;
+
+    width: min(360px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    max-height: 78vh;
+
+    padding: 16px;
+  }
+
+  #ui h3 {
+    font-size: 19px;
+  }
+
+  #satInfoPanel {
+    top: auto;
+    bottom: 10px;
+    right: 8px;
+
+    width: min(300px, calc(100vw - 16px));
+    max-height: 65vh;
+  }
+
+  #missionNav {
+    top: 8px;
+    gap: 5px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .missionSlot {
+    padding: 7px 9px;
+    gap: 6px;
+  }
+
+  .missionLabel {
+    font-size: 10px;
+  }
+
+  .missionSub {
+    font-size: 8px;
+  }
+
+  #missionPanel {
+    width: calc(100vw - 24px);
+    padding: 18px;
+  }
+
+  .mini-header,
+  .mini-pass {
+    grid-template-columns:
+      30px
+      minmax(65px, 1.2fr)
+      minmax(55px, 1fr)
+      40px
+      45px;
+
+    gap: 4px;
+  }
+
+  .mini-header {
+    font-size: 8px;
+  }
+
+  .mini-pass {
+    font-size: 10px;
+  }
+
+  .pass-card {
+    margin: 10px 0;
+  }
+
+  #satPatch {
+    width: 58px;
+    height: 58px;
+    bottom: 12px;
+    right: 12px;
+  }
 }
 
   /* ======================================================
