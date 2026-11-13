@@ -1596,9 +1596,11 @@ width:100%;
 }
 }
 
+
 /* =========================================
    BLOQUE PUBLICITARIO FLOTANTE
 ========================================= */
+
 #liteAdSlot {
   position: fixed;
   top: 50%;
@@ -1642,7 +1644,8 @@ width:100%;
 
 #liteAdImage {
   display: block;
-  width: 100%;
+  width: 370px;
+  max-width: 100%;
   height: auto;
 
   border-radius: 8px;
@@ -1657,14 +1660,25 @@ width:100%;
   opacity: 0;
 }
 
-/* Adaptación móvil */
+/* =========================================
+   ADAPTACIÓN RESPONSIVE
+========================================= */
 
 @media (max-width: 600px) {
+
   #liteAdSlot {
     width: 125px;
+    max-width: calc(100vw - 20px);
     right: 10px;
   }
+
+  #liteAdImage {
+    width: 100%;
+    max-width: 100%;
+  }
+
 }
+
   
 </style>
 </head>
