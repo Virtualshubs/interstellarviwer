@@ -352,7 +352,8 @@ button {
   top: 12px;
   left: 12px;
   z-index: 10;
-
+  overflow-y: auto;
+  overscroll-behavior: contain;
   width: 400px;
   max-width: calc(100vw - 24px);
   max-height: 85vh;
@@ -2422,6 +2423,15 @@ const savedCamera = {
 let moon;
 let moonGroup;
   let moonCameraMode = false;
+
+  // Evitar que el scroll del panel de tracking llegue a la escena 3D
+const trackingPanel = document.getElementById('ui');
+
+if (trackingPanel) {
+  trackingPanel.addEventListener('wheel', function (event) {
+    event.stopPropagation();
+  }, { passive: true });
+}
 
 
 // ======================================================
