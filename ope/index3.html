@@ -1645,6 +1645,487 @@
   }
 
 }
+
+
+    /* =====================================================
+   SEOD — INDUSTRIES EDITORIAL BOOK
+   ===================================================== */
+
+.industries-book {
+  position: relative;
+  overflow: hidden;
+}
+
+.industries-book-heading {
+  max-width: 760px;
+  margin-bottom: 55px;
+}
+
+.industries-book-heading h2 {
+  max-width: 700px;
+}
+
+
+/* BOOK CONTAINER */
+
+.industry-book {
+  position: relative;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+
+/* TWO PAGE SPREAD */
+
+.industry-book-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  min-height: 610px;
+
+  background: #F3F1EA;
+
+  box-shadow:
+    0 25px 65px rgba(0, 0, 0, .09);
+
+  perspective: 1600px;
+
+  position: relative;
+}
+
+
+/* LEFT PAGE */
+
+.industry-book-left {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+
+  background: #242522;
+}
+
+.industry-book-image {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.industry-book-image img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform 1s ease,
+    opacity .45s ease;
+}
+
+.industry-book-image img.is-changing {
+  opacity: .15;
+  transform: scale(1.035);
+}
+
+.industry-image-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    to top,
+    rgba(10, 12, 12, .55),
+    rgba(10, 12, 12, .02) 45%
+  );
+}
+
+.industry-image-caption {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 25px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  color: #fff;
+
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+
+
+/* RIGHT PAGE */
+
+.industry-book-right {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding: 32px 42px 25px;
+
+  background: #F3F1EA;
+  color: #242522;
+
+  transform-origin: left center;
+
+  transform-style: preserve-3d;
+
+  box-shadow:
+    inset 1px 0 rgba(36, 37, 34, .12);
+
+  transition:
+    transform .55s cubic-bezier(.2,.65,.25,1),
+    box-shadow .55s ease;
+}
+
+
+/* PAGE TURN EFFECT */
+
+.industry-book-spread.turn-next .industry-book-right {
+  transform: perspective(1600px) rotateY(-7deg);
+  box-shadow: -15px 0 35px rgba(0, 0, 0, .12);
+}
+
+.industry-book-spread.turn-prev .industry-book-right {
+  transform: perspective(1600px) rotateY(7deg);
+  box-shadow: 15px 0 35px rgba(0, 0, 0, .12);
+}
+
+
+/* PAGE HEADER */
+
+.industry-page-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  padding-bottom: 17px;
+
+  border-bottom: 1px solid rgba(36, 37, 34, .18);
+
+  color: #65665F;
+
+  font-size: 9px;
+  letter-spacing: .11em;
+}
+
+
+/* PAGE CONTENT */
+
+.industry-page-content {
+  flex: 1;
+  padding: 38px 0 25px;
+}
+
+.industry-page-eyebrow {
+  margin-bottom: 12px;
+
+  color: #416D80;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+
+.industry-page-content h3 {
+  margin: 0 0 17px;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(30px, 3.3vw, 43px);
+  line-height: 1.05;
+  letter-spacing: -.045em;
+
+  font-weight: 500;
+}
+
+.industry-page-description {
+  max-width: 440px;
+
+  margin: 0 0 30px;
+
+  color: #64655F;
+
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+
+/* APPLICATIONS */
+
+.industry-applications {
+  display: flex;
+  flex-direction: column;
+}
+
+.industry-application {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 13px;
+
+  padding: 17px 0;
+
+  border-top: 1px solid rgba(36, 37, 34, .16);
+}
+
+.industry-application-index {
+  padding-top: 2px;
+
+  color: #92938A;
+
+  font-size: 10px;
+}
+
+.industry-application-product {
+  margin-bottom: 5px;
+
+  color: #416D80;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .09em;
+}
+
+.industry-application h4 {
+  margin: 0 0 5px;
+
+  color: #242522;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.industry-application p {
+  max-width: 430px;
+
+  margin: 0;
+
+  color: #66675F;
+
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+
+/* PAGE FOOTER */
+
+.industry-page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-top: 17px;
+
+  border-top: 1px solid rgba(36, 37, 34, .18);
+
+  color: #77786F;
+
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+
+/* BOOK NAVIGATION */
+
+.industry-book-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+
+  margin-top: 32px;
+}
+
+.industry-book-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid rgba(36, 37, 34, .3);
+  border-radius: 50%;
+
+  background: transparent;
+  color: inherit;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  transition:
+    background .25s ease,
+    color .25s ease,
+    transform .25s ease;
+}
+
+.industry-book-arrow:hover {
+  background: #242522;
+  color: #F3F1EA;
+  transform: translateY(-2px);
+}
+
+.industry-book-arrow:focus-visible,
+.industry-book-chapter:focus-visible {
+  outline: 2px solid #416D80;
+  outline-offset: 4px;
+}
+
+
+/* CHAPTER INDICATORS */
+
+.industry-book-chapters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.industry-book-chapter {
+  width: 24px;
+  height: 24px;
+
+  padding: 0;
+
+  border: 0;
+  border-bottom: 1px solid transparent;
+
+  background: transparent;
+  color: #85867F;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+
+  cursor: pointer;
+
+  transition:
+    color .25s ease,
+    border-color .25s ease;
+}
+
+.industry-book-chapter.is-active {
+  color: #242522;
+  border-bottom-color: #416D80;
+}
+
+
+/* BOOK STATUS */
+
+.industry-book-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 17px;
+
+  color: #898A82;
+
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+
+  .industry-book-spread {
+    min-height: 560px;
+  }
+
+  .industry-book-right {
+    padding: 27px 27px 22px;
+  }
+
+  .industry-page-content {
+    padding-top: 28px;
+  }
+
+  .industry-page-description {
+    font-size: 13px;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .industries-book-heading {
+    margin-bottom: 35px;
+  }
+
+  .industry-book-spread {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .industry-book-left {
+    min-height: 310px;
+  }
+
+  .industry-book-right {
+    min-height: 510px;
+    padding: 25px 24px 22px;
+  }
+
+  .industry-page-content {
+    padding: 30px 0 20px;
+  }
+
+  .industry-page-content h3 {
+    font-size: 34px;
+  }
+
+  .industry-image-caption {
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+
+    font-size: 8px;
+  }
+
+  .industry-book-navigation {
+    gap: 16px;
+  }
+
+  .industry-book-chapters {
+    gap: 4px;
+  }
+
+  .industry-book-chapter {
+    width: 22px;
+  }
+
+  .industry-book-status {
+    font-size: 8px;
+  }
+
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .industry-book-right,
+  .industry-book-image img,
+  .industry-book-arrow,
+  .industry-book-chapter {
+    transition: none !important;
+  }
+
+}
   </style>
 </head>
 
@@ -2165,118 +2646,250 @@
 
     <!-- INDUSTRIES -->
 
- <section class="section industries">
+ <section class="section industries-book" id="industries">
 
   <div class="inner">
 
-    <div class="section-head" data-reveal>
+    <!-- SECTION INTRO -->
 
-      <div class="section-number mono" hidden>
-        03 / Industries
+    <div class="industries-book-heading" data-reveal>
+
+      <div class="eyebrow">
+        Industries & Applications
       </div>
 
-      <div class="industries-intro">
+      <h2>
+        Spatial intelligence across industries.
+      </h2>
 
-        <div class="eyebrow" data-i18n="industries_eyebrow">
-          Industries
-        </div>
-
-        <h2 data-i18n="industries_title">
-          Technology with applications across sectors.
-        </h2>
-
-        <p class="intro-copy" data-i18n="industries_intro">
-          Our technologies address spatial information challenges across
-          different industries, extending the applications of observation
-          and computational systems.
-        </p>
-
-      </div>
-
-      <figure class="industries-image">
-        <img
-          src="images/industries-observation.jpg"
-          alt="Spatial observation of natural and built environments"
-          loading="lazy"
-        >
-        <figcaption class="mono">
-          SPATIAL TECHNOLOGIES / CROSS-SECTOR APPLICATIONS
-        </figcaption>
-      </figure>
+      <p class="intro-copy">
+        Exploring how observation, spatial data and 3D technologies
+        can address challenges across different fields.
+      </p>
 
     </div>
 
-    <div class="industry-list" data-reveal>
 
-      <article class="industry-row">
-        <span class="nav-index">01</span>
-        <h3 data-i18n="industry_agriculture">Agriculture</h3>
-        <p data-i18n="industry_agriculture_text">
-          Territorial information, crop monitoring and spatial analysis.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+    <!-- BOOK -->
 
-      <article class="industry-row">
-        <span class="nav-index">02</span>
-        <h3 data-i18n="industry_forestry">Forestry</h3>
-        <p data-i18n="industry_forestry_text">
-          Forest observation, vegetation monitoring and environmental information.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+    <div class="industry-book" id="industryBook">
 
-      <article class="industry-row">
-        <span class="nav-index">03</span>
-        <h3 data-i18n="industry_construction">Construction</h3>
-        <p data-i18n="industry_construction_text">
-          Spatial context, infrastructure and 3D environments.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+      <div class="industry-book-spread">
 
-      <article class="industry-row">
-        <span class="nav-index">04</span>
-        <h3 data-i18n="industry_mining">Mining</h3>
-        <p data-i18n="industry_mining_text">
-          Territorial observation, surface information and spatial monitoring.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+        <!-- LEFT PAGE / PHOTOGRAPH -->
 
-      <article class="industry-row">
-        <span class="nav-index">05</span>
-        <h3 data-i18n="industry_energy">Energy</h3>
-        <p data-i18n="industry_energy_text">
-          Infrastructure, territorial analysis and environmental observation.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+        <div class="industry-book-left">
 
-      <article class="industry-row">
-        <span class="nav-index">06</span>
-        <h3 data-i18n="industry_heritage">Heritage</h3>
-        <p data-i18n="industry_heritage_text">
-          Documentation, digital preservation and 3D representation.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+          <div class="industry-book-image">
 
-      <article class="industry-row">
-        <span class="nav-index">07</span>
-        <h3 data-i18n="industry_research">Research</h3>
-        <p data-i18n="industry_research_text">
-          Spatial datasets, scientific observation and analytical exploration.
-        </p>
-        <span class="industry-arrow">↗</span>
-      </article>
+            <img
+              id="industryBookImage"
+              src="images/industries/agriculture.jpg"
+              alt="Agricultural landscape"
+            >
+
+            <div class="industry-image-overlay"></div>
+
+            <div class="industry-image-caption mono">
+              <span id="industryImageCaption">
+                AGRICULTURAL LANDSCAPES
+              </span>
+
+              <span id="industryImageNumber">
+                01 / 07
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- RIGHT PAGE / CONTENT -->
+
+        <div class="industry-book-right">
+
+          <div class="industry-page-top">
+
+            <span class="mono" id="industryPageCategory">
+              INDUSTRY / 01
+            </span>
+
+            <span class="mono">
+              SEOD / APPLICATIONS
+            </span>
+
+          </div>
+
+
+          <div class="industry-page-content">
+
+            <div class="industry-page-eyebrow" id="industryPageEyebrow">
+              AGRICULTURE
+            </div>
+
+            <h3 id="industryPageTitle">
+              Agriculture
+            </h3>
+
+            <p class="industry-page-description"
+              id="industryPageDescription">
+              Understanding agricultural landscapes through
+              spatial observation, data integration and
+              environmental analysis.
+            </p>
+
+
+            <!-- THREE APPLICATIONS -->
+
+            <div class="industry-applications">
+
+              <article class="industry-application">
+
+                <div class="industry-application-index mono">
+                  01
+                </div>
+
+                <div class="industry-application-content">
+
+                  <div class="industry-application-product">
+                    OPE / ORBITAL PASS ENGINE
+                  </div>
+
+                  <h4 id="industryUse1Title">
+                    Orbital observation
+                  </h4>
+
+                  <p id="industryUse1Text">
+                    Explore satellite observation opportunities
+                    and monitor agricultural territories.
+                  </p>
+
+                </div>
+
+              </article>
+
+
+              <article class="industry-application">
+
+                <div class="industry-application-index mono">
+                  02
+                </div>
+
+                <div class="industry-application-content">
+
+                  <div class="industry-application-product">
+                    JANUS / SPACE READER
+                  </div>
+
+                  <h4 id="industryUse2Title">
+                    Temporal data analysis
+                  </h4>
+
+                  <p id="industryUse2Text">
+                    Integrate observation collections and
+                    compare information across different dates.
+                  </p>
+
+                </div>
+
+              </article>
+
+
+              <article class="industry-application">
+
+                <div class="industry-application-index mono">
+                  03
+                </div>
+
+                <div class="industry-application-content">
+
+                  <div class="industry-application-product">
+                    3D TWINS LITE
+                  </div>
+
+                  <h4 id="industryUse3Title">
+                    3D environment visualization
+                  </h4>
+
+                  <p id="industryUse3Text">
+                    Visualize and share 3D terrain and
+                    infrastructure repositories.
+                  </p>
+
+                </div>
+
+              </article>
+
+            </div>
+
+          </div>
+
+
+          <div class="industry-page-footer">
+
+            <span class="mono">
+              SPATIAL COMPUTING TECHNOLOGIES
+            </span>
+
+            <span class="mono" id="industryPageNumber">
+              01
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOOK NAVIGATION -->
+
+      <div class="industry-book-navigation">
+
+        <button
+          type="button"
+          class="industry-book-arrow"
+          id="industryBookPrev"
+          aria-label="Previous industry">
+          ←
+        </button>
+
+        <div class="industry-book-chapters"
+          id="industryBookChapters"
+          aria-label="Select industry">
+        </div>
+
+        <button
+          type="button"
+          class="industry-book-arrow"
+          id="industryBookNext"
+          aria-label="Next industry">
+          →
+        </button>
+
+      </div>
+
+
+      <!-- BOOK STATUS -->
+
+      <div class="industry-book-status">
+
+        <span class="mono">
+          SEOD / INDUSTRIAL APPLICATIONS
+        </span>
+
+        <span class="mono" id="industryBookCounter">
+          01 — 07
+        </span>
+
+      </div>
 
     </div>
 
   </div>
 
 </section>
-
 
     <!-- SELECTED OBSERVATIONS -->
 
@@ -3240,6 +3853,510 @@ hero_cta_2: "Descubrir nuestros productos",
   /* INITIAL STATE */
 
   updateLayers();
+
+})();
+</script>
+  <script>
+/* =====================================================
+   SEOD — INTERACTIVE INDUSTRY BOOK
+   ===================================================== */
+
+(function () {
+
+  const book = document.getElementById("industryBook");
+
+  if (!book || book.dataset.initialized === "true") return;
+
+  book.dataset.initialized = "true";
+
+  const spread = book.querySelector(".industry-book-spread");
+
+  const image = document.getElementById("industryBookImage");
+  const imageCaption = document.getElementById("industryImageCaption");
+  const imageNumber = document.getElementById("industryImageNumber");
+
+  const category = document.getElementById("industryPageCategory");
+  const eyebrow = document.getElementById("industryPageEyebrow");
+  const title = document.getElementById("industryPageTitle");
+  const description = document.getElementById("industryPageDescription");
+
+  const pageNumber = document.getElementById("industryPageNumber");
+  const counter = document.getElementById("industryBookCounter");
+
+  const chapterNav = document.getElementById("industryBookChapters");
+
+  const prevButton = document.getElementById("industryBookPrev");
+  const nextButton = document.getElementById("industryBookNext");
+
+
+  /* =====================================================
+     INDUSTRY CONTENT
+     ===================================================== */
+
+  const industries = [
+
+    {
+      name: "Agriculture",
+      category: "AGRICULTURE",
+      image: "images/industries/agriculture.jpg",
+      imageAlt: "Aerial view of agricultural fields",
+      caption: "AGRICULTURAL LANDSCAPES",
+
+      description:
+        "Understand agricultural territories through satellite observation, historical data and spatial analysis. Connect information from different sources to explore crop environments and their evolution.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Satellite observation planning",
+          text:
+            "Explore orbital passes, observation geometry and satellite coverage to understand when and how agricultural territories can be observed."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Crop evolution analysis",
+          text:
+            "Integrate satellite observation collections and examine changes across locations, dates and descriptive variables."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "Agricultural environments in 3D",
+          text:
+            "Visualize and share 3D representations of agricultural land, terrain, facilities and related infrastructure."
+        }
+
+      ]
+    },
+
+
+    {
+      name: "Forestry",
+      category: "FORESTRY",
+      image: "images/industries/forestry.jpg",
+      imageAlt: "Aerial view of forest canopy",
+      caption: "FOREST ENVIRONMENTS",
+
+      description:
+        "Connect forest observation with territorial information to explore vegetation, landscape changes and environmental conditions across large areas.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Forest observation coverage",
+          text:
+            "Explore satellite observation opportunities and orbital coverage over forest territories."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Vegetation history and monitoring",
+          text:
+            "Organize observations from different dates and collections to investigate spatial and temporal patterns in forest environments."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "3D forest and terrain models",
+          text:
+            "Publish and share interactive 3D representations of forest areas, terrain and environmental assets."
+        }
+
+      ]
+    },
+
+
+    {
+      name: "Construction",
+      category: "CONSTRUCTION",
+      image: "images/industries/construction.jpg",
+      imageAlt: "Aerial view of construction and infrastructure",
+      caption: "BUILT ENVIRONMENTS",
+
+      description:
+        "Bring territorial context, observation data and 3D assets together to understand construction environments and the spatial relationships surrounding infrastructure projects.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Territorial observation",
+          text:
+            "Explore satellite coverage and observation geometry over construction sites and surrounding territories."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Spatial project context",
+          text:
+            "Integrate geospatial observations and datasets to examine the evolution and characteristics of project environments."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "3D project visualization",
+          text:
+            "Create interactive libraries for visualizing and sharing BIM models, architectural assets and infrastructure repositories."
+        }
+
+      ]
+    },
+
+
+    {
+      name: "Mining",
+      category: "MINING",
+      image: "images/industries/mining.jpg",
+      imageAlt: "Aerial view of an open pit mine",
+      caption: "EXTRACTIVE LANDSCAPES",
+
+      description:
+        "Explore large extractive territories through satellite observation, spatial datasets and 3D representations of terrain and industrial environments.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Observation of mining territories",
+          text:
+            "Explore satellite passes and observation coverage over mining areas and their surrounding environments."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Surface change analysis",
+          text:
+            "Organize multi-temporal observation collections to investigate changes in mining landscapes and surface conditions."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "3D mine environments",
+          text:
+            "Visualize and distribute 3D terrain models, excavation environments and industrial infrastructure."
+        }
+
+      ]
+    },
+
+
+    {
+      name: "Energy",
+      category: "ENERGY",
+      image: "images/industries/energy.jpg",
+      imageAlt: "Aerial view of energy infrastructure",
+      caption: "ENERGY INFRASTRUCTURES",
+
+      description:
+        "Connect observation, territorial information and 3D models to explore energy infrastructure and the environments in which it operates.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Infrastructure observation",
+          text:
+            "Explore orbital observation opportunities over energy installations, transmission corridors and surrounding territories."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Territorial and environmental analysis",
+          text:
+            "Integrate spatial observations and datasets to examine infrastructure environments and their changes over time."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "Energy assets in 3D",
+          text:
+            "Visualize and share interactive 3D representations of energy facilities, installations and engineering models."
+        }
+
+      ]
+    },
+
+
+    {
+      name: "Heritage",
+      category: "HERITAGE",
+      image: "images/industries/heritage.jpg",
+      imageAlt: "Aerial view of a historic archaeological site",
+      caption: "CULTURAL LANDSCAPES",
+
+      description:
+        "Extend the documentation and understanding of cultural heritage by connecting territorial observation, historical spatial information and digital 3D representations.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Landscape and site observation",
+          text:
+            "Explore satellite observation coverage over archaeological sites, historic landscapes and heritage environments."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Historical spatial information",
+          text:
+            "Integrate geospatial observations and historical collections to investigate landscape evolution and territorial context."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "Digital heritage libraries",
+          text:
+            "Visualize and share 3D digitizations of archaeological objects, monuments, sculptures and cultural assets."
+        }
+
+      ]
+    },
+
+
+    {
+      name: "Research",
+      category: "RESEARCH",
+      image: "images/industries/research.jpg",
+      imageAlt: "Scientific Earth observation and research environment",
+      caption: "SCIENTIFIC OBSERVATION",
+
+      description:
+        "Support scientific exploration by connecting heterogeneous spatial datasets, observation histories and digital representations across research disciplines.",
+
+      applications: [
+
+        {
+          product: "OPE / ORBITAL PASS ENGINE",
+          title: "Orbital observation exploration",
+          text:
+            "Explore satellite missions, orbital passes and observation geometry to support the planning and interpretation of Earth observation data."
+        },
+
+        {
+          product: "JANUS / SPACE READER",
+          title: "Multi-source data exploitation",
+          text:
+            "Integrate spatial catalogues and analyze large collections of observations across geographical, temporal and descriptive dimensions."
+        },
+
+        {
+          product: "3D TWINS LITE",
+          title: "Scientific 3D dissemination",
+          text:
+            "Publish interactive 3D research models and create accessible visual libraries for sharing scientific assets."
+        }
+
+      ]
+    }
+
+  ];
+
+
+  /* =====================================================
+     STATE
+     ===================================================== */
+
+  let currentIndex = 0;
+  let isAnimating = false;
+
+  const total = industries.length;
+
+  const applications = [
+    {
+      title: document.getElementById("industryUse1Title"),
+      text: document.getElementById("industryUse1Text"),
+      product: book.querySelectorAll(".industry-application-product")[0]
+    },
+    {
+      title: document.getElementById("industryUse2Title"),
+      text: document.getElementById("industryUse2Text"),
+      product: book.querySelectorAll(".industry-application-product")[1]
+    },
+    {
+      title: document.getElementById("industryUse3Title"),
+      text: document.getElementById("industryUse3Text"),
+      product: book.querySelectorAll(".industry-application-product")[2]
+    }
+  ];
+
+
+  /* =====================================================
+     CHAPTER NAVIGATION
+     ===================================================== */
+
+  industries.forEach((industry, index) => {
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "industry-book-chapter";
+
+    button.textContent = String(index + 1).padStart(2, "0");
+
+    button.setAttribute(
+      "aria-label",
+      "Open chapter " + (index + 1) + ": " + industry.name
+    );
+
+    button.addEventListener("click", () => {
+      changeIndustry(index);
+    });
+
+    chapterNav.appendChild(button);
+
+  });
+
+
+  const chapterButtons = Array.from(
+    chapterNav.querySelectorAll(".industry-book-chapter")
+  );
+
+
+  /* =====================================================
+     RENDER CHAPTER
+     ===================================================== */
+
+  function renderIndustry(index) {
+
+    const industry = industries[index];
+
+    const number = String(index + 1).padStart(2, "0");
+    const totalNumber = String(total).padStart(2, "0");
+
+    image.src = industry.image;
+    image.alt = industry.imageAlt;
+
+    imageCaption.textContent = industry.caption;
+    imageNumber.textContent = number + " / " + totalNumber;
+
+    category.textContent = "INDUSTRY / " + number;
+    eyebrow.textContent = industry.category;
+
+    title.textContent = industry.name;
+    description.textContent = industry.description;
+
+    pageNumber.textContent = number;
+
+    counter.textContent = number + " — " + totalNumber;
+
+
+    /* UPDATE THREE APPLICATIONS */
+
+    industry.applications.forEach((application, i) => {
+
+      applications[i].product.textContent = application.product;
+      applications[i].title.textContent = application.title;
+      applications[i].text.textContent = application.text;
+
+    });
+
+
+    /* UPDATE CHAPTER NAVIGATION */
+
+    chapterButtons.forEach((button, i) => {
+
+      const active = i === index;
+
+      button.classList.toggle("is-active", active);
+
+      button.setAttribute(
+        "aria-current",
+        active ? "page" : "false"
+      );
+
+    });
+
+  }
+
+
+  /* =====================================================
+     PAGE TURN
+     ===================================================== */
+
+  function changeIndustry(index) {
+
+    if (isAnimating) return;
+
+    if (index < 0) {
+      index = total - 1;
+    }
+
+    if (index >= total) {
+      index = 0;
+    }
+
+    if (index === currentIndex) return;
+
+    const direction = index > currentIndex ||
+      (currentIndex === total - 1 && index === 0)
+      ? "next"
+      : "prev";
+
+    isAnimating = true;
+
+    spread.classList.add("turn-" + direction);
+    image.classList.add("is-changing");
+
+    window.setTimeout(() => {
+
+      currentIndex = index;
+
+      renderIndustry(currentIndex);
+
+      image.classList.remove("is-changing");
+
+    }, 260);
+
+    window.setTimeout(() => {
+
+      spread.classList.remove("turn-next", "turn-prev");
+
+      isAnimating = false;
+
+    }, 600);
+
+  }
+
+
+  /* =====================================================
+     PREVIOUS / NEXT
+     ===================================================== */
+
+  prevButton.addEventListener("click", () => {
+    changeIndustry(currentIndex - 1);
+  });
+
+  nextButton.addEventListener("click", () => {
+    changeIndustry(currentIndex + 1);
+  });
+
+
+  /* =====================================================
+     KEYBOARD NAVIGATION
+     ===================================================== */
+
+  book.addEventListener("keydown", event => {
+
+    if (event.key === "ArrowRight") {
+      changeIndustry(currentIndex + 1);
+    }
+
+    if (event.key === "ArrowLeft") {
+      changeIndustry(currentIndex - 1);
+    }
+
+  });
+
+
+  /* =====================================================
+     INITIALIZE
+     ===================================================== */
+
+  renderIndustry(currentIndex);
 
 })();
 </script>
