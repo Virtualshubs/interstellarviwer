@@ -2126,6 +2126,250 @@
   }
 
 }
+    
+/* =====================================================
+   SEOD — REALISTIC PAGE CORNER CURL
+   ===================================================== */
+
+.industry-book-right {
+  isolation: isolate;
+}
+
+/* Soft shadow beneath the folding corner */
+
+.industry-book-right::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 155px;
+  height: 175px;
+
+  z-index: 4;
+  pointer-events: none;
+
+  opacity: 0;
+
+  background: radial-gradient(
+    ellipse at top right,
+    rgba(0, 0, 0, .30),
+    rgba(0, 0, 0, .12) 35%,
+    transparent 72%
+  );
+
+  transform-origin: top right;
+}
+
+/* The actual paper corner */
+
+.industry-book-right::after {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 145px;
+  height: 165px;
+
+  z-index: 5;
+  pointer-events: none;
+
+  opacity: 0;
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%
+  );
+
+  background: linear-gradient(
+    225deg,
+    #ffffff 0%,
+    #e8e5dc 24%,
+    #d5d1c7 48%,
+    rgba(36, 37, 34, .10) 70%,
+    transparent 100%
+  );
+
+  transform-origin: top right;
+
+  backface-visibility: hidden;
+}
+
+/* NEXT PAGE */
+
+.industry-book-spread.turn-next .industry-book-right::before {
+  animation: industry-curl-shadow-next .6s ease-in-out both;
+}
+
+.industry-book-spread.turn-next .industry-book-right::after {
+  animation: industry-curl-next .6s cubic-bezier(.25,.65,.25,1) both;
+}
+
+/* PREVIOUS PAGE */
+
+.industry-book-spread.turn-prev .industry-book-right::before {
+  animation: industry-curl-shadow-prev .6s ease-in-out both;
+}
+
+.industry-book-spread.turn-prev .industry-book-right::after {
+  animation: industry-curl-prev .6s cubic-bezier(.25,.65,.25,1) both;
+}
+
+
+/* CURL ANIMATIONS */
+
+@keyframes industry-curl-next {
+
+  0% {
+    opacity: 0;
+    transform: perspective(700px) rotateY(0deg) rotateX(0deg);
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  38% {
+    transform:
+      perspective(700px)
+      rotateY(-48deg)
+      rotateX(17deg)
+      translateX(-9px);
+  }
+
+  65% {
+    opacity: .95;
+    transform:
+      perspective(700px)
+      rotateY(-105deg)
+      rotateX(25deg)
+      translateX(-18px);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      perspective(700px)
+      rotateY(-155deg)
+      rotateX(8deg)
+      translateX(-25px);
+  }
+
+}
+
+
+@keyframes industry-curl-prev {
+
+  0% {
+    opacity: 0;
+    transform: perspective(700px) rotateY(0deg) rotateX(0deg);
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  38% {
+    transform:
+      perspective(700px)
+      rotateY(48deg)
+      rotateX(17deg)
+      translateX(-9px);
+  }
+
+  65% {
+    opacity: .95;
+    transform:
+      perspective(700px)
+      rotateY(105deg)
+      rotateX(25deg)
+      translateX(-18px);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      perspective(700px)
+      rotateY(155deg)
+      rotateX(8deg)
+      translateX(-25px);
+  }
+
+}
+
+
+@keyframes industry-curl-shadow-next {
+
+  0%, 100% {
+    opacity: 0;
+    transform: scale(.65);
+  }
+
+  25% {
+    opacity: .9;
+    transform: scale(1);
+  }
+
+  65% {
+    opacity: .65;
+    transform: scale(1.2);
+  }
+
+}
+
+
+@keyframes industry-curl-shadow-prev {
+
+  0%, 100% {
+    opacity: 0;
+    transform: scale(.65);
+  }
+
+  25% {
+    opacity: .9;
+    transform: scale(1);
+  }
+
+  65% {
+    opacity: .65;
+    transform: scale(1.2);
+  }
+
+}
+
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+
+  .industry-book-right::before {
+    width: 115px;
+    height: 130px;
+  }
+
+  .industry-book-right::after {
+    width: 110px;
+    height: 125px;
+  }
+
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .industry-book-right::before,
+  .industry-book-right::after {
+    animation: none !important;
+  }
+
+}
+
   </style>
 </head>
 
@@ -3856,7 +4100,8 @@ hero_cta_2: "Descubrir nuestros productos",
 
 })();
 </script>
-  <script>
+
+<script>
 /* =====================================================
    SEOD — INTERACTIVE INDUSTRY BOOK
    ===================================================== */
@@ -4185,6 +4430,109 @@ hero_cta_2: "Descubrir nuestros productos",
 
 
   /* =====================================================
+     REAL-TIME PAPER TURN SOUND
+     ===================================================== */
+
+  let pageAudioContext = null;
+  let pageNoiseBuffer = null;
+
+  function playPageTurnSound() {
+
+    try {
+
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContextClass) return;
+
+      if (!pageAudioContext) {
+
+        pageAudioContext = new AudioContextClass();
+
+        const sampleRate = pageAudioContext.sampleRate;
+        const duration = 0.35;
+
+        pageNoiseBuffer = pageAudioContext.createBuffer(
+          1,
+          Math.floor(sampleRate * duration),
+          sampleRate
+        );
+
+        const channel = pageNoiseBuffer.getChannelData(0);
+
+        for (let i = 0; i < channel.length; i++) {
+          channel[i] = Math.random() * 2 - 1;
+        }
+
+      }
+
+      const audio = pageAudioContext;
+
+      if (audio.state === "suspended") {
+        audio.resume();
+      }
+
+      const now = audio.currentTime;
+
+
+      /* PAPER FRICTION */
+
+      const noise = audio.createBufferSource();
+      noise.buffer = pageNoiseBuffer;
+
+      const filter = audio.createBiquadFilter();
+
+      filter.type = "bandpass";
+
+      filter.frequency.setValueAtTime(1250, now);
+      filter.frequency.exponentialRampToValueAtTime(550, now + 0.3);
+
+      filter.Q.value = 0.65;
+
+      const noiseVolume = audio.createGain();
+
+      noiseVolume.gain.setValueAtTime(0.0001, now);
+      noiseVolume.gain.exponentialRampToValueAtTime(0.045, now + 0.07);
+      noiseVolume.gain.exponentialRampToValueAtTime(0.0001, now + 0.34);
+
+      noise.connect(filter);
+      filter.connect(noiseVolume);
+      noiseVolume.connect(audio.destination);
+
+      noise.start(now);
+      noise.stop(now + 0.36);
+
+
+      /* SOFT PAPER MOVEMENT */
+
+      const tone = audio.createOscillator();
+      const toneVolume = audio.createGain();
+
+      tone.type = "sine";
+
+      tone.frequency.setValueAtTime(190, now);
+      tone.frequency.exponentialRampToValueAtTime(105, now + 0.22);
+
+      toneVolume.gain.setValueAtTime(0.0001, now);
+      toneVolume.gain.exponentialRampToValueAtTime(0.012, now + 0.04);
+      toneVolume.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+
+      tone.connect(toneVolume);
+      toneVolume.connect(audio.destination);
+
+      tone.start(now);
+      tone.stop(now + 0.27);
+
+    } catch (error) {
+
+      /* Audio is optional: navigation must always work. */
+
+    }
+
+  }
+
+
+  /* =====================================================
      CHAPTER NAVIGATION
      ===================================================== */
 
@@ -4263,10 +4611,11 @@ hero_cta_2: "Descubrir nuestros productos",
 
       button.classList.toggle("is-active", active);
 
-      button.setAttribute(
-        "aria-current",
-        active ? "page" : "false"
-      );
+      if (active) {
+        button.setAttribute("aria-current", "page");
+      } else {
+        button.removeAttribute("aria-current");
+      }
 
     });
 
@@ -4298,8 +4647,19 @@ hero_cta_2: "Descubrir nuestros productos",
 
     isAnimating = true;
 
+
+    /* PLAY PAPER SOUND */
+
+    playPageTurnSound();
+
+
+    /* START PAGE TURN */
+
     spread.classList.add("turn-" + direction);
     image.classList.add("is-changing");
+
+
+    /* CHANGE CONTENT DURING THE TURN */
 
     window.setTimeout(() => {
 
@@ -4310,6 +4670,9 @@ hero_cta_2: "Descubrir nuestros productos",
       image.classList.remove("is-changing");
 
     }, 260);
+
+
+    /* FINISH PAGE TURN */
 
     window.setTimeout(() => {
 
@@ -4360,6 +4723,7 @@ hero_cta_2: "Descubrir nuestros productos",
 
 })();
 </script>
+
   
 </body>
 </html>
