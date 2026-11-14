@@ -3294,6 +3294,25 @@
 
 }
 
+
+
+    #product-viewer {
+  position: fixed;
+  inset: var(--nav-height) 0 0;
+  z-index: 90;
+  background: var(--paper);
+}
+
+#product-viewer:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
+#product-frame {
+  width: 100%;
+  flex: 1;
+  border: 0;
+}
   </style>
 </head>
 
@@ -4308,99 +4327,106 @@
 
     <!-- PRODUCTS -->
 
-    <section class="section products" id="products">
 
-      <div class="inner">
+<section class="section products" id="products">
 
-        <div class="section-head" data-reveal>
+  <div class="inner">
 
-          <div class="section-number mono" hidden>
-            05 / Proprietary technologies
-          </div>
+    <div class="section-head" data-reveal>
 
-          <div>
-            <div class="eyebrow" data-i18n="products_eyebrow">
-              Proprietary technologies
-            </div>
-
-            <h2 data-i18n="products_title">
-              Technologies developed by SEOD.
-            </h2>
-
-            <p class="intro-copy" data-i18n="products_intro">
-              Our products translate spatial computing, observation and data
-              technologies into practical tools for different applications.
-            </p>
-          </div>
-
-        </div>
-
-        <div class="product-list" data-reveal>
-
-          <article class="product-row">
-            <span class="nav-index">01</span>
-
-            <h3>
-              OPE
-              <span>Orbital Pass Engine</span>
-            </h3>
-
-            <p data-i18n="ope_description">
-              Orbital operations, Earth observation and spatial simulation.
-            </p>
-
-            <!-- Replace with the definitive OPE URL -->
-            <a class="product-link" href="/ope/"
-              data-i18n="product_explore">
-              Explore product ↗
-            </a>
-          </article>
-
-          <article class="product-row">
-            <span class="nav-index">02</span>
-
-            <h3>
-              JANUS
-              <span>Space Reader</span>
-            </h3>
-
-            <p data-i18n="janus_description">
-              Spatial data integration, catalogue exploration and analytical exploitation.
-            </p>
-
-            <!-- Replace with the definitive JANUS URL -->
-            <a class="product-link" href="/janus/"
-              data-i18n="product_explore">
-              Explore product ↗
-            </a>
-          </article>
-
-          <article class="product-row">
-            <span class="nav-index">03</span>
-
-            <h3>
-             3D Lite Space
-              <span>3D repository visualization</span>
-            </h3>
-
-            <p data-i18n="lite_description">
-              Interactive visualization and distribution of existing 3D repositories.
-            </p>
-
-            <a class="product-link"
-              href="https://lite.3dtwins.tech/"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-i18n="product_explore">
-              Explore product ↗
-            </a>
-          </article>
-
-        </div>
+      <div class="section-number mono" hidden>
+        05 / Proprietary technologies
       </div>
-    </section>
+
+      <div>
+        <div class="eyebrow" data-i18n="products_eyebrow">
+          Proprietary technologies
+        </div>
+
+        <h2 data-i18n="products_title">
+          Technologies developed by SEOD.
+        </h2>
+
+        <p class="intro-copy" data-i18n="products_intro">
+          Our products translate spatial computing, observation and data
+          technologies into practical tools for different applications.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="product-list" data-reveal>
+
+      <article class="product-row">
+        <span class="nav-index">01</span>
+
+        <h3>
+          OPE
+          <span>Orbital Pass Engine</span>
+        </h3>
+
+        <p data-i18n="ope_description">
+          Orbital operations, Earth observation and spatial simulation.
+        </p>
+
+        <a class="product-link"
+           href="/ope/"
+           data-product-frame
+           data-i18n="product_explore">
+          Explore product ↗
+        </a>
+      </article>
+
+      <article class="product-row">
+        <span class="nav-index">02</span>
+
+        <h3>
+          JANUS
+          <span>Space Reader</span>
+        </h3>
+
+        <p data-i18n="janus_description">
+          Spatial data integration, catalogue exploration and analytical exploitation.
+        </p>
+
+        <a class="product-link"
+           href="/janus/"
+           data-product-frame
+           data-i18n="product_explore">
+          Explore product ↗
+        </a>
+      </article>
+
+      <article class="product-row">
+        <span class="nav-index">03</span>
+
+        <h3>
+          3D Lite Space
+          <span>3D repository visualization</span>
+        </h3>
+
+        <p data-i18n="lite_description">
+          Interactive visualization and distribution of existing 3D repositories.
+        </p>
+
+        <a class="product-link"
+           href="https://lite.3dtwins.tech/"
+           target="_blank"
+           rel="noopener noreferrer"
+           data-i18n="product_explore">
+          Explore product ↗
+        </a>
+      </article>
+
+    </div>
+  </div>
+</section>
 
 
+<div id="product-viewer" hidden>
+  <button id="close-product">← Back to SEOD</button>
+  <iframe id="product-frame"></iframe>
+</div>
 
 
 <section id="whoWeHelp" class="who-section">
@@ -7278,10 +7304,53 @@ document.addEventListener("keydown", event => {
 ----------------------------------------- */
 
 renderObservationsMosaic();
+
+
+
+
+
+
+
+
+
   
+
+const viewer = document.getElementById('product-viewer');
+const frame = document.getElementById('product-frame');
+const closeButton = document.getElementById('close-product');
+
+document.querySelectorAll('[data-product-frame]').forEach(link => {
+  link.addEventListener('click', event => {
+    event.preventDefault();
+
+    frame.src = link.href;
+    viewer.hidden = false;
+
+    history.pushState({ product: link.href }, '', link.href);
+    window.scrollTo(0, 0);
+  });
+});
+
+function closeProduct() {
+  viewer.hidden = true;
+  frame.src = 'about:blank';
+
+  history.pushState({}, '', '/');
+}
+
+closeButton.addEventListener('click', closeProduct);
+
+window.addEventListener('popstate', event => {
+  if (event.state && event.state.product) {
+    frame.src = event.state.product;
+    viewer.hidden = false;
+  } else {
+    viewer.hidden = true;
+    frame.src = 'about:blank';
+  }
+});
+
 </script>
-
-
   
 </body>
 </html>
