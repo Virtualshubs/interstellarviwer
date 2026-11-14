@@ -1229,6 +1229,422 @@
     aspect-ratio: 16 / 9;
   }
 }
+
+
+    /* =====================================================
+   SEOD — DATA & TECHNOLOGY ECOSYSTEM
+   ===================================================== */
+
+.ecosystem {
+  position: relative;
+  overflow: hidden;
+}
+
+.ecosystem-heading {
+  max-width: 760px;
+  margin-bottom: 65px;
+}
+
+.ecosystem-heading h2 {
+  max-width: 680px;
+}
+
+.ecosystem-heading .intro-copy {
+  max-width: 600px;
+}
+
+
+/* MAIN LAYOUT */
+
+.ecosystem-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px;
+  align-items: center;
+  gap: 45px;
+}
+
+
+/* STACK */
+
+.ecosystem-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+  padding: 0 0 12px 0;
+}
+
+
+/* INDIVIDUAL LAYERS */
+
+.ecosystem-layer {
+  --layer-offset: 0px;
+
+  position: relative;
+  z-index: 1;
+
+  width: calc(100% - var(--layer-offset));
+  margin-top: -1px;
+  margin-left: var(--layer-offset);
+
+  background: var(--mineral, #F3F1EA);
+  color: var(--grafito, #242522);
+
+  border: 1px solid rgba(36, 37, 34, .17);
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, .035);
+
+  transition:
+    width .45s ease,
+    margin .45s ease,
+    transform .45s ease,
+    box-shadow .45s ease,
+    background .35s ease;
+
+  overflow: hidden;
+}
+
+.ecosystem-layer:nth-child(1) {
+  --layer-offset: 0px;
+}
+
+.ecosystem-layer:nth-child(2) {
+  --layer-offset: 10px;
+}
+
+.ecosystem-layer:nth-child(3) {
+  --layer-offset: 20px;
+}
+
+.ecosystem-layer:nth-child(4) {
+  --layer-offset: 30px;
+}
+
+
+/* ACTIVE LAYER */
+
+.ecosystem-layer.is-active {
+  z-index: 10;
+
+  width: 100%;
+  margin-left: 0;
+
+  background: #F3F1EA;
+
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, .10);
+
+  border-color: rgba(65, 109, 128, .55);
+}
+
+
+/* HEADER */
+
+.ecosystem-layer-header {
+  display: grid;
+
+  grid-template-columns: 45px minmax(0, 1fr) auto 25px;
+
+  align-items: center;
+  gap: 20px;
+
+  width: 100%;
+  min-height: 76px;
+
+  padding: 0 27px;
+
+  background: transparent;
+  border: 0;
+
+  color: inherit;
+  text-align: left;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  transition:
+    background .3s ease,
+    padding .3s ease;
+}
+
+.ecosystem-layer-header:hover {
+  background: rgba(65, 109, 128, .045);
+}
+
+.ecosystem-layer-header:focus-visible {
+  outline: 2px solid var(--atmosferico, #416D80);
+  outline-offset: -4px;
+}
+
+
+/* HEADER TYPOGRAPHY */
+
+.ecosystem-layer-number {
+  font-size: 11px;
+  letter-spacing: .08em;
+  opacity: .55;
+}
+
+.ecosystem-layer-name {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.ecosystem-layer-category {
+  font-size: 9px;
+  letter-spacing: .12em;
+  opacity: .55;
+  text-align: right;
+}
+
+.ecosystem-layer-indicator {
+  font-size: 20px;
+  font-weight: 300;
+  text-align: center;
+
+  transition:
+    transform .35s ease,
+    color .35s ease;
+}
+
+.ecosystem-layer.is-active .ecosystem-layer-indicator {
+  transform: rotate(45deg);
+  color: var(--atmosferico, #416D80);
+}
+
+
+/* CONTENT */
+
+.ecosystem-layer-content {
+  display: grid;
+  grid-template-rows: 0fr;
+
+  opacity: 0;
+
+  transition:
+    grid-template-rows .45s ease,
+    opacity .3s ease;
+}
+
+.ecosystem-layer.is-active .ecosystem-layer-content {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.ecosystem-layer-content > .ecosystem-logos {
+  min-height: 0;
+  overflow: hidden;
+}
+
+
+/* LOGOS */
+
+.ecosystem-logos {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+
+  gap: 55px;
+
+  padding: 24px 35px 35px 92px;
+}
+
+.ecosystem-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 105px;
+  height: 55px;
+}
+
+.ecosystem-logo img {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+
+  filter: grayscale(100%);
+  opacity: .75;
+
+  transition:
+    filter .3s ease,
+    opacity .3s ease,
+    transform .3s ease;
+}
+
+.ecosystem-logo:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+
+/* SIDE NAVIGATION */
+
+.ecosystem-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.ecosystem-counter {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  font-size: 23px;
+  letter-spacing: -.04em;
+}
+
+.ecosystem-counter-divider {
+  opacity: .3;
+  font-size: 15px;
+}
+
+.ecosystem-side-label {
+  font-size: 9px;
+  letter-spacing: .12em;
+  line-height: 1.7;
+  opacity: .6;
+}
+
+.ecosystem-navigation {
+  display: flex;
+  gap: 9px;
+}
+
+.ecosystem-navigation button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid rgba(36, 37, 34, .25);
+  border-radius: 50%;
+
+  background: transparent;
+  color: inherit;
+
+  font-size: 19px;
+
+  cursor: pointer;
+
+  transition:
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease,
+    transform .25s ease;
+}
+
+.ecosystem-navigation button:hover {
+  background: var(--grafito, #242522);
+  color: var(--mineral, #F3F1EA);
+  border-color: var(--grafito, #242522);
+  transform: translateY(-2px);
+}
+
+.ecosystem-navigation button:focus-visible {
+  outline: 2px solid var(--atmosferico, #416D80);
+  outline-offset: 4px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+  .ecosystem-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .ecosystem-side {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .ecosystem-side-label {
+    margin-right: auto;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .ecosystem-heading {
+    margin-bottom: 40px;
+  }
+
+  .ecosystem-layer-header {
+    grid-template-columns: 28px minmax(0, 1fr) 22px;
+    gap: 10px;
+
+    min-height: 68px;
+    padding: 0 15px;
+  }
+
+  .ecosystem-layer-category {
+    display: none;
+  }
+
+  .ecosystem-layer-name {
+    font-size: 14px;
+  }
+
+  .ecosystem-logos {
+    justify-content: flex-start;
+    gap: 25px;
+
+    padding: 20px 18px 27px 52px;
+  }
+
+  .ecosystem-logo {
+    width: 75px;
+    height: 42px;
+  }
+
+  .ecosystem-side {
+    flex-wrap: wrap;
+  }
+
+  .ecosystem-counter {
+    font-size: 20px;
+  }
+
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .ecosystem-layer,
+  .ecosystem-layer-content,
+  .ecosystem-layer-indicator,
+  .ecosystem-logo img,
+  .ecosystem-navigation button {
+    transition: none !important;
+  }
+
+}
   </style>
 </head>
 
@@ -1471,6 +1887,252 @@
       </div>
     </section>
 
+
+<section class="section ecosystem" id="ecosystem">
+
+  <div class="inner">
+
+    <div class="ecosystem-heading" data-reveal>
+
+      <div class="eyebrow">
+        Data & Technology Ecosystem
+      </div>
+
+      <h2>
+        Connecting observation, data and technology.
+      </h2>
+
+      <p class="intro-copy">
+        An interconnected ecosystem of observation sources,
+        data catalogues and technological infrastructures.
+      </p>
+
+    </div>
+
+    <div class="ecosystem-layout">
+
+      <!-- LAYER STACK -->
+
+      <div class="ecosystem-stack" id="ecosystemStack">
+
+        <!-- 01 / EARTH OBSERVATION -->
+
+        <article class="ecosystem-layer is-active"
+          data-layer="0">
+
+          <button class="ecosystem-layer-header"
+            type="button"
+            aria-expanded="true">
+
+            <span class="ecosystem-layer-number mono">01</span>
+
+            <span class="ecosystem-layer-name">
+              Earth Observation
+            </span>
+
+            <span class="ecosystem-layer-category mono">
+              DATA SOURCES
+            </span>
+
+            <span class="ecosystem-layer-indicator">+</span>
+
+          </button>
+
+          <div class="ecosystem-layer-content">
+
+            <div class="ecosystem-logos">
+
+              <!-- REEMPLAZAR POR LOGOS -->
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/esa.svg" alt="ESA">
+              </div>
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/copernicus.svg" alt="Copernicus">
+              </div>
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/nasa.svg" alt="NASA">
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+
+
+        <!-- 02 / DATA CATALOGUES -->
+
+        <article class="ecosystem-layer"
+          data-layer="1">
+
+          <button class="ecosystem-layer-header"
+            type="button"
+            aria-expanded="false">
+
+            <span class="ecosystem-layer-number mono">02</span>
+
+            <span class="ecosystem-layer-name">
+              Data Catalogues
+            </span>
+
+            <span class="ecosystem-layer-category mono">
+              DISCOVERY & ACCESS
+            </span>
+
+            <span class="ecosystem-layer-indicator">+</span>
+
+          </button>
+
+          <div class="ecosystem-layer-content">
+
+            <div class="ecosystem-logos">
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/maap.svg" alt="MAAP">
+              </div>
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/stac.svg" alt="STAC">
+              </div>
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/earth-search.svg" alt="Earth Search">
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+
+
+        <!-- 03 / CLOUD INFRASTRUCTURE -->
+
+        <article class="ecosystem-layer"
+          data-layer="2">
+
+          <button class="ecosystem-layer-header"
+            type="button"
+            aria-expanded="false">
+
+            <span class="ecosystem-layer-number mono">03</span>
+
+            <span class="ecosystem-layer-name">
+              Cloud Infrastructure
+            </span>
+
+            <span class="ecosystem-layer-category mono">
+              COMPUTATION
+            </span>
+
+            <span class="ecosystem-layer-indicator">+</span>
+
+          </button>
+
+          <div class="ecosystem-layer-content">
+
+            <div class="ecosystem-logos">
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/aws.svg" alt="Amazon Web Services">
+              </div>
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/cloudflare.svg" alt="Cloudflare">
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+
+
+        <!-- 04 / SPATIAL TECHNOLOGIES -->
+
+        <article class="ecosystem-layer"
+          data-layer="3">
+
+          <button class="ecosystem-layer-header"
+            type="button"
+            aria-expanded="false">
+
+            <span class="ecosystem-layer-number mono">04</span>
+
+            <span class="ecosystem-layer-name">
+              Spatial Technologies
+            </span>
+
+            <span class="ecosystem-layer-category mono">
+              PROCESSING & STANDARDS
+            </span>
+
+            <span class="ecosystem-layer-indicator">+</span>
+
+          </button>
+
+          <div class="ecosystem-layer-content">
+
+            <div class="ecosystem-logos">
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/cesium.svg" alt="Cesium">
+              </div>
+
+              <div class="ecosystem-logo">
+                <img src="images/logos/ogc.svg" alt="OGC">
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      </div>
+
+
+      <!-- SIDE INFORMATION -->
+
+      <aside class="ecosystem-side">
+
+        <div class="ecosystem-counter mono">
+          <span id="ecosystemCurrent">01</span>
+          <span class="ecosystem-counter-divider">/</span>
+          <span id="ecosystemTotal">04</span>
+        </div>
+
+        <p class="ecosystem-side-label mono">
+          EXPLORE THE LAYERS
+        </p>
+
+        <div class="ecosystem-navigation">
+
+          <button type="button"
+            id="ecosystemPrev"
+            aria-label="Previous layer">
+            ←
+          </button>
+
+          <button type="button"
+            id="ecosystemNext"
+            aria-label="Next layer">
+            →
+          </button>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</section>
+    
 
     <!-- VISION -->
 
@@ -2428,7 +3090,159 @@ hero_cta_2: "Descubrir nuestros productos",
 
 
     })();
+
   </script>
 
+
+
+<script>
+/* =====================================================
+   SEOD — ECOSYSTEM LAYER INTERACTION
+   ===================================================== */
+
+(function () {
+
+  const stack = document.getElementById("ecosystemStack");
+
+  if (!stack) return;
+
+  const layers = Array.from(
+    stack.querySelectorAll(".ecosystem-layer")
+  );
+
+  const currentDisplay = document.getElementById("ecosystemCurrent");
+  const totalDisplay = document.getElementById("ecosystemTotal");
+
+  const prevButton = document.getElementById("ecosystemPrev");
+  const nextButton = document.getElementById("ecosystemNext");
+
+  if (!layers.length) return;
+
+  let activeIndex = 0;
+
+  const total = layers.length;
+
+  if (totalDisplay) {
+    totalDisplay.textContent = String(total).padStart(2, "0");
+  }
+
+
+  /* UPDATE LAYERS */
+
+  function updateLayers() {
+
+    layers.forEach((layer, index) => {
+
+      const header = layer.querySelector(
+        ".ecosystem-layer-header"
+      );
+
+      const isActive = index === activeIndex;
+
+      /*
+        Relative position:
+        0 = selected layer
+        1, 2, 3 = layers behind
+      */
+
+      const rank = (index - activeIndex + total) % total;
+
+      layer.classList.toggle("is-active", isActive);
+
+      layer.style.zIndex = String(total - rank);
+
+      layer.style.setProperty(
+        "--layer-offset",
+        `${rank * 10}px`
+      );
+
+      layer.style.transform = isActive
+        ? "translateY(-5px)"
+        : `translateX(${rank * 3}px)`;
+
+      if (header) {
+        header.setAttribute(
+          "aria-expanded",
+          String(isActive)
+        );
+      }
+
+    });
+
+
+    /* UPDATE COUNTER */
+
+    if (currentDisplay) {
+      currentDisplay.textContent = String(
+        activeIndex + 1
+      ).padStart(2, "0");
+    }
+
+  }
+
+
+  /* SELECT LAYER */
+
+  function selectLayer(index) {
+
+    activeIndex = (index + total) % total;
+
+    updateLayers();
+
+  }
+
+
+  /* CLICK ON LAYER */
+
+  layers.forEach((layer, index) => {
+
+    const header = layer.querySelector(
+      ".ecosystem-layer-header"
+    );
+
+    if (!header) return;
+
+    header.addEventListener("click", () => {
+
+      selectLayer(index);
+
+    });
+
+  });
+
+
+  /* PREVIOUS */
+
+  if (prevButton) {
+
+    prevButton.addEventListener("click", () => {
+
+      selectLayer(activeIndex - 1);
+
+    });
+
+  }
+
+
+  /* NEXT */
+
+  if (nextButton) {
+
+    nextButton.addEventListener("click", () => {
+
+      selectLayer(activeIndex + 1);
+
+    });
+
+  }
+
+
+  /* INITIAL STATE */
+
+  updateLayers();
+
+})();
+</script>
+  
 </body>
 </html>
