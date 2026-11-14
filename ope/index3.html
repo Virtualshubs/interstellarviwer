@@ -1,0 +1,2413 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f1ea">
+  <meta name="description" content="SEOD develops spatial computing technologies connecting observation, spatial data and computational systems.">
+  <title>SEOD — Space Engine, Observation &amp; Data</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --mineral: #f3f1ea;
+      --graphite: #242522;
+      --black: #111210;
+      --atmospheric: #416d80;
+      --thermal: #e5682e;
+      --vegetal: #657b54;
+      --paper: #fbfaf6;
+      --ink: #242522;
+      --muted: #777970;
+      --line: rgba(36,37,34,.17);
+      --nav-height: 78px;
+      --content: 1440px;
+      --gutter: clamp(22px, 5.2vw, 84px);
+      --ease: cubic-bezier(.22,.61,.36,1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--nav-height);
+    }
+
+    body {
+      margin: 0;
+      background: var(--mineral);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.is-menu-open { overflow: hidden; }
+
+    a { color: inherit; text-decoration: none; }
+    button { color: inherit; font: inherit; }
+    img { display: block; max-width: 100%; }
+
+    ::selection {
+      background: var(--atmospheric);
+      color: white;
+    }
+
+    .mono,
+    .eyebrow,
+    .meta,
+    .nav-index,
+    .footer-label {
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+    }
+
+    .mono,
+    .eyebrow {
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .eyebrow { color: var(--atmospheric); }
+
+    .section {
+      padding: clamp(92px, 12vw, 172px) var(--gutter);
+    }
+
+    .inner {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+      margin-bottom: clamp(42px, 7vw, 90px);
+    }
+
+    .section-head h2 {
+      max-width: 900px;
+      margin: 0;
+      font: 500 clamp(38px, 5.8vw, 82px)/.99 "Space Grotesk", sans-serif;
+      letter-spacing: -.065em;
+    }
+
+    .section-head .intro-copy {
+      max-width: 570px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(15px, 1.3vw, 18px);
+      line-height: 1.65;
+    }
+
+    .section-number {
+      color: var(--muted);
+      padding-top: 8px;
+    }
+
+    /* -----------------------------------------
+       NAVIGATION
+    ----------------------------------------- */
+
+    .site-header {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 100;
+      height: var(--nav-height);
+      background: rgba(243,241,234,.92);
+      border-bottom: 1px solid rgba(36,37,34,.10);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .nav {
+      width: min(100%, var(--content));
+      height: 100%;
+      margin: auto;
+      padding: 0 var(--gutter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 0 0 auto;
+    }
+
+    .brand-name {
+      font: 700 27px/.9 "Space Grotesk", sans-serif;
+      letter-spacing: -.075em;
+    }
+
+    .brand-sub {
+      font: 8px/1.3 "IBM Plex Mono", monospace;
+      letter-spacing: .11em;
+      color: var(--muted);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 3vw, 44px);
+      margin-left: auto;
+    }
+
+    .nav-links > a,
+    .products-trigger {
+      border: 0;
+      background: transparent;
+      padding: 10px 0;
+      cursor: pointer;
+      font: 500 12px "IBM Plex Sans", sans-serif;
+      color: #55574f;
+      transition: color .2s;
+    }
+
+    .nav-links > a:hover,
+    .products-trigger:hover {
+      color: var(--atmospheric);
+    }
+
+    .products-wrap { position: relative; }
+
+    .products-trigger {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .chevron {
+      width: 7px;
+      height: 7px;
+      border-right: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform .2s;
+    }
+
+    .products-wrap:hover .chevron,
+    .products-wrap:focus-within .chevron,
+    .products-wrap.is-open .chevron {
+      transform: rotate(225deg) translate(-1px,-1px);
+    }
+
+    .products-menu {
+      position: absolute;
+      top: calc(100% + 15px);
+      left: -22px;
+      width: 250px;
+      padding: 10px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 45px rgba(20,22,18,.12);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: .22s var(--ease);
+    }
+
+    .products-wrap:hover .products-menu,
+    .products-wrap:focus-within .products-menu,
+    .products-wrap.is-open .products-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .products-menu a {
+      display: block;
+      padding: 13px 12px;
+      font-size: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .products-menu a:last-child { border: 0; }
+
+    .products-menu a:hover { background: var(--mineral); }
+
+    .products-menu small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font: 9px "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .nav-tools {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .lang-switch {
+      display: flex;
+      gap: 5px;
+      font: 10px "IBM Plex Mono", monospace;
+    }
+
+    .lang-switch button,
+    .theme-toggle,
+    .menu-toggle {
+      border: 0;
+      background: none;
+      padding: 5px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .lang-switch button.is-active {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .lang-switch span { color: #aaa99f; }
+
+    .theme-toggle {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+    }
+
+    .theme-toggle svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 36px;
+      height: 36px;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 1px;
+      width: 20px;
+      margin: 5px auto;
+      background: currentColor;
+      transition: transform .2s;
+    }
+
+    /* -----------------------------------------
+       HERO
+    ----------------------------------------- */
+
+    .hero {
+      min-height: min(900px, 100svh);
+      padding: calc(var(--nav-height) + 70px) var(--gutter) 54px;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      overflow: hidden;
+      color: #f3f1ea;
+      background: #18232a;
+    }
+
+    .hero-media {
+      position: absolute;
+      inset: 0;
+      background: #18232a;
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .63;
+    }
+
+    .hero-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(12,18,21,.78) 0%, rgba(12,18,21,.38) 55%, rgba(12,18,21,.08) 100%),
+        linear-gradient(0deg, rgba(10,14,16,.58), transparent 55%);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      opacity: .17;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px);
+      background-size: 10vw 10vw;
+      mask-image: linear-gradient(90deg, black, transparent 85%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      width: min(100%, var(--content));
+      margin: 0 auto;
+    }
+
+    .hero-kicker {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: rgba(243,241,234,.72);
+      margin-bottom: 30px;
+    }
+
+    .hero-kicker::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: var(--thermal);
+    }
+
+    .hero h1 {
+      max-width: 1050px;
+      margin: 0;
+      font: 500 clamp(58px, 10vw, 148px)/.84 "Space Grotesk", sans-serif;
+      letter-spacing: -.085em;
+      text-transform: uppercase;
+    }
+
+    .hero-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 40px;
+      margin-top: clamp(48px, 8vw, 100px);
+    }
+
+    .hero-description {
+      max-width: 480px;
+      margin: 0;
+      color: rgba(243,241,234,.78);
+      font-size: clamp(15px, 1.35vw, 19px);
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 0 19px;
+      border: 1px solid currentColor;
+      font: 500 11px "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+      transition: background .25s, color .25s, border-color .25s;
+    }
+
+    .button::after {
+      content: "↗";
+      font: 15px "IBM Plex Sans", sans-serif;
+    }
+
+    .button-light {
+      color: var(--mineral);
+      border-color: rgba(243,241,234,.55);
+    }
+
+    .button-light:hover {
+      color: var(--black);
+      background: var(--mineral);
+    }
+
+    .button-dark {
+      color: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .button-dark:hover {
+      color: var(--mineral);
+      background: var(--ink);
+    }
+
+    .hero-index {
+      position: absolute;
+      right: var(--gutter);
+      top: calc(var(--nav-height) + 30px);
+      color: rgba(243,241,234,.6);
+    }
+
+    /* -----------------------------------------
+       CHALLENGE
+    ----------------------------------------- */
+
+    .challenge { background: var(--mineral); }
+
+    .challenge-body {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: clamp(40px, 9vw, 140px);
+      align-items: end;
+    }
+
+    .challenge-statement {
+      margin: 0;
+      max-width: 800px;
+      font: 500 clamp(32px, 5vw, 68px)/1.04 "Space Grotesk", sans-serif;
+      letter-spacing: -.06em;
+    }
+
+    .challenge-detail {
+      max-width: 470px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .challenge-detail p { margin: 0 0 18px; }
+
+    .data-line {
+      margin-top: 60px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+    }
+
+    .data-point { padding: 18px 20px 0 0; }
+
+    .data-point strong {
+      display: block;
+      font: 500 12px "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+    }
+
+    .data-point span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* -----------------------------------------
+       APPROACH
+    ----------------------------------------- */
+
+    .approach {
+      background: var(--graphite);
+      color: var(--mineral);
+    }
+
+    .approach .eyebrow,
+    .approach .section-number {
+      color: #9db2b8;
+    }
+
+    .approach .intro-copy { color: rgba(243,241,234,.62); }
+
+    .approach-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      border-top: 1px solid rgba(243,241,234,.25);
+    }
+
+    .approach-item {
+      min-height: 300px;
+      padding: 25px 28px 0 0;
+      border-right: 1px solid rgba(243,241,234,.18);
+    }
+
+    .approach-item:not(:first-child) { padding-left: 28px; }
+    .approach-item:last-child { border-right: 0; }
+
+    .approach-item .nav-index {
+      color: #9db2b8;
+      font-size: 11px;
+    }
+
+    .approach-item h3 {
+      margin: 70px 0 18px;
+      font: 500 clamp(28px, 3.4vw, 46px) "Space Grotesk", sans-serif;
+      letter-spacing: -.055em;
+    }
+
+    .approach-item p {
+      max-width: 320px;
+      margin: 0;
+      color: rgba(243,241,234,.62);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* -----------------------------------------
+       VISION
+    ----------------------------------------- */
+
+    .vision {
+      background: var(--paper);
+      padding-top: clamp(110px, 16vw, 220px);
+      padding-bottom: clamp(110px, 16vw, 220px);
+    }
+
+    .vision-inner {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+    }
+
+    .vision-copy { max-width: 1050px; }
+
+    .vision-copy h2 {
+      margin: 0;
+      font: 500 clamp(45px, 7.4vw, 105px)/.96 "Space Grotesk", sans-serif;
+      letter-spacing: -.075em;
+    }
+
+    .vision-copy p {
+      max-width: 590px;
+      margin: 40px 0 0 auto;
+      color: var(--muted);
+      font-size: clamp(16px, 1.45vw, 20px);
+      line-height: 1.7;
+    }
+
+    .vision-mark {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin-top: 55px;
+      color: var(--muted);
+    }
+
+    .vision-mark::before {
+      content: "";
+      width: 42px;
+      height: 1px;
+      background: var(--thermal);
+      margin-bottom: 6px;
+    }
+
+    /* -----------------------------------------
+       INDUSTRIES
+    ----------------------------------------- */
+
+    .industries { background: #e9e7df; }
+
+    .industry-list { border-top: 1px solid var(--line); }
+
+    .industry-row {
+      display: grid;
+      grid-template-columns: 70px minmax(180px,.8fr) 1.2fr 32px;
+      align-items: center;
+      gap: 22px;
+      min-height: 90px;
+      border-bottom: 1px solid var(--line);
+      transition: padding .25s var(--ease), background .25s;
+    }
+
+    .industry-row:hover {
+      padding-left: 14px;
+      background: rgba(255,255,255,.28);
+    }
+
+    .industry-row .nav-index { color: var(--muted); }
+
+    .industry-row h3 {
+      margin: 0;
+      font: 500 clamp(20px, 2.3vw, 30px) "Space Grotesk", sans-serif;
+      letter-spacing: -.04em;
+    }
+
+    .industry-row p {
+      max-width: 500px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .industry-arrow {
+      color: var(--atmospheric);
+      font-size: 20px;
+      text-align: right;
+    }
+
+    /* -----------------------------------------
+       SELECTED OBSERVATIONS
+    ----------------------------------------- */
+
+    .observations { background: var(--mineral); }
+
+    .observation-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .observation-card {
+      position: relative;
+      min-width: 0;
+    }
+
+    .observation-card:nth-child(2) { margin-top: 120px; }
+    .observation-card:nth-child(3) { margin-top: -60px; }
+
+    .observation-image {
+      overflow: hidden;
+      background: #d7d6ce;
+      aspect-ratio: 1.42;
+    }
+
+    .observation-card:nth-child(2) .observation-image { aspect-ratio: 1.05; }
+    .observation-card:nth-child(3) .observation-image { aspect-ratio: 1.65; }
+
+    .observation-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .8s var(--ease);
+    }
+
+    .observation-card:hover img { transform: scale(1.035); }
+
+    .observation-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      margin-top: 12px;
+    }
+
+    .observation-caption h3 {
+      margin: 0;
+      font: 500 16px "Space Grotesk", sans-serif;
+    }
+
+    .observation-caption p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font: 9px/1.5 "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .observation-caption .obs-number {
+      color: var(--muted);
+      font: 10px "IBM Plex Mono", monospace;
+    }
+
+    /* -----------------------------------------
+       PRODUCTS
+    ----------------------------------------- */
+
+    .products {
+      background: var(--black);
+      color: var(--mineral);
+    }
+
+    .products .eyebrow,
+    .products .section-number {
+      color: #9db2b8;
+    }
+
+    .products .intro-copy { color: rgba(243,241,234,.62); }
+
+    .product-list { border-top: 1px solid rgba(243,241,234,.25); }
+
+    .product-row {
+      display: grid;
+      grid-template-columns: 70px minmax(220px,.9fr) 1.1fr 150px;
+      gap: 22px;
+      align-items: center;
+      min-height: 155px;
+      border-bottom: 1px solid rgba(243,241,234,.2);
+      transition: padding .25s var(--ease), background .25s;
+    }
+
+    .product-row:hover {
+      padding: 0 18px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .product-row .nav-index { color: #9db2b8; }
+
+    .product-row h3 {
+      margin: 0;
+      font: 500 clamp(25px, 3.4vw, 46px) "Space Grotesk", sans-serif;
+      letter-spacing: -.06em;
+    }
+
+    .product-row h3 span {
+      display: block;
+      margin-top: 7px;
+      color: rgba(243,241,234,.5);
+      font: 9px "IBM Plex Mono", monospace;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .product-row p {
+      max-width: 430px;
+      margin: 0;
+      color: rgba(243,241,234,.62);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .product-link {
+      justify-self: end;
+      color: var(--mineral);
+      font: 10px "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(243,241,234,.5);
+      padding-bottom: 8px;
+    }
+
+    .product-link:hover {
+      color: #a9c3cc;
+      border-color: #a9c3cc;
+    }
+
+    /* -----------------------------------------
+       CONTACT
+    ----------------------------------------- */
+
+    .contact {
+      background: var(--atmospheric);
+      color: var(--mineral);
+    }
+
+    .contact .eyebrow { color: #d0e0e3; }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1.5fr .5fr;
+      gap: 50px;
+      align-items: end;
+    }
+
+    .contact h2 {
+      max-width: 950px;
+      margin: 0;
+      font: 500 clamp(48px, 7.6vw, 108px)/.94 "Space Grotesk", sans-serif;
+      letter-spacing: -.075em;
+    }
+
+    .contact-side p {
+      max-width: 330px;
+      color: rgba(243,241,234,.75);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .contact-side .button { margin-top: 20px; }
+
+    /* -----------------------------------------
+       FOOTER
+    ----------------------------------------- */
+
+    .footer {
+      background: var(--black);
+      color: var(--mineral);
+      padding: 60px var(--gutter) 26px;
+    }
+
+    .footer-inner {
+      width: min(100%, var(--content));
+      margin: auto;
+    }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 35px;
+      padding-bottom: 75px;
+    }
+
+    .footer-brand .brand-name { font-size: 38px; }
+    .footer-brand .brand-sub { color: rgba(243,241,234,.5); }
+
+    .footer-brand p {
+      max-width: 260px;
+      margin-top: 22px;
+      color: rgba(243,241,234,.5);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .footer-col h3 {
+      margin: 0 0 18px;
+      color: rgba(243,241,234,.45);
+      font: 9px "IBM Plex Mono", monospace;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .footer-col a {
+      display: block;
+      width: fit-content;
+      margin: 0 0 11px;
+      color: rgba(243,241,234,.82);
+      font-size: 12px;
+    }
+
+    .footer-col a:hover { color: #a9c3cc; }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(243,241,234,.18);
+      color: rgba(243,241,234,.45);
+      font: 9px "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .footer-legal {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    /* -----------------------------------------
+       ANIMATIONS / UTILITIES
+    ----------------------------------------- */
+
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .75s var(--ease), transform .75s var(--ease);
+    }
+
+    [data-reveal].is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 300;
+      padding: 10px 14px;
+      background: var(--black);
+      color: white;
+      transform: translateY(-150%);
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    /* -----------------------------------------
+       DARK THEME
+    ----------------------------------------- */
+
+    body[data-theme="dark"] {
+      --mineral: #20221f;
+      --paper: #292b27;
+      --ink: #eeede5;
+      --muted: #a4a59b;
+      --line: rgba(238,237,229,.18);
+    }
+
+    body[data-theme="dark"] .site-header {
+      background: rgba(32,34,31,.92);
+      border-color: rgba(238,237,229,.12);
+    }
+
+    body[data-theme="dark"] .nav-links > a,
+    body[data-theme="dark"] .products-trigger {
+      color: #c3c4ba;
+    }
+
+    body[data-theme="dark"] .products-menu { background: #292b27; }
+    body[data-theme="dark"] .products-menu a:hover { background: #363832; }
+    body[data-theme="dark"] .challenge,
+    body[data-theme="dark"] .observations { background: var(--mineral); }
+    body[data-theme="dark"] .industries { background: #292b27; }
+    body[data-theme="dark"] .vision { background: #292b27; }
+
+    body[data-theme="dark"] .industry-row:hover {
+      background: rgba(255,255,255,.04);
+    }
+
+    /* -----------------------------------------
+       TABLET
+    ----------------------------------------- */
+
+    @media (max-width: 900px) {
+      :root { --nav-height: 70px; }
+
+      .nav-links { gap: 18px; }
+
+      .section-head {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .section-number { padding: 0; }
+
+      .challenge-body {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .challenge-detail { max-width: 680px; }
+
+      .footer-main {
+        grid-template-columns: 1.3fr 1fr 1fr;
+      }
+
+      .footer-brand { grid-column: 1 / -1; }
+
+      .product-row {
+        grid-template-columns: 45px 1fr 1fr 120px;
+      }
+    }
+
+    /* -----------------------------------------
+       MOBILE
+    ----------------------------------------- */
+
+    @media (max-width: 680px) {
+      :root {
+        --nav-height: 64px;
+        --gutter: 22px;
+      }
+
+      .nav { gap: 10px; }
+
+      .brand-name { font-size: 24px; }
+      .brand-sub { font-size: 7px; }
+
+      .menu-toggle {
+        display: block;
+        order: 3;
+      }
+
+      .nav-tools {
+        margin-left: auto;
+        gap: 8px;
+      }
+
+      .theme-toggle { display: none; }
+
+      .nav-links {
+        position: fixed;
+        inset: var(--nav-height) 0 0;
+        z-index: 99;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 25px var(--gutter) 50px;
+        background: var(--mineral);
+        transform: translateX(100%);
+        transition: transform .3s var(--ease);
+        overflow-y: auto;
+      }
+
+      body.is-menu-open .nav-links { transform: translateX(0); }
+
+      .nav-links > a,
+      .products-trigger {
+        display: flex;
+        width: 100%;
+        padding: 19px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 18px;
+        text-align: left;
+      }
+
+      .products-trigger { justify-content: space-between; }
+
+      .products-menu {
+        position: static;
+        display: none;
+        width: 100%;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        padding: 4px 0 10px 12px;
+      }
+
+      .products-wrap.is-open .products-menu { display: block; }
+
+      .products-menu a { font-size: 14px; }
+
+      .menu-toggle[aria-expanded="true"] span:first-child {
+        transform: translateY(3px) rotate(45deg);
+      }
+
+      .menu-toggle[aria-expanded="true"] span:last-child {
+        transform: translateY(-3px) rotate(-45deg);
+      }
+
+      .hero {
+        min-height: 780px;
+        min-height: 92svh;
+        padding-bottom: 34px;
+      }
+
+      .hero h1 {
+        font-size: clamp(56px, 16vw, 100px);
+      }
+
+      .hero-bottom {
+        display: block;
+        margin-top: 42px;
+      }
+
+      .hero-description { max-width: 440px; }
+      .hero-actions { margin-top: 25px; }
+
+      .hero-index { top: calc(var(--nav-height) + 18px); }
+
+      .data-line {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .data-point { padding-top: 14px; }
+
+      .approach-grid { grid-template-columns: 1fr; }
+
+      .approach-item,
+      .approach-item:not(:first-child) {
+        min-height: 0;
+        padding: 22px 0 28px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(243,241,234,.18);
+      }
+
+      .approach-item h3 { margin: 28px 0 12px; }
+
+      .vision-inner {
+        grid-template-columns: 1fr;
+        gap: 35px;
+      }
+
+      .vision-copy p { margin: 28px 0 0; }
+
+      .industry-row {
+        grid-template-columns: 34px 1fr 22px;
+        gap: 12px;
+        padding: 18px 0;
+      }
+
+      .industry-row p {
+        grid-column: 2 / 3;
+        grid-row: 2;
+      }
+
+      .industry-arrow {
+        grid-column: 3;
+        grid-row: 1;
+      }
+
+      .observation-grid {
+        grid-template-columns: 1fr;
+        gap: 34px;
+      }
+
+      .observation-card:nth-child(2),
+      .observation-card:nth-child(3) {
+        margin: 0;
+      }
+
+      .observation-card:nth-child(2) .observation-image,
+      .observation-card:nth-child(3) .observation-image {
+        aspect-ratio: 1.42;
+      }
+
+      .product-row {
+        grid-template-columns: 34px 1fr 24px;
+        gap: 12px;
+        padding: 24px 0;
+      }
+
+      .product-row p {
+        grid-column: 2 / 3;
+        grid-row: 2;
+      }
+
+      .product-link {
+        grid-column: 2 / 3;
+        grid-row: 3;
+        justify-self: start;
+        margin-top: 8px;
+      }
+
+      .contact-layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 35px 20px;
+      }
+
+      .footer-brand { grid-column: 1 / -1; }
+
+      .footer-bottom { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+
+      [data-reveal] {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+
+  <!-- NAVIGATION -->
+
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+
+      <a class="brand" href="#home" aria-label="SEOD home">
+        <span class="brand-name">SEOD</span>
+        <span class="brand-sub">SPACE ENGINE, OBSERVATION &amp; DATA</span>
+      </a>
+
+      <div class="nav-links" id="primary-navigation">
+
+        <a href="#company" data-i18n="nav_company">Company</a>
+        <a href="#technology" data-i18n="nav_technology">Technology</a>
+
+        <div class="products-wrap" id="products-menu-wrap">
+
+          <button class="products-trigger" type="button"
+            aria-expanded="false" aria-controls="products-menu">
+            <span data-i18n="nav_products">Products</span>
+            <i class="chevron" aria-hidden="true"></i>
+          </button>
+
+          <div class="products-menu" id="products-menu">
+
+            <a href="#products">
+              <span data-i18n="product_ope">Orbital Pass Engine</span>
+              <small>OPE / Orbital systems</small>
+            </a>
+
+            <a href="#products">
+              <span data-i18n="product_janus">JANUS Space Reader</span>
+              <small>Spatial data exploitation</small>
+            </a>
+
+            <a href="#products">
+              <span data-i18n="product_lite">3D Twins Lite</span>
+              <small>3D repository visualization</small>
+            </a>
+
+          </div>
+        </div>
+
+        <a href="#contact" data-i18n="nav_contact">Contact</a>
+
+      </div>
+
+      <div class="nav-tools">
+
+        <div class="lang-switch" aria-label="Language">
+          <button type="button" class="is-active"
+            data-lang="en" aria-pressed="true">EN</button>
+          <span>/</span>
+          <button type="button"
+            data-lang="es" aria-pressed="false">ES</button>
+        </div>
+
+        <button class="theme-toggle" id="theme-toggle"
+          type="button" aria-label="Toggle colour theme"
+          title="Toggle colour theme">
+          <svg viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
+          </svg>
+        </button>
+
+      </div>
+
+      <button class="menu-toggle" id="menu-toggle"
+        type="button" aria-label="Open navigation"
+        aria-expanded="false" aria-controls="primary-navigation">
+        <span></span>
+        <span></span>
+      </button>
+
+    </nav>
+  </header>
+
+
+  <main id="main">
+
+    <!-- HERO -->
+
+    <section class="hero" id="home" aria-labelledby="hero-title">
+
+      <div class="hero-media" aria-hidden="true">
+        <!-- Replace with the final SEOD hero image -->
+        <img src="images/seod-hero-earth.jpg" alt="" fetchpriority="high">
+      </div>
+
+      <div class="hero-grid" aria-hidden="true"></div>
+
+      <span class="hero-index mono">
+        SEOD / 001 — Spatial computing
+      </span>
+
+      <div class="hero-content">
+
+        <div class="hero-kicker eyebrow" data-i18n="hero_kicker">
+          Space Engine, Observation &amp; Data
+        </div>
+
+        <h1 id="hero-title" data-i18n="hero_title">
+          Engineering the spatial computing frontier.
+        </h1>
+
+        <div class="hero-bottom">
+
+          <p class="hero-description" data-i18n="hero_description">
+            Developing technologies to integrate, process and exploit
+            spatial data, connecting observation, computation and analysis.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-light" href="#technology"
+              data-i18n="hero_cta_1">
+              Explore our technology
+            </a>
+
+            <a class="button button-light" href="#products"
+              data-i18n="hero_cta_2">
+              Discover our products
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- THE CHALLENGE -->
+
+    <section class="section challenge" id="company">
+
+      <div class="inner">
+
+        <div class="section-head" data-reveal>
+
+          <div class="section-number mono">
+            01 / The challenge
+          </div>
+
+          <div>
+            <div class="eyebrow" data-i18n="challenge_eyebrow">
+              The challenge
+            </div>
+
+            <h2 data-i18n="challenge_title">
+              Spatial data is growing. Making sense of it requires new ways of computing.
+            </h2>
+          </div>
+
+        </div>
+
+        <div class="challenge-body" data-reveal>
+
+          <p class="challenge-statement" data-i18n="challenge_statement">
+            The value of observation is not only in what we collect,
+            but in the relationships we are able to reveal.
+          </p>
+
+          <div class="challenge-detail">
+
+            <p data-i18n="challenge_p1">
+              Spatial information is distributed across different sources,
+              formats and systems. Understanding its relationships requires
+              more than simply accessing or visualizing individual datasets.
+            </p>
+
+            <p data-i18n="challenge_p2">
+              SEOD addresses this challenge through technologies designed
+              to connect spatial information with its computational context.
+            </p>
+
+          </div>
+        </div>
+
+        <div class="data-line" data-reveal>
+
+          <div class="data-point">
+            <strong data-i18n="challenge_stat_1">Distributed sources</strong>
+            <span data-i18n="challenge_stat_1_sub">Different origins and formats</span>
+          </div>
+
+          <div class="data-point">
+            <strong data-i18n="challenge_stat_2">Complex relationships</strong>
+            <span data-i18n="challenge_stat_2_sub">Spatial, temporal and descriptive</span>
+          </div>
+
+          <div class="data-point">
+            <strong data-i18n="challenge_stat_3">Computational context</strong>
+            <span data-i18n="challenge_stat_3_sub">From access to exploitation</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- OUR APPROACH -->
+
+    <section class="section approach" id="technology">
+
+      <div class="inner">
+
+        <div class="section-head" data-reveal>
+
+          <div class="section-number mono">
+            02 / Our approach
+          </div>
+
+          <div>
+            <div class="eyebrow" data-i18n="approach_eyebrow">
+              Our approach
+            </div>
+
+            <h2 data-i18n="approach_title">
+              From observation to computation.
+            </h2>
+
+            <p class="intro-copy" data-i18n="approach_intro">
+              SEOD develops proprietary technologies that connect observation,
+              spatial information and computational systems.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="approach-grid" data-reveal>
+
+          <article class="approach-item">
+            <span class="nav-index">01 /</span>
+            <h3 data-i18n="approach_1_title">Observe</h3>
+            <p data-i18n="approach_1_text">
+              Accessing and interpreting information generated by observation systems.
+            </p>
+          </article>
+
+          <article class="approach-item">
+            <span class="nav-index">02 /</span>
+            <h3 data-i18n="approach_2_title">Integrate</h3>
+            <p data-i18n="approach_2_text">
+              Connecting heterogeneous sources, spatial datasets and computational environments.
+            </p>
+          </article>
+
+          <article class="approach-item">
+            <span class="nav-index">03 /</span>
+            <h3 data-i18n="approach_3_title">Exploit</h3>
+            <p data-i18n="approach_3_text">
+              Transforming integrated information into meaningful analytical and operational resources.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- VISION -->
+
+    <section class="section vision">
+
+      <div class="inner vision-inner" data-reveal>
+
+        <div>
+          <div class="eyebrow" data-i18n="vision_eyebrow">
+            Long-term vision
+          </div>
+
+          <div class="vision-mark mono">
+            SEOD / VISION
+          </div>
+        </div>
+
+        <div class="vision-copy">
+
+          <h2 id="vision-title" data-i18n="vision_title">
+            A world understood through spatial intelligence.
+          </h2>
+
+          <p data-i18n="vision_text">
+            We envision a future where spatial data becomes a foundation
+            for understanding complex systems, connecting observations,
+            environments and information across disciplines.
+          </p>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- INDUSTRIES -->
+
+    <section class="section industries">
+
+      <div class="inner">
+
+        <div class="section-head" data-reveal>
+
+          <div class="section-number mono">
+            03 / Industries
+          </div>
+
+          <div>
+            <div class="eyebrow" data-i18n="industries_eyebrow">
+              Industries
+            </div>
+
+            <h2 data-i18n="industries_title">
+              Technology with applications across sectors.
+            </h2>
+
+            <p class="intro-copy" data-i18n="industries_intro">
+              Our technologies address spatial information challenges across
+              different industries, extending the applications of observation
+              and computational systems.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="industry-list" data-reveal>
+
+          <article class="industry-row">
+            <span class="nav-index">01</span>
+            <h3 data-i18n="industry_agriculture">Agriculture</h3>
+            <p data-i18n="industry_agriculture_text">
+              Territorial information, crop monitoring and spatial analysis.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+          <article class="industry-row">
+            <span class="nav-index">02</span>
+            <h3 data-i18n="industry_forestry">Forestry</h3>
+            <p data-i18n="industry_forestry_text">
+              Forest observation, vegetation monitoring and environmental information.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+          <article class="industry-row">
+            <span class="nav-index">03</span>
+            <h3 data-i18n="industry_construction">Construction</h3>
+            <p data-i18n="industry_construction_text">
+              Spatial context, infrastructure and 3D environments.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+          <article class="industry-row">
+            <span class="nav-index">04</span>
+            <h3 data-i18n="industry_mining">Mining</h3>
+            <p data-i18n="industry_mining_text">
+              Territorial observation, surface information and spatial monitoring.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+          <article class="industry-row">
+            <span class="nav-index">05</span>
+            <h3 data-i18n="industry_energy">Energy</h3>
+            <p data-i18n="industry_energy_text">
+              Infrastructure, territorial analysis and environmental observation.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+          <article class="industry-row">
+            <span class="nav-index">06</span>
+            <h3 data-i18n="industry_heritage">Heritage</h3>
+            <p data-i18n="industry_heritage_text">
+              Documentation, digital preservation and 3D representation.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+          <article class="industry-row">
+            <span class="nav-index">07</span>
+            <h3 data-i18n="industry_research">Research</h3>
+            <p data-i18n="industry_research_text">
+              Spatial datasets, scientific observation and analytical exploration.
+            </p>
+            <span class="industry-arrow">↗</span>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SELECTED OBSERVATIONS -->
+
+    <section class="section observations">
+
+      <div class="inner">
+
+        <div class="section-head" data-reveal>
+
+          <div class="section-number mono">
+            04 / Selected observations
+          </div>
+
+          <div>
+            <div class="eyebrow" data-i18n="observations_eyebrow">
+              Scientific archive / Selected observations
+            </div>
+
+            <h2 data-i18n="observations_title">
+              Reading the world through spatial data.
+            </h2>
+
+            <p class="intro-copy" data-i18n="observations_intro">
+              A selection of observations, spatial datasets and scientific
+              imagery illustrating the information and environments that
+              can be explored through spatial technologies.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="observation-grid">
+
+          <article class="observation-card" data-reveal>
+
+            <div class="observation-image">
+              <!-- Replace with a verified Earth observation image -->
+              <img
+                src="images/observation-earth-01.jpg"
+                alt="Earth observation image"
+                loading="lazy">
+            </div>
+
+            <div class="observation-caption">
+              <div>
+                <h3 data-i18n="obs_1_title">Earth observation</h3>
+                <p data-i18n="obs_1_meta">
+                  Satellite imagery / Source and date to be specified
+                </p>
+              </div>
+              <span class="obs-number">OBS. 001</span>
+            </div>
+
+          </article>
+
+          <article class="observation-card" data-reveal>
+
+            <div class="observation-image">
+              <!-- Replace with a verified terrain dataset image -->
+              <img
+                src="images/observation-terrain-02.jpg"
+                alt="Terrain and surface observation"
+                loading="lazy">
+            </div>
+
+            <div class="observation-caption">
+              <div>
+                <h3 data-i18n="obs_2_title">Land &amp; terrain</h3>
+                <p data-i18n="obs_2_meta">
+                  Surface data / Source and date to be specified
+                </p>
+              </div>
+              <span class="obs-number">OBS. 002</span>
+            </div>
+
+          </article>
+
+          <article class="observation-card" data-reveal>
+
+            <div class="observation-image">
+              <!-- Replace with a verified forest observation image -->
+              <img
+                src="images/observation-forest-03.jpg"
+                alt="Forest and vegetation observation"
+                loading="lazy">
+            </div>
+
+            <div class="observation-caption">
+              <div>
+                <h3 data-i18n="obs_3_title">Forest &amp; vegetation</h3>
+                <p data-i18n="obs_3_meta">
+                  Environmental data / Source and date to be specified
+                </p>
+              </div>
+              <span class="obs-number">OBS. 003</span>
+            </div>
+
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- PRODUCTS -->
+
+    <section class="section products" id="products">
+
+      <div class="inner">
+
+        <div class="section-head" data-reveal>
+
+          <div class="section-number mono">
+            05 / Proprietary technologies
+          </div>
+
+          <div>
+            <div class="eyebrow" data-i18n="products_eyebrow">
+              Proprietary technologies
+            </div>
+
+            <h2 data-i18n="products_title">
+              Technologies developed by SEOD.
+            </h2>
+
+            <p class="intro-copy" data-i18n="products_intro">
+              Our products translate spatial computing, observation and data
+              technologies into practical tools for different applications.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="product-list" data-reveal>
+
+          <article class="product-row">
+            <span class="nav-index">01</span>
+
+            <h3>
+              OPE
+              <span>Orbital Pass Engine</span>
+            </h3>
+
+            <p data-i18n="ope_description">
+              Orbital operations, Earth observation and spatial simulation.
+            </p>
+
+            <!-- Replace with the definitive OPE URL -->
+            <a class="product-link" href="/ope/"
+              data-i18n="product_explore">
+              Explore product ↗
+            </a>
+          </article>
+
+          <article class="product-row">
+            <span class="nav-index">02</span>
+
+            <h3>
+              JANUS
+              <span>Space Reader</span>
+            </h3>
+
+            <p data-i18n="janus_description">
+              Spatial data integration, catalogue exploration and analytical exploitation.
+            </p>
+
+            <!-- Replace with the definitive JANUS URL -->
+            <a class="product-link" href="/janus/"
+              data-i18n="product_explore">
+              Explore product ↗
+            </a>
+          </article>
+
+          <article class="product-row">
+            <span class="nav-index">03</span>
+
+            <h3>
+              3D TWINS LITE
+              <span>3D repository visualization</span>
+            </h3>
+
+            <p data-i18n="lite_description">
+              Interactive visualization and distribution of existing 3D repositories.
+            </p>
+
+            <a class="product-link"
+              href="https://lite.3dtwins.tech/"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-i18n="product_explore">
+              Explore product ↗
+            </a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- CONTACT -->
+
+    <section class="section contact" id="contact">
+
+      <div class="inner">
+
+        <div class="contact-layout" data-reveal>
+
+          <div>
+            <div class="eyebrow" data-i18n="contact_eyebrow">
+              Contact / Collaboration
+            </div>
+
+            <h2 data-i18n="contact_title">
+              Let's explore what spatial technology can make possible.
+            </h2>
+          </div>
+
+          <div class="contact-side">
+
+            <p data-i18n="contact_text">
+              For technology enquiries, partnerships, demonstrations
+              and new opportunities, get in touch with SEOD.
+            </p>
+
+            <!-- Replace with the official SEOD email -->
+            <a class="button button-light"
+              href="mailto:hello@seod.space"
+              data-i18n="contact_cta">
+              Get in touch
+            </a>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- FOOTER -->
+
+  <footer class="footer">
+
+    <div class="footer-inner">
+
+      <div class="footer-main">
+
+        <div class="footer-brand">
+
+          <a class="brand" href="#home">
+            <span class="brand-name">SEOD</span>
+            <span class="brand-sub">SPACE ENGINE, OBSERVATION &amp; DATA</span>
+          </a>
+
+          <p data-i18n="footer_description">
+            Spatial computing technologies connecting observation,
+            data and computational systems.
+          </p>
+
+        </div>
+
+        <div class="footer-col">
+
+          <h3 data-i18n="footer_company">Company</h3>
+
+          <a href="#company" data-i18n="nav_company">Company</a>
+          <a href="#technology" data-i18n="nav_technology">Technology</a>
+          <a href="#contact" data-i18n="nav_contact">Contact</a>
+
+        </div>
+
+        <div class="footer-col">
+
+          <h3 data-i18n="footer_products">Products</h3>
+
+          <a href="/ope/">OPE</a>
+          <a href="/janus/">JANUS Space Reader</a>
+
+          <a href="https://lite.3dtwins.tech/"
+            target="_blank"
+            rel="noopener noreferrer">
+            3D Twins Lite
+          </a>
+
+        </div>
+
+        <div class="footer-col">
+
+          <h3 data-i18n="footer_legal">Legal</h3>
+
+          <a href="/legal-notice/" data-i18n="legal_notice">Legal Notice</a>
+          <a href="/privacy-policy/" data-i18n="privacy">Privacy Policy</a>
+          <a href="/cookie-policy/" data-i18n="cookies">Cookie Policy</a>
+          <a href="/terms/" data-i18n="terms">Terms of Use</a>
+
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+
+        <span>
+          © <span id="current-year">2026</span> SEOD.
+          <span data-i18n="rights">All rights reserved.</span>
+        </span>
+
+        <div class="footer-legal">
+          <span>SPACE ENGINE, OBSERVATION &amp; DATA</span>
+          <span>SEOD.SPACE</span>
+        </div>
+
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector, root = document) =>
+        root.querySelector(selector);
+
+      const $$ = (selector, root = document) =>
+        [...root.querySelectorAll(selector)];
+
+
+      /* ---------------------------------------
+         TRANSLATIONS
+      --------------------------------------- */
+
+      const translations = {
+
+        en: {
+          skip: "Skip to content",
+
+          nav_company: "Company",
+          nav_technology: "Technology",
+          nav_products: "Products",
+          nav_contact: "Contact",
+
+          product_ope: "Orbital Pass Engine",
+          product_janus: "JANUS Space Reader",
+          product_lite: "3D Twins Lite",
+
+          hero_kicker: "Space Engine, Observation & Data",
+          hero_title: "Engineering the spatial computing frontier.",
+          hero_description: "Developing technologies to integrate, process and exploit spatial data, connecting observation, computation and analysis.",
+          hero_cta_1: "Explore our technology",
+          hero_cta_2: "Discover our products",
+
+          challenge_eyebrow: "The challenge",
+          challenge_title: "Spatial data is growing. Making sense of it requires new ways of computing.",
+          challenge_statement: "The value of observation is not only in what we collect, but in the relationships we are able to reveal.",
+          challenge_p1: "Spatial information is distributed across different sources, formats and systems. Understanding its relationships requires more than simply accessing or visualizing individual datasets.",
+          challenge_p2: "SEOD addresses this challenge through technologies designed to connect spatial information with its computational context.",
+
+          challenge_stat_1: "Distributed sources",
+          challenge_stat_1_sub: "Different origins and formats",
+          challenge_stat_2: "Complex relationships",
+          challenge_stat_2_sub: "Spatial, temporal and descriptive",
+          challenge_stat_3: "Computational context",
+          challenge_stat_3_sub: "From access to exploitation",
+
+          approach_eyebrow: "Our approach",
+          approach_title: "From observation to computation.",
+          approach_intro: "SEOD develops proprietary technologies that connect observation, spatial information and computational systems.",
+
+          approach_1_title: "Observe",
+          approach_1_text: "Accessing and interpreting information generated by observation systems.",
+
+          approach_2_title: "Integrate",
+          approach_2_text: "Connecting heterogeneous sources, spatial datasets and computational environments.",
+
+          approach_3_title: "Exploit",
+          approach_3_text: "Transforming integrated information into meaningful analytical and operational resources.",
+
+          vision_eyebrow: "Long-term vision",
+          vision_title: "A world understood through spatial intelligence.",
+          vision_text: "We envision a future where spatial data becomes a foundation for understanding complex systems, connecting observations, environments and information across disciplines.",
+
+          industries_eyebrow: "Industries",
+          industries_title: "Technology with applications across sectors.",
+          industries_intro: "Our technologies address spatial information challenges across different industries, extending the applications of observation and computational systems.",
+
+          industry_agriculture: "Agriculture",
+          industry_agriculture_text: "Territorial information, crop monitoring and spatial analysis.",
+
+          industry_forestry: "Forestry",
+          industry_forestry_text: "Forest observation, vegetation monitoring and environmental information.",
+
+          industry_construction: "Construction",
+          industry_construction_text: "Spatial context, infrastructure and 3D environments.",
+
+          industry_mining: "Mining",
+          industry_mining_text: "Territorial observation, surface information and spatial monitoring.",
+
+          industry_energy: "Energy",
+          industry_energy_text: "Infrastructure, territorial analysis and environmental observation.",
+
+          industry_heritage: "Heritage",
+          industry_heritage_text: "Documentation, digital preservation and 3D representation.",
+
+          industry_research: "Research",
+          industry_research_text: "Spatial datasets, scientific observation and analytical exploration.",
+
+          observations_eyebrow: "Scientific archive / Selected observations",
+          observations_title: "Reading the world through spatial data.",
+          observations_intro: "A selection of observations, spatial datasets and scientific imagery illustrating the information and environments that can be explored through spatial technologies.",
+
+          obs_1_title: "Earth observation",
+          obs_1_meta: "Satellite imagery / Source and date to be specified",
+
+          obs_2_title: "Land & terrain",
+          obs_2_meta: "Surface data / Source and date to be specified",
+
+          obs_3_title: "Forest & vegetation",
+          obs_3_meta: "Environmental data / Source and date to be specified",
+
+          products_eyebrow: "Proprietary technologies",
+          products_title: "Technologies developed by SEOD.",
+          products_intro: "Our products translate spatial computing, observation and data technologies into practical tools for different applications.",
+
+          ope_description: "Orbital operations, Earth observation and spatial simulation.",
+          janus_description: "Spatial data integration, catalogue exploration and analytical exploitation.",
+          lite_description: "Interactive visualization and distribution of existing 3D repositories.",
+
+          product_explore: "Explore product",
+
+          contact_eyebrow: "Contact / Collaboration",
+          contact_title: "Let's explore what spatial technology can make possible.",
+          contact_text: "For technology enquiries, partnerships, demonstrations and new opportunities, get in touch with SEOD.",
+          contact_cta: "Get in touch",
+
+          footer_description: "Spatial computing technologies connecting observation, data and computational systems.",
+
+          footer_company: "Company",
+          footer_products: "Products",
+          footer_legal: "Legal",
+
+          legal_notice: "Legal Notice",
+          privacy: "Privacy Policy",
+          cookies: "Cookie Policy",
+          terms: "Terms of Use",
+
+          rights: "All rights reserved."
+        },
+
+
+        es: {
+          skip: "Saltar al contenido",
+
+          nav_company: "Compañía",
+          nav_technology: "Tecnología",
+          nav_products: "Productos",
+          nav_contact: "Contacto",
+
+          product_ope: "Orbital Pass Engine",
+          product_janus: "JANUS Space Reader",
+          product_lite: "3D Twins Lite",
+
+          hero_kicker: "Space Engine, Observation & Data",
+          hero_title: "Impulsando la frontera de la computación espacial.",
+          hero_description: "Desarrollamos tecnologías para integrar, procesar y explotar datos espaciales, conectando observación, computación y análisis.",
+          hero_cta_1: "Explorar nuestra tecnología",
+          hero_cta_2: "Descubrir nuestros productos",
+
+          challenge_eyebrow: "El desafío",
+          challenge_title: "Los datos espaciales crecen. Comprenderlos requiere nuevas formas de computación.",
+          challenge_statement: "El valor de la observación no reside únicamente en lo que recopilamos, sino en las relaciones que somos capaces de revelar.",
+          challenge_p1: "La información espacial se distribuye entre distintas fuentes, formatos y sistemas. Comprender sus relaciones requiere algo más que acceder a conjuntos de datos individuales o visualizarlos.",
+          challenge_p2: "SEOD aborda este desafío mediante tecnologías diseñadas para conectar la información espacial con su contexto computacional.",
+
+          challenge_stat_1: "Fuentes distribuidas",
+          challenge_stat_1_sub: "Diferentes orígenes y formatos",
+          challenge_stat_2: "Relaciones complejas",
+          challenge_stat_2_sub: "Espaciales, temporales y descriptivas",
+          challenge_stat_3: "Contexto computacional",
+          challenge_stat_3_sub: "Del acceso a la explotación",
+
+          approach_eyebrow: "Nuestro enfoque",
+          approach_title: "De la observación a la computación.",
+          approach_intro: "SEOD desarrolla tecnologías propias que conectan observación, información espacial y sistemas computacionales.",
+
+          approach_1_title: "Observar",
+          approach_1_text: "Acceder e interpretar la información generada por sistemas de observación.",
+
+          approach_2_title: "Integrar",
+          approach_2_text: "Conectar fuentes heterogéneas, conjuntos de datos espaciales y entornos computacionales.",
+
+          approach_3_title: "Explotar",
+          approach_3_text: "Transformar la información integrada en recursos analíticos y operativos.",
+
+          vision_eyebrow: "Visión a largo plazo",
+          vision_title: "Un mundo comprendido a través de la inteligencia espacial.",
+          vision_text: "Imaginamos un futuro en el que los datos espaciales sean una base para comprender sistemas complejos, conectando observaciones, entornos e información entre disciplinas.",
+
+          industries_eyebrow: "Sectores",
+          industries_title: "Tecnología con aplicaciones en múltiples sectores.",
+          industries_intro: "Nuestras tecnologías abordan desafíos relacionados con la información espacial en distintas industrias, ampliando las aplicaciones de los sistemas de observación y computación.",
+
+          industry_agriculture: "Agricultura",
+          industry_agriculture_text: "Información territorial, seguimiento de cultivos y análisis espacial.",
+
+          industry_forestry: "Forestal",
+          industry_forestry_text: "Observación forestal, seguimiento de vegetación e información ambiental.",
+
+          industry_construction: "Construcción",
+          industry_construction_text: "Contexto espacial, infraestructuras y entornos 3D.",
+
+          industry_mining: "Minería",
+          industry_mining_text: "Observación territorial, información de superficies y monitorización espacial.",
+
+          industry_energy: "Energía",
+          industry_energy_text: "Infraestructuras, análisis territorial y observación ambiental.",
+
+          industry_heritage: "Patrimonio",
+          industry_heritage_text: "Documentación, preservación digital y representación 3D.",
+
+          industry_research: "Investigación",
+          industry_research_text: "Conjuntos de datos espaciales, observación científica y exploración analítica.",
+
+          observations_eyebrow: "Archivo científico / Observaciones seleccionadas",
+          observations_title: "Leer el mundo a través de los datos espaciales.",
+          observations_intro: "Una selección de observaciones, conjuntos de datos espaciales e imágenes científicas que ilustran la información y los entornos que pueden explorarse mediante tecnologías espaciales.",
+
+          obs_1_title: "Observación de la Tierra",
+          obs_1_meta: "Imagen satelital / Fuente y fecha pendientes de especificar",
+
+          obs_2_title: "Territorio y relieve",
+          obs_2_meta: "Datos de superficie / Fuente y fecha pendientes",
+
+          obs_3_title: "Bosques y vegetación",
+          obs_3_meta: "Datos ambientales / Fuente y fecha pendientes",
+
+          products_eyebrow: "Tecnologías propias",
+          products_title: "Tecnologías desarrolladas por SEOD.",
+          products_intro: "Nuestros productos convierten tecnologías de computación espacial, observación y datos en herramientas prácticas para distintas aplicaciones.",
+
+          ope_description: "Operaciones orbitales, observación de la Tierra y simulación espacial.",
+          janus_description: "Integración de datos espaciales, exploración de catálogos y explotación analítica.",
+          lite_description: "Visualización interactiva y distribución de repositorios 3D existentes.",
+
+          product_explore: "Explorar producto",
+
+          contact_eyebrow: "Contacto / Colaboración",
+          contact_title: "Exploremos lo que la tecnología espacial puede hacer posible.",
+          contact_text: "Para consultas tecnológicas, colaboraciones, demostraciones y nuevas oportunidades, contacta con SEOD.",
+          contact_cta: "Contactar",
+
+          footer_description: "Tecnologías de computación espacial que conectan observación, datos y sistemas computacionales.",
+
+          footer_company: "Compañía",
+          footer_products: "Productos",
+          footer_legal: "Legal",
+
+          legal_notice: "Aviso legal",
+          privacy: "Política de privacidad",
+          cookies: "Política de cookies",
+          terms: "Condiciones de uso",
+
+          rights: "Todos los derechos reservados."
+        }
+
+      };
+
+
+      /* ---------------------------------------
+         LANGUAGE SELECTOR
+      --------------------------------------- */
+
+      function setLanguage(lang) {
+
+        const dictionary = translations[lang] || translations.en;
+
+        document.documentElement.lang = lang;
+
+        $$("[data-i18n]").forEach((element) => {
+
+          const key = element.dataset.i18n;
+
+          if (Object.prototype.hasOwnProperty.call(dictionary, key)) {
+            element.textContent = dictionary[key];
+          }
+
+        });
+
+        $$("[data-lang]").forEach((button) => {
+
+          const active = button.dataset.lang === lang;
+
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", String(active));
+
+        });
+
+        try {
+          localStorage.setItem("seod-lang", lang);
+        } catch (_) {}
+
+      }
+
+
+      let savedLanguage = "en";
+
+      try {
+        const stored = localStorage.getItem("seod-lang");
+
+        if (stored && translations[stored]) {
+          savedLanguage = stored;
+        }
+
+      } catch (_) {}
+
+      setLanguage(savedLanguage);
+
+
+      $$("[data-lang]").forEach((button) => {
+
+        button.addEventListener("click", () => {
+          setLanguage(button.dataset.lang);
+        });
+
+      });
+
+
+      /* ---------------------------------------
+         MOBILE NAVIGATION
+      --------------------------------------- */
+
+      const menuToggle = $("#menu-toggle");
+      const nav = $("#primary-navigation");
+
+      const productsWrap = $("#products-menu-wrap");
+      const productsTrigger = $(".products-trigger");
+
+
+      function closeMenu() {
+
+        document.body.classList.remove("is-menu-open");
+
+        menuToggle?.setAttribute("aria-expanded", "false");
+        menuToggle?.setAttribute("aria-label", "Open navigation");
+
+        productsWrap?.classList.remove("is-open");
+        productsTrigger?.setAttribute("aria-expanded", "false");
+
+      }
+
+
+      menuToggle?.addEventListener("click", () => {
+
+        const open =
+          menuToggle.getAttribute("aria-expanded") !== "true";
+
+        menuToggle.setAttribute("aria-expanded", String(open));
+
+        menuToggle.setAttribute(
+          "aria-label",
+          open ? "Close navigation" : "Open navigation"
+        );
+
+        document.body.classList.toggle("is-menu-open", open);
+
+      });
+
+
+      productsTrigger?.addEventListener("click", () => {
+
+        const open = !productsWrap.classList.contains("is-open");
+
+        productsWrap.classList.toggle("is-open", open);
+
+        productsTrigger.setAttribute(
+          "aria-expanded",
+          String(open)
+        );
+
+      });
+
+
+      $$("#primary-navigation a").forEach((link) => {
+
+        link.addEventListener("click", closeMenu);
+
+      });
+
+
+      document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape") {
+          closeMenu();
+        }
+
+      });
+
+
+      document.addEventListener("click", (event) => {
+
+        if (productsWrap && !productsWrap.contains(event.target)) {
+
+          productsWrap.classList.remove("is-open");
+
+          productsTrigger?.setAttribute(
+            "aria-expanded",
+            "false"
+          );
+
+        }
+
+      });
+
+
+      /* ---------------------------------------
+         THEME SWITCH
+      --------------------------------------- */
+
+      const themeToggle = $("#theme-toggle");
+
+      let theme = "light";
+
+      try {
+        theme = localStorage.getItem("seod-theme") || "light";
+      } catch (_) {}
+
+
+      if (theme === "dark") {
+        document.body.dataset.theme = "dark";
+      }
+
+
+      themeToggle?.addEventListener("click", () => {
+
+        const dark = document.body.dataset.theme !== "dark";
+
+        if (dark) {
+          document.body.dataset.theme = "dark";
+        } else {
+          delete document.body.dataset.theme;
+        }
+
+        try {
+          localStorage.setItem(
+            "seod-theme",
+            dark ? "dark" : "light"
+          );
+        } catch (_) {}
+
+      });
+
+
+      /* ---------------------------------------
+         SCROLL REVEAL
+      --------------------------------------- */
+
+      const revealItems = $$("[data-reveal]");
+
+      if (
+        "IntersectionObserver" in window &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+
+        const observer = new IntersectionObserver(
+          (entries, currentObserver) => {
+
+            entries.forEach((entry) => {
+
+              if (entry.isIntersecting) {
+
+                entry.target.classList.add("is-visible");
+
+                currentObserver.unobserve(entry.target);
+
+              }
+
+            });
+
+          },
+          {
+            threshold: 0.12,
+            rootMargin: "0px 0px -35px 0px"
+          }
+        );
+
+        revealItems.forEach((item) => {
+          observer.observe(item);
+        });
+
+      } else {
+
+        revealItems.forEach((item) => {
+          item.classList.add("is-visible");
+        });
+
+      }
+
+
+      /* ---------------------------------------
+         FOOTER YEAR
+      --------------------------------------- */
+
+      const year = $("#current-year");
+
+      if (year) {
+        year.textContent = new Date().getFullYear();
+      }
+
+
+      /* ---------------------------------------
+         RESPONSIVE NAVIGATION RESET
+      --------------------------------------- */
+
+      window.addEventListener("resize", () => {
+
+        if (window.innerWidth > 680) {
+          closeMenu();
+        }
+
+      }, { passive: true });
+
+
+    })();
+  </script>
+
+</body>
+</html>
