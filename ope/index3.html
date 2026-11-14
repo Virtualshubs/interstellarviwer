@@ -3337,6 +3337,165 @@
   </div>
 
 </section>
+
+
+    <!-- -----------------------------------------
+     SELECTED OBSERVATIONS
+------------------------------------------ -->
+
+<section class="section selected-observations" id="observations">
+
+  <div class="inner">
+
+    <div class="observations-heading">
+      <div>
+        <span class="observations-eyebrow">
+          SPATIAL DATA ARCHIVE / JANUS
+        </span>
+
+        <h2>Selected Observations.</h2>
+
+        <p>
+          A selection of spatial observations discovered,
+          indexed and explored with JANUS.
+        </p>
+      </div>
+
+      <div class="observations-count">
+        <span id="observationsTotal">10</span>
+        <small>OBSERVATIONS</small>
+      </div>
+    </div>
+
+    <div
+      class="observations-mosaic"
+      id="observationsMosaic"
+      aria-label="Selected spatial observations"
+    ></div>
+
+    <div class="observations-footer">
+      <span>DISCOVERED AND INDEXED WITH JANUS</span>
+      <span>SEOD — SPATIAL COMPUTING TECHNOLOGIES</span>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- -----------------------------------------
+     OBSERVATION MODAL
+------------------------------------------ -->
+
+<div
+  class="observation-modal"
+  id="observationModal"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="observationModalTitle"
+>
+
+  <div class="observation-modal-backdrop"
+       data-observation-close></div>
+
+  <div class="observation-modal-panel">
+
+    <div class="observation-modal-header">
+
+      <span class="observation-modal-label">
+        JANUS OBSERVATION ARCHIVE
+      </span>
+
+      <div class="observation-modal-controls">
+
+        <span id="observationModalIndex">01 / 10</span>
+
+        <button
+          class="observation-close"
+          type="button"
+          aria-label="Close observation"
+          data-observation-close
+        >
+          &times;
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="observation-modal-image-wrap">
+
+      <img
+        id="observationModalImage"
+        src=""
+        alt=""
+      >
+
+    </div>
+
+
+    <div class="observation-modal-content">
+
+      <div class="observation-modal-main">
+
+        <div class="observation-modal-category"
+             id="observationModalCategory"></div>
+
+        <h3 id="observationModalTitle"></h3>
+
+        <p id="observationModalDescription"></p>
+
+      </div>
+
+
+      <div class="observation-modal-metadata"
+           id="observationModalMetadata"></div>
+
+
+      <div class="observation-modal-bottom">
+
+        <span>DISCOVERED AND INDEXED WITH JANUS</span>
+
+        <div class="observation-navigation">
+
+          <button
+            type="button"
+            id="observationPrevious"
+            aria-label="Previous observation"
+          >
+            ← PREVIOUS
+          </button>
+
+          <button
+            type="button"
+            id="observationNext"
+            aria-label="Next observation"
+          >
+            NEXT →
+          </button>
+
+        </div>
+
+      </div>
+
+      <a
+        class="observation-source-link"
+        id="observationSourceLink"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden
+      >
+        VIEW ORIGINAL SOURCE ↗
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
     
 
     <!-- VISION -->
@@ -3366,6 +3525,8 @@
         </div>
       </div>
     </section>
+
+    
 
 
     <!-- INDUSTRIES -->
@@ -6007,6 +6168,689 @@ const translations = {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+  /* -----------------------------------------
+   SELECTED OBSERVATIONS
+   DATA + MOSAIC + MODAL
+----------------------------------------- */
+
+
+/*
+  OBSERVATION DATA
+
+  Sustituye los valores de ejemplo por los datos
+  reales de las observaciones obtenidas con JANUS.
+
+  Los campos sin información pueden dejarse vacíos.
+*/
+
+const observationsData = [
+
+  {
+    title: "Observation 01",
+    category: "",
+    description: "",
+    image: "images/observations/observation-01.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 02",
+    category: "",
+    description: "",
+    image: "images/observations/observation-02.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 03",
+    category: "",
+    description: "",
+    image: "images/observations/observation-03.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 04",
+    category: "",
+    description: "",
+    image: "images/observations/observation-04.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 05",
+    category: "",
+    description: "",
+    image: "images/observations/observation-05.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 06",
+    category: "",
+    description: "",
+    image: "images/observations/observation-06.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 07",
+    category: "",
+    description: "",
+    image: "images/observations/observation-07.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 08",
+    category: "",
+    description: "",
+    image: "images/observations/observation-08.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 09",
+    category: "",
+    description: "",
+    image: "images/observations/observation-09.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  },
+
+  {
+    title: "Observation 10",
+    category: "",
+    description: "",
+    image: "images/observations/observation-10.jpg",
+
+    metadata: {
+      "Data provider": "",
+      "Mission": "",
+      "Instrument": "",
+      "Product": "",
+      "Coordinates": "",
+      "Acquisition date": "",
+      "Collection": "",
+      "Item ID": ""
+    },
+
+    sourceUrl: ""
+  }
+
+];
+
+
+/* -----------------------------------------
+   ELEMENTS
+----------------------------------------- */
+
+const observationsMosaic =
+  document.getElementById("observationsMosaic");
+
+const observationsTotal =
+  document.getElementById("observationsTotal");
+
+const observationModal =
+  document.getElementById("observationModal");
+
+const observationModalImage =
+  document.getElementById("observationModalImage");
+
+const observationModalTitle =
+  document.getElementById("observationModalTitle");
+
+const observationModalCategory =
+  document.getElementById("observationModalCategory");
+
+const observationModalDescription =
+  document.getElementById("observationModalDescription");
+
+const observationModalMetadata =
+  document.getElementById("observationModalMetadata");
+
+const observationModalIndex =
+  document.getElementById("observationModalIndex");
+
+const observationSourceLink =
+  document.getElementById("observationSourceLink");
+
+const observationPrevious =
+  document.getElementById("observationPrevious");
+
+const observationNext =
+  document.getElementById("observationNext");
+
+
+let currentObservationIndex = 0;
+let previousFocusedElement = null;
+
+
+/* -----------------------------------------
+   HELPERS
+----------------------------------------- */
+
+function observationEscapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+
+/* -----------------------------------------
+   MOSAIC LAYOUT
+----------------------------------------- */
+
+function getObservationTileLayout(count, index) {
+
+  // Composición especial para diez observaciones.
+  if (count === 10) {
+
+    const desktop = [
+      [6, 4],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [4, 3],
+      [4, 3],
+      [4, 2],
+      [4, 2],
+      [4, 2]
+    ];
+
+    const mobile = [
+      [6, 3],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2],
+      [3, 2]
+    ];
+
+    return {
+      desktop: desktop[index],
+      mobile: mobile[index]
+    };
+  }
+
+
+  // Distribución automática para otros números.
+  let desktopCols;
+
+  if (count <= 4) {
+    desktopCols = 6;
+  } else if (count <= 6) {
+    desktopCols = 4;
+  } else {
+    desktopCols = 3;
+  }
+
+  let mobileCols = count <= 4 ? 3 : 2;
+
+  // Algunas imágenes reciben más superficie
+  // para evitar que todas tengan el mismo tamaño.
+  const featured = index === 0 || index === 4;
+
+  return {
+    desktop: [
+      featured ? Math.min(desktopCols * 2, 12) : desktopCols,
+      featured ? 3 : 2
+    ],
+
+    mobile: [
+      featured ? 6 : mobileCols,
+      featured ? 3 : 2
+    ]
+  };
+}
+
+
+/* -----------------------------------------
+   RENDER MOSAIC
+----------------------------------------- */
+
+function renderObservationsMosaic() {
+
+  if (!observationsMosaic) return;
+
+  const observations = observationsData.filter(
+    observation => observation.image
+  );
+
+  observationsMosaic.innerHTML = "";
+
+  observations.forEach((observation, index) => {
+
+    const layout = getObservationTileLayout(
+      observations.length,
+      index
+    );
+
+    const tile = document.createElement("button");
+
+    tile.type = "button";
+    tile.className = "observation-tile";
+
+    tile.style.setProperty(
+      "--tile-cols",
+      layout.desktop[0]
+    );
+
+    tile.style.setProperty(
+      "--tile-rows",
+      layout.desktop[1]
+    );
+
+    tile.style.setProperty(
+      "--tile-mobile-cols",
+      layout.mobile[0]
+    );
+
+    tile.style.setProperty(
+      "--tile-mobile-rows",
+      layout.mobile[1]
+    );
+
+    tile.setAttribute(
+      "aria-label",
+      `Open observation ${index + 1}: ${observation.title}`
+    );
+
+    tile.innerHTML = `
+      <img
+        src="${observationEscapeHTML(observation.image)}"
+        alt="${observationEscapeHTML(observation.title)}"
+        loading="lazy"
+      >
+
+      <span class="observation-tile-index">
+        ${String(index + 1).padStart(2, "0")}
+      </span>
+    `;
+
+    tile.addEventListener("click", () => {
+      openObservation(index, tile);
+    });
+
+    observationsMosaic.appendChild(tile);
+
+  });
+
+
+  if (observationsTotal) {
+    observationsTotal.textContent =
+      String(observations.length).padStart(2, "0");
+  }
+
+}
+
+
+/* -----------------------------------------
+   OPEN OBSERVATION
+----------------------------------------- */
+
+function openObservation(index, triggerElement) {
+
+  const observations = observationsData.filter(
+    observation => observation.image
+  );
+
+  if (!observations.length) return;
+
+  currentObservationIndex =
+    (index + observations.length) % observations.length;
+
+  previousFocusedElement = triggerElement || document.activeElement;
+
+  updateObservationModal();
+
+  observationModal.classList.add("is-open");
+
+  observationModal.setAttribute("aria-hidden", "false");
+
+  document.body.style.overflow = "hidden";
+
+  const closeButton =
+    observationModal.querySelector(".observation-close");
+
+  if (closeButton) {
+    closeButton.focus();
+  }
+
+}
+
+
+/* -----------------------------------------
+   UPDATE MODAL CONTENT
+----------------------------------------- */
+
+function updateObservationModal() {
+
+  const observations = observationsData.filter(
+    observation => observation.image
+  );
+
+  const observation =
+    observations[currentObservationIndex];
+
+  if (!observation) return;
+
+
+  observationModalImage.src = observation.image;
+
+  observationModalImage.alt = observation.title || "";
+
+  observationModalTitle.textContent =
+    observation.title || "Untitled observation";
+
+  observationModalCategory.textContent =
+    observation.category || "";
+
+  observationModalCategory.hidden =
+    !observation.category;
+
+  observationModalDescription.textContent =
+    observation.description || "";
+
+  observationModalDescription.hidden =
+    !observation.description;
+
+
+  // INDEX
+
+  observationModalIndex.textContent =
+    `${String(currentObservationIndex + 1).padStart(2, "0")} / ${String(observations.length).padStart(2, "0")}`;
+
+
+  // METADATA
+
+  observationModalMetadata.innerHTML = "";
+
+  Object.entries(observation.metadata || {}).forEach(
+    ([label, value]) => {
+
+      if (!value) return;
+
+      const item = document.createElement("div");
+
+      item.className = "observation-meta-item";
+
+      const metaLabel = document.createElement("span");
+      metaLabel.className = "observation-meta-label";
+      metaLabel.textContent = label;
+
+      const metaValue = document.createElement("span");
+      metaValue.className = "observation-meta-value";
+      metaValue.textContent = value;
+
+      item.appendChild(metaLabel);
+      item.appendChild(metaValue);
+
+      observationModalMetadata.appendChild(item);
+
+    }
+  );
+
+
+  // ORIGINAL SOURCE LINK
+
+  if (observation.sourceUrl) {
+
+    observationSourceLink.href =
+      observation.sourceUrl;
+
+    observationSourceLink.hidden = false;
+
+  } else {
+
+    observationSourceLink.hidden = true;
+    observationSourceLink.removeAttribute("href");
+
+  }
+
+
+  // NAVIGATION
+
+  const hasMultiple = observations.length > 1;
+
+  observationPrevious.disabled = !hasMultiple;
+  observationNext.disabled = !hasMultiple;
+
+}
+
+
+/* -----------------------------------------
+   CLOSE MODAL
+----------------------------------------- */
+
+function closeObservationModal() {
+
+  if (!observationModal.classList.contains("is-open")) {
+    return;
+  }
+
+  observationModal.classList.remove("is-open");
+
+  observationModal.setAttribute("aria-hidden", "true");
+
+  document.body.style.overflow = "";
+
+  observationModalImage.src = "";
+
+  if (
+    previousFocusedElement &&
+    typeof previousFocusedElement.focus === "function"
+  ) {
+    previousFocusedElement.focus();
+  }
+
+}
+
+
+/* -----------------------------------------
+   PREVIOUS / NEXT
+----------------------------------------- */
+
+function navigateObservation(direction) {
+
+  const observations = observationsData.filter(
+    observation => observation.image
+  );
+
+  if (observations.length <= 1) return;
+
+  currentObservationIndex =
+    (
+      currentObservationIndex +
+      direction +
+      observations.length
+    ) % observations.length;
+
+  updateObservationModal();
+
+}
+
+
+observationPrevious.addEventListener("click", () => {
+  navigateObservation(-1);
+});
+
+observationNext.addEventListener("click", () => {
+  navigateObservation(1);
+});
+
+
+/* -----------------------------------------
+   CLOSE EVENTS
+----------------------------------------- */
+
+observationModal
+  .querySelectorAll("[data-observation-close]")
+  .forEach(element => {
+
+    element.addEventListener("click", closeObservationModal);
+
+  });
+
+
+/* -----------------------------------------
+   KEYBOARD
+----------------------------------------- */
+
+document.addEventListener("keydown", event => {
+
+  if (!observationModal.classList.contains("is-open")) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    closeObservationModal();
+  }
+
+  if (event.key === "ArrowLeft") {
+    navigateObservation(-1);
+  }
+
+  if (event.key === "ArrowRight") {
+    navigateObservation(1);
+  }
+
+});
+
+
+/* -----------------------------------------
+   INITIALIZE
+----------------------------------------- */
+
+renderObservationsMosaic();
   
 </script>
 
