@@ -2370,6 +2370,23 @@
 
 }
 
+    /* CLICKABLE BOOK PAGES */
+
+.industry-book-left,
+.industry-book-right {
+  cursor: pointer;
+}
+
+/* Subtle feedback */
+
+.industry-book-left {
+  cursor: w-resize;
+}
+
+.industry-book-right {
+  cursor: e-resize;
+}
+
   </style>
 </head>
 
@@ -4101,6 +4118,7 @@ hero_cta_2: "Descubrir nuestros productos",
 })();
 </script>
 
+
 <script>
 /* =====================================================
    SEOD — INTERACTIVE INDUSTRY BOOK
@@ -4115,6 +4133,9 @@ hero_cta_2: "Descubrir nuestros productos",
   book.dataset.initialized = "true";
 
   const spread = book.querySelector(".industry-book-spread");
+
+  const leftPage = book.querySelector(".industry-book-left");
+  const rightPage = book.querySelector(".industry-book-right");
 
   const image = document.getElementById("industryBookImage");
   const imageCaption = document.getElementById("industryImageCaption");
@@ -4686,7 +4707,7 @@ hero_cta_2: "Descubrir nuestros productos",
 
 
   /* =====================================================
-     PREVIOUS / NEXT
+     PREVIOUS / NEXT BUTTONS
      ===================================================== */
 
   prevButton.addEventListener("click", () => {
@@ -4696,6 +4717,32 @@ hero_cta_2: "Descubrir nuestros productos",
   nextButton.addEventListener("click", () => {
     changeIndustry(currentIndex + 1);
   });
+
+
+  /* =====================================================
+     CLICKABLE BOOK PAGES
+     ===================================================== */
+
+  /* LEFT PAGE — PREVIOUS CHAPTER */
+
+  if (leftPage) {
+
+    leftPage.addEventListener("click", () => {
+      changeIndustry(currentIndex - 1);
+    });
+
+  }
+
+
+  /* RIGHT PAGE — NEXT CHAPTER */
+
+  if (rightPage) {
+
+    rightPage.addEventListener("click", () => {
+      changeIndustry(currentIndex + 1);
+    });
+
+  }
 
 
   /* =====================================================
@@ -4723,6 +4770,7 @@ hero_cta_2: "Descubrir nuestros productos",
 
 })();
 </script>
+
 
   
 </body>
