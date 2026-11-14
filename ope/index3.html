@@ -2750,6 +2750,53 @@
 
 }
 
+    /* =========================================
+   CONTACT — FULL BACKGROUND GIF
+========================================= */
+
+#contact {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+/* GIF BACKGROUND */
+
+#contact .contact-background {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+#contact .contact-background img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* SUBTLE OVERLAY */
+
+#contact .contact-background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(17, 18, 16, 0.38);
+    pointer-events: none;
+}
+
+/* CONTENT ABOVE BACKGROUND */
+
+#contact .inner,
+#contact .contact-layout {
+    position: relative;
+    z-index: 1;
+}
+
   </style>
 </head>
 
@@ -3854,42 +3901,45 @@
 
     
 
-    <!-- CONTACT -->
+   <!-- CONTACT -->
 
-    <section class="section contact" id="contact">
+<section class="section contact" id="contact">
 
-      <div class="inner">
+  <div class="contact-background" aria-hidden="true">
+    <img src="images/contact-background.gif" alt="">
+  </div>
 
-        <div class="contact-layout" data-reveal>
+  <div class="inner">
 
-          <div>
-            <div class="eyebrow" data-i18n="contact_eyebrow">
-              Contact / Collaboration
-            </div>
+    <div class="contact-layout" data-reveal>
 
-            <h2 data-i18n="contact_title">
-              Let's explore what spatial technology can make possible.
-            </h2>
-          </div>
-
-          <div class="contact-side">
-
-            <p data-i18n="contact_text">
-              For technology enquiries, partnerships, demonstrations
-              and new opportunities, get in touch with SEOD.
-            </p>
-
-            <!-- Replace with the official SEOD email -->
-            <a class="button button-light"
-              href="mailto:hello@seod.space"
-              data-i18n="contact_cta">
-              Get in touch
-            </a>
-
-          </div>
+      <div>
+        <div class="eyebrow" data-i18n="contact_eyebrow">
+          Contact / Collaboration
         </div>
+
+        <h2 data-i18n="contact_title">
+          Let's explore what spatial technology can make possible.
+        </h2>
       </div>
-    </section>
+
+      <div class="contact-side">
+
+        <p data-i18n="contact_text">
+          For technology enquiries, partnerships, demonstrations
+          and new opportunities, get in touch with SEOD.
+        </p>
+
+        <a class="button button-light"
+          href="mailto:hello@seod.space"
+          data-i18n="contact_cta">
+          Get in touch
+        </a>
+
+      </div>
+    </div>
+  </div>
+</section>
 
   </main>
 
