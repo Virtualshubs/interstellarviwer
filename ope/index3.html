@@ -2387,6 +2387,369 @@
   cursor: e-resize;
 }
 
+    /* =========================================
+   WHO WE HELP
+========================================= */
+
+.who-section {
+    position: relative;
+    width: 100%;
+    padding: 100px 0;
+    background: #F3F1EA;
+    color: #242522;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+
+/* HEADER */
+
+.who-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 40px;
+    margin-bottom: 45px;
+}
+
+.who-eyebrow {
+    display: block;
+    margin-bottom: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: #657B54;
+}
+
+.who-heading h2 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 500;
+    letter-spacing: -.045em;
+}
+
+.who-heading > p {
+    max-width: 390px;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #62635D;
+}
+
+
+/* =========================================
+   SELECTED PROFILE BANNER
+========================================= */
+
+.who-banner {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    margin-bottom: 35px;
+    background: #F3F1EA;
+    border-top: 1px solid rgba(36, 37, 34, .2);
+    border-bottom: 1px solid rgba(36, 37, 34, .2);
+    animation: whoBannerIn .35s ease both;
+}
+
+.who-banner[hidden] {
+    display: none;
+}
+
+@keyframes whoBannerIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* IMAGE */
+
+.who-banner-image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: #242522;
+}
+
+.who-banner-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+
+/* CONTENT */
+
+.who-banner-content {
+    padding: 30px 35px 35px;
+}
+
+.who-banner-meta {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    color: #657B54;
+}
+
+.who-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    margin-left: auto;
+    border: 1px solid rgba(36, 37, 34, .25);
+    border-radius: 50%;
+    background: transparent;
+    color: #242522;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+
+.who-close:hover {
+    background: #242522;
+    color: #F3F1EA;
+}
+
+.who-banner-content h3 {
+    margin: 0 0 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(30px, 4vw, 46px);
+    font-weight: 500;
+    letter-spacing: -.04em;
+}
+
+.who-banner-subtitle {
+    max-width: 700px;
+    margin: 0 0 14px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.who-banner-description {
+    max-width: 750px;
+    margin: 0;
+    color: #62635D;
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+
+/* HOW SEOD HELPS */
+
+.who-banner-help {
+    margin-top: 28px;
+}
+
+.who-banner-help h4 {
+    margin: 0 0 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.who-banner-help ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.who-banner-help li {
+    position: relative;
+    padding-left: 15px;
+    color: #62635D;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.who-banner-help li::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 5px;
+    height: 5px;
+    background: #657B54;
+    border-radius: 50%;
+}
+
+
+/* RELATED TECHNOLOGY */
+
+.who-banner-footer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(36, 37, 34, .18);
+}
+
+.who-banner-footer span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    color: #777870;
+}
+
+.who-banner-footer strong {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   PROFILE GRID
+========================================= */
+
+.who-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px 18px;
+}
+
+
+/* SLOT */
+
+.who-slot {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #242522;
+    text-align: left;
+    cursor: pointer;
+}
+
+.who-slot img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+    background: #D9D7CE;
+    filter: saturate(.82);
+    transition:
+        filter .35s ease,
+        transform .45s ease;
+}
+
+.who-slot:hover img {
+    filter: saturate(1);
+    transform: scale(1.015);
+}
+
+.who-slot-info {
+    padding-top: 12px;
+}
+
+.who-slot-info span {
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .08em;
+    color: #657B54;
+}
+
+.who-slot-info h3 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.35;
+    transition: color .2s;
+}
+
+.who-slot:hover h3,
+.who-slot.is-active h3 {
+    color: #416D80;
+}
+
+.who-slot.is-active img {
+    outline: 2px solid #416D80;
+    outline-offset: -2px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .who-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px 16px;
+    }
+
+    .who-banner-help ul {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .who-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .who-section {
+        padding: 65px 0;
+    }
+
+    .who-banner-image {
+        height: 200px;
+    }
+
+    .who-banner-content {
+        padding: 23px 18px 25px;
+    }
+
+    .who-banner-content h3 {
+        font-size: 32px;
+    }
+
+    .who-banner-subtitle {
+        font-size: 15px;
+    }
+
+    .who-banner-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .who-slot-info h3 {
+        font-size: 14px;
+    }
+
+}
+
   </style>
 </head>
 
@@ -3349,6 +3712,147 @@
       </div>
     </section>
 
+
+
+
+<section id="whoWeHelp" class="who-section">
+
+    <div class="who-heading">
+        <div>
+            <span class="who-eyebrow">SEOD / ORGANISATION PROFILES</span>
+            <h2>Who we help.</h2>
+        </div>
+
+        <p>
+            We build spatial computing technologies for organisations
+            that observe, manage, analyse and communicate our world.
+        </p>
+    </div>
+
+
+    <!-- SELECTED PROFILE BANNER -->
+    <div id="whoBanner" class="who-banner" aria-live="polite" hidden>
+
+        <div class="who-banner-image">
+            <img id="whoBannerImage" src="" alt="">
+        </div>
+
+        <div class="who-banner-content">
+
+            <div class="who-banner-meta">
+                <span id="whoBannerNumber">01</span>
+                <span>/</span>
+                <span id="whoBannerCategory">SPACE INDUSTRY</span>
+
+                <button
+                    type="button"
+                    id="whoBannerClose"
+                    class="who-close"
+                    aria-label="Close profile">
+                    ×
+                </button>
+            </div>
+
+            <h3 id="whoBannerTitle">Satellite operators.</h3>
+
+            <p
+                id="whoBannerSubtitle"
+                class="who-banner-subtitle">
+            </p>
+
+            <p
+                id="whoBannerDescription"
+                class="who-banner-description">
+            </p>
+
+            <div class="who-banner-help">
+                <h4>How SEOD helps</h4>
+                <ul id="whoBannerBenefits"></ul>
+            </div>
+
+            <div class="who-banner-footer">
+                <span>RELATED TECHNOLOGY</span>
+                <strong id="whoBannerProducts"></strong>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- PROFILE GRID -->
+    <div class="who-grid">
+
+        <button class="who-slot" type="button" data-profile="0">
+            <img src="images/who/satellite-operators.jpg" alt="Satellite operators">
+            <div class="who-slot-info">
+                <span>01 / SPACE INDUSTRY</span>
+                <h3>Satellite operators</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="1">
+            <img src="images/who/scanning.jpg" alt="Scanning and monitoring organisations">
+            <div class="who-slot-info">
+                <span>02 / SPATIAL MONITORING</span>
+                <h3>Scanning organisations</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="2">
+            <img src="images/who/agriculture.jpg" alt="Agricultural operators">
+            <div class="who-slot-info">
+                <span>03 / AGRICULTURE</span>
+                <h3>Agricultural operators</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="3">
+            <img src="images/who/data-ai.jpg" alt="Data analytics and AI companies">
+            <div class="who-slot-info">
+                <span>04 / DATA INFRASTRUCTURE</span>
+                <h3>Data & AI companies</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="4">
+            <img src="images/who/museums.jpg" alt="Museums and science institutions">
+            <div class="who-slot-info">
+                <span>05 / SCIENCE & CULTURE</span>
+                <h3>Museums & institutions</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="5">
+            <img src="images/who/research.jpg" alt="Universities and research teams">
+            <div class="who-slot-info">
+                <span>06 / RESEARCH</span>
+                <h3>Research teams</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="6">
+            <img src="images/who/hardware.jpg" alt="Hardware manufacturers">
+            <div class="who-slot-info">
+                <span>07 / INDUSTRIAL TECHNOLOGY</span>
+                <h3>Hardware manufacturers</h3>
+            </div>
+        </button>
+
+        <button class="who-slot" type="button" data-profile="7">
+            <img src="images/who/conservation.jpg" alt="Biodiversity and conservation teams">
+            <div class="who-slot-info">
+                <span>08 / ENVIRONMENT</span>
+                <h3>Conservation teams</h3>
+            </div>
+        </button>
+
+    </div>
+
+</section>
+
+
+
+    
 
     <!-- CONTACT -->
 
@@ -4769,6 +5273,288 @@ hero_cta_2: "Descubrir nuestros productos",
   renderIndustry(currentIndex);
 
 })();
+
+
+
+
+
+
+/* =========================================
+   WHO WE HELP — PROFILE SELECTOR
+========================================= */
+
+(() => {
+
+    const profiles = [
+
+        {
+            number: "01",
+            category: "SPACE INDUSTRY",
+            title: "Satellite operators.",
+            subtitle: "Connecting orbital capabilities with observation.",
+            description:
+                "Satellite operators need to understand, visualise and communicate the observation potential of their missions, connecting orbital operations with the territories they observe.",
+
+            image: "images/who/satellite-operators.jpg",
+
+            benefits: [
+                "Visualise orbital trajectories and satellite operations.",
+                "Explore observation geometry and territorial coverage.",
+                "Communicate mission capabilities through interactive 3D environments."
+            ],
+
+            products: "OPE — Orbital Pass Engine"
+        },
+
+        {
+            number: "02",
+            category: "SPATIAL MONITORING",
+            title: "Scanning organisations.",
+            subtitle: "Turning large collections of observations into operational knowledge.",
+            description:
+                "Organisations working with scanning, surveying and monitoring generate large volumes of spatial information. Connecting those observations over time and territory makes them more useful.",
+
+            image: "images/who/scanning.jpg",
+
+            benefits: [
+                "Integrate spatial observations from different sources.",
+                "Explore historical and territorial datasets.",
+                "Relate observations through spatial, temporal and descriptive dimensions."
+            ],
+
+            products: "JANUS Space Reader"
+        },
+
+        {
+            number: "03",
+            category: "AGRICULTURE",
+            title: "Agricultural operators.",
+            subtitle: "Understanding the evolution of the land.",
+            description:
+                "Agricultural operators need to observe their own territories, understand crop evolution and connect environmental information with the places they manage.",
+
+            image: "images/who/agriculture.jpg",
+
+            benefits: [
+                "Visualise satellite observations over agricultural land.",
+                "Compare territorial and temporal information.",
+                "Organise observations into accessible analytical environments."
+            ],
+
+            products: "OPE — Orbital Pass Engine · JANUS Space Reader"
+        },
+
+        {
+            number: "04",
+            category: "DATA INFRASTRUCTURE",
+            title: "Data & AI companies.",
+            subtitle: "Preparing spatial information for advanced analytical workflows.",
+            description:
+                "Data infrastructure and analytics companies work with increasingly complex datasets. Spatial computing provides new ways to integrate, structure and exploit those sources.",
+
+            image: "images/who/data-ai.jpg",
+
+            benefits: [
+                "Integrate distributed spatial catalogues and datasets.",
+                "Explore and structure large observation collections.",
+                "Prepare enriched spatial information for analytical and AI workflows."
+            ],
+
+            products: "JANUS Space Reader"
+        },
+
+        {
+            number: "05",
+            category: "SCIENCE & CULTURE",
+            title: "Museums & institutions.",
+            subtitle: "Making scientific knowledge accessible and tangible.",
+            description:
+                "Museums, science centres and communication institutions need new ways to present complex scientific information, spatial observations and three-dimensional content.",
+
+            image: "images/who/museums.jpg",
+
+            benefits: [
+                "Present orbital and Earth observation information interactively.",
+                "Create accessible scientific visualisation experiences.",
+                "Share interactive 3D collections and models."
+            ],
+
+            products: "OPE — Orbital Pass Engine · 3DLite Space"
+        },
+
+        {
+            number: "06",
+            category: "RESEARCH",
+            title: "Research teams.",
+            subtitle: "Connecting multidisciplinary observations and models.",
+            description:
+                "Universities and research teams work with distributed datasets, scientific catalogues and complex spatial models that benefit from integrated exploration and visualisation.",
+
+            image: "images/who/research.jpg",
+
+            benefits: [
+                "Explore scientific observation catalogues.",
+                "Relate spatial and temporal datasets.",
+                "Visualise and distribute interactive 3D research assets."
+            ],
+
+            products: "OPE · JANUS Space Reader · 3DLite Space"
+        },
+
+        {
+            number: "07",
+            category: "INDUSTRIAL TECHNOLOGY",
+            title: "Hardware manufacturers.",
+            subtitle: "Giving technical products a spatial dimension.",
+            description:
+                "Manufacturers and technical distributors need effective ways to present equipment, components and product catalogues, especially when technical detail and three-dimensional understanding matter.",
+
+            image: "images/who/hardware.jpg",
+
+            benefits: [
+                "Turn existing 3D repositories into interactive catalogues.",
+                "Present technical products through browser-based 3D visualisation.",
+                "Share product collections without hosting customer models on SEOD infrastructure."
+            ],
+
+            products: "3DLite Space"
+        },
+
+        {
+            number: "08",
+            category: "ENVIRONMENT",
+            title: "Conservation teams.",
+            subtitle: "Understanding change across habitats and territories.",
+            description:
+                "Biodiversity and conservation organisations need to connect observations from different locations and periods to understand environmental changes and monitor ecosystems.",
+
+            image: "images/who/conservation.jpg",
+
+            benefits: [
+                "Visualise environmental observations across territories.",
+                "Relate historical and current spatial information.",
+                "Explore changes through integrated observation datasets."
+            ],
+
+            products: "OPE — Orbital Pass Engine · JANUS Space Reader"
+        }
+
+    ];
+
+
+    const banner = document.getElementById("whoBanner");
+
+    if (!banner) return;
+
+
+    const bannerImage = document.getElementById("whoBannerImage");
+    const bannerNumber = document.getElementById("whoBannerNumber");
+    const bannerCategory = document.getElementById("whoBannerCategory");
+    const bannerTitle = document.getElementById("whoBannerTitle");
+    const bannerSubtitle = document.getElementById("whoBannerSubtitle");
+    const bannerDescription = document.getElementById("whoBannerDescription");
+    const bannerBenefits = document.getElementById("whoBannerBenefits");
+    const bannerProducts = document.getElementById("whoBannerProducts");
+    const closeButton = document.getElementById("whoBannerClose");
+
+    const slots = document.querySelectorAll("#whoWeHelp .who-slot");
+
+
+    function selectProfile(index) {
+
+        const profile = profiles[index];
+
+        if (!profile) return;
+
+
+        /* UPDATE BANNER CONTENT */
+
+        bannerNumber.textContent = profile.number;
+        bannerCategory.textContent = profile.category;
+        bannerTitle.textContent = profile.title;
+        bannerSubtitle.textContent = profile.subtitle;
+        bannerDescription.textContent = profile.description;
+        bannerProducts.textContent = profile.products;
+
+
+        /* UPDATE IMAGE */
+
+        bannerImage.src = profile.image;
+        bannerImage.alt = profile.title;
+
+
+        /* UPDATE BENEFITS */
+
+        bannerBenefits.replaceChildren();
+
+        profile.benefits.forEach(benefit => {
+
+            const li = document.createElement("li");
+
+            li.textContent = benefit;
+
+            bannerBenefits.appendChild(li);
+
+        });
+
+
+        /* ACTIVE SLOT */
+
+        slots.forEach(slot => {
+
+            const active = Number(slot.dataset.profile) === index;
+
+            slot.classList.toggle("is-active", active);
+
+            slot.setAttribute("aria-pressed", active ? "true" : "false");
+
+        });
+
+
+        /* SHOW BANNER */
+
+        banner.hidden = false;
+
+    }
+
+
+    /* SLOT EVENTS */
+
+    slots.forEach(slot => {
+
+        slot.setAttribute("aria-pressed", "false");
+
+        slot.addEventListener("click", () => {
+
+            selectProfile(Number(slot.dataset.profile));
+
+        });
+
+    });
+
+
+    /* CLOSE BANNER */
+
+    closeButton.addEventListener("click", () => {
+
+        banner.hidden = true;
+
+        slots.forEach(slot => {
+
+            slot.classList.remove("is-active");
+
+            slot.setAttribute("aria-pressed", "false");
+
+        });
+
+    });
+
+})();
+
+
+
+
+  
 </script>
 
 
