@@ -1184,6 +1184,51 @@
         transform: none;
       }
     }
+
+    /* INDUSTRIES — INTRO IMAGE */
+
+.industries .section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.85fr);
+  align-items: center;
+  gap: 64px;
+}
+
+.industries-intro {
+  min-width: 0;
+}
+
+.industries-image {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.industries-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.industries-image figcaption {
+  margin-top: 12px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .industries .section-head {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .industries-image img {
+    aspect-ratio: 16 / 9;
+  }
+}
   </style>
 </head>
 
@@ -1437,10 +1482,6 @@
           <div class="eyebrow" data-i18n="vision_eyebrow">
             Long-term vision
           </div>
-
-          <div class="vision-mark mono">
-            SEOD / VISION
-          </div>
         </div>
 
         <div class="vision-copy">
@@ -1462,102 +1503,117 @@
 
     <!-- INDUSTRIES -->
 
-    <section class="section industries">
+ <section class="section industries">
 
-      <div class="inner">
+  <div class="inner">
 
-        <div class="section-head" data-reveal>
+    <div class="section-head" data-reveal>
 
-          <div class="section-number mono" hidden>
-            03 / Industries
-          </div>
-
-          <div>
-            <div class="eyebrow" data-i18n="industries_eyebrow">
-              Industries
-            </div>
-
-            <h2 data-i18n="industries_title">
-              Technology with applications across sectors.
-            </h2>
-
-            <p class="intro-copy" data-i18n="industries_intro">
-              Our technologies address spatial information challenges across
-              different industries, extending the applications of observation
-              and computational systems.
-            </p>
-          </div>
-
-        </div>
-
-        <div class="industry-list" data-reveal>
-
-          <article class="industry-row">
-            <span class="nav-index">01</span>
-            <h3 data-i18n="industry_agriculture">Agriculture</h3>
-            <p data-i18n="industry_agriculture_text">
-              Territorial information, crop monitoring and spatial analysis.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-          <article class="industry-row">
-            <span class="nav-index">02</span>
-            <h3 data-i18n="industry_forestry">Forestry</h3>
-            <p data-i18n="industry_forestry_text">
-              Forest observation, vegetation monitoring and environmental information.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-          <article class="industry-row">
-            <span class="nav-index">03</span>
-            <h3 data-i18n="industry_construction">Construction</h3>
-            <p data-i18n="industry_construction_text">
-              Spatial context, infrastructure and 3D environments.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-          <article class="industry-row">
-            <span class="nav-index">04</span>
-            <h3 data-i18n="industry_mining">Mining</h3>
-            <p data-i18n="industry_mining_text">
-              Territorial observation, surface information and spatial monitoring.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-          <article class="industry-row">
-            <span class="nav-index">05</span>
-            <h3 data-i18n="industry_energy">Energy</h3>
-            <p data-i18n="industry_energy_text">
-              Infrastructure, territorial analysis and environmental observation.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-          <article class="industry-row">
-            <span class="nav-index">06</span>
-            <h3 data-i18n="industry_heritage">Heritage</h3>
-            <p data-i18n="industry_heritage_text">
-              Documentation, digital preservation and 3D representation.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-          <article class="industry-row">
-            <span class="nav-index">07</span>
-            <h3 data-i18n="industry_research">Research</h3>
-            <p data-i18n="industry_research_text">
-              Spatial datasets, scientific observation and analytical exploration.
-            </p>
-            <span class="industry-arrow">↗</span>
-          </article>
-
-        </div>
+      <div class="section-number mono" hidden>
+        03 / Industries
       </div>
-    </section>
+
+      <div class="industries-intro">
+
+        <div class="eyebrow" data-i18n="industries_eyebrow">
+          Industries
+        </div>
+
+        <h2 data-i18n="industries_title">
+          Technology with applications across sectors.
+        </h2>
+
+        <p class="intro-copy" data-i18n="industries_intro">
+          Our technologies address spatial information challenges across
+          different industries, extending the applications of observation
+          and computational systems.
+        </p>
+
+      </div>
+
+      <figure class="industries-image">
+        <img
+          src="images/industries-observation.jpg"
+          alt="Spatial observation of natural and built environments"
+          loading="lazy"
+        >
+        <figcaption class="mono">
+          SPATIAL TECHNOLOGIES / CROSS-SECTOR APPLICATIONS
+        </figcaption>
+      </figure>
+
+    </div>
+
+    <div class="industry-list" data-reveal>
+
+      <article class="industry-row">
+        <span class="nav-index">01</span>
+        <h3 data-i18n="industry_agriculture">Agriculture</h3>
+        <p data-i18n="industry_agriculture_text">
+          Territorial information, crop monitoring and spatial analysis.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+      <article class="industry-row">
+        <span class="nav-index">02</span>
+        <h3 data-i18n="industry_forestry">Forestry</h3>
+        <p data-i18n="industry_forestry_text">
+          Forest observation, vegetation monitoring and environmental information.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+      <article class="industry-row">
+        <span class="nav-index">03</span>
+        <h3 data-i18n="industry_construction">Construction</h3>
+        <p data-i18n="industry_construction_text">
+          Spatial context, infrastructure and 3D environments.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+      <article class="industry-row">
+        <span class="nav-index">04</span>
+        <h3 data-i18n="industry_mining">Mining</h3>
+        <p data-i18n="industry_mining_text">
+          Territorial observation, surface information and spatial monitoring.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+      <article class="industry-row">
+        <span class="nav-index">05</span>
+        <h3 data-i18n="industry_energy">Energy</h3>
+        <p data-i18n="industry_energy_text">
+          Infrastructure, territorial analysis and environmental observation.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+      <article class="industry-row">
+        <span class="nav-index">06</span>
+        <h3 data-i18n="industry_heritage">Heritage</h3>
+        <p data-i18n="industry_heritage_text">
+          Documentation, digital preservation and 3D representation.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+      <article class="industry-row">
+        <span class="nav-index">07</span>
+        <h3 data-i18n="industry_research">Research</h3>
+        <p data-i18n="industry_research_text">
+          Spatial datasets, scientific observation and analytical exploration.
+        </p>
+        <span class="industry-arrow">↗</span>
+      </article>
+
+    </div>
+
+  </div>
+
+</section>
 
 
     <!-- SELECTED OBSERVATIONS -->
