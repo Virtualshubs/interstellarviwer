@@ -3649,7 +3649,21 @@
     transition-duration: 0.01ms !important;
   }
 }
- 
+ .manifesto-signature {
+  display: block;
+  width: 150px;
+  max-width: 45%;
+  height: auto;
+  margin: 32px 0 8px auto;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.manifesto-signature.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
   </style>
 </head>
 
@@ -3839,7 +3853,14 @@
           AN INVITATION TO OBSERVE
         </span>
 
-        <span data-i18n="manifesto_page">01 — 01</span>
+    
+<span
+  id="manifesto-language"
+  data-manifesto-lang="en"
+>
+  EN
+</span>
+
       </div>
 
       <div class="manifesto-paper-content">
@@ -7785,13 +7806,8 @@ renderObservationsMosaic();
 
 
 
-
-
-
-
-
 /* =========================================
-   MANIFIESTO — VERSIÓN ORIGINAL EN ESPAÑOL
+   MANIFESTO — ENGLISH VERSION
 ========================================= */
 
 (() => {
@@ -7817,41 +7833,47 @@ renderObservationsMosaic();
   const scenes = [
     {
       image: 'images/manifesto-01.jpg',
-      text: 'A veces olvidamos detenernos a mirar.'
+      text: 'Sometimes, we forget to stop and look.'
     },
     {
       image: 'images/manifesto-02.jpg',
-      text: 'Bajo nuestros pies, sobre nuestras cabezas y más allá de lo que alcanza nuestra vista, todo está cambiando.'
+      text: 'Beneath our feet, above our heads, and beyond the reach of our sight, everything is changing.'
     },
     {
       image: 'images/manifesto-03.jpg',
-      text: 'Los bosques respiran, los océanos dibujan caminos, los ríos transforman paisajes y la naturaleza escribe historias que apenas comenzamos a comprender.'
+      text: 'Forests breathe, oceans draw their own paths, rivers reshape landscapes, and nature writes stories we are only beginning to understand.'
     },
     {
       image: 'images/manifesto-04.jpg',
-      text: 'Hay tanta belleza que todavía desconocemos.'
+      text: 'There is so much beauty we have yet to discover.'
     },
     {
       image: 'images/manifesto-05.jpg',
-      text: 'Observar es una forma de acercarnos. De aprender a escuchar lo que el mundo nos muestra, reconocer sus cambios y descubrir las conexiones que nos unen a él.'
+      text: 'To observe is a way of drawing closer. Of learning to listen to what the world reveals, recognising its changes and discovering the connections that bring us together.'
     },
     {
       image: 'images/manifesto-06.jpg',
-      text: 'Porque cuanto más comprendemos, más conscientes somos de todo aquello que merece ser cuidado.'
+      text: 'Because the more we understand, the more aware we become of everything that deserves to be protected.'
     },
     {
       image: 'images/manifesto-07.jpg',
-      text: 'Y quizá esa sea una de las cosas más hermosas del conocimiento: que nunca termina.'
+      text: 'And perhaps that is one of the most beautiful things about knowledge: it never ends.'
     },
     {
       image: 'images/manifesto-08.jpg',
-      text: 'Siempre habrá algo nuevo que descubrir, otra pregunta que formular, otra frontera que explorar.'
+      text: 'There will always be something new to discover, another question to ask, another frontier to explore.'
     },
     {
       image: 'images/manifesto-09.jpg',
-      text: 'Que nunca perdamos la curiosidad. Que la ambición por conocer siga impulsándonos hacia el mañana. Porque, si somos capaces de imaginar un mundo mejor y comprenderlo, también podemos ayudar a hacerlo realidad.'
+      text: 'May we never lose our curiosity. May our ambition to understand keep carrying us towards tomorrow. Because if we can imagine a better world and learn to understand it, we can also help make it happen.'
     }
   ];
+
+  // -----------------------------------------
+  // SIGNATURE IMAGE
+  // -----------------------------------------
+
+  const signatureImage = 'images/manifesto-signature.png';
 
   // -----------------------------------------
   // TIMING
@@ -7899,6 +7921,10 @@ renderObservationsMosaic();
 
     };
 
+    preload.onerror = () => {
+      console.error('Manifesto: image could not be loaded:', src);
+    };
+
     preload.src = src;
   }
 
@@ -7937,6 +7963,27 @@ renderObservationsMosaic();
   }
 
   // -----------------------------------------
+  // SHOW SIGNATURE
+  // -----------------------------------------
+
+  function showSignature() {
+
+    const signature = document.createElement('img');
+
+    signature.className = 'manifesto-signature';
+    signature.src = signatureImage;
+    signature.alt = 'Signature';
+    signature.loading = 'eager';
+
+    copy.appendChild(signature);
+
+    requestAnimationFrame(() => {
+      signature.classList.add('is-visible');
+    });
+
+  }
+
+  // -----------------------------------------
   // COMPLETE TEXT
   // -----------------------------------------
 
@@ -7954,6 +8001,8 @@ renderObservationsMosaic();
 
     });
 
+    showSignature();
+
     // Keep the final image permanently
     changeBackground(scenes[scenes.length - 1].image);
 
@@ -7967,6 +8016,7 @@ renderObservationsMosaic();
   async function startManifesto() {
 
     startButton.disabled = true;
+    skipRequested = false;
 
     intro.hidden = true;
     paper.hidden = false;
@@ -7987,9 +8037,14 @@ renderObservationsMosaic();
     }
 
     if (skipRequested) {
+
       showCompleteText();
+
     } else {
+
+      showSignature();
       skipButton.hidden = true;
+
     }
 
   }
