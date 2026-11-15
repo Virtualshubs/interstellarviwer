@@ -7806,7 +7806,6 @@ renderObservationsMosaic();
 
 
 
-
 /* =========================================
    MANIFESTO — INDEPENDENT LANGUAGE SYSTEM
 ========================================= */
@@ -7906,12 +7905,15 @@ renderObservationsMosaic();
      MANIFESTO — SOUND DESIGN
   ========================================= */
 
+  // Sustituir por la URL directa del audio ambiental.
+  const ambientAudioURL = 'AQUI_TU_URL_DE_AUDIO';
+
   let audioContext = null;
   let masterGain = null;
-  let ambientGain = null;
-  let ambientOscillators = [];
-  let audioStarted = false;
+  let ambientAudio = null;
+  let ambientStarted = false;
   let ambientStartTimer = null;
+  let ambientFadeTimer = null;
 
   function initializeAudio() {
     if (audioContext) return;
@@ -7975,61 +7977,82 @@ renderObservationsMosaic();
   }
 
   function startAmbientSound() {
-    if (!audioContext || !masterGain || audioStarted) return;
+    if (
+      ambientStarted ||
+      !ambientAudioURL ||
+      ambientAudioURL === 'AQUI_TU_URL_DE_AUDIO'
+    ) return;
 
-    audioStarted = true;
+    ambientAudio = new Audio(ambientAudioURL);
+    ambientAudio.loop = true;
+    ambientAudio.preload = 'auto';
+    ambientAudio.volume = 0;
 
-    ambientGain = audioContext.createGain();
-    ambientGain.gain.setValueAtTime(0, audioContext.currentTime);
+    const audio = ambientAudio;
 
-    ambientGain.gain.linearRampToValueAtTime(
-      0.045,
-      audioContext.currentTime + 5
-    );
+    audio.addEventListener('error', () => {
+      console.warn('Manifesto: ambient audio could not be loaded.');
+      ambientStarted = false;
 
-    ambientGain.connect(masterGain);
+      if (ambientAudio === audio) {
+        ambientAudio = null;
+      }
+    }, { once: true });
 
-    // Acorde de La mayor con referencia A4 = 432 Hz.
-    const frequencies = [
-      108,      // A2
-      216,      // A3
-      272.14,   // C#4
-      324,      // E4
-      432       // A4
-    ];
+    audio.play()
+      .then(() => {
+        ambientStarted = true;
 
-    frequencies.forEach((frequency, index) => {
-      const oscillator = audioContext.createOscillator();
-      const voiceGain = audioContext.createGain();
+        // Fundido de entrada de 5 segundos.
+        const targetVolume = 0.22;
+        const duration = 5000;
+        const steps = 50;
+        let step = 0;
 
-      oscillator.type = 'sine';
-      oscillator.frequency.value = frequency;
+        if (ambientFadeTimer !== null) {
+          clearInterval(ambientFadeTimer);
+        }
 
-      // Volumen individual de cada armónico.
-      const levels = [0.16, 0.24, 0.12, 0.10, 0.035];
+        ambientFadeTimer = window.setInterval(() => {
+          if (!ambientAudio || ambientAudio !== audio || audio.paused) {
+            clearInterval(ambientFadeTimer);
+            ambientFadeTimer = null;
+            return;
+          }
 
-      voiceGain.gain.value = levels[index];
+          step++;
 
-      oscillator.connect(voiceGain);
-      voiceGain.connect(ambientGain);
+          audio.volume = Math.min(
+            targetVolume,
+            targetVolume * (step / steps)
+          );
 
-      oscillator.start();
+          if (step >= steps) {
+            clearInterval(ambientFadeTimer);
+            ambientFadeTimer = null;
+          }
+        }, duration / steps);
+      })
+      .catch(error => {
+        console.warn('Manifesto: ambient audio could not be played.', error);
+        ambientStarted = false;
 
-      ambientOscillators.push(oscillator);
-    });
+        if (ambientAudio === audio) {
+          ambientAudio = null;
+        }
+      });
   }
 
   async function startManifestoSound() {
     try {
       initializeAudio();
 
-      if (!audioContext) return;
+      if (audioContext) {
+        await audioContext.resume();
+        playPaperSound();
+      }
 
-      await audioContext.resume();
-
-      playPaperSound();
-
-      // La atmósfera aparece después del roce del papel.
+      // El ambiente comienza después del sonido de apertura.
       ambientStartTimer = window.setTimeout(() => {
         ambientStartTimer = null;
 
@@ -8044,35 +8067,55 @@ renderObservationsMosaic();
   }
 
   function stopAmbientSound() {
-    // Evita que la música comience después de haber terminado.
+    // Evita que el audio comience después de finalizar el manifiesto.
     if (ambientStartTimer !== null) {
       clearTimeout(ambientStartTimer);
       ambientStartTimer = null;
     }
 
-    if (!audioContext || !ambientGain || !audioStarted) return;
+    if (!ambientAudio) return;
 
-    const now = audioContext.currentTime;
+    const audio = ambientAudio;
 
-    ambientGain.gain.cancelScheduledValues(now);
-    ambientGain.gain.setValueAtTime(ambientGain.gain.value, now);
-    ambientGain.gain.linearRampToValueAtTime(0, now + 4);
+    if (ambientFadeTimer !== null) {
+      clearInterval(ambientFadeTimer);
+      ambientFadeTimer = null;
+    }
 
-    const oscillators = [...ambientOscillators];
+    if (audio.paused) {
+      audio.currentTime = 0;
+      ambientAudio = null;
+      ambientStarted = false;
+      return;
+    }
 
-    window.setTimeout(() => {
-      oscillators.forEach(oscillator => {
-        try {
-          oscillator.stop();
-        } catch (error) {
-          // El oscilador puede haberse detenido previamente.
+    // Fundido de salida de 4 segundos.
+    const initialVolume = audio.volume;
+    const duration = 4000;
+    const steps = 40;
+    let step = 0;
+
+    ambientFadeTimer = window.setInterval(() => {
+      step++;
+
+      audio.volume = Math.max(
+        0,
+        initialVolume * (1 - step / steps)
+      );
+
+      if (step >= steps) {
+        clearInterval(ambientFadeTimer);
+        ambientFadeTimer = null;
+
+        audio.pause();
+        audio.currentTime = 0;
+
+        if (ambientAudio === audio) {
+          ambientAudio = null;
+          ambientStarted = false;
         }
-      });
-
-      ambientOscillators = [];
-      ambientGain = null;
-      audioStarted = false;
-    }, 4500);
+      }
+    }, duration / steps);
   }
 
 
@@ -8245,7 +8288,7 @@ renderObservationsMosaic();
 
     isRunning = true;
 
-    // Inicia el sonido desde la interacción del usuario.
+    // Sonido de papel + audio ambiental externo.
     startManifestoSound();
 
     startButton.disabled = true;
@@ -8282,7 +8325,7 @@ renderObservationsMosaic();
 
     isRunning = false;
 
-    // Fundido suave al terminar la escritura.
+    // Fundido de salida del audio ambiental al terminar.
     stopAmbientSound();
   }
 
