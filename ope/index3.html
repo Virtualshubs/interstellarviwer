@@ -629,56 +629,89 @@ justify-content: flex-end;
       font-size: 12px;
     }
 
-    /* -----------------------------------------
-       APPROACH
-    ----------------------------------------- */
+   /* -----------------------------------------
+   APPROACH
+----------------------------------------- */
 
-    .approach {
-      background: var(--graphite);
-      color: var(--mineral);
-    }
+.approach {
+  background: var(--graphite);
+  color: var(--mineral);
+}
 
-    .approach .eyebrow,
-    .approach .section-number {
-      color: #9db2b8;
-    }
+.approach .eyebrow,
+.approach .section-number {
+  color: #9db2b8;
+}
 
-    .approach .intro-copy { color: rgba(243,241,234,.62); }
+.approach .intro-copy {
+  color: rgba(243,241,234,.68);
+}
 
-    .approach-grid {
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      border-top: 1px solid rgba(243,241,234,.25);
-    }
+.approach-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid rgba(243,241,234,.25);
+}
 
-    .approach-item {
-      min-height: 300px;
-      padding: 25px 28px 0 0;
-      border-right: 1px solid rgba(243,241,234,.18);
-    }
+.approach-item {
+  min-height: 250px;
+  padding: 28px 32px 30px 0;
+  border-right: 1px solid rgba(243,241,234,.18);
+}
 
-    .approach-item:not(:first-child) { padding-left: 28px; }
-    .approach-item:last-child { border-right: 0; }
+.approach-item:not(:first-child) {
+  padding-left: 32px;
+}
 
-    .approach-item .nav-index {
-      color: #9db2b8;
-      font-size: 11px;
-    }
+.approach-item:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
 
-    .approach-item h3 {
-      margin: 70px 0 18px;
-      font: 500 clamp(28px, 3.4vw, 46px) "Space Grotesk", sans-serif;
-      letter-spacing: -.055em;
-    }
+.approach-item .nav-index {
+  color: #9db2b8;
+  font-size: 11px;
+}
 
-    .approach-item p {
-      max-width: 320px;
-      margin: 0;
-      color: rgba(243,241,234,.62);
-      font-size: 14px;
-      line-height: 1.7;
-    }
+.approach-item h3 {
+  margin: 28px 0 20px;
+  max-width: 100%;
+  font: 500 clamp(25px, 2.6vw, 36px)/1.12 "Space Grotesk", sans-serif;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
 
+.approach-item p {
+  max-width: 390px;
+  margin: 0;
+  color: rgba(243,241,234,.68);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+@media (max-width: 760px) {
+  .approach-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .approach-item,
+  .approach-item:not(:first-child),
+  .approach-item:last-child {
+    min-height: auto;
+    padding: 26px 0 30px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(243,241,234,.18);
+  }
+
+  .approach-item:last-child {
+    border-bottom: 0;
+  }
+
+  .approach-item h3 {
+    margin: 22px 0 14px;
+    font-size: clamp(28px, 7vw, 36px);
+  }
+}
     /* -----------------------------------------
        VISION
     ----------------------------------------- */
@@ -3958,70 +3991,61 @@ justify-content: flex-end;
 </section>
 
 
+<section class="section challenge" id="company">
+  <div class="inner">
+    <div class="section-head" data-reveal>
 
-
-    <section class="section challenge" id="company">
-      <div class="inner">
-        <div class="section-head" data-reveal>
-       
-          <div>
-            <div class="eyebrow" data-i18n="challenge_eyebrow" hidden>
-              The challenge
-            </div>
-
-            <h2 data-i18n="challenge_title">
-              Spatial data is growing. Making sense of it requires new ways of computing.
-            </h2>
-          </div>
-
+      <div>
+        <div class="eyebrow" data-i18n="challenge_eyebrow" hidden>
+          The challenge
         </div>
 
-        <div class="challenge-body" data-reveal>
-
-          <p class="challenge-statement" data-i18n="challenge_statement">
-            The value of observation is not only in what we collect,
-            but in the relationships we are able to reveal.
-          </p>
-
-          <div class="challenge-detail">
-
-            <p data-i18n="challenge_p1">
-              Spatial information is distributed across different sources,
-              formats and systems. Understanding its relationships requires
-              more than simply accessing or visualizing individual datasets.
-            </p>
-
-            <p data-i18n="challenge_p2">
-              SEOD addresses this challenge through technologies designed
-              to connect spatial information with its computational context.
-            </p>
-
-          </div>
-        </div>
-
-        <div class="data-line" data-reveal>
-
-          <div class="data-point">
-            <strong data-i18n="challenge_stat_1">Distributed sources</strong>
-            <span data-i18n="challenge_stat_1_sub">Different origins and formats</span>
-          </div>
-
-          <div class="data-point">
-            <strong data-i18n="challenge_stat_2">Complex relationships</strong>
-            <span data-i18n="challenge_stat_2_sub">Spatial, temporal and descriptive</span>
-          </div>
-
-          <div class="data-point">
-            <strong data-i18n="challenge_stat_3">Computational context</strong>
-            <span data-i18n="challenge_stat_3_sub">From access to exploitation</span>
-          </div>
-
-        </div>
+        <h2 data-i18n="challenge_title">
+          Our world is constantly changing. Understanding it means seeing beyond the data.
+        </h2>
       </div>
-    </section>
 
+    </div>
 
+    <div class="challenge-body" data-reveal>
 
+      <p class="challenge-statement" data-i18n="challenge_statement">
+        Every observation reveals part of a much larger picture. Its real value emerges when we can connect those pieces and understand what they mean together.
+      </p>
+
+      <div class="challenge-detail">
+
+        <p data-i18n="challenge_p1">
+          From satellite imagery and orbital activity to three-dimensional environments, spatial information is produced across countless sources, formats and scales. Yet these resources often remain isolated, making it difficult to explore their full potential.
+        </p>
+
+        <p data-i18n="challenge_p2">
+          SEOD develops technologies that bring these different dimensions together, creating new ways to explore, interpret and work with the world around us.
+        </p>
+
+      </div>
+    </div>
+
+    <div class="data-line" data-reveal>
+
+      <div class="data-point">
+        <strong data-i18n="challenge_stat_1">A changing world</strong>
+        <span data-i18n="challenge_stat_1_sub">Information captured across different environments</span>
+      </div>
+
+      <div class="data-point">
+        <strong data-i18n="challenge_stat_2">A connected perspective</strong>
+        <span data-i18n="challenge_stat_2_sub">Understanding relationships across space and time</span>
+      </div>
+
+      <div class="data-point">
+        <strong data-i18n="challenge_stat_3">New possibilities</strong>
+        <span data-i18n="challenge_stat_3_sub">Turning spatial information into practical knowledge</span>
+      </div>
+
+    </div>
+  </div>
+</section>
 
 
 
