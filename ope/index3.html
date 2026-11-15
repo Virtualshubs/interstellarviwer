@@ -7788,269 +7788,310 @@ renderObservationsMosaic();
 
 
 
+
 /* =========================================
    MANIFESTO — MULTILINGUAL STORY
+   Integrated with SEOD translations
 ========================================= */
 
 (() => {
 
-  const intro = document.getElementById('manifesto-intro');
-  const startButton = document.getElementById('manifesto-start');
-  const paper = document.getElementById('manifesto-paper');
-  const copy = document.getElementById('manifesto-copy');
-  const skipButton = document.getElementById('manifesto-skip');
-
-  const bgA = document.getElementById('manifesto-bg-a');
-  const bgB = document.getElementById('manifesto-bg-b');
-
-  if (
-    !intro || !startButton || !paper ||
-    !copy || !skipButton || !bgA || !bgB
-  ) {
-    console.warn('Manifesto: required HTML elements not found.');
-    return;
-  }
-
   // -----------------------------------------
-  // LANGUAGE
+  // INITIALIZATION
   // -----------------------------------------
 
-  function getLanguage() {
-    return (document.documentElement.lang || 'en')
-      .toLowerCase()
-      .startsWith('es') ? 'es' : 'en';
-  }
+  function initManifesto() {
 
-  function getTranslations() {
+    const intro = document.getElementById('manifesto-intro');
+    const startButton = document.getElementById('manifesto-start');
+    const paper = document.getElementById('manifesto-paper');
+    const copy = document.getElementById('manifesto-copy');
+    const skipButton = document.getElementById('manifesto-skip');
 
-    if (typeof translations === 'undefined') {
-      console.error('Manifesto: translations object not found.');
-      return null;
-    }
+    const bgA = document.getElementById('manifesto-bg-a');
+    const bgB = document.getElementById('manifesto-bg-b');
 
-    return translations[getLanguage()] || translations.en || null;
-  }
-
-  function getSceneText(scene, dictionary) {
-
-    const text = dictionary && dictionary[scene.key];
-
-    if (typeof text !== 'string') {
-      console.error('Manifesto: missing translation:', scene.key);
-      return `[Missing translation: ${scene.key}]`;
-    }
-
-    return text;
-  }
-
-  // -----------------------------------------
-  // STORY: IMAGE + TRANSLATION KEY
-  // -----------------------------------------
-
-  const scenes = [
-    { image: 'images/manifesto-01.jpg', key: 'manifesto_scene_1' },
-    { image: 'images/manifesto-02.jpg', key: 'manifesto_scene_2' },
-    { image: 'images/manifesto-03.jpg', key: 'manifesto_scene_3' },
-    { image: 'images/manifesto-04.jpg', key: 'manifesto_scene_4' },
-    { image: 'images/manifesto-05.jpg', key: 'manifesto_scene_5' },
-    { image: 'images/manifesto-06.jpg', key: 'manifesto_scene_6' },
-    { image: 'images/manifesto-07.jpg', key: 'manifesto_scene_7' },
-    { image: 'images/manifesto-08.jpg', key: 'manifesto_scene_8' },
-    { image: 'images/manifesto-09.jpg', key: 'manifesto_scene_9' }
-  ];
-
-  // -----------------------------------------
-  // TIMING
-  // -----------------------------------------
-
-  const typingSpeed = 23;
-  const paragraphPause = 650;
-  const punctuationPause = 100;
-
-  let skipRequested = false;
-  let isRunning = false;
-
-  let currentLayer = bgA;
-  let nextLayer = bgB;
-  let currentImage = bgA.getAttribute('src');
-
-  const wait = ms =>
-    new Promise(resolve => setTimeout(resolve, ms));
-
-  // -----------------------------------------
-  // BACKGROUND TRANSITIONS
-  // -----------------------------------------
-
-  function changeBackground(src) {
-
-    if (!src || src === currentImage) return;
-
-    const preload = new Image();
-
-    preload.onload = () => {
-
-      nextLayer.src = src;
-
-      requestAnimationFrame(() => {
-
-        nextLayer.classList.add('is-visible');
-        currentLayer.classList.remove('is-visible');
-
-        const previousLayer = currentLayer;
-
-        currentLayer = nextLayer;
-        nextLayer = previousLayer;
-
-        currentImage = src;
-
-      });
-
-    };
-
-    preload.onerror = () => {
-      console.error('Manifesto: image could not be loaded:', src);
-    };
-
-    preload.src = src;
-  }
-
-  // -----------------------------------------
-  // TYPEWRITER
-  // -----------------------------------------
-
-  async function typeParagraph(text) {
-
-    const paragraph = document.createElement('p');
-    const textNode = document.createTextNode('');
-    const cursor = document.createElement('span');
-
-    cursor.className = 'manifesto-cursor';
-    cursor.setAttribute('aria-hidden', 'true');
-
-    paragraph.append(textNode, cursor);
-    copy.appendChild(paragraph);
-
-    for (let i = 0; i < text.length; i++) {
-
-      if (skipRequested) break;
-
-      textNode.textContent += text[i];
-
-      let delay = typingSpeed;
-
-      if ('.!?'.includes(text[i])) {
-        delay += punctuationPause;
-      }
-
-      await wait(delay);
-    }
-
-    cursor.remove();
-  }
-
-  // -----------------------------------------
-  // COMPLETE TEXT
-  // -----------------------------------------
-
-  function showCompleteText() {
-
-    const dictionary = getTranslations();
-
-    if (!dictionary) return;
-
-    copy.replaceChildren();
-
-    scenes.forEach(scene => {
-
-      const paragraph = document.createElement('p');
-
-      paragraph.textContent = getSceneText(scene, dictionary);
-
-      copy.appendChild(paragraph);
-
-    });
-
-    // Keep the final image permanently
-    changeBackground(scenes[scenes.length - 1].image);
-
-    skipButton.hidden = true;
-  }
-
-  // -----------------------------------------
-  // START
-  // -----------------------------------------
-
-  async function startManifesto() {
-
-    if (isRunning) return;
-
-    const dictionary = getTranslations();
-
-    if (!dictionary) {
-      console.error('Manifesto: unable to start without translations.');
+    if (
+      !intro || !startButton || !paper ||
+      !copy || !skipButton || !bgA || !bgB
+    ) {
+      console.error('Manifesto: HTML elements not found.');
       return;
     }
 
-    isRunning = true;
-    skipRequested = false;
+    // -----------------------------------------
+    // LANGUAGE
+    // Uses the same translations object as SEOD
+    // -----------------------------------------
 
-    startButton.disabled = true;
+    function getLanguage() {
 
-    intro.hidden = true;
-    paper.hidden = false;
-
-    copy.replaceChildren();
-
-    skipButton.hidden = false;
-
-    try {
-
-      for (const scene of scenes) {
-
-        if (skipRequested) break;
-
-        changeBackground(scene.image);
-
-        await typeParagraph(getSceneText(scene, dictionary));
-
-        if (skipRequested) break;
-
-        await wait(paragraphPause);
-      }
-
-      if (skipRequested) {
-        showCompleteText();
-      } else {
-        skipButton.hidden = true;
-      }
-
-    } catch (error) {
-
-      console.error('Manifesto animation error:', error);
-
-    } finally {
-
-      isRunning = false;
+      return (document.documentElement.lang || 'en')
+        .toLowerCase()
+        .startsWith('es') ? 'es' : 'en';
 
     }
+
+    function getTranslations() {
+
+      const lang = getLanguage();
+
+      if (typeof translations === 'undefined') {
+        console.error('Manifesto: SEOD translations object is unavailable.');
+        return null;
+      }
+
+      return translations[lang] || translations.en || null;
+
+    }
+
+    function getSceneText(scene, dictionary) {
+
+      const text = dictionary?.[scene.key];
+
+      if (typeof text !== 'string') {
+        console.error('Manifesto: missing translation:', scene.key);
+        return '';
+      }
+
+      return text;
+
+    }
+
+    // -----------------------------------------
+    // STORY: IMAGE + TRANSLATION KEY
+    // -----------------------------------------
+
+    const scenes = [
+      { image: 'images/manifesto-01.jpg', key: 'manifesto_scene_1' },
+      { image: 'images/manifesto-02.jpg', key: 'manifesto_scene_2' },
+      { image: 'images/manifesto-03.jpg', key: 'manifesto_scene_3' },
+      { image: 'images/manifesto-04.jpg', key: 'manifesto_scene_4' },
+      { image: 'images/manifesto-05.jpg', key: 'manifesto_scene_5' },
+      { image: 'images/manifesto-06.jpg', key: 'manifesto_scene_6' },
+      { image: 'images/manifesto-07.jpg', key: 'manifesto_scene_7' },
+      { image: 'images/manifesto-08.jpg', key: 'manifesto_scene_8' },
+      { image: 'images/manifesto-09.jpg', key: 'manifesto_scene_9' }
+    ];
+
+    // -----------------------------------------
+    // TIMING
+    // -----------------------------------------
+
+    const typingSpeed = 23;
+    const paragraphPause = 650;
+    const punctuationPause = 100;
+
+    let skipRequested = false;
+    let isRunning = false;
+
+    let currentLayer = bgA;
+    let nextLayer = bgB;
+    let currentImage = bgA.getAttribute('src');
+
+    const wait = ms =>
+      new Promise(resolve => setTimeout(resolve, ms));
+
+    // -----------------------------------------
+    // BACKGROUND TRANSITIONS
+    // -----------------------------------------
+
+    function changeBackground(src) {
+
+      if (!src || src === currentImage) return;
+
+      const preload = new Image();
+
+      preload.onload = () => {
+
+        nextLayer.src = src;
+
+        requestAnimationFrame(() => {
+
+          nextLayer.classList.add('is-visible');
+          currentLayer.classList.remove('is-visible');
+
+          const previousLayer = currentLayer;
+
+          currentLayer = nextLayer;
+          nextLayer = previousLayer;
+
+          currentImage = src;
+
+        });
+
+      };
+
+      preload.onerror = () => {
+        console.error('Manifesto: image could not be loaded:', src);
+      };
+
+      preload.src = src;
+
+    }
+
+    // -----------------------------------------
+    // TYPEWRITER
+    // -----------------------------------------
+
+    async function typeParagraph(text) {
+
+      const paragraph = document.createElement('p');
+      const textNode = document.createTextNode('');
+      const cursor = document.createElement('span');
+
+      cursor.className = 'manifesto-cursor';
+      cursor.setAttribute('aria-hidden', 'true');
+
+      paragraph.append(textNode, cursor);
+      copy.appendChild(paragraph);
+
+      for (let i = 0; i < text.length; i++) {
+
+        if (skipRequested) break;
+
+        textNode.textContent += text[i];
+
+        let delay = typingSpeed;
+
+        if ('.!?'.includes(text[i])) {
+          delay += punctuationPause;
+        }
+
+        await wait(delay);
+
+      }
+
+      cursor.remove();
+
+    }
+
+    // -----------------------------------------
+    // COMPLETE TEXT
+    // -----------------------------------------
+
+    function showCompleteText(dictionary) {
+
+      copy.replaceChildren();
+
+      scenes.forEach(scene => {
+
+        const paragraph = document.createElement('p');
+
+        paragraph.textContent = getSceneText(scene, dictionary);
+
+        copy.appendChild(paragraph);
+
+      });
+
+      // Keep the final image permanently
+      changeBackground(scenes[scenes.length - 1].image);
+
+      skipButton.hidden = true;
+
+    }
+
+    // -----------------------------------------
+    // START MANIFESTO
+    // -----------------------------------------
+
+    async function startManifesto() {
+
+      if (isRunning) return;
+
+      const dictionary = getTranslations();
+
+      if (!dictionary) {
+        console.error('Manifesto: unable to access SEOD translations.');
+        return;
+      }
+
+      isRunning = true;
+      skipRequested = false;
+
+      startButton.disabled = true;
+
+      intro.hidden = true;
+      paper.hidden = false;
+
+      copy.replaceChildren();
+
+      skipButton.hidden = false;
+
+      try {
+
+        for (const scene of scenes) {
+
+          if (skipRequested) break;
+
+          changeBackground(scene.image);
+
+          await typeParagraph(getSceneText(scene, dictionary));
+
+          if (skipRequested) break;
+
+          await wait(paragraphPause);
+
+        }
+
+        if (skipRequested) {
+
+          showCompleteText(dictionary);
+
+        } else {
+
+          skipButton.hidden = true;
+
+        }
+
+      } catch (error) {
+
+        console.error('Manifesto animation error:', error);
+
+      } finally {
+
+        isRunning = false;
+
+      }
+
+    }
+
+    // -----------------------------------------
+    // EVENTS
+    // -----------------------------------------
+
+    startButton.addEventListener('click', startManifesto);
+
+    skipButton.addEventListener('click', () => {
+
+      if (!isRunning) return;
+
+      skipRequested = true;
+
+    });
+
+    console.log('Manifesto initialized successfully.');
 
   }
 
   // -----------------------------------------
-  // EVENTS
+  // WAIT FOR HTML
   // -----------------------------------------
 
-  startButton.addEventListener('click', startManifesto);
+  if (document.readyState === 'loading') {
 
-  skipButton.addEventListener('click', () => {
+    document.addEventListener('DOMContentLoaded', initManifesto, {
+      once: true
+    });
 
-    if (!isRunning) return;
+  } else {
 
-    skipRequested = true;
+    initManifesto();
 
-  });
+  }
 
 })();
+
 
 
 
