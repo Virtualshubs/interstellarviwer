@@ -345,6 +345,12 @@
   transition: transform .2s;
 }
 
+
+
+
+
+    
+
 /* HEADER SCROLLED COLORS */
 
 .site-header.is-scrolled .brand-name {
@@ -374,6 +380,49 @@
   color: var(--mineral);
 }
 
+
+
+
+
+#close-product {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  z-index: 1001;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 11px 16px;
+
+  background: #242522;
+  color: #F3F1EA;
+
+  border: 1px solid rgba(243, 241, 234, 0.18);
+  border-radius: 4px;
+
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+#close-product:hover {
+  background: #416D80;
+  border-color: #416D80;
+  transform: translateX(-2px);
+}
+
+
+
+
+    
 /* -----------------------------------------
    HERO
 ----------------------------------------- */
@@ -520,6 +569,8 @@
   top: calc(var(--nav-height) + 30px);
   color: rgba(243,241,234,.6);
 }
+
+    
 
     /* -----------------------------------------
        CHALLENGE
