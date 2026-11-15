@@ -8453,6 +8453,27 @@ renderObservationsMosaic();
   closeButton.addEventListener("click", closeViewer);
 
 })();
+
+
+  
+  // Close product viewer when navigating through the main SEOD navigation.
+  const mainNav = document.querySelector(".site-header");
+
+  if (mainNav) {
+    mainNav.addEventListener("click", function (event) {
+      const navLink = event.target.closest("a");
+      const productsTrigger = event.target.closest(".products-trigger");
+
+      if (navLink && !navLink.hasAttribute("data-product-frame")) {
+        closeViewer();
+      }
+
+      if (productsTrigger) {
+        closeViewer();
+      }
+    });
+  }
+
 </script>
 
 
