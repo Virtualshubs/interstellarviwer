@@ -3783,10 +3783,8 @@
 
 
 
-    
 <section class="manifesto" id="manifesto">
 
-  <!-- Fondo cinematográfico -->
   <div class="manifesto-background">
     <img
       class="manifesto-bg-image is-visible"
@@ -3803,24 +3801,20 @@
     <div class="manifesto-overlay"></div>
   </div>
 
-  <!-- Contenido -->
   <div class="manifesto-stage">
 
-    <!-- Invitación inicial -->
     <div class="manifesto-intro" id="manifesto-intro">
 
-      <span class="manifesto-kicker">
+      <span class="manifesto-kicker" data-i18n="manifesto_eyebrow">
         A LETTER TO THE WORLD
       </span>
 
-      <h2>
-        ¿Y si mirásemos<br>
-        un poco más allá?
+      <h2 data-i18n="manifesto_intro_title">
+        What if we looked a little further?
       </h2>
 
-      <p>
-        Una pequeña reflexión sobre nuestro mundo
-        y todo lo que todavía nos queda por descubrir.
+      <p data-i18n="manifesto_intro_text">
+        A small reflection on our world and everything we have yet to discover.
       </p>
 
       <button
@@ -3828,12 +3822,12 @@
         id="manifesto-start"
         type="button"
       >
-        Leer manifiesto <span>↗</span>
+        <span data-i18n="manifesto_read">Read the manifesto</span>
+        <span aria-hidden="true">↗</span>
       </button>
 
     </div>
 
-    <!-- Folio y manifiesto -->
     <article
       class="manifesto-paper"
       id="manifesto-paper"
@@ -3841,15 +3835,17 @@
     >
 
       <div class="manifesto-paper-header">
-        <span>UNA INVITACIÓN A OBSERVAR</span>
-        <span>01 — 01</span>
+        <span data-i18n="manifesto_paper_label">
+          AN INVITATION TO OBSERVE
+        </span>
+
+        <span data-i18n="manifesto_page">01 — 01</span>
       </div>
 
       <div class="manifesto-paper-content">
 
-        <h2>
-          Una carta a lo que todavía
-          nos queda por descubrir.
+        <h2 data-i18n="manifesto_title">
+          A letter to everything we have yet to discover.
         </h2>
 
         <div
@@ -3861,15 +3857,20 @@
       </div>
 
       <div class="manifesto-paper-footer">
-        <span>OBSERVAR · COMPRENDER · DESCUBRIR</span>
+
+        <span data-i18n="manifesto_footer">
+          OBSERVE · UNDERSTAND · DISCOVER
+        </span>
 
         <button
           class="manifesto-skip"
           id="manifesto-skip"
           type="button"
+          data-i18n="manifesto_skip"
         >
-          Mostrar texto completo ↗
+          Show complete text
         </button>
+
       </div>
 
     </article>
@@ -3877,6 +3878,7 @@
   </div>
 
 </section>
+
 
 
 
@@ -5193,6 +5195,39 @@ const translations = {
         hero_cta_1: "Explore our technology",
         hero_cta_2: "Discover our products",
 
+
+
+
+
+
+
+
+/* =========================================
+   MANIFESTO
+========================================= */
+
+manifesto_eyebrow: "A LETTER TO THE WORLD",
+manifesto_intro_title: "What if we looked a little further?",
+manifesto_intro_text: "A small reflection on our world and everything we have yet to discover.",
+manifesto_read: "Read the manifesto",
+manifesto_paper_label: "AN INVITATION TO OBSERVE",
+manifesto_page: "01 — 01",
+manifesto_title: "A letter to everything we have yet to discover.",
+manifesto_footer: "OBSERVE · UNDERSTAND · DISCOVER",
+manifesto_skip: "Show complete text",
+manifesto_scene_1: "Sometimes, we forget to stop and look.",
+manifesto_scene_2: "Beneath our feet, above our heads, and beyond the reach of our sight, everything is changing.",
+manifesto_scene_3: "Forests breathe, oceans draw their own paths, rivers reshape landscapes, and nature writes stories we are only beginning to understand.",
+manifesto_scene_4: "There is so much beauty we have yet to discover.",
+manifesto_scene_5: "To observe is a way of drawing closer. Of learning to listen to what the world reveals, recognising its changes and discovering the connections that bring us together.",
+manifesto_scene_6: "Because the more we understand, the more aware we become of everything that deserves to be protected.",
+manifesto_scene_7: "And perhaps that is one of the most beautiful things about knowledge: it never ends.",
+manifesto_scene_8: "There will always be something new to discover, another question to ask, another frontier to explore.",
+manifesto_scene_9: "May we never lose our curiosity. May our ambition to understand keep carrying us towards tomorrow. Because if we can imagine a better world and learn to understand it, we can also help make it happen."
+
+
+
+      
         /* =========================================
            CHALLENGE
         ========================================= */
@@ -5202,7 +5237,6 @@ const translations = {
         challenge_statement: "The value of observation is not only in what we collect, but in the relationships we are able to reveal.",
         challenge_p1: "Spatial information is distributed across different sources, formats and systems. Understanding its relationships requires more than simply accessing or visualizing individual datasets.",
         challenge_p2: "SEOD addresses this challenge through technologies designed to connect spatial information with its computational context.",
-
         challenge_stat_1: "Distributed sources",
         challenge_stat_1_sub: "Different origins and formats",
         challenge_stat_2: "Complex relationships",
@@ -5217,13 +5251,10 @@ const translations = {
         approach_eyebrow: "Our approach",
         approach_title: "From observation to computation.",
         approach_intro: "SEOD develops proprietary technologies that connect observation, spatial information and computational systems.",
-
         approach_1_title: "Observe",
         approach_1_text: "Accessing and interpreting information generated by observation systems.",
-
         approach_2_title: "Integrate",
         approach_2_text: "Connecting heterogeneous sources, spatial datasets and computational environments.",
-
         approach_3_title: "Exploit",
         approach_3_text: "Transforming integrated information into meaningful analytical and operational resources.",
 
@@ -5242,28 +5273,20 @@ const translations = {
         industries_eyebrow: "Industries",
         industries_title: "Technology with applications across sectors.",
         industries_intro: "Our technologies address spatial information challenges across different industries, extending the applications of observation and computational systems.",
-
         industry_agriculture: "Agriculture",
         industry_agriculture_text: "Territorial information, crop monitoring and spatial analysis.",
-
         industry_forestry: "Forestry",
         industry_forestry_text: "Forest observation, vegetation monitoring and environmental information.",
-
         industry_construction: "Construction",
         industry_construction_text: "Spatial context, infrastructure and 3D environments.",
-
         industry_mining: "Mining",
         industry_mining_text: "Territorial observation, surface information and spatial monitoring.",
-
         industry_energy: "Energy",
         industry_energy_text: "Infrastructure, territorial analysis and environmental observation.",
-
         industry_heritage: "Heritage",
         industry_heritage_text: "Documentation, digital preservation and 3D representation.",
-
         industry_research: "Research",
         industry_research_text: "Spatial datasets, scientific observation and analytical exploration.",
-
         industry_select: "Select an industry",
         industry_previous: "Previous industry",
         industry_next: "Next industry",
@@ -5280,24 +5303,18 @@ const translations = {
         ecosystem_eyebrow: "Data & Technology Ecosystem",
         ecosystem_title: "An interconnected technological environment.",
         ecosystem_intro: "SEOD connects observation sources, data catalogues, platforms and computational infrastructures to create an integrated environment for spatial data exploitation.",
-
         ecosystem_sources: "Observation sources",
         ecosystem_catalogues: "Data catalogues & standards",
         ecosystem_platforms: "Platforms & services",
         ecosystem_infrastructure: "Technology infrastructure",
-
         ecosystem_layer_1: "Observation sources",
         ecosystem_layer_1_text: "Satellite missions and Earth observation programmes providing access to spatial information and scientific observations.",
-
         ecosystem_layer_2: "Data catalogues & standards",
         ecosystem_layer_2_text: "Structured catalogues and open standards that enable the discovery, description and interoperability of spatial datasets.",
-
         ecosystem_layer_3: "Platforms & services",
         ecosystem_layer_3_text: "Platforms and services that provide access to distributed data collections, processing environments and specialised resources.",
-
         ecosystem_layer_4: "Technology infrastructure",
         ecosystem_layer_4_text: "Cloud infrastructure, computing services and visualisation technologies supporting the development and operation of SEOD products.",
-
         ecosystem_current: "Current layer",
         ecosystem_previous: "Previous layer",
         ecosystem_next: "Next layer",
@@ -5313,11 +5330,9 @@ const translations = {
         who_intro: "We build spatial computing technologies for organisations that observe, manage, analyse and communicate our world.",
         who_explore: "Explore organisations",
         who_select: "Select a profile",
-
         who_close: "Close profile",
         who_how: "How SEOD helps",
         who_related: "Related technology",
-
         who_01_category: "Space industry",
         who_01_title: "Satellite operators",
         who_01_subtitle: "Connecting orbital capabilities with observation.",
@@ -5326,7 +5341,6 @@ const translations = {
         who_01_benefit_2: "Explore observation geometry and territorial coverage.",
         who_01_benefit_3: "Communicate mission capabilities through interactive 3D environments.",
         who_01_products: "OPE — Orbital Pass Engine",
-
         who_02_category: "Spatial monitoring",
         who_02_title: "Scanning organisations",
         who_02_subtitle: "Turning large collections of observations into operational knowledge.",
@@ -5335,7 +5349,6 @@ const translations = {
         who_02_benefit_2: "Explore historical and territorial datasets.",
         who_02_benefit_3: "Relate observations through spatial, temporal and descriptive dimensions.",
         who_02_products: "JANUS Space Reader",
-
         who_03_category: "Agriculture",
         who_03_title: "Agricultural operators",
         who_03_subtitle: "Understanding the evolution of the land.",
@@ -5344,7 +5357,6 @@ const translations = {
         who_03_benefit_2: "Compare territorial and temporal information.",
         who_03_benefit_3: "Organise observations into accessible analytical environments.",
         who_03_products: "OPE — Orbital Pass Engine · JANUS Space Reader",
-
         who_04_category: "Data infrastructure",
         who_04_title: "Data & AI companies",
         who_04_subtitle: "Preparing spatial information for advanced analytical workflows.",
@@ -5353,7 +5365,6 @@ const translations = {
         who_04_benefit_2: "Explore and structure large observation collections.",
         who_04_benefit_3: "Prepare enriched spatial information for analytical and AI workflows.",
         who_04_products: "JANUS Space Reader",
-
         who_05_category: "Science & culture",
         who_05_title: "Museums & institutions",
         who_05_subtitle: "Making scientific knowledge accessible and tangible.",
@@ -5362,7 +5373,6 @@ const translations = {
         who_05_benefit_2: "Create accessible scientific visualisation experiences.",
         who_05_benefit_3: "Share interactive 3D collections and models.",
         who_05_products: "OPE — Orbital Pass Engine · 3DLite Space",
-
         who_06_category: "Research",
         who_06_title: "Research teams",
         who_06_subtitle: "Connecting multidisciplinary observations and models.",
@@ -5371,7 +5381,6 @@ const translations = {
         who_06_benefit_2: "Relate spatial and temporal datasets.",
         who_06_benefit_3: "Visualise and distribute interactive 3D research assets.",
         who_06_products: "OPE · JANUS Space Reader · 3DLite Space",
-
         who_07_category: "Industrial technology",
         who_07_title: "Hardware manufacturers",
         who_07_subtitle: "Giving technical products a spatial dimension.",
@@ -5380,7 +5389,6 @@ const translations = {
         who_07_benefit_2: "Present technical products through browser-based 3D visualisation.",
         who_07_benefit_3: "Share product collections without hosting customer models on SEOD infrastructure.",
         who_07_products: "3DLite Space",
-
         who_08_category: "Environment",
         who_08_title: "Conservation teams",
         who_08_subtitle: "Understanding change across habitats and territories.",
@@ -5397,13 +5405,10 @@ const translations = {
         observations_eyebrow: "Scientific archive / Selected observations",
         observations_title: "Reading the world through spatial data.",
         observations_intro: "A selection of observations, spatial datasets and scientific imagery illustrating the information and environments that can be explored through spatial technologies.",
-
         obs_1_title: "Earth observation",
         obs_1_meta: "Satellite imagery / Source and date to be specified",
-
         obs_2_title: "Land & terrain",
         obs_2_meta: "Surface data / Source and date to be specified",
-
         obs_3_title: "Forest & vegetation",
         obs_3_meta: "Environmental data / Source and date to be specified",
 
@@ -5414,11 +5419,9 @@ const translations = {
         products_eyebrow: "Proprietary technologies",
         products_title: "Technologies developed by SEOD.",
         products_intro: "Our products translate spatial computing, observation and data technologies into practical tools for different applications.",
-
         ope_description: "Orbital operations, Earth observation and spatial simulation.",
         janus_description: "Spatial data integration, catalogue exploration and analytical exploitation.",
         lite_description: "Interactive visualisation and distribution of existing 3D repositories.",
-
         product_explore: "Explore product",
 
         /* =========================================
@@ -5476,6 +5479,33 @@ const translations = {
         hero_cta_1: "Explorar nuestra tecnología",
         hero_cta_2: "Descubrir nuestros productos",
 
+
+
+      
+/* =========================================
+   MANIFIESTO
+========================================= */
+
+manifesto_eyebrow: "UNA CARTA AL MUNDO",
+manifesto_intro_title: "¿Y si mirásemos un poco más allá?",
+manifesto_intro_text: "Una pequeña reflexión sobre nuestro mundo y todo lo que todavía nos queda por descubrir.",
+manifesto_read: "Leer manifiesto",
+manifesto_paper_label: "UNA INVITACIÓN A OBSERVAR",
+manifesto_page: "01 — 01",
+manifesto_title: "Una carta a lo que todavía nos queda por descubrir.",
+manifesto_footer: "OBSERVAR · COMPRENDER · DESCUBRIR",
+manifesto_skip: "Mostrar texto completo",
+manifesto_scene_1: "A veces olvidamos detenernos a mirar.",
+manifesto_scene_2: "Bajo nuestros pies, sobre nuestras cabezas y más allá de lo que alcanza nuestra vista, todo está cambiando.",
+manifesto_scene_3: "Los bosques respiran, los océanos dibujan caminos, los ríos transforman paisajes y la naturaleza escribe historias que apenas comenzamos a comprender.",
+manifesto_scene_4: "Hay tanta belleza que todavía desconocemos.",
+manifesto_scene_5: "Observar es una forma de acercarnos. De aprender a escuchar lo que el mundo nos muestra, reconocer sus cambios y descubrir las conexiones que nos unen a él.",
+manifesto_scene_6: "Porque cuanto más comprendemos, más conscientes somos de todo aquello que merece ser cuidado.",
+manifesto_scene_7: "Y quizá esa sea una de las cosas más hermosas del conocimiento: que nunca termina.",
+manifesto_scene_8: "Siempre habrá algo nuevo que descubrir, otra pregunta que formular, otra frontera que explorar.",
+manifesto_scene_9: "Que nunca perdamos la curiosidad. Que la ambición por conocer siga impulsándonos hacia el mañana. Porque, si somos capaces de imaginar un mundo mejor y comprenderlo, también podemos ayudar a hacerlo realidad."
+
+
         /* =========================================
            CHALLENGE
         ========================================= */
@@ -5485,7 +5515,6 @@ const translations = {
         challenge_statement: "El valor de la observación no reside únicamente en lo que recopilamos, sino en las relaciones que somos capaces de revelar.",
         challenge_p1: "La información espacial se distribuye entre distintas fuentes, formatos y sistemas. Comprender sus relaciones requiere algo más que acceder a conjuntos de datos individuales o visualizarlos.",
         challenge_p2: "SEOD aborda este desafío mediante tecnologías diseñadas para conectar la información espacial con su contexto computacional.",
-
         challenge_stat_1: "Fuentes distribuidas",
         challenge_stat_1_sub: "Diferentes orígenes y formatos",
         challenge_stat_2: "Relaciones complejas",
@@ -5500,13 +5529,10 @@ const translations = {
         approach_eyebrow: "Nuestro enfoque",
         approach_title: "De la observación a la computación.",
         approach_intro: "SEOD desarrolla tecnologías propias que conectan observación, información espacial y sistemas computacionales.",
-
         approach_1_title: "Observar",
         approach_1_text: "Acceder e interpretar la información generada por sistemas de observación.",
-
         approach_2_title: "Integrar",
         approach_2_text: "Conectar fuentes heterogéneas, conjuntos de datos espaciales y entornos computacionales.",
-
         approach_3_title: "Explotar",
         approach_3_text: "Transformar la información integrada en recursos analíticos y operativos.",
 
@@ -7764,64 +7790,8 @@ renderObservationsMosaic();
 
 
 
-const viewer = document.getElementById('product-viewer');
-const frame = document.getElementById('product-frame');
-const closeButton = document.getElementById('close-product');
-
-if (viewer && frame && closeButton) {
-
-  function openProduct(url, addHistory = true) {
-    frame.src = url;
-    viewer.hidden = false;
-
-    if (addHistory) {
-      history.pushState(
-        { product: url },
-        '',
-        window.location.href
-      );
-    }
-
-    window.scrollTo(0, 0);
-  }
-
-  // Open products inside the iframe
-  document.addEventListener('click', event => {
-    const link = event.target.closest('[data-product-frame]');
-
-    if (!link) return;
-
-    event.preventDefault();
-    openProduct(link.href);
-  });
-
-  // Close product viewer
-  function closeProduct() {
-    if (history.state && history.state.product) {
-      history.back();
-    } else {
-      viewer.hidden = true;
-      frame.src = 'about:blank';
-    }
-  }
-
-  closeButton.addEventListener('click', closeProduct);
-
-  // Browser back / forward
-  window.addEventListener('popstate', event => {
-    if (event.state && event.state.product) {
-      openProduct(event.state.product, false);
-    } else {
-      viewer.hidden = true;
-      frame.src = 'about:blank';
-    }
-  });
-
-}
-
-
 /* =========================================
-   MANIFESTO — SYNCHRONISED STORY
+   MANIFESTO — MULTILINGUAL STORY
 ========================================= */
 
 (() => {
@@ -7841,56 +7811,33 @@ if (viewer && frame && closeButton) {
   ) return;
 
   // -----------------------------------------
-  // STORY: TEXT + CORRESPONDING IMAGE
+  // LANGUAGE
+  // -----------------------------------------
+
+  function getLanguage() {
+    return document.documentElement.lang
+      .toLowerCase()
+      .startsWith('es') ? 'es' : 'en';
+  }
+
+  function getTranslations() {
+    return translations[getLanguage()] || translations.en;
+  }
+
+  // -----------------------------------------
+  // STORY: IMAGE + TRANSLATION KEY
   // -----------------------------------------
 
   const scenes = [
-
-    {
-      image: 'images/manifesto-01.jpg',
-      text: 'A veces olvidamos detenernos a mirar.'
-    },
-
-    {
-      image: 'images/manifesto-02.jpg',
-      text: 'Bajo nuestros pies, sobre nuestras cabezas y más allá de lo que alcanza nuestra vista, todo está cambiando.'
-    },
-
-    {
-      image: 'images/manifesto-03.jpg',
-      text: 'Los bosques respiran, los océanos dibujan caminos, los ríos transforman paisajes y la naturaleza escribe historias que apenas comenzamos a comprender.'
-    },
-
-    {
-      image: 'images/manifesto-04.jpg',
-      text: 'Hay tanta belleza que todavía desconocemos.'
-    },
-
-    {
-      image: 'images/manifesto-05.jpg',
-      text: 'Observar es una forma de acercarnos. De aprender a escuchar lo que el mundo nos muestra, reconocer sus cambios y descubrir las conexiones que nos unen a él.'
-    },
-
-    {
-      image: 'images/manifesto-06.jpg',
-      text: 'Porque cuanto más comprendemos, más conscientes somos de todo aquello que merece ser cuidado.'
-    },
-
-    {
-      image: 'images/manifesto-07.jpg',
-      text: 'Y quizá esa sea una de las cosas más hermosas del conocimiento: que nunca termina.'
-    },
-
-    {
-      image: 'images/manifesto-08.jpg',
-      text: 'Siempre habrá algo nuevo que descubrir, otra pregunta que formular, otra frontera que explorar.'
-    },
-
-    {
-      image: 'images/manifesto-09.jpg',
-      text: 'Que nunca perdamos la curiosidad. Que la ambición por conocer siga impulsándonos hacia el mañana. Porque, si somos capaces de imaginarlo y comprenderlo, también podemos construir un mundo mejor.'
-    }
-
+    { image: 'images/manifesto-01.jpg', key: 'manifesto_scene_1' },
+    { image: 'images/manifesto-02.jpg', key: 'manifesto_scene_2' },
+    { image: 'images/manifesto-03.jpg', key: 'manifesto_scene_3' },
+    { image: 'images/manifesto-04.jpg', key: 'manifesto_scene_4' },
+    { image: 'images/manifesto-05.jpg', key: 'manifesto_scene_5' },
+    { image: 'images/manifesto-06.jpg', key: 'manifesto_scene_6' },
+    { image: 'images/manifesto-07.jpg', key: 'manifesto_scene_7' },
+    { image: 'images/manifesto-08.jpg', key: 'manifesto_scene_8' },
+    { image: 'images/manifesto-09.jpg', key: 'manifesto_scene_9' }
   ];
 
   // -----------------------------------------
@@ -7910,7 +7857,7 @@ if (viewer && frame && closeButton) {
     new Promise(resolve => setTimeout(resolve, ms));
 
   // -----------------------------------------
-  // BACKGROUND IMAGE TRANSITIONS
+  // BACKGROUND TRANSITIONS
   // -----------------------------------------
 
   function changeBackground(src) {
@@ -7924,14 +7871,17 @@ if (viewer && frame && closeButton) {
       nextLayer.src = src;
 
       requestAnimationFrame(() => {
+
         nextLayer.classList.add('is-visible');
         currentLayer.classList.remove('is-visible');
 
         const previousLayer = currentLayer;
+
         currentLayer = nextLayer;
         nextLayer = previousLayer;
 
         currentImage = src;
+
       });
 
     };
@@ -7974,29 +7924,38 @@ if (viewer && frame && closeButton) {
   }
 
   // -----------------------------------------
-  // COMPLETE TEXT WITHOUT ANIMATION
+  // COMPLETE TEXT
   // -----------------------------------------
 
   function showCompleteText() {
 
+    const t = getTranslations();
+
     copy.replaceChildren();
 
     scenes.forEach(scene => {
+
       const paragraph = document.createElement('p');
-      paragraph.textContent = scene.text;
+
+      paragraph.textContent = t[scene.key];
+
       copy.appendChild(paragraph);
+
     });
 
+    // Keep the final image permanently
     changeBackground(scenes[scenes.length - 1].image);
 
     skipButton.hidden = true;
   }
 
   // -----------------------------------------
-  // START THE EXPERIENCE
+  // START
   // -----------------------------------------
 
   async function startManifesto() {
+
+    const t = getTranslations();
 
     startButton.disabled = true;
 
@@ -8009,11 +7968,9 @@ if (viewer && frame && closeButton) {
 
       if (skipRequested) break;
 
-      // Change image when its paragraph begins
       changeBackground(scene.image);
 
-      // Write paragraph
-      await typeParagraph(scene.text);
+      await typeParagraph(t[scene.key]);
 
       if (skipRequested) break;
 
@@ -8039,6 +7996,7 @@ if (viewer && frame && closeButton) {
   });
 
 })();
+
 
 </script>
   
