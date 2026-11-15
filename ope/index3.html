@@ -7314,9 +7314,6 @@ renderObservationsMosaic();
 
 
 
-/* -----------------------------------------
-   PRODUCT VIEWER - IFRAME NAVIGATION
------------------------------------------ */
 
 const viewer = document.getElementById('product-viewer');
 const frame = document.getElementById('product-frame');
@@ -7324,29 +7321,29 @@ const closeButton = document.getElementById('close-product');
 
 if (viewer && frame && closeButton) {
 
-  function openProduct(url) {
+  function openProduct(url, addHistory = true) {
     frame.src = url;
     viewer.hidden = false;
+
+    if (addHistory) {
+      history.pushState(
+        { product: url },
+        '',
+        window.location.href
+      );
+    }
+
     window.scrollTo(0, 0);
   }
 
-  // Intercept product links, including dropdown menu links
+  // Open products inside the iframe
   document.addEventListener('click', event => {
     const link = event.target.closest('[data-product-frame]');
 
     if (!link) return;
 
     event.preventDefault();
-
-    const url = link.href;
-
-    history.pushState(
-      { product: url },
-      '',
-      url
-    );
-
-    openProduct(url);
+    openProduct(link.href);
   });
 
   // Close product viewer
@@ -7361,10 +7358,10 @@ if (viewer && frame && closeButton) {
 
   closeButton.addEventListener('click', closeProduct);
 
-  // Browser back / forward navigation
+  // Browser back / forward
   window.addEventListener('popstate', event => {
     if (event.state && event.state.product) {
-      openProduct(event.state.product);
+      openProduct(event.state.product, false);
     } else {
       viewer.hidden = true;
       frame.src = 'about:blank';
@@ -7372,6 +7369,7 @@ if (viewer && frame && closeButton) {
   });
 
 }
+
 
 </script>
   
