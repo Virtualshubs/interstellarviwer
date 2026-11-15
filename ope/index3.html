@@ -7806,6 +7806,7 @@ renderObservationsMosaic();
 
 
 
+
 /* =========================================
    MANIFESTO — INDEPENDENT LANGUAGE SYSTEM
 ========================================= */
@@ -7900,6 +7901,185 @@ renderObservationsMosaic();
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+
+  /* =========================================
+     MANIFESTO — SOUND DESIGN
+  ========================================= */
+
+  let audioContext = null;
+  let masterGain = null;
+  let ambientGain = null;
+  let ambientOscillators = [];
+  let audioStarted = false;
+  let ambientStartTimer = null;
+
+  function initializeAudio() {
+    if (audioContext) return;
+
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) return;
+
+    audioContext = new AudioContextClass();
+
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = 0.7;
+    masterGain.connect(audioContext.destination);
+  }
+
+  function playPaperSound() {
+    if (!audioContext || !masterGain) return;
+
+    const duration = 0.75;
+    const sampleRate = audioContext.sampleRate;
+
+    const buffer = audioContext.createBuffer(
+      1,
+      Math.floor(sampleRate * duration),
+      sampleRate
+    );
+
+    const data = buffer.getChannelData(0);
+
+    // Ruido orgánico para simular el roce del papel.
+    for (let i = 0; i < data.length; i++) {
+      const progress = i / data.length;
+      const envelope = Math.pow(Math.sin(Math.PI * progress), 1.5);
+
+      data[i] = (Math.random() * 2 - 1) * envelope;
+    }
+
+    const source = audioContext.createBufferSource();
+    const filter = audioContext.createBiquadFilter();
+    const volume = audioContext.createGain();
+
+    source.buffer = buffer;
+
+    filter.type = 'bandpass';
+    filter.frequency.value = 1500;
+    filter.Q.value = 0.65;
+
+    const now = audioContext.currentTime;
+
+    volume.gain.setValueAtTime(0, now);
+    volume.gain.linearRampToValueAtTime(0.11, now + 0.12);
+    volume.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    source.connect(filter);
+    filter.connect(volume);
+    volume.connect(masterGain);
+
+    source.start();
+    source.stop(now + duration);
+  }
+
+  function startAmbientSound() {
+    if (!audioContext || !masterGain || audioStarted) return;
+
+    audioStarted = true;
+
+    ambientGain = audioContext.createGain();
+    ambientGain.gain.setValueAtTime(0, audioContext.currentTime);
+
+    ambientGain.gain.linearRampToValueAtTime(
+      0.045,
+      audioContext.currentTime + 5
+    );
+
+    ambientGain.connect(masterGain);
+
+    // Acorde de La mayor con referencia A4 = 432 Hz.
+    const frequencies = [
+      108,      // A2
+      216,      // A3
+      272.14,   // C#4
+      324,      // E4
+      432       // A4
+    ];
+
+    frequencies.forEach((frequency, index) => {
+      const oscillator = audioContext.createOscillator();
+      const voiceGain = audioContext.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+
+      // Volumen individual de cada armónico.
+      const levels = [0.16, 0.24, 0.12, 0.10, 0.035];
+
+      voiceGain.gain.value = levels[index];
+
+      oscillator.connect(voiceGain);
+      voiceGain.connect(ambientGain);
+
+      oscillator.start();
+
+      ambientOscillators.push(oscillator);
+    });
+  }
+
+  async function startManifestoSound() {
+    try {
+      initializeAudio();
+
+      if (!audioContext) return;
+
+      await audioContext.resume();
+
+      playPaperSound();
+
+      // La atmósfera aparece después del roce del papel.
+      ambientStartTimer = window.setTimeout(() => {
+        ambientStartTimer = null;
+
+        if (isRunning) {
+          startAmbientSound();
+        }
+      }, 550);
+
+    } catch (error) {
+      console.warn('Manifesto: audio could not be started.', error);
+    }
+  }
+
+  function stopAmbientSound() {
+    // Evita que la música comience después de haber terminado.
+    if (ambientStartTimer !== null) {
+      clearTimeout(ambientStartTimer);
+      ambientStartTimer = null;
+    }
+
+    if (!audioContext || !ambientGain || !audioStarted) return;
+
+    const now = audioContext.currentTime;
+
+    ambientGain.gain.cancelScheduledValues(now);
+    ambientGain.gain.setValueAtTime(ambientGain.gain.value, now);
+    ambientGain.gain.linearRampToValueAtTime(0, now + 4);
+
+    const oscillators = [...ambientOscillators];
+
+    window.setTimeout(() => {
+      oscillators.forEach(oscillator => {
+        try {
+          oscillator.stop();
+        } catch (error) {
+          // El oscilador puede haberse detenido previamente.
+        }
+      });
+
+      ambientOscillators = [];
+      ambientGain = null;
+      audioStarted = false;
+    }, 4500);
+  }
+
+
+  /* =========================================
+     MANIFESTO — LANGUAGE
+  ========================================= */
+
   function setManifestoLanguage(lang) {
     if (!translations[lang]) return;
 
@@ -7919,10 +8099,12 @@ renderObservationsMosaic();
     setText('.manifesto-paper-header > span:first-child', t.paperLabel);
     setText('.manifesto-paper-content > h2', t.title);
     setText('.manifesto-paper-footer > span', t.footer);
+
     skipButton.textContent = t.skip;
 
     languageButtons.forEach(button => {
       const active = button.dataset.manifestoLang === language;
+
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
@@ -7931,6 +8113,11 @@ renderObservationsMosaic();
       renderCompleteText();
     }
   }
+
+
+  /* =========================================
+     MANIFESTO — BACKGROUND
+  ========================================= */
 
   function changeBackground(src) {
     if (!src || src === currentImage) return;
@@ -7945,6 +8132,7 @@ renderObservationsMosaic();
         currentLayer.classList.remove('is-visible');
 
         const previousLayer = currentLayer;
+
         currentLayer = nextLayer;
         nextLayer = previousLayer;
         currentImage = src;
@@ -7957,6 +8145,11 @@ renderObservationsMosaic();
 
     preload.src = src;
   }
+
+
+  /* =========================================
+     MANIFESTO — TYPEWRITER
+  ========================================= */
 
   async function typeParagraph(text) {
     const paragraph = document.createElement('p');
@@ -7975,13 +8168,21 @@ renderObservationsMosaic();
       textNode.textContent += text[i];
 
       let delay = typingSpeed;
-      if ('.!?'.includes(text[i])) delay += punctuationPause;
+
+      if ('.!?'.includes(text[i])) {
+        delay += punctuationPause;
+      }
 
       await wait(delay);
     }
 
     cursor.remove();
   }
+
+
+  /* =========================================
+     MANIFESTO — SIGNATURE
+  ========================================= */
 
   function showSignature() {
     const signature = document.createElement('img');
@@ -7998,6 +8199,11 @@ renderObservationsMosaic();
     });
   }
 
+
+  /* =========================================
+     MANIFESTO — COMPLETE TEXT
+  ========================================= */
+
   function renderCompleteText() {
     const t = translations[language];
 
@@ -8005,12 +8211,15 @@ renderObservationsMosaic();
 
     t.scenes.forEach(text => {
       const paragraph = document.createElement('p');
+
       paragraph.textContent = text;
       copy.appendChild(paragraph);
     });
 
     showSignature();
+
     changeBackground(images[images.length - 1]);
+
     skipButton.hidden = true;
     completed = true;
   }
@@ -8018,13 +8227,27 @@ renderObservationsMosaic();
   function showCompleteText() {
     skipRequested = true;
     completed = true;
+
     renderCompleteText();
+
+    if (!isRunning) {
+      stopAmbientSound();
+    }
   }
+
+
+  /* =========================================
+     MANIFESTO — START EXPERIENCE
+  ========================================= */
 
   async function startManifesto() {
     if (isRunning) return;
 
     isRunning = true;
+
+    // Inicia el sonido desde la interacción del usuario.
+    startManifestoSound();
+
     startButton.disabled = true;
     skipRequested = false;
     completed = false;
@@ -8032,6 +8255,7 @@ renderObservationsMosaic();
 
     intro.hidden = true;
     paper.hidden = false;
+
     copy.replaceChildren();
 
     const t = translations[language];
@@ -8057,7 +8281,15 @@ renderObservationsMosaic();
     }
 
     isRunning = false;
+
+    // Fundido suave al terminar la escritura.
+    stopAmbientSound();
   }
+
+
+  /* =========================================
+     MANIFESTO — EVENTS
+  ========================================= */
 
   languageButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -8069,7 +8301,12 @@ renderObservationsMosaic();
 
   skipButton.addEventListener('click', showCompleteText);
 
-  // Initial language: English
+
+  /* =========================================
+     INITIAL STATE
+  ========================================= */
+
+  // Idioma inicial: inglés.
   setManifestoLanguage('en');
 
 })();
