@@ -383,42 +383,59 @@
 
 
 
+#product-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100dvh;
+  background: #F3F1EA;
+  display: flex;
+  flex-direction: column;
+}
+
+#product-viewer[hidden] {
+  display: none;
+}
 
 #close-product {
-  position: absolute;
-  top: 24px;
-  left: 28px;
-  z-index: 1001;
+  position: relative;
+  flex: 0 0 58px;
+  width: 100%;
+  height: 58px;
 
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
 
-  padding: 11px 16px;
+  padding: 0 28px;
+  margin: 0;
 
   background: #242522;
   color: #F3F1EA;
-
-  border: 1px solid rgba(243, 241, 234, 0.18);
-  border-radius: 4px;
+  border: 0;
+  border-bottom: 1px solid rgba(243, 241, 234, 0.16);
+  border-radius: 0;
 
   font-family: "IBM Plex Mono", monospace;
   font-size: 11px;
   letter-spacing: 0.04em;
+  text-align: left;
 
   cursor: pointer;
-  transition:
-    background 180ms ease,
-    border-color 180ms ease,
-    transform 180ms ease;
+  transition: background 180ms ease;
+}
+
+#close-product::after {
+  content: "SEOD / PRODUCT VIEWER";
+  color: #A6A69E;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 #close-product:hover {
-  background: #416D80;
-  border-color: #416D80;
-  transform: translateX(-2px);
+  background: #30332F;
 }
-
 
 
 
