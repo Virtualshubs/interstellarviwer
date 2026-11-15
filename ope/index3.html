@@ -398,6 +398,7 @@
   display: none;
 }
 
+
 #close-product {
   position: relative;
   flex: 0 0 58px;
@@ -406,7 +407,7 @@
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 
   padding: 0 28px;
   margin: 0;
@@ -418,19 +419,12 @@
   border-radius: 0;
 
   font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   text-align: left;
 
   cursor: pointer;
   transition: background 180ms ease;
-}
-
-#close-product::after {
-  content: "SEOD / PRODUCT VIEWER";
-  color: #A6A69E;
-  font-size: 10px;
-  letter-spacing: 0.08em;
 }
 
 #close-product:hover {
