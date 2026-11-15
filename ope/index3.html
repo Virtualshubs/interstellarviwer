@@ -8362,7 +8362,6 @@ renderObservationsMosaic();
 </script>
 
 
-
 <script>
 (function () {
   const viewer = document.getElementById("product-viewer");
@@ -8374,29 +8373,14 @@ renderObservationsMosaic();
     return;
   }
 
-  let viewerOpen = false;
-
   function openProduct(url) {
     frame.src = url;
     viewer.hidden = false;
-    viewerOpen = true;
-
-    // Add one history entry so browser Back closes the viewer.
-    if (!history.state?.seodProductViewer) {
-      history.pushState(
-        { ...(history.state || {}), seodProductViewer: true },
-        "",
-        location.href
-      );
-    }
   }
 
   function closeViewer() {
-    if (!viewerOpen) return;
-
     viewer.hidden = true;
     frame.src = "about:blank";
-    viewerOpen = false;
   }
 
   // All products open inside the same SEOD iframe.
@@ -8409,26 +8393,11 @@ renderObservationsMosaic();
     openProduct(link.href);
   });
 
-  // Close button.
-  closeButton.addEventListener("click", function () {
-    if (history.state?.seodProductViewer) {
-      history.back();
-    } else {
-      closeViewer();
-    }
-  });
-
-  // Browser Back / Forward.
-  window.addEventListener("popstate", function () {
-    if (viewerOpen && !history.state?.seodProductViewer) {
-      closeViewer();
-    }
-  });
+  // Close viewer.
+  closeButton.addEventListener("click", closeViewer);
 
 })();
 </script>
-
-
 
 
   
