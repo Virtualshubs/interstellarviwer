@@ -8456,23 +8456,21 @@ renderObservationsMosaic();
 
 
   
-  // Close product viewer when navigating through the main SEOD navigation.
-  const mainNav = document.querySelector(".site-header");
 
-  if (mainNav) {
-    mainNav.addEventListener("click", function (event) {
-      const navLink = event.target.closest("a");
-      const productsTrigger = event.target.closest(".products-trigger");
+  // Close the viewer when the user interacts with the main navigation.
+  document.addEventListener("click", function (event) {
+    const navAction = event.target.closest(
+      ".site-header a, .site-header button"
+    );
 
-      if (navLink && !navLink.hasAttribute("data-product-frame")) {
-        closeViewer();
-      }
+    if (!navAction) return;
 
-      if (productsTrigger) {
-        closeViewer();
-      }
-    });
-  }
+    // Product links must continue opening inside the iframe.
+    if (navAction.matches("[data-product-frame]")) return;
+
+    closeViewer();
+  }, true);
+
 
 </script>
 
