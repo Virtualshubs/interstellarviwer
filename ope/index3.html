@@ -8363,7 +8363,6 @@ renderObservationsMosaic();
 
 
 
-
 <script>
 (function () {
   const viewer = document.getElementById("product-viewer");
@@ -8400,24 +8399,14 @@ renderObservationsMosaic();
     viewerOpen = false;
   }
 
-  // Intercept product links.
+  // All products open inside the same SEOD iframe.
   document.addEventListener("click", function (event) {
     const link = event.target.closest("a[data-product-frame]");
 
     if (!link) return;
 
-    const url = new URL(link.href, location.href);
-
-    // 3DLite Space remains in a separate tab.
-    if (url.hostname === "lite.3dtwins.tech") {
-      event.preventDefault();
-      window.open(url.href, "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    // OPE and JANUS open inside the SEOD viewer.
     event.preventDefault();
-    openProduct(url.href);
+    openProduct(link.href);
   });
 
   // Close button.
@@ -8438,7 +8427,6 @@ renderObservationsMosaic();
 
 })();
 </script>
-
 
 
 
