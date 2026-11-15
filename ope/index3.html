@@ -666,6 +666,78 @@ justify-content: flex-end;
 }
 
     
+/* CHALLENGE — heading and image */
+
+.challenge-head {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 3rem;
+}
+
+.challenge-heading {
+  position: relative;
+  z-index: 2;
+}
+
+.challenge-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(
+    ellipse 75% 75% at center,
+    #000 48%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 75% 75% at center,
+    #000 48%,
+    transparent 100%
+  );
+}
+
+.challenge-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* CONTENT */
+
+.challenge-body {
+  margin-top: 2.5rem;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+
+  .challenge-head {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .challenge-heading {
+    order: 1;
+  }
+
+  .challenge-image {
+    order: 2;
+    aspect-ratio: 16 / 9;
+  }
+
+  .challenge-body {
+    margin-top: 2rem;
+  }
+
+  .data-line {
+    grid-template-columns: 1fr;
+  }
+
+}
+
 
    /* -----------------------------------------
    APPROACH
@@ -4029,11 +4101,13 @@ justify-content: flex-end;
 </section>
 
 
+
 <section class="section challenge" id="company">
   <div class="inner">
-    <div class="section-head" data-reveal>
 
-      <div>
+    <div class="section-head challenge-head" data-reveal>
+
+      <div class="challenge-heading">
         <div class="eyebrow" data-i18n="challenge_eyebrow" hidden>
           The challenge
         </div>
@@ -4041,6 +4115,10 @@ justify-content: flex-end;
         <h2 data-i18n="challenge_title">
           Our world is constantly changing. Understanding it means seeing beyond the data.
         </h2>
+      </div>
+
+      <div class="challenge-image">
+        <img src="images/challenge-image.webp" alt="" loading="lazy">
       </div>
 
     </div>
@@ -4084,8 +4162,6 @@ justify-content: flex-end;
     </div>
   </div>
 </section>
-
-
 
 
 
