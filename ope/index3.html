@@ -3854,12 +3854,11 @@
         </span>
 
     
-<span
-  id="manifesto-language"
-  data-manifesto-lang="en"
->
-  EN
-</span>
+<div class="manifesto-language" aria-label="Manifest language">
+  <button type="button" class="is-active" data-manifesto-lang="en" aria-pressed="true">EN</button>
+  <span aria-hidden="true">/</span>
+  <button type="button" data-manifesto-lang="es" aria-pressed="false">ES</button>
+</div>
 
       </div>
 
@@ -7806,119 +7805,150 @@ renderObservationsMosaic();
 
 
 
+
 /* =========================================
-   MANIFESTO — ENGLISH VERSION
+   MANIFESTO — INDEPENDENT LANGUAGE SYSTEM
 ========================================= */
 
 (() => {
-
   const intro = document.getElementById('manifesto-intro');
   const startButton = document.getElementById('manifesto-start');
   const paper = document.getElementById('manifesto-paper');
   const copy = document.getElementById('manifesto-copy');
   const skipButton = document.getElementById('manifesto-skip');
-
   const bgA = document.getElementById('manifesto-bg-a');
   const bgB = document.getElementById('manifesto-bg-b');
 
-  if (
-    !intro || !startButton || !paper ||
-    !copy || !skipButton || !bgA || !bgB
-  ) return;
+  if (!intro || !startButton || !paper || !copy || !skipButton || !bgA || !bgB) return;
 
-  // -----------------------------------------
-  // STORY: IMAGE + TEXT
-  // -----------------------------------------
+  const translations = {
+    en: {
+      introEyebrow: 'A LETTER TO THE WORLD',
+      introTitle: 'What if we looked a little further?',
+      introText: 'A small reflection on our world and everything we have yet to discover.',
+      read: 'Read the manifesto',
+      paperLabel: 'AN INVITATION TO OBSERVE',
+      title: 'A letter to everything we have yet to discover.',
+      footer: 'OBSERVE · UNDERSTAND · DISCOVER',
+      skip: 'Show complete text',
+      signatureAlt: 'Signature',
+      scenes: [
+        'Sometimes, we forget to stop and look.',
+        'Beneath our feet, above our heads, and beyond the reach of our sight, everything is changing.',
+        'Forests breathe, oceans draw their own paths, rivers reshape landscapes, and nature writes stories we are only beginning to understand.',
+        'There is so much beauty we have yet to discover.',
+        'To observe is a way of drawing closer. Of learning to listen to what the world reveals, recognising its changes and discovering the connections that bring us together.',
+        'Because the more we understand, the more aware we become of everything that deserves to be protected.',
+        'And perhaps that is one of the most beautiful things about knowledge: it never ends.',
+        'There will always be something new to discover, another question to ask, another frontier to explore.',
+        'May we never lose our curiosity. May our ambition to understand keep carrying us towards tomorrow. Because if we can imagine a better world and learn to understand it, we can also help make it happen.'
+      ]
+    },
 
-  const scenes = [
-    {
-      image: 'images/manifesto-01.jpg',
-      text: 'Sometimes, we forget to stop and look.'
-    },
-    {
-      image: 'images/manifesto-02.jpg',
-      text: 'Beneath our feet, above our heads, and beyond the reach of our sight, everything is changing.'
-    },
-    {
-      image: 'images/manifesto-03.jpg',
-      text: 'Forests breathe, oceans draw their own paths, rivers reshape landscapes, and nature writes stories we are only beginning to understand.'
-    },
-    {
-      image: 'images/manifesto-04.jpg',
-      text: 'There is so much beauty we have yet to discover.'
-    },
-    {
-      image: 'images/manifesto-05.jpg',
-      text: 'To observe is a way of drawing closer. Of learning to listen to what the world reveals, recognising its changes and discovering the connections that bring us together.'
-    },
-    {
-      image: 'images/manifesto-06.jpg',
-      text: 'Because the more we understand, the more aware we become of everything that deserves to be protected.'
-    },
-    {
-      image: 'images/manifesto-07.jpg',
-      text: 'And perhaps that is one of the most beautiful things about knowledge: it never ends.'
-    },
-    {
-      image: 'images/manifesto-08.jpg',
-      text: 'There will always be something new to discover, another question to ask, another frontier to explore.'
-    },
-    {
-      image: 'images/manifesto-09.jpg',
-      text: 'May we never lose our curiosity. May our ambition to understand keep carrying us towards tomorrow. Because if we can imagine a better world and learn to understand it, we can also help make it happen.'
+    es: {
+      introEyebrow: 'UNA CARTA AL MUNDO',
+      introTitle: '¿Y si mirásemos un poco más allá?',
+      introText: 'Una pequeña reflexión sobre nuestro mundo y todo lo que aún nos queda por descubrir.',
+      read: 'Leer el manifiesto',
+      paperLabel: 'UNA INVITACIÓN A OBSERVAR',
+      title: 'Una carta a todo lo que aún nos queda por descubrir.',
+      footer: 'OBSERVAR · COMPRENDER · DESCUBRIR',
+      skip: 'Mostrar texto completo',
+      signatureAlt: 'Firma',
+      scenes: [
+        'A veces olvidamos detenernos a mirar.',
+        'Bajo nuestros pies, sobre nuestras cabezas y más allá de lo que alcanza nuestra vista, todo está cambiando.',
+        'Los bosques respiran, los océanos dibujan caminos, los ríos transforman paisajes y la naturaleza escribe historias que apenas comenzamos a comprender.',
+        'Hay tanta belleza que todavía desconocemos.',
+        'Observar es una forma de acercarnos. De aprender a escuchar lo que el mundo nos muestra, reconocer sus cambios y descubrir las conexiones que nos unen a él.',
+        'Porque cuanto más comprendemos, más conscientes somos de todo aquello que merece ser cuidado.',
+        'Y quizá esa sea una de las cosas más hermosas del conocimiento: que nunca termina.',
+        'Siempre habrá algo nuevo que descubrir, otra pregunta que formular, otra frontera que explorar.',
+        'Que nunca perdamos la curiosidad. Que la ambición por conocer siga impulsándonos hacia el mañana. Porque, si somos capaces de imaginar un mundo mejor y comprenderlo, también podemos ayudar a hacerlo realidad.'
+      ]
     }
+  };
+
+  const images = [
+    'images/manifesto-01.jpg',
+    'images/manifesto-02.jpg',
+    'images/manifesto-03.jpg',
+    'images/manifesto-04.jpg',
+    'images/manifesto-05.jpg',
+    'images/manifesto-06.jpg',
+    'images/manifesto-07.jpg',
+    'images/manifesto-08.jpg',
+    'images/manifesto-09.jpg'
   ];
 
-  // -----------------------------------------
-  // SIGNATURE IMAGE
-  // -----------------------------------------
-
   const signatureImage = 'images/manifesto-signature.png';
-
-  // -----------------------------------------
-  // TIMING
-  // -----------------------------------------
 
   const typingSpeed = 23;
   const paragraphPause = 650;
   const punctuationPause = 100;
 
+  let language = 'en';
+  let currentScene = 0;
+  let isRunning = false;
   let skipRequested = false;
+  let completed = false;
   let currentLayer = bgA;
   let nextLayer = bgB;
   let currentImage = bgA.getAttribute('src');
 
-  const wait = ms =>
-    new Promise(resolve => setTimeout(resolve, ms));
+  const languageButtons = document.querySelectorAll('[data-manifesto-lang]');
 
-  // -----------------------------------------
-  // BACKGROUND TRANSITIONS
-  // -----------------------------------------
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function setManifestoLanguage(lang) {
+    if (!translations[lang]) return;
+
+    language = lang;
+
+    const t = translations[language];
+
+    const setText = (selector, value) => {
+      const element = document.querySelector(selector);
+      if (element) element.textContent = value;
+    };
+
+    setText('.manifesto-kicker', t.introEyebrow);
+    setText('#manifesto-intro h2', t.introTitle);
+    setText('#manifesto-intro p', t.introText);
+    setText('#manifesto-start [data-i18n="manifesto_read"]', t.read);
+    setText('.manifesto-paper-header > span:first-child', t.paperLabel);
+    setText('.manifesto-paper-content > h2', t.title);
+    setText('.manifesto-paper-footer > span', t.footer);
+    skipButton.textContent = t.skip;
+
+    languageButtons.forEach(button => {
+      const active = button.dataset.manifestoLang === language;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    if (completed) {
+      renderCompleteText();
+    }
+  }
 
   function changeBackground(src) {
-
     if (!src || src === currentImage) return;
 
     const preload = new Image();
 
     preload.onload = () => {
-
       nextLayer.src = src;
 
       requestAnimationFrame(() => {
-
         nextLayer.classList.add('is-visible');
         currentLayer.classList.remove('is-visible');
 
         const previousLayer = currentLayer;
-
         currentLayer = nextLayer;
         nextLayer = previousLayer;
-
         currentImage = src;
-
       });
-
     };
 
     preload.onerror = () => {
@@ -7928,12 +7958,7 @@ renderObservationsMosaic();
     preload.src = src;
   }
 
-  // -----------------------------------------
-  // TYPEWRITER
-  // -----------------------------------------
-
   async function typeParagraph(text) {
-
     const paragraph = document.createElement('p');
     const textNode = document.createTextNode('');
     const cursor = document.createElement('span');
@@ -7945,16 +7970,12 @@ renderObservationsMosaic();
     copy.appendChild(paragraph);
 
     for (let i = 0; i < text.length; i++) {
-
       if (skipRequested) break;
 
       textNode.textContent += text[i];
 
       let delay = typingSpeed;
-
-      if ('.!?'.includes(text[i])) {
-        delay += punctuationPause;
-      }
+      if ('.!?'.includes(text[i])) delay += punctuationPause;
 
       await wait(delay);
     }
@@ -7962,17 +7983,12 @@ renderObservationsMosaic();
     cursor.remove();
   }
 
-  // -----------------------------------------
-  // SHOW SIGNATURE
-  // -----------------------------------------
-
   function showSignature() {
-
     const signature = document.createElement('img');
 
     signature.className = 'manifesto-signature';
     signature.src = signatureImage;
-    signature.alt = 'Signature';
+    signature.alt = translations[language].signatureAlt;
     signature.loading = 'eager';
 
     copy.appendChild(signature);
@@ -7980,84 +7996,81 @@ renderObservationsMosaic();
     requestAnimationFrame(() => {
       signature.classList.add('is-visible');
     });
-
   }
 
-  // -----------------------------------------
-  // COMPLETE TEXT
-  // -----------------------------------------
-
-  function showCompleteText() {
+  function renderCompleteText() {
+    const t = translations[language];
 
     copy.replaceChildren();
 
-    scenes.forEach(scene => {
-
+    t.scenes.forEach(text => {
       const paragraph = document.createElement('p');
-
-      paragraph.textContent = scene.text;
-
+      paragraph.textContent = text;
       copy.appendChild(paragraph);
-
     });
 
     showSignature();
-
-    // Keep the final image permanently
-    changeBackground(scenes[scenes.length - 1].image);
-
+    changeBackground(images[images.length - 1]);
     skipButton.hidden = true;
+    completed = true;
   }
 
-  // -----------------------------------------
-  // START
-  // -----------------------------------------
+  function showCompleteText() {
+    skipRequested = true;
+    completed = true;
+    renderCompleteText();
+  }
 
   async function startManifesto() {
+    if (isRunning) return;
 
+    isRunning = true;
     startButton.disabled = true;
     skipRequested = false;
+    completed = false;
+    currentScene = 0;
 
     intro.hidden = true;
     paper.hidden = false;
-
     copy.replaceChildren();
 
-    for (const scene of scenes) {
+    const t = translations[language];
 
-      if (skipRequested) break;
+    while (currentScene < t.scenes.length && !skipRequested) {
+      changeBackground(images[currentScene]);
 
-      changeBackground(scene.image);
+      await typeParagraph(t.scenes[currentScene]);
 
-      await typeParagraph(scene.text);
+      currentScene++;
 
-      if (skipRequested) break;
-
-      await wait(paragraphPause);
+      if (!skipRequested && currentScene < t.scenes.length) {
+        await wait(paragraphPause);
+      }
     }
 
     if (skipRequested) {
-
-      showCompleteText();
-
+      renderCompleteText();
     } else {
-
+      completed = true;
       showSignature();
       skipButton.hidden = true;
-
     }
 
+    isRunning = false;
   }
 
-  // -----------------------------------------
-  // EVENTS
-  // -----------------------------------------
+  languageButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      setManifestoLanguage(button.dataset.manifestoLang);
+    });
+  });
 
   startButton.addEventListener('click', startManifesto);
 
-  skipButton.addEventListener('click', () => {
-    skipRequested = true;
-  });
+  skipButton.addEventListener('click', showCompleteText);
+
+  // Initial language: English
+  setManifestoLanguage('en');
 
 })();
 
