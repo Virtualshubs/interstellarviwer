@@ -1593,6 +1593,339 @@ justify-content: flex-end;
 
 }
 
+
+
+/* =========================================
+   JANUS VALUE — DATA EXPLOITATION
+========================================= */
+
+#technology .janus-value {
+  margin-top: 76px;
+  padding: 54px 48px 42px;
+  background: #171a1d;
+  border: 1px solid rgba(150, 174, 190, 0.14);
+  border-radius: 3px;
+  color: #f3f1ea;
+}
+
+/* HEAD */
+
+#technology .janus-value-head {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 64px;
+  align-items: end;
+  padding-bottom: 42px;
+}
+
+#technology .janus-value-eyebrow {
+  display: block;
+  margin-bottom: 18px;
+  color: #83a9bd;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  line-height: 1.5;
+}
+
+#technology .janus-value-head h3,
+#technology .janus-business-head h3 {
+  max-width: 700px;
+  margin: 0;
+  color: #f3f1ea;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 500;
+  line-height: 1.13;
+  letter-spacing: -0.045em;
+}
+
+#technology .janus-value-head > p {
+  max-width: 430px;
+  margin: 0 0 3px;
+  color: #aeb8be;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* CAPABILITIES */
+
+#technology .janus-value-capabilities {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid rgba(150, 174, 190, 0.2);
+  border-left: 1px solid rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-capability {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 20px;
+  min-height: 174px;
+  padding: 29px 30px;
+  border-right: 1px solid rgba(150, 174, 190, 0.2);
+  border-bottom: 1px solid rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-capability-index {
+  padding-top: 4px;
+  color: #83a9bd;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+#technology .janus-capability h4,
+#technology .janus-benefit h4 {
+  margin: 0 0 12px;
+  color: #f3f1ea;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+#technology .janus-capability p,
+#technology .janus-benefit p {
+  max-width: 440px;
+  margin: 0;
+  color: #aeb8be;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* BUSINESS VALUE */
+
+#technology .janus-value-divider {
+  height: 1px;
+  margin: 48px 0 42px;
+  background: rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-business-head {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  column-gap: 64px;
+  align-items: end;
+  margin-bottom: 32px;
+}
+
+#technology .janus-business-head .janus-value-eyebrow {
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+}
+
+#technology .janus-business-head h3 {
+  font-size: clamp(25px, 2.7vw, 34px);
+}
+
+#technology .janus-business-head > p {
+  max-width: 430px;
+  margin: 0 0 2px;
+  color: #aeb8be;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+#technology .janus-benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-benefit {
+  min-height: 145px;
+  padding: 25px 24px 25px 0;
+  border-bottom: 1px solid rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-benefit:not(:nth-child(3n)) {
+  border-right: 1px solid rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-benefit:nth-child(3n + 2),
+#technology .janus-benefit:nth-child(3n) {
+  padding-left: 24px;
+}
+
+#technology .janus-benefit h4 {
+  font-size: 15px;
+  margin-bottom: 9px;
+}
+
+#technology .janus-benefit p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* EARTH OBSERVATION EXAMPLE */
+
+#technology .janus-value-example {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: 40px;
+  margin-top: 38px;
+  padding: 29px 30px;
+  background: rgba(91, 130, 151, 0.09);
+  border-left: 2px solid #638da4;
+}
+
+#technology .janus-example-label {
+  color: #83a9bd;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  line-height: 1.7;
+}
+
+#technology .janus-example-content h4 {
+  margin: 0 0 11px;
+  color: #f3f1ea;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+#technology .janus-example-content p {
+  max-width: 700px;
+  margin: 0;
+  color: #aeb8be;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* CLOSING STATEMENT */
+
+#technology .janus-value-closing {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 34px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(150, 174, 190, 0.2);
+}
+
+#technology .janus-value-closing > span {
+  color: #83a9bd;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+#technology .janus-value-closing p {
+  margin: 0;
+  color: #f3f1ea;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+  #technology .janus-value {
+    padding: 36px 26px 30px;
+    margin-top: 52px;
+  }
+
+  #technology .janus-value-head {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-bottom: 30px;
+  }
+
+  #technology .janus-business-head {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  #technology .janus-business-head .janus-value-eyebrow {
+    grid-column: auto;
+  }
+
+  #technology .janus-value-capabilities {
+    grid-template-columns: 1fr;
+  }
+
+  #technology .janus-capability {
+    min-height: auto;
+    padding: 25px 22px;
+  }
+
+  #technology .janus-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #technology .janus-benefit:not(:nth-child(3n)) {
+    border-right: none;
+  }
+
+  #technology .janus-benefit:nth-child(3n + 2),
+  #technology .janus-benefit:nth-child(3n) {
+    padding-left: 0;
+  }
+
+  #technology .janus-benefit:nth-child(odd) {
+    padding-right: 20px;
+    border-right: 1px solid rgba(150, 174, 190, 0.2);
+  }
+
+  #technology .janus-benefit:nth-child(even) {
+    padding-left: 20px;
+  }
+
+  #technology .janus-value-example {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  #technology .janus-value {
+    padding: 29px 19px 25px;
+  }
+
+  #technology .janus-value-head h3,
+  #technology .janus-business-head h3 {
+    font-size: 27px;
+  }
+
+  #technology .janus-capability {
+    grid-template-columns: 27px 1fr;
+    gap: 12px;
+    padding: 23px 16px;
+  }
+
+  #technology .janus-benefits {
+    grid-template-columns: 1fr;
+  }
+
+  #technology .janus-benefit,
+  #technology .janus-benefit:nth-child(odd),
+  #technology .janus-benefit:nth-child(even) {
+    min-height: auto;
+    padding: 22px 0;
+    border-right: none;
+  }
+
+  #technology .janus-value-example {
+    padding: 24px 20px;
+  }
+
+  #technology .janus-value-closing {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+}
+
+
+
+
+    
     /* -----------------------------------------
        VISION
     ----------------------------------------- */
@@ -5276,6 +5609,137 @@ justify-content: flex-end;
 
   </div>
 
+
+
+
+
+<div class="janus-value" data-reveal>
+
+  <div class="janus-value-head">
+    <div>
+      <span class="janus-value-eyebrow">BEYOND THE BENCHMARK / JANUS CAPABILITIES</span>
+      <h3>From catalog reading to complete data exploitation.</h3>
+    </div>
+    <p>
+      Every reading becomes an organized, explorable and analytically
+      described dataset — ready to support operational decisions and
+      further applications.
+    </p>
+  </div>
+
+  <div class="janus-value-capabilities">
+
+    <article class="janus-capability">
+      <span class="janus-capability-index">01</span>
+      <div>
+        <h4>Catalog exploitation</h4>
+        <p>
+          Explore the items retrieved from the catalog, access their
+          associated assets and metadata, and inspect available content.
+          Supported 3D assets can also be visualized directly.
+        </p>
+      </div>
+    </article>
+
+    <article class="janus-capability">
+      <span class="janus-capability-index">02</span>
+      <div>
+        <h4>Intelligent reporting</h4>
+        <p>
+          Generate a dynamic report describing the dataset, its contents,
+          spatial and temporal coverage, and relevant characteristics.
+        </p>
+      </div>
+    </article>
+
+    <article class="janus-capability">
+      <span class="janus-capability-index">03</span>
+      <div>
+        <h4>Computational analysis</h4>
+        <p>
+          Calculate metrics, statistical summaries and relationships
+          across the observations and assets processed.
+        </p>
+      </div>
+    </article>
+
+    <article class="janus-capability">
+      <span class="janus-capability-index">04</span>
+      <div>
+        <h4>Spatial and temporal exploration</h4>
+        <p>
+          Explore where and when observations occur through an interactive
+          spatial view and dynamic analytical visualizations.
+        </p>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="janus-value-divider"></div>
+
+  <div class="janus-business-head">
+    <span class="janus-value-eyebrow">THE BUSINESS VALUE</span>
+    <h3>More insight. Less operational effort.</h3>
+    <p>
+      Turn large and complex data catalogs into accessible information
+      that your organization can understand, use and build upon.
+    </p>
+  </div>
+
+  <div class="janus-benefits">
+
+    <article class="janus-benefit">
+      <h4>Save time</h4>
+      <p>Reduce the time and manual effort required to discover, explore and understand large datasets.</p>
+    </article>
+
+    <article class="janus-benefit">
+      <h4>Scale data exploitation</h4>
+      <p>Work with larger observation volumes without increasing exploration effort at the same rate.</p>
+    </article>
+
+    <article class="janus-benefit">
+      <h4>Make data AI-ready</h4>
+      <p>Use structured information as a foundation for RAG architectures, knowledge bases and LLM applications.</p>
+    </article>
+
+    <article class="janus-benefit">
+      <h4>Reduce technical barriers</h4>
+      <p>Make complex catalog information easier to access and understand, reducing reliance on specialist intervention for routine exploration.</p>
+    </article>
+
+    <article class="janus-benefit">
+      <h4>Understand the whole product</h4>
+      <p>Gain an overview of a dataset's content, coverage, evolution and available resources instead of examining isolated records.</p>
+    </article>
+
+  </div>
+
+  <div class="janus-value-example">
+    <div class="janus-example-label">APPLICATION / EARTH OBSERVATION</div>
+    <div class="janus-example-content">
+      <h4>From satellite acquisition to data intelligence.</h4>
+      <p>
+        For satellite operators and data providers, JANUS can provide
+        a computational layer to explore and understand the information
+        generated by a mission — from observation distribution and
+        temporal coverage to available assets and catalog evolution.
+      </p>
+    </div>
+  </div>
+
+  <div class="janus-value-closing">
+    <span>JANUS</span>
+    <p>Not just access to data. A new way to exploit what your data contains.</p>
+  </div>
+
+</div>
+
+
+
+
+  
 </section>
 
 
