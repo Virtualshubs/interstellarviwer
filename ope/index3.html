@@ -7788,8 +7788,6 @@ renderObservationsMosaic();
 
 
 
-
-
 /* =========================================
    MANIFESTO — MULTILINGUAL STORY
 ========================================= */
@@ -7808,20 +7806,41 @@ renderObservationsMosaic();
   if (
     !intro || !startButton || !paper ||
     !copy || !skipButton || !bgA || !bgB
-  ) return;
+  ) {
+    console.warn('Manifesto: required HTML elements not found.');
+    return;
+  }
 
   // -----------------------------------------
   // LANGUAGE
   // -----------------------------------------
 
   function getLanguage() {
-    return document.documentElement.lang
+    return (document.documentElement.lang || 'en')
       .toLowerCase()
       .startsWith('es') ? 'es' : 'en';
   }
 
   function getTranslations() {
-    return translations[getLanguage()] || translations.en;
+
+    if (typeof translations === 'undefined') {
+      console.error('Manifesto: translations object not found.');
+      return null;
+    }
+
+    return translations[getLanguage()] || translations.en || null;
+  }
+
+  function getSceneText(scene, dictionary) {
+
+    const text = dictionary && dictionary[scene.key];
+
+    if (typeof text !== 'string') {
+      console.error('Manifesto: missing translation:', scene.key);
+      return `[Missing translation: ${scene.key}]`;
+    }
+
+    return text;
   }
 
   // -----------------------------------------
@@ -7849,6 +7868,8 @@ renderObservationsMosaic();
   const punctuationPause = 100;
 
   let skipRequested = false;
+  let isRunning = false;
+
   let currentLayer = bgA;
   let nextLayer = bgB;
   let currentImage = bgA.getAttribute('src');
@@ -7884,6 +7905,10 @@ renderObservationsMosaic();
 
       });
 
+    };
+
+    preload.onerror = () => {
+      console.error('Manifesto: image could not be loaded:', src);
     };
 
     preload.src = src;
@@ -7929,7 +7954,9 @@ renderObservationsMosaic();
 
   function showCompleteText() {
 
-    const t = getTranslations();
+    const dictionary = getTranslations();
+
+    if (!dictionary) return;
 
     copy.replaceChildren();
 
@@ -7937,7 +7964,7 @@ renderObservationsMosaic();
 
       const paragraph = document.createElement('p');
 
-      paragraph.textContent = t[scene.key];
+      paragraph.textContent = getSceneText(scene, dictionary);
 
       copy.appendChild(paragraph);
 
@@ -7955,7 +7982,17 @@ renderObservationsMosaic();
 
   async function startManifesto() {
 
-    const t = getTranslations();
+    if (isRunning) return;
+
+    const dictionary = getTranslations();
+
+    if (!dictionary) {
+      console.error('Manifesto: unable to start without translations.');
+      return;
+    }
+
+    isRunning = true;
+    skipRequested = false;
 
     startButton.disabled = true;
 
@@ -7964,23 +8001,37 @@ renderObservationsMosaic();
 
     copy.replaceChildren();
 
-    for (const scene of scenes) {
+    skipButton.hidden = false;
 
-      if (skipRequested) break;
+    try {
 
-      changeBackground(scene.image);
+      for (const scene of scenes) {
 
-      await typeParagraph(t[scene.key]);
+        if (skipRequested) break;
 
-      if (skipRequested) break;
+        changeBackground(scene.image);
 
-      await wait(paragraphPause);
-    }
+        await typeParagraph(getSceneText(scene, dictionary));
 
-    if (skipRequested) {
-      showCompleteText();
-    } else {
-      skipButton.hidden = true;
+        if (skipRequested) break;
+
+        await wait(paragraphPause);
+      }
+
+      if (skipRequested) {
+        showCompleteText();
+      } else {
+        skipButton.hidden = true;
+      }
+
+    } catch (error) {
+
+      console.error('Manifesto animation error:', error);
+
+    } finally {
+
+      isRunning = false;
+
     }
 
   }
@@ -7992,10 +8043,15 @@ renderObservationsMosaic();
   startButton.addEventListener('click', startManifesto);
 
   skipButton.addEventListener('click', () => {
+
+    if (!isRunning) return;
+
     skipRequested = true;
+
   });
 
 })();
+
 
 
 </script>
