@@ -742,13 +742,14 @@ justify-content: flex-end;
  
 /* =========================================================
    TECHNOLOGY SECTION
+   SEOD — EDITORIAL TECHNICAL SYSTEM
    ========================================================= */
 
 #technology {
-  --tech-bg: #111210;
-  --tech-surface: #191b19;
-  --tech-surface-2: #202320;
-  --tech-border: rgba(243, 241, 234, 0.13);
+  --tech-bg: #000000;
+  --tech-surface: #111210;
+  --tech-surface-2: #191b19;
+  --tech-border: rgba(243, 241, 234, 0.15);
 
   --tech-text: #F3F1EA;
   --tech-muted: #A6AAA2;
@@ -756,7 +757,7 @@ justify-content: flex-end;
 
   --tech-accent: #7895A3;
   --tech-accent-bright: #A4C1CE;
-  --tech-accent-soft: rgba(120, 149, 163, 0.12);
+  --tech-accent-soft: rgba(120, 149, 163, 0.10);
 
   --tech-orange: #E5682E;
 
@@ -827,7 +828,7 @@ justify-content: flex-end;
 
   background: var(--tech-bg);
   border: 1px solid var(--tech-border);
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 
@@ -860,18 +861,17 @@ justify-content: flex-end;
 
 #technology .benchmark-heading h3 {
   color: var(--tech-text);
-  font-size: clamp(28px, 4vw, 44px);
+  font-size: clamp(28px, 3.5vw, 42px);
   font-weight: 500;
-  line-height: 1.12;
+  line-height: 1.15;
   letter-spacing: -0.035em;
-
   margin: 16px 0;
 }
 
 #technology .benchmark-heading p {
   max-width: 680px;
   color: var(--tech-muted);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.75;
   margin: 0;
 }
@@ -956,7 +956,6 @@ justify-content: flex-end;
 
 #technology .collection-context-note {
   margin-left: auto;
-
   color: var(--tech-subtle);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
@@ -1001,14 +1000,13 @@ justify-content: flex-end;
   align-items: center;
   justify-content: center;
   gap: 22px;
-
   margin-top: 16px;
 }
 
 #technology .shared-time-main > strong {
   color: var(--tech-text);
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(42px, 6vw, 66px);
+  font-size: clamp(42px, 6vw, 64px);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.055em;
@@ -1068,7 +1066,6 @@ justify-content: flex-end;
   justify-content: space-between;
   align-items: flex-start;
   gap: 15px;
-
   min-height: 90px;
 }
 
@@ -1087,7 +1084,7 @@ justify-content: flex-end;
 
 #technology .benchmark-panel-header h4 {
   color: var(--tech-text);
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(24px, 3vw, 32px);
   font-weight: 500;
   letter-spacing: -0.035em;
   margin: 9px 0 3px;
@@ -1103,7 +1100,6 @@ justify-content: flex-end;
 #technology .benchmark-panel-tag {
   padding: 7px 9px;
   border: 1px solid var(--tech-border);
-
   color: var(--tech-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
@@ -1142,7 +1138,7 @@ justify-content: flex-end;
 
   color: var(--tech-text);
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(30px, 4vw, 43px);
+  font-size: clamp(30px, 4vw, 42px);
   font-weight: 500;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -1162,21 +1158,18 @@ justify-content: flex-end;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-
   padding: 28px 0 25px;
 }
 
 #technology .benchmark-panel-volume > strong {
   display: block;
   color: var(--tech-text);
-
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(48px, 6.5vw, 76px);
+  font-size: clamp(48px, 6.5vw, 72px);
   font-weight: 500;
   line-height: 1.08;
   letter-spacing: -0.06em;
   font-variant-numeric: tabular-nums;
-
   margin-top: 10px;
 }
 
@@ -1250,7 +1243,7 @@ justify-content: flex-end;
 
 #technology .benchmark-result {
   margin-top: 24px;
-  padding: clamp(24px, 4vw, 42px);
+  padding: clamp(24px, 4vw, 40px);
 
   background: var(--tech-accent-soft);
   border: 1px solid rgba(120, 149, 163, 0.28);
@@ -1258,7 +1251,7 @@ justify-content: flex-end;
 
 #technology .benchmark-result-heading h4 {
   color: var(--tech-text);
-  font-size: clamp(22px, 3vw, 30px);
+  font-size: clamp(22px, 2.7vw, 29px);
   font-weight: 500;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -1270,14 +1263,13 @@ justify-content: flex-end;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: clamp(24px, 5vw, 60px);
-
   margin-top: 30px;
 }
 
 #technology .benchmark-result-value {
   color: var(--tech-accent-bright);
   font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(64px, 10vw, 112px);
+  font-size: clamp(64px, 9vw, 104px);
   font-weight: 500;
   line-height: 0.95;
   letter-spacing: -0.075em;
@@ -1348,7 +1340,6 @@ justify-content: flex-end;
   color: var(--tech-text);
   font-size: 15px;
   font-weight: 500;
-
   cursor: pointer;
   list-style: none;
 }
@@ -1360,17 +1351,14 @@ justify-content: flex-end;
 #technology .benchmark-estimates-toggle {
   display: grid;
   place-items: center;
-
   width: 27px;
   height: 27px;
 
   border: 1px solid var(--tech-border);
   color: var(--tech-accent-bright);
-
   font-size: 19px;
   font-weight: 300;
   line-height: 1;
-
   transition: transform 0.2s ease;
 }
 
@@ -1395,7 +1383,6 @@ justify-content: flex-end;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-
   padding: 17px 0;
   border-top: 1px solid var(--tech-border);
 }
@@ -1424,12 +1411,260 @@ justify-content: flex-end;
 
 #technology .benchmark-note {
   max-width: 850px;
-
   color: var(--tech-subtle);
   font-size: 12px;
   line-height: 1.75;
-
   margin: 24px 0 0;
+}
+
+
+/* =========================================================
+   JANUS VALUE — EDITORIAL DATA EXPLOITATION
+   ========================================================= */
+
+#technology .janus-value {
+  margin-top: clamp(68px, 8vw, 100px);
+  padding-top: clamp(38px, 5vw, 58px);
+  border-top: 1px solid var(--tech-border);
+  color: var(--tech-text);
+}
+
+
+/* =========================================================
+   JANUS INTRODUCTION
+   ========================================================= */
+
+#technology .janus-value-head {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: end;
+  gap: 48px;
+  padding-bottom: 34px;
+}
+
+#technology .janus-value-eyebrow {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--tech-accent-bright);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+}
+
+#technology .janus-value-head h3,
+#technology .janus-business-head h3 {
+  max-width: 650px;
+  margin: 0;
+  color: var(--tech-text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(25px, 2.7vw, 34px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+#technology .janus-value-head > p {
+  max-width: 440px;
+  margin: 0 0 3px;
+  color: var(--tech-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   JANUS CAPABILITIES
+   ========================================================= */
+
+#technology .janus-value-capabilities {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--tech-border);
+  border-bottom: 1px solid var(--tech-border);
+}
+
+#technology .janus-capability {
+  min-width: 0;
+  padding: 23px 22px 25px 0;
+}
+
+#technology .janus-capability:not(:last-child) {
+  border-right: 1px solid var(--tech-border);
+}
+
+#technology .janus-capability:not(:first-child) {
+  padding-left: 22px;
+}
+
+#technology .janus-capability-index {
+  display: block;
+  margin-bottom: 22px;
+  color: var(--tech-accent);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+#technology .janus-capability h4 {
+  margin: 0 0 10px;
+  color: var(--tech-text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+#technology .janus-capability p {
+  max-width: 290px;
+  margin: 0;
+  color: var(--tech-muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   BUSINESS VALUE
+   ========================================================= */
+
+#technology .janus-value-divider {
+  height: 1px;
+  margin: clamp(44px, 6vw, 68px) 0 34px;
+  background: var(--tech-border);
+}
+
+#technology .janus-business-head {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: end;
+  gap: 48px;
+  margin-bottom: 28px;
+}
+
+#technology .janus-business-head .janus-value-eyebrow {
+  grid-column: 1 / -1;
+  margin-bottom: -32px;
+}
+
+#technology .janus-business-head > p {
+  max-width: 440px;
+  margin: 0 0 3px;
+  color: var(--tech-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   BUSINESS BENEFITS — OPEN COLUMNS
+   ========================================================= */
+
+#technology .janus-benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--tech-border);
+  border-bottom: 1px solid var(--tech-border);
+}
+
+#technology .janus-benefit {
+  min-width: 0;
+  padding: 22px 24px 24px 0;
+}
+
+#technology .janus-benefit:not(:last-child) {
+  border-right: 1px solid var(--tech-border);
+}
+
+#technology .janus-benefit:not(:first-child) {
+  padding-left: 24px;
+}
+
+#technology .janus-benefit h4 {
+  margin: 0 0 9px;
+  color: var(--tech-text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+#technology .janus-benefit p {
+  max-width: 310px;
+  margin: 0;
+  color: var(--tech-muted);
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   EARTH OBSERVATION APPLICATION
+   ========================================================= */
+
+#technology .janus-value-example {
+  display: grid;
+  grid-template-columns: 0.65fr 1.35fr;
+  gap: 38px;
+  margin-top: 38px;
+  padding: 23px 0;
+  border-top: 1px solid var(--tech-border);
+  border-bottom: 1px solid var(--tech-border);
+}
+
+#technology .janus-example-label {
+  color: var(--tech-accent-bright);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.11em;
+  line-height: 1.7;
+}
+
+#technology .janus-example-content h4 {
+  margin: 0 0 10px;
+  color: var(--tech-text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+#technology .janus-example-content p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--tech-muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   JANUS CLOSING STATEMENT
+   ========================================================= */
+
+#technology .janus-value-closing {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 25px;
+}
+
+#technology .janus-value-closing > span {
+  flex-shrink: 0;
+  color: var(--tech-accent-bright);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+#technology .janus-value-closing p {
+  margin: 0;
+  color: var(--tech-text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
 
@@ -1437,7 +1672,7 @@ justify-content: flex-end;
    RESPONSIVE — TABLET
    ========================================================= */
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
 
   #technology .benchmark-heading {
     flex-direction: column;
@@ -1457,8 +1692,32 @@ justify-content: flex-end;
     gap: 22px;
   }
 
-  #technology .benchmark-result-value {
-    font-size: clamp(70px, 13vw, 100px);
+  #technology .janus-value-head,
+  #technology .janus-business-head {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  #technology .janus-business-head .janus-value-eyebrow {
+    grid-column: auto;
+    margin-bottom: -5px;
+  }
+
+  #technology .janus-value-capabilities {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #technology .janus-capability:nth-child(2) {
+    border-right: none;
+  }
+
+  #technology .janus-capability:nth-child(3),
+  #technology .janus-capability:nth-child(4) {
+    border-top: 1px solid var(--tech-border);
+  }
+
+  #technology .janus-capability:nth-child(3) {
+    padding-left: 0;
   }
 
 }
@@ -1480,7 +1739,7 @@ justify-content: flex-end;
   }
 
   #technology .benchmark-heading h3 {
-    font-size: 30px;
+    font-size: 29px;
   }
 
   #technology .benchmark-heading p {
@@ -1515,7 +1774,7 @@ justify-content: flex-end;
   }
 
   #technology .shared-time-main > strong {
-    font-size: 58px;
+    font-size: 56px;
   }
 
   #technology .shared-time-label {
@@ -1541,19 +1800,19 @@ justify-content: flex-end;
   }
 
   #technology .benchmark-panel-volume > strong {
-    font-size: 64px;
+    font-size: 62px;
   }
 
   #technology .benchmark-result {
-    padding: 25px 20px;
+    padding: 24px 19px;
   }
 
   #technology .benchmark-result-heading h4 {
-    font-size: 24px;
+    font-size: 23px;
   }
 
   #technology .benchmark-result-value {
-    font-size: 76px;
+    font-size: 74px;
   }
 
   #technology .benchmark-result-explanation p {
@@ -1578,6 +1837,73 @@ justify-content: flex-end;
     text-align: left;
   }
 
+  /* JANUS VALUE */
+
+  #technology .janus-value {
+    margin-top: 54px;
+    padding-top: 35px;
+  }
+
+  #technology .janus-value-head h3,
+  #technology .janus-business-head h3 {
+    font-size: 27px;
+  }
+
+  #technology .janus-value-capabilities {
+    grid-template-columns: 1fr;
+  }
+
+  #technology .janus-capability,
+  #technology .janus-capability:not(:first-child) {
+    padding: 19px 0;
+    border-right: none;
+  }
+
+  #technology .janus-capability:not(:last-child) {
+    border-bottom: 1px solid var(--tech-border);
+  }
+
+  #technology .janus-capability:nth-child(2),
+  #technology .janus-capability:nth-child(3),
+  #technology .janus-capability:nth-child(4) {
+    border-top: none;
+  }
+
+  #technology .janus-capability-index {
+    margin-bottom: 10px;
+  }
+
+  #technology .janus-capability p,
+  #technology .janus-benefit p {
+    max-width: 100%;
+  }
+
+  #technology .janus-benefits {
+    grid-template-columns: 1fr;
+  }
+
+  #technology .janus-benefit,
+  #technology .janus-benefit:not(:first-child) {
+    padding: 19px 0;
+    border-right: none;
+  }
+
+  #technology .janus-benefit:not(:last-child) {
+    border-bottom: 1px solid var(--tech-border);
+  }
+
+  #technology .janus-value-example {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  #technology .janus-value-closing {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
 }
 
 
@@ -1592,336 +1918,6 @@ justify-content: flex-end;
   }
 
 }
-
-
-
-/* =========================================
-   JANUS VALUE — DATA EXPLOITATION
-========================================= */
-
-#technology .janus-value {
-  margin-top: 76px;
-  padding: 54px 48px 42px;
-  background: #171a1d;
-  border: 1px solid rgba(150, 174, 190, 0.14);
-  border-radius: 3px;
-  color: #f3f1ea;
-}
-
-/* HEAD */
-
-#technology .janus-value-head {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 64px;
-  align-items: end;
-  padding-bottom: 42px;
-}
-
-#technology .janus-value-eyebrow {
-  display: block;
-  margin-bottom: 18px;
-  color: #83a9bd;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.13em;
-  line-height: 1.5;
-}
-
-#technology .janus-value-head h3,
-#technology .janus-business-head h3 {
-  max-width: 700px;
-  margin: 0;
-  color: #f3f1ea;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(26px, 3vw, 38px);
-  font-weight: 500;
-  line-height: 1.13;
-  letter-spacing: -0.045em;
-}
-
-#technology .janus-value-head > p {
-  max-width: 430px;
-  margin: 0 0 3px;
-  color: #aeb8be;
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-/* CAPABILITIES */
-
-#technology .janus-value-capabilities {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid rgba(150, 174, 190, 0.2);
-  border-left: 1px solid rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-capability {
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  gap: 20px;
-  min-height: 174px;
-  padding: 29px 30px;
-  border-right: 1px solid rgba(150, 174, 190, 0.2);
-  border-bottom: 1px solid rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-capability-index {
-  padding-top: 4px;
-  color: #83a9bd;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-
-#technology .janus-capability h4,
-#technology .janus-benefit h4 {
-  margin: 0 0 12px;
-  color: #f3f1ea;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 17px;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-#technology .janus-capability p,
-#technology .janus-benefit p {
-  max-width: 440px;
-  margin: 0;
-  color: #aeb8be;
-  font-size: 13px;
-  line-height: 1.75;
-}
-
-/* BUSINESS VALUE */
-
-#technology .janus-value-divider {
-  height: 1px;
-  margin: 48px 0 42px;
-  background: rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-business-head {
-  display: grid;
-  grid-template-columns: 1fr 0.8fr;
-  column-gap: 64px;
-  align-items: end;
-  margin-bottom: 32px;
-}
-
-#technology .janus-business-head .janus-value-eyebrow {
-  grid-column: 1 / -1;
-  margin-bottom: 16px;
-}
-
-#technology .janus-business-head h3 {
-  font-size: clamp(25px, 2.7vw, 34px);
-}
-
-#technology .janus-business-head > p {
-  max-width: 430px;
-  margin: 0 0 2px;
-  color: #aeb8be;
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-#technology .janus-benefits {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-benefit {
-  min-height: 145px;
-  padding: 25px 24px 25px 0;
-  border-bottom: 1px solid rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-benefit:not(:nth-child(3n)) {
-  border-right: 1px solid rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-benefit:nth-child(3n + 2),
-#technology .janus-benefit:nth-child(3n) {
-  padding-left: 24px;
-}
-
-#technology .janus-benefit h4 {
-  font-size: 15px;
-  margin-bottom: 9px;
-}
-
-#technology .janus-benefit p {
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-/* EARTH OBSERVATION EXAMPLE */
-
-#technology .janus-value-example {
-  display: grid;
-  grid-template-columns: 0.7fr 1.3fr;
-  gap: 40px;
-  margin-top: 38px;
-  padding: 29px 30px;
-  background: rgba(91, 130, 151, 0.09);
-  border-left: 2px solid #638da4;
-}
-
-#technology .janus-example-label {
-  color: #83a9bd;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  line-height: 1.7;
-}
-
-#technology .janus-example-content h4 {
-  margin: 0 0 11px;
-  color: #f3f1ea;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 19px;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-#technology .janus-example-content p {
-  max-width: 700px;
-  margin: 0;
-  color: #aeb8be;
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-/* CLOSING STATEMENT */
-
-#technology .janus-value-closing {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-top: 34px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(150, 174, 190, 0.2);
-}
-
-#technology .janus-value-closing > span {
-  color: #83a9bd;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-}
-
-#technology .janus-value-closing p {
-  margin: 0;
-  color: #f3f1ea;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 800px) {
-  #technology .janus-value {
-    padding: 36px 26px 30px;
-    margin-top: 52px;
-  }
-
-  #technology .janus-value-head {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding-bottom: 30px;
-  }
-
-  #technology .janus-business-head {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  #technology .janus-business-head .janus-value-eyebrow {
-    grid-column: auto;
-  }
-
-  #technology .janus-value-capabilities {
-    grid-template-columns: 1fr;
-  }
-
-  #technology .janus-capability {
-    min-height: auto;
-    padding: 25px 22px;
-  }
-
-  #technology .janus-benefits {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  #technology .janus-benefit:not(:nth-child(3n)) {
-    border-right: none;
-  }
-
-  #technology .janus-benefit:nth-child(3n + 2),
-  #technology .janus-benefit:nth-child(3n) {
-    padding-left: 0;
-  }
-
-  #technology .janus-benefit:nth-child(odd) {
-    padding-right: 20px;
-    border-right: 1px solid rgba(150, 174, 190, 0.2);
-  }
-
-  #technology .janus-benefit:nth-child(even) {
-    padding-left: 20px;
-  }
-
-  #technology .janus-value-example {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-}
-
-@media (max-width: 520px) {
-  #technology .janus-value {
-    padding: 29px 19px 25px;
-  }
-
-  #technology .janus-value-head h3,
-  #technology .janus-business-head h3 {
-    font-size: 27px;
-  }
-
-  #technology .janus-capability {
-    grid-template-columns: 27px 1fr;
-    gap: 12px;
-    padding: 23px 16px;
-  }
-
-  #technology .janus-benefits {
-    grid-template-columns: 1fr;
-  }
-
-  #technology .janus-benefit,
-  #technology .janus-benefit:nth-child(odd),
-  #technology .janus-benefit:nth-child(even) {
-    min-height: auto;
-    padding: 22px 0;
-    border-right: none;
-  }
-
-  #technology .janus-value-example {
-    padding: 24px 20px;
-  }
-
-  #technology .janus-value-closing {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 9px;
-  }
-}
-
 
 
 
