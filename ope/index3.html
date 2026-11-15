@@ -824,14 +824,15 @@ justify-content: flex-end;
 }
 
     
+
 /* =========================================
-   SEOD — BENCHMARK MODULE
+   SEOD — BENCHMARK / NAIP
 ========================================= */
 
 .benchmark-module {
   margin-top: 5rem;
-  border-top: 1px solid var(--border-color, rgba(36,37,34,.16));
   padding-top: 2.5rem;
+  border-top: 1px solid var(--border-color, rgba(36,37,34,.16));
   font-family: inherit;
 }
 
@@ -897,6 +898,62 @@ justify-content: flex-end;
 }
 
 
+/* COLLECTION CONTEXT */
+
+.benchmark-collection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(36,37,34,.12);
+}
+
+.collection-symbol {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--accent-color, #416D80);
+  flex-shrink: 0;
+}
+
+.collection-symbol svg {
+  width: 100%;
+  height: 100%;
+}
+
+.collection-description {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.collection-description strong {
+  font-size: .95rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+.collection-description span {
+  font-size: .75rem;
+}
+
+.collection-description small {
+  font-size: .64rem;
+  opacity: .55;
+}
+
+.collection-context-note {
+  margin-left: auto;
+  text-align: right;
+  font-family: var(--font-mono, monospace);
+  font-size: .59rem;
+  letter-spacing: .07em;
+  opacity: .5;
+}
+
+
 /* BENCHMARK ROWS */
 
 .benchmark-row {
@@ -949,7 +1006,7 @@ justify-content: flex-end;
 }
 
 
-/* VISUAL ANALYTICS */
+/* ANALYTICS VISUALS */
 
 .benchmark-visual {
   min-width: 0;
@@ -960,6 +1017,306 @@ justify-content: flex-end;
   background-size: 12px 12px;
   border: 1px solid rgba(36,37,34,.08);
 }
+
+.visual-label {
+  display: block;
+  opacity: .55;
+  margin-bottom: .8rem;
+  font-size: .56rem;
+}
+
+.visual-caption {
+  display: block;
+  opacity: .5;
+  margin-top: .7rem;
+  font-size: .53rem;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.catalog-grid span {
+  height: 7px;
+  background: rgba(36,37,34,.2);
+}
+
+.catalog-grid span:nth-child(3n) {
+  background: rgba(36,37,34,.42);
+}
+
+.catalog-grid span:nth-child(5n) {
+  background: rgba(36,37,34,.08);
+}
+
+.janus-signal {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 11px;
+}
+
+.janus-signal span {
+  flex: 1;
+  height: 100%;
+  background: rgba(65,109,128,.2);
+}
+
+.janus-signal span:nth-child(3n) {
+  background: rgba(65,109,128,.75);
+}
+
+.janus-signal span:nth-child(4n) {
+  background: rgba(65,109,128,.45);
+}
+
+
+/* METRICS */
+
+.benchmark-metrics {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.benchmark-main-metric strong {
+  display: block;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+}
+
+.benchmark-main-metric > span {
+  display: block;
+  margin-top: .55rem;
+  opacity: .55;
+  white-space: nowrap;
+}
+
+.benchmark-secondary {
+  display: flex;
+  gap: 1.4rem;
+}
+
+.benchmark-secondary > div {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.benchmark-secondary strong {
+  font-size: 1.05rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.benchmark-secondary span {
+  opacity: .55;
+  font-size: .55rem;
+  white-space: nowrap;
+}
+
+
+/* RESULT */
+
+.benchmark-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.8rem;
+  margin-top: 1.3rem;
+  border-top: 1px solid rgba(36,37,34,.15);
+  border-bottom: 1px solid rgba(36,37,34,.15);
+}
+
+.benchmark-result-label {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.benchmark-result-label > span {
+  font-size: .67rem;
+}
+
+.benchmark-result-label small {
+  font-size: .58rem;
+  opacity: .5;
+}
+
+.benchmark-result-value {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.benchmark-result-value strong {
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  font-weight: 500;
+  letter-spacing: -.06em;
+  line-height: 1;
+  color: var(--accent-color, #416D80);
+  font-variant-numeric: tabular-nums;
+}
+
+.benchmark-result-value strong span {
+  font-size: .55em;
+}
+
+
+/* ESTIMATES */
+
+.benchmark-estimates {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(36,37,34,.13);
+}
+
+.benchmark-estimates-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  font-family: var(--font-mono, monospace);
+  font-size: .65rem;
+  letter-spacing: .07em;
+}
+
+.benchmark-estimates-heading small {
+  opacity: .5;
+  font-size: .58rem;
+}
+
+.benchmark-estimate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  border-top: 1px solid rgba(36,37,34,.1);
+  font-family: var(--font-mono, monospace);
+  font-size: .68rem;
+}
+
+.benchmark-estimate-row strong {
+  font-size: .9rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.benchmark-estimate-janus {
+  background: rgba(65,109,128,.055);
+  color: var(--accent-color, #416D80);
+}
+
+.benchmark-note {
+  max-width: 850px;
+  margin: 1rem 0 0;
+  font-size: .68rem;
+  line-height: 1.65;
+  opacity: .55;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+  .benchmark-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .benchmark-visual {
+    display: none;
+  }
+
+  .benchmark-metrics {
+    justify-content: flex-end;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .benchmark-module {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+  }
+
+  .benchmark-heading {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .benchmark-collection {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .collection-context-note {
+    width: 100%;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .benchmark-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.3rem;
+  }
+
+  .benchmark-visual {
+    display: block;
+  }
+
+  .benchmark-metrics {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .benchmark-secondary {
+    gap: 1.3rem;
+  }
+
+  .benchmark-main-metric strong {
+    font-size: 2.5rem;
+  }
+
+  .benchmark-result {
+    align-items: flex-start;
+    gap: 1rem;
+    flex-direction: column;
+    padding: 1.3rem 0;
+  }
+
+  .benchmark-result-value {
+    align-items: baseline;
+  }
+
+  .benchmark-estimates-heading {
+    flex-direction: column;
+  }
+
+  .benchmark-estimate-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+  .benchmark-note {
+    font-size: .65rem;
+  }
+
+}
+
 
 .visual-label {
   display: block;
@@ -4549,11 +4906,11 @@ justify-content: flex-end;
 
 
 
-
-
 <section class="section approach" id="technology">
 
   <div class="inner">
+
+    <!-- INTRODUCTION -->
 
     <div class="section-head" data-reveal>
 
@@ -4567,6 +4924,9 @@ justify-content: flex-end;
       </p>
 
     </div>
+
+
+    <!-- THREE PILLARS -->
 
     <div class="approach-grid" data-reveal>
 
@@ -4597,21 +4957,24 @@ justify-content: flex-end;
     </div>
 
 
-    <!-- BENCHMARK -->
+    <!-- BENCHMARK MODULE -->
 
     <div class="benchmark-module" data-reveal>
 
       <div class="benchmark-heading">
+
         <div>
           <span class="benchmark-kicker">
-            PERFORMANCE / ALOS-MAAP COLLECTION
+            PERFORMANCE / NAIP IMAGERY COLLECTION
           </span>
 
-          <h3>From catalog retrieval to observation processing.</h3>
+          <h3>
+            From catalog filtering to large-scale observation reading.
+          </h3>
 
           <p>
             A recorded benchmark comparing conventional spatial catalog
-            retrieval with JANUS observation reading.
+            retrieval with SEOD's proprietary JANUS Reader.
           </p>
         </div>
 
@@ -4619,51 +4982,101 @@ justify-content: flex-end;
           <span class="benchmark-indicator-dot"></span>
           RECORDED TEST
         </div>
+
       </div>
 
 
-      <!-- ROW 01 : STAC -->
+      <!-- COLLECTION CONTEXT -->
+
+      <div class="benchmark-collection">
+
+        <div class="collection-symbol" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none">
+            <path d="M5 35L17 19L25 28L32 17L43 35H5Z"
+              stroke="currentColor" stroke-width="1.3"/>
+            <path d="M5 40H43"
+              stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="34" cy="11" r="3"
+              stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+        </div>
+
+        <div class="collection-description">
+          <strong>NAIP</strong>
+          <span>National Agriculture Imagery Program</span>
+          <small>
+            US aerial imagery archive · USDA / USGS
+          </small>
+        </div>
+
+        <div class="collection-context-note">
+          HIGH-RESOLUTION AERIAL IMAGERY
+        </div>
+
+      </div>
+
+
+      <!-- STAC -->
 
       <article class="benchmark-row benchmark-classic">
 
         <div class="benchmark-identity">
+
           <span class="benchmark-index">01</span>
 
           <div>
             <span class="benchmark-type">CONVENTIONAL METHOD</span>
+
             <h4>Classic catalog filtering</h4>
-            <span class="benchmark-engine">STAC API / ALOS-MAAP</span>
+
+            <span class="benchmark-engine">
+              STAC API / NAIP
+            </span>
           </div>
+
         </div>
 
-        <div class="benchmark-visual classic-visual" aria-hidden="true">
-          <div class="visual-label">CATALOG QUERY</div>
+
+        <div class="benchmark-visual classic-visual"
+             aria-hidden="true">
+
+          <div class="visual-label">
+            CATALOG RETRIEVAL
+          </div>
+
           <div class="catalog-grid">
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
           </div>
-          <div class="visual-caption">ITEM RETRIEVAL</div>
+
+          <div class="visual-caption">
+            225 PAGES / 2,250 IDS
+          </div>
+
         </div>
+
 
         <div class="benchmark-metrics">
 
           <div class="benchmark-main-metric">
-            <strong>5,810</strong>
+            <strong>2,250</strong>
             <span>ITEMS RETRIEVED</span>
           </div>
 
           <div class="benchmark-secondary">
+
             <div>
               <strong>120 s</strong>
-              <span>ELAPSED TIME</span>
+              <span>TEST WINDOW</span>
             </div>
 
             <div>
-              <strong>48.41</strong>
+              <strong>18.75</strong>
               <span>ITEMS / SECOND</span>
             </div>
+
           </div>
 
         </div>
@@ -4671,22 +5084,36 @@ justify-content: flex-end;
       </article>
 
 
-      <!-- ROW 02 : JANUS -->
+      <!-- JANUS -->
 
       <article class="benchmark-row benchmark-janus">
 
         <div class="benchmark-identity">
+
           <span class="benchmark-index">02</span>
 
           <div>
-            <span class="benchmark-type">PROPRIETARY TECHNOLOGY</span>
+            <span class="benchmark-type">
+              PROPRIETARY TECHNOLOGY
+            </span>
+
             <h4>JANUS Reader</h4>
-            <span class="benchmark-engine">SEOD / ALOS-MAAP</span>
+
+            <span class="benchmark-engine">
+              SEOD / NAIP
+            </span>
           </div>
+
         </div>
 
-        <div class="benchmark-visual janus-visual" aria-hidden="true">
-          <div class="visual-label">OBSERVATION PROCESSING</div>
+
+        <div class="benchmark-visual janus-visual"
+             aria-hidden="true">
+
+          <div class="visual-label">
+            OBSERVATION PROCESSING
+          </div>
+
           <div class="janus-signal">
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
@@ -4695,26 +5122,33 @@ justify-content: flex-end;
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
           </div>
-          <div class="visual-caption">DATA READING / ANALYSIS</div>
+
+          <div class="visual-caption">
+            67,001 OBSERVATIONS READ
+          </div>
+
         </div>
+
 
         <div class="benchmark-metrics">
 
           <div class="benchmark-main-metric">
-            <strong>70,835</strong>
+            <strong>67,001</strong>
             <span>OBSERVATIONS READ</span>
           </div>
 
           <div class="benchmark-secondary">
+
             <div>
-              <strong>100 s</strong>
-              <span>ELAPSED TIME</span>
+              <strong>120 s</strong>
+              <span>TEST WINDOW</span>
             </div>
 
             <div>
-              <strong>708.35</strong>
+              <strong>558.33</strong>
               <span>OBSERVATIONS / SECOND</span>
             </div>
+
           </div>
 
         </div>
@@ -4722,27 +5156,82 @@ justify-content: flex-end;
       </article>
 
 
-      <!-- BENCHMARK RESULT -->
+      <!-- PERFORMANCE RESULT -->
 
       <div class="benchmark-result">
 
         <div class="benchmark-result-label">
-          <span>RECORDED THROUGHPUT RATIO</span>
-          <small>ALOS-MAAP / STAC vs JANUS</small>
+
+          <span>RELATIVE THROUGHPUT</span>
+
+          <small>
+            JANUS READER / STAC
+          </small>
+
         </div>
 
         <div class="benchmark-result-value">
-          <strong>14.6<span>×</span></strong>
-          <span>JANUS READER</span>
+
+          <strong>29.78<span>×</span></strong>
+
+          <span>+2,878.2%</span>
+
         </div>
 
       </div>
 
+
+      <!-- PROJECTED PROCESSING TIME -->
+
+      <div class="benchmark-estimates">
+
+        <div class="benchmark-estimates-heading">
+
+          <span>PROJECTED PROCESSING TIME</span>
+
+          <small>
+            FULL CATALOG / LINEAR EXTRAPOLATION
+          </small>
+
+        </div>
+
+        <div class="benchmark-estimate-row">
+
+          <span>
+            STAC · CLASSIC FILTERING
+          </span>
+
+          <strong>
+            1,263 min 14 s
+          </strong>
+
+        </div>
+
+        <div class="benchmark-estimate-row benchmark-estimate-janus">
+
+          <span>
+            JANUS READER
+          </span>
+
+          <strong>
+            42 min 25 s
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- METHODOLOGY -->
+
       <p class="benchmark-note">
-        Recorded test results. STAC measurements represent items retrieved
-        through the catalog API; JANUS measurements represent observations
-        read by the engine. Different retrieval and measurement procedures.
-        Throughput ratio is indicative, not a like-for-like functional comparison.
+        STAC: 225 pages, 2,250 unique IDs, zero errors.
+        Partial reading within a 120-second window.
+        JANUS: 67,001 observations declared; heap measured
+        in the host document. Throughput comparison uses
+        reported items and observations respectively.
+        Full-catalog times are linear estimates, not measured
+        end-to-end execution times.
       </p>
 
     </div>
@@ -4750,7 +5239,6 @@ justify-content: flex-end;
   </div>
 
 </section>
-
 
 
 
