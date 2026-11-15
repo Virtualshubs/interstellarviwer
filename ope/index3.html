@@ -8357,6 +8357,89 @@ renderObservationsMosaic();
 
 
 </script>
+
+
+
+
+<script>
+(function () {
+  const viewer = document.getElementById("product-viewer");
+  const frame = document.getElementById("product-frame");
+  const closeButton = document.getElementById("close-product");
+
+  if (!viewer || !frame || !closeButton) {
+    console.warn("SEOD Product Viewer: missing HTML elements.");
+    return;
+  }
+
+  let viewerOpen = false;
+
+  function openProduct(url) {
+    frame.src = url;
+    viewer.hidden = false;
+    viewerOpen = true;
+
+    // Add one history entry so browser Back closes the viewer.
+    if (!history.state?.seodProductViewer) {
+      history.pushState(
+        { ...(history.state || {}), seodProductViewer: true },
+        "",
+        location.href
+      );
+    }
+  }
+
+  function closeViewer() {
+    if (!viewerOpen) return;
+
+    viewer.hidden = true;
+    frame.src = "about:blank";
+    viewerOpen = false;
+  }
+
+  // Intercept product links.
+  document.addEventListener("click", function (event) {
+    const link = event.target.closest("a[data-product-frame]");
+
+    if (!link) return;
+
+    const url = new URL(link.href, location.href);
+
+    // 3DLite Space remains in a separate tab.
+    if (url.hostname === "lite.3dtwins.tech") {
+      event.preventDefault();
+      window.open(url.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // OPE and JANUS open inside the SEOD viewer.
+    event.preventDefault();
+    openProduct(url.href);
+  });
+
+  // Close button.
+  closeButton.addEventListener("click", function () {
+    if (history.state?.seodProductViewer) {
+      history.back();
+    } else {
+      closeViewer();
+    }
+  });
+
+  // Browser Back / Forward.
+  window.addEventListener("popstate", function () {
+    if (viewerOpen && !history.state?.seodProductViewer) {
+      closeViewer();
+    }
+  });
+
+})();
+</script>
+
+
+
+
+
   
 </body>
 </html>
