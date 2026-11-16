@@ -10,7 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300,0,0&display=block"
+/>
   <style>
    
 :root {
@@ -1634,7 +1637,20 @@ justify-content: flex-end;
   font-size: 12px;
   line-height: 1.75;
 }
-
+    
+.janus-benefit-icon {
+  display: block;
+  font-size: 27px;
+  line-height: 1;
+  margin-bottom: 18px;
+  color: var(--atmospheric);
+  font-weight: 300;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 300,
+    'GRAD' 0,
+    'opsz' 24;
+}
 
 /* =========================================================
    EARTH OBSERVATION APPLICATION
@@ -5728,34 +5744,39 @@ justify-content: flex-end;
       </p>
     </div>
 
-    <div class="janus-benefits">
+ <div class="janus-benefits">
 
-      <article class="janus-benefit">
-        <h4 data-i18n="janus_benefit_1_title">Save time</h4>
-        <p data-i18n="janus_benefit_1_text">Reduce the time and manual effort required to discover, explore and understand large datasets.</p>
-      </article>
+  <article class="janus-benefit">
+    <span class="material-symbols-outlined janus-benefit-icon">schedule</span>
+    <h4 data-i18n="janus_benefit_1_title">Save time</h4>
+    <p data-i18n="janus_benefit_1_text">Reduce the time and manual effort required to discover, explore and understand large datasets.</p>
+  </article>
 
-      <article class="janus-benefit">
-        <h4 data-i18n="janus_benefit_2_title">Scale data exploitation</h4>
-        <p data-i18n="janus_benefit_2_text">Work with larger observation volumes without increasing exploration effort at the same rate.</p>
-      </article>
+  <article class="janus-benefit">
+    <span class="material-symbols-outlined janus-benefit-icon">database</span>
+    <h4 data-i18n="janus_benefit_2_title">Scale data exploitation</h4>
+    <p data-i18n="janus_benefit_2_text">Work with larger observation volumes without increasing exploration effort at the same rate.</p>
+  </article>
 
-      <article class="janus-benefit">
-        <h4 data-i18n="janus_benefit_3_title">Make data AI-ready</h4>
-        <p data-i18n="janus_benefit_3_text">Use structured information as a foundation for RAG architectures, knowledge bases and LLM applications.</p>
-      </article>
+  <article class="janus-benefit">
+    <span class="material-symbols-outlined janus-benefit-icon">neurology</span>
+    <h4 data-i18n="janus_benefit_3_title">Make data AI-ready</h4>
+    <p data-i18n="janus_benefit_3_text">Use structured information as a foundation for RAG architectures, knowledge bases and LLM applications.</p>
+  </article>
 
-      <article class="janus-benefit">
-        <h4 data-i18n="janus_benefit_4_title">Reduce technical barriers</h4>
-        <p data-i18n="janus_benefit_4_text">Make complex catalog information easier to access and understand, reducing reliance on specialist intervention for routine exploration.</p>
-      </article>
+  <article class="janus-benefit">
+    <span class="material-symbols-outlined janus-benefit-icon">account_tree</span>
+    <h4 data-i18n="janus_benefit_4_title">Reduce technical barriers</h4>
+    <p data-i18n="janus_benefit_4_text">Make complex catalog information easier to access and understand, reducing reliance on specialist intervention for routine exploration.</p>
+  </article>
 
-      <article class="janus-benefit">
-        <h4 data-i18n="janus_benefit_5_title">Understand the whole product</h4>
-        <p data-i18n="janus_benefit_5_text">Gain an overview of a dataset's content, coverage, evolution and available resources instead of examining isolated records.</p>
-      </article>
+  <article class="janus-benefit">
+    <span class="material-symbols-outlined janus-benefit-icon">public</span>
+    <h4 data-i18n="janus_benefit_5_title">Understand the whole product</h4>
+    <p data-i18n="janus_benefit_5_text">Gain an overview of a dataset's content, coverage, evolution and available resources instead of examining isolated records.</p>
+  </article>
 
-    </div>
+</div>
 
     <div class="janus-value-example">
       <div class="janus-example-label" data-i18n="janus_example_label">APPLICATION / EARTH OBSERVATION</div>
