@@ -139,7 +139,10 @@
       padding-top: 8px;
     }
 
-   
+   /* Hide theme toggle */
+#theme-toggle {
+  display: none !important;
+}
 /* -----------------------------------------
    NAVIGATION
 ----------------------------------------- */
@@ -5406,7 +5409,7 @@ justify-content: flex-end;
         <button class="theme-toggle" id="theme-toggle"
           type="button" aria-label="Toggle colour theme"
           title="Toggle colour theme"
-          hidden>
+          >
           <svg viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="1.5"
             aria-hidden="true">
@@ -5430,6 +5433,10 @@ justify-content: flex-end;
 
   <main id="main">
 
+<div id="product-viewer" hidden>
+  <button id="close-product">← Back to SEOD</button>
+  <iframe id="product-frame"></iframe>
+</div>
     <!-- HERO -->
 
  <section class="hero" id="home" aria-labelledby="hero-title">
@@ -6399,247 +6406,6 @@ justify-content: flex-end;
     
 
 
-    <!-- INDUSTRIES -->
-
- <section class="section industries-book" id="industries">
-
-  <div class="inner">
-
-    <!-- SECTION INTRO -->
-
-    <div class="industries-book-heading" data-reveal>
-
-      <h2>
-        Spatial intelligence across industries.
-      </h2>
-
-      <p class="intro-copy">
-        Exploring how observation, spatial data and 3D technologies
-        can address challenges across different fields.
-      </p>
-
-    </div>
-
-
-    <!-- BOOK -->
-
-    <div class="industry-book" id="industryBook">
-
-      <div class="industry-book-spread">
-
-        <!-- LEFT PAGE / PHOTOGRAPH -->
-
-        <div class="industry-book-left">
-
-          <div class="industry-book-image">
-
-            <img
-              id="industryBookImage"
-              src="images/industries/agriculture.jpg"
-              alt="Agricultural landscape"
-            >
-
-            <div class="industry-image-overlay"></div>
-
-            <div class="industry-image-caption mono">
-              <span id="industryImageCaption">
-                AGRICULTURAL LANDSCAPES
-              </span>
-
-              <span id="industryImageNumber">
-                01 / 07
-              </span>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- RIGHT PAGE / CONTENT -->
-
-        <div class="industry-book-right">
-
-          <div class="industry-page-top">
-
-            <span class="mono" id="industryPageCategory">
-              INDUSTRY / 01
-            </span>
-
-            <span class="mono">
-              SEOD / APPLICATIONS
-            </span>
-
-          </div>
-
-
-          <div class="industry-page-content">
-
-            <div class="industry-page-eyebrow" id="industryPageEyebrow">
-              AGRICULTURE
-            </div>
-
-            <h3 id="industryPageTitle">
-              Agriculture
-            </h3>
-
-            <p class="industry-page-description"
-              id="industryPageDescription">
-              Understanding agricultural landscapes through
-              spatial observation, data integration and
-              environmental analysis.
-            </p>
-
-
-            <!-- THREE APPLICATIONS -->
-
-            <div class="industry-applications">
-
-              <article class="industry-application">
-
-                <div class="industry-application-index mono">
-                  01
-                </div>
-
-                <div class="industry-application-content">
-
-                  <div class="industry-application-product">
-                    OPE / ORBITAL PASS ENGINE EARTH TWIN
-                  </div>
-
-                  <h4 id="industryUse1Title">
-                    Orbital observation
-                  </h4>
-
-                  <p id="industryUse1Text">
-                    Explore satellite observation opportunities
-                    and monitor agricultural territories.
-                  </p>
-
-                </div>
-
-              </article>
-
-
-              <article class="industry-application">
-
-                <div class="industry-application-index mono">
-                  02
-                </div>
-
-                <div class="industry-application-content">
-
-                  <div class="industry-application-product">
-                    JANUS / READER
-                  </div>
-
-                  <h4 id="industryUse2Title">
-                    Temporal data analysis
-                  </h4>
-
-                  <p id="industryUse2Text">
-                    Integrate observation collections and
-                    compare information across different dates.
-                  </p>
-
-                </div>
-
-              </article>
-
-
-              <article class="industry-application">
-
-                <div class="industry-application-index mono">
-                  03
-                </div>
-
-                <div class="industry-application-content">
-
-                  <div class="industry-application-product">
-                    3D LITE SPACE
-                  </div>
-
-                  <h4 id="industryUse3Title">
-                    3D environment visualization
-                  </h4>
-
-                  <p id="industryUse3Text">
-                    Visualize and share 3D terrain and
-                    infrastructure repositories.
-                  </p>
-
-                </div>
-
-              </article>
-
-            </div>
-
-          </div>
-
-
-          <div class="industry-page-footer">
-
-            <span class="mono">
-              SPATIAL COMPUTING TECHNOLOGIES
-            </span>
-
-            <span class="mono" id="industryPageNumber">
-              01
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- BOOK NAVIGATION -->
-
-      <div class="industry-book-navigation">
-
-        <button
-          type="button"
-          class="industry-book-arrow"
-          id="industryBookPrev"
-          aria-label="Previous industry">
-          ←
-        </button>
-
-        <div class="industry-book-chapters"
-          id="industryBookChapters"
-          aria-label="Select industry">
-        </div>
-
-        <button
-          type="button"
-          class="industry-book-arrow"
-          id="industryBookNext"
-          aria-label="Next industry">
-          →
-        </button>
-
-      </div>
-
-
-      <!-- BOOK STATUS -->
-
-      <div class="industry-book-status">
-
-        <span class="mono" id="industryBookCounter">
-          01 — 07
-        </span>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-
 
 
 <!-- PARTNERS -->
@@ -6937,10 +6703,251 @@ justify-content: flex-end;
 
 
 
-<div id="product-viewer" hidden>
-  <button id="close-product">← Back to SEOD</button>
-  <iframe id="product-frame"></iframe>
-</div>
+
+
+
+
+
+    <!-- INDUSTRIES -->
+
+ <section class="section industries-book" id="industries">
+
+  <div class="inner">
+
+    <!-- SECTION INTRO -->
+
+    <div class="industries-book-heading" data-reveal>
+
+      <h2>
+        Spatial intelligence across industries.
+      </h2>
+
+      <p class="intro-copy">
+        Exploring how observation, spatial data and 3D technologies
+        can address challenges across different fields.
+      </p>
+
+    </div>
+
+
+    <!-- BOOK -->
+
+    <div class="industry-book" id="industryBook">
+
+      <div class="industry-book-spread">
+
+        <!-- LEFT PAGE / PHOTOGRAPH -->
+
+        <div class="industry-book-left">
+
+          <div class="industry-book-image">
+
+            <img
+              id="industryBookImage"
+              src="images/industries/agriculture.jpg"
+              alt="Agricultural landscape"
+            >
+
+            <div class="industry-image-overlay"></div>
+
+            <div class="industry-image-caption mono">
+              <span id="industryImageCaption">
+                AGRICULTURAL LANDSCAPES
+              </span>
+
+              <span id="industryImageNumber">
+                01 / 07
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- RIGHT PAGE / CONTENT -->
+
+        <div class="industry-book-right">
+
+          <div class="industry-page-top">
+
+            <span class="mono" id="industryPageCategory">
+              INDUSTRY / 01
+            </span>
+
+            <span class="mono">
+              SEOD / APPLICATIONS
+            </span>
+
+          </div>
+
+
+          <div class="industry-page-content">
+
+            <div class="industry-page-eyebrow" id="industryPageEyebrow">
+              AGRICULTURE
+            </div>
+
+            <h3 id="industryPageTitle">
+              Agriculture
+            </h3>
+
+            <p class="industry-page-description"
+              id="industryPageDescription">
+              Understanding agricultural landscapes through
+              spatial observation, data integration and
+              environmental analysis.
+            </p>
+
+
+            <!-- THREE APPLICATIONS -->
+
+            <div class="industry-applications">
+
+              <article class="industry-application">
+
+                <div class="industry-application-index mono">
+                  01
+                </div>
+
+                <div class="industry-application-content">
+
+                  <div class="industry-application-product">
+                    OPE / ORBITAL PASS ENGINE EARTH TWIN
+                  </div>
+
+                  <h4 id="industryUse1Title">
+                    Orbital observation
+                  </h4>
+
+                  <p id="industryUse1Text">
+                    Explore satellite observation opportunities
+                    and monitor agricultural territories.
+                  </p>
+
+                </div>
+
+              </article>
+
+
+              <article class="industry-application">
+
+                <div class="industry-application-index mono">
+                  02
+                </div>
+
+                <div class="industry-application-content">
+
+                  <div class="industry-application-product">
+                    JANUS / READER
+                  </div>
+
+                  <h4 id="industryUse2Title">
+                    Temporal data analysis
+                  </h4>
+
+                  <p id="industryUse2Text">
+                    Integrate observation collections and
+                    compare information across different dates.
+                  </p>
+
+                </div>
+
+              </article>
+
+
+              <article class="industry-application">
+
+                <div class="industry-application-index mono">
+                  03
+                </div>
+
+                <div class="industry-application-content">
+
+                  <div class="industry-application-product">
+                    3D LITE SPACE
+                  </div>
+
+                  <h4 id="industryUse3Title">
+                    3D environment visualization
+                  </h4>
+
+                  <p id="industryUse3Text">
+                    Visualize and share 3D terrain and
+                    infrastructure repositories.
+                  </p>
+
+                </div>
+
+              </article>
+
+            </div>
+
+          </div>
+
+
+          <div class="industry-page-footer">
+
+            <span class="mono">
+              SPATIAL COMPUTING TECHNOLOGIES
+            </span>
+
+            <span class="mono" id="industryPageNumber">
+              01
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOOK NAVIGATION -->
+
+      <div class="industry-book-navigation">
+
+        <button
+          type="button"
+          class="industry-book-arrow"
+          id="industryBookPrev"
+          aria-label="Previous industry">
+          ←
+        </button>
+
+        <div class="industry-book-chapters"
+          id="industryBookChapters"
+          aria-label="Select industry">
+        </div>
+
+        <button
+          type="button"
+          class="industry-book-arrow"
+          id="industryBookNext"
+          aria-label="Next industry">
+          →
+        </button>
+
+      </div>
+
+
+      <!-- BOOK STATUS -->
+
+      <div class="industry-book-status">
+
+        <span class="mono" id="industryBookCounter">
+          01 — 07
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
 
 
 <section id="whoWeHelp" class="who-section">
