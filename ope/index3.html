@@ -612,59 +612,59 @@ justify-content: flex-end;
   color: rgba(243,241,234,.6);
 }
 
-    /* =========================================
-   ABOUT SEOD
-========================================= */
+ /* WHO WE ARE — INTRO */
 
-.about-seod {
+.about-intro {
+  display: block;
   width: 100%;
-  padding: 90px 7%;
-  background: var(--mineral);
-  color: var(--grafito);
+  padding: 110px 7%;
+  background: #F3F1EA;
+  color: #242522;
 }
 
-.about-seod-inner {
+.about-intro-inner {
+  display: block;
   width: 100%;
-  max-width: 1100px;
+  max-width: none;
   margin: 0 auto;
 }
 
-.about-seod h2 {
-  margin: 0 0 24px;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 24px;
+.about-intro h2 {
+  width: 100%;
+  margin: 0 0 32px;
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.04em;
-  color: var(--grafito);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
 }
 
-.about-seod p {
-  max-width: 850px;
+.about-intro p {
+  display: block;
+  width: 100%;
+  max-width: none;
   margin: 0;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 18px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
   font-weight: 400;
-  line-height: 1.7;
-  color: var(--grafito);
+  line-height: 1.75;
 }
 
-@media (max-width: 768px) {
-  .about-seod {
-    padding: 65px 7%;
-  }
-
-  .about-seod h2 {
-    font-size: 21px;
-    margin-bottom: 18px;
-  }
-
-  .about-seod p {
-    font-size: 16px;
-    line-height: 1.65;
+@media (max-width: 900px) {
+  .about-intro {
+    padding: 85px 6%;
   }
 }
 
+@media (max-width: 600px) {
+  .about-intro {
+    padding: 65px 6%;
+  }
+
+  .about-intro h2 {
+    margin-bottom: 24px;
+  }
+}
   /* -----------------------------------------
    CHALLENGE
 ----------------------------------------- */
@@ -6361,8 +6361,8 @@ justify-content: flex-end;
   </div>
 </section>
 
-<section class="about-seod" id="about" lang="en">
-  <div class="about-seod-inner">
+<section class="about-intro" id="about" lang="en">
+  <div class="about-intro-inner">
 
     <h2 data-i18n="about_title">Who we are</h2>
 
