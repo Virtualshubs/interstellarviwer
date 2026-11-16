@@ -5341,6 +5341,7 @@ justify-content: flex-end;
 
 
 
+
 /* =====================================================
    SEOD — ABOUT US
    EXPANDABLE EDITORIAL SECTION
@@ -5526,6 +5527,9 @@ justify-content: flex-end;
   display: grid;
   grid-template-rows: 0fr;
 
+  width: 100%;
+  min-width: 0;
+
   opacity: 0;
   visibility: hidden;
 
@@ -5573,6 +5577,8 @@ justify-content: flex-end;
 }
 
 .about-block-body {
+  display: block;
+
   width: 100%;
   max-width: none;
   min-width: 0;
@@ -5581,12 +5587,17 @@ justify-content: flex-end;
 }
 
 .about-section-label {
+  display: block;
   width: 100%;
+
   margin: 0 0 18px;
+
   text-align: left;
 }
 
 .about-block h3 {
+  display: block;
+
   width: 100%;
   max-width: none;
 
@@ -5603,7 +5614,10 @@ justify-content: flex-end;
 }
 
 .about-block p {
-  max-width: 850px;
+  display: block;
+
+  width: 100%;
+  max-width: none;
 
   margin: 0 0 18px;
 
