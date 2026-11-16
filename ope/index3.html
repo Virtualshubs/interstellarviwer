@@ -5340,6 +5340,7 @@ justify-content: flex-end;
 
 
 
+
 /* =====================================================
    SEOD — ABOUT US
    EXPANDABLE EDITORIAL SECTION
@@ -5354,11 +5355,20 @@ justify-content: flex-end;
   --about-muted: rgba(36, 37, 34, .58);
   --about-line: rgba(36, 37, 34, .18);
 
+  box-sizing: border-box;
   width: 100%;
   padding: 0 7%;
+
   background: var(--about-mineral);
   color: var(--about-graphite);
+
   scroll-margin-top: 100px;
+}
+
+.about-seod *,
+.about-seod *::before,
+.about-seod *::after {
+  box-sizing: border-box;
 }
 
 
@@ -5398,15 +5408,6 @@ justify-content: flex-end;
   min-width: 0;
 }
 
-/* El control de cierre no ocupa espacio en la composición */
-.about-seod-status {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  margin: 0;
-}
-
 .about-seod-eyebrow,
 .about-section-label,
 .about-detail-label {
@@ -5424,6 +5425,7 @@ justify-content: flex-end;
 .about-seod-heading {
   display: block;
 
+  width: 100%;
   margin: 12px 0 8px;
 
   font-family: var(--font-display, "Sora", sans-serif);
@@ -5438,6 +5440,7 @@ justify-content: flex-end;
 .about-seod-teaser {
   display: block;
 
+  width: 100%;
   margin: 0;
 
   font-family: var(--font-body, "Public Sans", sans-serif);
@@ -5448,9 +5451,16 @@ justify-content: flex-end;
 }
 
 .about-seod-status {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+
   display: flex;
   align-items: center;
   gap: 14px;
+
+  margin: 0;
   flex-shrink: 0;
 
   font-family: var(--font-mono, "IBM Plex Mono", monospace);
@@ -5532,6 +5542,8 @@ justify-content: flex-end;
 }
 
 .about-seod-content {
+  width: 100%;
+  min-width: 0;
   min-height: 0;
   overflow: hidden;
 }
@@ -5547,6 +5559,7 @@ justify-content: flex-end;
 
 .about-block {
   display: block;
+
   width: 100%;
   min-width: 0;
 
@@ -5561,18 +5574,21 @@ justify-content: flex-end;
 
 .about-block-body {
   width: 100%;
-  max-width: 1100px;
+  max-width: none;
   min-width: 0;
-  margin: 0 auto;
+
+  margin: 0;
 }
 
 .about-section-label {
+  width: 100%;
   margin: 0 0 18px;
   text-align: left;
 }
 
 .about-block h3 {
-  max-width: 850px;
+  width: 100%;
+  max-width: none;
 
   margin: 0 0 28px;
 
@@ -5614,7 +5630,7 @@ justify-content: flex-end;
   grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
 
   width: 100%;
-  max-width: 900px;
+  max-width: none;
   min-width: 0;
   min-height: 330px;
 
@@ -5977,8 +5993,8 @@ justify-content: flex-end;
   gap: 25px;
 
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 
   padding: 38px 0 55px;
 }
@@ -6062,7 +6078,6 @@ justify-content: flex-end;
 
   .about-seod-trigger {
     padding: 32px 0;
-    gap: 12px;
   }
 
   .about-seod-heading {
@@ -6195,98 +6210,96 @@ justify-content: flex-end;
 
   <!-- NAVIGATION -->
 
-  <header class="site-header">
-    <nav class="nav" aria-label="Main navigation">
+ 
+<header class="site-header">
+  <nav class="nav" aria-label="Main navigation">
 
-   <a class="brand" href="#home" aria-label="SEOD home">
-  <img class="brand-logo" src="https://3d.staratlas.es/ope/logoseod.png" alt="SEOD">
-  <span class="brand-text">
-    <span class="brand-name">SEOD</span>
-    <span class="brand-sub">SPACE ENGINE, OBSERVATION &amp; DATA</span>
-  </span>
-</a>
+    <a class="brand" href="#home" aria-label="SEOD home">
+      <img class="brand-logo" src="https://3d.staratlas.es/ope/logoseod.png" alt="SEOD">
+      <span class="brand-text">
+        <span class="brand-name">SEOD</span>
+        <span class="brand-sub">SPACE ENGINE, OBSERVATION &amp; DATA</span>
+      </span>
+    </a>
 
-      <div class="nav-links" id="primary-navigation">
+    <div class="nav-links" id="primary-navigation">
 
-        <a href="#company" data-i18n="nav_company">Company</a>
-        <a href="#technology" data-i18n="nav_technology">Technology</a>
+      <a href="#company" data-i18n="nav_company">Company</a>
+      <a href="#technology" data-i18n="nav_technology">Technology</a>
 
-        <div class="products-wrap" id="products-menu-wrap">
+      <div class="products-wrap" id="products-menu-wrap">
 
-          <button class="products-trigger" type="button"
-            aria-expanded="false" aria-controls="products-menu">
-            <span data-i18n="nav_products">Products</span>
-            <i class="chevron" aria-hidden="true"></i>
-          </button>
-
-      
-
-<div class="products-menu" id="products-menu">
-
-  <a href="/ope/" data-product-frame>
-    <span data-i18n="product_ope">Orbital Pass Engine</span>
-    <small>OPE / Orbital systems</small>
-  </a>
-
-  <a href="/esaobservation8.html" data-product-frame>
-    <span data-i18n="product_janus">JANUS Space Reader</span>
-    <small>Spatial data exploitation</small>
-  </a>
-
-<a href="https://lite.3dtwins.tech/" data-product-frame>
-  <span data-i18n="product_lite">3D Lite Space</span>
-  <small>3D repository visualization</small>
-</a>
-
-</div>
-
-
-<a
-  href="#about-seod"
-  id="about-nav-trigger"
-  data-i18n="nav_about">
-  About us
-</a>
-
-        </div>
-
-        <a href="#contact" data-i18n="nav_contact">Contact</a>
-
-      </div>
-
-      <div class="nav-tools">
-
-        <div class="lang-switch" aria-label="Language">
-          <button type="button" class="is-active"
-            data-lang="en" aria-pressed="true">EN</button>
-          <span>/</span>
-          <button type="button"
-            data-lang="es" aria-pressed="false">ES</button>
-        </div>
-
-        <button class="theme-toggle" id="theme-toggle"
-          type="button" aria-label="Toggle colour theme"
-          title="Toggle colour theme"
-          >
-          <svg viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="1.5"
-            aria-hidden="true">
-            <circle cx="12" cy="12" r="4"/>
-            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
-          </svg>
+        <button class="products-trigger" type="button"
+          aria-expanded="false" aria-controls="products-menu">
+          <span data-i18n="nav_products">Products</span>
+          <i class="chevron" aria-hidden="true"></i>
         </button>
 
+        <div class="products-menu" id="products-menu">
+
+          <a href="/ope/" data-product-frame>
+            <span data-i18n="product_ope">Orbital Pass Engine</span>
+            <small>OPE / Orbital systems</small>
+          </a>
+
+          <a href="/esaobservation8.html" data-product-frame>
+            <span data-i18n="product_janus">JANUS Space Reader</span>
+            <small>Spatial data exploitation</small>
+          </a>
+
+          <a href="https://lite.3dtwins.tech/" data-product-frame>
+            <span data-i18n="product_lite">3D Lite Space</span>
+            <small>3D repository visualization</small>
+          </a>
+
+        </div>
+
       </div>
 
-      <button class="menu-toggle" id="menu-toggle"
-        type="button" aria-label="Open navigation"
-        aria-expanded="false" aria-controls="primary-navigation">
-        <span></span>
-        <span></span>
+      <a
+        href="#about-seod"
+        id="about-nav-trigger"
+        data-i18n="nav_about">
+        About us
+      </a>
+
+      <a href="#contact" data-i18n="nav_contact">Contact</a>
+
+    </div>
+
+    <div class="nav-tools">
+
+      <div class="lang-switch" aria-label="Language">
+        <button type="button" class="is-active"
+          data-lang="en" aria-pressed="true">EN</button>
+        <span>/</span>
+        <button type="button"
+          data-lang="es" aria-pressed="false">ES</button>
+      </div>
+
+      <button class="theme-toggle" id="theme-toggle"
+        type="button" aria-label="Toggle colour theme"
+        title="Toggle colour theme">
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.5"
+          aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>
+        </svg>
       </button>
 
-    </nav>
-  </header>
+    </div>
+
+    <button class="menu-toggle" id="menu-toggle"
+      type="button" aria-label="Open navigation"
+      aria-expanded="false" aria-controls="primary-navigation">
+      <span></span>
+      <span></span>
+    </button>
+
+  </nav>
+</header>
+
 
 
   <main id="main">
