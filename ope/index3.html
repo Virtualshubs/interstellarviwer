@@ -5370,10 +5370,8 @@ justify-content: flex-end;
   appearance: none;
   -webkit-appearance: none;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 30px;
+  display: block;
+  position: relative;
 
   width: 100%;
   padding: 48px 0;
@@ -5396,7 +5394,17 @@ justify-content: flex-end;
 
 .about-seod-trigger-copy {
   display: block;
+  width: 100%;
   min-width: 0;
+}
+
+/* El control de cierre no ocupa espacio en la composición */
+.about-seod-status {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  margin: 0;
 }
 
 .about-seod-eyebrow,
@@ -8508,10 +8516,10 @@ justify-content: flex-end;
                 CURRENT LOCATION
               </span>
 
-              <h4>CEI Albacete</h4>
+              <h4>CEEI Albacete</h4>
 
               <p data-i18n="about_presence_text">
-                SEOD is currently based at CEI Albacete,
+                SEOD is currently based at CEEI Albacete,
                 in Castilla-La Mancha, Spain. From this location,
                 we develop our technologies and coordinate
                 our projects and collaborations.
@@ -9119,7 +9127,7 @@ tool_3_text: "Visualize, organize and manage georeferenced 3D assets through int
   about_presence_label: "05 / OUR PRESENCE",
   about_presence_title: "Based in Albacete, connected to the world",
   about_location_label: "CURRENT LOCATION",
-  about_presence_text: "SEOD is currently based at CEI Albacete, in Castilla-La Mancha, Spain. From this location, we develop our technologies and coordinate our projects and collaborations.",
+  about_presence_text: "SEOD is currently based at CEEI Albacete, in Albacete, Castilla-La Mancha, Spain. From this location, we develop our technologies and coordinate our projects and collaborations.",
 
   about_closing: "Building new ways to understand and work with spatial data.",
 
@@ -9617,7 +9625,7 @@ tool_3_text: "Visualiza, organiza y gestiona activos 3D georreferenciados median
   about_presence_label: "05 / DÓNDE ESTAMOS",
   about_presence_title: "Desde Albacete, conectados con el mundo",
   about_location_label: "UBICACIÓN ACTUAL",
-  about_presence_text: "SEOD tiene actualmente su sede en el CEI de Albacete, en Castilla-La Mancha, España. Desde este espacio desarrollamos nuestras tecnologías y coordinamos nuestros proyectos y colaboraciones.",
+  about_presence_text: "SEOD tiene actualmente su sede en el CEEI de Albacete, en Castilla-La Mancha, España. Desde este espacio desarrollamos nuestras tecnologías y coordinamos nuestros proyectos y colaboraciones.",
 
   about_closing: "Desarrollando nuevas formas de comprender y trabajar con los datos espaciales.",
 
