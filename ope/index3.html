@@ -602,7 +602,58 @@ justify-content: flex-end;
   color: rgba(243,241,234,.6);
 }
 
-    
+    /* =========================================
+   ABOUT SEOD
+========================================= */
+
+.about-seod {
+  width: 100%;
+  padding: 90px 7%;
+  background: var(--mineral);
+  color: var(--grafito);
+}
+
+.about-seod-inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.about-seod h2 {
+  margin: 0 0 24px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  color: var(--grafito);
+}
+
+.about-seod p {
+  max-width: 850px;
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--grafito);
+}
+
+@media (max-width: 768px) {
+  .about-seod {
+    padding: 65px 7%;
+  }
+
+  .about-seod h2 {
+    font-size: 21px;
+    margin-bottom: 18px;
+  }
+
+  .about-seod p {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+}
 
   /* -----------------------------------------
    CHALLENGE
@@ -5151,7 +5202,17 @@ justify-content: flex-end;
   </div>
 </section>
 
+<section class="about-seod" id="about" lang="en">
+  <div class="about-seod-inner">
 
+    <h2 data-i18n="about_title">Who we are</h2>
+
+    <p data-i18n="about_text">
+      SEOD is a technology company focused on spatial computing and geospatial data. We develop software and proprietary technologies to integrate, process and exploit spatial information, turning complex datasets into useful knowledge and practical applications across industries.
+    </p>
+
+  </div>
+</section>
 
 
 <section class="manifesto" id="manifesto">
@@ -7003,7 +7064,8 @@ const translations = {
 
 
 
-
+about_title: "Who we are",
+about_text: "SEOD is a technology company focused on spatial computing and geospatial data. We develop software and proprietary technologies to integrate, process and exploit spatial information, turning complex datasets into useful knowledge and practical applications across industries.",
 
 
 /* =========================================
@@ -7392,7 +7454,8 @@ janus_closing_text: "Not just access to data. A new way to exploit what your dat
         hero_cta_2: "Descubrir nuestros productos",
 
 
-
+about_title: "Quiénes somos",
+about_text: "SEOD es una empresa tecnológica especializada en computación espacial y datos geoespaciales. Desarrollamos software y tecnologías propias para integrar, procesar y explotar información espacial, transformando conjuntos de datos complejos en conocimiento útil y aplicaciones prácticas para distintos sectores.",
       
 /* =========================================
    MANIFIESTO
