@@ -6,15 +6,17 @@
   <meta name="theme-color" content="#f3f1ea">
   <meta name="description" content="SEOD develops spatial computing technologies connecting observation, spatial data and computational systems.">
   <title>SEOD — Space Engine, Observation &amp; Data</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300,0,0&display=block"
-/>
-  <style>
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300,0,0&display=block"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+  
+<style>
    
 :root {
   --mineral: #f3f1ea;
@@ -32,10 +34,11 @@
   --gutter: clamp(22px, 5.2vw, 84px);
   --ease: cubic-bezier(.22,.61,.36,1);
 
-  /* TYPOGRAPHY */
-  --font-display: "Sora", sans-serif;
-  --font-body: "Public Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+/* TYPOGRAPHY */
+--font-display: "Sora", sans-serif;
+--font-body: "Public Sans", sans-serif;
+--font-mono: "IBM Plex Mono", monospace;
+--font-brand: "Bungee", sans-serif;
 
   /* WEIGHTS */
   --weight-regular: 400;
@@ -200,8 +203,11 @@
 
 .brand-name {
   display: block;
-  font: 700 27px/.9 "Space Grotesk", sans-serif;
-  letter-spacing: -.075em;
+  font-family: var(--font-brand);
+  font-size: 27px;
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: .01em;
   color: var(--mineral);
 }
 
