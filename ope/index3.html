@@ -5336,6 +5336,815 @@ justify-content: flex-end;
   opacity: 1;
   transform: translateY(0);
 }
+
+
+
+/* =====================================================
+   SEOD — ABOUT US
+   EXPANDABLE EDITORIAL SECTION
+   ===================================================== */
+
+.about-seod {
+  --about-mineral: var(--mineral, #F3F1EA);
+  --about-graphite: var(--grafito, #242522);
+  --about-black: var(--negro, #111210);
+  --about-blue: var(--atmosferico, #416D80);
+  --about-orange: var(--termico, #E5682E);
+  --about-muted: rgba(36, 37, 34, .58);
+  --about-line: rgba(36, 37, 34, .18);
+
+  width: 100%;
+  padding: 0 7%;
+  background: var(--about-mineral);
+  color: var(--about-graphite);
+  scroll-margin-top: 100px;
+}
+
+
+/* =====================================================
+   COLLAPSED HEADER / INTERACTIVE BUTTON
+   ===================================================== */
+
+.about-seod-trigger {
+  appearance: none;
+  -webkit-appearance: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+
+  width: 100%;
+  padding: 48px 0;
+
+  margin: 0;
+  cursor: pointer;
+
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+
+  border: 0;
+  border-top: 1px solid var(--about-line);
+  border-bottom: 1px solid var(--about-line);
+  border-radius: 0;
+
+  transition: border-color .3s ease;
+}
+
+.about-seod-trigger-copy {
+  display: block;
+  min-width: 0;
+}
+
+.about-seod-eyebrow,
+.about-section-label,
+.about-detail-label {
+  display: block;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: .12em;
+
+  color: var(--about-blue);
+}
+
+.about-seod-heading {
+  display: block;
+
+  margin: 12px 0 8px;
+
+  font-family: var(--font-display, "Sora", sans-serif);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -.055em;
+
+  color: var(--about-graphite);
+}
+
+.about-seod-teaser {
+  display: block;
+
+  margin: 0;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 15px;
+  line-height: 1.6;
+
+  color: var(--about-muted);
+}
+
+.about-seod-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+  letter-spacing: .1em;
+
+  color: var(--about-graphite);
+}
+
+.about-seod-status-line {
+  width: 30px;
+  height: 1px;
+  background: var(--about-orange);
+}
+
+.about-seod-status-text {
+  white-space: nowrap;
+}
+
+.about-seod-arrow {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid var(--about-line);
+  border-radius: 50%;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 22px;
+  font-weight: 300;
+
+  transition:
+    transform .35s ease,
+    background .35s ease,
+    color .35s ease,
+    border-color .35s ease;
+}
+
+.about-seod-trigger:hover .about-seod-arrow {
+  background: var(--about-graphite);
+  color: var(--about-mineral);
+  border-color: var(--about-graphite);
+}
+
+.about-seod-trigger:focus-visible {
+  outline: 2px solid var(--about-blue);
+  outline-offset: 5px;
+}
+
+.about-seod.is-open .about-seod-trigger {
+  border-bottom-color: transparent;
+}
+
+
+/* =====================================================
+   EXPANDABLE PANEL
+   ===================================================== */
+
+.about-seod-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    grid-template-rows .65s cubic-bezier(.2,.7,.2,1),
+    opacity .4s ease,
+    visibility .4s ease;
+}
+
+.about-seod.is-open .about-seod-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+
+.about-seod-content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.about-seod.is-open .about-seod-arrow {
+  transform: rotate(45deg);
+}
+
+
+/* =====================================================
+   CONTENT LAYOUT
+   ===================================================== */
+
+.about-block {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 25px;
+
+  padding: 75px 0;
+
+  border-bottom: 1px solid var(--about-line);
+}
+
+.about-block-index {
+  padding-top: 4px;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 11px;
+  letter-spacing: .08em;
+
+  color: var(--about-orange);
+}
+
+.about-block-body {
+  min-width: 0;
+}
+
+.about-section-label {
+  margin-bottom: 18px;
+}
+
+.about-block h3 {
+  max-width: 850px;
+
+  margin: 0 0 28px;
+
+  font-family: var(--font-display, "Sora", sans-serif);
+  font-size: clamp(25px, 3.2vw, 39px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -.05em;
+
+  color: var(--about-graphite);
+}
+
+.about-block p {
+  max-width: 850px;
+
+  margin: 0 0 18px;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.8;
+
+  color: var(--about-muted);
+}
+
+.about-block p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =====================================================
+   FOUNDERS — MULTIPASS-INSPIRED CARD
+   ===================================================== */
+
+.about-founder-card {
+  display: grid;
+  grid-template-columns: minmax(200px, .75fr) minmax(0, 1.25fr);
+
+  max-width: 900px;
+  min-height: 330px;
+
+  margin-top: 36px;
+
+  background: var(--about-black);
+  color: var(--about-mineral);
+
+  overflow: hidden;
+  border: 1px solid rgba(36,37,34,.25);
+}
+
+.about-founder-photo {
+  position: relative;
+
+  min-height: 330px;
+
+  overflow: hidden;
+  background: #D8D5CB;
+}
+
+.about-founder-photo::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    transparent 55%,
+    rgba(17,18,16,.42)
+  );
+
+  pointer-events: none;
+}
+
+.about-founder-photo img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  min-height: 330px;
+
+  object-fit: cover;
+  object-position: center;
+
+  filter: grayscale(100%);
+}
+
+.about-photo-index {
+  position: absolute;
+  z-index: 1;
+
+  left: 18px;
+  bottom: 17px;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 11px;
+  letter-spacing: .12em;
+
+  color: white;
+}
+
+.about-founder-details {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  padding: 30px 34px 22px;
+}
+
+.about-founder-topline,
+.about-founder-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 9px;
+  letter-spacing: .09em;
+
+  color: rgba(243,241,234,.58);
+}
+
+.about-founder-status {
+  color: var(--about-orange);
+  text-align: right;
+}
+
+.about-founder-name {
+  margin: 38px 0 7px;
+
+  font-family: var(--font-display, "Sora", sans-serif);
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -.045em;
+
+  color: var(--about-mineral);
+}
+
+.about-founder-role {
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 12px;
+  letter-spacing: .1em;
+
+  color: var(--about-orange);
+}
+
+.about-founder-divider {
+  height: 1px;
+
+  margin: 25px 0 20px;
+
+  background: rgba(243,241,234,.2);
+}
+
+.about-founder-profile .about-detail-label {
+  color: rgba(243,241,234,.55);
+}
+
+.about-founder-profile ul {
+  display: grid;
+  gap: 10px;
+
+  margin: 15px 0 25px;
+  padding: 0;
+
+  list-style: none;
+}
+
+.about-founder-profile li {
+  position: relative;
+
+  padding-left: 16px;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 13px;
+  line-height: 1.55;
+
+  color: var(--about-mineral);
+}
+
+.about-founder-profile li::before {
+  content: "";
+
+  position: absolute;
+  top: 8px;
+  left: 0;
+
+  width: 5px;
+  height: 5px;
+
+  background: var(--about-orange);
+  border-radius: 50%;
+}
+
+.about-founder-footer {
+  margin-top: auto;
+  padding-top: 16px;
+
+  border-top: 1px solid rgba(243,241,234,.2);
+}
+
+
+/* =====================================================
+   HOW WE WORK
+   ===================================================== */
+
+.about-work-intro {
+  margin-bottom: 32px !important;
+}
+
+.about-work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+.about-work-card {
+  min-height: 250px;
+  padding: 28px;
+
+  background: rgba(36,37,34,.045);
+  border: 1px solid var(--about-line);
+}
+
+.about-work-number,
+.about-collab-index {
+  display: block;
+
+  margin-bottom: 28px;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 11px;
+
+  color: var(--about-orange);
+}
+
+.about-work-card h4,
+.about-collab-item h4 {
+  margin: 0 0 16px;
+
+  font-family: var(--font-display, "Sora", sans-serif);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.035em;
+
+  color: var(--about-graphite);
+}
+
+.about-work-card p,
+.about-collab-item p {
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+
+/* =====================================================
+   CAREERS & COLLABORATION
+   ===================================================== */
+
+.about-collab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-top: 35px;
+}
+
+.about-collab-item {
+  padding: 28px;
+
+  border-top: 2px solid var(--about-graphite);
+  background: rgba(36,37,34,.035);
+}
+
+.about-contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-top: 22px;
+  padding-bottom: 6px;
+
+  border-bottom: 1px solid var(--about-orange);
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+  letter-spacing: .1em;
+
+  text-decoration: none;
+  color: var(--about-graphite);
+
+  transition: color .25s ease;
+}
+
+.about-contact-link:hover {
+  color: var(--about-orange);
+}
+
+.about-contact-link:focus-visible {
+  outline: 2px solid var(--about-blue);
+  outline-offset: 4px;
+}
+
+
+/* =====================================================
+   OUR PRESENCE
+   ===================================================== */
+
+.about-presence-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(230px, .8fr);
+  gap: 35px;
+
+  align-items: stretch;
+
+  margin-top: 35px;
+}
+
+.about-presence-image {
+  min-height: 280px;
+
+  overflow: hidden;
+  background: #D8D5CB;
+}
+
+.about-presence-image img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+
+  object-fit: cover;
+
+  filter: saturate(.75);
+}
+
+.about-presence-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 28px;
+
+  background: rgba(36,37,34,.045);
+  border: 1px solid var(--about-line);
+}
+
+.about-presence-details h4 {
+  margin: 17px 0 14px;
+
+  font-family: var(--font-display, "Sora", sans-serif);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: -.04em;
+}
+
+.about-location-meta {
+  display: block;
+
+  margin-top: 28px;
+  padding-top: 15px;
+
+  border-top: 1px solid var(--about-line);
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 9px;
+  line-height: 1.6;
+  letter-spacing: .08em;
+
+  color: var(--about-blue);
+}
+
+
+/* =====================================================
+   CLOSING
+   ===================================================== */
+
+.about-seod-closing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+
+  padding: 38px 0 55px;
+}
+
+.about-seod-closing-mark {
+  font-family: var(--font-brand, "Bungee", sans-serif);
+  font-size: 24px;
+
+  color: var(--about-graphite);
+}
+
+.about-seod-closing p {
+  max-width: 420px;
+
+  margin: 0;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 13px;
+  line-height: 1.6;
+
+  text-align: right;
+
+  color: var(--about-muted);
+}
+
+
+/* =====================================================
+   RESPONSIVE — TABLET
+   ===================================================== */
+
+@media (max-width: 850px) {
+
+  .about-block {
+    grid-template-columns: 55px minmax(0, 1fr);
+    gap: 15px;
+    padding: 60px 0;
+  }
+
+  .about-founder-card {
+    grid-template-columns: minmax(160px, .7fr) minmax(0, 1.3fr);
+  }
+
+  .about-founder-details {
+    padding: 24px;
+  }
+
+  .about-presence-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE — MOBILE
+   ===================================================== */
+
+@media (max-width: 600px) {
+
+  .about-seod {
+    padding-left: 6%;
+    padding-right: 6%;
+  }
+
+  .about-seod-trigger {
+    padding: 32px 0;
+    gap: 12px;
+  }
+
+  .about-seod-heading {
+    font-size: 30px;
+  }
+
+  .about-seod-teaser {
+    font-size: 13px;
+  }
+
+  .about-seod-status {
+    gap: 8px;
+  }
+
+  .about-seod-status-line,
+  .about-seod-status-text {
+    display: none;
+  }
+
+  .about-seod-arrow {
+    width: 34px;
+    height: 34px;
+  }
+
+  .about-block {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 45px 0;
+  }
+
+  .about-block h3 {
+    font-size: 27px;
+  }
+
+  .about-block p {
+    font-size: 14px;
+  }
+
+  .about-founder-card {
+    grid-template-columns: 1fr;
+  }
+
+  .about-founder-photo,
+  .about-founder-photo img {
+    min-height: 310px;
+    max-height: 390px;
+  }
+
+  .about-founder-details {
+    min-height: 340px;
+    padding: 24px;
+  }
+
+  .about-founder-name {
+    margin-top: 30px;
+  }
+
+  .about-founder-topline,
+  .about-founder-footer {
+    font-size: 8px;
+  }
+
+  .about-work-grid,
+  .about-collab-grid,
+  .about-presence-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .about-work-card,
+  .about-collab-item {
+    min-height: auto;
+    padding: 23px;
+  }
+
+  .about-work-number,
+  .about-collab-index {
+    margin-bottom: 18px;
+  }
+
+  .about-presence-image,
+  .about-presence-image img {
+    min-height: 220px;
+  }
+
+  .about-presence-details {
+    padding: 24px;
+  }
+
+  .about-seod-closing {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 30px 0 42px;
+  }
+
+  .about-seod-closing p {
+    text-align: left;
+  }
+
+}
+
+
+/* =====================================================
+   ACCESSIBILITY — REDUCED MOTION
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .about-seod-panel,
+  .about-seod-arrow,
+  .about-seod-trigger,
+  .about-contact-link {
+    transition: none !important;
+  }
+
+}
+
+
+
+
+
+  
   </style>
 </head>
 
@@ -5389,6 +6198,13 @@ justify-content: flex-end;
 
 </div>
 
+
+<a
+  href="#about-seod"
+  id="about-nav-trigger"
+  data-i18n="nav_about">
+  About us
+</a>
 
         </div>
 
@@ -7311,6 +8127,425 @@ justify-content: flex-end;
 
     
 
+<!-- =====================================================
+     SEOD — ABOUT US
+     Expandable company section
+     ===================================================== -->
+
+<section class="about-seod" id="about-seod">
+
+  <!-- COLLAPSED HEADER / INTERACTIVE BUTTON -->
+
+  <button
+    type="button"
+    class="about-seod-trigger"
+    aria-expanded="false"
+    aria-controls="about-seod-panel">
+
+    <span class="about-seod-trigger-copy">
+
+      <span class="about-seod-eyebrow" data-i18n="about_eyebrow">
+        SEOD / COMPANY
+      </span>
+
+      <span class="about-seod-heading" data-i18n="about_heading">
+        Who we are.
+      </span>
+
+      <span class="about-seod-teaser" data-i18n="about_teaser">
+        The people, ideas and technology behind SEOD.
+      </span>
+
+    </span>
+
+    <span class="about-seod-status" aria-hidden="true">
+      <span class="about-seod-status-line"></span>
+
+      <span class="about-seod-status-text" data-i18n="about_expand">
+        EXPLORE
+      </span>
+
+      <span class="about-seod-arrow">+</span>
+    </span>
+
+  </button>
+
+
+  <!-- EXPANDABLE CONTENT -->
+
+  <div
+    class="about-seod-panel"
+    id="about-seod-panel"
+    aria-hidden="true"
+    inert>
+
+    <div class="about-seod-content">
+
+
+      <!-- 01 / OUR STORY -->
+
+      <section class="about-block about-story">
+
+        <div class="about-block-index">01 /</div>
+
+        <div class="about-block-body">
+
+          <div class="about-section-label" data-i18n="about_story_label">
+            OUR STORY
+          </div>
+
+          <h3 data-i18n="about_story_title">
+            From digital twins to spatial intelligence.
+          </h3>
+
+          <p data-i18n="about_story_p1">
+            SEOD originated from our work in digital twin technologies.
+            While developing and managing large volumes of data to feed
+            our models, we encountered a recurring challenge: the
+            difficulty of accessing, connecting and exploiting complex
+            datasets efficiently.
+          </p>
+
+          <p data-i18n="about_story_p2">
+            This challenge led us to identify an opportunity beyond our
+            original field. The nature of our technology and the advances
+            achieved through our internal development made it possible
+            to apply these capabilities to the space and geospatial
+            data ecosystem.
+          </p>
+
+          <p data-i18n="about_story_p3">
+            SEOD emerged from that transition: bringing together spatial
+            computing, data engineering and proprietary technology to
+            develop new ways of working with Earth observation and
+            georeferenced information.
+          </p>
+
+        </div>
+      </section>
+
+
+      <!-- 02 / FOUNDERS & TEAM -->
+
+      <section class="about-block about-founders">
+
+        <div class="about-block-index">02 /</div>
+
+        <div class="about-block-body">
+
+          <div class="about-section-label" data-i18n="about_founders_label">
+            FOUNDERS & TEAM
+          </div>
+
+          <h3 data-i18n="about_founders_title">
+            The people behind the technology.
+          </h3>
+
+          <article class="about-founder-card">
+
+            <div class="about-founder-photo">
+
+              <img
+                src="images/about/founder.jpg"
+                alt="SEOD founder portrait"
+                loading="lazy">
+
+              <span class="about-photo-index">001</span>
+
+            </div>
+
+
+            <div class="about-founder-details">
+
+              <div class="about-founder-topline">
+
+                <span data-i18n="about_founder_record">
+                  SEOD / PERSONNEL RECORD
+                </span>
+
+                <span class="about-founder-status" data-i18n="about_founder_status">
+                  FOUNDING MEMBER
+                </span>
+
+              </div>
+
+
+              <h4 class="about-founder-name">[YOUR NAME]</h4>
+
+              <div class="about-founder-role" data-i18n="about_founder_role">
+                CEO & CTO
+              </div>
+
+
+              <div class="about-founder-divider"></div>
+
+
+              <div class="about-founder-profile">
+
+                <span class="about-detail-label" data-i18n="about_profile_label">
+                  PROFILE / EXPERTISE
+                </span>
+
+                <ul>
+
+                  <li data-i18n="about_expertise_1">
+                    Product design
+                  </li>
+
+                  <li data-i18n="about_expertise_2">
+                    Complex structures and systems
+                  </li>
+
+                  <li data-i18n="about_expertise_3">
+                    Spatial graphics computing applied to digital twins
+                  </li>
+
+                </ul>
+
+              </div>
+
+
+              <div class="about-founder-footer">
+
+                <span>SEOD / FOUNDERS</span>
+
+                <span>IDENTITY RECORD · 001</span>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </div>
+      </section>
+
+
+      <!-- 03 / HOW WE WORK -->
+
+      <section class="about-block about-work">
+
+        <div class="about-block-index">03 /</div>
+
+        <div class="about-block-body">
+
+          <div class="about-section-label" data-i18n="about_work_label">
+            HOW WE WORK
+          </div>
+
+          <h3 data-i18n="about_work_title">
+            Different needs. A tailored approach.
+          </h3>
+
+          <p class="about-work-intro" data-i18n="about_work_intro">
+            We approach each project according to its scope,
+            requirements and intended use.
+          </p>
+
+
+          <div class="about-work-grid">
+
+
+            <article class="about-work-card">
+
+              <span class="about-work-number">A /</span>
+
+              <h4 data-i18n="about_work_custom_title">
+                Tailored technology & B2B2B projects
+              </h4>
+
+              <p data-i18n="about_work_custom_text">
+                The process begins with an initial consultation to
+                understand the organization, assess its requirements
+                and determine whether our capabilities are suited
+                to the project.
+              </p>
+
+              <p data-i18n="about_work_custom_text_2">
+                Based on this assessment, we define the technical
+                scope and prepare a tailored proposal outlining
+                the solution, implementation approach and
+                collaboration terms.
+              </p>
+
+            </article>
+
+
+            <article class="about-work-card">
+
+              <span class="about-work-number">B /</span>
+
+              <h4 data-i18n="about_work_products_title">
+                Access to our products
+              </h4>
+
+              <p data-i18n="about_work_products_text">
+                Organizations and professionals interested in using
+                our existing tools can contact our sales team directly.
+                They will guide them through product selection,
+                access and the internal onboarding process.
+              </p>
+
+            </article>
+
+
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- 04 / CAREERS & COLLABORATION -->
+
+      <section class="about-block about-collaboration">
+
+        <div class="about-block-index">04 /</div>
+
+        <div class="about-block-body">
+
+          <div class="about-section-label" data-i18n="about_collab_label">
+            CAREERS & COLLABORATION
+          </div>
+
+          <h3 data-i18n="about_collab_title">
+            Build new possibilities with us.
+          </h3>
+
+
+          <div class="about-collab-grid">
+
+
+            <article class="about-collab-item">
+
+              <span class="about-collab-index">01</span>
+
+              <h4 data-i18n="about_careers_title">
+                Build with us
+              </h4>
+
+              <p data-i18n="about_careers_text">
+                We are open to connecting with professionals,
+                technology providers and organizations interested
+                in developing new applications of spatial computing
+                and geospatial data.
+              </p>
+
+            </article>
+
+
+            <article class="about-collab-item">
+
+              <span class="about-collab-index">02</span>
+
+              <h4 data-i18n="about_partners_title">
+                Partnerships & advertising
+              </h4>
+
+              <p data-i18n="about_partners_text">
+                If you are interested in becoming a SEOD partner,
+                exploring a technology collaboration or featuring
+                advertising content within one of our platforms,
+                please contact our sales team to discuss the possibilities.
+              </p>
+
+              <a class="about-contact-link" href="#contact">
+
+                <span data-i18n="about_contact_sales">
+                  CONTACT SALES
+                </span>
+
+                <span aria-hidden="true">↗</span>
+
+              </a>
+
+            </article>
+
+
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- 05 / OUR PRESENCE -->
+
+      <section class="about-block about-presence">
+
+        <div class="about-block-index">05 /</div>
+
+        <div class="about-block-body">
+
+          <div class="about-section-label" data-i18n="about_presence_label">
+            OUR PRESENCE
+          </div>
+
+          <h3 data-i18n="about_presence_title">
+            Based in Albacete, Spain.
+          </h3>
+
+
+          <div class="about-presence-layout">
+
+
+            <div class="about-presence-image">
+
+              <img
+                src="images/about/cei-albacete.jpg"
+                alt="SEOD office location at CEI Albacete"
+                loading="lazy">
+
+            </div>
+
+
+            <div class="about-presence-details">
+
+              <span class="about-detail-label" data-i18n="about_location_label">
+                CURRENT LOCATION
+              </span>
+
+              <h4>CEI Albacete</h4>
+
+              <p data-i18n="about_presence_text">
+                SEOD is currently based at CEI Albacete,
+                in Castilla-La Mancha, Spain. From this location,
+                we develop our technologies and coordinate
+                our projects and collaborations.
+              </p>
+
+              <span class="about-location-meta">
+                ALBACETE · CASTILLA-LA MANCHA · SPAIN
+              </span>
+
+            </div>
+
+
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- CLOSING -->
+
+      <div class="about-seod-closing">
+
+        <span class="about-seod-closing-mark">SEOD</span>
+
+        <p data-i18n="about_closing">
+          Engineering technology for a more connected understanding
+          of our world.
+        </p>
+
+      </div>
+
+
+    </div>
+  </div>
+
+</section>
+
+
+
   </main>
 
 
@@ -7829,7 +9064,66 @@ tool_3_text: "Visualize, organize and manage georeferenced 3D assets through int
         cookies: "Cookie Policy",
         terms: "Terms of Use",
 
-        rights: "All rights reserved."
+        rights: "All rights reserved.",
+
+
+
+
+
+
+  nav_about: "About us",
+
+  about_eyebrow: "THE COMPANY",
+  about_heading: "A little more about SEOD",
+  about_teaser: "Our story, the people behind our work and the way we build technology.",
+  about_expand: "EXPLORE",
+
+  about_story_label: "01 / OUR STORY",
+  about_story_title: "From digital twins to spatial intelligence",
+  about_story_p1: "SEOD originated from our work in digital twin technologies. While developing and managing large volumes of data to feed our models, we encountered a recurring challenge: the difficulty of accessing, connecting and exploiting complex datasets efficiently.",
+  about_story_p2: "This challenge led us to identify an opportunity beyond our original field. The nature of our technology and the advances achieved through our internal development made it possible to apply these capabilities to the space and geospatial data ecosystem.",
+  about_story_p3: "SEOD emerged from that transition: bringing together spatial computing, data engineering and proprietary technology to develop new ways of working with Earth observation and georeferenced information.",
+
+  about_founders_label: "02 / FOUNDERS & TEAM",
+  about_founders_title: "The people behind SEOD",
+  about_founder_record: "FOUNDING MEMBER",
+  about_founder_status: "IDENTITY RECORD 001",
+  about_founder_role: "CEO & CTO",
+  about_profile_label: "PROFILE / EXPERTISE",
+  about_expertise_1: "Product design",
+  about_expertise_2: "Complex structures and systems",
+  about_expertise_3: "Spatial graphics computing applied to digital twins",
+
+  about_work_label: "03 / HOW WE WORK",
+  about_work_title: "A collaborative approach",
+  about_work_intro: "We approach each project according to its scope, requirements and intended use.",
+  about_work_custom_title: "Tailored technology and B2B2B projects",
+  about_work_custom_text: "The process begins with an initial consultation to understand the organization, assess its requirements and determine whether our capabilities are suited to the project.",
+  about_work_custom_text_2: "Based on this assessment, we define the technical scope and prepare a tailored proposal outlining the solution, implementation approach and collaboration terms.",
+  about_work_products_title: "Access to our products",
+  about_work_products_text: "Organizations and professionals interested in using our existing tools can contact our sales team directly. They will guide them through the appropriate product selection, access and onboarding process.",
+
+  about_collab_label: "04 / CAREERS & COLLABORATION",
+  about_collab_title: "Build with us",
+  about_careers_title: "Careers & collaboration",
+  about_careers_text: "We are open to connecting with professionals, technology providers and organizations interested in developing new applications of spatial computing and geospatial data.",
+  about_partners_title: "Partnerships & advertising",
+  about_partners_text: "If you are interested in becoming a SEOD partner, exploring a technology collaboration or featuring advertising content within one of our platforms, please contact our sales team to discuss the possibilities.",
+  about_contact_sales: "CONTACT OUR TEAM",
+
+  about_presence_label: "05 / OUR PRESENCE",
+  about_presence_title: "Based in Albacete, connected to the world",
+  about_location_label: "CURRENT LOCATION",
+  about_presence_text: "SEOD is currently based at CEI Albacete, in Castilla-La Mancha, Spain. From this location, we develop our technologies and coordinate our projects and collaborations.",
+
+  about_closing: "Building new ways to understand and work with spatial data.",
+
+
+
+
+
+
+      
     },
 
 
@@ -8271,7 +9565,59 @@ tool_3_text: "Visualiza, organiza y gestiona activos 3D georreferenciados median
         cookies: "Política de cookies",
         terms: "Condiciones de uso",
 
-        rights: "Todos los derechos reservados."
+        rights: "Todos los derechos reservados.",
+
+
+
+  nav_about: "Quiénes somos",
+
+  about_eyebrow: "LA EMPRESA",
+  about_heading: "Conoce un poco más SEOD",
+  about_teaser: "Nuestra historia, las personas detrás del proyecto y nuestra forma de desarrollar tecnología.",
+  about_expand: "DESCUBRIR",
+
+  about_story_label: "01 / NUESTRA HISTORIA",
+  about_story_title: "De los gemelos digitales a la inteligencia espacial",
+  about_story_p1: "SEOD nace de nuestro trabajo en tecnologías de gemelos digitales. Durante el desarrollo y la gestión de grandes volúmenes de datos destinados a alimentar nuestros modelos, nos encontramos con un problema recurrente: la dificultad para acceder, conectar y explotar conjuntos de datos complejos de forma eficiente.",
+  about_story_p2: "Este desafío nos permitió identificar una oportunidad más allá de nuestro ámbito original. La propia naturaleza de nuestra tecnología y los avances alcanzados mediante nuestro desarrollo interno hicieron posible trasladar estas capacidades al ecosistema espacial y de los datos georreferenciados.",
+  about_story_p3: "SEOD surge de esa evolución: la convergencia entre computación espacial, ingeniería de datos y tecnología propia para desarrollar nuevas formas de trabajar con observación de la Tierra e información georreferenciada.",
+
+  about_founders_label: "02 / FUNDADORES Y EQUIPO",
+  about_founders_title: "Las personas detrás de SEOD",
+  about_founder_record: "MIEMBRO FUNDADOR",
+  about_founder_status: "REGISTRO DE IDENTIDAD 001",
+  about_founder_role: "CEO y CTO",
+  about_profile_label: "PERFIL / ESPECIALIZACIÓN",
+  about_expertise_1: "Diseño de producto",
+  about_expertise_2: "Estructuras y sistemas complejos",
+  about_expertise_3: "Computación gráfica espacial aplicada a gemelos digitales",
+
+  about_work_label: "03 / CÓMO TRABAJAMOS",
+  about_work_title: "Un enfoque colaborativo",
+  about_work_intro: "Abordamos cada proyecto en función de su alcance, sus requisitos y su finalidad.",
+  about_work_custom_title: "Desarrollo tecnológico a medida y proyectos B2B2B",
+  about_work_custom_text: "El proceso comienza con una reunión inicial para conocer la organización, analizar sus necesidades y valorar si nuestras capacidades pueden dar respuesta al proyecto.",
+  about_work_custom_text_2: "A partir de ese análisis, definimos el alcance técnico y elaboramos una propuesta personalizada que recoge la solución planteada, el enfoque de implementación y las condiciones de colaboración.",
+  about_work_products_title: "Acceso a nuestros productos",
+  about_work_products_text: "Las organizaciones y profesionales interesados en utilizar nuestras herramientas pueden contactar directamente con el equipo comercial. Desde allí recibirán orientación sobre el producto adecuado, el acceso y el proceso interno de incorporación.",
+
+  about_collab_label: "04 / EMPLEO Y COLABORACIÓN",
+  about_collab_title: "Construye con nosotros",
+  about_careers_title: "Empleo y colaboración",
+  about_careers_text: "Estamos abiertos a conectar con profesionales, proveedores tecnológicos y organizaciones interesadas en desarrollar nuevas aplicaciones de la computación espacial y los datos geoespaciales.",
+  about_partners_title: "Partners y publicidad",
+  about_partners_text: "Si estás interesado en convertirte en partner de SEOD, explorar una colaboración tecnológica o incorporar contenido publicitario en alguno de nuestros sistemas, contacta con nuestro equipo comercial para estudiar las posibilidades.",
+  about_contact_sales: "CONTACTAR CON EL EQUIPO",
+
+  about_presence_label: "05 / DÓNDE ESTAMOS",
+  about_presence_title: "Desde Albacete, conectados con el mundo",
+  about_location_label: "UBICACIÓN ACTUAL",
+  about_presence_text: "SEOD tiene actualmente su sede en el CEI de Albacete, en Castilla-La Mancha, España. Desde este espacio desarrollamos nuestras tecnologías y coordinamos nuestros proyectos y colaboraciones.",
+
+  about_closing: "Desarrollando nuevas formas de comprender y trabajar con los datos espaciales.",
+
+
+      
 
     }
 
@@ -10908,6 +12254,67 @@ renderObservationsMosaic();
 
     closeViewer();
   }, true);
+
+
+
+
+
+
+
+
+  
+/* =====================================================
+   SEOD — ABOUT US NAVIGATION
+   ===================================================== */
+
+(() => {
+
+  const aboutSection = document.getElementById('about-seod');
+  const aboutPanel = document.getElementById('about-seod-panel');
+  const aboutNav = document.getElementById('about-nav-trigger');
+  const aboutTrigger = aboutSection?.querySelector('.about-seod-trigger');
+
+  if (!aboutSection || !aboutPanel || !aboutTrigger) return;
+
+  const setAboutOpen = (open, scrollToSection = false) => {
+    aboutSection.classList.toggle('is-open', open);
+    aboutTrigger.setAttribute('aria-expanded', String(open));
+    aboutPanel.setAttribute('aria-hidden', String(!open));
+    aboutPanel.inert = !open;
+    const statusText = aboutSection.querySelector('.about-seod-status-text');
+    if (statusText) {
+      const language = document.documentElement.lang.toLowerCase();
+      statusText.textContent = open
+        ? (language.startsWith('es') ? 'CERRAR' : 'CLOSE')
+        : (language.startsWith('es') ? 'DESCUBRIR' : 'EXPLORE');
+    }
+    if (scrollToSection) {
+      requestAnimationFrame(() => {
+        aboutSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      });
+    }
+
+  };
+
+
+  aboutNav?.addEventListener('click', (event) => {
+    event.preventDefault();
+    setAboutOpen(true, true);
+  });
+
+
+  aboutTrigger.addEventListener('click', () => {
+    const isOpen = aboutSection.classList.contains('is-open');
+    setAboutOpen(!isOpen, !isOpen);
+  });
+
+
+  setAboutOpen(false, false);
+
+})();
 
 
 </script>
