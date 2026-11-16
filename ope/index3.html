@@ -151,6 +151,35 @@
     border-color .3s ease;
 }
 
+
+    .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brand-logo {
+  display: block;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand-name {
+  display: block;
+}
+
+.brand-sub {
+  display: block;
+}
 .site-header.is-scrolled {
   background: #111210;
   border-bottom: 1px solid rgba(243,241,234,.12);
@@ -4988,10 +5017,13 @@ justify-content: flex-end;
   <header class="site-header">
     <nav class="nav" aria-label="Main navigation">
 
-      <a class="brand" href="#home" aria-label="SEOD home">
-        <span class="brand-name">SEOD</span>
-        <span class="brand-sub">SPACE ENGINE, OBSERVATION &amp; DATA</span>
-      </a>
+   <a class="brand" href="#home" aria-label="SEOD home">
+  <img class="brand-logo" src="https://3d.staratlas.es/ope/logoseod.png" alt="SEOD">
+  <span class="brand-text">
+    <span class="brand-name">SEOD</span>
+    <span class="brand-sub">SPACE ENGINE, OBSERVATION &amp; DATA</span>
+  </span>
+</a>
 
       <div class="nav-links" id="primary-navigation">
 
