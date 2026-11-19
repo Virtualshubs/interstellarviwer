@@ -3907,8 +3907,6 @@ justify-content: flex-end;
 
 
 
-
-
 /* =====================================================
    SEOD — PARTNERS
    ===================================================== */
@@ -3917,8 +3915,6 @@ justify-content: flex-end;
   position: relative;
   overflow: hidden;
 }
-
-/* HEADING */
 
 .partners-heading {
   margin-bottom: 30px;
@@ -3939,7 +3935,7 @@ justify-content: flex-end;
 .partners-collage {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: 105px 120px;
+  grid-auto-rows: 120px;
   gap: 12px;
   width: 100%;
 }
@@ -3961,7 +3957,11 @@ justify-content: flex-end;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 22px 28px;
+
+  min-width: 0;
+  min-height: 0;
+  padding: 16px 20px;
+
   background: var(--mineral, #F3F1EA);
   border: 1px solid rgba(36, 37, 34, .08);
 }
@@ -3970,11 +3970,13 @@ justify-content: flex-end;
   display: block;
   width: 100%;
   height: 100%;
-  max-width: 150px;
-  max-height: 65px;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
+
   filter: grayscale(100%);
   opacity: .72;
+
   transition:
     opacity .3s ease,
     filter .3s ease,
@@ -3988,92 +3990,43 @@ justify-content: flex-end;
 }
 
 
-/* INDUSTRY PHOTOGRAPHS */
+/* DYNAMIC LOGO DISTRIBUTION */
 
-.partners-photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(65%);
-  opacity: .85;
-  transition:
-    filter .4s ease,
-    opacity .4s ease,
-    transform .5s ease;
+.partners-collage:has(.partners-logo:only-of-type) {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-.partners-photo:hover img {
-  filter: grayscale(0%);
-  opacity: 1;
-  transform: scale(1.035);
+.partners-collage:has(.partners-logo:nth-of-type(2):last-of-type) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-
-/* COLLAGE COMPOSITION — ROW 1 */
-
-.partners-logo-1 {
-  grid-column: span 2;
-  grid-row: 1;
+.partners-collage:has(.partners-logo:nth-of-type(3):last-of-type) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.partners-photo-1 {
-  grid-column: span 3;
-  grid-row: 1;
+.partners-collage:has(.partners-logo:nth-of-type(4):last-of-type) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.partners-logo-2 {
-  grid-column: span 2;
-  grid-row: 1;
-}
-
-.partners-photo-2 {
-  grid-column: span 3;
-  grid-row: 1;
-}
-
-.partners-logo-3 {
-  grid-column: span 2;
-  grid-row: 1;
-}
-
-
-/* COLLAGE COMPOSITION — ROW 2 */
-
-.partners-photo-3 {
-  grid-column: span 3;
-  grid-row: 2;
-}
-
-.partners-logo-4 {
-  grid-column: span 4;
-  grid-row: 2;
-}
-
-.partners-logo-5 {
-  grid-column: span 5;
-  grid-row: 2;
+.partners-collage:has(.partners-logo:nth-of-type(5):last-of-type) {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 
 /* RESPONSIVE */
 
 @media (max-width: 900px) {
-
   .partners-collage {
-    grid-template-rows: 95px 105px;
     gap: 10px;
+    grid-auto-rows: 105px;
   }
 
   .partners-logo {
-    padding: 16px;
+    padding: 14px;
   }
-
 }
 
-
 @media (max-width: 600px) {
-
   .partners-heading {
     margin-bottom: 22px;
   }
@@ -4083,67 +4036,14 @@ justify-content: flex-end;
   }
 
   .partners-collage {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: repeat(3, 85px);
+    grid-auto-rows: 85px;
     gap: 8px;
-  }
-
-  .partners-logo-1 {
-    grid-column: span 2;
-    grid-row: 1;
-  }
-
-  .partners-photo-1 {
-    grid-column: span 4;
-    grid-row: 1;
-  }
-
-  .partners-logo-2 {
-    grid-column: span 3;
-    grid-row: 2;
-  }
-
-  .partners-photo-2 {
-    grid-column: span 3;
-    grid-row: 2;
-  }
-
-  .partners-logo-3 {
-    grid-column: span 2;
-    grid-row: 3;
-  }
-
-  .partners-photo-3 {
-    grid-column: span 2;
-    grid-row: 3;
-  }
-
-  .partners-logo-4 {
-    grid-column: span 1;
-    grid-row: 3;
-  }
-
-  .partners-logo-5 {
-    grid-column: span 1;
-    grid-row: 3;
   }
 
   .partners-logo {
     padding: 10px;
   }
-
-  .partners-logo img {
-    max-width: 100%;
-    max-height: 48px;
-  }
-
 }
-
-
-
-
-
-
 
 
 
