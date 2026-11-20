@@ -6485,140 +6485,17 @@ justify-content: flex-end;
 
   
 
-/* JANUS — DATA BASE INTEROPERABLE */
 
-.janus-data-section {
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  padding: clamp(80px, 10vw, 140px) 24px;
-  overflow: hidden;
-  background: #111111;
-  color: #F3F1EA;
-}
+/* JANUS — CONTINUOUS LOGO MARQUEE */
 
-/* Fondo */
-
-.janus-data-background {
-  position: absolute;
-  z-index: -2;
-  inset: 0;
-  background:
-    radial-gradient(
-      ellipse at 50% 45%,
-      rgba(110, 111, 99, 0.18),
-      transparent 65%
-    ),
-    linear-gradient(
-      135deg,
-      #343530 0%,
-      #242522 48%,
-      #171815 100%
-    );
-  transform: scale(1.02);
-}
-
-.janus-data-overlay {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(17, 18, 16, 0.65),
-      rgba(17, 18, 16, 0.18) 50%,
-      rgba(17, 18, 16, 0.65)
-    ),
-    linear-gradient(
-      180deg,
-      rgba(17, 18, 16, 0.35),
-      transparent 35%,
-      rgba(17, 18, 16, 0.55)
-    );
-}
-
-/* Contenido */
-
-.janus-data-content {
-  position: relative;
-  width: min(100%, 1320px);
-  margin: 0 auto;
-}
-
-/* Cabecera */
-
-.janus-data-header {
-  text-align: center;
-  margin-bottom: 55px;
-}
-
-.janus-data-eyebrow {
-  display: block;
-  margin-bottom: 18px;
-  color: #B9B7AC;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.13em;
-}
-
-.janus-data-header h2 {
-  margin: 0;
-  color: #F3F1EA;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(27px, 4vw, 46px);
-  font-weight: 500;
-  letter-spacing: -0.045em;
-}
-
-.janus-data-header p {
-  margin: 12px 0 0;
-  color: #C4C1B7;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 15px;
-  font-weight: 300;
-}
-
-/* Superficie de cristal ahumado */
-
-.janus-data-glass {
-  position: relative;
-  width: 100%;
-  padding: 36px 45px;
-  overflow: hidden;
-
-  background: rgba(35, 36, 32, 0.68);
-  border: 1px solid rgba(243, 241, 234, 0.13);
-  border-radius: 3px;
-
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-
-  box-shadow:
-    0 22px 60px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.055);
-}
-
-.janus-data-glass::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 8%;
-  right: 8%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(243, 241, 234, 0.22),
-    transparent
-  );
-}
-
-/* Banda de logotipos */
+/* Viewport */
 
 .janus-data-track-viewport {
   width: 100%;
   overflow: hidden;
 }
+
+/* Track */
 
 .janus-data-track {
   display: flex;
@@ -6630,7 +6507,7 @@ justify-content: flex-end;
   will-change: transform;
 }
 
-/* Cada grupo contiene una secuencia completa */
+/* Repeating logo sequence */
 
 .janus-data-group {
   display: flex;
@@ -6641,7 +6518,7 @@ justify-content: flex-end;
   padding-right: clamp(45px, 7vw, 100px);
 }
 
-/* Logotipos */
+/* Individual logos */
 
 .janus-data-logo {
   display: flex;
@@ -6674,152 +6551,52 @@ justify-content: flex-end;
   opacity: 1;
 }
 
-/* Entrada escalonada */
+/* Staggered entrance */
 
 .janus-data-section.is-visible .janus-data-logo {
   opacity: 1;
   transform: translateY(0);
 }
 
-.janus-data-section.is-visible .janus-data-logo:nth-child(1) {
+.janus-data-group .janus-data-logo:nth-child(1) {
   transition-delay: 100ms;
 }
 
-.janus-data-section.is-visible .janus-data-logo:nth-child(2) {
+.janus-data-group .janus-data-logo:nth-child(2) {
   transition-delay: 240ms;
 }
 
-.janus-data-section.is-visible .janus-data-logo:nth-child(3) {
+.janus-data-group .janus-data-logo:nth-child(3) {
   transition-delay: 380ms;
 }
 
-.janus-data-section.is-visible .janus-data-logo:nth-child(4) {
+.janus-data-group .janus-data-logo:nth-child(4) {
   transition-delay: 520ms;
 }
 
-.janus-data-section.is-visible .janus-data-logo:nth-child(5) {
+.janus-data-group .janus-data-logo:nth-child(5) {
   transition-delay: 660ms;
 }
 
-/* Movimiento horizontal continuo */
+/* Seamless infinite movement */
 
 .janus-data-track.is-marquee {
-  animation:
-    janusDataMarquee
-    var(--marquee-duration, 35s)
-    linear infinite;
+  animation: janusDataMarquee var(--marquee-duration) linear infinite;
 }
 
 @keyframes janusDataMarquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform: translateX(
-      calc(-1 * var(--marquee-distance))
-    );
+    transform: translate3d(var(--marquee-distance), 0, 0);
   }
-}
-
-/* CTA */
-
-.janus-data-cta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 760px;
-  margin: 75px auto 0;
-  text-align: center;
-}
-
-.janus-data-cta h3 {
-  max-width: 720px;
-  margin: 0;
-  color: #F3F1EA;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: clamp(23px, 3vw, 34px);
-  line-height: 1.25;
-  font-weight: 400;
-  letter-spacing: -0.035em;
-}
-
-.janus-data-cta p {
-  max-width: 650px;
-  margin: 20px 0 30px;
-  color: #C8C6BD;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 15px;
-  line-height: 1.7;
-  font-weight: 300;
-}
-
-/* Botón */
-
-.janus-data-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 13px 19px;
-
-  border: 1px solid rgba(243, 241, 234, 0.45);
-  border-radius: 2px;
-
-  color: #F3F1EA;
-  background: rgba(243, 241, 234, 0.07);
-
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-
-  transition:
-    background 250ms ease,
-    border-color 250ms ease;
-}
-
-.janus-data-button:hover {
-  background: rgba(243, 241, 234, 0.14);
-  border-color: rgba(243, 241, 234, 0.75);
-}
-
-.janus-data-button span {
-  font-size: 15px;
-}
-
-/* Roadmap */
-
-.janus-data-roadmap {
-  margin-top: 22px;
-  color: #BDBAAF;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 12px;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(189, 186, 175, 0.35);
-  padding-bottom: 3px;
-  transition: color 250ms ease;
-}
-
-.janus-data-roadmap:hover {
-  color: #F3F1EA;
 }
 
 /* Responsive */
 
 @media (max-width: 768px) {
-  .janus-data-section {
-    padding: 75px 18px;
-  }
-
-  .janus-data-header {
-    margin-bottom: 38px;
-  }
-
-  .janus-data-glass {
-    padding: 28px 22px;
-  }
-
   .janus-data-group {
     gap: 45px;
     padding-right: 45px;
@@ -6833,13 +6610,9 @@ justify-content: flex-end;
     max-width: 125px;
     max-height: 36px;
   }
-
-  .janus-data-cta {
-    margin-top: 55px;
-  }
 }
 
-/* Accesibilidad */
+/* Reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
   .janus-data-logo,
@@ -6848,6 +6621,7 @@ justify-content: flex-end;
     animation: none !important;
   }
 }
+
 
 
   
@@ -13276,6 +13050,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
 document.addEventListener("DOMContentLoaded", () => {
   const section = document.querySelector(".janus-data-section");
   if (!section) return;
@@ -13290,7 +13065,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!viewport || !track) return;
 
-  const originalLogos = [...track.children];
+  // Preserve the original logo elements.
+  const originalLogos = [...track.children].map(logo =>
+    logo.cloneNode(true)
+  );
 
   if (!originalLogos.length) return;
 
@@ -13300,9 +13078,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let initialized = false;
   let resizeTimer;
+  let resizeObserver;
 
-  // Esperar a que los logotipos estén cargados.
-  function prepareImages() {
+  // Wait until all original images have loaded.
+  function waitForImages() {
     const images = originalLogos
       .map(logo => logo.querySelector("img"))
       .filter(Boolean);
@@ -13321,31 +13100,41 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // Construir la banda continua.
+  // Create one complete sequence of logos.
+  function createLogoGroup() {
+    const group = document.createElement("div");
+    group.className = "janus-data-group";
+
+    originalLogos.forEach(logo => {
+      group.appendChild(logo.cloneNode(true));
+    });
+
+    return group;
+  }
+
+  // Build enough identical sequences to cover the viewport.
   function buildMarquee() {
     track.classList.remove("is-marquee");
 
     track.style.removeProperty("--marquee-distance");
     track.style.removeProperty("--marquee-duration");
 
-    // Crear el grupo original.
-    const group = document.createElement("div");
-    group.className = "janus-data-group";
+    track.replaceChildren();
 
-    originalLogos.forEach(logo => {
-      group.appendChild(logo);
-    });
+    const firstGroup = createLogoGroup();
+    track.appendChild(firstGroup);
 
-    track.replaceChildren(group);
-
-    const sequenceWidth = group.getBoundingClientRect().width;
+    const sequenceWidth = firstGroup.getBoundingClientRect().width;
     const viewportWidth = viewport.getBoundingClientRect().width;
 
     if (!sequenceWidth || !viewportWidth) return;
 
-    // Repetir grupos hasta cubrir toda la banda.
-    while (track.scrollWidth < viewportWidth + sequenceWidth) {
-      const clone = group.cloneNode(true);
+    // One additional sequence guarantees continuous coverage.
+    const requiredGroups =
+      Math.ceil(viewportWidth / sequenceWidth) + 1;
+
+    for (let i = 1; i < requiredGroups; i++) {
+      const clone = createLogoGroup();
 
       clone.setAttribute("aria-hidden", "true");
 
@@ -13356,12 +13145,12 @@ document.addEventListener("DOMContentLoaded", () => {
       track.appendChild(clone);
     }
 
-    // Distancia exacta entre el inicio de dos secuencias.
+    // Move exactly one sequence width per animation cycle.
     const duration = sequenceWidth / 35;
 
     track.style.setProperty(
       "--marquee-distance",
-      `${sequenceWidth}px`
+      `-${sequenceWidth}px`
     );
 
     track.style.setProperty(
@@ -13369,44 +13158,53 @@ document.addEventListener("DOMContentLoaded", () => {
       `${duration}s`
     );
 
-    // Activar la animación.
+    // Force layout before starting the animation.
     void track.offsetWidth;
 
     track.classList.add("is-marquee");
   }
 
-  // Iniciar cuando la sección entra en pantalla.
   async function startAnimation() {
     if (initialized) return;
-
     initialized = true;
 
-    section.classList.add("is-visible");
+    await waitForImages();
 
-    await prepareImages();
+    // Build the complete band before the entrance animation.
+    buildMarquee();
 
-    if (reducedMotion || originalLogos.length < 2) return;
+    if (reducedMotion) {
+      section.classList.add("is-visible");
+      return;
+    }
 
-    // Dejar terminar la entrada escalonada.
-    window.setTimeout(() => {
-      buildMarquee();
-    }, 1500);
+    // Allow the browser to render the initial hidden state.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        section.classList.add("is-visible");
 
-    // Recalcular si cambia el tamaño del contenedor.
+        // Start the marquee after the staggered entrance.
+        window.setTimeout(() => {
+          track.classList.add("is-marquee");
+        }, 1500);
+      });
+    });
+
+    // Recalculate the sequence when the viewport changes.
     if ("ResizeObserver" in window) {
-      const observer = new ResizeObserver(() => {
+      resizeObserver = new ResizeObserver(() => {
         clearTimeout(resizeTimer);
 
         resizeTimer = setTimeout(() => {
           buildMarquee();
-        }, 200);
+        }, 250);
       });
 
-      observer.observe(viewport);
+      resizeObserver.observe(viewport);
     }
   }
 
-  // Detectar la entrada en pantalla.
+  // Start when the section enters the viewport.
   if ("IntersectionObserver" in window) {
     const observer = new IntersectionObserver(
       entries => {
