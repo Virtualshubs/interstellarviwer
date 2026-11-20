@@ -6329,11 +6329,12 @@ justify-content: flex-end;
 
 
 
-  /* HEADING */
+/* HEADING */
 
 .planetary-heading {
   width: 100%;
   margin: 0 auto;
+  text-align: center;
 }
 
 .planetary-heading h2 {
@@ -6341,12 +6342,14 @@ justify-content: flex-end;
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 500;
   letter-spacing: -0.035em;
+  text-align: center;
 }
 
 .planetary-heading p {
-  margin-top: 12px;
+  margin: 12px auto 0;
   font-size: 1rem;
   opacity: 0.7;
+  text-align: center;
 }
 
 /* CAROUSEL */
@@ -6420,6 +6423,7 @@ justify-content: flex-end;
   color: #fff;
   font-size: clamp(1.5rem, 3vw, 2.8rem);
   font-weight: 500;
+  text-align: center;
   text-shadow: 0 2px 15px rgba(0, 0, 0, 0.35);
 }
 
@@ -12689,7 +12693,74 @@ renderObservationsMosaic();
 
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
+  document.querySelectorAll(".planetary-carousel").forEach(carousel => {
+
+    const slides = carousel.querySelectorAll(".planetary-slide");
+    const prev = carousel.querySelector(".planetary-prev");
+    const next = carousel.querySelector(".planetary-next");
+
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    function showSlide(newIndex, direction) {
+
+      if (isAnimating || newIndex === currentIndex) return;
+
+      isAnimating = true;
+
+      const currentSlide = slides[currentIndex];
+      const nextSlide = slides[newIndex];
+
+      currentSlide.classList.remove("is-active");
+      currentSlide.classList.add("is-leaving");
+
+      nextSlide.style.transform =
+        direction === "next" ? "translateY(100%)" : "translateY(-100%)";
+
+      nextSlide.style.visibility = "visible";
+      nextSlide.style.opacity = "0";
+
+      void nextSlide.offsetHeight;
+
+      nextSlide.classList.add("is-active");
+      nextSlide.style.transform = "";
+      nextSlide.style.opacity = "";
+
+      currentIndex = newIndex;
+
+      setTimeout(() => {
+        slides.forEach(slide => {
+          slide.classList.remove("is-leaving");
+
+          if (!slide.classList.contains("is-active")) {
+            slide.style.visibility = "hidden";
+            slide.style.opacity = "0";
+            slide.style.transform = "";
+          }
+        });
+
+        isAnimating = false;
+      }, 900);
+    }
+
+    next.addEventListener("click", () => {
+      showSlide((currentIndex + 1) % slides.length, "next");
+    });
+
+    prev.addEventListener("click", () => {
+      showSlide(
+        (currentIndex - 1 + slides.length) % slides.length,
+        "prev"
+      );
+    });
+
+  });
+
+});
+</script>
   
 </body>
 </html>
