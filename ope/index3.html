@@ -6482,6 +6482,354 @@ justify-content: flex-end;
   }
 }
 
+
+  
+/* JANUS — DATA BASE INTEROPERABLE */
+
+.janus-data-section {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding: clamp(80px, 10vw, 140px) 24px;
+  overflow: hidden;
+  background: #242522;
+  color: #F3F1EA;
+}
+
+/* Fondo */
+
+.janus-data-background {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(110, 111, 99, 0.18),
+      transparent 65%
+    ),
+    linear-gradient(
+      135deg,
+      #343530 0%,
+      #242522 48%,
+      #171815 100%
+    );
+  transform: scale(1.02);
+}
+
+.janus-data-overlay {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(17, 18, 16, 0.65),
+      rgba(17, 18, 16, 0.18) 50%,
+      rgba(17, 18, 16, 0.65)
+    ),
+    linear-gradient(
+      180deg,
+      rgba(17, 18, 16, 0.35),
+      transparent 35%,
+      rgba(17, 18, 16, 0.55)
+    );
+}
+
+/* Contenido */
+
+.janus-data-content {
+  position: relative;
+  width: min(100%, 1320px);
+  margin: 0 auto;
+}
+
+/* Cabecera */
+
+.janus-data-header {
+  text-align: center;
+  margin-bottom: 55px;
+}
+
+.janus-data-eyebrow {
+  display: block;
+  margin-bottom: 18px;
+  color: #B9B7AC;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+}
+
+.janus-data-header h2 {
+  margin: 0;
+  color: #F3F1EA;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(27px, 4vw, 46px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.janus-data-header p {
+  margin: 12px 0 0;
+  color: #C4C1B7;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+}
+
+/* Superficie de cristal ahumado */
+
+.janus-data-glass {
+  position: relative;
+  width: 100%;
+  padding: 36px 45px;
+  overflow: hidden;
+
+  background: rgba(35, 36, 32, 0.68);
+  border: 1px solid rgba(243, 241, 234, 0.13);
+  border-radius: 3px;
+
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.janus-data-glass::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(243, 241, 234, 0.22),
+    transparent
+  );
+}
+
+/* Banda de logotipos */
+
+.janus-data-track-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.janus-data-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: clamp(45px, 7vw, 100px);
+  width: max-content;
+  min-width: 100%;
+  will-change: transform;
+}
+
+.janus-data-logo {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 125px;
+  height: 65px;
+
+  opacity: 0;
+  transform: translateY(-18px);
+
+  transition:
+    opacity 700ms ease,
+    transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.janus-data-logo img {
+  display: block;
+  width: auto;
+  max-width: 155px;
+  max-height: 43px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0) invert(1);
+  opacity: 0.82;
+  transition: opacity 300ms ease;
+}
+
+.janus-data-logo:hover img {
+  opacity: 1;
+}
+
+/* Entrada escalonada */
+
+.janus-data-section.is-visible .janus-data-logo {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.janus-data-section.is-visible .janus-data-logo:nth-child(1) {
+  transition-delay: 100ms;
+}
+
+.janus-data-section.is-visible .janus-data-logo:nth-child(2) {
+  transition-delay: 240ms;
+}
+
+.janus-data-section.is-visible .janus-data-logo:nth-child(3) {
+  transition-delay: 380ms;
+}
+
+.janus-data-section.is-visible .janus-data-logo:nth-child(4) {
+  transition-delay: 520ms;
+}
+
+.janus-data-section.is-visible .janus-data-logo:nth-child(5) {
+  transition-delay: 660ms;
+}
+
+/* Movimiento continuo */
+
+.janus-data-track.is-marquee {
+  justify-content: flex-start;
+  animation: janusDataMarquee 35s linear infinite;
+}
+
+@keyframes janusDataMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* CTA */
+
+.janus-data-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 760px;
+  margin: 75px auto 0;
+  text-align: center;
+}
+
+.janus-data-cta h3 {
+  max-width: 720px;
+  margin: 0;
+  color: #F3F1EA;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(23px, 3vw, 34px);
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+.janus-data-cta p {
+  max-width: 650px;
+  margin: 20px 0 30px;
+  color: #C8C6BD;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* Botón */
+
+.janus-data-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 13px 19px;
+
+  border: 1px solid rgba(243, 241, 234, 0.45);
+  border-radius: 2px;
+
+  color: #F3F1EA;
+  background: rgba(243, 241, 234, 0.07);
+
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+
+  transition:
+    background 250ms ease,
+    border-color 250ms ease;
+}
+
+.janus-data-button:hover {
+  background: rgba(243, 241, 234, 0.14);
+  border-color: rgba(243, 241, 234, 0.75);
+}
+
+.janus-data-button span {
+  font-size: 15px;
+}
+
+/* Roadmap */
+
+.janus-data-roadmap {
+  margin-top: 22px;
+  color: #BDBAAF;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(189, 186, 175, 0.35);
+  padding-bottom: 3px;
+  transition: color 250ms ease;
+}
+
+.janus-data-roadmap:hover {
+  color: #F3F1EA;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .janus-data-section {
+    padding: 75px 18px;
+  }
+
+  .janus-data-header {
+    margin-bottom: 38px;
+  }
+
+  .janus-data-glass {
+    padding: 28px 22px;
+  }
+
+  .janus-data-track {
+    gap: 45px;
+  }
+
+  .janus-data-logo {
+    min-width: 110px;
+  }
+
+  .janus-data-logo img {
+    max-width: 125px;
+    max-height: 36px;
+  }
+
+  .janus-data-cta {
+    margin-top: 55px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .janus-data-logo,
+  .janus-data-track {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+  
+
   </style>
 </head>
 
@@ -8121,6 +8469,71 @@ justify-content: flex-end;
 
 </section>
 
+
+<section class="janus-data-section" id="janus-data">
+  <div class="janus-data-background"></div>
+  <div class="janus-data-overlay"></div>
+
+  <div class="janus-data-content">
+
+    <header class="janus-data-header">
+      <span class="janus-data-eyebrow">JANUS · DATA INFRASTRUCTURE</span>
+      <h2>INTEROPERABLE DATA INFRASTRUCTURE</h2>
+      <p>Integrated systems</p>
+    </header>
+
+    <div class="janus-data-glass">
+
+      <div class="janus-data-track-viewport">
+        <div class="janus-data-track">
+
+          <div class="janus-data-logo">
+            <img src="/assets/logos/aws.svg" alt="Amazon Web Services">
+          </div>
+
+          <div class="janus-data-logo">
+            <img src="/assets/logos/esa-maap.svg" alt="ESA MAAP">
+          </div>
+
+          <div class="janus-data-logo">
+            <img src="/assets/logos/nasa-cmr.svg" alt="NASA Common Metadata Repository">
+          </div>
+
+          <div class="janus-data-logo">
+            <img src="/assets/logos/usgs-astrogeology.svg" alt="USGS Astrogeology Science Center">
+          </div>
+
+          <div class="janus-data-logo">
+            <img src="/assets/logos/microsoft-planetary.svg" alt="Microsoft Planetary Computer">
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="janus-data-cta">
+      <h3>
+        Need access to these systems, or want to implement your own catalogue?
+      </h3>
+
+      <p>
+        Connect your data sources with JANUS and discover new possibilities
+        for integrating, exploring and analysing your geospatial repositories.
+      </p>
+
+      <a class="janus-data-button" href="#contact">
+        Talk to our sales team
+        <span aria-hidden="true">↗</span>
+      </a>
+
+      <a class="janus-data-roadmap" href="#roadmap">
+        Explore the integration roadmap
+      </a>
+    </div>
+
+  </div>
+</section>
 
 
 
@@ -12837,6 +13250,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+
+
+
+  
+document.addEventListener("DOMContentLoaded", () => {
+  const section = document.querySelector(".janus-data-section");
+  if (!section) return;
+
+  const track = section.querySelector(".janus-data-track");
+  const logos = [...track.children];
+
+  if (!track || logos.length === 0) return;
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  let animationStarted = false;
+
+  function startAnimation() {
+    if (animationStarted) return;
+    animationStarted = true;
+
+    section.classList.add("is-visible");
+
+    if (reducedMotion || logos.length < 2) return;
+
+    // Duplicamos la secuencia para crear un desplazamiento continuo.
+    logos.forEach(logo => {
+      const clone = logo.cloneNode(true);
+      clone.setAttribute("aria-hidden", "true");
+      clone.querySelector("img")?.setAttribute("alt", "");
+      track.appendChild(clone);
+    });
+
+    // Esperamos a que termine la entrada escalonada.
+    window.setTimeout(() => {
+      track.classList.add("is-marquee");
+    }, 1500);
+  }
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          startAnimation();
+          observer.disconnect();
+        }
+      });
+    }, {
+      threshold: 0.25
+    });
+
+    observer.observe(section);
+  } else {
+    startAnimation();
+  }
+});
 
 </script>
   
