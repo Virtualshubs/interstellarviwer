@@ -12703,6 +12703,7 @@ renderObservationsMosaic();
 
 <script>
 
+
 document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".planetary-carousel").forEach(carousel => {
@@ -12710,10 +12711,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const track = carousel.querySelector(".planetary-carousel-track");
     const controls = carousel.parentElement.querySelector(".planetary-carousel-controls");
 
+    if (!track || !controls) return;
+
     const prev = controls.querySelector(".planetary-prev");
     const next = controls.querySelector(".planetary-next");
 
+    if (!prev || !next) return;
+
     let animating = false;
+    let direction = null;
 
     const getSlides = () => [...track.children];
 
@@ -12722,77 +12728,80 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateCenter() {
       const slides = getSlides();
 
-      slides.forEach(slide => slide.classList.remove("is-center"));
+      slides.forEach(slide => {
+        slide.classList.remove("is-center");
+      });
 
-      if (slides[1]) {
-        slides[1].classList.add("is-center");
-      }
+      slides[1]?.classList.add("is-center");
     }
 
-    updateCenter();
-
-    function moveNext() {
+    function move(dir) {
 
       if (animating) return;
 
       animating = true;
-
-      const slides = getSlides();
-
-      slides[1].classList.remove("is-center");
-      slides[2].classList.add("is-center");
+      direction = dir;
 
       track.classList.add("is-moving");
-      track.style.transform = "translateX(-33.333333%)";
-    }
 
-    function movePrev() {
+      if (dir === "next") {
+        track.style.transform = "translateX(-33.333333%)";
+      } else {
+        const lastSlide = track.lastElementChild;
 
-      if (animating) return;
+        track.prepend(lastSlide);
 
-      animating = true;
+        track.style.transition = "none";
+        track.style.transform = "translateX(-33.333333%)";
 
-      track.classList.remove("is-moving");
+        void track.offsetWidth;
 
-      const lastSlide = track.lastElementChild;
+        track.style.transition = "";
+        track.classList.add("is-moving");
 
-      track.prepend(lastSlide);
-
-      track.style.transform = "translateX(-33.333333%)";
+        track.style.transform = "translateX(0)";
+      }
 
       updateCenter();
-
-      void track.offsetWidth;
-
-      track.classList.add("is-moving");
-      track.style.transform = "translateX(0)";
     }
 
     track.addEventListener("transitionend", event => {
 
-      if (event.target !== track || event.propertyName !== "transform") return;
+      if (
+        event.target !== track ||
+        event.propertyName !== "transform" ||
+        !animating
+      ) return;
 
-      const movingNext = track.style.transform.includes("-33.333333%");
-
-      if (movingNext) {
+      if (direction === "next") {
         track.appendChild(track.firstElementChild);
       }
 
       track.classList.remove("is-moving");
+
+      track.style.transition = "none";
       track.style.transform = "translateX(0)";
+
+      void track.offsetWidth;
+
+      track.style.transition = "";
 
       updateCenter();
 
+      direction = null;
       animating = false;
 
     });
 
-    next.addEventListener("click", moveNext);
-    prev.addEventListener("click", movePrev);
+    next.addEventListener("click", () => move("next"));
+    prev.addEventListener("click", () => move("prev"));
+
+    updateCenter();
 
   });
 
 });
+
 
 </script>
   
