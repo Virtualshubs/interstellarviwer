@@ -6492,7 +6492,7 @@ justify-content: flex-end;
   width: 100%;
   padding: clamp(80px, 10vw, 140px) 24px;
   overflow: hidden;
-  background: #242522;
+  background: #111111;
   color: #F3F1EA;
 }
 
@@ -6619,15 +6619,30 @@ justify-content: flex-end;
   overflow: hidden;
 }
 
+
 .janus-data-track {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: flex-start;
   gap: clamp(45px, 7vw, 100px);
   width: max-content;
   min-width: 100%;
   will-change: transform;
 }
+
+.janus-data-track.is-marquee {
+  animation: janusDataMarquee var(--marquee-duration, 35s) linear infinite;
+}
+
+@keyframes janusDataMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--marquee-distance, -50%));
+  }
+}
+
 
 .janus-data-logo {
   display: flex;
@@ -13252,16 +13267,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
-  
 document.addEventListener("DOMContentLoaded", () => {
   const section = document.querySelector(".janus-data-section");
   if (!section) return;
 
   const track = section.querySelector(".janus-data-track");
-  const logos = [...track.children];
+  if (!track) return;
 
-  if (!track || logos.length === 0) return;
+  const logos = [...track.children];
+  if (!logos.length) return;
 
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
@@ -13277,7 +13291,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (reducedMotion || logos.length < 2) return;
 
-    // Duplicamos la secuencia para crear un desplazamiento continuo.
+    // Duplicamos la secuencia original.
     logos.forEach(logo => {
       const clone = logo.cloneNode(true);
       clone.setAttribute("aria-hidden", "true");
@@ -13285,10 +13299,35 @@ document.addEventListener("DOMContentLoaded", () => {
       track.appendChild(clone);
     });
 
-    // Esperamos a que termine la entrada escalonada.
-    window.setTimeout(() => {
+    // Calculamos el ancho exacto de una secuencia.
+    requestAnimationFrame(() => {
+      const originalWidth = logos.reduce(
+        (width, logo) => width + logo.getBoundingClientRect().width,
+        0
+      );
+
+      const gap = parseFloat(
+        getComputedStyle(track).columnGap
+      ) || 0;
+
+      const sequenceWidth =
+        originalWidth + gap * (logos.length - 1);
+
+      // Ajustamos la distancia y la velocidad.
+      const duration = sequenceWidth / 35;
+
+      track.style.setProperty(
+        "--marquee-distance",
+        `-${sequenceWidth}px`
+      );
+
+      track.style.setProperty(
+        "--marquee-duration",
+        `${duration}s`
+      );
+
       track.classList.add("is-marquee");
-    }, 1500);
+    });
   }
 
   if ("IntersectionObserver" in window) {
@@ -13308,6 +13347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     startAnimation();
   }
 });
+
 
 </script>
   
