@@ -6484,6 +6484,7 @@ justify-content: flex-end;
 
 
   
+
 /* JANUS — DATA BASE INTEROPERABLE */
 
 .janus-data-section {
@@ -6619,30 +6620,28 @@ justify-content: flex-end;
   overflow: hidden;
 }
 
-
 .janus-data-track {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: clamp(45px, 7vw, 100px);
   width: max-content;
   min-width: 100%;
+  gap: 0;
   will-change: transform;
 }
 
-.janus-data-track.is-marquee {
-  animation: janusDataMarquee var(--marquee-duration, 35s) linear infinite;
+/* Cada grupo contiene una secuencia completa */
+
+.janus-data-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: clamp(45px, 7vw, 100px);
+  width: max-content;
+  padding-right: clamp(45px, 7vw, 100px);
 }
 
-@keyframes janusDataMarquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(var(--marquee-distance, -50%));
-  }
-}
-
+/* Logotipos */
 
 .janus-data-logo {
   display: flex;
@@ -6702,19 +6701,24 @@ justify-content: flex-end;
   transition-delay: 660ms;
 }
 
-/* Movimiento continuo */
+/* Movimiento horizontal continuo */
 
 .janus-data-track.is-marquee {
-  justify-content: flex-start;
-  animation: janusDataMarquee 35s linear infinite;
+  animation:
+    janusDataMarquee
+    var(--marquee-duration, 35s)
+    linear infinite;
 }
 
 @keyframes janusDataMarquee {
   from {
     transform: translateX(0);
   }
+
   to {
-    transform: translateX(-50%);
+    transform: translateX(
+      calc(-1 * var(--marquee-distance))
+    );
   }
 }
 
@@ -6816,8 +6820,9 @@ justify-content: flex-end;
     padding: 28px 22px;
   }
 
-  .janus-data-track {
+  .janus-data-group {
     gap: 45px;
+    padding-right: 45px;
   }
 
   .janus-data-logo {
@@ -6833,6 +6838,8 @@ justify-content: flex-end;
     margin-top: 55px;
   }
 }
+
+/* Accesibilidad */
 
 @media (prefers-reduced-motion: reduce) {
   .janus-data-logo,
@@ -8483,6 +8490,7 @@ justify-content: flex-end;
   </div>
 
 </section>
+
 
 
 <section class="janus-data-section" id="janus-data">
@@ -13267,86 +13275,159 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+
 document.addEventListener("DOMContentLoaded", () => {
   const section = document.querySelector(".janus-data-section");
   if (!section) return;
 
-  const track = section.querySelector(".janus-data-track");
-  if (!track) return;
+  const viewport = section.querySelector(
+    ".janus-data-track-viewport"
+  );
 
-  const logos = [...track.children];
-  if (!logos.length) return;
+  const track = section.querySelector(
+    ".janus-data-track"
+  );
+
+  if (!viewport || !track) return;
+
+  const originalLogos = [...track.children];
+
+  if (!originalLogos.length) return;
 
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
-  let animationStarted = false;
+  let initialized = false;
+  let resizeTimer;
 
-  function startAnimation() {
-    if (animationStarted) return;
-    animationStarted = true;
+  // Esperar a que los logotipos estén cargados.
+  function prepareImages() {
+    const images = originalLogos
+      .map(logo => logo.querySelector("img"))
+      .filter(Boolean);
+
+    return Promise.all(
+      images.map(img => {
+        if (img.complete) {
+          return Promise.resolve();
+        }
+
+        return new Promise(resolve => {
+          img.addEventListener("load", resolve, { once: true });
+          img.addEventListener("error", resolve, { once: true });
+        });
+      })
+    );
+  }
+
+  // Construir la banda continua.
+  function buildMarquee() {
+    track.classList.remove("is-marquee");
+
+    track.style.removeProperty("--marquee-distance");
+    track.style.removeProperty("--marquee-duration");
+
+    // Crear el grupo original.
+    const group = document.createElement("div");
+    group.className = "janus-data-group";
+
+    originalLogos.forEach(logo => {
+      group.appendChild(logo);
+    });
+
+    track.replaceChildren(group);
+
+    const sequenceWidth = group.getBoundingClientRect().width;
+    const viewportWidth = viewport.getBoundingClientRect().width;
+
+    if (!sequenceWidth || !viewportWidth) return;
+
+    // Repetir grupos hasta cubrir toda la banda.
+    while (track.scrollWidth < viewportWidth + sequenceWidth) {
+      const clone = group.cloneNode(true);
+
+      clone.setAttribute("aria-hidden", "true");
+
+      clone.querySelectorAll("img").forEach(img => {
+        img.setAttribute("alt", "");
+      });
+
+      track.appendChild(clone);
+    }
+
+    // Distancia exacta entre el inicio de dos secuencias.
+    const duration = sequenceWidth / 35;
+
+    track.style.setProperty(
+      "--marquee-distance",
+      `${sequenceWidth}px`
+    );
+
+    track.style.setProperty(
+      "--marquee-duration",
+      `${duration}s`
+    );
+
+    // Activar la animación.
+    void track.offsetWidth;
+
+    track.classList.add("is-marquee");
+  }
+
+  // Iniciar cuando la sección entra en pantalla.
+  async function startAnimation() {
+    if (initialized) return;
+
+    initialized = true;
 
     section.classList.add("is-visible");
 
-    if (reducedMotion || logos.length < 2) return;
+    await prepareImages();
 
-    // Duplicamos la secuencia original.
-    logos.forEach(logo => {
-      const clone = logo.cloneNode(true);
-      clone.setAttribute("aria-hidden", "true");
-      clone.querySelector("img")?.setAttribute("alt", "");
-      track.appendChild(clone);
-    });
+    if (reducedMotion || originalLogos.length < 2) return;
 
-    // Calculamos el ancho exacto de una secuencia.
-    requestAnimationFrame(() => {
-      const originalWidth = logos.reduce(
-        (width, logo) => width + logo.getBoundingClientRect().width,
-        0
-      );
+    // Dejar terminar la entrada escalonada.
+    window.setTimeout(() => {
+      buildMarquee();
+    }, 1500);
 
-      const gap = parseFloat(
-        getComputedStyle(track).columnGap
-      ) || 0;
+    // Recalcular si cambia el tamaño del contenedor.
+    if ("ResizeObserver" in window) {
+      const observer = new ResizeObserver(() => {
+        clearTimeout(resizeTimer);
 
-      const sequenceWidth =
-        originalWidth + gap * (logos.length - 1);
+        resizeTimer = setTimeout(() => {
+          buildMarquee();
+        }, 200);
+      });
 
-      // Ajustamos la distancia y la velocidad.
-      const duration = sequenceWidth / 35;
-
-      track.style.setProperty(
-        "--marquee-distance",
-        `-${sequenceWidth}px`
-      );
-
-      track.style.setProperty(
-        "--marquee-duration",
-        `${duration}s`
-      );
-
-      track.classList.add("is-marquee");
-    });
+      observer.observe(viewport);
+    }
   }
 
+  // Detectar la entrada en pantalla.
   if ("IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          startAnimation();
-          observer.disconnect();
-        }
-      });
-    }, {
-      threshold: 0.25
-    });
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            startAnimation();
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        threshold: 0.25
+      }
+    );
 
     observer.observe(section);
   } else {
     startAnimation();
   }
 });
+
 
 
 </script>
