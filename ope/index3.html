@@ -780,29 +780,19 @@ justify-content: flex-end;
   position: relative;
   z-index: 2;
 }
-
 .challenge-image {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
   overflow: hidden;
-  -webkit-mask-image: radial-gradient(
-    ellipse 75% 75% at center,
-    #000 48%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse 75% 75% at center,
-    #000 48%,
-    transparent 100%
-  );
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .challenge-image img {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
 }
 
 /* CONTENT */
@@ -810,7 +800,6 @@ justify-content: flex-end;
 .challenge-body {
   margin-top: 2.5rem;
 }
-
 /* RESPONSIVE */
 
 @media (max-width: 768px) {
