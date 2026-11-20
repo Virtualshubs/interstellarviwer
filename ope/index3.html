@@ -6329,143 +6329,156 @@ justify-content: flex-end;
 
 
 
+
+/* SECTION */
+
+.planetary-section {
+  width: 100%;
+  padding: clamp(75px, 9vw, 130px) 0;
+  color: #fff;
+  overflow: hidden;
+}
+
 /* HEADING */
 
 .planetary-heading {
   width: 100%;
-  margin: 0 auto;
+  padding: 0 24px;
+  margin: 0 auto clamp(40px, 5vw, 75px);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .planetary-heading h2 {
   margin: 0;
+  color: #fff;
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 500;
   letter-spacing: -0.035em;
-  text-align: center;
 }
 
 .planetary-heading p {
   margin: 12px auto 0;
+  color: #fff;
   font-size: 1rem;
-  opacity: 0.7;
+  opacity: 0.75;
   text-align: center;
 }
 
-/* CAROUSEL */
+/* FULL WIDTH CAROUSEL */
 
 .planetary-carousel {
   position: relative;
-  width: min(100%, 1200px);
-  margin: 90px auto 0;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
   overflow: hidden;
-  background: transparent;
-  box-shadow: 0 22px 35px -28px rgba(255, 255, 255, 0.22);
+  padding: 35px 0;
+  box-sizing: border-box;
 }
 
 .planetary-carousel-track {
-  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
+  transform: translateX(0);
 }
+
+.planetary-carousel-track.is-moving {
+  transition: transform 750ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* SLIDES */
 
 .planetary-slide {
-  position: absolute;
-  inset: 0;
+  flex: 0 0 33.333333%;
+  min-width: 0;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(100%);
-  transition:
-    transform 850ms cubic-bezier(0.22, 0.61, 0.36, 1),
-    opacity 850ms ease,
-    visibility 850ms ease;
-}
-
-.planetary-slide.is-active {
-  position: relative;
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  z-index: 2;
-}
-
-.planetary-slide.is-leaving {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  visibility: visible;
-  transform: translateY(-100%);
-  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0 clamp(5px, 1vw, 16px);
+  box-sizing: border-box;
 }
 
 /* IMAGES */
 
 .planetary-slide img {
   display: block;
-  position: relative;
   width: 100%;
   height: auto;
   object-fit: contain;
+  transform: scale(0.86);
+  transition:
+    transform 750ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-/* TITLES */
+/* CENTER IMAGE */
 
-.planetary-slide h3 {
-  position: absolute;
-  z-index: 3;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  margin: 0;
-  padding: 35px 40px;
-  color: #fff;
-  font-size: clamp(1.5rem, 3vw, 2.8rem);
-  font-weight: 500;
-  text-align: center;
-  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.35);
+.planetary-slide.is-center img {
+  transform: scale(1.12);
 }
 
 /* CONTROLS */
 
 .planetary-carousel-controls {
-  position: absolute;
-  z-index: 5;
-  right: 25px;
-  bottom: 25px;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 35px;
 }
 
 .planetary-carousel-controls button {
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 50%;
-  background: rgba(20, 20, 20, 0.35);
+  background: transparent;
   color: #fff;
   font-size: 20px;
   cursor: pointer;
-  transition: background 0.25s ease;
+  transition:
+    background 250ms ease,
+    border-color 250ms ease;
 }
 
 .planetary-carousel-controls button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
 }
 
 /* RESPONSIVE */
 
 @media (max-width: 768px) {
-  .planetary-carousel {
-    margin-top: 55px;
+
+  .planetary-section {
+    padding: 65px 0;
   }
 
-  .planetary-slide h3 {
-    padding: 25px;
+  .planetary-heading {
+    margin-bottom: 35px;
+  }
+
+  .planetary-carousel {
+    padding: 20px 0;
+  }
+
+  .planetary-slide {
+    padding: 0 4px;
+  }
+
+  .planetary-slide img {
+    transform: scale(0.88);
+  }
+
+  .planetary-slide.is-center img {
+    transform: scale(1.08);
+  }
+
+  .planetary-carousel-controls {
+    margin-top: 25px;
   }
 }
+
   </style>
 </head>
 
@@ -7545,12 +7558,11 @@ justify-content: flex-end;
 
   </div>
 
-</section>
 
 
 
 
-    
+
 <section class="planetary-section">
 
   <div class="planetary-heading">
@@ -7562,41 +7574,43 @@ justify-content: flex-end;
 
     <div class="planetary-carousel-track">
 
-      <div class="planetary-slide is-active">
-        <img src="https://3d.staratlas.es/ope/opeluna2.png" alt="moon missions">
-        <h3>Moon</h3>
+      <div class="planetary-slide">
+        <img src="IMAGEN-MARTE.jpg" alt="Mars">
       </div>
 
       <div class="planetary-slide">
-        <img src="https://3d.staratlas.es/ope/exploracionydescubrimientojanus.png" alt="Superficie lunar">
-        <h3>PLANETARY CATALOGS</h3>
+        <img src="IMAGEN-LUNA.jpg" alt="Moon">
       </div>
 
-         <div class="planetary-slide">
-        <img src="https://3d.staratlas.es/ope/exploracionydescubrimientojanus.png" alt="Superficie lunar">
-        <h3>PLANETARY CATALOGS</h3>
+      <div class="planetary-slide">
+        <img src="IMAGEN-JUPITER.jpg" alt="Jupiter">
       </div>
 
-         <div class="planetary-slide">
-        <img src="https://3d.staratlas.es/ope/exploracionydescubrimientojanus.png" alt="Superficie lunar">
-        <h3>PLANETARY CATALOGS</h3>
+      <div class="planetary-slide">
+        <img src="IMAGEN-VENUS.jpg" alt="Venus">
       </div>
 
-         <div class="planetary-slide">
-        <img src="https://3d.staratlas.es/ope/exploracionydescubrimientojanus.png" alt="Superficie lunar">
-        <h3>PLANETARY CATALOGS</h3>
-      </div>
-
-    </div>
-
-    <div class="planetary-carousel-controls">
-      <button class="planetary-prev" aria-label="Anterior">↑</button>
-      <button class="planetary-next" aria-label="Siguiente">↓</button>
     </div>
 
   </div>
 
+  <div class="planetary-carousel-controls">
+    <button class="planetary-prev" aria-label="Previous">←</button>
+    <button class="planetary-next" aria-label="Next">→</button>
+  </div>
+
 </section>
+
+
+
+
+
+
+  
+
+</section>
+
+
 
 
 
@@ -12694,72 +12708,98 @@ renderObservationsMosaic();
 </script>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".planetary-carousel").forEach(carousel => {
 
-    const slides = carousel.querySelectorAll(".planetary-slide");
-    const prev = carousel.querySelector(".planetary-prev");
-    const next = carousel.querySelector(".planetary-next");
+    const track = carousel.querySelector(".planetary-carousel-track");
+    const controls = carousel.parentElement.querySelector(".planetary-carousel-controls");
 
-    let currentIndex = 0;
-    let isAnimating = false;
+    const prev = controls.querySelector(".planetary-prev");
+    const next = controls.querySelector(".planetary-next");
 
-    function showSlide(newIndex, direction) {
+    let animating = false;
 
-      if (isAnimating || newIndex === currentIndex) return;
+    const getSlides = () => [...track.children];
 
-      isAnimating = true;
+    if (getSlides().length < 3) return;
 
-      const currentSlide = slides[currentIndex];
-      const nextSlide = slides[newIndex];
+    function updateCenter() {
+      const slides = getSlides();
 
-      currentSlide.classList.remove("is-active");
-      currentSlide.classList.add("is-leaving");
+      slides.forEach(slide => slide.classList.remove("is-center"));
 
-      nextSlide.style.transform =
-        direction === "next" ? "translateY(100%)" : "translateY(-100%)";
-
-      nextSlide.style.visibility = "visible";
-      nextSlide.style.opacity = "0";
-
-      void nextSlide.offsetHeight;
-
-      nextSlide.classList.add("is-active");
-      nextSlide.style.transform = "";
-      nextSlide.style.opacity = "";
-
-      currentIndex = newIndex;
-
-      setTimeout(() => {
-        slides.forEach(slide => {
-          slide.classList.remove("is-leaving");
-
-          if (!slide.classList.contains("is-active")) {
-            slide.style.visibility = "hidden";
-            slide.style.opacity = "0";
-            slide.style.transform = "";
-          }
-        });
-
-        isAnimating = false;
-      }, 900);
+      if (slides[1]) {
+        slides[1].classList.add("is-center");
+      }
     }
 
-    next.addEventListener("click", () => {
-      showSlide((currentIndex + 1) % slides.length, "next");
+    updateCenter();
+
+    function moveNext() {
+
+      if (animating) return;
+
+      animating = true;
+
+      const slides = getSlides();
+
+      slides[1].classList.remove("is-center");
+      slides[2].classList.add("is-center");
+
+      track.classList.add("is-moving");
+      track.style.transform = "translateX(-33.333333%)";
+    }
+
+    function movePrev() {
+
+      if (animating) return;
+
+      animating = true;
+
+      track.classList.remove("is-moving");
+
+      const lastSlide = track.lastElementChild;
+
+      track.prepend(lastSlide);
+
+      track.style.transform = "translateX(-33.333333%)";
+
+      updateCenter();
+
+      void track.offsetWidth;
+
+      track.classList.add("is-moving");
+      track.style.transform = "translateX(0)";
+    }
+
+    track.addEventListener("transitionend", event => {
+
+      if (event.target !== track || event.propertyName !== "transform") return;
+
+      const movingNext = track.style.transform.includes("-33.333333%");
+
+      if (movingNext) {
+        track.appendChild(track.firstElementChild);
+      }
+
+      track.classList.remove("is-moving");
+      track.style.transform = "translateX(0)";
+
+      updateCenter();
+
+      animating = false;
+
     });
 
-    prev.addEventListener("click", () => {
-      showSlide(
-        (currentIndex - 1 + slides.length) % slides.length,
-        "prev"
-      );
-    });
+    next.addEventListener("click", moveNext);
+    prev.addEventListener("click", movePrev);
 
   });
 
 });
+
 </script>
   
 </body>
