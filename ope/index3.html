@@ -6497,6 +6497,7 @@ justify-content: flex-end;
 
 
 
+
 /* JANUS — DATA BASE INTEROPERABLE */
 
 .janus-data-section {
@@ -6505,8 +6506,37 @@ justify-content: flex-end;
   width: 100%;
   padding: clamp(80px, 10vw, 140px) 24px;
   overflow: hidden;
-  background: #111111;
+  background: #000000;
   color: #F3F1EA;
+}
+
+/* Difuminado perimetral */
+.janus-data-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(to right,
+      #000000 0%,
+      transparent 9%,
+      transparent 91%,
+      #000000 100%
+    ),
+    linear-gradient(to bottom,
+      #000000 0%,
+      transparent 12%,
+      transparent 88%,
+      #000000 100%
+    );
+}
+
+/* Mantener el contenido por encima del difuminado */
+.janus-data-section > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Fondo */
@@ -6515,7 +6545,6 @@ justify-content: flex-end;
   position: absolute;
   z-index: -2;
   inset: 0;
-
   background:
     linear-gradient(
       rgba(17, 18, 16, 0.45),
@@ -7018,7 +7047,6 @@ justify-content: flex-end;
   <button id="close-product">← Back to SEOD</button>
   <iframe id="product-frame"></iframe>
 </div>
-    <!-- HERO -->
 
  <section class="hero" id="home" aria-labelledby="hero-title">
 
@@ -7396,7 +7424,7 @@ B2B2B SERVICES
           text-anchor="middle"
           font-family="Arial, sans-serif"
           font-weight="900"
-          font-size="155"
+          font-size="195"
           letter-spacing="5"
           fill="black"
         >JANUS</text>
@@ -7420,8 +7448,8 @@ B2B2B SERVICES
     <div class="tech-image">
         <img src="https://3d.staratlas.es/ope/januslogo.png" alt="" loading="lazy">
       </div>
-  <h2 data-i18n="approach_title">Discover JANUS, our high-performance exploration engine.</h2>
-  <p class="intro-copy" data-i18n="approach_intro">
+  <h2 data-i18n="approach_title">Discover our high-performance exploration engine.</h2>
+  <p class="intro-copy" data-i18n="approach_intro" hidden>
     Our technologies are designed to work with real-world data infrastructures, from existing repositories to specialized analytical applications.
   </p>
     </div>  
