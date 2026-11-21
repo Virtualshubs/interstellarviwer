@@ -5549,20 +5549,28 @@ justify-content: flex-end;
 }
 
 
+
 /* =====================================================
    FOUNDERS & TEAM
    ===================================================== */
 
-.about-founder-card {
+.about-founder-grid {
   display: grid;
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 18px;
 
   width: 100%;
-  max-width: none;
-  min-width: 0;
-  min-height: 330px;
-
   margin: 36px 0 0;
+}
+
+.about-founder-card {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
 
   background: var(--about-black);
   color: var(--about-mineral);
@@ -5574,8 +5582,9 @@ justify-content: flex-end;
 .about-founder-photo {
   position: relative;
 
+  width: 100%;
+  aspect-ratio: 4 / 3;
   min-width: 0;
-  min-height: 330px;
 
   overflow: hidden;
   background: #D8D5CB;
@@ -5590,7 +5599,7 @@ justify-content: flex-end;
   background: linear-gradient(
     180deg,
     transparent 55%,
-    rgba(17,18,16,.42)
+    rgba(17,18,16,.38)
   );
 
   pointer-events: none;
@@ -5601,12 +5610,16 @@ justify-content: flex-end;
 
   width: 100%;
   height: 100%;
-  min-height: 330px;
 
   object-fit: cover;
   object-position: center;
 
   filter: grayscale(100%);
+  transition: transform .6s ease;
+}
+
+.about-founder-card:hover .about-founder-photo img {
+  transform: scale(1.025);
 }
 
 .about-photo-index {
@@ -5616,9 +5629,10 @@ justify-content: flex-end;
 .about-founder-details {
   display: flex;
   flex-direction: column;
+  flex: 1;
 
   min-width: 0;
-  padding: 30px 34px 22px;
+  padding: 24px 23px 20px;
 }
 
 .about-founder-topline,
@@ -5627,12 +5641,12 @@ justify-content: flex-end;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px 16px;
+  gap: 8px 12px;
 
   font-family: var(--font-mono, "IBM Plex Mono", monospace);
-  font-size: 9px;
+  font-size: 8px;
   line-height: 1.5;
-  letter-spacing: .09em;
+  letter-spacing: .08em;
 
   color: rgba(243,241,234,.58);
 }
@@ -5643,12 +5657,12 @@ justify-content: flex-end;
 }
 
 .about-founder-name {
-  margin: 38px 0 7px;
+  margin: 28px 0 7px;
 
   overflow-wrap: anywhere;
 
   font-family: var(--font-display, "Sora", sans-serif);
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(22px, 2vw, 29px);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -.045em;
@@ -5657,10 +5671,12 @@ justify-content: flex-end;
 }
 
 .about-founder-role {
+  min-height: 36px;
+
   font-family: var(--font-mono, "IBM Plex Mono", monospace);
-  font-size: 12px;
-  line-height: 1.5;
-  letter-spacing: .1em;
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: .07em;
 
   color: var(--about-orange);
 }
@@ -5670,61 +5686,122 @@ justify-content: flex-end;
   height: 1px;
   flex-shrink: 0;
 
-  margin: 25px 0 20px;
+  margin: 20px 0 18px;
 
   background: rgba(243,241,234,.2);
 }
 
-.about-founder-profile {
+.about-founder-profile,
+.about-founder-recognition {
   min-width: 0;
 }
 
-.about-founder-profile .about-detail-label {
+.about-founder-profile .about-detail-label,
+.about-founder-recognition .about-detail-label {
+  display: block;
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: .08em;
+
   color: rgba(243,241,234,.55);
 }
 
-.about-founder-profile ul {
+.about-founder-profile ul,
+.about-founder-recognition ul {
   display: grid;
-  gap: 10px;
+  gap: 9px;
 
-  margin: 15px 0 25px;
+  margin: 13px 0 20px;
   padding: 0;
 
   list-style: none;
 }
 
-.about-founder-profile li {
+.about-founder-profile li,
+.about-founder-recognition li {
   position: relative;
 
-  padding-left: 16px;
+  padding-left: 14px;
 
   font-family: var(--font-body, "Public Sans", sans-serif);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.55;
   overflow-wrap: anywhere;
 
   color: var(--about-mineral);
 }
 
-.about-founder-profile li::before {
+.about-founder-profile li::before,
+.about-founder-recognition li::before {
   content: "";
 
   position: absolute;
-  top: 8px;
+  top: 7px;
   left: 0;
 
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
 
   background: var(--about-orange);
   border-radius: 50%;
 }
 
+.about-founder-recognition {
+  margin-top: 2px;
+}
+
+.about-founder-recognition ul {
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.about-founder-recognition li {
+  color: rgba(243,241,234,.82);
+}
+
 .about-founder-footer {
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 15px;
 
   border-top: 1px solid rgba(243,241,234,.2);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 900px) {
+
+  .about-founder-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .about-founder-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .about-founder-photo {
+    aspect-ratio: 16 / 10;
+  }
+
+  .about-founder-details {
+    padding: 23px 22px 19px;
+  }
+
+  .about-founder-name {
+    margin-top: 24px;
+    font-size: 27px;
+  }
+
 }
 
 
@@ -9164,89 +9241,184 @@ B2B2B SERVICES
 
       <!-- FOUNDERS & TEAM -->
 
-      <section class="about-block about-founders">
+  
+<section class="about-block about-founders">
 
-        <div class="about-block-body">
+  <div class="about-block-body">
 
-          <div class="about-section-label" data-i18n="about_founders_label">
-            FOUNDERS & TEAM
+    <div class="about-section-label" data-i18n="about_founders_label">
+      FOUNDERS & TEAM
+    </div>
+
+    <h3 data-i18n="about_founders_title">
+      The people behind the technology.
+    </h3>
+
+    <div class="about-founder-grid">
+
+      <!-- SANDRA -->
+      <article class="about-founder-card">
+
+        <div class="about-founder-photo">
+          <img
+            src="https://3d.staratlas.es/ope/founder1.jpg"
+            alt="Sandra Sánchez"
+            loading="lazy">
+        </div>
+
+        <div class="about-founder-details">
+
+          <div class="about-founder-topline">
+            <span>SEOD / FOUNDING TEAM</span>
+            <span class="about-founder-status">FOUNDING MEMBER</span>
           </div>
 
-          <h3 data-i18n="about_founders_title">
-            The people behind the technology.
-          </h3>
+          <h4 class="about-founder-name">Sandra Sánchez</h4>
 
-          <article class="about-founder-card">
+          <div class="about-founder-role">
+            Founder · CEO & CTO
+          </div>
 
-            <div class="about-founder-photo">
+          <div class="about-founder-divider"></div>
 
-              <img
-                src="https://3d.staratlas.es/ope/founder1.jpg"
-                alt="SEOD founder portrait"
-                loading="lazy">
+          <div class="about-founder-profile">
 
-            </div>
+            <span class="about-detail-label">
+              PROFILE / EXPERTISE
+            </span>
 
+            <ul>
+              <li>Product design and development</li>
+              <li>Complex structures and systems</li>
+              <li>Spatial computing applied to 3D digital twins</li>
+            </ul>
 
-            <div class="about-founder-details">
+          </div>
 
-              <div class="about-founder-topline">
+          <div class="about-founder-recognition">
 
-                <span data-i18n="about_founder_record">
-                  SEOD / PERSONNEL RECORD
-                </span>
+            <span class="about-detail-label">
+              RECOGNITION / PROFESSIONAL MILESTONES
+            </span>
 
-                <span class="about-founder-status" data-i18n="about_founder_status">
-                  FOUNDING MEMBER
-                </span>
+            <ul>
+              <li>1st Prize — CEEI & INCIBE 2025</li>
+              <li>Innovation Award — AJE Young Entrepreneurs 2025</li>
+              <li>Finalist — Female Founder Leaders Castilla-La Mancha 2025</li>
+              <li>CEEI Guadalajara Innovation Investment Forum</li>
+              <li>Speaker — Junta de Castilla-La Mancha & CADE, 2024</li>
+            </ul>
 
-              </div>
+          </div>
 
-
-              <h4 class="about-founder-name">Sandra Sánchez</h4>
-
-              <div class="about-founder-role" data-i18n="about_founder_role">
-                CEO & CTO
-              </div>
-
-
-              <div class="about-founder-divider"></div>
-
-
-              <div class="about-founder-profile">
-
-                <span class="about-detail-label" data-i18n="about_profile_label">
-                  PROFILE / EXPERTISE
-                </span>
-
-                <ul>
-
-                  <li data-i18n="about_expertise_1">
-                    Product design
-                  </li>
-
-                  <li data-i18n="about_expertise_2">
-                    Complex structures and systems
-                  </li>
-
-                  <li data-i18n="about_expertise_3">
-                    Spatial graphics computing applied to 3D digital twins
-                  </li>
-
-                </ul>
-
-              </div>
-
-              <div class="about-founder-footer">
-                <span>SEOD / FOUNDERS</span>
-              </div>
-
-            </div>
-
-          </article>
+          <div class="about-founder-footer">
+            <span>SEOD / FOUNDERS</span>
+            <span>CEO & CTO</span>
+          </div>
 
         </div>
-      </section>
+      </article>
+
+
+      <!-- VÍCTOR -->
+      <article class="about-founder-card">
+
+        <div class="about-founder-photo">
+          <img
+            src="RUTA_FOTO_VICTOR"
+            alt="Víctor"
+            loading="lazy">
+        </div>
+
+        <div class="about-founder-details">
+
+          <div class="about-founder-topline">
+            <span>SEOD / FOUNDING TEAM</span>
+            <span class="about-founder-status">FOUNDING MEMBER</span>
+          </div>
+
+          <h4 class="about-founder-name">Víctor</h4>
+
+          <div class="about-founder-role">
+            CFO
+          </div>
+
+          <div class="about-founder-divider"></div>
+
+          <div class="about-founder-profile">
+
+            <span class="about-detail-label">
+              PROFILE / RESPONSIBILITIES
+            </span>
+
+            <ul>
+              <li>Financial strategy and planning</li>
+              <li>Economic management and resource allocation</li>
+              <li>Financial oversight and business development</li>
+            </ul>
+
+          </div>
+
+          <div class="about-founder-footer">
+            <span>SEOD / FOUNDERS</span>
+            <span>CFO</span>
+          </div>
+
+        </div>
+      </article>
+
+
+      <!-- TARAN -->
+      <article class="about-founder-card">
+
+        <div class="about-founder-photo">
+          <img
+            src="RUTA_FOTO_TARAN"
+            alt="Taran"
+            loading="lazy">
+        </div>
+
+        <div class="about-founder-details">
+
+          <div class="about-founder-topline">
+            <span>SEOD / FOUNDING TEAM</span>
+            <span class="about-founder-status">FOUNDING MEMBER</span>
+          </div>
+
+          <h4 class="about-founder-name">Taran</h4>
+
+          <div class="about-founder-role">
+            Communications & International Relations
+          </div>
+
+          <div class="about-founder-divider"></div>
+
+          <div class="about-founder-profile">
+
+            <span class="about-detail-label">
+              PROFILE / RESPONSIBILITIES
+            </span>
+
+            <ul>
+              <li>Corporate communication and brand positioning</li>
+              <li>International relations and partnerships</li>
+              <li>International presence and development</li>
+            </ul>
+
+          </div>
+
+          <div class="about-founder-footer">
+            <span>SEOD / FOUNDERS</span>
+            <span>COMMUNICATIONS</span>
+          </div>
+
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
 
 
       <!-- HOW WE WORK -->
