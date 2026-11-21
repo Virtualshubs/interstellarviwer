@@ -6848,6 +6848,31 @@ justify-content: flex-end;
 }
 
   
+.seod-launch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 5;
+  overflow: hidden;
+  background: #242522;
+}
+
+.seod-launch__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.seod-launch__mask {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 
   </style>
 </head>
@@ -7316,7 +7341,7 @@ B2B2B SERVICES
 <div class="section-head" data-reveal>
   <h2 data-i18n="approach_title">Discover JANUS, our high-performance exploration engine.</h2>
    <div class="challenge-image">
-        <img src="https://3d.staratlas.es/januslogo" alt="" loading="lazy">
+        <img src="https://3d.staratlas.es/ope/januslogo.png" alt="" loading="lazy">
       </div>
   <p class="intro-copy" data-i18n="approach_intro">
     Our technologies are designed to work with real-world data infrastructures, from existing repositories to specialized analytical applications.
@@ -9349,6 +9374,52 @@ B2B2B SERVICES
   </div>
 
 </section>
+
+    
+<section class="seod-launch">
+  <video
+    class="seod-launch__video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+  >
+    <source src="TU-VIDEO-COHETE.mp4" type="video/mp4">
+  </video>
+
+  <svg
+    class="seod-launch__mask"
+    viewBox="0 0 1600 420"
+    preserveAspectRatio="xMidYMid meet"
+    aria-label="SEOD"
+    role="img"
+  >
+    <defs>
+      <mask id="seod-cutout">
+        <rect width="1600" height="420" fill="white"/>
+        <text
+          x="50%"
+          y="78%"
+          text-anchor="middle"
+          font-family="Arial, sans-serif"
+          font-weight="900"
+          font-size="390"
+          letter-spacing="-12"
+          fill="black"
+        >SEOD</text>
+      </mask>
+    </defs>
+
+    <rect
+      width="1600"
+      height="420"
+      fill="#242522"
+      mask="url(#seod-cutout)"
+    />
+  </svg>
+</section>
+
 
   </main>
 
