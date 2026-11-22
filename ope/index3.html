@@ -681,6 +681,7 @@ justify-content: flex-end;
 }
 
   
+
 /* =====================================================
    ABOUT / EARTH OBSERVATION CHALLENGES
    ===================================================== */
@@ -693,7 +694,7 @@ justify-content: flex-end;
 }
 
 .about-challenges-heading {
-  margin-bottom: 25px;
+  margin-bottom: 9px;
 
   font-family: var(--font-mono, "IBM Plex Mono", monospace);
   font-size: 10px;
@@ -703,54 +704,86 @@ justify-content: flex-end;
   color: var(--about-orange);
 }
 
-.about-challenges-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid rgba(36,37,34,.2);
-  border-bottom: 1px solid rgba(36,37,34,.2);
+.about-challenges-intro {
+  margin-bottom: 25px;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 13px;
+  line-height: 1.6;
+
+  color: rgba(36,37,34,.7);
 }
 
-.about-challenge {
+/* MATRIX */
+
+.about-challenges-grid {
+  width: 100%;
+
+  border-top: 1px solid rgba(36,37,34,.25);
+  border-bottom: 1px solid rgba(36,37,34,.25);
+}
+
+.about-challenges-row {
+  display: grid;
+  grid-template-columns: 64px repeat(4, minmax(0, 1fr));
+
   min-width: 0;
-  padding: 22px 20px 25px;
+}
+
+/* ROW LABELS */
+
+.about-challenges-row-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 10px;
+
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .16em;
+
+  color: var(--about-orange);
 
   border-right: 1px solid rgba(36,37,34,.2);
 }
 
-.about-challenge:first-child {
-  padding-left: 0;
+/* PROBLEM ROW */
+
+.about-challenges-problems {
+  border-bottom: 1px solid rgba(36,37,34,.25);
+}
+
+.about-challenge {
+  min-width: 0;
+  padding: 23px 18px 25px;
+
+  border-right: 1px solid rgba(36,37,34,.2);
 }
 
 .about-challenge:last-child {
-  padding-right: 0;
   border-right: 0;
 }
 
-.about-challenge-index {
-  display: block;
-  margin-bottom: 25px;
-
-  font-family: var(--font-mono, "IBM Plex Mono", monospace);
-  font-size: 11px;
-  letter-spacing: .08em;
-
-  color: var(--about-orange);
-}
-
 .about-challenge h3 {
-  margin: 0 0 16px;
+  margin: 0 0 19px;
 
   font-family: var(--font-display, "Sora", sans-serif);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.35;
   letter-spacing: -.025em;
 
   color: var(--about-black);
 }
 
 .about-challenge p {
-  margin: 0 0 7px;
+  margin: 0 0 8px;
 
   font-family: var(--font-body, "Public Sans", sans-serif);
   font-size: 12px;
@@ -758,6 +791,47 @@ justify-content: flex-end;
 
   color: rgba(36,37,34,.72);
 }
+
+.about-challenge p:last-child {
+  margin-bottom: 0;
+}
+
+/* SOLUTION ROW */
+
+.about-challenge-benefit {
+  min-width: 0;
+  padding: 22px 18px 24px;
+
+  border-right: 1px solid rgba(36,37,34,.2);
+}
+
+.about-challenge-benefit:last-child {
+  border-right: 0;
+}
+
+.about-challenge-benefit h4 {
+  margin: 0 0 11px;
+
+  font-family: var(--font-display, "Sora", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+
+  color: var(--about-orange);
+}
+
+.about-challenge-benefit p {
+  margin: 0;
+
+  font-family: var(--font-body, "Public Sans", sans-serif);
+  font-size: 12px;
+  line-height: 1.6;
+
+  color: rgba(36,37,34,.78);
+}
+
+/* CLOSING STATEMENT */
 
 .about-challenges-solution {
   margin-top: 25px;
@@ -771,55 +845,89 @@ justify-content: flex-end;
 }
 
 
-/* RESPONSIVE */
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
 
 @media (max-width: 850px) {
-  .about-challenges-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  .about-challenges-row {
+    grid-template-columns: 48px repeat(2, minmax(0, 1fr));
   }
 
-  .about-challenge {
-    padding: 20px;
-    border-bottom: 1px solid rgba(36,37,34,.2);
+  .about-challenges-row-label {
+    grid-row: span 2;
+    padding: 16px 7px;
   }
 
-  .about-challenge:nth-child(2) {
+  .about-challenge,
+  .about-challenge-benefit {
+    padding: 20px 15px;
+  }
+
+  .about-challenges-problems .about-challenge:nth-of-type(2),
+  .about-challenges-solutions .about-challenge-benefit:nth-of-type(2) {
     border-right: 0;
   }
 
-  .about-challenge:nth-child(3),
-  .about-challenge:nth-child(4) {
-    border-bottom: 0;
+  .about-challenges-problems .about-challenge:nth-of-type(2),
+  .about-challenges-problems .about-challenge:nth-of-type(3) {
+    border-bottom: 1px solid rgba(36,37,34,.2);
   }
 
-  .about-challenge:first-child {
-    padding-left: 20px;
+  .about-challenges-solutions .about-challenge-benefit:nth-of-type(2),
+  .about-challenges-solutions .about-challenge-benefit:nth-of-type(3) {
+    border-bottom: 1px solid rgba(36,37,34,.2);
   }
 }
 
 @media (max-width: 520px) {
+
   .about-challenges {
     margin-top: 38px;
   }
 
-  .about-challenges-grid {
+  .about-challenges-intro {
+    margin-bottom: 20px;
+  }
+
+  .about-challenges-row {
     grid-template-columns: 1fr;
   }
 
-  .about-challenge,
-  .about-challenge:first-child,
-  .about-challenge:last-child {
-    padding: 19px 0;
+  .about-challenges-row-label {
+    grid-row: auto;
+
+    justify-content: flex-start;
+
+    padding: 13px 15px;
+
+    writing-mode: horizontal-tb;
+    transform: none;
+
     border-right: 0;
     border-bottom: 1px solid rgba(36,37,34,.2);
   }
 
-  .about-challenge:last-child {
+  .about-challenge,
+  .about-challenge-benefit {
+    padding: 19px 15px;
+
+    border-right: 0;
+    border-bottom: 1px solid rgba(36,37,34,.2);
+  }
+
+  .about-challenge:last-child,
+  .about-challenge-benefit:last-child {
     border-bottom: 0;
   }
 
-  .about-challenge-index {
-    margin-bottom: 12px;
+  .about-challenge h3 {
+    margin-bottom: 13px;
+  }
+
+  .about-challenges-solution {
+    margin-top: 21px;
   }
 }
 
@@ -7297,6 +7405,7 @@ justify-content: flex-end;
 
 
 
+
 <section class="about-intro" id="about" lang="en">
   <div class="about-intro-inner">
 
@@ -7312,66 +7421,118 @@ justify-content: flex-end;
         THE CHALLENGES OF EARTH OBSERVATION
       </div>
 
+      <div class="about-challenges-intro">
+        How our technology transforms market limitations into practical benefits.
+      </div>
+
       <div class="about-challenges-grid">
 
-        <article class="about-challenge">
-          <span class="about-challenge-index"></span>
-          <h3>DATA VOLUME</h3>
-          <p>Billions of Earth observation records</p>
-          <p>Growing satellite constellations</p>
-          <p>Massive volumes of products and observations</p>
-          <p>Limited performance in large-scale data exploration</p>
+        <!-- PROBLEM ROW -->
+
+        <div class="about-challenges-row about-challenges-problems">
+
+          <div class="about-challenges-row-label">
+            PROBLEM
+          </div>
+
+          <article class="about-challenge">
+
+            <h3>DATA VOLUME</h3>
+
+            <p>Billions of Earth observation records</p>
+            <p>Growing satellite constellations</p>
+            <p>Massive volumes of products and observations</p>
+            <p>Limited performance in large-scale data exploration</p>
+
+          </article>
+
+          <article class="about-challenge">
+
+            <h3>FRAGMENTATION</h3>
+
+            <p>Fragmented data infrastructures</p>
+            <p>Multiple providers and catalogues</p>
+            <p>Limited system interoperability</p>
+            <p>No unified view across distributed datasets</p>
+            <p>Dependence on external systems and platforms</p>
+
+          </article>
+
+          <article class="about-challenge">
+
+            <h3>DATA EXPLOITATION</h3>
+
+            <p>Disconnected observations</p>
+            <p>Complex data integration, analysis and research</p>
+            <p>Heterogeneous formats: JPG, XML, LAZ, LAS, Parquet...</p>
+            <p>Limited readiness for AI-driven workflows</p>
+            <p>Limited technology transfer across sectors</p>
+
+          </article>
+
+          <article class="about-challenge">
+
+            <h3>ACCESSIBILITY</h3>
+
+            <p>High infrastructure and access costs</p>
+            <p>High technological barriers to entry</p>
+            <p>Dependence on highly specialized teams</p>
+            <p>Barriers to European technological autonomy</p>
+            <p>Limited access to knowledge-sharing and cooperation</p>
+
+          </article>
+
+        </div>
+
+        <!-- SOLUTION ROW -->
+
+        <div class="about-challenges-row about-challenges-solutions">
+
+          <div class="about-challenges-row-label">
+            SOLUTION
+          </div>
 
           <div class="about-challenge-benefit">
+
             <h4>Explore at scale</h4>
-            <p>Efficient exploration of massive observation datasets.</p>
-          </div>
-        </article>
 
-        <article class="about-challenge">
-          <span class="about-challenge-index"></span>
-          <h3>FRAGMENTATION</h3>
-          <p>Fragmented data infrastructures</p>
-          <p>Multiple providers and catalogues</p>
-          <p>Limited system interoperability</p>
-          <p>No unified view across distributed datasets</p>
-          <p>Dependence on external systems and platforms</p>
+            <p>
+              Efficient exploration of massive observation datasets.
+            </p>
+
+          </div>
 
           <div class="about-challenge-benefit">
+
             <h4>Unify distributed data</h4>
-            <p>Interoperability across providers, catalogues and data infrastructures.</p>
-          </div>
-        </article>
 
-        <article class="about-challenge">
-          <span class="about-challenge-index"></span>
-          <h3>DATA EXPLOITATION</h3>
-          <p>Disconnected observations</p>
-          <p>Complex data integration, analysis and research</p>
-          <p>Heterogeneous formats: JPG, XML, LAZ, LAS, Parquet...</p>
-          <p>Limited readiness for AI-driven workflows</p>
-          <p>Limited technology transfer across sectors</p>
+            <p>
+              Interoperability across providers, catalogues and data infrastructures.
+            </p>
+
+          </div>
 
           <div class="about-challenge-benefit">
+
             <h4>Turn data into insight</h4>
-            <p>Connect spatial, temporal and descriptive information for deeper analysis.</p>
-          </div>
-        </article>
 
-        <article class="about-challenge">
-          <span class="about-challenge-index"></span>
-          <h3>ACCESSIBILITY</h3>
-          <p>High infrastructure and access costs</p>
-          <p>High technological barriers to entry</p>
-          <p>Dependence on highly specialized teams</p>
-          <p>Barriers to European technological autonomy</p>
-          <p>Limited access to knowledge-sharing and cooperation</p>
+            <p>
+              Connect spatial, temporal and descriptive information for deeper analysis.
+            </p>
+
+          </div>
 
           <div class="about-challenge-benefit">
+
             <h4>Expand access and adoption</h4>
-            <p>Lower technological barriers and enable knowledge transfer across sectors.</p>
+
+            <p>
+              Lower technological barriers and enable knowledge transfer across sectors.
+            </p>
+
           </div>
-        </article>
+
+        </div>
 
       </div>
 
@@ -7383,6 +7544,7 @@ justify-content: flex-end;
 
   </div>
 </section>
+
 
 
 
