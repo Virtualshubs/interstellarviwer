@@ -1,0 +1,850 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Legal Information | SEOD</title>
+  <meta name="description" content="Legal information, privacy policy, cookie policy and terms of use of SEOD.">
+
+  <style>
+    /* =========================================
+       SEOD LEGAL — BASE
+    ========================================= */
+
+    :root {
+      --legal-bg: #111210;
+      --legal-surface: #191a17;
+      --legal-text: #f3f1ea;
+      --legal-muted: #a5a59c;
+      --legal-line: rgba(243,241,234,.15);
+      --legal-accent: #416d80;
+      --legal-width: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 110px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--legal-bg);
+      color: var(--legal-text);
+      font-family: "IBM Plex Sans", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    /* =========================================
+       HEADER — MAIN WEBSITE INTEGRATION
+       Replace with the original website header
+       ========================================= */
+
+    .legal-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      background: rgba(17,18,16,.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--legal-line);
+    }
+
+    .legal-header-inner {
+      max-width: var(--legal-width);
+      min-height: 76px;
+      margin: auto;
+      padding: 0 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .legal-brand {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+
+    .legal-header-right {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .legal-main-link {
+      color: var(--legal-muted);
+      font-size: 13px;
+      transition: color .2s ease;
+    }
+
+    .legal-main-link:hover {
+      color: var(--legal-text);
+    }
+
+    .legal-language {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+    }
+
+    .legal-language button {
+      padding: 5px 7px;
+      border: 0;
+      background: transparent;
+      color: var(--legal-muted);
+      cursor: pointer;
+    }
+
+    .legal-language button.active {
+      color: var(--legal-text);
+    }
+
+    /* =========================================
+       MAIN LAYOUT
+    ========================================= */
+
+    .legal-container {
+      width: min(100% - 60px, var(--legal-width));
+      margin: auto;
+    }
+
+    .legal-hero {
+      padding: 115px 0 85px;
+      border-bottom: 1px solid var(--legal-line);
+    }
+
+    .legal-eyebrow {
+      display: block;
+      margin-bottom: 24px;
+      color: var(--legal-muted);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .legal-hero h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(42px, 7vw, 82px);
+      font-weight: 400;
+      line-height: 1.02;
+      letter-spacing: -.055em;
+    }
+
+    .legal-hero p {
+      max-width: 570px;
+      margin: 28px 0 0;
+      color: var(--legal-muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    /* =========================================
+       CONTENT GRID
+    ========================================= */
+
+    .legal-layout {
+      display: grid;
+      grid-template-columns: 245px minmax(0, 1fr);
+      gap: 95px;
+      padding: 85px 0 120px;
+    }
+
+    .legal-index {
+      position: sticky;
+      top: 115px;
+      align-self: start;
+    }
+
+    .legal-index-title {
+      margin-bottom: 24px;
+      color: var(--legal-muted);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .legal-index a {
+      display: block;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--legal-line);
+      color: var(--legal-muted);
+      font-size: 13px;
+      line-height: 1.5;
+      transition: color .2s ease;
+    }
+
+    .legal-index a:hover {
+      color: var(--legal-text);
+    }
+
+    .legal-content {
+      min-width: 0;
+    }
+
+    .legal-section {
+      padding-bottom: 65px;
+      margin-bottom: 65px;
+      border-bottom: 1px solid var(--legal-line);
+      scroll-margin-top: 110px;
+    }
+
+    .legal-section:last-child {
+      border-bottom: 0;
+    }
+
+    .legal-section-label {
+      display: block;
+      margin-bottom: 20px;
+      color: var(--legal-muted);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .legal-section h2 {
+      margin: 0 0 32px;
+      font-size: clamp(27px, 3.5vw, 40px);
+      font-weight: 400;
+      letter-spacing: -.035em;
+      line-height: 1.15;
+    }
+
+    .legal-section h3 {
+      margin: 35px 0 14px;
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .legal-section p {
+      margin: 0 0 19px;
+      color: #c4c3bb;
+      font-size: 15px;
+      line-height: 1.85;
+    }
+
+    .legal-section ul {
+      padding-left: 20px;
+      margin: 15px 0 25px;
+      color: #c4c3bb;
+    }
+
+    .legal-section li {
+      padding-left: 5px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    /* =========================================
+       FOOTER — MAIN WEBSITE INTEGRATION
+       Replace with the original website footer
+       ========================================= */
+
+    .legal-footer {
+      border-top: 1px solid var(--legal-line);
+      background: #0b0c0a;
+    }
+
+    .legal-footer-inner {
+      width: min(100% - 60px, var(--legal-width));
+      min-height: 130px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+    }
+
+    .legal-footer-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+
+    .legal-footer-copy {
+      color: var(--legal-muted);
+      font-size: 12px;
+    }
+
+    .legal-footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+    }
+
+    .legal-footer-links a {
+      color: var(--legal-muted);
+      font-size: 12px;
+    }
+
+    .legal-footer-links a:hover {
+      color: var(--legal-text);
+    }
+
+    /* =========================================
+       LANGUAGE VISIBILITY
+    ========================================= */
+
+    [data-lang-content] {
+      display: none;
+    }
+
+    body[data-lang="es"] [data-lang-content="es"],
+    body[data-lang="en"] [data-lang-content="en"] {
+      display: block;
+    }
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 800px) {
+      .legal-layout {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        padding-top: 55px;
+      }
+
+      .legal-index {
+        position: static;
+      }
+
+      .legal-index nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 20px;
+      }
+
+      .legal-hero {
+        padding: 85px 0 65px;
+      }
+
+      .legal-footer-inner {
+        padding: 35px 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .legal-container {
+        width: calc(100% - 40px);
+      }
+
+      .legal-header-inner {
+        padding: 0 20px;
+      }
+
+      .legal-header-right {
+        gap: 12px;
+      }
+
+      .legal-main-link {
+        display: none;
+      }
+
+      .legal-index nav {
+        grid-template-columns: 1fr;
+      }
+
+      .legal-footer-inner {
+        width: calc(100% - 40px);
+      }
+    }
+  </style>
+</head>
+
+<body data-lang="es">
+
+  <!-- =========================================
+       HEADER
+       ========================================= -->
+
+  <header class="legal-header">
+    <div class="legal-header-inner">
+
+      <a href="/index3.html" class="legal-brand">SEOD</a>
+
+      <div class="legal-header-right">
+
+        <a href="/index3.html" class="legal-main-link">
+          <span data-lang-content="es">Volver al sitio</span>
+          <span data-lang-content="en">Back to website</span>
+        </a>
+
+        <div class="legal-language" aria-label="Language selector">
+          <button type="button" data-set-lang="es" class="active">ES</button>
+          <span>/</span>
+          <button type="button" data-set-lang="en">EN</button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+
+  <!-- =========================================
+       HERO
+       ========================================= -->
+
+  <main>
+
+    <section class="legal-hero">
+      <div class="legal-container">
+
+        <span class="legal-eyebrow">
+          SEOD · LEGAL INFORMATION
+        </span>
+
+        <div data-lang-content="es">
+          <h1>Información legal.</h1>
+          <p>
+            Información jurídica, condiciones de uso y políticas
+            aplicables a los proyectos y plataformas integrados
+            en el ecosistema SEOD.
+          </p>
+        </div>
+
+        <div data-lang-content="en">
+          <h1>Legal information.</h1>
+          <p>
+            Legal information, terms of use and policies applicable
+            to the projects and platforms integrated into the
+            SEOD ecosystem.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================
+         LEGAL CONTENT
+         ========================================= -->
+
+    <div class="legal-container">
+
+      <div class="legal-layout">
+
+        <!-- INDEX -->
+
+        <aside class="legal-index">
+
+          <div class="legal-index-title">
+            <span data-lang-content="es">Documentación</span>
+            <span data-lang-content="en">Documentation</span>
+          </div>
+
+          <nav>
+            <a href="#ownership">
+              <span data-lang-content="es">Titularidad y propiedad intelectual</span>
+              <span data-lang-content="en">Ownership and intellectual property</span>
+            </a>
+
+            <a href="#legal-notice">
+              <span data-lang-content="es">Aviso legal</span>
+              <span data-lang-content="en">Legal notice</span>
+            </a>
+
+            <a href="#privacy">
+              <span data-lang-content="es">Política de privacidad</span>
+              <span data-lang-content="en">Privacy policy</span>
+            </a>
+
+            <a href="#cookies">
+              <span data-lang-content="es">Política de cookies</span>
+              <span data-lang-content="en">Cookie policy</span>
+            </a>
+
+            <a href="#terms">
+              <span data-lang-content="es">Condiciones de uso</span>
+              <span data-lang-content="en">Terms of use</span>
+            </a>
+          </nav>
+
+        </aside>
+
+
+        <!-- DOCUMENTS -->
+
+        <div class="legal-content">
+
+
+          <!-- =====================================
+               OWNERSHIP
+          ====================================== -->
+
+          <section class="legal-section" id="ownership">
+
+            <span class="legal-section-label">
+              SEOD · INTELLECTUAL PROPERTY
+            </span>
+
+            <div data-lang-content="es">
+
+              <h2>Titularidad de los proyectos y derechos de propiedad intelectual e industrial</h2>
+
+              <p>
+                La totalidad de los proyectos, productos, plataformas,
+                desarrollos y activos que integran el ecosistema
+                empresarial identificado bajo la denominación SEOD,
+                incluidos, entre otros, JANUS Engine, Orbital Pass Engine
+                y 3D Lite Space, se encuentran bajo la titularidad
+                y control de su fundadora.
+              </p>
+
+              <p>
+                Asimismo, corresponden a su fundadora, en los términos
+                y con el alcance reconocidos por la legislación aplicable,
+                los derechos de propiedad intelectual e industrial
+                relativos a las marcas, nombres comerciales, desarrollos
+                tecnológicos, programas informáticos, diseños, interfaces,
+                elementos gráficos, documentación técnica, contenidos,
+                estructuras de datos, recursos digitales y demás activos
+                originales vinculados a dichos proyectos.
+              </p>
+
+              <p>
+                Quedan comprendidos en esta titularidad los derechos de
+                explotación, reproducción, distribución, comunicación
+                pública, transformación y cualesquiera otros derechos
+                que legalmente correspondan, sin perjuicio de los derechos
+                morales de autor, los derechos de terceros y las licencias
+                de uso que resulten aplicables.
+              </p>
+
+              <p>
+                La titularidad de los elementos tecnológicos o materiales
+                procedentes de terceros, así como aquellos incorporados
+                mediante acuerdos de colaboración, transferencia
+                tecnológica, cesión o licencia, se determinará conforme
+                a los respectivos títulos jurídicos y condiciones
+                contractuales.
+              </p>
+
+              <p>
+                Queda expresamente prohibida la reproducción, distribución,
+                comunicación pública, transformación, extracción,
+                reutilización o explotación, total o parcial, de los
+                contenidos y elementos protegidos de estos proyectos
+                sin la autorización previa y expresa de su legítima
+                titular, salvo en aquellos supuestos en los que la
+                legislación aplicable permita su utilización sin
+                autorización.
+              </p>
+
+              <p>
+                El acceso a los sitios web, plataformas o servicios
+                no implica, en ningún caso, la transmisión, cesión o
+                concesión de derechos de propiedad intelectual o
+                industrial al usuario, más allá de los derechos de uso
+                expresamente autorizados.
+              </p>
+
+              <p>
+                La denominación de los proyectos, sus marcas, logotipos
+                y demás signos distintivos no podrán utilizarse de forma
+                que induzcan a confusión sobre su titularidad, procedencia
+                o vinculación comercial sin la correspondiente
+                autorización.
+              </p>
+
+            </div>
+
+
+            <div data-lang-content="en">
+
+              <h2>Ownership of projects and intellectual and industrial property rights</h2>
+
+              <p>
+                All projects, products, platforms, developments and
+                assets forming part of the business ecosystem identified
+                under the name SEOD, including, among others, JANUS Engine,
+                Orbital Pass Engine and 3D Lite Space, are owned and
+                controlled by its founder.
+              </p>
+
+              <p>
+                Likewise, the intellectual and industrial property rights
+                relating to the trademarks, trade names, technological
+                developments, software, designs, interfaces, graphic
+                elements, technical documentation, content, data
+                structures, digital resources and other original assets
+                associated with these projects belong to its founder,
+                within the terms and scope recognised by applicable law.
+              </p>
+
+              <p>
+                Such ownership includes the rights of exploitation,
+                reproduction, distribution, communication to the public,
+                adaptation and any other rights legally applicable,
+                without prejudice to authors' moral rights, third-party
+                rights and applicable usage licences.
+              </p>
+
+              <p>
+                Ownership of technological elements or materials
+                originating from third parties, as well as those
+                incorporated through collaboration, technology transfer,
+                assignment or licensing agreements, shall be determined
+                in accordance with the relevant legal instruments and
+                contractual terms.
+              </p>
+
+              <p>
+                The reproduction, distribution, communication to the
+                public, adaptation, extraction, reuse or exploitation,
+                in whole or in part, of protected content and elements
+                belonging to these projects is expressly prohibited
+                without the prior and explicit authorisation of their
+                legitimate owner, except where applicable law permits
+                such use without authorisation.
+              </p>
+
+              <p>
+                Access to the websites, platforms or services shall
+                under no circumstances imply the transfer, assignment
+                or grant of intellectual or industrial property rights
+                to the user, beyond the usage rights expressly
+                authorised.
+              </p>
+
+              <p>
+                The names of the projects, their trademarks, logos and
+                other distinctive signs may not be used in a manner
+                that creates confusion regarding their ownership,
+                origin or commercial affiliation without the relevant
+                authorisation.
+              </p>
+
+            </div>
+
+          </section>
+
+
+          <!-- =====================================
+               LEGAL NOTICE
+          ====================================== -->
+
+          <section class="legal-section" id="legal-notice">
+
+            <span class="legal-section-label">LEGAL NOTICE</span>
+
+            <div data-lang-content="es">
+              <h2>Aviso legal</h2>
+              <p>
+                La información relativa a la identificación del titular,
+                la actividad desarrollada y las condiciones de acceso
+                se incorporará en esta sección.
+              </p>
+            </div>
+
+            <div data-lang-content="en">
+              <h2>Legal notice</h2>
+              <p>
+                Information concerning the website operator,
+                its activities and the applicable access conditions
+                will be provided in this section.
+              </p>
+            </div>
+
+          </section>
+
+
+          <!-- =====================================
+               PRIVACY
+          ====================================== -->
+
+          <section class="legal-section" id="privacy">
+
+            <span class="legal-section-label">DATA PROTECTION</span>
+
+            <div data-lang-content="es">
+              <h2>Política de privacidad</h2>
+              <p>
+                Esta sección recogerá la información relativa al
+                tratamiento de datos personales, sus finalidades,
+                bases jurídicas, plazos de conservación y derechos
+                de los interesados.
+              </p>
+            </div>
+
+            <div data-lang-content="en">
+              <h2>Privacy policy</h2>
+              <p>
+                This section will provide information concerning
+                personal data processing, its purposes, legal bases,
+                retention periods and data subject rights.
+              </p>
+            </div>
+
+          </section>
+
+
+          <!-- =====================================
+               COOKIES
+          ====================================== -->
+
+          <section class="legal-section" id="cookies">
+
+            <span class="legal-section-label">COOKIE MANAGEMENT</span>
+
+            <div data-lang-content="es">
+              <h2>Política de cookies</h2>
+              <p>
+                Esta sección describirá las cookies y tecnologías
+                similares utilizadas, sus finalidades, duración,
+                proveedores y mecanismos de configuración
+                del consentimiento.
+              </p>
+            </div>
+
+            <div data-lang-content="en">
+              <h2>Cookie policy</h2>
+              <p>
+                This section will describe the cookies and similar
+                technologies used, their purposes, duration, providers
+                and consent management mechanisms.
+              </p>
+            </div>
+
+          </section>
+
+
+          <!-- =====================================
+               TERMS
+          ====================================== -->
+
+          <section class="legal-section" id="terms">
+
+            <span class="legal-section-label">TERMS & CONDITIONS</span>
+
+            <div data-lang-content="es">
+              <h2>Condiciones generales de uso</h2>
+              <p>
+                Esta sección establecerá las condiciones de acceso
+                y utilización de los sitios web, plataformas,
+                herramientas y servicios integrados en el
+                ecosistema SEOD.
+              </p>
+            </div>
+
+            <div data-lang-content="en">
+              <h2>General terms of use</h2>
+              <p>
+                This section will establish the conditions governing
+                access to and use of the websites, platforms, tools
+                and services integrated into the SEOD ecosystem.
+              </p>
+            </div>
+
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- =========================================
+       FOOTER
+       ========================================= -->
+
+  <footer class="legal-footer">
+
+    <div class="legal-footer-inner">
+
+      <a href="/index3.html" class="legal-footer-brand">SEOD</a>
+
+      <div class="legal-footer-copy">
+        © <span id="legalYear"></span> SEOD
+      </div>
+
+      <nav class="legal-footer-links">
+        <a href="#legal-notice">
+          <span data-lang-content="es">Aviso legal</span>
+          <span data-lang-content="en">Legal notice</span>
+        </a>
+
+        <a href="#privacy">
+          <span data-lang-content="es">Privacidad</span>
+          <span data-lang-content="en">Privacy</span>
+        </a>
+
+        <a href="#cookies">
+          <span data-lang-content="es">Cookies</span>
+          <span data-lang-content="en">Cookies</span>
+        </a>
+      </nav>
+
+    </div>
+
+  </footer>
+
+  <script>
+    (() => {
+      const body = document.body;
+      const buttons = document.querySelectorAll("[data-set-lang]");
+
+      function setLanguage(lang) {
+        if (!["es", "en"].includes(lang)) return;
+
+        body.dataset.lang = lang;
+        document.documentElement.lang = lang;
+
+        buttons.forEach(button => {
+          const active = button.dataset.setLang === lang;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        try {
+          localStorage.setItem("seod-legal-language", lang);
+        } catch (error) {}
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener("click", () => {
+          setLanguage(button.dataset.setLang);
+        });
+      });
+
+      let savedLanguage = "es";
+
+      try {
+        savedLanguage = localStorage.getItem("seod-legal-language") || "es";
+      } catch (error) {}
+
+      setLanguage(savedLanguage);
+
+      document.getElementById("legalYear").textContent =
+        new Date().getFullYear();
+    })();
+  </script>
+
+</body>
+</html>
+
