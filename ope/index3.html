@@ -10080,7 +10080,119 @@ B2B2B SERVICES
 </section>
 
 
-    
+  <!-- -----------------------------------------
+     OBSERVATION MODAL
+------------------------------------------ -->
+
+<div
+  class="observation-modal"
+  id="observationModal"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="observationModalTitle"
+>
+
+  <div class="observation-modal-backdrop"
+       data-observation-close></div>
+
+  <div class="observation-modal-panel">
+
+    <div class="observation-modal-header">
+
+      <span class="observation-modal-label">
+        JANUS OBSERVATION ARCHIVE
+      </span>
+
+      <div class="observation-modal-controls">
+
+        <span id="observationModalIndex">01 / 10</span>
+
+        <button
+          class="observation-close"
+          type="button"
+          aria-label="Close observation"
+          data-observation-close
+        >
+          &times;
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="observation-modal-image-wrap">
+
+      <img
+        id="observationModalImage"
+        src=""
+        alt=""
+      >
+
+    </div>
+
+
+    <div class="observation-modal-content">
+
+      <div class="observation-modal-main">
+
+        <div class="observation-modal-category"
+             id="observationModalCategory"></div>
+
+        <h3 id="observationModalTitle"></h3>
+
+        <p id="observationModalDescription"></p>
+
+      </div>
+
+
+      <div class="observation-modal-metadata"
+           id="observationModalMetadata"></div>
+
+
+      <div class="observation-modal-bottom">
+
+        <span>DISCOVERED AND INDEXED WITH JANUS</span>
+
+        <div class="observation-navigation">
+
+          <button
+            type="button"
+            id="observationPrevious"
+            aria-label="Previous observation"
+          >
+            ← PREVIOUS
+          </button>
+
+          <button
+            type="button"
+            id="observationNext"
+            aria-label="Next observation"
+          >
+            NEXT →
+          </button>
+
+        </div>
+
+      </div>
+
+      <a
+        class="observation-source-link"
+        id="observationSourceLink"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        hidden
+      >
+        VIEW ORIGINAL SOURCE ↗
+      </a>
+
+    </div>
+
+  </div>
+
+</div>  
 
   
 <section class="about-seod" id="about-seod">
@@ -10620,120 +10732,6 @@ B2B2B SERVICES
   </svg>
 </section>
 
-
-<!-- -----------------------------------------
-     OBSERVATION MODAL
------------------------------------------- -->
-
-<div
-  class="observation-modal"
-  id="observationModal"
-  aria-hidden="true"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="observationModalTitle"
->
-
-  <div class="observation-modal-backdrop"
-       data-observation-close></div>
-
-  <div class="observation-modal-panel">
-
-    <div class="observation-modal-header">
-
-      <span class="observation-modal-label">
-        JANUS OBSERVATION ARCHIVE
-      </span>
-
-      <div class="observation-modal-controls">
-
-        <span id="observationModalIndex" hidden>01 / 10</span>
-
-        <button
-          class="observation-close"
-          type="button"
-          aria-label="Close observation"
-          data-observation-close
-        >
-          &times;
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div class="observation-modal-image-wrap">
-
-      <img
-        id="observationModalImage"
-        src=""
-        alt=""
-      >
-
-    </div>
-
-
-    <div class="observation-modal-content">
-
-      <div class="observation-modal-main">
-
-        <div class="observation-modal-category"
-             id="observationModalCategory"></div>
-
-        <h3 id="observationModalTitle"></h3>
-
-        <p id="observationModalDescription"></p>
-
-      </div>
-
-
-      <div class="observation-modal-metadata"
-           id="observationModalMetadata"></div>
-
-
-      <div class="observation-modal-bottom">
-
-        <span>DISCOVERED AND INDEXED WITH JANUS</span>
-
-        <div class="observation-navigation">
-
-          <button
-            type="button"
-            id="observationPrevious"
-            aria-label="Previous observation"
-          >
-            ← PREVIOUS
-          </button>
-
-          <button
-            type="button"
-            id="observationNext"
-            aria-label="Next observation"
-          >
-            NEXT →
-          </button>
-
-        </div>
-
-      </div>
-
-      <a
-        class="observation-source-link"
-        id="observationSourceLink"
-        href="#"
-        target="_blank"
-        rel="noopener noreferrer"
-        hidden
-      >
-        VIEW ORIGINAL SOURCE ↗
-      </a>
-
-    </div>
-
-  </div>
-
-</div>
 
 
   </main>
