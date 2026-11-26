@@ -7555,11 +7555,20 @@ justify-content: flex-end;
 ========================================= */
 
 .rgj-section {
-  width: 100%;
+  width: calc(100% - 48px);
+  margin: 10 auto;
   padding: 80px 24px;
-  background: #f3f1ea;
-  color: #242522;
   box-sizing: border-box;
+  background: rgba(243, 241, 234, 0.075);
+  color: #F3F1EA;
+  border: 1px solid rgba(243, 241, 234, 0.13);
+  border-radius: 24px;
+  -webkit-backdrop-filter: blur(24px) saturate(115%);
+  backdrop-filter: blur(24px) saturate(115%);
+  box-shadow:
+    0 0 1px rgba(255,255,255,0.45),
+    0 8px 35px rgba(255,255,255,0.025),
+    inset 0 1px 0 rgba(255,255,255,0.09);
 }
 
 .rgj-container {
@@ -7580,7 +7589,7 @@ justify-content: flex-end;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 10px;
   letter-spacing: 1.5px;
-  color: #416d80;
+  color: #A9C3CC;
 }
 
 .rgj-heading h2 {
@@ -7590,6 +7599,7 @@ justify-content: flex-end;
   line-height: 1.12;
   font-weight: 500;
   letter-spacing: -1.2px;
+  color: #F3F1EA;
 }
 
 .rgj-heading p {
@@ -7598,7 +7608,7 @@ justify-content: flex-end;
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 15px;
   line-height: 1.65;
-  color: #666861;
+  color: rgba(243,241,234,0.72);
 }
 
 /* FORM */
@@ -7614,22 +7624,27 @@ justify-content: flex-end;
   min-height: 56px;
   padding: 0 18px;
   box-sizing: border-box;
-  border: 1px solid #d4d2ca;
-  border-radius: 3px;
-  background: #fff;
-  color: #242522;
+  border: 1px solid rgba(243,241,234,0.17);
+  border-radius: 9px;
+  background: rgba(243,241,234,0.055);
+  color: #F3F1EA;
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 15px;
   outline: none;
-  transition: border-color .2s ease;
+  transition:
+    border-color .2s ease,
+    background .2s ease,
+    box-shadow .2s ease;
 }
 
 .rgj-field input:focus {
-  border-color: #416d80;
+  border-color: rgba(169,195,204,0.7);
+  background: rgba(243,241,234,0.085);
+  box-shadow: 0 0 0 3px rgba(169,195,204,0.07);
 }
 
 .rgj-field input::placeholder {
-  color: #999990;
+  color: rgba(243,241,234,0.42);
 }
 
 /* CONSENT */
@@ -7646,7 +7661,7 @@ justify-content: flex-end;
   width: 15px;
   height: 15px;
   margin: 3px 0 0;
-  accent-color: #416d80;
+  accent-color: #A9C3CC;
   cursor: pointer;
 }
 
@@ -7654,11 +7669,11 @@ justify-content: flex-end;
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 12px;
   line-height: 1.6;
-  color: #696b64;
+  color: rgba(243,241,234,0.65);
 }
 
 .rgj-consent a {
-  color: #416d80;
+  color: #A9C3CC;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -7672,19 +7687,22 @@ justify-content: flex-end;
   width: 100%;
   min-height: 56px;
   padding: 0 20px;
-  border: 0;
-  border-radius: 3px;
-  background: #242522;
-  color: #fff;
+  border: 1px solid rgba(243,241,234,0.16);
+  border-radius: 9px;
+  background: rgba(243,241,234,0.12);
+  color: #F3F1EA;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 11px;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: background .2s ease;
+  transition:
+    background .2s ease,
+    border-color .2s ease;
 }
 
 .rgj-submit:hover {
-  background: #416d80;
+  background: rgba(243,241,234,0.19);
+  border-color: rgba(243,241,234,0.3);
 }
 
 .rgj-submit:disabled {
@@ -7701,7 +7719,9 @@ justify-content: flex-end;
 @media (max-width: 600px) {
 
   .rgj-section {
+    width: calc(100% - 28px);
     padding: 56px 20px;
+    border-radius: 20px;
   }
 
   .rgj-heading {
@@ -7709,7 +7729,6 @@ justify-content: flex-end;
   }
 
 }
-
 
   </style>
 </head>
