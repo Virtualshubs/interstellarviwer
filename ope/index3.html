@@ -7340,17 +7340,16 @@ justify-content: flex-end;
 .ecosystem-visual {
   position: relative;
   min-height: 510px;
-  background: #E5E2D8;
+  background: transparent;
   overflow: hidden;
 }
 
+  
 .ecosystem-landscape {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 58% 35%, rgba(65,109,128,0.12), transparent 42%),
-    linear-gradient(145deg, #E9E6DD 0%, #D8D8CF 100%);
+  background: transparent;
 }
 
 .ecosystem-landscape-layer {
@@ -7362,64 +7361,24 @@ justify-content: flex-end;
   transform: rotate(-12deg);
 }
 
-.ecosystem-layer-back {
-  top: 8%;
-  background:
-    repeating-radial-gradient(
-      ellipse at 50% 100%,
-      transparent 0 19px,
-      rgba(65,109,128,0.22) 20px 21px,
-      transparent 22px 34px
-    ),
-    #C8D0CB;
-  opacity: 0.85;
-}
-
-.ecosystem-layer-mid {
-  top: 34%;
-  left: -12%;
-  width: 155%;
-  height: 70%;
-  background:
-    repeating-radial-gradient(
-      ellipse at 48% 100%,
-      transparent 0 23px,
-      rgba(36,37,34,0.18) 24px 25px,
-      transparent 26px 39px
-    ),
-    #9DAFA8;
-  transform: rotate(8deg);
-}
-
-.ecosystem-layer-front {
-  top: 58%;
-  left: -25%;
-  width: 165%;
-  height: 65%;
-  background:
-    repeating-radial-gradient(
-      ellipse at 50% 0%,
-      transparent 0 17px,
-      rgba(36,37,34,0.15) 18px 19px,
-      transparent 20px 32px
-    ),
-    #657B70;
-  transform: rotate(-7deg);
-}
-
+.ecosystem-layer-back,
+.ecosystem-layer-mid,
+.ecosystem-layer-front,
 .ecosystem-landscape-highlight {
-  position: absolute;
-  width: 38%;
-  height: 50%;
-  top: 16%;
-  right: 12%;
-  background: radial-gradient(
-    ellipse,
-    rgba(243,241,234,0.65),
-    rgba(243,241,234,0) 70%
-  );
-  filter: blur(12px);
+  display: none;
 }
+
+
+
+  .ecosystem-landscape-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+}
+  
+
 
 .ecosystem-visual-caption {
   position: absolute;
