@@ -2471,6 +2471,62 @@ justify-content: flex-end;
   }
 }
 
+  /* -----------------------------------------
+   OBSERVATIONS SECTION
+----------------------------------------- */
+
+.observations-section {
+  width: 100%;
+  padding: 80px 0;
+  background: var(--mineral);
+  color: var(--graphite);
+}
+
+/* HEADER */
+
+.observations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.observations-header > span {
+  color: var(--muted);
+  font: 10px "IBM Plex Mono", monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.observations-header > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#observationsTotal {
+  color: var(--graphite);
+  font: 500 12px "IBM Plex Mono", monospace;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+  .observations-section {
+    padding: 56px 0;
+  }
+
+  .observations-header {
+    margin-bottom: 16px;
+  }
+
+  .observations-header > span {
+    font-size: 9px;
+  }
+}
     /* -----------------------------------------
        PRODUCTS
     ----------------------------------------- */
