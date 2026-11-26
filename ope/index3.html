@@ -2476,8 +2476,10 @@ justify-content: flex-end;
 ----------------------------------------- */
 
 .observations-section {
-  width: 100%;
-  padding: 80px 0;
+  width: calc(100% - 48px);
+  margin: 0 auto;
+  padding: 64px 0;
+  box-sizing: border-box;
   background: var(--mineral);
   color: var(--graphite);
 }
@@ -2516,7 +2518,8 @@ justify-content: flex-end;
 
 @media (max-width: 768px) {
   .observations-section {
-    padding: 56px 0;
+    width: calc(100% - 28px);
+    padding: 40px 0;
   }
 
   .observations-header {
@@ -7624,7 +7627,7 @@ justify-content: flex-end;
 
 .rgj-section {
   width: calc(100% - 48px);
-  margin: 10 auto;
+  margin: 40px auto;
   padding: 80px 24px;
   box-sizing: border-box;
   background: rgba(243, 241, 234, 0.075);
@@ -10397,7 +10400,8 @@ B2B2B SERVICES
           <img
             src="https://3d.staratlas.es/ope/founder1.jpg"
             alt="Sandra Sánchez"
-            loading="lazy">
+            loading="lazy"
+            hidden>
         </div>
 
         <div class="about-founder-details">
@@ -10461,7 +10465,8 @@ B2B2B SERVICES
           <img
             src="RUTA_FOTO_VICTOR"
             alt="Víctor"
-            loading="lazy">
+            loading="lazy"
+            hidden>
         </div>
 
         <div class="about-founder-details">
@@ -10522,7 +10527,8 @@ B2B2B SERVICES
           <img
             src="RUTA_FOTO_TARAN"
             alt="Taran"
-            loading="lazy">
+            loading="lazy"
+            hidden>
         </div>
 
         <div class="about-founder-details">
